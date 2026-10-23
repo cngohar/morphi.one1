@@ -1,0 +1,185 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<title>In-game: block puzzle</title>
+		<script src="./support.js"></script>
+	</head>
+	<body>
+		<x-dc>
+			<helmet>
+				<link
+					href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;800;900&display=swap"
+					rel="stylesheet"
+				/>
+				<style>
+					body {
+						margin: 0;
+					}
+					button {
+						font-family: inherit;
+						cursor: pointer;
+					}
+				</style>
+			</helmet>
+			<div
+				style="
+					width: 390px;
+					height: 844px;
+					box-sizing: border-box;
+					position: relative;
+					overflow: hidden;
+					background: #f5f8fc;
+					font-family: 'Nunito', system-ui, sans-serif;
+					color: #1b2433;
+				"
+			>
+				<button
+					aria-label="Menu"
+					style="
+						position: absolute;
+						left: 20px;
+						top: 48px;
+						width: 44px;
+						height: 44px;
+						border: 0;
+						border-radius: 14px;
+						background: #fff;
+						box-shadow: 0 2px 8px rgba(27, 36, 51, 0.08);
+					"
+				>
+					<svg
+						width="22"
+						height="22"
+						viewBox="0 0 24 24"
+						fill="none"
+						stroke="#1B2433"
+						stroke-width="2.4"
+						stroke-linecap="round"
+						aria-hidden="true"
+					>
+						<path d="M4 7h16M4 12h16M4 17h16" />
+					</svg>
+				</button>
+				<div
+					style="
+						position: absolute;
+						right: 20px;
+						top: 50px;
+						text-align: right;
+						font-weight: 800;
+						font-size: 16px;
+						line-height: 1.35;
+						color: #5a667b;
+					"
+				>
+					Best<br />1,280
+				</div>
+				<div
+					style="
+						position: absolute;
+						top: 100px;
+						left: 0;
+						right: 0;
+						text-align: center;
+						font-size: 56px;
+						font-weight: 900;
+						line-height: 1;
+					"
+				>
+					340
+				</div>
+				<div style="position: absolute; top: 172px; left: 0; right: 0; text-align: center">
+					<span
+						style="
+							display: inline-block;
+							padding: 6px 14px;
+							border-radius: 999px;
+							background: #fff1d6;
+							color: #8a5a00;
+							font-weight: 800;
+							font-size: 15px;
+						"
+						>Combo x2</span
+					>
+				</div>
+				<svg
+					style="position: absolute; left: 35px; top: 230px"
+					width="320"
+					height="320"
+					viewBox="0 0 320 320"
+					role="img"
+					aria-label="Eight by eight game board"
+				>
+					<defs>
+						<pattern id="g" width="40" height="40" patternUnits="userSpaceOnUse">
+							<rect x="2" y="2" width="36" height="36" rx="8" fill="#E3EAF5" />
+						</pattern>
+					</defs>
+					<rect width="320" height="320" fill="url(#g)" />
+					<rect x="2" y="282" width="36" height="36" rx="8" fill="#12A594" />
+					<rect x="42" y="282" width="36" height="36" rx="8" fill="#12A594" />
+					<rect x="82" y="282" width="36" height="36" rx="8" fill="#12A594" />
+					<rect x="122" y="282" width="36" height="36" rx="8" fill="#12A594" />
+					<rect x="162" y="282" width="36" height="36" rx="8" fill="#12A594" />
+					<rect x="202" y="282" width="36" height="36" rx="8" fill="#12A594" />
+					<rect x="242" y="282" width="36" height="36" rx="8" fill="#12A594" />
+					<rect x="2" y="242" width="36" height="36" rx="8" fill="#2F6FED" />
+					<rect x="42" y="242" width="36" height="36" rx="8" fill="#2F6FED" />
+					<rect x="82" y="242" width="36" height="36" rx="8" fill="#2F6FED" />
+					<rect x="202" y="242" width="36" height="36" rx="8" fill="#F5A524" />
+					<rect x="242" y="242" width="36" height="36" rx="8" fill="#F5A524" />
+					<rect x="2" y="202" width="36" height="36" rx="8" fill="#8B5CF6" />
+					<rect x="42" y="202" width="36" height="36" rx="8" fill="#8B5CF6" />
+					<rect x="242" y="202" width="36" height="36" rx="8" fill="#E5532D" />
+					<rect x="282" y="202" width="36" height="36" rx="8" fill="#E5532D" opacity=".35" />
+					<rect x="282" y="242" width="36" height="36" rx="8" fill="#E5532D" opacity=".35" />
+					<rect x="282" y="282" width="36" height="36" rx="8" fill="#E5532D" opacity=".35" />
+				</svg>
+				<div
+					style="
+						position: absolute;
+						left: 24px;
+						right: 24px;
+						top: 600px;
+						height: 150px;
+						border-radius: 24px;
+						background: #fff;
+						box-shadow: 0 4px 16px rgba(27, 36, 51, 0.08);
+						display: flex;
+						align-items: center;
+						justify-content: space-around;
+					"
+				>
+					<svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-label="L-shaped piece">
+						<rect x="0" y="0" width="28" height="28" rx="7" fill="#8B5CF6" />
+						<rect x="0" y="30" width="28" height="28" rx="7" fill="#8B5CF6" />
+						<rect x="30" y="30" width="28" height="28" rx="7" fill="#8B5CF6" />
+					</svg>
+					<svg width="88" height="88" viewBox="0 0 88 88" role="img" aria-label="Square piece">
+						<rect x="0" y="0" width="28" height="28" rx="7" fill="#F5A524" />
+						<rect x="30" y="0" width="28" height="28" rx="7" fill="#F5A524" />
+						<rect x="0" y="30" width="28" height="28" rx="7" fill="#F5A524" />
+						<rect x="30" y="30" width="28" height="28" rx="7" fill="#F5A524" />
+					</svg>
+					<svg
+						width="88"
+						height="88"
+						viewBox="0 0 88 88"
+						role="img"
+						aria-label="Vertical bar piece"
+					>
+						<rect x="30" y="0" width="28" height="28" rx="7" fill="#E5532D" />
+						<rect x="30" y="30" width="28" height="28" rx="7" fill="#E5532D" />
+						<rect x="30" y="60" width="28" height="28" rx="7" fill="#E5532D" />
+					</svg>
+				</div>
+			</div>
+		</x-dc>
+		<script type="text/x-dc" data-dc-script data-props='{"$preview":{"width":390,"height":844}}'>
+			class Component extends DCLogic {
+			renderVals() { return {}; }
+			}
+		</script>
+	</body>
+</html>

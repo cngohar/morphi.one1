@@ -1,0 +1,93 @@
+{
+	"v": 3,
+	"attachments": {},
+	"boards": {
+		"Block.dc.html": {
+			"h": 844,
+			"title": "In-game: block puzzle",
+			"w": 390,
+			"x": 940,
+			"y": 0
+		},
+		"Desktop.dc.html": {
+			"expand": "fill",
+			"h": 800,
+			"title": "Desktop: in-game memory",
+			"w": 1280,
+			"x": 0,
+			"y": 964
+		},
+		"Fonts.dc.html": {
+			"h": 600,
+			"title": "Font candidates",
+			"w": 1280,
+			"x": 0,
+			"y": 2564
+		},
+		"Generated.dc.html": {
+			"h": 1400,
+			"title": "Generated themes",
+			"w": 1280,
+			"x": 0,
+			"y": 3284
+		},
+		"Main.dc.html": {
+			"h": 844,
+			"title": "Home",
+			"w": 390,
+			"x": 0,
+			"y": 0
+		},
+		"Memory.dc.html": {
+			"h": 844,
+			"title": "In-game: memory",
+			"w": 390,
+			"x": 470,
+			"y": 0
+		},
+		"Result.dc.html": {
+			"h": 844,
+			"title": "Result",
+			"w": 390,
+			"x": 1410,
+			"y": 0
+		},
+		"Themes.dc.html": {
+			"h": 560,
+			"title": "Theme variety",
+			"w": 1280,
+			"x": 0,
+			"y": 1884
+		}
+	},
+	"createdOnFiles": {
+		"at": "2026-10-11T12:00:00Z",
+		"v": 1
+	},
+	"designSystems": [],
+	"launch": {
+		"view": "canvas"
+	},
+	"notes": {
+		"t1": {
+			"kind": "title1",
+			"maxW": 1800,
+			"text": "Puzzle game UI demo: light theme first",
+			"w": 240,
+			"x": 0,
+			"y": -280
+		}
+	},
+	"order": [
+		"Main.dc.html",
+		"Memory.dc.html",
+		"Block.dc.html",
+		"Result.dc.html",
+		"Desktop.dc.html",
+		"Themes.dc.html",
+		"Fonts.dc.html",
+		"Generated.dc.html"
+	],
+	"pages": [],
+	"title": "Puzzle Game UI Demo (Light Theme)"
+}

@@ -1,0 +1,15 @@
+# Used by ripgrep-based agent searches to cut noise and save tokens.
+.svelte-kit/
+.wrangler/
+.cloudflare/
+dist/
+build/
+coverage/
+playwright-report/
+test-results/
+bun.lock
+bun.lockb
+package-lock.json
+pnpm-lock.yaml
+docs/design-demo/
+docs/reference/

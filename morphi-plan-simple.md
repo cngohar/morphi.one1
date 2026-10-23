@@ -1,0 +1,109 @@
+# Morphi: Simple Plan
+
+This is the short plan. It replaces the long plan for day-to-day work. The long plan (`docs/PLAN.md`) stays as reference. If a step below needs something from it, pull only that part in.
+
+Current status (2026-10-23): Step 4 accepted; Step 5 public testing completed per owner report (45+ players, over 60% positive feedback). Exact replay counts and the offline threshold are not recorded here, so this is not a measured replay-rate pass. Next implementation awaits owner direction. Feedback is recorded in `docs/PHASE_REPORTS.md`.
+
+## The goal
+
+Make one small puzzle game that people enjoy on a phone. Then decide what comes next based on whether they enjoy it.
+
+The site has one Play button. Each press gives a new puzzle made from a random seed, so repeat plays feel different.
+
+## Order of work
+
+Game first. Architecture second. Accounts and payments last.
+
+Only do the step you are on. Check it before moving on.
+
+## Step 1: Memory
+
+Build a complete, playable Memory game (about 1 to 2 weeks).
+
+- A grid of face-down cards. Tap one to flip it, tap a second to try a match.
+- Matches stay face up. Mismatches flip back after about 0.6 seconds.
+- Clear all pairs to win.
+- Round size changes with each Play: 6, 8, or 10 pairs. Bigger rounds are harder.
+- Score starts at 1,000 per pair, minus 150 per mismatch and minus 5 per second. Never below zero. These are starting values to tune by playtest.
+- Three sounds (flip, match, mismatch) and one win moment: a short burst of shapes, under one second.
+- Three screens only: Home (title and Play), Game (grid, score, timer), and Result (score, best score, one big Next puzzle button).
+- Runs in a phone browser in portrait and in a desktop browser. Local only. Best score is saved in the browser.
+
+Done when you can play 20 rounds on a phone without a bug, and the win moment makes you want the next one.
+
+## Step 2: Playtest
+
+Give the phone build to five people who have not seen it. Say only "tap Play." Watch them and take notes. Ask three things afterwards:
+
+1. Did you finish a round?
+2. Did you press Next?
+3. Would you play again tomorrow?
+
+If most of them press Next, go to Step 3. If they quit early or ask what to do, fix the feel first: faster feedback, clearer flips, a stronger win moment. Do not add features. Test again with five new people.
+
+## Step 3: Block puzzle
+
+Build the second game (about 1 to 2 weeks). Place pieces on a grid. Clear full lines to score. The run ends when no piece in the tray fits. It uses the same Home, Game, and Result screens and the same feedback style as Memory.
+
+Playtest it with five new people, the same way as Step 2. Keep the game more people replay as the main game. The other one stays in the code but is not in the menu for now.
+
+## Step 4: Make the winner feel like a game (about 2 to 4 weeks)
+
+- Three or four fixed color themes. The seed picks one. No randomly generated colors yet.
+- Every tap answers within 100 ms: a flip, a pop, a shake, or a sound.
+- One signature moment that people remember, such as a reveal, a combo, or a line clear. Pick one and make it great.
+- Game words in the small HUD: round number, streak, best.
+- A one-line hint on the first round only, then never again.
+- Owner addition (2026-10-20): Play and Next rotate the games. Block comes first, then Memory, then Block, and the same game never comes twice in a row.
+- Owner addition (2026-10-20): Memory gets the same four themes. The seed picks one and changes the backdrop, cards, and symbols. The simple plan did not include Memory theme randomization, but the long plan does, and the owner wants both games complete before public testing.
+
+## Step 5: Public test (about 1 week)
+
+- Deploy the static build to any static host. The Cloudflare setup in the long plan works, but it is not needed yet.
+- Page title, one-sentence description, and one `<h1>` on Home.
+- Analytics only if it is simple to set up. Two events: round started and Next pressed. No personal data.
+- Share the link with about 50 people.
+
+Done when a clear share of the people who started a round also started a second one. Decide what "clear" means before you look at the numbers.
+
+## Step 6: Accounts and leaderboards (only if Step 5 works)
+
+Only now: sign-in, progress across devices, and a leaderboard. Scores must be checked on the server, because local scores can be edited. The anti-cheat section of the long plan starts to matter here, and not before.
+
+## Look and feel
+
+- Flat shapes, big type, and bright colors on a light background. No gradients, no glow, no drop shadows on game pieces.
+- Minimal means few things on screen, not empty. The board is the art.
+- Feel comes from motion and sound. Keep motion short (under 300 ms) and respect the reduced-motion setting. Owner override (2026-10-20): the block-placement line clear may run 1500 ms.
+- Menus stay small and out of the way. The first screen is a title and one Play button.
+- Use the light palette from section 11.1a of the long plan so text stays readable. Do not invent new colors.
+- Icons are simple inline shapes. No emoji.
+
+## Rules for whoever builds it
+
+1. Work on one step at a time.
+2. If a task is not in this file, ask first.
+3. Keep the game rules separate from drawing, so the rules can be tested without a browser.
+4. Each round is made from a seed number, so any round can be recreated.
+5. Keep all visible text in one place, so translations are easy to add later.
+6. Test on a real phone at every step.
+
+## Stack
+
+SvelteKit with Svelte 5 and TypeScript, as already chosen. Skip the multi-browser test setup, the CI pipeline, and the Cloudflare Worker setup until Step 5.
+
+## Parked
+
+Not for now. Each of these is designed in the long plan and stays there until players ask for it.
+
+- Multiplayer
+- Payments and subscriptions
+- Admin panel
+- Physics puzzles
+- Translations and right-to-left layout
+- Dark theme
+- Achievements, levels, and XP
+- Daily challenge and share links
+- Server-side scoring and anti-cheat (until leaderboards exist)
+- Durable Objects, D1 sharding, seed banks, analytics pipeline, and audit logs
+- Puzzle types beyond the first two

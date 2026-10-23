@@ -1,0 +1,40 @@
+node_modules
+
+# Workspace-local agent and credential directories
+/.agents/
+/.aws/
+/.codex/
+
+# Output
+.output
+.vercel
+.netlify
+.wrangler
+/.svelte-kit
+/build
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+.dev.vars
+.dev.vars.*
+!.env.example
+!.env.test
+!.dev.vars.example
+
+# Vite
+vite.config.js.timestamp-*
+vite.config.ts.timestamp-*
+
+# Playwright
+/test-results/
+/playwright-report/
+/blob-report/
+/playwright/.cache/
+/playwright/.auth/
+# Local secrets written by `elevenlabs onboard`
+/.env.local
