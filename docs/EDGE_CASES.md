@@ -18,6 +18,8 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 
 ## 2. Time
 
+- Simple-build regression: Memory's mismatch hold and preview hide transition consume visible time only; hidden time does not remove the player's remaining hold. An initially hidden mount does not start the preview (`src/lib/ui/active-delay.test.ts`, `tests/e2e/reliability.spec.ts`).
+
 - Device clock moved forward or back, or timezone or DST change → durations use a monotonic clock; wall-clock time is used only for display and daily resets.
 - Sleep and wake, or background timer throttling → elapsed time comes from timestamps, not tick counts; a countdown that expires while hidden is evaluated on return.
 - Countdown reaches zero in the same instant as the last match → deterministic rule (documented in the puzzle spec); ties never produce negative or double results.
@@ -25,6 +27,9 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 - Player in a far timezone sees the daily reset at a local time that is not midnight → show the reset time clearly.
 
 ## 3. Input
+
+- Simple-build regression: a failed seed draw must not consume the next puzzle family; retry still starts that family. Two synchronous Play activations start one round only (`tests/e2e/reliability.spec.ts`).
+- Simple-build regression: Block drops use the final release coordinates; secondary pointers cannot replace the active drag; lost capture or window blur cancels it; repeated Enter/Space cannot select and place unintentionally (`tests/e2e/reliability.spec.ts`).
 
 - Double or triple tap, or rapid taps before an animation ends → input is ignored or queued by the puzzle's state machine; state never corrupts.
 - Tap during the mismatch flip-back delay → ignored (or handled per spec), never a third revealed card.
@@ -35,6 +40,8 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 - Keyboard repeat, Enter or Space on focused controls, and focus loss → no double activation.
 
 ## 4. Storage
+
+- Simple-build regression: when writes fail but old disk data remains readable, the latest in-memory best and sound setting take precedence. A previously read best survives later storage blocking, and malformed score strings are discarded (`src/lib/ui/storage.test.ts`).
 
 - IndexedDB unavailable, blocked, or in private mode → in-memory fallback with a one-time notice.
 - Quota exceeded → drop the oldest history first, keep settings and bests, and warn once.

@@ -13,6 +13,7 @@
 	} from '#lib/game/memory.js';
 	import { SYMBOL_COLORS } from '#lib/game/symbols.js';
 	import { t } from '#lib/i18n/messages.js';
+	import { createActiveDelay } from '#lib/ui/active-delay.js';
 	import { formatDuration, formatNumber } from '#lib/ui/format.js';
 	import { memoryThemeForSeed, memoryThemeStyle } from '#lib/ui/memory-themes.js';
 	import { sound } from '#lib/ui/sound.js';
@@ -59,7 +60,6 @@
 	const WIN_FINISH_MS = 1150;
 
 	let ticker: ReturnType<typeof setInterval> | null = null;
-	let mismatchTimer: ReturnType<typeof setTimeout> | null = null;
 	let shakeTimer: ReturnType<typeof setTimeout> | null = null;
 	let celebrateTimer: ReturnType<typeof setTimeout> | null = null;
 	let delayedFlipTimer: ReturnType<typeof setTimeout> | null = null;
@@ -68,11 +68,14 @@
 	let finishTimer: ReturnType<typeof setTimeout> | null = null;
 	let scoreDropTimer: ReturnType<typeof setTimeout> | null = null;
 	let previewTimer: ReturnType<typeof setTimeout> | null = null;
-	let hideTimer: ReturnType<typeof setTimeout> | null = null;
 	let previewRemaining = PREVIEW_MS;
 	let previewStart: number | null = null;
 	let hideDuration = 250;
 	let layoutMode = $state<'phone' | 'phone-landscape' | 'wide'>('phone');
+	const hideDelay = createActiveDelay(finishHide);
+	const mismatchDelay = createActiveDelay(() => {
+		game = resolveMismatch(game);
+	});
 
 	const columns = $derived(
 		layoutMode === 'phone-landscape'
@@ -205,13 +208,10 @@
 		clearTimer(previewTimer);
 		previewTimer = null;
 		phase = 'hiding';
-		clearTimer(hideTimer);
-		hideTimer = setTimeout(finishHide, hideDuration);
+		hideDelay.start(hideDuration, document.hidden);
 	}
 
 	function finishHide(): void {
-		hideTimer = null;
-
 		if (phase !== 'hiding') {
 			return;
 		}
@@ -226,6 +226,8 @@
 
 	function handleVisibility(): void {
 		if (document.hidden) {
+			hideDelay.pause();
+			mismatchDelay.pause();
 			if (phase === 'preview') {
 				pausePreview();
 			} else if (phase === 'playing') {
@@ -234,6 +236,8 @@
 			return;
 		}
 
+		hideDelay.resume();
+		mismatchDelay.resume();
 		if (phase === 'preview') {
 			startPreviewClock();
 		} else if (phase === 'playing') {
@@ -246,7 +250,7 @@
 	}
 
 	function handleFlip(index: number): void {
-		if (phase !== 'playing' || game.status !== 'playing' || locked) {
+		if (document.hidden || phase !== 'playing' || game.status !== 'playing' || locked) {
 			return;
 		}
 
@@ -306,11 +310,7 @@
 				scoreDropTimer = null;
 			}, 180);
 
-			clearTimer(mismatchTimer);
-			mismatchTimer = setTimeout(() => {
-				game = resolveMismatch(game);
-				mismatchTimer = null;
-			}, MISMATCH_HOLD_MS);
+			mismatchDelay.start(MISMATCH_HOLD_MS);
 			return;
 		}
 
@@ -364,7 +364,7 @@
 		}
 
 		announcement = t('status.memorize');
-		startPreviewClock();
+		if (!document.hidden) startPreviewClock();
 
 		return () => {
 			document.removeEventListener('visibilitychange', handleVisibility);
@@ -372,8 +372,8 @@
 			shortLandscapeQuery.removeEventListener('change', updateLayout);
 			stopTicker();
 			clearTimer(previewTimer);
-			clearTimer(hideTimer);
-			clearTimer(mismatchTimer);
+			hideDelay.cancel();
+			mismatchDelay.cancel();
 			clearTimer(shakeTimer);
 			clearTimer(celebrateTimer);
 			clearTimer(delayedFlipTimer);
