@@ -19,6 +19,56 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 Newest first.
 
+## Owner-approved production release — 2026-10-23
+
+- **Built:** Deployed the merged reliability fixes with `bun run deploy` after explicit owner authorization ("if all successfull then deploy the latest changes"). Worker `morphi-one`, version `fb89f416-e757-4015-9d94-0741a7b5bf95`, deployment `6c735baf-ccb7-4c1a-8629-6a3a7bd6750f`, created `2026-10-23T04:39:40.274344Z`, serves 100% of traffic. Pre-deploy comparison found all 49 deployable source/config/assets files identical to merged commit `32ed6bf6bcb58f16d9d44e904ab3ca695e378ee0`. Cloudflare MCP identity, docs/spec search, settings, domain, and deployment reads also succeeded.
+- **Skipped (and why):** No new game, feature, dependency upgrade, CI/automatic deploy, database, resource creation, or DNS change. No real-phone, Firefox, or WebKit run in this release; automated browser coverage is Chromium.
+- **Known issues:** Previously documented simple-build limitations remain, including no reload recovery, first-hint behavior, and incomplete generic handler guards. The old browser-run environment blocker is resolved: all 11 existing/new browser tests now pass. Virtual phone viewports do not establish real-device performance.
+- **Decisions and pinned versions:** Kept Wrangler 4.151.3, adapter-cloudflare 8.0.1, runtime compatibility date `2026-10-22`, and `nodejs_als`. The same `ASSETS` binding, `morphi.one` attachment, and nested logs/traces/issues settings were verified before and after deployment. GitHub remains source backup; releases remain manual and owner-approved. Previous version: `6d71da4d-d24b-4ba0-973e-6e63daff2887`.
+- **Questions for the owner:** None required for this release.
+- **Evidence table:**
+
+| Item                                  | Evidence type                                 | Location                                                                                                    | Result                                |
+| ------------------------------------- | --------------------------------------------- | ----------------------------------------------------------------------------------------------------------- | ------------------------------------- |
+| Source matches merged PR              | Git blob comparison                           | 49 source/config/assets files against merged commit above                                                   | pass; no differences                  |
+| Formatting and lint                   | Prettier/ESLint                               | `bun run lint`                                                                                              | pass                                  |
+| Types                                 | Svelte/TypeScript                             | `bun run check`                                                                                             | pass; 0 errors/warnings               |
+| Unit regression suite                 | Node/Vitest                                   | `bun run test:unit -- --run`                                                                                | pass; 92 tests, 8 files               |
+| Layout/input/lifecycle browser suite  | Chromium/Playwright                           | `bun run test:e2e`, `tests/e2e/`, screenshots under `test-results/`                                         | pass; 11 tests in 1.9 minutes         |
+| Production build and packaging        | Adapter build and Wrangler dry run            | `bun run deploy:dry`; `/tmp/morphi-deploy-dry-20261023.log`                                                 | pass                                  |
+| Built Worker behavior                 | Local Wrangler + Chromium                     | `/tmp/morphi-deployment-smoke.cjs`, `http://127.0.0.1:8794`                                                 | pass; 390x844, 844x390, 1280x800      |
+| Production rollout                    | Wrangler output and Cloudflare deployment API | `/tmp/morphi-deploy-20261023.log`; deployment/version above                                                 | pass; version at 100%                 |
+| Live site behavior and updated bundle | Chromium HTTP/browser checks                  | `https://morphi.one`, `https://morphi-one.electrasincng.workers.dev`; `/tmp/morphi-live-smoke-20261023.log` | pass; both origins in all 3 viewports |
+| Bindings/runtime/domain preservation  | Before/after Cloudflare MCP reads             | settings, domains, deployments APIs for `morphi-one`                                                        | pass                                  |
+
+- **Live checks:** HTTP 200, title, description, one Home h1, Block's 64-cell board, Home/Play rotation into Memory, Memory flip input, no page overflow, and no console/page errors. The served game bundle contains `morphi:round_start_failed`, `morphi:pointer_capture_failed`, and `lostpointercapture`, confirming the new reliability code is live.
+- **Measurements:** Wrangler reported 354.03 KiB upload / 83.37 KiB gzip and 10 ms startup (single tool-reported values, not latency gates). Smoke used headless desktop Chromium with virtual viewports, no network throttling, new browser contexts, one visit per viewport/origin. No statistical load/input measurement, median, or p95 is claimed. The 11-case suite took 1.9 minutes; this is test duration, not player performance. Temporary `/tmp` logs/scripts are session artifacts; outcomes and release identifiers are recorded here durably.
+- **Waivers:** None added.
+- **Owner responsibilities:** Continue player surveys; report real-device issues. Every future deployment still requires separate owner authorization.
+- **CODEMAP updated:** yes.
+
+## Cloudflare project-local setup follow-up — 2026-10-23
+
+- **Built:** Installed 19 Cloudflare skills in `.agents/skills`, generated `skills-lock.json`, and registered the enabled Cloudflare MCP server in `.codex/config.toml`. Completed browser OAuth with read-only account/Worker diagnostic scopes plus offline access.
+- **Skipped:** Global installation/configuration, the optional `cf` CLI, deployment, and infrastructure changes. The current conversation needs a reload before it can invoke newly registered MCP tools.
+- **Known issues:** MCP API/tool access has not been exercised after login; authentication success does not establish that every API operation is available with the selected scopes. No gameplay changes.
+- **Decisions:** Project-only configuration; Wrangler remains the deployment tool. Codex manages OAuth credentials outside the repository. Installation paths and scopes are recorded in `docs/CLOUDFLARE_AGENT_SETUP.md`.
+- **Questions for the owner:** None.
+- **Evidence table:**
+
+| Item                                | Evidence type                          | Location                                                                        | Result                              |
+| ----------------------------------- | -------------------------------------- | ------------------------------------------------------------------------------- | ----------------------------------- |
+| Project directories writable        | Create/delete probes                   | `.agents`, `.codex`                                                             | pass                                |
+| Project-local skill installation    | Filesystem and CLI inventory           | `.agents/skills`, `skills-lock.json`, `npx -y skills list --agent codex --json` | pass; 19 skills                     |
+| Local MCP registration              | Config parse and CLI inventory         | `.codex/config.toml`, `codex mcp list --json`                                   | pass; Cloudflare enabled            |
+| Browser OAuth                       | Login completion and credential status | `codex mcp login cloudflare`, subsequent MCP listing                            | pass; successful login and `o_auth` |
+| MCP API access in this conversation | Tool invocation                        | Awaiting agent reload                                                           | not run                             |
+
+- **Measurements:** No performance targets apply to this setup; no gameplay measurements were run.
+- **Waivers:** None.
+- **Owner responsibilities:** Restart/reopen the agent to load the new MCP tools. Production deployments remain separately approved.
+- **CODEMAP updated:** yes.
+
 ## Engineering reliability review — 2026-10-23
 
 - **Built:** Fixed stale best/sound reads after failed writes; retained the last readable settings when storage later blocks; rejected malformed score strings. Memory now pauses mismatch and hide deadlines while hidden and does not start preview on an initially hidden mount. Failed round starts retain the queued family and the previous screen; duplicate synchronous Play activations start one round. Block uses final release coordinates, ignores secondary pointers, cancels on lost capture/blur, ignores repeated activation keys, and cancels pending focus/click-suppression work on unmount. Unit tests run independently of the Cloudflare runtime; browser tests and config files are included in type-checking.

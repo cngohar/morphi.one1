@@ -1,23 +1,24 @@
 # Project-local Cloudflare agent setup
 
-The owner requested Cloudflare's [official agent setup](https://developers.cloudflare.com/agent-setup/prompt.md) on 2026-10-23, scoped to this repository. Do not install skills, MCP settings, or the optional `cf` CLI globally for this task.
+Installed and authenticated on 2026-10-23 using Cloudflare's [official agent setup](https://developers.cloudflare.com/agent-setup/prompt.md), adapted to the owner's project-only requirement.
 
-## Current status
+## Verified status
 
-- The project already has Wrangler 4.151.3, `wrangler.jsonc`, and the Cloudflare SvelteKit adapter. Continue using Wrangler; no CLI migration or dependency upgrade is needed.
-- Nineteen pre-existing Cloudflare skills are available to this session from `/home/ali-gohar/.agents/skills`. These were not installed by this task and do not constitute a project-local installation.
-- `codex mcp list --json` reports no registered MCP servers. Cloudflare's MCP tools are not available in this session.
-- The workspace mounts this repo's `.agents` and `.codex` directories read-only. Standard project-local installation and MCP activation are blocked. No global settings were changed, no OAuth login was attempted, and setup is not complete.
+- Both `.agents` and `.codex` passed create/delete write probes after the owner restored workspace permissions.
+- All 19 Cloudflare skills are installed under `.agents/skills`. `skills-lock.json` records the sources and content hashes. The project-only Codex skill listing reports 19 entries.
+- The Cloudflare MCP server is registered and enabled in this repo's `.codex/config.toml`, pointing to `https://mcp.cloudflare.com/mcp`. `codex mcp list --json` recognizes the project configuration.
+- Browser authorization completed: the CLI reported `Successfully logged in to MCP server 'cloudflare'`; the subsequent MCP listing reports `auth_status: o_auth`.
+- Requested OAuth scopes are `offline_access`, `user:read`, `account:read`, `workers-scripts.read`, `workers-scripts.metadata_read`, `workers-tail.read`, and `workers-observability.read`. The MCP connection is for read-only account/Worker diagnostics. Wrangler remains the deployment tool.
+- The agent setup installed no global skills/MCP configuration or optional `cf` CLI and made no deployment, DNS, or infrastructure changes. A later, separately owner-authorized Wrangler deployment is recorded in `docs/PHASE_REPORTS.md`. Codex manages OAuth credentials separately; no credentials are stored in the repository.
+- MCP tools are active and were verified on 2026-10-23: documentation search, identity, OpenAPI discovery, and read-only retrieval of Worker settings, custom domains, and deployment history all succeeded for `morphi-one`. Wrangler authentication and deployment permissions were also checked separately.
 
-## Setup to apply when the project directories are writable
-
-Cloudflare's skills command, with its global flag omitted, is:
+## Installation used
 
 ```sh
-npx -y skills add cloudflare/skills --skill '*' --yes
+npx -y skills add cloudflare/skills --skill '*' --agent codex --yes
 ```
 
-The project-local Codex MCP configuration belongs in `.codex/config.toml`:
+Project-local `.codex/config.toml`:
 
 ```toml
 [mcp_servers.cloudflare]
@@ -25,6 +26,12 @@ url = "https://mcp.cloudflare.com/mcp"
 enabled = true
 ```
 
-Preserve any existing config and merge this table rather than replacing the file. Codex reads project MCP settings in trusted projects; see the [official MCP configuration docs](https://learn.chatgpt.com/docs/extend/mcp). The default `codex mcp add` command in Cloudflare's instructions writes user configuration, so it is not appropriate for this project's scope. OAuth authentication still requires the owner's browser authorization after registration. Authentication has not been verified.
+Authorization was started with:
 
-The current `.gitignore` excludes `.agents` and `.codex`. Decide explicitly whether to version a non-secret project MCP config; never commit credentials. Reopen the project after setup to load the tools. Setup does not authorize deployments, DNS changes, or new Cloudflare resources.
+```sh
+codex mcp login cloudflare --scopes offline_access,user:read,account:read,workers-scripts.read,workers-scripts.metadata_read,workers-tail.read,workers-observability.read
+```
+
+The default `codex mcp add` command in Cloudflare's instructions was not used because it writes user configuration. Project MCP settings are supported in trusted projects; see the [official MCP configuration docs](https://learn.chatgpt.com/docs/extend/mcp).
+
+The repo ignores `.agents` and `.codex`, keeping installation and MCP config local. `skills-lock.json` is outside those ignored directories so its non-secret source manifest can be backed up with the project. The existing Wrangler and Cloudflare adapter versions are unchanged. Each production deployment still requires explicit owner permission.

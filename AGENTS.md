@@ -18,7 +18,7 @@ Instructions for coding agents (Codex, OpenCode, Claude Code, etc.) working in t
 
 **Simple plan: Step 5 public test completed; next work awaiting owner direction.** Step 4 was accepted on 2026-10-22. On 2026-10-23 the owner reported testing with 45+ players and over 60% positive feedback. Exact replay counts and the predetermined threshold have not been supplied in the repo; positive feedback is not a measured replay-rate pass. Do not start Step 6 or add games without owner direction. See `docs/PHASE_REPORTS.md` for the feedback record.
 
-Owner-authorized maintenance (2026-10-23): review and improve engineering reliability in the existing two-game build while player surveys continue. This does not advance the product step. Cloudflare agent setup must be project-local; see `docs/CLOUDFLARE_AGENT_SETUP.md` for its current environment blocker.
+Owner-authorized maintenance (2026-10-23): review and improve engineering reliability in the existing two-game build while player surveys continue. This does not advance the product step. Cloudflare agent setup is project-local and OAuth-authenticated; see `docs/CLOUDFLARE_AGENT_SETUP.md` for installation, requested read-only scopes, and tool activation status.
 
 ## Rules
 
@@ -61,7 +61,7 @@ Fill these in during Phase 0 as the repo takes shape.
 ## Cloudflare deployment
 
 - Target: Worker `morphi-one` with static assets, configured in `wrangler.jsonc`; build with `@sveltejs/adapter-cloudflare`. Owner-authorized private source repository: `https://github.com/cngohar/morphi.one1`. No CI deploy; pushing source does not authorize a deployment.
-- Current Step 5 URLs: `https://morphi.one` (custom domain) and `https://morphi-one.electrasincng.workers.dev` (deployed 2026-10-22). `www` and HTTP redirect to `https://morphi.one`.
+- Current Step 5 URLs: `https://morphi.one` (custom domain) and `https://morphi-one.electrasincng.workers.dev` (latest owner-approved deployment 2026-10-23; version `fb89f416-e757-4015-9d94-0741a7b5bf95`). `www` and HTTP redirect to `https://morphi.one`.
 - Ask the owner before every deploy. Never deploy from a hook, schedule, or automatic trigger.
 - `workers.dev` and a custom domain serve the same Worker; `workers.dev` is not a separate staging environment.
 - `morphi.one` is on Cloudflare nameservers and attached to the Worker. Do not move the zone or add/remove DNS records without owner approval. The custom domain is attached in the Cloudflare dashboard; `wrangler.jsonc` does not declare a route.

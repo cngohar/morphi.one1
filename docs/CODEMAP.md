@@ -4,7 +4,7 @@ A short map of the codebase so agents can find things without broad searches. Ke
 
 ## Current build (Step 5 public test completed; next work awaiting owner direction)
 
-Block placement and Memory are both routed, themed, and alternate on Play/Next (Block first). Step 4 was accepted on 2026-10-22. Step 5 (public test) is live at `https://morphi.one`; the `workers.dev` URL also remains live. `www` and HTTP both redirect to `https://morphi.one`. Single SvelteKit app with a Cloudflare Workers adapter; deployed to Worker `morphi-one` on 2026-10-22. No accounts. Playwright is a project dev dependency; layout checks run at phone and desktop viewports.
+Block placement and Memory are both routed, themed, and alternate on Play/Next (Block first). Step 4 was accepted on 2026-10-22. Step 5 (public test) is live at `https://morphi.one`; the `workers.dev` URL also remains live. `www` and HTTP both redirect to `https://morphi.one`. Single SvelteKit app with a Cloudflare Workers adapter; latest owner-approved deployment to Worker `morphi-one` on 2026-10-23 (version `fb89f416-e757-4015-9d94-0741a7b5bf95`). No accounts. Playwright is a project dev dependency; layout checks run at phone and desktop viewports.
 
 Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-10-23 the owner reported the public test finished with 45+ players and over 60% positive feedback; exact replay counts are not recorded. See the newest `docs/PHASE_REPORTS.md` entry. Owner-authorized private source repository: `https://github.com/cngohar/morphi.one1`; no automatic deployment.
 
@@ -54,8 +54,8 @@ Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-
 
 - `docs/puzzles/_TEMPLATE.md`: required puzzle brief structure.
 - `docs/puzzles/block-placement.md`: approved brief plus Step 3 and Step 4 build status.
-- `docs/PHASE_REPORTS.md`: Step 1, Step 3, and Step 4 evidence and known issues, including rotation and Memory themes.
-- `docs/CLOUDFLARE_AGENT_SETUP.md`: owner-requested project-local setup; currently blocked by read-only agent config directories. No global changes.
+- `docs/PHASE_REPORTS.md`: game implementation, engineering reliability, agent setup, and production deployment evidence and known issues.
+- `docs/CLOUDFLARE_AGENT_SETUP.md`: project-local skills/MCP setup completed; OAuth and read-only Worker API access verified. No global configuration or deployment changes.
 
 ## Conventions
 
