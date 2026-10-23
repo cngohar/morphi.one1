@@ -33,24 +33,29 @@ Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-
 | `src/lib/ui/memory-themes.ts`            | Same four theme ids for Memory: card back/edge/face/matched, back mark, symbol palette; seed selection; CSS serialization                      |
 | `src/lib/ui/sound.ts`                    | Web Audio tones: pick, place, invalid, clear, end, plus retained Memory tones                                                                  |
 | `src/lib/ui/storage.ts`                  | Per-game best keys, `morphi.block.hintSeen`, sound, with memory fallback                                                                       |
+| `src/lib/ui/active-delay.ts`             | Pausable visible-time deadlines for Memory hide and mismatch transitions; cancellation on unmount                                              |
 | `src/lib/ui/format.ts`                   | Number and clock formatting                                                                                                                    |
 | `src/lib/engine/rng.test.ts`             | RNG vectors, range, shuffle, seed tests                                                                                                        |
 | `src/lib/game/block.test.ts`             | 27 block tests: vectors, fairness, clears, combo, cap, no-fit, replay                                                                          |
 | `src/lib/game/memory.test.ts`            | Retained Memory determinism, solvability, flip rules, mismatch, scoring tests                                                                  |
 | `src/lib/ui/block-themes.test.ts`        | Theme count, palette uniqueness, board/picker contrast floors, seed determinism, reachability, serialization                                   |
 | `src/lib/ui/memory-themes.test.ts`       | Memory theme/Block backdrop match, card and symbol contrast, palette uniqueness, seed determinism, serialization                               |
-| `src/lib/ui/storage.test.ts`             | Hint marker memory fallback when localStorage is blocked                                                                                       |
+| `src/lib/ui/storage.test.ts`             | Settings/best regressions: failed writes with readable stale data, later read blocking, recovery, malformed scores, per-game bests             |
+| `src/lib/ui/active-delay.test.ts`        | Visible-time deadline tests: background pauses, repeated resume, hidden start, cancellation, zero-delay motion                                 |
 | `static/demo/block.html`                 | Unlinked interactive visual sample for Block placement; not production code                                                                    |
 | `playwright.config.ts`                   | Project Playwright config: Chromium, dev-server reuse, `test-results/` output, 120 s timeout                                                   |
 | `tests/e2e/layout.spec.ts`               | Four-viewport layout audit: board centering, no page scroll, Memory columns/card sizes, HUD type                                               |
+| `tests/e2e/reliability.spec.ts`          | Failed-start retry, duplicate Play, final drag coordinates, secondary pointers, lost capture/blur, keyboard repeat, hidden mismatch hold       |
 | `wrangler.jsonc`                         | Cloudflare Worker `morphi-one`: built Worker, static assets, compatibility date/flags, logs/traces/issues; custom domain is dashboard-attached |
-| `vite.config.ts`                         | SvelteKit + Cloudflare adapter + Vitest configuration                                                                                          |
+| `vite.config.ts`                         | SvelteKit + Cloudflare adapter configuration                                                                                                   |
+| `vitest.config.ts`                       | Pure Node unit tests, independent of the SvelteKit/Cloudflare runtime; no Worker listener or secrets loading                                   |
 
 ## Design docs
 
 - `docs/puzzles/_TEMPLATE.md`: required puzzle brief structure.
 - `docs/puzzles/block-placement.md`: approved brief plus Step 3 and Step 4 build status.
 - `docs/PHASE_REPORTS.md`: Step 1, Step 3, and Step 4 evidence and known issues, including rotation and Memory themes.
+- `docs/CLOUDFLARE_AGENT_SETUP.md`: owner-requested project-local setup; currently blocked by read-only agent config directories. No global changes.
 
 ## Conventions
 

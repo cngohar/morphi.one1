@@ -19,6 +19,32 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 Newest first.
 
+## Engineering reliability review — 2026-10-23
+
+- **Built:** Fixed stale best/sound reads after failed writes; retained the last readable settings when storage later blocks; rejected malformed score strings. Memory now pauses mismatch and hide deadlines while hidden and does not start preview on an initially hidden mount. Failed round starts retain the queued family and the previous screen; duplicate synchronous Play activations start one round. Block uses final release coordinates, ignores secondary pointers, cancels on lost capture/blur, ignores repeated activation keys, and cancels pending focus/click-suppression work on unmount. Unit tests run independently of the Cloudflare runtime; browser tests and config files are included in type-checking.
+- **Skipped (and why):** No new games, tutorial UI, accounts, architecture migration, dependencies, CI, or deployment. Cloudflare project-local setup was investigated and documented, but installation/activation is blocked by this workspace's read-only `.agents` and `.codex` directories; no global changes were made.
+- **Known issues:** The new browser regressions are unexecuted: the dev server fails with `listen EPERM 127.0.0.1`, and standalone Chromium launch fails with `sandbox_host_linux.cc: shutdown: Operation not permitted`. Real-device, Firefox, and WebKit checks remain unperformed. Existing first-hint behavior (consumed at start, hidden in short landscape), no reload recovery, and incomplete guards around existing event/timer callbacks remain outside this bounded repair. Session storage fallback cannot persist through reload if disk writes fail.
+- **Decisions and pinned versions:** No dependency or gameplay-version changes. Standalone Vitest config, visible-time UI deadlines, and project-only Cloudflare setup are recorded in `docs/DECISIONS.md`.
+- **Questions for the owner:** None required to review the code. Browser/device verification is needed before considering deployment. Cloudflare activation needs writable project config directories and subsequent browser OAuth authorization.
+- **Evidence table:**
+
+| Acceptance item                                    | Evidence type                              | Location                          | Result                                                                  |
+| -------------------------------------------------- | ------------------------------------------ | --------------------------------- | ----------------------------------------------------------------------- |
+| Storage corruption and failed-write fallback       | Unit regressions                           | `src/lib/ui/storage.test.ts`      | pass; earlier comparison against original code reproduced four failures |
+| Visible-time UI deadlines and cancellation         | Fake-clock unit tests                      | `src/lib/ui/active-delay.test.ts` | pass                                                                    |
+| Existing rule, RNG, selector, and palette tests    | Node/Vitest                                | `bun run test:unit -- --run`      | 92 tests pass across 8 files                                            |
+| Types, including new browser cases and test config | Svelte/TypeScript                          | `bun run check`                   | 0 errors, 0 warnings                                                    |
+| Formatting and lint                                | Prettier/ESLint                            | `bun run lint`                    | pass                                                                    |
+| Production bundle                                  | Local build                                | `bun run build`                   | pass with Cloudflare adapter; no upload                                 |
+| Browser regression discovery                       | Playwright listing                         | `bun run test:e2e -- --list`      | 11 cases discovered in 2 files                                          |
+| Retry, drag, keyboard, visibility integration      | Browser tests                              | `tests/e2e/reliability.spec.ts`   | blocked by local listener/browser sandbox; no browser pass claimed      |
+| Project-local Cloudflare agent setup               | Read-only inspection/current official docs | `docs/CLOUDFLARE_AGENT_SETUP.md`  | blocked; no MCP registration, OAuth, or new skill installation          |
+
+- **Measurements:** No new latency/load performance measurements; device/network profile, cold/preloaded runs, median, and p95 are not available. Fake-clock tests establish deadline behavior, not device performance.
+- **Waivers:** None. Browser verification is blocked, not waived.
+- **Owner responsibilities:** Review the maintenance changes; verify affected paths in a browser/phone when the environment allows. Decide deployment separately. Allow standard project config directories to be written before Cloudflare MCP activation.
+- **CODEMAP updated:** yes.
+
 ## Step 5 public-test feedback and source handoff — 2026-10-23
 
 - **Built:** No gameplay changes. Updated the active-plan instructions and recorded the owner's completed manual public test. Prepared the existing project for the owner-authorized private GitHub repository `cngohar/morphi.one1`, excluding local secrets and generated artifacts.

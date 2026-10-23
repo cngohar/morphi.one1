@@ -72,22 +72,26 @@
 	}
 
 	function startRound(): void {
+		if (screen === 'game') return;
 		try {
 			sound.unlock();
-			const chosen = getSelector().next();
+			const chosen = getSelector().peek();
+			startErrorFamily = chosen;
 			const seed = randomSeed();
+			const nextBlock = chosen === 'block' ? createBlockRound(seed) : null;
+			const nextMemory = chosen === 'memory' ? createMemoryRound(seed) : null;
 
+			// Commit rotation only after generation succeeds. Retry keeps the same family.
+			getSelector().next();
 			family = chosen;
 			nextFamily = getSelector().peek();
+			blockRound = nextBlock;
+			memoryRound = nextMemory;
 
 			if (chosen === 'block') {
-				blockRound = createBlockRound(seed);
-				memoryRound = null;
 				showHint = !loadBlockHintSeen();
 				saveBlockHintSeen();
 			} else {
-				memoryRound = createMemoryRound(seed);
-				blockRound = null;
 				showHint = false;
 			}
 
@@ -97,7 +101,7 @@
 			startError = false;
 			screen = 'game';
 		} catch {
-			startErrorFamily = family;
+			console.error('morphi:round_start_failed', { family: startErrorFamily });
 			startError = true;
 		}
 	}
@@ -180,6 +184,7 @@
 		memoryRound = null;
 		result = null;
 		resultAnnouncement = '';
+		startError = false;
 		screen = 'home';
 	}
 </script>

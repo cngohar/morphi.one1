@@ -18,6 +18,8 @@ Instructions for coding agents (Codex, OpenCode, Claude Code, etc.) working in t
 
 **Simple plan: Step 5 public test completed; next work awaiting owner direction.** Step 4 was accepted on 2026-10-22. On 2026-10-23 the owner reported testing with 45+ players and over 60% positive feedback. Exact replay counts and the predetermined threshold have not been supplied in the repo; positive feedback is not a measured replay-rate pass. Do not start Step 6 or add games without owner direction. See `docs/PHASE_REPORTS.md` for the feedback record.
 
+Owner-authorized maintenance (2026-10-23): review and improve engineering reliability in the existing two-game build while player surveys continue. This does not advance the product step. Cloudflare agent setup must be project-local; see `docs/CLOUDFLARE_AGENT_SETUP.md` for its current environment blocker.
+
 ## Rules
 
 1. **One phase at a time.** Stop when the acceptance criteria are met, write the report (format below), and wait for the owner.

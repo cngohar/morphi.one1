@@ -8,11 +8,18 @@ const BLOCK_HINT_KEY = 'morphi.block.hintSeen';
 export type BestGame = keyof typeof BEST_KEYS;
 
 const memoryStore = new Map<string, string>();
+const failedWrites = new Set<string>();
 
 function read(key: string): string | null {
+	// A failed write must not be hidden by an older value still on disk.
+	if (failedWrites.has(key)) {
+		return memoryStore.get(key) ?? null;
+	}
+
 	try {
 		const stored = localStorage.getItem(key);
 		if (stored !== null) {
+			memoryStore.set(key, stored);
 			return stored;
 		}
 	} catch {
@@ -27,14 +34,16 @@ function write(key: string, value: string): void {
 
 	try {
 		localStorage.setItem(key, value);
+		failedWrites.delete(key);
 	} catch {
+		failedWrites.add(key);
 		// The in-memory fallback still keeps this session playable.
 	}
 }
 
 export function loadBestScore(game: BestGame = 'block'): number {
 	const stored = read(BEST_KEYS[game]);
-	const score = stored === null ? 0 : Number.parseInt(stored, 10);
+	const score = stored !== null && /^\d+$/.test(stored) ? Number(stored) : 0;
 	return Number.isSafeInteger(score) && score > 0 ? score : 0;
 }
 

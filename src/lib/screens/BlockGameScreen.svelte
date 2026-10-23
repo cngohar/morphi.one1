@@ -123,6 +123,8 @@
 	let gainTimer: ReturnType<typeof setTimeout> | null = null;
 	let finishTimer: ReturnType<typeof setTimeout> | null = null;
 	let enterTimer: ReturnType<typeof setTimeout> | null = null;
+	let suppressTimer: ReturnType<typeof setTimeout> | null = null;
+	let focusFrame: number | null = null;
 
 	function pieceColor(piece: PieceId): string {
 		return `var(--piece-${PIECE_COLORS[piece]})`;
@@ -282,7 +284,9 @@
 	}
 
 	function restoreTrayFocus(): void {
-		requestAnimationFrame(() => {
+		if (focusFrame !== null) cancelAnimationFrame(focusFrame);
+		focusFrame = requestAnimationFrame(() => {
+			focusFrame = null;
 			if (game.status !== 'playing' || ending) {
 				return;
 			}
@@ -539,6 +543,8 @@
 
 	function startDrag(event: PointerEvent, index: number): void {
 		if (
+			drag !== null ||
+			!event.isPrimary ||
 			busy ||
 			game.status !== 'playing' ||
 			(event.pointerType === 'mouse' && event.button !== 0)
@@ -585,7 +591,13 @@
 			anchorX: 0,
 			anchorY: 0
 		};
-		slot.setPointerCapture(event.pointerId);
+		try {
+			slot.setPointerCapture(event.pointerId);
+		} catch {
+			cancelDrag();
+			console.error('morphi:pointer_capture_failed');
+			return;
+		}
 		sound.unlock();
 	}
 
@@ -663,6 +675,8 @@
 			return;
 		}
 
+		// The final pointerup can have newer coordinates than the last pointermove.
+		moveDrag(event);
 		const current = drag;
 
 		if (!current.moved) {
@@ -674,8 +688,10 @@
 		drag = null;
 		hideGhost();
 		suppressClick = true;
-		setTimeout(() => {
+		clearTimerRef(suppressTimer);
+		suppressTimer = setTimeout(() => {
 			suppressClick = false;
+			suppressTimer = null;
 		}, 60);
 
 		if (current.over && current.valid) {
@@ -702,6 +718,10 @@
 		hideGhost();
 	}
 
+	function handlePointerCancel(event: PointerEvent): void {
+		if (drag?.pointerId === event.pointerId) cancelDrag();
+	}
+
 	function handleTrayClick(index: number): void {
 		if (suppressClick || busy || game.status !== 'playing') {
 			return;
@@ -721,6 +741,10 @@
 		}
 
 		const key = event.key;
+		if (event.repeat && (key === 'Enter' || key === ' ')) {
+			event.preventDefault();
+			return;
+		}
 
 		if (key === 'Escape') {
 			if (selected !== null) {
@@ -799,12 +823,14 @@
 		document.addEventListener('keydown', handleWindowKeydown);
 		document.addEventListener('visibilitychange', handleVisibility);
 		window.addEventListener('resize', handleResize);
+		window.addEventListener('blur', handleResize);
 		boardEl?.addEventListener('click', handleBoardClick);
 
 		return () => {
 			document.removeEventListener('keydown', handleWindowKeydown);
 			document.removeEventListener('visibilitychange', handleVisibility);
 			window.removeEventListener('resize', handleResize);
+			window.removeEventListener('blur', handleResize);
 			boardEl?.removeEventListener('click', handleBoardClick);
 			clearTimerRef(clearTimer);
 			clearTimerRef(settleTimer);
@@ -812,6 +838,8 @@
 			clearTimerRef(gainTimer);
 			clearTimerRef(finishTimer);
 			clearTimerRef(enterTimer);
+			clearTimerRef(suppressTimer);
+			if (focusFrame !== null) cancelAnimationFrame(focusFrame);
 		};
 	});
 </script>
@@ -925,7 +953,8 @@
 						onpointerdown={(event) => startDrag(event, index)}
 						onpointermove={moveDrag}
 						onpointerup={endDrag}
-						onpointercancel={cancelDrag}
+						onpointercancel={handlePointerCancel}
+						onlostpointercapture={handlePointerCancel}
 					>
 						<span class="mini" style={miniStyle(piece)} aria-hidden="true">
 							{#each PIECE_BY_ID[piece].cells as cell (`${cell.x},${cell.y}`)}
