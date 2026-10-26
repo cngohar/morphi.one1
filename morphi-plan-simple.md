@@ -1,8 +1,55 @@
 # Morphi: Simple Plan
 
+## Owner integration authorization — 2026-10-25
+
+The owner accepted the v1 preview and authorized integration into the actual
+local app. This supersedes earlier demo-only/review-pending restrictions.
+Include per-puzzle entrances through the anime.js motion wrapper: Memory
+6/8/10 pairs arrive over 3/4/5 seconds face up, then a full 3-second preview,
+then hide before the timer/input start. Block uses the same entrance language.
+Generate original action sounds with the installed ElevenLabs SDK. Compare
+actual screens with the accepted demo at the required sizes. Profile XP and
+achievements are future fixtures and must not ship as real v1 data. Production
+resources, credentials, D5 eligibility and every deployment remain separate.
+
 This is the short plan. It replaces the long plan for day-to-day work. The long plan (`docs/PLAN.md`) stays as reference. If a step below needs something from it, pull only that part in.
 
-Current status (2026-10-23): Step 4 accepted; Step 5 public testing completed per owner report (45+ players, over 60% positive feedback). Exact replay counts and the offline threshold are not recorded here, so this is not a measured replay-rate pass. Next implementation awaits owner direction. Feedback is recorded in `docs/PHASE_REPORTS.md`.
+Current status (2026-10-24): Step 4 accepted; Step 5 accepted by the owner based on the public-test result (45+ players, over 60% positive feedback). The owner accepts proceeding without the missing replay counts and predetermined threshold; the measured replay-rate criterion is waived, not recorded as a pass. Step 6 implementation is authorized: Google sign-in and all five account-screen designs are approved. The owner subsequently confirmed local Google OAuth works and authorized completing Step 6 locally, including the small per-puzzle structural cleanup. Local progress/ranked/leaderboard implementation and verification are tracked in `docs/STEP6_WORK.md`. The owner completed the PC/mobile functional review and explicitly accepted the local Step 6 build on 2026-10-24 (`docs/STEP6_REVIEW.md`); production resource/operating evidence remains open. Global-release planning, including an admin panel proposal, follows local acceptance. See `docs/STEP6.md`. Acceptance and feedback are recorded in `docs/PHASE_REPORTS.md`.
+
+## Owner-authorized local privacy preparation (2026-10-23)
+
+The owner requested a privacy page before public Google OAuth verification and the later v1 launch. Implement the page locally using the long plan's content-page template; admin editing of privacy/terms/other static pages remains the later Stage 5 content-management scope. Operator/contact: Ali Gohar, cngohar@gmail.com. On 2026-10-24 the owner clarified a general-audience puzzle site, with no child-focused content, design, or marketing and no separate kids site planned. This supersedes the earlier audience-includes-under-13s interpretation. Child accounts remain deferred. The owner approved the wording and authorized finishing practical readiness on 2026-10-24. Retention inventory, the owner-monitored contact/request procedure, and protected local cleanup/privacy deletion are prepared; the public copy has no internal draft notes. A separate assets-only guest publication candidate is prepared for review and deployment authorization. Public account eligibility and production operator/retention operations remain v1 gates. See `docs/PRIVACY_REVIEW.md`. Privacy preparation did not itself close Step 6 acceptance; the subsequent owner-completed review records local functional acceptance separately. Neither authorizes public provisioning, publication, or deployment.
+
+## Owner-authorized publication follow-up (2026-10-24)
+
+The owner explicitly approved publishing the prepared guest homepage/privacy update and confirms Search Console/domain ownership is already verified. Initial public version was `44a5846f-95d6-43d5-b61e-c7f478b6e857`; the subsequently owner-requested analytics disclosure is published as `b50a7a18-2e85-4406-bd40-77f27c4b3da3` with all seven live verification groups passing. Live checks found Cloudflare’s automatic Web Analytics injection; the owner explicitly chose to keep it and requested the privacy disclosure update, intentional-beacon release note and live recheck. The beacon is absent from build assets by design, and this does not authorize GA4 or a new analytics pipeline. Current deployment versions/evidence are in `docs/PHASE_REPORTS.md`; Google project setup/submission stays owner-controlled. Account/global-release operations and admin-panel planning remain separate.
+
+## Owner-requested v1 release planning (2026-10-24)
+
+The owner requested the v1 plan after local Step 6 acceptance and guest/privacy publication. [docs/V1_RELEASE_PLAN.md](docs/V1_RELEASE_PLAN.md) proposes the production account rollout, operating/resource checks, a small Stage 1 admin panel and an optional repository-managed terms page. This simple plan remains authoritative; the proposal does not promote the parked features into implementation. The owner reports production Google setup complete and supplied a private credential-file location; credential validation, actual branding/audience state and live OAuth behavior are not verified by the planning task. No credential is installed and no backend is deployed. Next is agreement on the release contract/local preparation; admin/terms implementation, provisioning and every deployment still require their applicable approval.
+
+## Owner-authorized v1 implementation and visual review (2026-10-24)
+
+The owner supplied the consolidated v2 checklist and authorized starting local
+v1 implementation. [docs/V1_RELEASE_CHECKLIST.md](docs/V1_RELEASE_CHECKLIST.md)
+records the active handoff and subsequent decisions; the old v1 proposal is
+historical. Stage 1 admin, SEO search-entry pages and removal of Block-first
+are promoted into v1. Dashboard plus anonymous gameplay events, Terms
+preparation, and deferring procedural themes are approved. Proposed 18+
+account wording is approved for the demo only; account launch jurisdictions
+remain a specific legal-review question owned by Ali Gohar. The owner requested
+an interactive demo instead of wireframes; layouts/content await review before
+screen integration. No production provisioning or future deployment is approved.
+
+## Oct 25 design-package demo update
+
+The owner accepted the [design package](docs/morphi-design-package-2026-10-25/morphi-design-handoff-2026-10-25.md)
+and authorized applying it to the v1 demo only, then running verification and
+stopping for visual review. It supersedes earlier design choices (including
+door navigation/dimmed columns); the v2 rollout/release gates remain in force.
+The owner subsequently accepted this demo and authorized actual local
+integration (Oct 25). Deployment, production XP/achievements and a final D5
+eligibility/jurisdiction decision remain outside that authorization. See `docs/DECISIONS.md`.
 
 ## The goal
 
@@ -69,6 +116,8 @@ Done when a clear share of the people who started a round also started a second 
 ## Step 6: Accounts and leaderboards (only if Step 5 works)
 
 Only now: sign-in, progress across devices, and a leaderboard. Scores must be checked on the server, because local scores can be edited. The anti-cheat section of the long plan starts to matter here, and not before.
+
+The owner accepted Step 5 on 2026-10-23. The proposed Step 6 sequence and decisions needed before implementation are in `docs/STEP6.md`; the full platform phase is not added wholesale to this step.
 
 ## Look and feel
 

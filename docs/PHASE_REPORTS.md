@@ -17,7 +17,615 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1 local app integration — 2026-10-26 (local review candidate)
+
+- **Built:** Accepted Home, Mix/Stay doors, results, real-data profile and local
+  Stage 1 operator screens; metadata/sitemap/robots/OG assets and Terms. Memory
+  3/4/5-second arrivals → full 3-second preview → hide → input/timer; a locked
+  3-second Block arrival. Shared anime.js wrapper and cosmetic-failure fallback.
+  Thirteen generated ElevenLabs cues (69,320 bytes), static playback only.
+  Default-off coarse measurement with privacy controls. Backdrop dismissal in
+  app and demo; long names, correct Nunito/wordmark, landscape and board geometry
+  corrected through comparison. Template, retention and owner setup docs updated.
+- **Skipped:** New games, XP/mastery/achievements, CMS, production provisioning,
+  owner credential/enrollment changes, DNS/Google changes and deployments.
+  They are outside this local integration or remain explicit release gates.
+- **Known issues / limits:** Post-integration owner real-device/feel review and
+  production resource/security/operating gates remain open. Short portrait result
+  pages scroll to preserve approved readable copy. A fresh app Google session
+  plus TOTP is enforced; no claim of forcing a Google password prompt is made.
+- **Decisions:** Existing engine versions/vectors retained; anime.js 4.5.0 and
+  existing lockfile-resolved ElevenLabs SDK 2.74.0. Fixed server opening allowance;
+  no score/seed selection by the ranked client. See `DECISIONS.md`.
+- **Questions for the owner:** Review the integrated desktop/phone experience and
+  generated sounds. Final account jurisdictions/eligibility and production
+  operating decisions remain the previously recorded owner responsibilities.
+- **Evidence table:** The final `bun run verify` passes; the artifacts below record the local scope.
+
+| Acceptance item                                              | Evidence type / location                                                                                          | Result                                                       |
+| ------------------------------------------------------------ | ----------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Accepted public layouts / responsive boards                  | 110 actual/demo viewport captures across Chromium, Firefox and WebKit; `build/v1-integration-review/results.json` | Pass: no uncaught browser errors or horizontal overflow      |
+| Profile and native operator screens                          | 36 captures, three approved sizes; `account-results.json`, synthetic fixture removed afterward                    | Pass: no uncaught browser errors or horizontal overflow      |
+| Memory / Block entrance and timer sequence                   | `tests/e2e/entrance.spec.ts`, active-delay and timing units                                                       | Pass: final verification                                     |
+| Backdrop dismissal / focus / inside drags                    | `tests/e2e/dialogs.spec.ts`, account deletion flow                                                                | Pass: final browser suite                                    |
+| Account saves / recovery / rotation                          | Existing account, reliability and selector browser regressions                                                    | Pass: final verification                                     |
+| Operator permissions / recovery / audited actions            | `tests/integration/operator.test.ts`, `tests/e2e/operator.spec.ts`                                                | Pass: integration matrix/recovery and native browser actions |
+| Sound assets and provenance                                  | `static/audio/manifest.json`, `audio.json`; 13 hashes and ffprobe decoding                                        | Pass                                                         |
+| Formatting, types, boundaries, units and six-runtime vectors | `build/v1-integration-review/verify-final.log`                                                                    | Pass: final verification                                     |
+| Built Worker with isolated D1                                | `scripts/check-worker.ts`, automatically allocated loopback port                                                  | Pass: 15 isolated built-Worker checks                        |
+| Guest-only artifact / publication separation                 | `public-prepare.log`, `public-check.log`; retained historical artifact                                            | Pass: six local groups, 90 static files; no deployment       |
+| Schema / future migration baseline                           | `schema.log`: Drizzle reports no changes; migrations 0003–0005 and snapshots                                      | Pass                                                         |
+| Owner device review / public release gates                   | Owner review and release checklist                                                                                | Pending, not waived                                          |
+
+- **Measurements:** Functional desktop-headless browser runs used localhost with
+  no network shaping, at the viewport sizes above. They measure layout and
+  behavior, not real phones or production capacity. The 69,320-byte sound set is
+  a payload measurement, not a loading-performance claim.
+
+| Target                                   | Device / network / load                                                   | Runs                | Median / p95 | Gate or goal / result                       |
+| ---------------------------------------- | ------------------------------------------------------------------------- | ------------------- | ------------ | ------------------------------------------- |
+| LCP ≤2.5 s, INP ≤200 ms, CLS ≤0.1        | Required mid-range real phone, specified network, cold/preloaded protocol | 0 for this delivery | Not measured | Release targets remain pending              |
+| Tap response ≤100 ms                     | Real device / actual delivery                                             | 0 measured          | Not measured | Feel goal; functional response only checked |
+| Production Worker/auth/D1 CPU and memory | Production configuration / load profile                                   | 0                   | Not measured | Release gate remains pending                |
+
+- **Waivers:** None added. Historical owner exceptions remain recorded in their
+  earlier reports; no production, device or accessibility gate is newly waived.
+- **Owner responsibilities:** Real-device review and acceptance; explicit local
+  operator enrollment if desired (`ADMIN_LOCAL.md`); settle D5 and production
+  operations/resource evidence; review the final release artifact and separately
+  authorize each deployment. Current published version/evidence is preserved.
+- **CODEMAP updated:** yes.
+
+Final verification: **103 unit tests, 21 D1/auth/operator integration tests, six
+determinism runtimes, 15 isolated built-Worker checks and 39 browser cases all
+pass**, with zero type errors/warnings and passing format/lint/boundaries.
+`verify-final.log` is the complete clean run. `results.json` and
+`account-results.json` contain 146 captures with no uncaught errors or horizontal
+overflow; actual layouts retain curated themes and real data rather than demo
+fixture scores. `public-check.log` passes all six guest-only groups, including
+real Block → result → Memory play without account APIs/queues/prompts. Schema
+drift check reports no changes. `asset-safety.json` records the generated-browser
+asset scan (no configured private values, backend or review demos in the guest
+bundle). These are local evidence, not owner acceptance or launch authorization.
+
+## Demo phone layout and slower transitions — 2026-10-25
+
+- **Built:** Owner-requested timing revision: 1-second door/return/result
+  presentation, 1.5-second Home → puzzle and the subsequent owner correction
+  to 0.5-second help opening/closing (2 seconds combined Home → puzzle → help). Incoming Home stage is hidden
+  before its delayed fade, preventing the visible/fade/reappear flash.
+  Decorative travel uses a clipped viewport overlay; active phone stages are
+  clipped without adding scrollbars during scale/translation. Reduced-motion
+  changes restore visibility and clear layers immediately.
+- **Phone layouts:** Actual boards are centred in portrait for Memory and
+  Block, both door and surprise/Mix entry. Short landscape sizes boards from
+  available height, with the HUD on the left and help/pieces on the right.
+  Layouts include 568×320 narrow landscape; rotation preserves moves. Clear
+  stage space lets taps reach header/help controls. Forward and return door
+  transitions measure the board rather than its full-screen stage.
+- **Skipped:** Application integration, admin redesign, deployment, remote
+  resources and final eligibility/jurisdictions. Other screen designs remain
+  as reviewed. The owner explicitly said this is **not full acceptance**.
+- **Known issues:** Owner physical-device review remains pending. Automated
+  viewport checks cannot establish real-device browser/performance acceptance.
+  Early checks found help-button interception and transient animation overflow;
+  both were corrected before final demo checks. Full verification exposed a
+  pre-existing guest-account test assumption that the first family is always
+  Block. Its assertion now accepts the dealt Memory card or Block grid;
+  application code is unchanged.
+- **Decisions and pins:** `DECISIONS.md` records the later owner timing/layout
+  amendment, superseding the package's 350 ms timing. Existing anime.js 4.5.0
+  dev pin remains; logic is independent of animation completion.
+- **Questions for the owner:** No implementation clarification required. Review
+  the revised demo; integration/deployment and D5 remain separate gates.
+- **Evidence table:**
+
+| Item                                                                                   | Evidence type / location                                                                                                                                     | Result                                                                                                               |
+| -------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------- |
+| Portrait centring, landscape size, no scrolling, tappable controls                     | Synthetic Chromium, both families × door/Mix × six phone sizes; `build/design-review-2026-10-25/phone-layouts.json`, screenshots, `phone-cross-browser.json` | Pass: 24 Chromium cases plus 48 Firefox/WebKit cases                                                                 |
+| Rotation preserves a revealed card or placed cell                                      | Same demo script, portrait → landscape → portrait                                                                                                            | Pass: both families                                                                                                  |
+| Single Home arrival, slower timing, no transient scrollbar, mid-arrival reduced motion | Per-frame samples in `memory-motion-frames.json` / `block-motion-frames.json` in the same evidence directory                                                 | Pass: monotonic arrival; all sampled frames fit; reduced-motion cleanup                                              |
+| Half-second help opening and closing                                                   | Same frame traces, `helpFrames`; How to play and Scoring & tips for both families                                                                            | Pass: both dialogs complete in 0.5 s; close cleans overlays                                                          |
+| Existing screen flows and admin unchanged                                              | `bun run test:demo`; `/tmp/morphi-demo-phone.log`; original admin stylesheet SHA-256                                                                         | Pass: 366 checks, no browser errors or uploads                                                                       |
+| Product regression                                                                     | `bun run verify`; `/tmp/morphi-phone-verify-final.log`; final help change also checked in `/tmp/morphi-demo-phone-types.log` and scoped ESLint               | Pass: zero type errors/warnings, 101 units, 17 account integration, six runtimes, 15 Worker checks, 27 browser tests |
+| Full acceptance, integration, deployment, D5                                           | Explicit owner scope                                                                                                                                         | Pending; not granted or finalized                                                                                    |
+
+- **Measurements:** Local static server; Chromium desktop emulation at
+  390×844, 844×390, 667×375, 568×320, 320×568 and 320×480. One layout probe
+  per game/entry/size and one frame trace per family/transition; no network
+  throttling. At 844×390, final Memory board is about 371×276 and Block is
+  278×278, replacing the previous 280×90 and roughly 164–170-square boards.
+  Every phone board centre is within 1 px of the viewport centre. The 0.5/1/1.5 s
+  durations are presentation settings, not performance percentiles. No median,
+  p95, production capacity or physical-phone measurement claim is made.
+- **Waivers:** None.
+- **Owner responsibilities:** Re-review phone layouts and transition feel.
+  No full acceptance inferred; later integration and every deployment still
+  need their separate authorization. D5 remains open.
+- **CODEMAP updated:** Yes; scoped phone/motion probes are mapped.
+
+## Accepted Oct 25 design package applied to the demo — 2026-10-25
+
+- **Built:** Read the complete owner-accepted handoff before code. The actual
+  package path is `docs/morphi-design-package-2026-10-25/`. Updated the existing
+  v1 demo screen by screen using its images and both GIFs (including sampled
+  transition frames). Public changes are isolated in `v1-design.css`; the
+  existing admin stylesheet remains byte-for-byte unchanged.
+- **Screen delivery:** Home is centred, one screen, with coral Play, a 36-second
+  orbit/gentle pulse, mystery tiles, tinted chips and bounded visit-local mixed
+  scatter. Its decorative layer is aria-hidden/unlinked, respects safe zones
+  and spacing, and is laid out synchronously before paint. Footers contain
+  Privacy · Terms only. Door pages start ready with one board Play; quiet
+  numbered/scoring guides step aside for play and two help dialogs. Game names
+  are headings; SEO phrases are eyebrows/titles; only the ready-state quiet
+  surprise link enters Mix. Results appear first at round end; Next returns a
+  door to its ready guides in Stay mode. Home Play starts Mix on arrival.
+- **Profile/result/wording:** Foundation v2 adds the identity band, keyboard
+  tabs, one row per played game with detail view, activity and three fixed
+  right-rail slots. Labels use #68798E; Level/XP/mastery/achievements are
+  synthetic fixtures, not production additions. All user wordmarks say
+  Morphi.One and user score wording uses Your high score per family. Result
+  follows the accepted ink sign-in treatment with its device-only note inside
+  the section; mobile order is score → Next → stats → sign-in. No simulated
+  data footer appears inside user screens; the outer review harness explains
+  the simulation. Admin reference images were not implemented.
+- **Motion:** `scripts/demo-motion.ts` is the only anime.js importer. Both
+  transitions and help grow/fold use 350 ms ease-out presentation; reduced
+  motion swaps instantly and stops orbit/pulse. Logic commits independently of
+  animation completion, missing motion does not block start, and decorative
+  clones are cleaned up. `bun run demo:motion` builds its demo-only asset and
+  retains the MIT license; `bun run test:demo` is reproducible and isolated.
+- **Skipped:** Application/route/engine integration, production XP/mastery or
+  achievements, public metadata/sitemap deployment, account eligibility,
+  provisioning, DNS, secrets, Google settings and every deployment. V2 release
+  tracks/gates are unchanged. D5 remains open; the existing 18+ wording remains
+  a demo proposal only. This delivery does not imply integration approval.
+- **Known issues:** No unresolved failure in the scoped automated checks.
+  Initial checks caught reduced-motion clones and short-screen Block sizing;
+  both were fixed before the final demo pass. Visual review on owner devices
+  remains pending, and this demo does not prove production accessibility,
+  load/capacity, account operations or legal readiness. Account preview modules
+  require the HTTP review server, as before. Review demos must be excluded from
+  any eventual release artifact.
+- **Decisions:** `DECISIONS.md` records the explicit §11.16 amendment from
+  dimming to hybrid, navigation amendment removing door links from product
+  navigation, accepted Home loop exception, scoped palette and design-package
+  precedence. V2 still controls rollout gates. `animejs@4.5.0` (MIT) is an exact
+  dev pin; other version pins remain unchanged. Generated motion JS alone is
+  excluded from ESLint; its authored TypeScript wrapper is checked.
+- **Questions for the owner:** Review the updated demo's layouts, copy and
+  transition feel. Integration needs the later owner direction; each deployment
+  retains its own explicit approval. D5 still needs its separate resolution.
+- **Evidence table:**
+
+| Acceptance item                                        | Evidence type / location                                           | Result                                                                                                                                           |
+| ------------------------------------------------------ | ------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Accepted handoff and all public design references used | Complete handoff read; screen/GIF review; `DECISIONS.md` amendment | Pass                                                                                                                                             |
+| Home/scatter/chips/footer                              | `build/design-review-2026-10-25/checks.json`, screenshots          | Pass: three required sizes, short-phone fit, fresh bounded mixed scatter, no door navigation                                                     |
+| Door ready/playing/help/results flow                   | Same synthetic demo evidence                                       | Pass: single Play, columns leave, two help controls, Escape/focus restoration, Stay return                                                       |
+| Both transitions and reduced/missing-motion behavior   | Same checks; `motion-evidence.json`; authored wrapper              | Pass: logical state before animation finishes; instant reduced fallback; missing bundle still starts                                             |
+| Foundation v2 and per-family high scores               | Same checks/screenshots; profile detail and keyboard tabs          | Pass: fixed slots, two game rows, #68798E labels                                                                                                 |
+| Result layout and sign-in section                      | Same checks/screenshots                                            | Pass: mobile order, ink button and internal device-only note                                                                                     |
+| Admin preserved                                        | SHA-256 of original `v1.css` checked by demo script                | Pass: stylesheet unchanged; reference redesign not implemented                                                                                   |
+| Product regression                                     | `/tmp/morphi-design-verify.log`                                    | Pass: `bun run verify`, zero type errors/warnings, 101 units, 17 integration, six runtimes, 15 built-Worker checks, 27 application browser cases |
+| Demo verification                                      | `/tmp/morphi-design-demo-final.log`, `checks.json`                 | Pass: 252 checks, zero browser errors, zero backend/telemetry uploads                                                                            |
+| Production integration/deployment/D5                   | Owner scope and v2 release gates                                   | Pending; not authorized or finalized by this task                                                                                                |
+
+- **Measurements:** Functional desktop Chromium emulation at 390×844, 844×390
+  and 1280×800; local static server, font-ready probes, one local layout-shift
+  probe per size. Recorded Home CLS = 0 at all three sizes and a stationary
+  orbit under reduced motion. The 350 ms duration is configured, not a measured
+  real-device performance percentile. No throttled network, five-run median/
+  p95, real-phone or production resource evidence was collected; no v2
+  performance/capacity gate is passed by this demo evidence.
+- **Waivers:** None.
+- **Owner responsibilities:** Review the updated demo and copy before
+  integration; resolve D5 and operating gates separately; authorize each
+  applicable remote action/deployment and the eventual launch.
+- **CODEMAP:** Updated with public design scope, motion build and demo checks;
+  remains 150 lines. The simple plan, active v2 handoff and `V1_WORK.md` link
+  the accepted design supplement without reopening rollout authorization.
+
+## v1 demo user-profile access — 2026-10-25
+
+- **Built:** Added the missing User / profile entry to the v1 demo Screen
+  dropdown, with the existing approved sign-in, player-name and leaderboard
+  previews. Reused the account demo; synchronized its navigation with the v1
+  selector and full-size link. Restarted the static review server on port 5174.
+- **Skipped:** No new profile design, backend, auth, game, deployment or scope
+  acceptance. This is access to previously approved simulated account screens.
+- **Known issues:** Account previews require the local HTTP server because
+  they use JavaScript modules. Existing v1 visual/release gates remain open.
+- **Decisions:** Reuse the approved screens and catalog; no dependency changes.
+- **Questions for the owner:** Continue the pending visual review; no additional
+  decision is needed to expose the existing profile preview.
+- **Evidence:** `build/v1-profile-review/results.json`: 16 focused browser
+  checks pass, including profile at 390×844, 844×390 and 1280×800, full-size
+  links, no horizontal overflow, name editing, leaderboard/sign-in/sign-out
+  navigation, offline state and zero browser errors. Explicit Prettier/ESLint
+  checks pass for the two changed demo scripts. Full application verification
+  was not repeated for this isolated demo-navigation change; the previous
+  verification remains historical.
+- **Measurements/waivers:** Functional viewport emulation only; no new timing,
+  capacity or real-device evidence and no waivers.
+- **Owner responsibilities:** Review layouts/content before integration and
+  retain separate approval for deployments and public-account release gates.
+- **CODEMAP:** Updated with the integrated profile/account previews.
+
+## v1 handoff, interactive demo and first selector slice — 2026-10-24
+
+- **Built:** Imported the owner-supplied consolidated v2 handoff into
+  `V1_RELEASE_CHECKLIST.md`, marked the earlier v1 proposal historical and
+  recorded explicit local implementation authorization. Captured D1 dashboard
+  plus anonymous events, D3 Terms preparation, D4 curated themes, and D5 proposed
+  18+ wording approved for the demo only. Updated the simple plan/agent guidance
+  to preserve those newer owner instructions.
+- **Built for visual review:** `static/demo/v1.html` and its isolated screen,
+  catalog, styles and interactions provide 15 public/operator screens at all
+  three required viewport sizes. Includes puzzle interactions, mystery Next,
+  content/Terms review, simulated 2FA/recovery/re-authentication, role
+  presentations, moderation/reporting/audit and a proposed protected privacy
+  workflow. Everything is synthetic and in memory. The owner specifically
+  requested this actual demo instead of wireframes; layouts/copy await approval.
+- **Application slice:** Removed Block-first. Weighted family order is sampled
+  without replacement, with one of each eligible family per cycle, minimum gaps
+  across refills and stable pending draws through failures. Added larger-index
+  property checks without new puzzles. Generic start-error and loading text
+  preserve the mystery; Home best no longer reads the next family's best.
+  Browser fixtures inject selector entropy in tests only. No engine logic,
+  replay vectors, engine versions or dependency versions changed.
+- **Skipped/pending:** New production screens, SEO routes/metadata/OG/sitemap,
+  real admin security/backend and enrollment, telemetry and its final privacy
+  controls, final Terms publication, production operating decisions/resources,
+  OAuth/mailbox verification, restore/load/rollback/resource/device drills and
+  every deployment remain unfinished. The demo does not implement or validate
+  production security, collection or account rollout. Public site is unchanged.
+- **Known issues:** Account eligibility is not finally accepted; Ali Gohar owns
+  a focused legal review of jurisdictions/child-data obligations for the
+  intended global account launch. Proposed age wording does not verify age.
+  Production ID-token storage, audit/claim retention, observability, admin
+  recovery, resource measurements and operating rules remain explicit gates.
+  The initial demo check caught phone admin overflow; fixed before the passing
+  45-layout check. Two overlapping Playwright runs initially collided in their
+  shared trace directory (ENOENT during browser-context cleanup); the affected
+  run was stopped. A serial rerun passed 26/27 browser cases and exposed one
+  stale privacy-test assumption that the first family must be Block; that
+  assertion now checks either game, matching the owner amendment. The final
+  clean `bun run verify` passes, including all 27 browser cases. No application
+  defect remains from those test-harness/obsolete-expectation failures.
+- **Decisions/security:** Owner asked for Cloudflare security skills;
+  project-local `workers-best-practices` and `wrangler` guidance and relevant
+  current official Worker/Web Crypto/D1 references were checked. Keep pinned
+  versions and compatibility settings; no secrets, DNS, Google or live Worker
+  settings were inspected or changed. Local tools use ignored development
+  bindings normally. Demo-only role tests are not production RBAC evidence.
+- **Questions for the owner:** Review/approve or amend the demo layouts and
+  how-to/scoring/tips/Terms copy before production screen integration (checklist
+  §§4.1/5.2 and `AGENTS.md` rule 9; demo replaces wireframes at owner request).
+  Final account eligibility and jurisdictions need owner resolution after
+  focused legal review; operating choices and future remote approvals remain.
+- **Evidence table:**
+
+| Acceptance item                                               | Evidence type / location                                                | Result                                                                                                                                                          |
+| ------------------------------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Revised handoff and explicit owner decisions preserved        | `V1_RELEASE_CHECKLIST.md`, `DECISIONS.md`, simple plan, `V1_WORK.md`    | Pass: local work authorized; release scope not finally frozen                                                                                                   |
+| Actual interactive visual demo at 390×844, 844×390, 1280×800  | Local Chromium: `build/v1-demo-review/results.json`, 22 screenshots     | Pass: 98 checks, 45 screen/viewport cases, zero browser errors or backend mutations; owner approval pending                                                     |
+| Direct-file review without a dev server                       | Same synthetic browser evidence; open `static/demo/v1.html`             | Pass                                                                                                                                                            |
+| RNG-start, cycle counts/weights/gaps, stable failed draws     | `src/lib/selector.test.ts`, `tests/e2e/selector.spec.ts`, `entropy.ts`  | Pass: 13 selector unit cases and 3 new selector browser cases                                                                                                   |
+| Existing product regression                                   | `/tmp/morphi-v1-verify-clean.log`                                       | Pass: full `bun run verify`; format/lint, zero type errors/warnings, boundaries, 101 units, 17 integration, six runtimes, 15 Worker checks and 27 browser cases |
+| Determinism preserved                                         | Six-runtime output in verification log                                  | Pass: fingerprint `a8be9d5fdacc1818c3d078be2fa014cb279c349d6ba7313029f9a363b40b0ac4` unchanged                                                                  |
+| Historical guest artifact remains testable                    | `/tmp/morphi-v1-public-artifact.log`, `scripts/check-public-privacy.ts` | Pass: six local check groups; selector entropy fixture used only by the test browser; no new artifact or deployment                                             |
+| Production admin, telemetry, SEO delivery and public accounts | Active handoff release gates                                            | Pending: not implemented by a mock/demo                                                                                                                         |
+
+- **Measurements:** Desktop Chromium functional checks at the three viewport
+  sizes are emulations, not named real devices or performance measurements.
+  No network profile, cold/preloaded timing, median/p95, peak memory, production
+  CPU, capacity or screen-reader pass is claimed. Existing release targets
+  remain gates; synthetic demo checks are not substitutes.
+- **Waivers:** None. The earlier Step 5 owner waiver remains historical; no v1
+  acceptance item is waived by this work.
+- **Owner responsibilities:** Review the demo and content, resolve final
+  eligibility/jurisdictions and operating choices, authorize applicable remote
+  work and each deployment, complete real-device/provider checks and accept
+  the eventual release. No global launch acceptance is inferred.
+- **CODEMAP updated:** yes; active handoff, work log, demo and selector behavior
+  are mapped. `V1_WORK.md` lists the remaining implementation/release sequence.
+
+## V1 release planning — 2026-10-24
+
+- **Built:** Owner-requested `V1_RELEASE_PLAN.md`, grounded in the authoritative simple plan and accepted Step 6 evidence. It separates the release contract, approved local work, authorized production provisioning/operations, controlled account deployment and global launch. Includes a narrow Stage 1 admin-panel proposal, optional static terms decision, production request/maintenance/restore duties, measurement gates and deployment/rollback approval boundaries. Updated the simple plan, decision record, OAuth status note and CODEMAP.
+- **Skipped:** No application/configuration changes, credential-file access/installation, Google action, provisioning, DNS change, deployment, new services or admin/terms implementation. The plan does not authorize its proposed implementation.
+- **Known issues:** Owner reports production OAuth setup complete; actual client metadata, console branding/audience state and live sign-in are not verified by this planning task. Production account endpoints are not deployed. Account eligibility, operating/retention choices, protected production access and resource evidence remain open; no earlier local functional acceptance is reopened.
+- **Decisions and pinned versions:** Existing versions unchanged. Keep the two accepted games and seeded generation; general-audience privacy and intentional automatic Cloudflare beacon remain settled. Larger long-plan phases and parked features stay deferred.
+- **Questions for the owner:** Decide the release contract, Stage 1 panel versus a protected operator alternative, optional static terms scope, launch account eligibility and production operating/budget rules. These decisions are listed concretely in the plan; no implementation approval is assumed.
+- **Evidence table:**
+
+| Acceptance item                             | Evidence type / location                                                                 | Result                                                     |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------- | ---------------------------------------------------------- |
+| Reviewable v1 sequence and completion gates | Document review: `V1_RELEASE_PLAN.md` §§1–3, 6–7                                         | Pass: plan prepared; execution pending                     |
+| Small admin proposal and explicit limits    | Document review: §§2, 4–5; `ADMIN_LOCAL.md`, reference `PLAN.md` §11.10                  | Pass: proposal only; implementation pending owner decision |
+| Honest Google/privacy/local-review status   | Cross-check: plan §1, `STEP6_REVIEW.md`, `PUBLIC_PRIVACY_RELEASE.md`, owner messages     | Pass: reported versus verified status distinguished        |
+| Formatting, links and final scope review    | Prettier/ESLint, local Markdown link and plan-status checks; diff against saved baseline | Pass: lint, links and scope checks complete                |
+
+- **Checks:** `bun run lint` passes (repository Prettier check and ESLint); local Markdown links and plan-status checks pass; CODEMAP remains 150 lines. Diff against the saved pre-task documentation baseline shows only the intended plan/status/link additions. No obvious credential patterns found in changed documents. Application tests/type checks/build were not rerun for documentation-only changes; prior results are labelled historical.
+- **Measurements:** None taken; documentation-only task. Historical replay observations remain in `STEP6_MEASUREMENTS.md`; no new median/p95, production memory or capacity pass is claimed.
+- **Waivers:** None. Existing Step 5 owner waiver is unchanged; no new release gate is waived.
+- **Owner responsibilities:** Approve the selected implementation scope, supply actual Google console status, decide operating/eligibility/budget choices, authorize each applicable remote action/deployment, and perform/accept production device checks and public launch.
+- **CODEMAP updated:** yes; release plan is linked without changing the simple plan's authority.
+
+## Guest privacy publication and intentional Cloudflare analytics — 2026-10-24
+
+- **Built/published:** Owner explicitly approved publishing the prepared guest homepage/privacy bundle. Initial release: `morphi-one` version `44a5846f-95d6-43d5-b61e-c7f478b6e857`, deployment `0da17bcf-36a2-4140-83ea-8c663efd7afd`, 2026-10-24T12:14:09.992338Z; reviewed manifest `15c32fd3562c607d43d676e09041f4ccda498e9457f06a18c553e43ce600efce`, archived in `build/public-privacy-published-44a5846f/`. Home/privacy return 200 on custom domain and workers.dev; HTTP/www redirects remain canonical; guest Block/result/Next/Memory works and account/API paths stay unavailable.
+- **Intentional beacon:** Live browser responses include **Cloudflare Web Analytics through Cloudflare’s automatic setup**. It is absent from build files **by design** because Cloudflare injects it at delivery. The owner explicitly chose to keep it and instructed updating `/privacy`, noting intentional injection here, and rechecking live pages. No analytics configuration was added or toggled by the agent. The first generic no-external-request assertion surfaced this behavior; it is recorded as a failed assumption, not silently declared a pass. Raw build integrity checks remain strict; live checks now permit only the exact identified Cloudflare beacon origin/path and still reject other external requests.
+- **Disclosure update:** Added Website analytics copy describing visits/performance, coarse report dimensions, automatic delivery injection, no custom Google identity/seed/move/history events and separate provider report retention. General-audience/contact/deletion direction remains unchanged. Follow-up publication is explicitly requested by the owner's live-page update instruction; final published version is `b50a7a18-2e85-4406-bd40-77f27c4b3da3`, deployment `fdb5c4e0-d618-40f0-a557-0130470cc24a`, 2026-10-24T12:32:54.790982Z; final evidence is recorded below.
+- **Skipped:** No production account backend/D1, Google project/client/credential changes, Google submission, DNS edits, GA4, ads, new analytics pipeline, consent/age flow, CMS, admin web panel or game changes. Cloudflare account analytics settings were not changed. Domain ownership is already done according to the owner's explicit confirmation.
+- **Known issues:** The diagnostic MCP session cannot inspect account-level Web Analytics settings (`account-settings.read` missing); retention is not independently configured/verified. No fixed provider erasure deadline or blanket privacy-law/consent exemption is claimed. Initial Python-urllib HTTP 403 was not reproduced by successful curl/browser delivery checks; it is not reported as an ongoing outage. Public accounts and their operating/resource gates remain separate from this guest/policy release.
+- **Decisions/versions:** Keep existing dependency pins and static publication config. Update only policy content and focused verification behavior for the owner's intentional provider analytics choice. Keep main local-account config away from public deployment. Source/docs references are in `PRIVACY_RETENTION.md` and `DECISIONS.md`.
+- **Owner responsibilities:** Domain ownership is owner-confirmed complete. Owner will configure/apply for the production Google project using the public home/privacy URLs; no Google verification or global account launch is inferred. Every later deployment still requires its applicable explicit authorization.
+- **Evidence:** Source type check: zero errors/warnings; focused privacy browser cases: 2/2 pass; exact regenerated artifact: 41 files, manifest `019edab6f58dff4f231739763a527f955e84afa60432da08a9e19a52f28d82c0`, credential scan clean. Type check, lint, focused privacy cases (2/2), build, six local artifact groups and packaging dry run pass. The owner-requested live recheck passes all seven groups, including intentional Cloudflare beacon and no other external requests; account/auth/API routes remain 404 and Block/result/Next/Memory works. Both hostnames serve updated disclosure/metadata; curl HTML matches reviewed assets and HTTP/www redirects remain canonical. Evidence: `/tmp/morphi-analytics-{check,lint,privacy-browser,build,local-smoke,dry,live-smoke}.log` and `build/public-privacy/checks/{deployment,live-results,live-http-results}.json`; three live screenshots captured. The post-deployment API reports 100% of traffic on the new version, no backend bindings, and custom domain still attached. Earlier 95-unit/17-integration/six-runtime/15-Worker/24-browser verification remains the prior functional evidence; these unrelated tests were not repeated for policy text.
+- **Measurements/waivers:** Functional desktop Chromium checks at phone portrait/landscape and desktop sizes; no new speed/memory medians or p95 claims, no waiver. Tests use synthetic guest rounds, no production account data.
+- **CODEMAP:** Updated with publication/intentional-beacon status before delivery.
+
+## Owner local Step 6 review accepted — 2026-10-24
+
+- **Built:** Reviewed the owner-completed `STEP6_REVIEW.md` and synchronized the current plan, decision/status records and CODEMAP. No application code changed.
+- **Skipped:** No deployment, provisioning, DNS/OAuth change, Google submission or admin-panel implementation. The question about deployment is not treated as authorization.
+- **Known issues:** Specific device/browser models and the mobile OAuth connection method were not supplied. Peak isolate memory, production capacity and operating/eligibility decisions remain open; no measurement pass or waiver is inferred.
+- **Decisions:** Owner accepts the local functional Step 6 build on 2026-10-24. PC/mobile checks are owner-reported evidence. Public account rollout and global launch are not accepted by this review.
+- **Questions / owner responsibilities:** Explicit approval is still required before the prepared guest-policy Cloudflare deployment; subsequent domain/Google setup and submission require their applicable authorization. Additional device/browser details can be recorded later without reopening the accepted functional review.
+- **Evidence:** All nine functional review rows report working as expected on PC/mobile; the final row explicitly accepts Step 6 (`STEP6_REVIEW.md`). Existing automated evidence remains in the prior report; tests were not rerun for this documentation-only update. The prepared guest artifact still has 41 matching files and config hash; manifest SHA-256 `15c32fd3562c607d43d676e09041f4ccda498e9457f06a18c553e43ce600efce`.
+- **Measurements / waivers:** No new timing or memory measurements, medians/p95, or waivers. Owner records PC/mobile only.
+- **CODEMAP updated:** yes.
+
+## Privacy readiness and guest publication preparation — 2026-10-24
+
+- **Built:** Reviewed public policy candidate with the approved general-audience direction, owner/contact, updated date, production canonical, Home/account links, no internal draft banner/notes/noindex and no client JavaScript on the legal page. The copy distinguishes public guest play from later account features. Added a real retention inventory and an owner-monitored privacy/children's-information request procedure. Added local admin/TOTP-protected operational cleanup and verified-request deletion, each audited atomically. Prepared an assets-only guest publication artifact with explicit allowlisting, hashed manifest and local browser/workerd checks. Updated the Google production setup/submission instructions and prepared a physical-device Step 6 review checklist.
+- **Skipped:** No deployment, public publication, DNS modification, production D1/secrets/OAuth changes, Google submission, automatic cleanup service, age gate/verification/parental-consent service, CMS, GA4, new puzzle, multiplayer, payments or web admin panel. No real personal account or owner's local saved data was deleted/cleaned by the task. No dependency or engine/schema/auth-provider changes.
+- **Known issues:** Initial full checks exposed a Worker-vector startup failure and one source-reload interruption in a layout test. Captured diagnostics identified a fixed-port collision with another local application; the vector harness now reuses its OS-assigned test port, reports bounded child startup errors and exits promptly when the child fails. No timeout or assertions were weakened, and the other application was left untouched. The layout trace shows Vite hot updates resetting an in-progress game during a final source edit; the final stable-source full run passes, as recorded below. Account data/saved rounds remain until account deletion; audit records, unlinked state/rate limits, unresolved claimed starts, browser copies and provider records can outlive that deletion. Maintenance is manual/local, not scheduled, and provider log/recovery retention is not configured by this task. Public account eligibility/jurisdictions and production operator/maintenance/audit/restore procedures remain v1 gates. Owner physical-device acceptance and true peak isolate memory/production capacity evidence remain pending. No universal legal-compliance determination or Google-approval guarantee is made.
+- **Decisions / versions:** Owner confirmed personally monitoring cngohar@gmail.com. Preserve general-audience intent; no child-focused product or separate site. Use the published-update label with source revision date 2026-10-24, not a fictitious effective date. Existing Better Auth 1.7.12 session/online basic scopes and token storage were inspected; only access/refresh token encryption is asserted at application level. Cleanup preserves active supersession rows and unresolved claims. The assets-only candidate targets the same Worker/custom domain and replaces guest server rendering with static serving; no backend binding is included. `redact_query_string:true` is prepared locally, with no live changes. Existing dependency pins stay unchanged; see `DECISIONS.md`.
+- **Questions / owner responsibilities:** Review and explicitly authorize the exact guest publication artifact before deploying it; `AGENTS.md` requires a separate approval for every deployment. Confirm Search Console/domain/project state, perform or authorize production Google setup and applicable submission, follow requests received at the monitored mailbox, resolve public-account operational/eligibility decisions, and complete the physical-device checklist. No settled audience/wording question is reopened.
+- **Evidence table:**
+
+| Acceptance item                                                                             | Evidence                                                                                                      | Result                                                                                                                                           |
+| ------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------ |
+| Real public/local architecture and provider limitations                                     | Read-only Cloudflare settings/deployment GETs; schema/auth/source inspection; current primary docs            | Live version unchanged, ASSETS only/no account D1, observability top-level disabled, Logpush off/no tails; limitations in `PRIVACY_RETENTION.md` |
+| Privacy copy, updated date, production URL/contact, no draft/local notices                  | `tests/e2e/privacy.spec.ts`; publication static/browser assertions                                            | Pass; final full verification below                                                                                                              |
+| Home/account links, no-JS legal document and layouts                                        | Normal account/privacy browser cases and guest artifact checks                                                | Pass; final full verification below                                                                                                              |
+| Real Google scopes and auth data                                                            | Google authorization URL assertions, pinned auth/provider/schema inspection                                   | Exactly openid/email/profile and online access; no password registration; no age claim inferred                                                  |
+| Local cleanup permission, active/expired distinction, safe supersession/retry recovery      | `tests/integration/accounts.test.ts`                                                                          | Pass in isolated D1                                                                                                                              |
+| Privacy deletion, FK cascades, revoked sessions, board field allowlist and separate records | Accounts/runs integration and built-Worker checks                                                             | Pass; integration plus 15-check built-Worker smoke                                                                                               |
+| Atomic audit requirement                                                                    | Injected audit-insert failure triggers in isolated D1                                                         | Cleanup and privacy deletion both roll back; successful actions audit without request-message/age/email evidence                                 |
+| Request procedure and responsible contact                                                   | `PRIVACY_REQUESTS.md`; owner reply                                                                            | Prepared; monitoring owner-confirmed; mailbox deliverability not independently tested                                                            |
+| Exact guest publication payload, inaccessible account/API routes and real two-game rotation | `build/public-privacy/manifest.json`; `scripts/check-public-privacy.ts`; local workerd/browser checks         | Pass; 41 asset files match the final manifest, all six workerd/browser check groups pass                                                         |
+| Source diff/secrets/scope                                                                   | Local baseline comparison (workspace has no Git metadata); configured-credential scan without printing values | No credential-value matches; core RNG/game logic/auth/schema unchanged                                                                           |
+| Publication / OAuth / Step 6 acceptance / global launch                                     | Live deployment state and owner/Google evidence                                                               | Pending; none inferred or waived                                                                                                                 |
+| Authoritative plan/decisions/CODEMAP                                                        | `morphi-plan-simple.md`, `DECISIONS.md`, `CODEMAP.md`                                                         | Updated; CODEMAP 150 lines                                                                                                                       |
+
+Changed files for this task:
+
+| Area                                                           | Files                                                                                                                                                                         |
+| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Public policy                                                  | `src/lib/content/privacy.ts`, `src/lib/i18n/messages.ts`, `src/routes/privacy/+page.svelte`                                                                                   |
+| Guest publication mode (account prompts/replay queue disabled) | `src/routes/+page.ts` (new), `src/routes/+page.svelte`, `src/lib/screens/HomeScreen.svelte`, `src/lib/screens/ResultScreen.svelte`                                            |
+| Local operator controls                                        | `src/lib/server/retention.ts` (new), `scripts/admin-local.ts`                                                                                                                 |
+| Publication preparation/checks                                 | `scripts/prepare-public-privacy.ts`, `scripts/check-public-privacy.ts` (both new)                                                                                             |
+| Existing verification                                          | `tests/integration/accounts.test.ts`, `tests/e2e/privacy.spec.ts`, `scripts/check-vectors.ts`                                                                                 |
+| Configuration                                                  | `package.json`, `wrangler.jsonc`, `wrangler.public-privacy.jsonc` (new)                                                                                                       |
+| Operational docs                                               | `docs/PRIVACY_RETENTION.md`, `PRIVACY_REQUESTS.md`, `PUBLIC_PRIVACY_RELEASE.md`, `STEP6_REVIEW.md` (new)                                                                      |
+| Project records                                                | `AGENTS.md`, `morphi-plan-simple.md`, `docs/PRIVACY_REVIEW.md`, `GOOGLE_OAUTH_PUBLIC.md`, `ADMIN_LOCAL.md`, `STEP6_WORK.md`, `DECISIONS.md`, `CODEMAP.md`, `PHASE_REPORTS.md` |
+
+- **Final verification:** `bun run verify` passes in `/tmp/morphi-readiness-verify-complete.log`: format/lint, 0-error/0-warning type check, boundary self-checks, 95 unit tests, 17 D1/auth integration tests, six runtime vectors (unchanged fingerprint `a8be9d5fdacc1818c3d078be2fa014cb279c349d6ba7313029f9a363b40b0ac4`), production build, 15 isolated built-Worker checks and all 24 Chromium account/privacy/recovery/layout/input cases. Initial failures and their fixes are described above; `/tmp/morphi-readiness-layout-hmr.zip` retains the interrupted-run evidence. A final factual mail-disclosure addition was checked separately with `bun run check` (0 errors/warnings) and the rebuilt artifact checks. Final `prepare:public-privacy`, `test:public-privacy` and `wrangler deploy --config wrangler.public-privacy.jsonc --dry-run` all pass (`/tmp/morphi-readiness-public-build-final.log`, `/tmp/morphi-readiness-public-test-final.log`, `/tmp/morphi-readiness-public-dry.log`). Dry run reports no bindings and exits without upload; its 47 filesystem entries correspond to 41 asset files plus directories, not a claim about total uploaded asset bytes. Manifest SHA-256: `15c32fd3562c607d43d676e09041f4ccda498e9457f06a18c553e43ce600efce`. After the dry run, all asset names/hashes still match. Final phone rendering inspected at `build/public-privacy/checks/privacy-390.png`; three approved sizes captured. The final scan of 30 changed source/config/doc files and all 41 asset files found no configured credential-value matches; baseline diff is `/tmp/morphi-privacy-readiness.diff` (no Git metadata in this workspace).
+- **Measurements:** Local Linux development desktop and Chromium; localhost serving; policy layouts 390×844, 844×390 and 1280×800 in the artifact check, plus the normal 320×480 policy case. These are functional/layout checks, not new latency/performance claims. No median/p95 series was introduced; prior replay measurements and their limits remain in `STEP6_MEASUREMENTS.md`.
+- **Waivers:** None. The initial harness collision and interrupted layout run are disclosed, not waived. No remaining owner/device/resource/legal/production gate is marked accepted by this task.
+- **CODEMAP updated:** yes.
+
+## Privacy audience clarification — 2026-10-24
+
+- **Built / decisions:** Owner clarified that Morphi is a general-audience puzzle site with no child-focused content, design, or marketing and no separate kids site planned. This supersedes the intended-under-13 audience interpretation in the report below. Updated the local draft to describe guest ages not being requested or independently verified, essential connection/provider data, deferred child accounts, and unresolved public account eligibility/request handling. Policy version: `2026-10-24-draft-2`. Updated the simple plan, AGENTS, decision record, OAuth guide, and `PRIVACY_REVIEW.md`; the latter links rechecked FTC/EU guidance. The clarification does not establish a legal classification by itself.
+- **Skipped:** No age gate, consent system, sign-in eligibility change, CMS, analytics, publication, Google submission, or deployment. No dependency changes.
+- **Known issues / owner responsibilities:** Account eligibility, handling of known children's information, retention, and final wording still require review before publication. The policy remains draft/noindex. No new owner question or waiver; Step 6 acceptance remains pending.
+- **Evidence:** `bun run check` passes with zero errors/warnings; both updated `tests/e2e/privacy.spec.ts` Chromium cases pass, covering the no-JavaScript disclosures, draft state, navigation, and four layouts. Existing static rendering and account-navigation evidence remains in the prior report. No new performance claim or measurements; CODEMAP updated.
+
+## Privacy policy page — local draft, 2026-10-23
+
+- **Built:** `/privacy` with the owner-supplied operator Ali Gohar and public contact cngohar@gmail.com, current Google/account/history/leaderboard/device-storage/security disclosures, provider links, deletion/retention limits, and children's/families wording. Prerendered HTML with client JavaScript disabled, readable without sign-in, title/description/canonical, accessible headings, and a visible draft/noindex state. Home and account/content footers link to it; gameplay has no footer overlay. Content is separate from the route layout and all copy uses the message catalog. Fixed the server hook's build guard so prerendering never reads unavailable Worker bindings. Added static-document/account-navigation and layout checks, plus `/privacy` in the isolated built-Worker smoke.
+- **Skipped (and why):** No publication, Google submission, DNS/credentials/backend provisioning, or deployment. No admin editor/CMS, terms/blog/other new pages, analytics, age screen, or parental-consent flow. The owner selected under-13 guest games with child accounts deferred; this task records that decision and exposes the unimplemented safeguards instead of inventing an account flow. Later editable static pages belong to long-plan section 11.10 Stage 5.
+- **Known issues:** This is deliberately a local draft, not a publication-ready policy or a legal-compliance determination. The under-13 guest-only/account-eligibility and data-collection safeguards must be designed, implemented, and reviewed before public accounts. Security/moderation/provider-log/backup retention periods and request handling still need owner review. Google's requirements and children's privacy considerations apply to actual behavior; a page alone does not establish those protections. `docs/PRIVACY_REVIEW.md` records the scope and blockers. Step 6 owner/physical-device acceptance remains open.
+- **Decisions and pinned versions:** Owner chooses public OAuth verification before the full v1 launch, with final home/privacy information published first through a separately authorized, reviewed change. The local accounts configuration is not a policy-only deploy artifact. Keep Google-only sign-in, guest play, and existing dependency pins. Use the approved scrolling content template; no CMS schema or Markdown/HTML interpreter is added. Current SvelteKit prerender/CSR and Google/FTC primary sources are linked in `PRIVACY_REVIEW.md`; no dependencies changed.
+- **Questions for the owner:** Review the local policy and the recorded under-13 guest-only direction. A separate safeguards/retention design review is needed before this policy can be finalized for Google submission. Admin editing and other static pages remain future scoped work.
+- **Evidence table:**
+
+| Acceptance item                                                                       | Evidence type                                   | Where                                                                            | Result                                                                  |
+| ------------------------------------------------------------------------------------- | ----------------------------------------------- | -------------------------------------------------------------------------------- | ----------------------------------------------------------------------- |
+| Publicly readable policy without sign-in or JavaScript                                | Browser with JS disabled; built HTML inspection | `tests/e2e/privacy.spec.ts`; `.svelte-kit/output/prerendered/pages/privacy.html` | pass; generated HTML contains policy/contact details and no script tags |
+| Owner/contact, draft blockers, canonical, and children's disclosure                   | Browser assertions and source review            | `privacy.spec.ts`, `src/lib/content/privacy.ts`, message catalog                 | pass                                                                    |
+| Home/account links; no gameplay footer; mobile and desktop fit                        | Browser layout/navigation checks                | `privacy.spec.ts` at 390×844, 844×390, 1280×800, 320×480                         | pass                                                                    |
+| Static-document navigation preserves sign-in                                          | Real local signed-session browser test          | privacy navigation case in `tests/e2e/accounts.spec.ts`                          | pass                                                                    |
+| Existing account, recovery, game-layout, and input checks                             | Existing Chromium cases in full browser run     | `/tmp/morphi-privacy-e2e.log`                                                    | all 21 pre-existing cases pass                                          |
+| Final new privacy/navigation checks                                                   | Focused Chromium run                            | `/tmp/morphi-privacy-focused.log`                                                | 3/3 pass; the new Play assertion waits for Home hydration               |
+| Lint/format and type check                                                            | Project commands                                | `bun run lint`, `bun run check`                                                  | pass; 0 errors, 0 warnings                                              |
+| Production build including prerender                                                  | Framework build                                 | `bun run test:worker`; `/tmp/morphi-privacy-worker.log`                          | pass after moving build guard before Worker binding reads               |
+| Built Worker still serves public pages and validates/revokes real sessions            | Isolated temporary local D1 smoke               | `scripts/check-worker.ts`, `/tmp/morphi-privacy-worker.log`                      | 15 checks pass, including guest `/privacy`                              |
+| Readable layout review                                                                | Local Chromium screenshots                      | `/tmp/morphi-privacy-390.png`, `-844.png`, `-1280.png`                           | inspected portrait and desktop; all sizes captured                      |
+| Public publication / Google verification / children's safeguards / retention approval | Owner review and future implementation          | `docs/PRIVACY_REVIEW.md`                                                         | pending; no waiver or public-ready claim                                |
+| CODEMAP and decision records                                                          | Documentation                                   | `docs/CODEMAP.md`, `docs/DECISIONS.md`, simple plan                              | updated                                                                 |
+
+- **Measurements:** Layout checks use local desktop Chromium with the four viewport sizes above and normal scrolling for the policy; Home retains its no-scroll fit. No new timing/load-performance claim or median/p95 series was introduced. Existing Step 6 replay measurements remain unchanged.
+- **Waivers:** None. The policy remains visibly draft/noindex; unresolved children's safeguards and retention review are not waived.
+- **Owner responsibilities:** Review the wording, confirm the contact is monitored, and complete the separate safeguards/retention decisions and implementation review. Then review a concrete policy/home publication artifact or production rollout configuration and explicitly authorize its deployment before Google submission. Continue v1 release work after those gates; do not publish the current local backend configuration as a shortcut.
+- **CODEMAP updated:** yes (145 lines).
+
+## Step 6 local delivery and puzzle isolation — 2026-10-23
+
+Status: implementation and automated local verification delivered. Owner acceptance and new physical-device review remain pending; Step 6 is not declared accepted or globally released.
+
+- **Built:** Dedicated Memory/Block directories with pure rules, manifests/versions, local views/themes/components/tests and READMEs; pure shared engine and external seed entropy; generated headless catalog/app registry and linted dependency boundaries. New versioned completed runs queue at logical completion before animations, replay into account-owned history/bests, and retry idempotently through IndexedDB/backoff. Explicit guest import remains unranked. Added server-owned ranked starts, authoritative timed scoring, D1 caps/supersession/claims/recovery, bounded replay, compatible all-time boards, personal position, hide/ban/deletion consistency, and private API/cache handling. Added local role/TOTP moderation with transactional audits and a ranked kill switch. Public OAuth submission guide and local delivery/measurement docs are written.
+- **Skipped (and why):** No production database/secrets, OAuth project/publication/brand submission, DNS change, repository publication, or deployment; this authorization is local. No full admin web panel, new game, expanded procedural themes, unfinished-round cross-device continuation, payments, multiplayer, analytics pipeline, or sharding. Global-release planning (including a web admin panel proposal) follows owner review. No admin is automatically enrolled.
+- **Known issues:** The remaining real-phone check is owner-operated. Cross-device functionality is automated with two independent browser contexts; no physical second-device OAuth sign-in was claimed. Replay CPU and observed heap were measured, but allocation-time peak isolate memory, production request cost/capacity, and real-phone loading performance are unmeasured. Long Memory logs beyond the documented cap are retained locally with an explicit verification failure rather than saved/ranked. IndexedDB failure retains only in-memory pending results until acknowledged; the UI warns to keep the tab open. Ranked Memory wall time includes preview/background/submission delay, unlike solo active time; the saved-score line shows the authoritative result. Replay cannot establish human play. Local session/history retention, production key rotation/pending-data compatibility, and production admin recovery need review in the global-release plan.
+- **Decisions and pinned versions:** No dependency upgrades. Keep TypeScript `~6.0.3`, Better Auth and Drizzle adapter `1.7.12`, Drizzle ORM `0.45.4`, kit `0.31.11`, Cloudflare adapter `8.0.1`, Wrangler `4.151.3`. Use stateful, opaque, account-bound D1 ranked sessions and conditional atomic claims for the short-plan scope instead of the long plan's stateless-token/Durable Object platform. Preserve game vectors and four fixed themes. Details, caps, timing, group/tie rules, and the moderation boundary are in the latest `DECISIONS.md` entry.
+- **Questions for the owner:** Review the local account/history/leaderboard flows and a round on a physical phone, then accept or report issues. The following planning discussion should define the global-release scope and smallest useful protected admin panel; this report does not implement it.
+- **Evidence table:**
+
+| Acceptance item                                                                  | Evidence type                                               | Where                                                                                          | Result                                                              |
+| -------------------------------------------------------------------------------- | ----------------------------------------------------------- | ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------- |
+| Guest play and Block-first/Memory rotation retained                              | Unit/browser regression                                     | `selector.test.ts`, `tests/e2e/layout.spec.ts`, `reliability.spec.ts`                          | pass                                                                |
+| Google sign-in/out, cancellation, expired sessions, fresh deletion               | Owner-reported interactive OAuth; D1/browser tests          | owner confirmation in chat; `tests/integration/accounts.test.ts`, `tests/e2e/accounts.spec.ts` | local OAuth owner-confirmed; automated flows pass                   |
+| Engine/puzzle isolation and unchanged generation/scoring                         | Import self-checks, independent vectors, unit regressions   | `scripts/check-boundaries.ts`, puzzle tests, `tests/vectors/`                                  | pass                                                                |
+| New completed history, bests, account ownership/isolation                        | D1 tests and independent browser contexts                   | `tests/integration/runs.test.ts`, account browser suite                                        | pass for automated contexts; physical second device unverified      |
+| Old browser bests and guest imports never become ranked scores                   | Replay/API and browser import tests                         | `runs.test.ts`, account browser suite                                                          | pass                                                                |
+| Server chooses ranked seeds and computes scores                                  | D1 and actual built-Worker checks                           | `runs.test.ts`, `scripts/check-worker.ts`                                                      | pass                                                                |
+| Malformed/forged/oversized/expired/superseded/conflicting submissions rejected   | D1/adversarial HTTP tests                                   | `runs.test.ts`, account browser suite                                                          | pass                                                                |
+| Identical/concurrent retries and interrupted-claim recovery store one result     | D1 race tests; lost-response browser test; built Worker     | `runs.test.ts`, account browser suite, `check-worker.ts`                                       | pass                                                                |
+| Finished result survives reload and interruption                                 | Logical-completion-before-animation and lost-response tests | account browser suite; `src/lib/ui/progress.ts`                                                | pass                                                                |
+| Blocked storage remains playable with honest warning                             | Real browser API failure injection                          | account browser suite                                                                          | pass; persistence unavailable is explicitly disclosed               |
+| Comparable groups, one best result/player, hidden/banned/deleted entries removed | Real D1 queries and browser/built-Worker deletion           | `runs.test.ts`, account browser suite, `check-worker.ts`                                       | pass                                                                |
+| Necessary moderation permissions, second factor, and audits                      | D1 role/audit tests; RFC 6238 vector                        | `runs.test.ts`, `admin-totp.test.ts`, `docs/ADMIN_LOCAL.md`                                    | pass; owner enrollment not performed                                |
+| Lint/format and zero-error/zero-warning type check                               | Full verification command                                   | `bun run verify`                                                                               | pass                                                                |
+| Unit and account/ranked integration regressions                                  | Vitest                                                      | full verification: 95 unit and 15 integration tests                                            | pass                                                                |
+| Browser account, recovery, input, and approved layouts                           | Chromium                                                    | full verification: 21 cases including 390×844, 844×390, 1280×800, smaller portraits            | pass                                                                |
+| Node/Bun/Chromium/Firefox/WebKit/Worker vectors                                  | Independent-reference comparison                            | `bun run test:vectors`; fingerprint in `STEP6_MEASUREMENTS.md`                                 | pass                                                                |
+| Production build and local built Worker                                          | Framework build, isolated temporary D1 smoke                | `bun run test:worker` within full verification                                                 | pass, 14 smoke checks                                               |
+| Deployable bundle validation, without upload                                     | Wrangler dry run                                            | `/tmp/morphi-step6-bundle.log`                                                                 | pass: 2547.44 KiB / 475.44 KiB gzip; no upload                      |
+| Replay CPU and memory observations documented                                    | Five warmed batches per workload, Node CPU and V8 inspector | `scripts/measure-replay.ts`, `STEP6_MEASUREMENTS.md`                                           | local observations recorded; true peak/production limits unverified |
+| Physical phone and final local acceptance                                        | Owner review                                                | owner                                                                                          | pending; no waiver                                                  |
+| Public OAuth instructions                                                        | Current official documentation review                       | `GOOGLE_OAUTH_PUBLIC.md`                                                                       | written; no remote action                                           |
+| CODEMAP                                                                          | Documentation                                               | `docs/CODEMAP.md`                                                                              | updated                                                             |
+
+- **Measurements:** Desktop AMD PRO A8-8650B/Linux, no network during replay, warmed, five batches of 1,000 replays/workload. Local Worker median/p95 batch-average sampled CPU per replay: Block 300 moves 0.750/0.768 ms; Memory 120 flips 0.0540/0.0721 ms. Maximum observed post-batch Worker used/allocated heap: Block 2,127,772/6,553,600 B; Memory 4,042,988/10,747,904 B. These are local baseline observations, not a new production CPU or peak-memory pass. Node comparison, exact method, fingerprint, device/network limitations, and unmeasured targets are in `STEP6_MEASUREMENTS.md`. No real-phone cold/preloaded median/p95 load series or production concurrency test was taken.
+- **Waivers:** None added. The prior Step 5 replay-measurement waiver remains the owner's recorded exception; it is not reused for Step 6 device/memory/release evidence.
+- **Owner responsibilities:** Review on a physical phone and accept the local delivery. If desired, enroll local moderation through `ADMIN_LOCAL.md`; protect its OS login and authenticator. Next, agree the global-release/admin-panel scope, operator/contact/age/retention details, and public pages. Only after concrete review should production Google/D1/secrets and deployment be authorized. Follow `GOOGLE_OAUTH_PUBLIC.md` at that time.
+- **CODEMAP updated:** yes.
+
 Newest first.
+
+## Step 6: OAuth credentials and real sign-in start — 2026-10-23
+
+- **Built:** Verified the owner’s new local OAuth credential fields are populated, the client ID has the expected format, and `.dev.vars` remains mode 0600; no credential values were printed. Restarted the local app to load them. Fixed the real SvelteKit sign-in action to explicitly allow its external redirect only to `https://accounts.google.com`. Previously, SvelteKit 3 rejected the redirect and returned a 500 before Google could handle it. Added a browser regression for the actual enhanced form, canonical callback, basic identity scopes, and HttpOnly/SameSite state cookie. Updated active status and Google Testing/brand-verification guidance.
+- **Skipped (and why):** No user Google password, consent, or identity interaction was automated. No Google app publishing, brand submission, DNS change, production database, secret upload, or deployment. Saved progress and ranked scoring remain the next implementation slices after the real account flow is verified.
+- **Known issues:** Reaching Google’s sign-in page does not verify the client secret/token exchange or create an account. The aggregate-only local D1 check found zero non-fixture Google-linked accounts and active sessions; full user login/callback is still pending. The local browser check reached Google with the expected callback, detected a sign-in page and no identified provider error/block, but did not authenticate. The new regression skips explicitly when OAuth credentials are absent; it passed with this configured local app.
+- **Decisions:** Current SvelteKit docs and installed types require explicit external redirect permission. Use an origin allowlist instead of allowing arbitrary destinations. Keep the OAuth app in Testing, as reported by the owner. Development/testing does not require brand verification. Plan production publishing and brand verification for Morphi’s public Google-login release; basic `openid`, `email`, and `profile` scopes do not require sensitive/restricted-scope verification. Google’s current state table also gives basic-identity-only apps an exception to Testing allowlisting. No pinned versions changed.
+- **Questions for the owner:** Complete a Google login in the normal browser at `http://localhost:5173/account/sign-in`, choose a public player name, sign out, and sign back in. This verifies the external identity/callback path that a test fixture cannot establish.
+- **Evidence table:**
+
+| Item                                                 | Evidence type                                           | Where                                                                              | Result                                                                                                   |
+| ---------------------------------------------------- | ------------------------------------------------------- | ---------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- |
+| Credentials present and local file protected         | Values inspected without printing them                  | Ignored `.dev.vars`; sanitized presence/format check                               | configured; mode 0600                                                                                    |
+| App loads credentials                                | Browser UI/runtime check                                | Real `/account/sign-in`                                                            | Continue with Google enabled                                                                             |
+| Actual form permits Google-only redirect             | Chromium regression with provider-boundary interception | `tests/e2e/accounts.spec.ts`; `/tmp/morphi-google-redirect-regression.log`         | 1 targeted case passes                                                                                   |
+| Canonical callback, basic scopes, state-cookie flags | Same regression                                         | Callback `http://localhost:5173/api/auth/callback/google`; scope/cookie assertions | pass                                                                                                     |
+| Real Google page reached                             | Chromium navigation without login                       | `/tmp/morphi-google-start-check.cjs`                                               | sign-in page detected, no identified provider error/block or page errors; no authenticated login claimed |
+| Types                                                | Svelte/TypeScript                                       | `bun run check`; `/tmp/morphi-google-check.log`                                    | 0 errors, 0 warnings                                                                                     |
+| Formatting/lint                                      | Prettier/ESLint                                         | `bun run lint`; `/tmp/morphi-google-lint.log`                                      | pass                                                                                                     |
+| Production build                                     | Cloudflare adapter                                      | `bun run build`; `/tmp/morphi-google-build.log`                                    | pass                                                                                                     |
+| Google token exchange and authenticated callback     | Owner-operated real login                               | Normal browser                                                                     | pending, not waived                                                                                      |
+
+- **Measurements:** Local Vite and headless Chromium; no network throttling or latency benchmarking. The targeted browser regression took 11.4 seconds, a test duration rather than a user performance measurement. The provider-boundary regression avoids authenticating or storing personal identity. No median/p95 claim.
+- **Waivers:** None. Real Google authentication remains a required check.
+- **Owner responsibilities:** Complete the real login test. Keep Testing while development continues. Before public accounts, prepare the production OAuth project/client, canonical HTTPS callback, verified domain, public privacy/home information, and brand verification. Publishing OAuth settings and deploying the Worker are separate operations requiring the applicable owner authorization.
+- **CODEMAP updated:** yes.
+
+## Step 6: connect the approved result screen to real games — 2026-10-23
+
+- **Built:** Replaced the old shared result card with the approved responsive result layout and connected it to the real Block/Memory completion flow. Next puzzle remains primary. Guests get a “Sign in with Google” link to `/account/sign-in`; signed-in players get their account link. The route passes server-layout session state into the result screen. Score, best/new-best/so-close, round summary, and Home/Next behavior remain intact. Added compact spacing down to 320x480 and message-catalog copy that describes current scores as local, without claiming account synchronization.
+- **Skipped (and why):** No deployment, OAuth provisioning, database/schema change, game rules, score synchronization, ranked scoring, or leaderboard implementation. Those are outside this bounded correction. The standalone demo is still a reference; this change fixes its missing connection to the actual game.
+- **Known issues:** Real Google login still needs the owner’s OAuth client. Saved history/cloud sync and ranked results remain outstanding Step 6 slices. The first full browser run passed all nine account/layout cases but the reused local Vite server stopped before the seven reliability cases (`ERR_CONNECTION_REFUSED`); after restarting it, all seven failed cases passed with `--last-failed`. This was an environment interruption, not an ignored test failure. Real-phone validation of the implemented result flow is not recorded.
+- **Decisions:** Use the already approved result-screen design for both games. Show a sign-in entry point regardless of local OAuth readiness; the account page handles unavailable authentication and guest continuation. Until synchronization is implemented, the result says the best stays on this device and does not show “Saved to your account.” No dependencies or versions changed.
+- **Questions for the owner:** None required for this fix. Use the local game to review actual completion; the public site has not received these changes.
+- **Evidence table:**
+
+| Acceptance item                                                               | Evidence type                                          | Where                                                                           | Result                                                                     |
+| ----------------------------------------------------------------------------- | ------------------------------------------------------ | ------------------------------------------------------------------------------- | -------------------------------------------------------------------------- |
+| Real Block completion shows guest sign-in and retains Next rotation           | Chromium, four actual played rounds                    | `tests/e2e/layout.spec.ts`                                                      | pass at 390x844, 844x390, 360x640, 1280x800                                |
+| Real Memory completion shows guest sign-in and follows it to the account page | Chromium, actual preview/flip/match flow               | `tests/e2e/accounts.spec.ts`                                                    | pass; browser best retained after navigation                               |
+| Signed-in Memory result shows the account link and Next rotates to Block      | Chromium with signed local session fixture             | `tests/e2e/accounts.spec.ts`                                                    | pass; guest sign-in link absent                                            |
+| Result fits small and approved viewports                                      | Chromium measurements                                  | Memory case at 320x480, 360x640, 390x844, 844x390, 1280x800; Block layout cases | no page overflow; guest link in viewport                                   |
+| All browser cases                                                             | Full suite plus failed-case rerun after server restart | `/tmp/morphi-result-e2e-all.log`, `/tmp/morphi-result-e2e-retry.log`            | all 16 cases pass across the two runs                                      |
+| Existing unit suite                                                           | Node/Vitest                                            | `bun run test:unit -- --run`; `/tmp/morphi-result-unit.log`                     | 94 tests pass                                                              |
+| Types                                                                         | Svelte/TypeScript                                      | `bun run check`; `/tmp/morphi-result-check.log`                                 | 0 errors, 0 warnings                                                       |
+| Formatting/lint                                                               | Prettier/ESLint                                        | `bun run lint`; `/tmp/morphi-result-lint.log`                                   | pass                                                                       |
+| Production build                                                              | Cloudflare adapter                                     | `bun run build`; `/tmp/morphi-result-build.log`                                 | pass                                                                       |
+| Built Worker real guest completion → sign-in                                  | Local Wrangler + Chromium, actual Memory round         | `/tmp/morphi-result-worker-smoke.cjs`, `/tmp/morphi-result-worker-smoke.log`    | pass; correct link, real account page, local best retained, no page errors |
+
+- **Measurements:** Virtual Chromium viewports listed above, local dev server plus one built-Worker run at 390x844, no throttling. Actual completed rounds were used; results were not injected. Screenshot artifacts are in `/tmp/morphi-result-review-20261023/` (including the built Worker Memory result). Initial browser run took 2.9 minutes and the seven-case environment retry took 24.6 seconds; these are test durations, not user latency measurements. No median/p95 or real-device performance claim.
+- **Waivers:** None. Failed cases were rerun successfully after restoring the local server.
+- **Owner responsibilities:** Review `http://localhost:5173/` through Play and a completed round. `morphi.one` remains the prior owner-approved deployment; no deployment was performed. Follow `docs/GOOGLE_AUTH_SETUP.md` to enable real Google login when ready.
+- **CODEMAP updated:** yes.
+
+## Step 6: local accounts foundation — 2026-10-23
+
+- **Built:** Recorded the owner’s approval of all five account-screen designs and proposed Step 6 scope. Implemented the first local slice with Better Auth, D1/Drizzle, Google-only authorization setup, server-owned sessions, separate public player names, database-enforced case-insensitive uniqueness, name edits, sign-out, and account deletion. Added approved Svelte account screens and a Home account link using the existing tokens and message catalog. Requests are constructed per Worker request, mutations are bounded to 16 KiB even without Content-Length, signed-out/revoked sessions cannot access account routes, and account responses are private/no-store. Deletion requires a session created in the last five minutes. Sign-out revokes the database session before asking Better Auth to clear cookies, so storage failures cannot silently leave a supposedly revoked session valid. Local D1 migrations, generated binding types, ignored credential setup, and owner Google setup instructions are included.
+- **Skipped (and why):** Real Google login/callback verification is pending the owner’s OAuth client; the owner confirmed it does not exist yet. No remote database, Google project, deployment, web admin panel, new game, or gameplay/scoring change. Saved-round synchronization and validated ranked leaderboards are the next slices and are not claimed complete; the account page truthfully shows empty progress instead of mock scores. The standalone demo remains a reference artifact.
+- **Known issues:** No real Google OAuth callback has been exercised. Account creation via Google, cancellation/denied consent, and provider credential errors need a real test once credentials exist. Local cookie/session tests use privileged helpers only in the test processes; no fixture endpoint or test-login path ships in the app. Real-device review of the implemented screens, Firefox/WebKit account verification, account-scale load measurements, and full Step 6 release hardening remain outstanding. The D1 ID and canonical base URL are explicitly local and must be replaced/reviewed before any production release. The browser tests use the same local D1 file as the dev app, so they create and remove reserved test accounts; fixture proxies are closed before browser requests to avoid competing local SQLite writers.
+- **Decisions and pinned versions:** `better-auth@1.7.12`, `@better-auth/drizzle-adapter@1.7.12`, `drizzle-orm@0.45.4`, `drizzle-kit@0.31.11`. Kept TypeScript `~6.0.3`, adapter-cloudflare 8.0.1, Wrangler 4.151.3, runtime date 2026-10-22, and `nodejs_als`. Seven-day sessions, daily update age, five-minute freshness for deletion, encrypted provider tokens, disabled password registration/account linking, explicit origin/CSRF checks, and database-backed auth rate limiting. Public names use 3–20 ASCII letters/numbers/underscores with official names reserved; Google profile fields are not used publicly. Secrets are read from `cloudflare:workers`, including the pinned adapter’s Vite emulation of `.dev.vars`. See `docs/DECISIONS.md` for generated-types and SvelteKit 3 API details.
+- **Questions for the owner:** No further screen/scope approval needed. Create the Google OAuth web client using `docs/GOOGLE_AUTH_SETUP.md` and enter its credentials only in ignored `.dev.vars`; then the real provider flow can be tested. This is an external setup dependency, not a request to reapprove implementation.
+- **Evidence table:**
+
+| Acceptance item for this slice                                                                         | Evidence type                                  | Where                                                                                                                                | Result                                                                                                                               |
+| ------------------------------------------------------------------------------------------------------ | ---------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------------ |
+| Screen and scope approval                                                                              | Explicit owner instruction                     | Conversation, 2026-10-23: “everything is approved you are authorized to go to next step”                                             | approved                                                                                                                             |
+| Local D1 migration                                                                                     | Wrangler local migration and isolated D1 setup | `migrations/0000_flimsy_turbo.sql`; `bun run db:migrate:local`                                                                       | pass; six tables, no remote resource                                                                                                 |
+| Signed/tampered/expired sessions, name races, origin checks, sign-out and deletion cascades            | Better Auth + real emulated D1 integration     | `tests/integration/accounts.test.ts`; `bun run test:accounts`                                                                        | 6 tests pass                                                                                                                         |
+| Existing games and bounded request bodies                                                              | Node/Vitest                                    | `bun run test:unit -- --run`; `src/lib/server/request-body.test.ts`                                                                  | 94 tests pass across 9 files                                                                                                         |
+| Three account layouts, two-account isolation, name-error correction, deletion freshness and revocation | Chromium/Playwright                            | `tests/e2e/accounts.spec.ts`                                                                                                         | 3 tests pass                                                                                                                         |
+| Full account/layout/input/lifecycle suite                                                              | Chromium/Playwright                            | `bun run test:e2e`; `/tmp/morphi-accounts-e2e-all.log`                                                                               | 14 tests pass in 3.3 minutes                                                                                                         |
+| Type-check                                                                                             | Svelte/TypeScript                              | `bun run check`; `/tmp/morphi-accounts-check-final.log`                                                                              | 0 errors, 0 warnings                                                                                                                 |
+| Formatting and lint                                                                                    | Prettier/ESLint                                | `bun run lint`; `/tmp/morphi-accounts-lint-final.log`                                                                                | pass                                                                                                                                 |
+| Production bundle                                                                                      | Adapter build                                  | `bun run build`; `/tmp/morphi-accounts-build-final.log`                                                                              | pass                                                                                                                                 |
+| Built Worker with real D1/session operations                                                           | Isolated local Wrangler + Chromium             | `/tmp/morphi-account-worker-smoke.ts`; `/tmp/morphi-accounts-worker-result.json`; screenshots `/tmp/morphi-accounts-worker-screens/` | pass; profile at all 3 sizes, private cache headers, name edit, fresh deletion, revoked-session redirect, guest game; no page errors |
+| Local secret values excluded from browser output                                                       | Byte scan, no values printed                   | `.svelte-kit/output/client/` (37 files) against the local auth secret                                                                | no matches                                                                                                                           |
+| Real Google authorization completion                                                                   | Real provider/browser test                     | Owner OAuth client not yet created                                                                                                   | pending; not waived                                                                                                                  |
+| Saved game history, ranked scoring, leaderboard and release gates                                      | Later Step 6 slices                            | `docs/STEP6.md`                                                                                                                      | outstanding; no Step 6 completion claimed                                                                                            |
+
+- **Measurements:** Automated Chromium uses virtual 390x844, 844x390, and 1280x800 viewports. The built Worker smoke uses a separate temporary local D1 state directory, the same configured runtime flags, canonical localhost origin overridden to port 8787, no network throttling, and one profile capture per viewport. No horizontal overflow or page errors. Full browser-suite duration is 3.3 minutes; it is not a user latency measurement. No median/p95, real-device, load-capacity, or ranked-replay CPU/memory claim. Temporary logs/scripts/screenshots are session artifacts; outcomes are recorded durably here.
+- **Waivers:** None added. The Step 5 replay-evidence waiver remains historical; real Google testing and Step 6 release checks are still required.
+- **Owner responsibilities:** Follow `docs/GOOGLE_AUTH_SETUP.md`; do not send secrets in chat. Use `http://localhost:5173/account/sign-in` on the development machine for the exact configured callback. Report real-device issues. Remote D1 provisioning, production Google settings/secrets, and any deployment remain separate authorized operations.
+- **CODEMAP updated:** yes.
+
+## Step 6 Google choice and account-screen preview — 2026-10-23
+
+- **Built:** Recorded the owner’s Google-only sign-in choice with guest play retained. Added an isolated local HTML review harness (`static/demo/accounts.html`) and five responsive proposed screens: Sign in, Choose player name, Your account, After a round, and Leaderboard. Included normal/cancelled/failed/offline connection samples, an in-memory sign-in/name flow, public-name validation samples, edit/sign-out, deletion confirmation, and game/Memory-size filters. Reused the existing self-hosted Nunito subset and palette tokens; prototype copy lives in its own message catalog. Documented the database and administration sequence in `docs/STEP6.md`.
+- **Skipped (and why):** Production UI/authentication, migrations/database creation, real Google access, new dependencies, admin panel, gameplay changes, and deployment. The owner requested a demo to review before accepting screens. Sample actions do not persist or perform real sign-in, saving, deletion, or scoring.
+- **Known issues:** New-screen approval is pending. Profile history scrolls at phone sizes and short landscape; the landscape leaderboard also scrolls. Preview Play/Next shows a notice instead of starting the games. Public-name rules, deletion policy, leaderboard windows, and saved-progress scope remain design proposals. Real-phone review and real Google/D1 integration are not established by this preview.
+- **Decisions:** Google sign-in selected by the owner. Start account storage with local D1 using the locked Better Auth stack; no resource was created. A full admin web panel is not a prerequisite: the full plan’s Stage 0 audit-logged command tool precedes it. Current Better Auth Google/database and Cloudflare D1 local-development documentation checked 2026-10-23. No pinned dependency versions changed.
+- **Questions for the owner:** Review the screens and request adjustments or accept the layouts. Approve remaining progress/leaderboard/public-name/deletion choices before production implementation.
+- **Evidence table:**
+
+| Item                                                            | Evidence type                                 | Where                                                                      | Result                                                       |
+| --------------------------------------------------------------- | --------------------------------------------- | -------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Google sign-in choice                                           | Explicit owner instruction                    | Conversation, 2026-10-23: “i chose your recommandation of google accounts” | selected                                                     |
+| Five screens at all three requested sizes                       | Chromium browser measurements and screenshots | `/tmp/morphi-account-review/`; script `/tmp/morphi-account-review.cjs`     | 15 combinations pass horizontal fit; no unnamed icon buttons |
+| Sign-in/name validation/edit/sign-out and deletion confirmation | Chromium interaction checks                   | Same script; `results.json`                                                | pass                                                         |
+| Cancelled/failed/offline sign-in retains guest continuation     | Chromium interaction checks                   | Same script                                                                | pass                                                         |
+| Game/Memory-size grouping and review-harness synchronization    | Chromium interaction checks                   | Same script                                                                | pass                                                         |
+| Browser errors                                                  | Chromium page/console capture                 | Same script                                                                | none                                                         |
+| New prototype JavaScript lint                                   | ESLint API, project config                    | `accounts.js`, `accounts-review.js`, `accounts.messages.js`                | 0 errors, 0 warnings                                         |
+| Formatting                                                      | Prettier API, project config                  | Changed prototype and documentation files                                  | pass                                                         |
+| Owner screen approval                                           | Owner review                                  | `http://localhost:5174/demo/accounts.html`                                 | pending                                                      |
+
+- **Measurements:** Local static HTTP server and headless desktop Chromium, no network throttling; one layout capture per screen/viewport. Exact viewports: 390x844, 844x390, 1280x800. No horizontal overflow in 15 combinations. Sign-in, name entry, and result fit vertically in all three sizes; desktop profile fits 800 px. Phone profile content height 975 px; landscape profile 695 px and leaderboard 653 px, intentionally scrollable. No performance gate or median/p95 claim. `/tmp` screenshots/scripts are temporary session artifacts; outcomes are recorded here.
+- **Waivers:** None added. Layouts are proposed and unaccepted; this is not a Step 6 completion report.
+- **Owner responsibilities:** Review the local demo (including on a phone). Google OAuth credentials and remote D1 provisioning will need the applicable setup/authorization when integration begins. Deployment still requires a separate owner instruction.
+- **CODEMAP updated:** yes.
+
+## Step 5 owner acceptance and Step 6 planning — 2026-10-23
+
+- **Built:** Recorded the owner's acceptance of the public-test result and prepared `docs/STEP6.md` with a proposed sequence for accounts, completed-progress sync, server-validated scores, and leaderboards. Updated the active status in the simple plan, agent instructions, decisions, and CODEMAP.
+- **Skipped (and why):** No runtime changes, dependency installation, authentication implementation, new games, remote resource creation, or deployment. The owner requested the next-step approach; authentication and new-screen choices remain unresolved.
+- **Known issues:** Replay counts and the predetermined threshold are still unavailable. The acceptance is owner judgment, not a measured retention or replay claim. Existing browser bests cannot be replay-validated because they contain no move logs.
+- **Decisions:** Step 5 is accepted. Google-only sign-in with guest play is recommended but not selected. Step 6 planning draws only relevant requirements from the full plan.
+- **Questions for the owner:** Select the sign-in method; review the saved-progress and leaderboard scope before implementation. Account/Profile/Leaderboard wireframes will need approval before screen implementation.
+- **Evidence table:**
+
+| Acceptance item                                    | Evidence type                 | Where                                                            | Result                                               |
+| -------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------- |
+| Owner accepts the public-test result               | Explicit owner instruction    | Conversation, 2026-10-23: "i ill maccept the public test result" | accepted by owner judgment                           |
+| Second-round share against predetermined threshold | No measured evidence supplied | Prior public-test feedback report                                | waived by owner acceptance; no measured pass claimed |
+| Proposed Step 6 sequence and unresolved choices    | Documentation                 | `docs/STEP6.md`                                                  | prepared; implementation not begun                   |
+
+- **Measurements:** No new performance measurements; documentation-only change.
+- **Waivers:** The owner accepts proceeding from Step 5 without the missing replay counts and predetermined threshold. Risk: positive sentiment may not predict repeat play.
+- **Owner responsibilities:** Choose authentication, review upcoming wireframes, and provide provider setup/credentials when needed. Any remote resource creation or deployment requires the applicable authorization.
+- **CODEMAP updated:** yes.
 
 ## Owner-approved production release — 2026-10-23
 

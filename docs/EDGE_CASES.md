@@ -65,6 +65,15 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 
 ## 6. Engine
 
+V1 selector regressions (2026-10-24): both starting families must be reachable;
+a failed seed/generation attempt retains the pending family; repeated peeks do
+not consume it. Every eligible family appears exactly once per cycle, with the
+minimum gap preserved across refills. Unequal weights affect cycle position,
+not frequency; zero disables a family; invalid/duplicate/overflowing data fails
+closed. `src/lib/selector.test.ts` covers these, including synthetic larger
+family indexes. Browser fixtures inject entropy only in the browser test
+process, never through a shipped family-selection bypass.
+
 - A seed above `2^63 - 1` stored in a database → seeds are TEXT columns, never INTEGER (SQLite integers are signed 64-bit).
 - Seed `0`, seed `2^64 - 1`, leading zeros, whitespace, negative, non-numeric, or enormous digit strings → validated; invalid seeds are rejected, never coerced.
 - Difficulty out of range or unknown modifiers → clamped or rejected per spec, never undefined behavior.
@@ -78,6 +87,26 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 
 ## 7. Rendering and accessibility
 
+Oct 25 design demo checks (`bun run test:demo`): bounded scatter stays outside
+foreground safe zones, never creates links/focus targets and re-deals only on
+visits/resize; Home/footer fit short phones; door Play commits a round once;
+columns leave during play; help traps/restores focus and closes on Escape;
+results appear before returning to ready guides; missing/disabled/reduced
+motion cannot block a logical state change; mobile result order is score,
+Next, statistics, sign-in; profile tabs work by keyboard and each game has one
+row. These are synthetic demo checks, not application acceptance or device
+measurements.
+
+Phone follow-up: both families are forced in tests for direct door and Mix
+play at 390×844, 844×390, 667×375, 568×320, 320×568 and 320×480. Assert the
+actual board centre, usable landscape size, full control visibility and tap
+reachability without scrolling. Rotation must retain a revealed card/placed
+cell. Frame samples check a single monotonic Home arrival over 1.5 seconds,
+no early flash, one-second door presentation, half-second help opening/closing
+and no transition overflow.
+Switching reduced motion on during arrival must restore visibility and clear
+decorative overlays; missing animation must still allow play.
+
 - 320 px wide phones, 4K screens, 200 percent browser zoom, large system text → no clipped controls or overflow.
 - Forced colors or high contrast, reduced motion, color blindness → playable; never color alone.
 - Right-to-left locales, very long translations, missing translations → logical CSS, text expansion room, fallback to English.
@@ -86,6 +115,10 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 - Screen reader and keyboard-only play → results announced with `aria-live`; focus trapped in overlays and restored on close.
 
 ## 8. Server and auth (Phase 3)
+
+Post-round account entry regression (2026-10-23): completing either real game as a guest must reveal the sign-in option without blocking Next. A signed-in result links to the account instead. The saved local best survives navigating to sign-in, and the result must not claim a cloud save before synchronization exists. Coverage: `tests/e2e/accounts.spec.ts` and `tests/e2e/layout.spec.ts`.
+
+Local account regressions (2026-10-23): `tests/integration/accounts.test.ts` and `tests/e2e/accounts.spec.ts` cover signed/tampered/expired/revoked sessions, two-account isolation, concurrent case-insensitive public-name claims, retries after a name conflict, session freshness before deletion, sign-out and deletion revocation, and password registration being disabled. `src/lib/server/request-body.test.ts` covers oversized bodies without Content-Length. A name field must retain edits after an error, and it is disabled while its request finishes so pending-state rendering cannot reset a new edit.
 
 - Session expires mid-round → play is not interrupted; re-authenticate after the result and claim the run.
 - Logged out in another tab, account deleted mid-round, or user banned mid-round → the round finishes locally; submission is refused with a neutral message.
@@ -127,6 +160,8 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 - Personal data in an event (username, email) → never allowed; schema validation rejects it.
 
 ## 13. SEO and crawlers
+
+Privacy-page regressions (2026-10-23): `/privacy` is public, prerendered, and readable without JavaScript or a session. The build hook must skip Worker binding reads during prerendering. Draft publication issues stay visible with `noindex`; the page must not claim implemented children's safeguards or retention schedules that do not exist. Home/account links remain available at the approved widths, the footer stays out of gameplay, and visiting the static document preserves signed-in access on return. Coverage: `tests/e2e/privacy.spec.ts`, the static-document navigation case in `tests/e2e/accounts.spec.ts`, the production build and isolated built-Worker smoke.
 
 - A prerendered page is served by the CDN without running the Worker → no cookie is set; the page requests a tiny endpoint to create the anonymous id (or `run_worker_first` is set for HTML routes).
 - Crawlers without JavaScript → landing pages render server-side or prerendered.
@@ -219,3 +254,29 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 - A clear completes both a row and a column → both cell waves run once, the wave uses the smaller delay for each cell, the board cells persist, and the combo increments once.
 - Invalid board tap → the cell gets a danger outline and 220 ms shake, the board is unchanged, and the tray remains selected; reduced motion removes the shake but keeps the outline.
 - Reduced motion → clear fill/wave, invalid shake, pick pop, score/streak bump, settle, arrival, and tray motion are disabled; cleared fills disappear immediately while the board cells keep their themed static colors and the result still appears on time.
+
+## v1 integration regressions (2026-10-26)
+
+- Memory arrival consumes 3/4/5 visible seconds for 6/8/10 pairs; all cards stay
+  face up for a further 3 seconds, then hide before input and the timer begin.
+- Hidden entrance/preview/hide pauses its deadline; reduced-motion changes
+  reveal safely. Ranked openings keep the server-known fixed deadline, even
+  with travel disabled. Cosmetic entropy failure cannot block readiness.
+- Block rejects early placement until its 3-second arrival settles; drag
+  geometry uses the same gaps as rendering. Rotation reflows without a new run.
+- A dialog backdrop click dismisses, inside clicks remain open, and an inside
+  drag released outside does not dismiss. Pending account mutations retain the
+  dialog; focus returns after closing. App and accepted demo share this rule.
+- Empty profile history has no fabricated list row; zero-point completed rounds
+  show a real zero. Settings does not hide save failures or guest-import notices.
+- Ordinary players receive 403 on every operator page/action. Two-factor replay,
+  short/expired grants, cross-origin writes and missing per-action permissions
+  fail closed. Recovery is single-use; operator-account/last-admin guards apply.
+- Gameplay measurement starts only after opt-in, obeys DNT/GPC, accepts strict
+  coarse fields and stops on withdrawal. A blocked provider/asset never blocks play.
+- A pre-existing local server can occupy a smoke-test port; the built Worker
+  check allocates its own port and refuses to pass against the wrong service.
+
+Coverage: `tests/e2e/entrance.spec.ts`, `dialogs.spec.ts`, `operator.spec.ts`,
+existing account/recovery/layout tests, `tests/integration/operator.test.ts`,
+`src/lib/server/measurement.test.ts`, and `scripts/check-worker.ts`.
