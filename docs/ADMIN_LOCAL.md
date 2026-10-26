@@ -10,6 +10,14 @@ bun run admin:local -- --local bootstrap
 
 Privately open the newly created ignored `.admin-local.json` and enroll its `authenticatorURI` in an authenticator. The file contains a secret, has mode 600, and must never be committed or shared. Bootstrap refuses an existing admin or key file. No administrator is automatically enrolled by development, tests, or this implementation task.
 
+For manual authenticator setup, use only the Base32 value of the URI's `secret`
+query parameter (the uppercase letters and digits between `secret=` and `&`),
+with a time-based, six-digit, 30-second entry named **Morphi local**. The separate
+JSON `secret` field is hexadecimal for the CLI and is not an authenticator setup
+key. Do not paste the entire URI into a manual key field. Enrollment JSON does
+not display a QR code by itself; any QR helper must encode the URI offline and
+keep the resulting image/page private and ignored.
+
 Run commands from an interactive terminal. They prompt for a current authenticator code; never pass codes or secrets as command arguments.
 
 ```sh
@@ -42,6 +50,13 @@ the verified owner email `cngohar@gmail.com`, and enrolls that Google user only.
 No enrollment was performed by the integration task. Privately read the mode-600
 ignored `.admin-web-enrollment.json`, add the authenticator URI, and store the
 eight single-use recovery codes offline. Never share these artifacts.
+
+This creates a separate **Morphi.One** authenticator entry. Use its code on the
+web panel; **Morphi local** codes only authorize terminal commands. Apply the
+same Base32 manual setup instructions to the web enrollment URI. A rejected or
+already-used code, temporary lock, and request limit now have distinct sign-in
+messages. After five incorrect codes the account is locked for 15 minutes;
+verification also permits at most five attempts per minute.
 
 Visit `/admin/sign-in`, complete Google re-authentication and TOTP. The panel
 includes aggregates, ranked status, exact public-name/round lookup, moderation,

@@ -5,6 +5,19 @@
 	import { t } from '#lib/i18n/messages.js';
 	import type { PageProps } from './$types';
 	let { data, form }: PageProps = $props();
+	const errorMessage = $derived(
+		form?.code === 'reauth'
+			? 'v1.admin.reauth'
+			: form?.code === 'code'
+				? data.recovery
+					? 'v1.admin.login.recoveryError'
+					: 'v1.admin.login.codeError'
+				: form?.code === 'locked'
+					? 'v1.admin.login.locked'
+					: form?.code === 'limit'
+						? 'v1.admin.login.limited'
+						: 'v1.admin.login.unavailable'
+	);
 </script>
 
 <svelte:head
@@ -28,15 +41,18 @@
 		</h1>
 		<p>{t(data.recovery ? 'v1.admin.recovery.body' : 'v1.admin.login.body')}</p>
 		{#if form?.code}<p role="alert">
-				{t(form.code === 'reauth' ? 'v1.admin.reauth' : 'v1.admin.error')}
+				{t(errorMessage)}
 			</p>{/if}{#if data.signedIn && data.fresh}<AccountForm action="?/verify"
-				>{#snippet children(pending)}<label
+				>{#snippet children(pending)}
+					{#if !data.recovery}<p id="authenticator-hint">{t('v1.admin.login.codeHint')}</p>{/if}
+					<label
 						>{t(data.recovery ? 'v1.admin.recovery.code' : 'v1.admin.code')}<input
 							name="code"
 							required
 							maxlength={data.recovery ? 32 : 6}
 							autocomplete={data.recovery ? 'off' : 'one-time-code'}
 							inputmode={data.recovery ? 'text' : 'numeric'}
+							aria-describedby={data.recovery ? undefined : 'authenticator-hint'}
 						/></label
 					><input name="recovery" type="hidden" value={data.recovery ? '1' : '0'} /><button
 						class="btn primary"

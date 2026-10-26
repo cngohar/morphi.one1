@@ -24,6 +24,15 @@ export const messages = {
 		'Your browser choice was saved if storage was available. We could not confirm clearing server events; retry when connected.',
 
 	'v1.admin.reauth': 'Sign in with Google and verify your authenticator again to continue.',
+	'v1.admin.login.codeError':
+		'That code was not accepted. Use the current six-digit code from your Morphi.One authenticator entry. If a code was already used, wait for the next one.',
+	'v1.admin.login.recoveryError':
+		'That recovery code was not accepted. Use an unused recovery code from your web enrollment.',
+	'v1.admin.login.locked': 'Too many incorrect codes. Wait 15 minutes before trying again.',
+	'v1.admin.login.limited': 'Too many attempts. Wait a minute before trying again.',
+	'v1.admin.login.unavailable': 'We couldn’t verify your sign-in. Try again.',
+	'v1.admin.login.codeHint':
+		'Use the Morphi.One authenticator entry for this panel. Morphi local codes authorize terminal commands.',
 	'v1.admin.status.ranked': 'Ranked play',
 	'v1.admin.lookup.title': 'Find a player or score',
 	'v1.admin.operator.warning':

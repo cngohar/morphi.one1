@@ -74,7 +74,12 @@ export const actions: Actions = {
 					code: error instanceof RunError ? error.code : 'unavailable'
 				})
 			);
-			return fail(403, { code: 'code' });
+			if (error instanceof RunError) {
+				if (error.code === 'operator_code') return fail(403, { code: 'code' });
+				if (error.code === 'operator_locked') return fail(429, { code: 'locked' });
+				if (error.code === 'operator_limit') return fail(429, { code: 'limit' });
+			}
+			return fail(503, { code: 'unavailable' });
 		}
 		redirect(303, '/admin/dashboard');
 	}

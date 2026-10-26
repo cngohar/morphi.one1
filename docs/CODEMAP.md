@@ -118,6 +118,7 @@ Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-
 - `src/routes/admin/`, `server/operator.ts`, `operator-http.ts`, `operator-permissions.ts`, migrations `0003`–`0005`: protected local Stage 1 operator UI, owner-only CLI enrollment/reset, TOTP/recovery, bounds/RBAC/audits and deletion counts.
 - `src/routes/api/measurement/`, `server/measurement.ts`, `ui/measurement.ts`, `components/MeasurementChoice.svelte`: default-off coarse events, DNT/GPC, withdrawal and disclosed cleanup. `api/account/status/` refreshes static chrome privately.
 - `tests/e2e/entrance.spec.ts`, `dialogs.spec.ts`, `operator.spec.ts`, `tests/integration/operator.test.ts`: entrance/timer/lifecycle, backdrop and actual operator permission/action regressions.
+- `src/routes/admin/sign-in/`: Google plus the separate Morphi.One second factor; actionable rejected-code, temporary-lock and request-limit messages. Manual authenticator setup is documented in `docs/ADMIN_LOCAL.md`.
 - `scripts/check-v1-app.ts`, `build/v1-integration-review/`: actual/demo viewport captures and persistent verification logs. `docs/V1_WORK.md` / latest phase report hold delivery/release boundaries.
 
 ## Conventions

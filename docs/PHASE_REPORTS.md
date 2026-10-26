@@ -17,6 +17,30 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1 operator sign-in follow-up — 2026-10-26
+
+- **Built:** Distinct sign-in messages for rejected/replayed codes, recovery
+  codes, account locks, request limits and service failures. The code field now
+  identifies the Morphi.One authenticator entry. Clarified manual Base32 setup
+  and the separate terminal/web authenticators in `ADMIN_LOCAL.md`. Generated
+  private offline QR helper pages in the ignored local build directory.
+- **Skipped:** Credential rotation, permission/limit changes, public setup and
+  deployment. Owner bootstrap and web enrollment were performed by the owner;
+  the helper reads existing enrollment material without changing it.
+- **Known issues:** Owner confirmation of successful web sign-in is pending.
+- **Decisions:** Preserve the existing second-factor and replay protections;
+  distinguish actionable authentication failures from a data-loading failure.
+- **Questions / owner responsibilities:** Add the separate Morphi.One entry and
+  confirm sign-in using its current code; retain recovery codes privately.
+- **Evidence:** `tests/e2e/operator.spec.ts` covers rejected-code recovery to a
+  successful dashboard, ordinary-player denial, account-lock and request-limit
+  messages. Run evidence: `build/v1-integration-review/operator-login-followup.log`.
+  Type check: zero errors/warnings; changed-file format and lint checks pass.
+- **Measurements:** Functional localhost desktop Chromium checks only; no new
+  performance measurements or production capacity claims.
+- **Waivers:** None. Existing public release gates remain open.
+- **CODEMAP updated:** Yes.
+
 ## v1 local app integration — 2026-10-26 (local review candidate)
 
 - **Built:** Accepted Home, Mix/Stay doors, results, real-data profile and local

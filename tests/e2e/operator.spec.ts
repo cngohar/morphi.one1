@@ -100,6 +100,12 @@ test('real Google-session fixture plus TOTP opens the native dashboard and audit
 	await context.addCookies(operator.login.cookies);
 	const page = await context.newPage();
 	await page.goto('/admin/sign-in');
+	await expect(
+		page.getByText('Use the Morphi.One authenticator entry', { exact: false })
+	).toBeVisible();
+	await page.getByRole('textbox').fill('123');
+	await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
+	await expect(page.getByRole('alert')).toContainText('That code was not accepted.');
 	await page.getByRole('textbox').fill(operator.code);
 	await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
 	await expect(page).toHaveURL(/\/admin\/dashboard$/);
@@ -178,6 +184,35 @@ test('real Google-session fixture plus TOTP opens the native dashboard and audit
 			form: { action: 'ranked-off', target: 'ranked', reason: 'CASE-TEST-ORIGIN', confirm: 'yes' }
 		});
 		expect(denied.status()).toBe(403);
+	} finally {
+		await proxy.dispose();
+		await context.close();
+	}
+});
+
+test('operator sign-in explains temporary locks and request limits', async ({ browser }) => {
+	const operator = await fixture('admin'),
+		context = await browser.newContext({ baseURL: 'http://localhost:5173' }),
+		proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc' });
+	try {
+		await context.addCookies(operator.login.cookies);
+		await proxy.env.DB.prepare('UPDATE admin_web_operator SET locked_until=? WHERE user_id=?')
+			.bind(Date.now() + 15 * 60000, operator.id)
+			.run();
+		const page = await context.newPage();
+		await page.goto('/admin/sign-in');
+		await page.getByRole('textbox').fill(operator.code);
+		await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
+		await expect(page.getByRole('alert')).toContainText('Wait 15 minutes');
+		await expect(page).toHaveURL(/\/admin\/sign-in(?:\?.*)?$/);
+		await proxy.env.DB.prepare(
+			'INSERT INTO admin_web_limit(key,count,expires_at) VALUES(?,5,?) ON CONFLICT(key) DO UPDATE SET count=5'
+		)
+			.bind(`${Math.floor(Date.now() / 60000)}:verify:${operator.id}`, Date.now() + 120000)
+			.run();
+		await page.getByRole('textbox').fill(operator.code);
+		await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
+		await expect(page.getByRole('alert')).toContainText('Wait a minute');
 	} finally {
 		await proxy.dispose();
 		await context.close();
