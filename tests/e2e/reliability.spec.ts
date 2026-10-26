@@ -1,9 +1,14 @@
 import { expect, test, type Page } from '@playwright/test';
+import { fixSelectorSeed } from './entropy.js';
+
+test.beforeEach(async ({ page }) => {
+	await fixSelectorSeed(page);
+});
 
 async function startBlock(page: Page): Promise<void> {
 	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
-	await expect(page.locator('.game[data-family="block"]')).toBeVisible();
+	await expect(page.locator('.game[data-family="block"]')).toHaveAttribute('data-phase', 'playing');
 }
 
 async function dragOverBoard(page: Page) {
@@ -27,7 +32,7 @@ async function dragOverBoard(page: Page) {
 	return slot;
 }
 
-test('a failed seed draw preserves Block-first rotation on retry', async ({ page }) => {
+test('a failed seed draw preserves the pending selector draw on retry', async ({ page }) => {
 	await page.addInitScript(() => {
 		const original = crypto.getRandomValues.bind(crypto);
 		let draws = 0;
@@ -41,7 +46,7 @@ test('a failed seed draw preserves Block-first rotation on retry', async ({ page
 	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	await expect(page.getByRole('alert')).toBeVisible();
-	await page.getByRole('button', { name: 'Play', exact: true }).click();
+	await page.getByRole('button', { name: 'Try again', exact: true }).click();
 	await expect(page.locator('.game[data-family="block"]')).toBeVisible();
 	await expect(page.getByRole('alert')).toHaveCount(0);
 });
@@ -57,7 +62,7 @@ test('two synchronous Play activations start only one round', async ({ page }) =
 	await expect(page.locator('.round-meta')).toContainText('Round 1');
 	await page.getByRole('button', { name: 'Back to home' }).click();
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
-	await expect(page.locator('.game[data-family="memory"]')).toBeVisible();
+	await expect(page.locator('.game')).toBeVisible();
 });
 
 test('a drop outside uses pointerup coordinates rather than the previous valid ghost', async ({
@@ -118,8 +123,7 @@ test('held Enter does not select and immediately place a piece', async ({ page }
 });
 
 test('Memory preserves the mismatch hold while hidden', async ({ page }) => {
-	await startBlock(page);
-	await page.getByRole('button', { name: 'Back to home' }).click();
+	await page.goto('/memory', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	const cards = page.locator('.memory-card');
 	await expect(cards.first()).toHaveAttribute('aria-pressed', 'true');
@@ -128,7 +132,7 @@ test('Memory preserves the mismatch hold while hidden', async ({ page }) => {
 	);
 	const other = labels.findIndex((label) => label !== labels[0]);
 	expect(other).toBeGreaterThan(0);
-	await expect(cards.first()).toBeEnabled({ timeout: 6000 });
+	await expect(cards.first()).toBeEnabled({ timeout: 10000 });
 	await cards.first().click();
 	await cards.nth(other).click();
 	await page.evaluate(() => {

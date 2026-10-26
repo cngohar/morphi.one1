@@ -2,7 +2,18 @@
 	"extends": "$app/tsconfig",
 	"compilerOptions": {
 		"strict": true,
-		"types": ["$app/types", "node"]
+		"types": ["$app/types", "node"],
+		"checkJs": false
 	},
-	"include": ["src", "tests", "vite.config.ts", "vitest.config.ts", "playwright.config.ts"]
+	"include": [
+		"src",
+		"tests",
+		"vite.config.ts",
+		"vitest.config.ts",
+		"playwright.config.ts",
+		"worker-configuration.d.ts",
+		"drizzle.config.ts",
+		"scripts",
+		"vitest.accounts.config.ts"
+	]
 }

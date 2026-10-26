@@ -5,11 +5,24 @@
 	"compatibility_date": "2026-10-22",
 	"compatibility_flags": ["nodejs_als"],
 	"workers_dev": true,
+	"vars": {
+		"BETTER_AUTH_URL": "http://localhost:5173"
+	},
+	"d1_databases": [
+		{
+			"binding": "DB",
+			"database_name": "morphi-accounts-local",
+			"database_id": "local-morphi-accounts",
+			"migrations_dir": "migrations",
+			"remote": false
+		}
+	],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare"
 	},
 	"observability": {
+		"redact_query_string": true,
 		"logs": {
 			"enabled": true,
 			"head_sampling_rate": 1,

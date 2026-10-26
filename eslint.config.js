@@ -8,8 +8,44 @@ import ts from 'typescript-eslint';
 
 const gitignorePath = path.resolve(import.meta.dirname, '.gitignore');
 
+const boundaries = {
+	meta: { type: 'problem', schema: [] },
+	create(context) {
+		const file = context.filename.replaceAll('\\', '/');
+		if (file.endsWith('.test.ts') || file.endsWith('.spec.ts')) return {};
+		function check(node) {
+			const specifier = node.source?.value;
+			if (typeof specifier !== 'string') return;
+			const target = specifier.startsWith('#lib/')
+				? path.resolve('src/lib', specifier.slice(5))
+				: specifier.startsWith('.')
+					? path.resolve(path.dirname(file), specifier)
+					: specifier;
+			const sourcePuzzle = /\/src\/lib\/puzzles\/([^/]+)\//.exec(file)?.[1];
+			const targetPuzzle = /\/src\/lib\/puzzles\/([^/]+)\//.exec(target)?.[1];
+			if (file.includes('/src/lib/engine/') && !target.includes('/src/lib/engine/'))
+				context.report({ node, message: 'The pure engine may import only engine modules.' });
+			if (sourcePuzzle && targetPuzzle && sourcePuzzle !== targetPuzzle)
+				context.report({ node, message: 'A puzzle must never import another puzzle.' });
+			if (!sourcePuzzle && targetPuzzle && !/\/src\/lib\/(catalog|registry)\.ts$/.test(file))
+				context.report({
+					node,
+					message: 'Reach puzzles through the generated catalog or registry.'
+				});
+		}
+		return {
+			ImportDeclaration: check,
+			ExportNamedDeclaration: check,
+			ExportAllDeclaration: check,
+			ImportExpression: check
+		};
+	}
+};
+
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
+	// Reproducible third-party bundle; lint its authored motion wrapper instead.
+	{ ignores: ['static/demo/motion.js'] },
 	js.configs.recommended,
 	ts.configs.recommended,
 	svelte.configs.recommended,
@@ -17,7 +53,9 @@ export default defineConfig(
 	svelte.configs.prettier,
 	{
 		languageOptions: { globals: { ...globals.browser, ...globals.node } },
+		plugins: { morphi: { rules: { boundaries } } },
 		rules: {
+			'morphi/boundaries': 'error',
 			// typescript-eslint strongly recommend that you do not use the no-undef lint rule on TypeScript projects.
 			// see: https://typescript-eslint.io/troubleshooting/faqs/eslint/#i-get-errors-from-the-no-undef-rule-about-global-variables-not-being-defined-even-though-there-are-no-typescript-errors
 			'no-undef': 'off'
@@ -34,7 +72,12 @@ export default defineConfig(
 		}
 	},
 	{
-		files: ['src/lib/engine/**/*.ts', 'src/lib/game/**/*.ts'],
+		files: [
+			'src/lib/engine/**/*.ts',
+			'src/lib/puzzles/*/logic*.ts',
+			'src/lib/puzzles/*/manifest.ts',
+			'src/lib/puzzles/*/symbols.ts'
+		],
 		rules: {
 			'no-restricted-properties': [
 				'error',

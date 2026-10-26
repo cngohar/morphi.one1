@@ -1,6 +1,7 @@
 <script lang="ts">
 	import '@fontsource-variable/nunito/wght.css';
 	import '../app.css';
+	import '#lib/ui/v1.css';
 	import favicon from '#lib/assets/favicon.svg';
 	import type { LayoutProps } from './$types';
 
@@ -11,4 +12,4 @@
 	<link rel="icon" href={favicon} />
 </svelte:head>
 
-{@render children()}
+<div class="design-public">{@render children()}</div>

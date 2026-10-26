@@ -1,0 +1,93 @@
+{
+	"rng": [
+		"e220a8397b1dcdaf",
+		"6e789e6aa1b965f4",
+		"6c45d188009454f",
+		"f88bb8a8724c81ec",
+		"1b39896a51a8749b"
+	],
+	"memory": [
+		{
+			"seed": "0",
+			"pairs": 8,
+			"deck": [
+				"pentagon:0",
+				"diamond:0",
+				"hexagon:1",
+				"ring:0",
+				"square:1",
+				"square:0",
+				"hexagon:0",
+				"cross:0",
+				"star:1",
+				"heart:0",
+				"heart:1",
+				"cross:1",
+				"ring:1",
+				"star:0",
+				"pentagon:1",
+				"diamond:1"
+			],
+			"score": 7950
+		},
+		{
+			"seed": "42",
+			"pairs": 8,
+			"deck": [
+				"diamond:0",
+				"pentagon:0",
+				"diamond:1",
+				"heart:0",
+				"star:0",
+				"pentagon:1",
+				"ring:0",
+				"ring:1",
+				"square:0",
+				"hexagon:1",
+				"heart:1",
+				"cross:0",
+				"cross:1",
+				"hexagon:0",
+				"square:1",
+				"star:1"
+			],
+			"score": 7950
+		},
+		{
+			"seed": "18446744073709551615",
+			"pairs": 10,
+			"deck": [
+				"cross:0",
+				"circle:0",
+				"diamond:0",
+				"diamond:1",
+				"ring:0",
+				"hexagon:0",
+				"star:1",
+				"heart:1",
+				"pentagon:0",
+				"triangle:0",
+				"square:0",
+				"star:0",
+				"cross:1",
+				"pentagon:1",
+				"square:1",
+				"heart:0",
+				"ring:1",
+				"triangle:1",
+				"hexagon:1",
+				"circle:1"
+			],
+			"score": 9950
+		}
+	],
+	"block": {
+		"score": 700,
+		"lines": 5,
+		"combo": 0,
+		"placements": 20,
+		"status": "playing",
+		"supplyIndex": 21,
+		"tray": [null, null, "single"]
+	}
+}

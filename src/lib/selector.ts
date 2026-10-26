@@ -1,98 +1,90 @@
-import { shuffle, type Rng } from '#lib/engine/rng.js';
+import type { Rng } from '#lib/engine/rng.js';
 
 export type PuzzleFamily = 'block' | 'memory';
 
-export interface FamilyWeight {
-	family: PuzzleFamily;
+export interface FamilyWeight<Family extends string = PuzzleFamily> {
+	family: Family;
 	weight: number;
 }
 
-export interface PuzzleSelector {
-	next(): PuzzleFamily;
-	peek(): PuzzleFamily;
+export interface PuzzleSelector<Family extends string = PuzzleFamily> {
+	next(): Family;
+	peek(): Family;
 }
 
-export interface PuzzleSelectorOptions {
-	families: readonly FamilyWeight[];
-	firstFamily: PuzzleFamily;
+export interface PuzzleSelectorOptions<Family extends string = PuzzleFamily> {
+	families: readonly FamilyWeight<Family>[];
 	rng: Rng;
 }
 
-export function createPuzzleSelector(options: PuzzleSelectorOptions): PuzzleSelector {
+export function createPuzzleSelector<Family extends string = PuzzleFamily>(
+	options: PuzzleSelectorOptions<Family>
+): PuzzleSelector<Family> {
+	const ids = new Set<Family>();
+	let totalWeight = 0;
+	for (const entry of options.families) {
+		if (ids.has(entry.family)) throw new Error('Puzzle families must be unique.');
+		ids.add(entry.family);
+		if (!Number.isSafeInteger(entry.weight) || entry.weight < 0)
+			throw new Error('Puzzle weights must be nonnegative safe integers.');
+		totalWeight += entry.weight;
+	}
+	if (!Number.isSafeInteger(totalWeight)) throw new Error('Puzzle weight total is too large.');
 	const eligible = options.families.filter((entry) => entry.weight > 0);
-	if (eligible.length === 0) {
-		throw new Error('At least one puzzle family must be eligible.');
-	}
+	if (eligible.length === 0) throw new Error('At least one puzzle family must be eligible.');
 
-	const bag: PuzzleFamily[] = [];
-	for (const entry of eligible) {
-		const copies = Math.max(1, Math.floor(entry.weight));
-		for (let copy = 0; copy < copies; copy += 1) {
-			bag.push(entry.family);
+	const gap = eligible.length === 1 ? 0 : Math.min(5, Math.max(1, Math.floor(eligible.length / 3)));
+	let recent: Family[] = [];
+	let queue: Family[] = [];
+
+	function weightedOrder(entries: readonly FamilyWeight<Family>[]): Family[] {
+		const remaining = entries.slice();
+		const ordered: Family[] = [];
+		while (remaining.length) {
+			let draw = options.rng.nextInt(remaining.reduce((sum, entry) => sum + entry.weight, 0));
+			const index = remaining.findIndex((entry) => {
+				draw -= entry.weight;
+				return draw < 0;
+			});
+			ordered.push(remaining.splice(index, 1)[0]!.family);
 		}
+		return ordered;
 	}
 
-	const first = eligible.some((entry) => entry.family === options.firstFamily)
-		? options.firstFamily
-		: eligible[0]!.family;
-
-	let queue: PuzzleFamily[] = [];
-	let last: PuzzleFamily | null = null;
-	let pending: PuzzleFamily | null = null;
-	let firstPending = true;
-
-	function refill(): PuzzleFamily[] {
-		const next = shuffle(options.rng, bag);
-		if (eligible.length > 1 && next[0] === last) {
-			const swapIndex = next.findIndex((family) => family !== last);
-			if (swapIndex > 0) {
-				const different = next[swapIndex]!;
-				next[swapIndex] = next[0]!;
-				next[0] = different;
+	function refill(): Family[] {
+		const ordered = weightedOrder(eligible);
+		// Plan the whole cycle before exposing a pick. If its tail violates the
+		// minimum gap, revisit earlier positions without dropping/duplicating a family.
+		function arrange(remaining: Family[], history: Family[]): Family[] | null {
+			if (remaining.length === 0) return [];
+			for (let index = 0; index < remaining.length; index += 1) {
+				const family = remaining[index]!;
+				if (history.includes(family)) continue;
+				const rest = arrange(
+					remaining.filter((_, position) => position !== index),
+					gap === 0 ? [] : [...history, family].slice(-gap)
+				);
+				if (rest) return [family, ...rest];
 			}
+			return null;
 		}
-		return next;
+		const cycle = arrange(ordered, recent);
+		if (!cycle) throw new Error('No puzzle rotation satisfies the minimum gap.');
+		return cycle;
 	}
 
-	function computeNext(): PuzzleFamily {
-		if (firstPending) {
-			firstPending = false;
-			last = first;
-			return first;
-		}
-
-		if (queue.length === 0) {
-			queue = refill();
-		}
-
-		let pick = queue.shift()!;
-		if (eligible.length > 1 && pick === last) {
-			const swapIndex = queue.findIndex((family) => family !== last);
-			if (swapIndex >= 0) {
-				const different = queue[swapIndex]!;
-				queue[swapIndex] = pick;
-				pick = different;
-			}
-		}
-
-		last = pick;
-		return pick;
+	function peek(): Family {
+		if (queue.length === 0) queue = refill();
+		return queue[0]!;
 	}
 
 	return {
+		peek,
 		next() {
-			if (pending !== null) {
-				const result = pending;
-				pending = null;
-				return result;
-			}
-			return computeNext();
-		},
-		peek() {
-			if (pending === null) {
-				pending = computeNext();
-			}
-			return pending;
+			const family = peek();
+			queue.shift();
+			recent = gap === 0 ? [] : [...recent, family].slice(-gap);
+			return family;
 		}
 	};
 }

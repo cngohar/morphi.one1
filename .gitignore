@@ -38,3 +38,10 @@ vite.config.ts.timestamp-*
 /playwright/.auth/
 # Local secrets written by `elevenlabs onboard`
 /.env.local
+
+# Generated from wrangler.jsonc by bun run cf:types
+/worker-configuration.d.ts
+/.admin-local.json
+
+/.admin-web-enrollment.json
+/.admin-web-reset.json

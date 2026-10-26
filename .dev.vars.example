@@ -1,0 +1,4 @@
+# Run bun run accounts:setup to generate BETTER_AUTH_SECRET in ignored .dev.vars.
+# Add the OAuth web application's credentials to .dev.vars, not this example.
+GOOGLE_CLIENT_ID=
+GOOGLE_CLIENT_SECRET=

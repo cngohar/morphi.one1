@@ -1,0 +1,14 @@
+{
+	"$schema": "node_modules/wrangler/config-schema.json",
+	"name": "morphi-one",
+	"compatibility_date": "2026-10-22",
+	"workers_dev": true,
+	"assets": {
+		"directory": "build/public-privacy/assets",
+		"not_found_handling": "none"
+	},
+	"observability": {
+		"enabled": false,
+		"redact_query_string": true
+	}
+}

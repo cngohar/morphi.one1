@@ -1,5 +1,6 @@
+import { randomSeed } from '#lib/seeds.js';
 import { describe, expect, it } from 'vitest';
-import { createRng, normalizeSeed, randomSeed, shuffle } from '#lib/engine/rng.js';
+import { createRng, normalizeSeed, shuffle } from '#lib/engine/rng.js';
 
 describe('splitmix64', () => {
 	it('matches known vectors for seed 0', () => {

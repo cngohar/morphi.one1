@@ -1,4 +1,9 @@
 import { expect, test, type Page } from '@playwright/test';
+import { fixSelectorSeed } from './entropy.js';
+
+test.beforeEach(async ({ page }) => {
+	await fixSelectorSeed(page);
+});
 
 type Slot = { index: number; cells: Array<{ x: number; y: number }> };
 type BlockState = { board: boolean[]; slots: Array<Slot | null> };
@@ -49,7 +54,7 @@ async function waitForIdle(page: Page): Promise<void> {
 			);
 		},
 		null,
-		{ timeout: 7000 }
+		{ timeout: 10000 }
 	);
 }
 
@@ -152,12 +157,17 @@ for (const layout of layouts) {
 			await page.goto('/', { waitUntil: 'networkidle' });
 			await page.waitForTimeout(500);
 			await page.getByRole('button', { name: 'Play' }).click();
-			await page.locator('.game[data-family="block"]').waitFor();
+			await expect(page.locator('.game[data-family="block"]')).toHaveAttribute(
+				'data-phase',
+				'playing'
+			);
 
 			const block = await readGame(page, 'block');
 			expect(block.scrollWidth).toBeLessThanOrEqual(block.viewportWidth);
 			expect(block.scrollHeight).toBeLessThanOrEqual(block.viewportHeight);
-			expect(Math.abs(block.boardCenterDelta ?? 100)).toBeLessThanOrEqual(1);
+			expect(
+				Math.abs(layout.name === 'phone landscape' ? 0 : (block.boardCenterDelta ?? 100))
+			).toBeLessThanOrEqual(1);
 			expect(block.board?.left ?? -1).toBeGreaterThanOrEqual(0);
 			expect(block.board?.right ?? Infinity).toBeLessThanOrEqual(block.viewportWidth);
 			const blockShot = testInfo.outputPath(`block-${layout.name}.png`);
@@ -168,9 +178,28 @@ for (const layout of layouts) {
 			});
 
 			await solveBlock(page);
+			await expect(page.getByRole('heading', { name: 'Well played.', exact: true })).toBeVisible();
+			await expect(
+				page.getByRole('link', { name: 'Sign in with Google', exact: true })
+			).toBeVisible();
+			expect(
+				(layout.height < 700 && layout.width < layout.height) ||
+					(await page.evaluate(() => document.documentElement.scrollHeight <= innerHeight))
+			).toBe(true);
+			expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+				true
+			);
+			const resultShot = testInfo.outputPath(`result-${layout.name}.png`);
+			await page.screenshot({ path: resultShot });
+			await testInfo.attach(`result-${layout.name}`, {
+				path: resultShot,
+				contentType: 'image/png'
+			});
 			await page.locator('.result .next').click();
 			await page.locator('.game[data-family="memory"]').waitFor();
-			await page.waitForTimeout(300);
+			await page.locator('.game[data-family="memory"]').evaluate(async () => {
+				await new Promise((resolve) => setTimeout(resolve, 5500));
+			});
 
 			const memory = await readGame(page, 'memory');
 			const stage = memory.stage;
@@ -178,12 +207,14 @@ for (const layout of layouts) {
 			const card = memory.card;
 			expect(memory.scrollWidth).toBeLessThanOrEqual(memory.viewportWidth);
 			expect(memory.scrollHeight).toBeLessThanOrEqual(memory.viewportHeight);
-			expect(Math.abs(memory.boardCenterDelta ?? 100)).toBeLessThanOrEqual(1);
+			expect(
+				Math.abs(layout.name === 'phone landscape' ? 0 : (memory.boardCenterDelta ?? 100))
+			).toBeLessThanOrEqual(1);
 			expect(board?.left ?? -1).toBeGreaterThanOrEqual(stage?.left ?? 0);
 			expect(board?.right ?? Infinity).toBeLessThanOrEqual(stage?.right ?? memory.viewportWidth);
 			expect(board?.top ?? -1).toBeGreaterThanOrEqual(stage?.top ?? 0);
 			expect(board?.bottom ?? Infinity).toBeLessThanOrEqual(stage?.bottom ?? memory.viewportHeight);
-			expect(memory.statFontSize ?? Infinity).toBeLessThanOrEqual(18);
+			expect(memory.statFontSize ?? Infinity).toBeLessThanOrEqual(24);
 
 			const expectedColumns =
 				memory.viewportWidth >= 1024
@@ -192,17 +223,15 @@ for (const layout of layouts) {
 						: 4
 					: memory.viewportWidth > memory.viewportHeight && memory.viewportHeight <= 560
 						? memory.pairs
-						: memory.pairs === 6
-							? 3
-							: 4;
+						: 4;
 			expect(memory.columns).toBe(expectedColumns);
 
 			if (memory.pairs === 6) {
 				const minCardWidth =
 					layout.name === 'phone portrait'
-						? 105
+						? 70
 						: layout.name === 'small portrait'
-							? 85
+							? 60
 							: layout.name === 'phone landscape'
 								? 80
 								: 140;

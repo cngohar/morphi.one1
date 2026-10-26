@@ -8,26 +8,21 @@ const families = [
 ] satisfies FamilyWeight[];
 
 function sequence(seed: string, count: number): string[] {
-	const selector = createPuzzleSelector({ families, firstFamily: 'block', rng: createRng(seed) });
+	const selector = createPuzzleSelector({ families, rng: createRng(seed) });
 	return Array.from({ length: count }, () => selector.next());
 }
 
 describe('puzzle selector', () => {
-	it('starts with the first-impression family and alternates two families', () => {
-		const picks = sequence('1', 20);
-		expect(picks[0]).toBe('block');
-		for (let index = 1; index < picks.length; index += 1) {
-			expect(picks[index]).not.toBe(picks[index - 1]);
-		}
-		expect(new Set(picks)).toEqual(new Set(['block', 'memory']));
+	it('draws either starting family from the injected RNG, then alternates', () => {
+		expect(sequence('0', 4)).toEqual(['memory', 'block', 'memory', 'block']);
+		expect(sequence('2', 4)).toEqual(['block', 'memory', 'block', 'memory']);
 	});
 
-	it('never repeats the same family in a row across many seeded sessions', () => {
-		for (let seed = 1; seed <= 50; seed += 1) {
-			const picks = sequence(String(seed), 24);
-			for (let index = 1; index < picks.length; index += 1) {
+	it('never repeats across refills in many seeded two-family sessions', () => {
+		for (let seed = 0; seed < 100; seed++) {
+			const picks = sequence(String(seed), 40);
+			for (let index = 1; index < picks.length; index++)
 				expect(picks[index]).not.toBe(picks[index - 1]);
-			}
 		}
 	});
 
@@ -35,53 +30,104 @@ describe('puzzle selector', () => {
 		expect(sequence('42', 12)).toEqual(sequence('42', 12));
 	});
 
-	it('allows repetition when only one family is eligible', () => {
-		const selector = createPuzzleSelector({
-			families: [
-				{ family: 'block', weight: 1 },
-				{ family: 'memory', weight: 0 }
-			],
-			firstFamily: 'block',
-			rng: createRng('7')
-		});
-		expect(Array.from({ length: 6 }, () => selector.next())).toEqual([
-			'block',
-			'block',
-			'block',
-			'block',
-			'block',
-			'block'
-		]);
-	});
-
-	it('falls back to the first eligible family when the requested first family is disabled', () => {
+	it('allows repetition with one eligible family and never serves disabled families', () => {
 		const selector = createPuzzleSelector({
 			families: [
 				{ family: 'block', weight: 0 },
 				{ family: 'memory', weight: 1 }
 			],
-			firstFamily: 'block',
-			rng: createRng('3')
+			rng: createRng('7')
 		});
-		expect(selector.next()).toBe('memory');
+		expect(Array.from({ length: 6 }, () => selector.next())).toEqual(Array(6).fill('memory'));
 	});
 
-	it('throws when no family is eligible', () => {
+	it('fails closed when no family is eligible', () => {
+		expect(() => createPuzzleSelector({ families: [], rng: createRng('9') })).toThrow(
+			'At least one puzzle family'
+		);
+		expect(() =>
+			createPuzzleSelector({ families: [{ family: 'block', weight: 0 }], rng: createRng('9') })
+		).toThrow('At least one puzzle family');
+	});
+
+	it('repeated peeks consume neither the pending pick nor additional entropy', () => {
+		const rng = createRng('5');
+		let draws = 0;
+		const selector = createPuzzleSelector({
+			families,
+			rng: {
+				...rng,
+				nextInt: (max) => {
+					draws++;
+					return rng.nextInt(max);
+				}
+			}
+		});
+		const first = selector.peek();
+		const initialDraws = draws;
+		for (let retry = 0; retry < 10; retry++) expect(selector.peek()).toBe(first);
+		expect(draws).toBe(initialDraws);
+		expect(selector.next()).toBe(first);
+		expect(selector.next()).not.toBe(first);
+	});
+
+	it.each([3, 4, 6, 9, 18])(
+		'keeps exactly one of every family per cycle and a minimum gap with %i families',
+		(count) => {
+			const entries = Array.from({ length: count }, (_, index) => ({
+				family: `family-${index}`,
+				weight: index + 1
+			}));
+			const gap = Math.min(5, Math.max(1, Math.floor(count / 3)));
+			for (let seed = 0; seed < 40; seed++) {
+				const selector = createPuzzleSelector({ families: entries, rng: createRng(String(seed)) });
+				const picks = Array.from({ length: count * 10 }, () => selector.next());
+				for (let cycle = 0; cycle < 10; cycle++)
+					expect(new Set(picks.slice(cycle * count, (cycle + 1) * count))).toEqual(
+						new Set(entries.map((entry) => entry.family))
+					);
+				for (let index = 1; index < picks.length; index++)
+					expect(picks.slice(Math.max(0, index - gap), index)).not.toContain(picks[index]);
+			}
+		}
+	);
+
+	it('uses weights to move families earlier without multiplying their cycle count', () => {
+		let heavyPosition = 0,
+			lightPosition = 0;
+		for (let seed = 0; seed < 1000; seed++) {
+			const selector = createPuzzleSelector({
+				families: [
+					{ family: 'heavy', weight: 8 },
+					{ family: 'light', weight: 1 },
+					{ family: 'other', weight: 1 }
+				],
+				rng: createRng(String(seed))
+			});
+			const cycle = Array.from({ length: 3 }, () => selector.next());
+			expect(new Set(cycle).size).toBe(3);
+			heavyPosition += cycle.indexOf('heavy');
+			lightPosition += cycle.indexOf('light');
+		}
+		expect(heavyPosition / 1000).toBeLessThan(lightPosition / 1000 - 0.7);
+	});
+
+	it('rejects duplicate families and invalid or overflowing weights', () => {
+		expect(() =>
+			createPuzzleSelector({ families: [families[0]!, families[0]!], rng: createRng('1') })
+		).toThrow('unique');
+		for (const weight of [-1, 0.5, NaN, Infinity, Number.MAX_SAFE_INTEGER + 1])
+			expect(() =>
+				createPuzzleSelector({ families: [{ family: 'block', weight }], rng: createRng('1') })
+			).toThrow('safe integers');
 		expect(() =>
 			createPuzzleSelector({
-				families: [{ family: 'block', weight: 0 }],
-				firstFamily: 'block',
-				rng: createRng('9')
+				families: [
+					{ family: 'block', weight: Number.MAX_SAFE_INTEGER },
+					{ family: 'memory', weight: 1 }
+				],
+				rng: createRng('1')
 			})
-		).toThrow('At least one puzzle family must be eligible.');
-	});
-
-	it('peek returns the same family as the next call', () => {
-		const selector = createPuzzleSelector({ families, firstFamily: 'block', rng: createRng('5') });
-		const first = selector.peek();
-		expect(first).toBe('block');
-		expect(selector.next()).toBe(first);
-		const upcoming = selector.peek();
-		expect(selector.next()).toBe(upcoming);
+		).toThrow('total is too large');
 	});
 });
