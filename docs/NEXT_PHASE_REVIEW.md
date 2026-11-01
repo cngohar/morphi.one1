@@ -1,9 +1,11 @@
 # Next-phase combined local review
 
-Status: implementation and automated verification complete locally (2026-11-01);
-all three slices await combined owner acceptance. The owner explicitly requested completing all slices before one
-combined review, then supplied quick-review corrections. That feedback is not
-acceptance. No deployment is authorized or performed.
+Status: all three local slices and the quick-review changes were accepted by the
+owner on 2026-11-01. The owner reported all checks passed after review on their
+own local PC and checked mobile layouts with browser responsive emulation without
+noting corrections. Browser and device models were not supplied; physical mobile
+review was not reported. This closes the local work and supersedes earlier pending
+review notes. No deployment or production release is authorized.
 
 ## Admin review
 
@@ -72,16 +74,14 @@ storage failure is logged and shown while keeping the result available.
 
 Review at 390×844, 844×390 and 1280×800, then on the owner's own devices. Inspect
 preparation failure/retry, early Next, all-disabled recovery, reduced motion and
-sign-out/sign-in behavior. No stage is closed until the owner accepts this
-combined review.
+sign-out/sign-in behavior. The owner accepted this combined review on 2026-11-01 as described above.
 
 ## Verification
 
 Final `bun run verify` passed on 2026-11-01: lint/format, zero errors/warnings,
 boundaries, 30,000 palettes, 126 unit tests, 37 account integration tests, vectors
 in all six runtimes, 32 built-Worker smoke checks, and 174/174 browser checks with
-one worker. Full output: `build/combined-review/verify-final.log`. These checks do
-not replace owner physical-device and functional acceptance.
+one worker. Full output: `build/combined-review/verify-final.log`. The subsequent owner review and its limits are recorded above.
 
 ## Visual comparison
 

@@ -870,3 +870,12 @@ acceptance. No deployment is authorized.
   header, summary cards, readable grouped tables, stronger accessible tabs and
   responsive action cards. Existing account fields and privacy boundaries stay
   intact. This is visual feedback, not acceptance.
+
+## Combined local acceptance (2026-11-01)
+
+The owner accepted all three next-phase slices and the quick-review changes,
+closing local work. They reported all checks passed after review on their own PC
+and checked mobile layouts using browser responsive emulation without noting
+corrections. Browser/device models were not supplied; physical mobile review was
+not reported. This supersedes the pending acceptance directions above. It does
+not authorize deployment, production release or further implementation.

@@ -1,8 +1,10 @@
 # Combined visual review — 2026-11-01
 
-Local screenshot review requested by the owner. Implementation and automated
-verification are complete; owner acceptance remains pending. No public upload or
-deployment was performed.
+Local screenshot review requested by the owner. All three slices and quick-review
+changes were accepted locally on 2026-11-01 after the owner reviewed them on their
+own PC and checked mobile layouts in browser responsive emulation without noting
+corrections. Models were not supplied; physical mobile review was not reported.
+This supersedes earlier pending-review notes. No deployment is authorized.
 
 Open `build/combined-review/index.html` locally. It compares 63 matched pairs:
 48 admin captures (12 states × four viewports) and 15 game captures (five states ×
@@ -39,7 +41,5 @@ full verification passed all 174 browser checks with one worker, plus the other
 required stages; see `docs/PHASE_REPORTS.md` and
 `build/combined-review/verify-final.log`.
 
-The owner still needs to review the live local flows and physical devices, then
-accept or request changes for all three slices together. Independent audit
-retention, best-effort activity limits and unchanged static public guest release
-are explained in `docs/NEXT_PHASE_REVIEW.md`.
+Independent audit retention, best-effort activity limits and the unchanged static
+public guest release are explained in `docs/NEXT_PHASE_REVIEW.md`.

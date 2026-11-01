@@ -1573,3 +1573,33 @@ before/after pairs; `docs/NEXT_PHASE_VISUAL_REVIEW.md` records findings.
 All implementation and automated checks are complete locally. All three slices
 and owner quick-review changes remain **pending combined owner acceptance**.
 No deployment occurred. CODEMAP and review handoff are updated.
+
+## Combined next-phase local acceptance — 2026-11-01
+
+**Built:** All three local slices and the owner-requested quick-review changes,
+covered by the preceding implementation and verification report.
+
+**Skipped:** Production provisioning, deployment and further implementation;
+they are outside this local acceptance.
+
+**Known issues:** The previous report's operational and data limitations remain.
+Physical mobile review was not reported; browser and device models are unspecified.
+
+**Decisions:** The owner reported all checks passed and accepted the combined
+local work. This supersedes earlier pending-review statements; no dependency
+versions changed. See `docs/DECISIONS.md`.
+
+**Questions for the owner:** None required to close this local work. Any further
+work and production release remain separate decisions.
+
+| Acceptance item                       | Evidence type and location                                                       | Result                                                             |
+| ------------------------------------- | -------------------------------------------------------------------------------- | ------------------------------------------------------------------ |
+| Three slices and quick-review changes | Owner report of review on their own local PC, 2026-11-01                         | Accepted locally; owner reported all checks passed                 |
+| Mobile layouts                        | Owner report of browser responsive emulation, 2026-11-01                         | Checked; no corrections noted. Physical mobile review not reported |
+| Combined automated verification       | `build/combined-review/verify-final.log` and preceding final verification report | Pass: all stages, 174/174 browser checks                           |
+
+**Measurements:** No new performance measurements or targets; the preceding
+report records screenshot dimensions and verification context. **Waivers:** None
+reported; no physical-mobile waiver is inferred. **Owner responsibilities:**
+Decide any future work and separately authorize production actions or deployment.
+**CODEMAP:** Updated.
