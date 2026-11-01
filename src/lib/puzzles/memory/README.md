@@ -6,7 +6,7 @@ Rules version: `memory-1`. The seed chooses 6/8/10 pairs, the symbol set, and sh
 
 Score: `max(0, pairs * 1000 - mismatches * 150 - wholeSeconds * 5)`. Solo uses visible active time. Ranked uses server start-to-claim wall time, minus the fixed one-second network allowance, rounded down to whole seconds. Ranked time includes preview, background time, and submission delay; hiding the tab does not pause ranked scoring. The local HUD is an estimate; the result's ranked-save line and account/leaderboard show the server result. Boards are separate for 6, 8, and 10 pairs. No client score is accepted.
 
-The view records accepted flips and queues a completed round before the win animation. Cosmetics never consume the logic RNG stream or alter scoring. Four fixed palettes and viewport-based layouts remain the short-plan scope; procedural theme expansion is deferred.
+The view records accepted flips and queues a completed round before the win animation. Cosmetics never consume the logic RNG stream or alter scoring. The owner-authorized local v1.1 slice supplies a resolved procedural theme: generated glyphs map to existing logical symbol identities, and colors, surfaces, proportions and gaps remain cosmetic. The theme's config/generator versions and resolved snapshot are recorded separately from gameplay. The earlier four app palettes remain for the legacy guest build; verified procedural fallbacks are the documented Shapes/Ocean/Garden/Candy anchors. Taste and the complete v1.1 visual pass remain pending (`docs/V1.1_WORK.md`).
 
 Tests: local `logic.test.ts` and `themes.test.ts`, the app-level theme consistency test, integration/browser account flows, and `tests/vectors/`. A version mismatch is rejected explicitly; no old replay is silently re-scored.
 

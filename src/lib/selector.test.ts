@@ -13,6 +13,20 @@ function sequence(seed: string, count: number): string[] {
 }
 
 describe('puzzle selector', () => {
+	it('includes Connect once per three-family Mix cycle without immediate repeats', () => {
+		const selector = createPuzzleSelector({
+			families: [
+				{ family: 'block', weight: 1 },
+				{ family: 'memory', weight: 1 },
+				{ family: 'connect', weight: 1 }
+			],
+			rng: createRng('1')
+		});
+		const picks = Array.from({ length: 30 }, () => selector.next());
+		for (let i = 0; i < picks.length; i += 3)
+			expect(new Set(picks.slice(i, i + 3))).toEqual(new Set(['block', 'memory', 'connect']));
+		for (let i = 1; i < picks.length; i++) expect(picks[i]).not.toBe(picks[i - 1]);
+	});
 	it('draws either starting family from the injected RNG, then alternates', () => {
 		expect(sequence('0', 4)).toEqual(['memory', 'block', 'memory', 'block']);
 		expect(sequence('2', 4)).toEqual(['block', 'memory', 'block', 'memory']);
@@ -39,6 +53,34 @@ describe('puzzle selector', () => {
 			rng: createRng('7')
 		});
 		expect(Array.from({ length: 6 }, () => selector.next())).toEqual(Array(6).fill('memory'));
+	});
+
+	it('updates availability without consuming a stable pending choice and reintroduces games', () => {
+		const selector = createPuzzleSelector({
+			families: [...families, { family: 'connect', weight: 1 }],
+			rng: createRng('1')
+		});
+		const pending = selector.peek();
+		const other = (['block', 'memory', 'connect'] as const).filter((family) => family !== pending);
+		selector.setAvailable([pending, other[0]!]);
+		expect(selector.peek()).toBe(pending);
+		selector.setAvailable(other);
+		expect(other).toContain(selector.peek());
+		expect(() => selector.setAvailable([])).toThrow('At least one puzzle family');
+		expect(other).toContain(selector.next());
+		selector.setAvailable(['block', 'memory', 'connect']);
+		expect(Array.from({ length: 6 }, () => selector.next())).toContain(pending);
+	});
+
+	it('repeats the sole available family without a rotation deadlock', () => {
+		const selector = createPuzzleSelector({ families, rng: createRng('2') });
+		const first = selector.next();
+		selector.setAvailable([first]);
+		expect(Array.from({ length: 4 }, () => selector.next())).toEqual(Array(4).fill(first));
+		selector.setAvailable(['block', 'memory']);
+		expect(new Set(Array.from({ length: 4 }, () => selector.next()))).toEqual(
+			new Set(['block', 'memory'])
+		);
 	});
 
 	it('fails closed when no family is eligible', () => {

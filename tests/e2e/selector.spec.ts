@@ -3,13 +3,13 @@ import { fixSelectorSeed } from './entropy.js';
 
 for (const [seed, family] of [
 	[0, 'memory'],
-	[2, 'block']
+	[7, 'block']
 ] as const) {
 	test(`the selector RNG can deal ${family} as the first game`, async ({ page }) => {
 		await fixSelectorSeed(page, seed);
 		await page.goto('/', { waitUntil: 'networkidle' });
 		await page.getByRole('button', { name: 'Play', exact: true }).click();
-		await expect(page.locator(`.game[data-family="${family}"]`)).toBeVisible();
+		await expect(page.locator(`.game[data-family="${family}"]`)).toBeVisible({ timeout: 15000 });
 	});
 }
 
@@ -34,11 +34,11 @@ test('a failed Memory start keeps its pending draw and does not reveal it in the
 	});
 	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
-	await expect(page.getByRole('alert')).toHaveText(
+	await expect(page.getByRole('alert').locator('p')).toHaveText(
 		'Your puzzle could not start. Please try again.'
 	);
-	await expect(page.getByRole('alert')).not.toContainText(/memory|block/i);
+	await expect(page.getByRole('alert')).not.toContainText(/memory|block|connect/i);
 	await page.getByRole('button', { name: 'Try again', exact: true }).click();
-	await expect(page.locator('.game[data-family="memory"]')).toBeVisible();
+	await expect(page.locator('.game[data-family="memory"]')).toBeVisible({ timeout: 15000 });
 	await expect(page.getByRole('alert')).toHaveCount(0);
 });

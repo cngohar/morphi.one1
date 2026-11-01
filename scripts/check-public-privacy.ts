@@ -119,6 +119,39 @@ try {
 		);
 	assert(html.includes('Website analytics') && html.includes('Cloudflare’s automatic setup'));
 	checks.push('privacy disclosure/metadata present; no draft/local URLs or account cookies');
+	if (!live) {
+		const routes = ['/', '/privacy', '/terms', '/how-it-works', '/about', '/faq'];
+		const slugs = ['block', 'memory', 'connect', 'block-puzzle'];
+		const sitemap = await (await fetch(origin + '/sitemap.xml')).text();
+		assert.deepEqual(
+			[...sitemap.matchAll(/<loc>https:\/\/morphi\.one([^<]*)<\/loc>/g)].map((item) => item[1]),
+			routes
+		);
+		const robots = await (await fetch(origin + '/robots.txt')).text();
+		for (const slug of slugs) {
+			const redirect = await fetch(`${origin}/${slug}?game=${slug}`, { redirect: 'manual' });
+			assert.equal(redirect.status, 308, slug);
+			assert.equal(new URL(redirect.headers.get('location')!, origin).pathname, '/');
+			assert(!robots.includes(`/${slug}`));
+			assert(!sitemap.includes(`https://morphi.one/${slug}<`));
+		}
+		for (const route of routes) {
+			const document = await fetch(origin + route);
+			assert.equal(document.status, 200, route);
+			const source = await document.text();
+			for (const [, href] of source.matchAll(/href="([^"]*)"/g)) {
+				const url = new URL(href, origin);
+				if (url.origin === origin) {
+					assert(!slugs.includes(url.pathname.slice(1)), href);
+					assert(!url.pathname.startsWith('/play/'), href);
+					if (url.pathname === '/play') assert.equal(url.search, '');
+				}
+			}
+		}
+		checks.push(
+			'exact guest assets: family redirects, static explainers, sitemap/robots and public-link crawl'
+		);
+	}
 	browser = await chromium.launch();
 	const noJS = await browser.newContext({ javaScriptEnabled: false });
 	const policyPage = await noJS.newPage();
@@ -168,12 +201,14 @@ try {
 		});
 	}
 	checks.push('home/privacy links and document layouts at three approved viewports');
-	// Exercise Block -> result -> Memory in both the historical release and the
-	// RNG-start candidate. Only this browser's first selector draw is controlled.
-	await fixSelectorSeed(page);
+	// The current Mix selector may deal either other family after Block.
+	await fixSelectorSeed(page, live ? 2 : 7);
 	await page.goto(origin, { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	await page.locator('.game[data-family="block"]').waitFor();
+	await page.waitForFunction(
+		() => document.querySelector('.game')?.getAttribute('data-phase') === 'playing'
+	);
 	await finishBlock(page);
 	assert.equal(await page.locator('a[href*="/account"]').count(), 0);
 	assert(
@@ -183,7 +218,9 @@ try {
 		'Guest publication does not enable replay queues'
 	);
 	await page.getByRole('button', { name: 'Next puzzle', exact: true }).click();
-	await page.locator('.game[data-family="memory"]').waitFor();
+	await page
+		.locator(live ? '.game[data-family="memory"]' : '.game:not([data-family="block"])')
+		.waitFor();
 	assert.equal(await page.locator('.site-footer').count(), 0);
 	assert.deepEqual(errors, []);
 	const external = requests.filter((url) => new URL(url).origin !== origin);
@@ -206,7 +243,7 @@ try {
 		'No account API calls'
 	);
 	checks.push(
-		'real Block round/result/Next to Memory; no account prompts, replay queue, account APIs, or browser errors'
+		'real Block round/result/Next to a different family; no account prompts, replay queue, account APIs, or browser errors'
 	);
 	await writeFile(
 		`${directory}/checks/${live ? 'live-' : ''}results.json`,

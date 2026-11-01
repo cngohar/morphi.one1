@@ -1,3 +1,4 @@
+import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
 import { createRng, shuffle } from '#lib/engine/rng.js';
 
 export const BLOCK_ENGINE_VERSION = 'block-placement-1';
@@ -316,19 +317,24 @@ function fullLines(board: readonly BoardCell[]): { rows: number[]; columns: numb
 	return { rows, columns };
 }
 
-export function scorePlacement(lines: number, combo: number): number {
+export function scorePlacement(
+	lines: number,
+	combo: number,
+	scoring: ScoreValues = SCORE_DEFAULTS.block
+): number {
 	if (lines <= 0) {
 		return 0;
 	}
 
-	return lines * 100 + (lines - 1) * 50 + (combo - 1) * 50;
+	return lines * scoring.line! + (lines - 1) * scoring.extraLine! + (combo - 1) * scoring.combo!;
 }
 
 export function placeBlockPiece(
 	round: BlockRound,
 	trayIndex: number,
 	x: number,
-	y: number
+	y: number,
+	scoring: ScoreValues = SCORE_DEFAULTS.block
 ): PlaceResult {
 	const pieceId = round.tray[trayIndex];
 
@@ -371,7 +377,7 @@ export function placeBlockPiece(
 	}
 
 	const combo = lineCount > 0 ? round.combo + 1 : 0;
-	const gained = scorePlacement(lineCount, combo);
+	const gained = scorePlacement(lineCount, combo, scoring);
 	const placements = round.placements + 1;
 	let next: BlockRound = {
 		...round,
@@ -398,7 +404,11 @@ export function placeBlockPiece(
 	};
 }
 
-export function replayBlockMoves(seed: string, moves: readonly BlockMove[]): BlockRound {
+export function replayBlockMoves(
+	seed: string,
+	moves: readonly BlockMove[],
+	scoring: ScoreValues = SCORE_DEFAULTS.block
+): BlockRound {
 	let round = createBlockRound(seed);
 
 	for (let index = 0; index < moves.length; index += 1) {
@@ -407,7 +417,7 @@ export function replayBlockMoves(seed: string, moves: readonly BlockMove[]): Blo
 			throw new RangeError(`Move ${index} is missing.`);
 		}
 
-		const result = placeBlockPiece(round, move.trayIndex, move.x, move.y);
+		const result = placeBlockPiece(round, move.trayIndex, move.x, move.y, scoring);
 		if (result.effect === 'invalid') {
 			throw new RangeError(`Move ${index} is invalid.`);
 		}

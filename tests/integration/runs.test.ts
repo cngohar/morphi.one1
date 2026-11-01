@@ -1,8 +1,13 @@
-import { memoryOpeningMs } from '../../src/lib/round-timing.js';
+import {
+	anonymizeExpiredUsers,
+	restoreDeletedUser,
+	softDeleteUser
+} from '../../src/lib/server/user-lifecycle.js';
+import { memoryOpeningMs, CARD_RANKED_OPENING_MS } from '../../src/lib/round-timing.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readFile, readdir } from 'node:fs/promises';
 import { getPlatformProxy } from 'wrangler';
-import { eq } from 'drizzle-orm';
+import { eq, inArray } from 'drizzle-orm';
 import { createDatabase } from '../../src/lib/server/db/index.js';
 import {
 	user,
@@ -20,9 +25,15 @@ import {
 	startRanked
 } from '../../src/lib/server/runs.js';
 import { createMemoryRound } from '../../src/lib/puzzles/memory/logic.js';
+import { createConnectRound } from '../../src/lib/puzzles/connect/logic.js';
 import { moderate } from '../../src/lib/server/moderation.js';
 import { adminActor, adminAudit } from '../../src/lib/server/db/schema.js';
 import type { CompletedRun } from '../../src/lib/engine/contract.js';
+import { generateTheme } from '../../src/lib/engine/theme/generator.js';
+import {
+	THEME_CONFIG_VERSION,
+	THEME_GENERATOR_VERSION
+} from '../../src/lib/engine/theme/config.js';
 let proxy: Awaited<ReturnType<typeof getPlatformProxy<Cloudflare.Env>>>;
 let serial = 0;
 const now = 1800000000000;
@@ -62,6 +73,21 @@ function memory(seed = '42', id = crypto.randomUUID()): CompletedRun {
 		rankedSession: null
 	};
 }
+function connect(seed = '314159', id = crypto.randomUUID()): CompletedRun {
+	const round = createConnectRound(seed);
+	return {
+		version: 1,
+		id,
+		family: 'connect',
+		engineVersion: 'connect-1',
+		seed,
+		moves: round.solution.flatMap((path, pair) =>
+			path.map((cell, at) => ({ pair, cell, stroke: pair, at: pair * 100 + at }))
+		),
+		elapsedSeconds: 10,
+		rankedSession: null
+	};
+}
 beforeAll(async () => {
 	proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc', persist: false });
 	for (const file of (await readdir('migrations')).filter((name) => name.endsWith('.sql')).sort()) {
@@ -78,6 +104,141 @@ afterAll(async () => {
 });
 
 describe('completed progress and ranked runs against real local D1', () => {
+	it('enforces timed bans, preserves saved retries, and finalizes soft deletion at the deadline', async () => {
+		const a = await owner();
+		const actor = crypto.randomUUID();
+		await proxy.env.DB.prepare("INSERT INTO admin_actor(id,role) VALUES (?,'admin')")
+			.bind(actor)
+			.run();
+		const run = memory();
+		const saved = await saveRun(proxy.env.DB, a, run, now);
+		await moderate(proxy.env.DB, actor, 'ban', a, 'review reason', now + 1000);
+		expect(await saveRun(proxy.env.DB, a, run, now + 1)).toEqual(saved);
+		await proxy.env.DB.prepare(
+			'INSERT INTO session(id,token,user_id,expires_at,created_at,updated_at) VALUES (?,?,?,?,?,?)'
+		)
+			.bind(crypto.randomUUID(), crypto.randomUUID(), a, now + 5000, now, now)
+			.run();
+		await expect(saveRun(proxy.env.DB, a, memory(), now + 1)).rejects.toMatchObject({
+			code: 'unavailable'
+		});
+		await expect(startRanked(proxy.env.DB, a, 'memory', a, now + 1)).rejects.toMatchObject({
+			status: 429
+		});
+		await saveRun(proxy.env.DB, a, memory(), now + 1000);
+		await startRanked(proxy.env.DB, a, 'memory', a, now + 1000);
+		const { restoreUntil } = await softDeleteUser(proxy.env.DB, actor, a, 'review reason', 1, now);
+		await expect(
+			restoreDeletedUser(proxy.env.DB, actor, a, 'review reason', restoreUntil)
+		).rejects.toMatchObject({ code: 'restore_expired_or_unavailable' });
+		await anonymizeExpiredUsers(proxy.env.DB, restoreUntil);
+		expect(await proxy.env.DB.prepare('SELECT id FROM user WHERE id=?').bind(a).first()).toBeNull();
+		expect(
+			await proxy.env.DB.prepare('SELECT id FROM completed_run WHERE user_id=?').bind(a).first()
+		).toBeNull();
+		expect(
+			(
+				await proxy.env.DB.prepare('SELECT anonymized_at FROM user_lifecycle WHERE user_id=?')
+					.bind(a)
+					.first<{ anonymized_at: number }>()
+			)?.anonymized_at
+		).toBe(restoreUntil);
+	});
+	it('restores only before the deadline and protects enrolled operators', async () => {
+		const a = await owner();
+		const actor = crypto.randomUUID();
+		await proxy.env.DB.prepare("INSERT INTO admin_actor(id,role) VALUES (?,'admin')")
+			.bind(actor)
+			.run();
+		const { restoreUntil } = await softDeleteUser(proxy.env.DB, actor, a, 'review reason', 1, now);
+		await restoreDeletedUser(proxy.env.DB, actor, a, 'review reason', restoreUntil - 1);
+		expect(
+			await proxy.env.DB.prepare('SELECT id FROM user WHERE id=?').bind(a).first()
+		).toBeTruthy();
+		await proxy.env.DB.prepare(
+			"INSERT INTO admin_web_operator(user_id,secret_cipher) VALUES (?,'test')"
+		)
+			.bind(a)
+			.run();
+		await expect(
+			softDeleteUser(proxy.env.DB, actor, a, 'review reason', 1, now)
+		).rejects.toMatchObject({ code: 'user_unavailable' });
+	});
+
+	it('replays Connect from path strokes and scores ranked time on the server', async () => {
+		const a = await owner();
+		const issued = await startRanked(proxy.env.DB, a, 'connect', a, now);
+		const run = {
+			...connect(issued.seed, issued.id),
+			rankedSession: issued.id,
+			theme: { configVersion: THEME_CONFIG_VERSION, generatorVersion: THEME_GENERATOR_VERSION }
+		};
+		const saved = await saveRun(proxy.env.DB, a, run, now + 60000);
+		expect(saved.ranked).toBe(true);
+		expect(saved.score).toBeGreaterThan(1000);
+		expect((await leaderboard(proxy.env.DB, saved.group, 0, a)).rows).toHaveLength(1);
+		await expect(
+			saveRun(proxy.env.DB, a, { ...connect(), moves: run.moves.slice(0, -1) }, now)
+		).rejects.toMatchObject({ code: 'invalid_replay' });
+	});
+	it('accepts a Connect all-pairs win with gaps and omits the grid bonus', async () => {
+		const a = await owner();
+		const round = createConnectRound('1');
+		const moves = round.solution.flatMap((path, pair) =>
+			(pair === 2 ? [path[0]!, path[1]!, path[2]!, path.at(-1)!] : path).map((cell, at) => ({
+				pair,
+				cell,
+				stroke: pair,
+				at: pair * 100 + at
+			}))
+		);
+		const saved = await saveRun(proxy.env.DB, a, { ...connect('1'), moves }, now);
+		expect(saved.ranked).toBe(false);
+		expect(saved.score).toBe(round.pairs.length * 200 + (round.par - 10) * 10);
+	});
+	it('records authoritative theme snapshots and keeps legacy queued runs compatible', async () => {
+		const a = await owner();
+		const issued = await startRanked(proxy.env.DB, a, 'memory', a, now);
+		expect(issued.theme).toEqual(generateTheme(issued.seed, 'memory'));
+		const run = {
+			...memory(issued.seed, issued.id),
+			rankedSession: issued.id,
+			theme: { configVersion: THEME_CONFIG_VERSION, generatorVersion: THEME_GENERATOR_VERSION }
+		};
+		const saved = await saveRun(proxy.env.DB, a, run, now + 31000);
+		const db = createDatabase(proxy.env.DB);
+		const stored = await db.select().from(completedRun).where(eq(completedRun.id, run.id)).get();
+		expect(stored?.themeConfigVersion).toBe(THEME_CONFIG_VERSION);
+		expect(stored?.themeGeneratorVersion).toBe(THEME_GENERATOR_VERSION);
+		expect(JSON.parse(stored!.themeSnapshot!)).toEqual(issued.theme);
+		const legacy = memory();
+		await saveRun(proxy.env.DB, a, legacy, now);
+		expect(
+			(await db.select().from(completedRun).where(eq(completedRun.id, legacy.id)).get())
+				?.themeConfigVersion
+		).toBe('curated-v1');
+		const solo = { ...memory(), theme: run.theme };
+		await saveRun(proxy.env.DB, a, solo, now);
+		expect(
+			JSON.parse(
+				(await db.select().from(completedRun).where(eq(completedRun.id, solo.id)).get())!
+					.themeSnapshot!
+			)
+		).toEqual(generateTheme(solo.seed, 'memory'));
+		await expect(
+			saveRun(
+				proxy.env.DB,
+				a,
+				{ ...memory(), theme: { ...run.theme, configVersion: 'future' } },
+				now
+			)
+		).rejects.toMatchObject({ code: 'theme_version' });
+		await expect(
+			saveRun(proxy.env.DB, a, { ...memory(), theme: { ...run.theme, colors: ['#ffffff'] } }, now)
+		).rejects.toMatchObject({ code: 'theme_version' });
+		expect((await saveRun(proxy.env.DB, a, run, now + 9000000)).score).toBe(saved.score);
+		await db.delete(user).where(eq(user.id, a));
+	});
 	it('checks moderation roles per action and audits mutations atomically', async () => {
 		const a = await owner();
 		const db = createDatabase(proxy.env.DB);
@@ -104,7 +265,14 @@ describe('completed progress and ranked runs against real local D1', () => {
 			status: 429
 		});
 		await moderate(proxy.env.DB, admin, 'ranked-on', 'ranked', 'test reason');
-		expect((await db.select().from(adminAudit)).length).toBe(4);
+		expect(
+			(
+				await db
+					.select()
+					.from(adminAudit)
+					.where(inArray(adminAudit.actor, [admin, moderator]))
+			).length
+		).toBe(4);
 	});
 	it('replays unranked history, isolates ownership, and never promotes it into a board', async () => {
 		const a = await owner(),
@@ -118,6 +286,43 @@ describe('completed progress and ranked runs against real local D1', () => {
 		await expect(saveRun(proxy.env.DB, b, run, now)).rejects.toMatchObject({ code: 'conflict' });
 		expect((await leaderboard(proxy.env.DB, result.group, 0, a)).rows).toEqual([]);
 	});
+	it('uses the issued Card allowance while legacy sessions keep their original timing', async () => {
+		const a = await owner(),
+			b = await owner();
+		const issued = await startRanked(proxy.env.DB, a, 'memory', a, now);
+		const db = createDatabase(proxy.env.DB);
+		const row = await db.select().from(playSession).where(eq(playSession.id, issued.id)).get();
+		expect(row?.cardOpeningMs).toBe(CARD_RANKED_OPENING_MS);
+		const legacyId = crypto.randomUUID();
+		await db.insert(playSession).values({
+			id: legacyId,
+			userId: b,
+			family: 'memory',
+			seed: issued.seed,
+			engineVersion: 'memory-1',
+			createdAt: now,
+			expiresAt: now + 7200000,
+			ipHash: b
+		});
+		const legacy = await db.select().from(playSession).where(eq(playSession.id, legacyId)).get();
+		expect(legacy?.cardOpeningMs).toBe(0);
+		const opening = memoryOpeningMs(createMemoryRound(issued.seed).pairs);
+		const current = await saveRun(
+			proxy.env.DB,
+			a,
+			{ ...memory(issued.seed, issued.id), elapsedSeconds: 0, rankedSession: issued.id },
+			now + 1000 + opening + CARD_RANKED_OPENING_MS + 10000
+		);
+		const previous = await saveRun(
+			proxy.env.DB,
+			b,
+			{ ...memory(issued.seed, legacyId), elapsedSeconds: 0, rankedSession: legacyId },
+			now + 1000 + opening + 10000
+		);
+		expect(current.score).toBe(previous.score);
+		expect(current.score).toBe(createMemoryRound(issued.seed).pairs * 1000 - 50);
+		expect(() => parseRun({ ...memory(), cardOpeningMs: 999999 })).toThrow();
+	});
 	it('calculates ranked score from server time and tolerates identical concurrent retries', async () => {
 		const a = await owner();
 		const issued = await startRanked(proxy.env.DB, a, 'memory', a, now);
@@ -129,7 +334,11 @@ describe('completed progress and ranked runs against real local D1', () => {
 		expect(results[0]).toEqual(results[1]);
 		expect(results[0].score).toBe(
 			createMemoryRound(issued.seed).pairs * 1000 -
-				Math.floor((30000 - memoryOpeningMs(createMemoryRound(issued.seed).pairs)) / 1000) * 5
+				Math.floor(
+					(30000 - memoryOpeningMs(createMemoryRound(issued.seed).pairs) - CARD_RANKED_OPENING_MS) /
+						1000
+				) *
+					5
 		);
 		expect((await accountHistory(proxy.env.DB, a)).history).toHaveLength(1);
 		const board = await leaderboard(proxy.env.DB, results[0].group, 0, a);
@@ -186,7 +395,11 @@ describe('completed progress and ranked runs against real local D1', () => {
 		expect(saved.ranked).toBe(true);
 		expect(saved.score).toBe(
 			createMemoryRound(run.seed).pairs * 1000 -
-				Math.floor((29000 - memoryOpeningMs(createMemoryRound(run.seed).pairs)) / 1000) * 5
+				Math.floor(
+					(29000 - memoryOpeningMs(createMemoryRound(run.seed).pairs) - CARD_RANKED_OPENING_MS) /
+						1000
+				) *
+					5
 		);
 	});
 	it('serializes competing payloads and a start racing submission without duplicate results', async () => {
@@ -254,4 +467,174 @@ describe('completed progress and ranked runs against real local D1', () => {
 			code: 'board'
 		});
 	});
+});
+
+it('versions scoring edits, freezes in-flight/past replay, separates boards and audits defaults', async () => {
+	const { readScoreConfig, saveScoreConfig } = await import('../../src/lib/server/scoring.js');
+	const { SCORE_DEFAULTS } = await import('../../src/lib/engine/scoring.js');
+	const { catalog } = await import('../../src/lib/catalog.js');
+	const db = proxy.env.DB,
+		userId = await owner();
+	const before = await readScoreConfig(db, 'memory');
+	const old = await startRanked(db, userId, 'memory', 'score-old', now);
+	const oldRun = {
+		...memory(old.seed, old.id),
+		rankedSession: old.id,
+		scoreConfigVersion: old.scoring.version
+	};
+	const edited = await saveScoreConfig(
+		db,
+		'test-operator',
+		'memory',
+		before.version,
+		{ ...SCORE_DEFAULTS.memory, pair: 2000 },
+		'Local scoring test'
+	);
+	expect(edited.version).not.toBe(before.version);
+	const savedOld = await saveRun(db, userId, oldRun, now + 60000);
+	expect(savedOld.score).toBe(
+		catalog.memory.replay(
+			old.seed,
+			oldRun.moves,
+			Math.floor(
+				(59000 - memoryOpeningMs(createMemoryRound(old.seed).pairs) - CARD_RANKED_OPENING_MS) / 1000
+			),
+			before.values
+		).score
+	);
+	const newer = await startRanked(db, userId, 'memory', 'score-new', now + 70000);
+	expect(newer.scoring).toEqual(edited);
+	const newerRun = {
+		...memory(newer.seed, newer.id),
+		rankedSession: newer.id,
+		scoreConfigVersion: edited.version
+	};
+	const savedNew = await saveRun(db, userId, newerRun, now + 130000);
+	expect(savedNew.score).toBeGreaterThan(10000);
+	expect((await saveRun(db, userId, oldRun, now + 140000)).score).toBe(savedOld.score);
+	const row = await db
+		.prepare('SELECT score_config_version FROM completed_run WHERE id=?')
+		.bind(newer.id)
+		.first<{ score_config_version: string }>();
+	expect(row?.score_config_version).toBe(edited.version);
+	const board = await leaderboard(db, savedOld.group, 0, userId);
+	expect(board.scoreConfigVersion).toBe(edited.version);
+	const historyAfterEdit = await accountHistory(db, userId);
+	expect(historyAfterEdit.bests.every((best) => best.scoreConfigVersion === edited.version)).toBe(
+		true
+	);
+	expect(
+		historyAfterEdit.history.some((item) => item.scoreConfigVersion === old.scoring.version)
+	).toBe(true);
+	if (savedOld.group === savedNew.group)
+		expect(board.rows.find((row) => row.own)?.score).toBe(savedNew.score);
+	else expect(board.rows.find((row) => row.own)).toBeUndefined();
+	const audit = await db
+		.prepare(
+			"SELECT before,after FROM admin_audit WHERE action='score-change' AND target='memory' ORDER BY created_at DESC LIMIT 1"
+		)
+		.first<{ before: string; after: string }>();
+	expect(JSON.parse(audit!.before)).toEqual(before);
+	expect(JSON.parse(audit!.after)).toEqual(edited);
+	await expect(
+		saveScoreConfig(
+			db,
+			'test-operator',
+			'memory',
+			edited.version,
+			{ ...SCORE_DEFAULTS.memory, pair: -1 },
+			'Invalid'
+		)
+	).rejects.toThrow();
+	expect(await readScoreConfig(db, 'memory')).toEqual(edited);
+	await expect(
+		saveScoreConfig(db, 'test-operator', 'memory', before.version, SCORE_DEFAULTS.memory, 'Stale')
+	).rejects.toMatchObject({ code: 'score_conflict' });
+	const restored = await saveScoreConfig(
+		db,
+		'test-operator',
+		'memory',
+		edited.version,
+		SCORE_DEFAULTS.memory,
+		'Restore',
+		true
+	);
+	expect(restored.version).not.toBe(before.version);
+	expect(restored.values).toEqual(SCORE_DEFAULTS.memory);
+	await expect(
+		db
+			.prepare('UPDATE score_config SET values_json=? WHERE version=?')
+			.bind('{}', edited.version)
+			.run()
+	).rejects.toThrow('immutable');
+	expect((await saveRun(db, userId, newerRun, now + 150000)).score).toBe(savedNew.score);
+});
+it('serializes concurrent score saves without orphan versions or audit records', async () => {
+	const { readScoreConfig, saveScoreConfig } = await import('../../src/lib/server/scoring.js');
+	const { SCORE_DEFAULTS } = await import('../../src/lib/engine/scoring.js');
+	const db = proxy.env.DB,
+		before = await readScoreConfig(db, 'connect');
+	const outcomes = await Promise.allSettled(
+		[100, 300].map((pair) =>
+			saveScoreConfig(
+				db,
+				'race-operator',
+				'connect',
+				before.version,
+				{ ...SCORE_DEFAULTS.connect, pair },
+				'Concurrent test'
+			)
+		)
+	);
+	expect(outcomes.filter((result) => result.status === 'fulfilled')).toHaveLength(1);
+	const audit = await db
+		.prepare("SELECT count(*) n FROM admin_audit WHERE actor='race-operator'")
+		.first<{ n: number }>();
+	expect(audit?.n).toBe(1);
+	const current = await readScoreConfig(db, 'connect');
+	expect([100, 300]).toContain(current.values.pair);
+});
+
+it('enforces game lifecycle for new ranked starts while keeping existing runs and audit', async () => {
+	const { changeGame, gameAvailable } = await import('../../src/lib/server/games.js');
+	const db = proxy.env.DB,
+		actor = crypto.randomUUID(),
+		id = await owner();
+	await db.prepare("INSERT INTO admin_actor(id,role) VALUES(?,'admin')").bind(actor).run();
+	const issued = await startRanked(db, id, 'connect', crypto.randomUUID(), now);
+	await changeGame(db, actor, 'connect', 'game-disable', 'Maintenance', 7, now);
+	expect(await gameAvailable(db, 'connect')).toBe(false);
+	await expect(startRanked(db, id, 'connect', crypto.randomUUID(), now)).rejects.toMatchObject({
+		code: 'game_disabled'
+	});
+	expect(
+		await db.prepare('SELECT id FROM play_session WHERE id=?').bind(issued.id).first()
+	).toBeTruthy();
+	await changeGame(db, actor, 'connect', 'game-enable', 'Reopen game', 7, now);
+	await changeGame(db, actor, 'connect', 'game-delete', 'Retire game', 7, now);
+	await expect(
+		changeGame(db, actor, 'connect', 'game-hard-delete', 'Confirm retirement', 7, now)
+	).rejects.toMatchObject({ code: 'game_conflict' });
+	await changeGame(db, actor, 'connect', 'game-restore', 'Restore game', 7, now + 1);
+	await changeGame(db, actor, 'connect', 'game-delete', 'Retire game again', 1, now + 2);
+	await changeGame(
+		db,
+		actor,
+		'connect',
+		'game-hard-delete',
+		'Confirm retirement',
+		7,
+		now + 86400002
+	);
+	expect(
+		await db.prepare('SELECT id FROM play_session WHERE id=?').bind(issued.id).first()
+	).toBeTruthy();
+	const audit = await db
+		.prepare("SELECT count(*) AS n FROM admin_audit WHERE actor=? AND action LIKE 'game-%'")
+		.bind(actor)
+		.first<{ n: number }>();
+	expect(audit?.n).toBe(6);
+	await db
+		.prepare("UPDATE game_lifecycle SET state='enabled',restore_until=NULL WHERE family='connect'")
+		.run();
 });

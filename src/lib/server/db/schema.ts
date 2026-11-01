@@ -94,6 +94,11 @@ export const playSession = sqliteTable(
 		family: text('family').notNull(),
 		seed: text('seed').notNull(),
 		engineVersion: text('engine_version').notNull(),
+		scoreConfigVersion: text('score_config_version').notNull().default('brief-v1'),
+		themeConfigVersion: text('theme_config_version').notNull().default('curated-v1'),
+		themeGeneratorVersion: text('theme_generator_version').notNull().default('curated-v1'),
+		themeSnapshot: text('theme_snapshot'),
+		cardOpeningMs: integer('card_opening_ms').notNull().default(0),
 		createdAt: integer('created_at').notNull(),
 		expiresAt: integer('expires_at').notNull(),
 		ipHash: text('ip_hash').notNull(),
@@ -116,6 +121,10 @@ export const completedRun = sqliteTable(
 			.references(() => user.id, { onDelete: 'cascade' }),
 		family: text('family').notNull(),
 		engineVersion: text('engine_version').notNull(),
+		scoreConfigVersion: text('score_config_version').notNull().default('brief-v1'),
+		themeConfigVersion: text('theme_config_version').notNull().default('curated-v1'),
+		themeGeneratorVersion: text('theme_generator_version').notNull().default('curated-v1'),
+		themeSnapshot: text('theme_snapshot'),
 		group: text('rules_group').notNull(),
 		score: integer('score').notNull(),
 		pairs: integer('pairs'),
@@ -139,8 +148,40 @@ export const playerBan = sqliteTable('player_ban', {
 		.primaryKey()
 		.references(() => user.id, { onDelete: 'cascade' }),
 	reason: text('reason').notNull(),
-	createdAt: integer('created_at').notNull()
+	createdAt: integer('created_at').notNull(),
+	expiresAt: integer('expires_at')
 });
+
+export const userLifecycle = sqliteTable('user_lifecycle', {
+	userId: text('user_id').primaryKey(),
+	deletedAt: integer('deleted_at').notNull(),
+	restoreUntil: integer('restore_until').notNull(),
+	anonymizedAt: integer('anonymized_at'),
+	operationId: text('operation_id').notNull()
+});
+
+export const accountActivity = sqliteTable('account_activity', {
+	userId: text('user_id')
+		.primaryKey()
+		.references(() => user.id, { onDelete: 'cascade' }),
+	trackingSince: integer('tracking_since').notNull(),
+	lastActivityAt: integer('last_activity_at').notNull()
+});
+export const accountRoundActivity = sqliteTable(
+	'account_round_activity',
+	{
+		runId: text('run_id').primaryKey(),
+		ranked: integer('ranked', { mode: 'boolean' }).notNull(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		family: text('family').notNull(),
+		startedAt: integer('started_at').notNull(),
+		completedAt: integer('completed_at'),
+		abandonedAt: integer('abandoned_at')
+	},
+	(table) => [index('account_round_owner_start').on(table.userId, table.startedAt)]
+);
 
 export const adminActor = sqliteTable('admin_actor', {
 	id: text('id').primaryKey(),
@@ -221,3 +262,27 @@ export const anonymousEvent = sqliteTable(
 		index('anonymous_event_visitor').on(table.visitor)
 	]
 );
+
+export const scoreConfig = sqliteTable(
+	'score_config',
+	{
+		version: text('version').primaryKey(),
+		family: text('family').notNull(),
+		parent: text('parent').notNull(),
+		valuesJson: text('values_json').notNull(),
+		createdAt: integer('created_at').notNull()
+	},
+	(table) => [uniqueIndex('score_parent').on(table.family, table.parent)]
+);
+export const scoreLive = sqliteTable('score_live', {
+	family: text('family').primaryKey(),
+	version: text('version')
+		.notNull()
+		.references(() => scoreConfig.version)
+});
+
+export const gameLifecycle = sqliteTable('game_lifecycle', {
+	family: text('family').primaryKey(),
+	state: text('state', { enum: ['enabled', 'disabled', 'deleted', 'hard-deleted'] }).notNull(),
+	restoreUntil: integer('restore_until')
+});

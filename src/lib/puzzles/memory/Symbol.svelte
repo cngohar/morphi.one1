@@ -1,7 +1,18 @@
 <script lang="ts">
 	import type { SymbolId } from '#lib/puzzles/memory/symbols.js';
+	import type { ThemeSymbol } from '#lib/engine/theme/symbols.js';
 
-	let { symbol, color }: { symbol: SymbolId; color: string } = $props();
+	let {
+		symbol,
+		color,
+		glyph,
+		fillMode = 'solid'
+	}: {
+		symbol: SymbolId;
+		color: string;
+		glyph?: ThemeSymbol;
+		fillMode?: 'solid' | 'outline';
+	} = $props();
 </script>
 
 <svg
@@ -12,7 +23,16 @@
 	focusable="false"
 	style:color
 >
-	{#if symbol === 'circle'}
+	{#if glyph}
+		<path
+			d={glyph.path}
+			fill={fillMode === 'outline' ? 'none' : 'currentColor'}
+			stroke={fillMode === 'outline' ? 'currentColor' : 'none'}
+			stroke-width="3"
+			fill-rule="evenodd"
+			stroke-linejoin="round"
+		/>
+	{:else if symbol === 'circle'}
 		<circle cx="24" cy="24" r="15" fill="currentColor" />
 	{:else if symbol === 'triangle'}
 		<path d="M24 6 44 41H4Z" fill="currentColor" />

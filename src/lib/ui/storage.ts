@@ -1,6 +1,8 @@
+import { SCORE_DEFAULT_VERSION } from '#lib/engine/scoring.js';
 const BEST_KEYS = {
 	block: 'morphi.block.best',
-	memory: 'morphi.memory.best'
+	memory: 'morphi.memory.best',
+	connect: 'morphi.connect.best'
 } as const;
 const SOUND_KEY = 'morphi.sound';
 const BLOCK_HINT_KEY = 'morphi.block.hintSeen';
@@ -41,22 +43,39 @@ function write(key: string, value: string): void {
 	}
 }
 
-export function loadBestScore(game: BestGame = 'block'): number {
-	const stored = read(BEST_KEYS[game]);
+export function loadBestScore(game: BestGame = 'block', version = SCORE_DEFAULT_VERSION): number {
+	const stored = read(
+		version === SCORE_DEFAULT_VERSION ? BEST_KEYS[game] : `${BEST_KEYS[game]}.${version}`
+	);
 	const score = stored !== null && /^\d+$/.test(stored) ? Number(stored) : 0;
 	return Number.isSafeInteger(score) && score > 0 ? score : 0;
 }
 
-export function saveBestScore(score: number, game: BestGame = 'block'): void {
-	if (!Number.isSafeInteger(score) || score <= loadBestScore(game)) {
+export function saveBestScore(
+	score: number,
+	game: BestGame = 'block',
+	version = SCORE_DEFAULT_VERSION
+): void {
+	if (!Number.isSafeInteger(score) || score <= loadBestScore(game, version)) {
 		return;
 	}
 
-	write(BEST_KEYS[game], String(score));
+	write(
+		version === SCORE_DEFAULT_VERSION ? BEST_KEYS[game] : `${BEST_KEYS[game]}.${version}`,
+		String(score)
+	);
 }
 
 export function loadBlockHintSeen(): boolean {
 	return read(BLOCK_HINT_KEY) === '1';
+}
+
+export function loadFamilyPlayed(game: BestGame): boolean {
+	return read(`morphi.${game}.played`) === '1' || loadBestScore(game) > 0;
+}
+
+export function markFamilyPlayed(game: BestGame): void {
+	write(`morphi.${game}.played`, '1');
 }
 
 export function saveBlockHintSeen(): void {

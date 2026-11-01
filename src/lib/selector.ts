@@ -1,6 +1,6 @@
 import type { Rng } from '#lib/engine/rng.js';
 
-export type PuzzleFamily = 'block' | 'memory';
+export type PuzzleFamily = 'block' | 'memory' | 'connect';
 
 export interface FamilyWeight<Family extends string = PuzzleFamily> {
 	family: Family;
@@ -10,6 +10,7 @@ export interface FamilyWeight<Family extends string = PuzzleFamily> {
 export interface PuzzleSelector<Family extends string = PuzzleFamily> {
 	next(): Family;
 	peek(): Family;
+	setAvailable(families: readonly Family[]): void;
 }
 
 export interface PuzzleSelectorOptions<Family extends string = PuzzleFamily> {
@@ -33,7 +34,9 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 	const eligible = options.families.filter((entry) => entry.weight > 0);
 	if (eligible.length === 0) throw new Error('At least one puzzle family must be eligible.');
 
-	const gap = eligible.length === 1 ? 0 : Math.min(5, Math.max(1, Math.floor(eligible.length / 3)));
+	let available = eligible;
+	const gap = () =>
+		available.length === 1 ? 0 : Math.min(5, Math.max(1, Math.floor(available.length / 3)));
 	let recent: Family[] = [];
 	let queue: Family[] = [];
 
@@ -52,7 +55,7 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 	}
 
 	function refill(): Family[] {
-		const ordered = weightedOrder(eligible);
+		const ordered = weightedOrder(available);
 		// Plan the whole cycle before exposing a pick. If its tail violates the
 		// minimum gap, revisit earlier positions without dropping/duplicating a family.
 		function arrange(remaining: Family[], history: Family[]): Family[] | null {
@@ -62,13 +65,13 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 				if (history.includes(family)) continue;
 				const rest = arrange(
 					remaining.filter((_, position) => position !== index),
-					gap === 0 ? [] : [...history, family].slice(-gap)
+					gap() === 0 ? [] : [...history, family].slice(-gap())
 				);
 				if (rest) return [family, ...rest];
 			}
 			return null;
 		}
-		const cycle = arrange(ordered, recent);
+		const cycle = arrange(ordered, gap() === 0 ? [] : recent.slice(-gap()));
 		if (!cycle) throw new Error('No puzzle rotation satisfies the minimum gap.');
 		return cycle;
 	}
@@ -80,10 +83,22 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 
 	return {
 		peek,
+		setAvailable(families) {
+			const selected = new Set(families);
+			const nextAvailable = eligible.filter((entry) => selected.has(entry.family));
+			if (!nextAvailable.length) throw new Error('At least one puzzle family must be eligible.');
+			const previous = new Set(available.map((entry) => entry.family));
+			queue = queue.filter((family) => selected.has(family));
+			if (queue.length) {
+				for (const entry of nextAvailable)
+					if (!previous.has(entry.family)) queue.push(entry.family);
+			}
+			available = nextAvailable;
+		},
 		next() {
 			const family = peek();
 			queue.shift();
-			recent = gap === 0 ? [] : [...recent, family].slice(-gap);
+			recent = [...recent, family].slice(-5);
 			return family;
 		}
 	};

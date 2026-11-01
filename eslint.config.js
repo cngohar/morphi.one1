@@ -45,7 +45,7 @@ const boundaries = {
 export default defineConfig(
 	includeIgnoreFile(gitignorePath),
 	// Reproducible third-party bundle; lint its authored motion wrapper instead.
-	{ ignores: ['static/demo/motion.js'] },
+	{ ignores: ['static/demo/motion.js', 'static/demo/card-proof.js'] },
 	js.configs.recommended,
 	ts.configs.recommended,
 	svelte.configs.recommended,
@@ -78,6 +78,7 @@ export default defineConfig(
 			'src/lib/puzzles/*/manifest.ts',
 			'src/lib/puzzles/*/symbols.ts'
 		],
+		ignores: ['src/lib/engine/theme/**'],
 		rules: {
 			'no-restricted-properties': [
 				'error',
@@ -161,6 +162,28 @@ export default defineConfig(
 				{
 					selector: "NewExpression[callee.name='Date']",
 					message: 'Engine logic must not read wall-clock time.'
+				}
+			]
+		}
+	},
+	{
+		files: ['src/lib/engine/theme/**/*.ts'],
+		rules: {
+			'no-restricted-properties': [
+				'error',
+				{ object: 'Math', property: 'random', message: 'Use the separate seeded theme RNG.' },
+				{ object: 'Date', property: 'now', message: 'Theme generation must be reproducible.' },
+				{
+					object: 'performance',
+					property: 'now',
+					message: 'Theme generation must be reproducible.'
+				}
+			],
+			'no-restricted-syntax': [
+				'error',
+				{
+					selector: "NewExpression[callee.name='Date']",
+					message: 'Theme generation must be reproducible.'
 				}
 			]
 		}

@@ -9,7 +9,10 @@
 		['block-placement-1', 'leaderboard.block'],
 		['memory-1:6', 'leaderboard.memory6'],
 		['memory-1:8', 'leaderboard.memory8'],
-		['memory-1:10', 'leaderboard.memory10']
+		['memory-1:10', 'leaderboard.memory10'],
+		['connect-1:1', 'leaderboard.connect1'],
+		['connect-1:2', 'leaderboard.connect2'],
+		['connect-1:3', 'leaderboard.connect3']
 	];
 </script>
 
@@ -28,6 +31,7 @@
 		{#if data.unavailable}<p class="account-notice" role="alert">{t('leaderboard.error')}</p>
 		{:else if !data.rows.length}<p class="account-empty">{t('leaderboard.empty')}</p>
 		{:else}
+			<p>{t('scoring.version')}: {'scoreConfigVersion' in data ? data.scoreConfigVersion : '—'}</p>
 			<table>
 				<thead
 					><tr

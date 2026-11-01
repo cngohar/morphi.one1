@@ -17,7 +17,7 @@ await mkdir(assets, { recursive: true });
 await cp('.svelte-kit/output/client/_app', join(assets, '_app'), { recursive: true });
 await cp('.svelte-kit/output/prerendered/pages/index.html', join(assets, 'index.html'));
 await cp('.svelte-kit/output/prerendered/pages/privacy.html', join(assets, 'privacy.html'));
-for (const page of ['play', 'memory', 'block-puzzle', 'terms'])
+for (const page of ['play', 'terms', 'how-it-works', 'about', 'faq'])
 	await cp(`.svelte-kit/output/prerendered/pages/${page}.html`, join(assets, `${page}.html`));
 await cp('static/audio', join(assets, 'audio'), { recursive: true });
 await cp('static/og', join(assets, 'og'), { recursive: true });
@@ -26,8 +26,9 @@ for (const endpoint of ['robots.txt', 'sitemap.xml'])
 for (const path of [
 	'__data.json',
 	'play/__data.json',
-	'memory/__data.json',
-	'block-puzzle/__data.json',
+	'how-it-works/__data.json',
+	'about/__data.json',
+	'faq/__data.json',
 	'privacy/__data.json',
 	'terms/__data.json'
 ]) {
@@ -35,6 +36,10 @@ for (const path of [
 	await mkdir(join(destination, '..'), { recursive: true });
 	await cp(join('.svelte-kit/output/prerendered/dependencies', path), destination);
 }
+await writeFile(
+	join(assets, '_redirects'),
+	['block', 'memory', 'connect', 'block-puzzle'].map((slug) => `/${slug} / 308\n`).join('')
+);
 await writeFile(
 	join(assets, '_headers'),
 	'/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n'

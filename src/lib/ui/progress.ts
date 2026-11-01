@@ -1,4 +1,8 @@
+import { validateScoreValues, type ScoreConfig } from '#lib/engine/scoring.js';
 import type { CompletedRun, PuzzleId } from '#lib/engine/contract.js';
+import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
+import { paletteIssues } from '#lib/engine/theme/generator.js';
+import { THEME_CONFIG_VERSION, THEME_GENERATOR_VERSION } from '#lib/engine/theme/config.js';
 export interface PendingRun {
 	id: string;
 	owner: string | null;
@@ -6,6 +10,7 @@ export interface PendingRun {
 	attempts: number;
 	retryAt: number;
 	rejected?: boolean;
+	resolvedTheme?: ResolvedTheme;
 }
 export interface SavedResult {
 	id: string;
@@ -90,7 +95,10 @@ export async function startSession(family: PuzzleId, owner: string) {
 		body: JSON.stringify({ family, ownerKey: owner }),
 		signal: AbortSignal.timeout(8000)
 	});
-	if (!response.ok) throw new Error('ranked_unavailable');
+	if (!response.ok) {
+		const failure = (await response.json().catch(() => null)) as { code?: string } | null;
+		throw new Error(failure?.code === 'game_disabled' ? 'game_disabled' : 'ranked_unavailable');
+	}
 	const value = (await response.json()) as Record<string, unknown>;
 	if (
 		!value ||
@@ -101,6 +109,19 @@ export async function startSession(family: PuzzleId, owner: string) {
 		typeof value.engineVersion !== 'string'
 	)
 		throw new Error('ranked_response');
+	const theme = value.theme as ResolvedTheme | undefined;
+	if (
+		!theme ||
+		theme.seed !== value.seed ||
+		theme.family !== family ||
+		theme.themeConfigVersion !== THEME_CONFIG_VERSION ||
+		theme.themeGeneratorVersion !== THEME_GENERATOR_VERSION ||
+		paletteIssues(theme).length
+	)
+		throw new Error('ranked_theme');
+	const scoring = value.scoring as ScoreConfig | undefined;
+	if (!scoring || typeof scoring.version !== 'string') throw new Error('ranked_scoring');
+	validateScoreValues(family, scoring.values);
 	return value as {
 		id: string;
 		seed: string;
@@ -108,6 +129,8 @@ export async function startSession(family: PuzzleId, owner: string) {
 		startedAt: number;
 		expiresAt: number;
 		family: PuzzleId;
+		theme: ResolvedTheme;
+		scoring: import('#lib/engine/scoring.js').ScoreConfig;
 	};
 }
 export async function syncProgress(

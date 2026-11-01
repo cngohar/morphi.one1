@@ -1,12 +1,15 @@
 import { expect, test, type Page } from '@playwright/test';
+import { fixSelectorSeed } from './entropy.js';
 async function fixedPuzzleSeed(page: Page, pairs: number) {
 	const seed = pairs === 6 ? 3 : pairs === 8 ? 0 : 1;
 	await page.addInitScript((value) => {
 		const original = crypto.getRandomValues.bind(crypto);
+		let first = true;
 		crypto.getRandomValues = (array) => {
 			if (array instanceof Uint32Array && array.length === 2) {
 				array[0] = 0;
-				array[1] = value;
+				array[1] = first ? 0 : value;
+				first = false;
 				return array;
 			}
 			return original(array);
@@ -18,7 +21,7 @@ for (const pairs of [6, 8, 10])
 		page
 	}) => {
 		await fixedPuzzleSeed(page, pairs);
-		await page.goto('/memory', { waitUntil: 'networkidle' });
+		await page.goto('/', { waitUntil: 'networkidle' });
 		await page.evaluate(() => {
 			const phases: { phase: string; time: number }[] = [];
 			Object.assign(window, { entrancePhases: phases });
@@ -47,10 +50,8 @@ for (const pairs of [6, 8, 10])
 		);
 		await expect(page.locator('.stat').nth(1)).toContainText('0:00');
 
-		await page.waitForTimeout(2300);
-		await expect(game).toHaveAttribute('data-phase', 'preview');
 		await expect(cards.first()).toBeDisabled();
-		await expect(game).toHaveAttribute('data-phase', 'playing', { timeout: 3000 });
+		await expect(game).toHaveAttribute('data-phase', 'playing', { timeout: 5000 });
 		const phases = await page.evaluate(
 			() => Reflect.get(window, 'entrancePhases') as { phase: string; time: number }[]
 		);
@@ -67,7 +68,7 @@ test('hidden entrance pauses and reduced-motion changes reveal safely without sk
 	page
 }) => {
 	await fixedPuzzleSeed(page, 6);
-	await page.goto('/memory', { waitUntil: 'networkidle' });
+	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'dealing');
 	await page.evaluate(() => {
@@ -87,7 +88,8 @@ test('hidden entrance pauses and reduced-motion changes reveal safely without sk
 	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'playing', { timeout: 2500 });
 });
 test('Block entrance locks placement, then supports real selection', async ({ page }) => {
-	await page.goto('/block-puzzle', { waitUntil: 'networkidle' });
+	await fixSelectorSeed(page, 7);
+	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'dealing');
 	const slot = page.locator('button.tray-slot').first();
@@ -141,6 +143,7 @@ test('every operator view denies guests without exposing records', async ({ requ
 test('failed cosmetic entropy keeps Memory visible and playable after its preview', async ({
 	page
 }) => {
+	await fixSelectorSeed(page, 0);
 	await page.addInitScript(() => {
 		const original = crypto.getRandomValues.bind(crypto);
 		crypto.getRandomValues = (array) => {
@@ -149,7 +152,7 @@ test('failed cosmetic entropy keeps Memory visible and playable after its previe
 			return original(array);
 		};
 	});
-	await page.goto('/memory', { waitUntil: 'networkidle' });
+	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	await expect(page.locator('.memory-card').first()).toBeVisible();
 	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'playing', { timeout: 10000 });

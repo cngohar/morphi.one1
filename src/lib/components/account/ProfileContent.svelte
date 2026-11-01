@@ -26,7 +26,14 @@
 	let tab = $state('overview'),
 		detail = $state<string | null>(null);
 	const tabs = ['overview', 'games', 'activity', 'settings'];
-	const familyName = (family: string) => t(family === 'block' ? 'v1.game.block' : 'v1.game.memory');
+	const familyName = (family: string) =>
+		t(
+			family === 'block'
+				? 'v1.game.block'
+				: family === 'connect'
+					? 'v1.game.connect'
+					: 'v1.game.memory'
+		);
 	const high = (family: string) =>
 		Math.max(0, ...bests.filter((row) => row.family === family).map((row) => row.score));
 	const date = (timestamp: number) =>
@@ -100,7 +107,7 @@
 							>{t('v1.profile.rounds')}</span
 						><span>{t('v1.profile.last')}</span>
 					</div>
-					{#each ['block', 'memory'] as family (family)}<button
+					{#each ['block', 'memory', 'connect'] as family (family)}<button
 							class="family-row"
 							onclick={() => (detail = detail === family ? null : family)}
 							aria-expanded={detail === family}

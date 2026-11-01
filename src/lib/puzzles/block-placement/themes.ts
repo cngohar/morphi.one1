@@ -1,4 +1,5 @@
 import { createRng } from '#lib/engine/rng.js';
+import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 
 export interface BlockTheme {
 	id: string;
@@ -9,6 +10,24 @@ export interface BlockTheme {
 	tray: string;
 	traySlot: string;
 	pieces: readonly [string, string, string, string];
+}
+
+export function blockThemeFromResolved(theme: ResolvedTheme): BlockTheme {
+	return {
+		id: theme.recipe,
+		name: theme.recipe,
+		background: theme.background,
+		cell: theme.back,
+		edge: theme.edge,
+		tray: theme.face,
+		traySlot: theme.background,
+		pieces: [0, 1, 2, 3].map((i) => theme.colors[i % theme.colors.length]) as [
+			string,
+			string,
+			string,
+			string
+		]
+	};
 }
 
 export const BLOCK_THEMES: readonly BlockTheme[] = [

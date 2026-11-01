@@ -1,13 +1,24 @@
 <script lang="ts">
+	import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	let {
 		family,
+		scoring,
 		section = 'all'
 	}: {
-		family: 'block' | 'memory';
+		family: 'block' | 'memory' | 'connect';
+		scoring?: ScoreValues;
 		section?: 'all' | 'how' | 'scoring' | 'scoring-tips' | 'right';
 	} = $props();
 	const key = (suffix: string) => `v1.game.${family}.${suffix}` as MessageKey;
+	const fields = $derived(Object.keys(SCORE_DEFAULTS[family]));
+	const values: ScoreValues = $derived(scoring ?? SCORE_DEFAULTS[family]);
+	function scoreValue(row: number) {
+		const field = fields[row - 1];
+		if (!field) return t(key(`value${row}`));
+		const negative = family === 'memory' ? row > 1 : family === 'connect' && row === 4;
+		return `${negative ? '−' : '+'}${new Intl.NumberFormat('en').format(values[field]!)}`;
+	}
 </script>
 
 {#if section === 'all' || section === 'how'}<section class="guide-how">
@@ -26,7 +37,7 @@
 		<dl>
 			{#each [1, 2, 3, 4] as number (number)}<div>
 					<dt>{t(key(`row${number}`))}</dt>
-					<dd>{t(key(`value${number}`))}</dd>
+					<dd>{scoreValue(number)}</dd>
 				</div>{/each}
 		</dl>
 		<p class="guide-note">{t(key('scoringNote'))}</p>

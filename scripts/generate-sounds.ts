@@ -74,6 +74,51 @@ const sounds = [
 		'deal',
 		0.6,
 		'A short delicate fan of paper cards sliding through the air, ending in a soft ceramic tile click. Start of a fresh puzzle, under 500 milliseconds.'
+	],
+	[
+		'connect-start',
+		0.5,
+		'One soft ceramic dot touches a felt grid, a clear restrained tap. Path begins, under 150 milliseconds.'
+	],
+	[
+		'connect-appear',
+		0.6,
+		'An original Connect puzzle board arriving: a brief inward ripple of small ceramic grid cells, then two dots landing together with a warm paired tick. No paper cards. Under 500 milliseconds.'
+	],
+	[
+		'connect-extend',
+		0.5,
+		'A single quiet flowing wooden bead slide across a felt grid, crisp and short, under 150 milliseconds.'
+	],
+	[
+		'connect-backtrack',
+		0.5,
+		'A single tiny ceramic path bead slides backward along felt and settles softly, descending and shorter than a forward draw. Under 200 milliseconds.'
+	],
+	[
+		'connect-pair',
+		0.5,
+		'Two small ceramic dots join with a warm resonant double tick, a gentle completed connection, under 300 milliseconds.'
+	],
+	[
+		'connect-cut',
+		0.5,
+		'A small line of felt beads retracts with a soft quick descending zip, friendly path cut, under 300 milliseconds.'
+	],
+	[
+		'connect-redraw',
+		0.5,
+		'A muted dry wooden eraser flick and tiny low tick, calm redraw cost, under 200 milliseconds.'
+	],
+	[
+		'connect-invalid',
+		0.5,
+		'A Connect path tip touches a closed ceramic edge and gently springs back with a short muted felt bump. No harsh buzzer, under 200 milliseconds.'
+	],
+	[
+		'connect-win',
+		0.8,
+		'A full grid of tiny ceramic dots joins in one airy left-to-right cascade ending in a warm clear completion chord, under 700 milliseconds.'
 	]
 ] as const;
 const previous = existsSync('static/audio/manifest.json')
@@ -117,12 +162,15 @@ for (const [name, durationSeconds, description] of sounds) {
 		}
 	}
 	const bytes = readFileSync(path);
-	manifest[name] = previous[name] ?? {
+	const provenance = {
 		file: `${name}.mp3`,
 		durationSeconds,
 		prompt: palette + description,
 		sha256: createHash('sha256').update(bytes).digest('hex')
 	};
+	manifest[name] = name.startsWith('connect-')
+		? { ...provenance, generatedAt: '2026-10-28' }
+		: (previous[name] ?? provenance);
 }
 writeFileSync(
 	'static/audio/manifest.json',
@@ -131,7 +179,7 @@ writeFileSync(
 			provider: 'ElevenLabs',
 			model: 'eleven_text_to_sound_v2',
 			sdk: '2.74.0',
-			generated: '2026-10-25',
+			generated: '2026-10-28',
 			sounds: manifest
 		},
 		null,

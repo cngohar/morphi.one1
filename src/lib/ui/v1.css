@@ -1789,12 +1789,18 @@
 	aspect-ratio: 1;
 	transition: none;
 }
+.design-public .active-round[data-family='memory'] .game[data-theme-version] .board {
+	gap: clamp(5px, 1.5vmin, var(--theme-gap));
+}
+.design-public .active-round[data-family='memory'] .game[data-theme-version] .memory-card {
+	aspect-ratio: var(--theme-aspect);
+}
 .design-public .active-round[data-family='block'] .board {
 	width: min(100%, 380px, calc(100svh - 355px));
-	gap: 4px;
+	gap: var(--block-grid-gap, 4px);
 }
 .design-public .active-round[data-family='block'] .row {
-	gap: 4px;
+	gap: var(--block-grid-gap, 4px);
 }
 .design-public .active-round[data-family='block'] .tray {
 	position: static;

@@ -3,6 +3,7 @@
 	import type { MemoryCard as Card } from '#lib/puzzles/memory/logic.js';
 	import { symbolLabel } from '#lib/puzzles/memory/symbols.js';
 	import { t } from '#lib/i18n/messages.js';
+	import type { ThemeSymbol } from '#lib/engine/theme/symbols.js';
 
 	let {
 		card,
@@ -19,7 +20,9 @@
 		dealDelay,
 		matchDelay,
 		waveDelay,
-		onflip
+		onflip,
+		glyph,
+		fillMode = 'solid'
 	}: {
 		card: Card;
 		index: number;
@@ -36,9 +39,11 @@
 		matchDelay: number;
 		waveDelay: number;
 		onflip: (index: number) => void;
+		glyph?: ThemeSymbol;
+		fillMode?: 'solid' | 'outline';
 	} = $props();
 
-	const name = $derived(t(symbolLabel(card.symbol)));
+	const name = $derived(t(glyph ? `symbol.${glyph.label}` : symbolLabel(card.symbol)));
 	const label = $derived(
 		matched
 			? t('card.matched', { symbol: name })
@@ -51,6 +56,7 @@
 <button
 	type="button"
 	class="memory-card"
+	class:is-procedural={!!glyph}
 	class:is-up={faceUp}
 	class:is-matched={matched}
 	class:is-shaking={shaking}
@@ -69,7 +75,7 @@
 			<span class="back-mark"></span>
 		</span>
 		<span class="card-face card-front" aria-hidden="true">
-			<Symbol symbol={card.symbol} color={symbolColor} />
+			<Symbol symbol={card.symbol} color={symbolColor} {glyph} {fillMode} />
 		</span>
 	</span>
 </button>
@@ -78,7 +84,7 @@
 	.memory-card {
 		position: relative;
 		display: block;
-		aspect-ratio: 0.78;
+		aspect-ratio: var(--theme-aspect, 0.78);
 		padding: 0;
 		border: 0;
 		background: none;
@@ -120,6 +126,7 @@
 	}
 
 	.card-face {
+		clip-path: var(--theme-clip, none);
 		position: absolute;
 		inset: 0;
 		display: grid;
@@ -130,12 +137,34 @@
 
 	.card-back {
 		background: var(--memory-back);
-		border: 2px solid var(--memory-edge);
+		border: var(--theme-border, 2px) solid var(--memory-edge);
+	}
+
+	.is-procedural .card-face {
+		border: 0;
+		background: var(--memory-edge);
+	}
+	.is-procedural .card-face::before {
+		content: '';
+		position: absolute;
+		inset: var(--theme-border);
+		border-radius: inherit;
+		clip-path: inherit;
+		background: var(--memory-back);
+	}
+	.is-procedural .card-front::before {
+		background: var(--memory-face);
+	}
+	.is-procedural .card-face > :global(*) {
+		position: relative;
+	}
+	.is-procedural.is-matched .card-front {
+		background: var(--memory-mark);
 	}
 
 	.card-front {
 		background: var(--memory-face);
-		border: 2px solid var(--memory-edge);
+		border: var(--theme-border, 2px) solid var(--memory-edge);
 		transform: rotateY(180deg);
 	}
 
@@ -160,7 +189,7 @@
 	}
 
 	.is-matched .card-front :global(.symbol) {
-		opacity: 0.55;
+		opacity: 1;
 	}
 
 	.back-mark {
@@ -172,7 +201,9 @@
 	}
 
 	.memory-card:focus-visible {
-		outline: none;
+		outline: 3px solid var(--focus);
+		outline-offset: 3px;
+		border-radius: var(--memory-radius);
 	}
 
 	.memory-card:focus-visible .card-face {

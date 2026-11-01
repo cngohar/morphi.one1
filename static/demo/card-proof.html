@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><meta name="robots" content="noindex">
+  <title>The Card · Morphi.One</title><link rel="stylesheet" href="/demo/card-proof.css">
+</head>
+<body>
+  <div id="proof" data-phase="idle">
+    <header><a class="brand" href="/" data-message="v1.brand"></a><h1 id="puzzle-name"></h1><details class="review-tools"><summary data-message="v1.common.demo"></summary><div id="review-tools"></div></details></header>
+    <main class="proof-stage">
+      <div class="proof-scatter" aria-hidden="true"></div>
+      <section class="proof-board" aria-labelledby="puzzle-name"><div class="proof-content"><div class="proof-hud"></div><div class="proof-grid"></div></div>
+      <div class="proof-card" aria-hidden="true"><div class="proof-card-inner"><div class="proof-card-back"><i></i></div><div class="proof-card-front"><strong></strong><span></span></div></div></div></section>
+      <aside class="played-stack"><p id="stack-label"></p><div class="stack-cards" aria-hidden="true"></div></aside>
+      <div class="proof-result"><div class="proof-result-inner"><div class="proof-result-summary"><h2 data-message="v1.result.title"></h2><p data-message="result.score"></p><strong class="sample-score"></strong><p><span data-message="v1.game.best"></span> <b class="sample-high"></b></p></div><dl class="proof-result-stats"></dl><div class="proof-next-area"><button id="next" data-message="result.next"></button><div class="waiting-card" aria-hidden="true"><i></i></div><p class="proof-mystery" data-message="v1.result.mystery"></p></div></div></div>
+    </main>
+    <footer>
+      <div class="proof-help"><span data-message="v1.game.how"></span><span data-message="v1.game.helpScoring"></span></div>
+      <p role="status" id="status"></p>
+      <div class="review-controls">
+        <label><span data-message="v11.proof.family"></span><select id="family"><option value="memory" data-message="v1.game.memory"></option><option value="block" data-message="v1.game.block"></option></select></label>
+        <label><span data-message="v11.proof.loading"></span><select id="load"><option value="normal" data-message="v11.proof.normal"></option><option value="slow" data-message="v11.proof.slow"></option><option value="fail" data-message="v11.proof.fail"></option></select></label>
+        <label><span data-message="v11.proof.motion"></span><select id="motion"><option value="system" data-message="v11.proof.motionOn"></option><option value="off" data-message="v11.proof.motionOff"></option></select></label>
+        <button id="replay" data-message="v11.proof.replay"></button><button id="finish" data-message="v11.proof.finish"></button><button id="retry" hidden data-message="account.retry"></button>
+      </div>
+      <small data-message="v11.proof.note"></small>
+    </footer>
+  </div>
+  <script type="module" src="/demo/card-proof.js"></script>
+</body>
+</html>

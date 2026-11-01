@@ -11,7 +11,19 @@ export default defineConfig({
 		trace: 'retain-on-failure',
 		screenshot: 'only-on-failure'
 	},
-	projects: [{ name: 'chromium', use: { ...devices['Desktop Chrome'] } }],
+	projects: [
+		{ name: 'chromium', use: { ...devices['Desktop Chrome'] } },
+		{
+			name: 'firefox-themes',
+			testMatch: ['themes.spec.ts', 'card.spec.ts', 'app-card.spec.ts', 'connect.spec.ts'],
+			use: { browserName: 'firefox' }
+		},
+		{
+			name: 'webkit-themes',
+			testMatch: ['themes.spec.ts', 'card.spec.ts', 'app-card.spec.ts', 'connect.spec.ts'],
+			use: { browserName: 'webkit' }
+		}
+	],
 	webServer: {
 		command: 'bun run dev --host 127.0.0.1',
 		url: 'http://127.0.0.1:5173',

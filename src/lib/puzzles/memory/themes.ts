@@ -1,4 +1,5 @@
 import { createRng } from '#lib/engine/rng.js';
+import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 
 export interface MemoryTheme {
 	id: string;
@@ -10,6 +11,25 @@ export interface MemoryTheme {
 	matched: string;
 	mark: string;
 	symbols: readonly [string, string, string, string];
+}
+
+export function memoryThemeFromResolved(theme: ResolvedTheme): MemoryTheme {
+	return {
+		id: theme.recipe,
+		name: theme.recipe,
+		background: theme.background,
+		back: theme.back,
+		edge: theme.edge,
+		face: theme.face,
+		matched: theme.face,
+		mark: theme.mark,
+		symbols: [0, 1, 2, 3].map((i) => theme.colors[i % theme.colors.length]) as [
+			string,
+			string,
+			string,
+			string
+		]
+	};
 }
 
 export const MEMORY_THEMES: readonly MemoryTheme[] = [

@@ -1,5 +1,17 @@
 export const permissions = {
 	admin: [
+		'games',
+		'game-enable',
+		'game-disable',
+		'game-delete',
+		'game-restore',
+		'game-hard-delete',
+		'users',
+		'user-delete',
+		'user-restore',
+		'undo',
+		'audit-export',
+		'scoring',
 		'dashboard',
 		'status',
 		'moderation',

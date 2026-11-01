@@ -66,21 +66,60 @@ it('matches the established TOTP vectors, denies replay and binds privileged ses
 	expect(code).toBe(totp(secret, now));
 	const token = await verifyOperator(db, fixture.id, fixture.session, code, false, appSecret, now);
 	const current = { userId: fixture.id, authSession: fixture.session, authCreatedAt: now, token };
+	await expect(
+		requireOperator(db, { ...current, authCreatedAt: now - 16 * 60000 }, 'dashboard', true, now)
+	).rejects.toMatchObject({ code: 'operator_reauth', status: 403 });
 	expect((await requireOperator(db, current, 'dashboard', true, now)).role).toBe('admin');
 	await expect(
 		verifyOperator(db, fixture.id, fixture.session, code, false, appSecret, now)
 	).rejects.toMatchObject({ code: 'operator_code' });
 	await expect(
 		requireOperator(db, { ...current, authSession: 'another' }, 'dashboard', false, now)
-	).rejects.toMatchObject({ status: 403 });
+	).rejects.toMatchObject({ code: 'signed_out', status: 401 });
 	await expect(
 		requireOperator(db, current, 'dashboard', true, now + 16 * 60000)
-	).rejects.toMatchObject({ status: 403 });
+	).rejects.toMatchObject({ code: 'signed_out', status: 401 });
 	const audit = await db
 		.prepare("SELECT count(*) n FROM admin_audit WHERE actor=? AND action='operator-login'")
 		.bind(fixture.id)
 		.first<{ n: number }>();
 	expect(audit?.n).toBe(1);
+});
+it('requires a new operator sign-in after idle or absolute expiry and keeps fresh-auth limits', async () => {
+	const fixture = await identity(),
+		db = proxy.env.DB;
+	const token = await verifyOperator(
+		db,
+		fixture.id,
+		fixture.session,
+		await totpAt(secret, Math.floor(now / 30000)),
+		false,
+		appSecret,
+		now
+	);
+	const current = { userId: fixture.id, authSession: fixture.session, authCreatedAt: now, token };
+	await expect(
+		requireOperator(db, current, 'dashboard', false, now + 10 * 60000)
+	).rejects.toMatchObject({ code: 'signed_out', status: 401 });
+	for (const minutes of [9, 15])
+		await requireOperator(db, current, 'dashboard', false, now + minutes * 60000);
+	await expect(
+		requireOperator(db, current, 'dashboard', true, now + 16 * 60000)
+	).rejects.toMatchObject({ code: 'operator_reauth', status: 403 });
+	await expect(
+		requireOperator(
+			db,
+			{ ...current, authCreatedAt: now + 16 * 60000 },
+			'dashboard',
+			true,
+			now + 16 * 60000
+		)
+	).rejects.toMatchObject({ code: 'operator_reauth', status: 403 });
+	for (const minutes of [24, 29])
+		await requireOperator(db, current, 'dashboard', false, now + minutes * 60000);
+	await expect(
+		requireOperator(db, current, 'dashboard', false, now + 30 * 60000)
+	).rejects.toMatchObject({ code: 'signed_out', status: 401 });
 });
 it('locks repeated failures and consumes recovery codes once with an audit record', async () => {
 	const fixture = await identity(),
@@ -139,7 +178,7 @@ it('rejects enrollment without explicit OS-owner permission and rejects moderato
 			false,
 			now
 		)
-	).rejects.toMatchObject({ status: 403 });
+	).rejects.toMatchObject({ code: 'permission', status: 403 });
 	expect(
 		await requireOperator(
 			proxy.env.DB,

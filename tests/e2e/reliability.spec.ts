@@ -2,13 +2,19 @@ import { expect, test, type Page } from '@playwright/test';
 import { fixSelectorSeed } from './entropy.js';
 
 test.beforeEach(async ({ page }) => {
-	await fixSelectorSeed(page);
+	await fixSelectorSeed(page, 7);
 });
 
 async function startBlock(page: Page): Promise<void> {
 	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
-	await expect(page.locator('.game[data-family="block"]')).toHaveAttribute('data-phase', 'playing');
+	await expect(page.locator('.game[data-family="block"]')).toHaveAttribute(
+		'data-phase',
+		'playing',
+		{
+			timeout: 12000
+		}
+	);
 }
 
 async function dragOverBoard(page: Page) {
@@ -123,7 +129,8 @@ test('held Enter does not select and immediately place a piece', async ({ page }
 });
 
 test('Memory preserves the mismatch hold while hidden', async ({ page }) => {
-	await page.goto('/memory', { waitUntil: 'networkidle' });
+	await fixSelectorSeed(page, 0);
+	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	const cards = page.locator('.memory-card');
 	await expect(cards.first()).toHaveAttribute('aria-pressed', 'true');

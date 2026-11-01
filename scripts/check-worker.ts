@@ -132,13 +132,51 @@ try {
 		if (!condition) throw new Error(label);
 		evidence.push(label);
 	}
-	for (const path of ['/', '/account/sign-in', '/leaderboard', '/privacy']) {
+	const publicPages = ['/', '/privacy', '/terms', '/how-it-works', '/about', '/faq'];
+	for (const path of [...publicPages, '/account/sign-in', '/leaderboard']) {
 		const response = await fetch(origin + path);
 		if (response.status !== 200)
 			throw new Error(
 				`guest ${path}: ${response.status} ${(await response.text()).slice(0, 1500)} ${diagnostics}`
 			);
 		check(true, `guest ${path}`);
+	}
+	const slugs = ['block', 'memory', 'connect', 'block-puzzle'];
+	for (const slug of slugs) {
+		const response = await fetch(`${origin}/${slug}?game=${slug}`, { redirect: 'manual' });
+		const location = response.headers.get('location');
+		const destination = location ? new URL(location, `${origin}/${slug}`).pathname : null;
+		check(
+			response.status === 308 && destination === '/',
+			`built family route ${slug} redirects Home (got ${response.status}, ${location ?? 'no location'})`
+		);
+	}
+	const sitemap = await (await fetch(origin + '/sitemap.xml')).text();
+	const sitemapPaths = [...sitemap.matchAll(/<loc>https:\/\/morphi\.one([^<]*)<\/loc>/g)].map(
+		(match) => match[1]
+	);
+	check(
+		JSON.stringify(sitemapPaths) === JSON.stringify(publicPages),
+		'built sitemap lists only Home and static public documents'
+	);
+	const robots = await (await fetch(origin + '/robots.txt')).text();
+	check(
+		slugs.every((slug) => !robots.includes(`/${slug}`)),
+		'built robots output has no game routes'
+	);
+	for (const path of publicPages) {
+		const html = await (await fetch(origin + path)).text();
+		const links = [...html.matchAll(/href="([^"]*)"/g)].map((match) => new URL(match[1]!, origin));
+		check(
+			links.every(
+				(url) =>
+					url.origin !== origin ||
+					(!slugs.includes(url.pathname.slice(1).replace(/\/$/, '')) &&
+						!url.pathname.startsWith('/play/') &&
+						(url.pathname !== '/play' || url.search === ''))
+			),
+			`built page links do not expose a family route: ${path}`
+		);
 	}
 	check((await fetch(origin + '/api/progress')).status === 401, 'anonymous history refused');
 	const headers = new Headers(login.headers);

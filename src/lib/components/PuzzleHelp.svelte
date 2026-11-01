@@ -5,8 +5,13 @@
 	import { motion } from '#lib/ui/motion.js';
 	let {
 		family,
+		scoring,
 		onpause = () => {}
-	}: { family: 'memory' | 'block'; onpause?: (paused: boolean) => void } = $props();
+	}: {
+		scoring?: import('#lib/engine/scoring.js').ScoreValues;
+		family: 'memory' | 'block' | 'connect';
+		onpause?: (paused: boolean) => void;
+	} = $props();
 	let dialog: HTMLDialogElement, anchor: HTMLElement;
 	let kind = $state<'how' | 'scoring'>('how');
 	function open(event: MouseEvent, section: 'how' | 'scoring') {
@@ -54,7 +59,7 @@
 	<header>
 		<h2 id="help-title">{t(kind === 'how' ? 'v1.game.how' : 'v1.game.helpScoring')}</h2>
 	</header>
-	<PuzzleGuide {family} section={kind === 'scoring' ? 'scoring-tips' : kind} /><button
+	<PuzzleGuide {family} {scoring} section={kind === 'scoring' ? 'scoring-tips' : kind} /><button
 		class="btn"
 		onclick={close}>{t('v1.game.back')}</button
 	>

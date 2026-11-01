@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { onMount } from 'svelte';
+	import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
+	import { onMount, untrack } from 'svelte';
 	import { motion } from '#lib/ui/motion.js';
 	import { createActiveDelay } from '#lib/ui/active-delay.js';
 	import { BLOCK_ENTRANCE_MS } from '#lib/round-timing.js';
@@ -17,8 +18,12 @@
 	import { blockThemeForSeed, blockThemeStyle } from '#lib/puzzles/block-placement/themes.js';
 	import { formatNumber } from '#lib/ui/format.js';
 	import { sound } from '#lib/ui/sound.js';
+	import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
+	import { themeStyle as proceduralStyle } from '#lib/engine/theme/style.js';
+	import { blockThemeFromResolved } from '#lib/puzzles/block-placement/themes.js';
 
 	let {
+		scoring = SCORE_DEFAULTS.block,
 		round,
 		roundNumber,
 		best,
@@ -29,7 +34,10 @@
 		onhome,
 		onmove,
 		oncomplete,
-		traySide = 'right'
+		traySide = 'right',
+		entranceReady = true,
+		onready,
+		resolvedTheme = null
 	}: {
 		round: BlockRound;
 		roundNumber: number;
@@ -48,9 +56,13 @@
 		oncomplete?: (score: number) => void;
 		onmove?: (move: { trayIndex: number; x: number; y: number }) => void;
 		traySide?: 'left' | 'right';
+		entranceReady?: boolean;
+		onready?: () => void;
+		scoring?: ScoreValues;
+		resolvedTheme?: ResolvedTheme | null;
 	} = $props();
 
-	const GAP = 4;
+	const GAP = $derived(resolvedTheme ? Math.max(2, Math.round(resolvedTheme.style.gap / 3)) : 4);
 	const CLEAR_MS = 1500;
 	const CLEAR_STEP_MS = 8;
 	const SETTLE_MS = 120;
@@ -74,8 +86,12 @@
 		t4: 4,
 		s4: 1
 	};
-	const theme = $derived(blockThemeForSeed(round.seed));
-	const themeStyle = $derived(blockThemeStyle(theme));
+	const theme = $derived(
+		resolvedTheme ? blockThemeFromResolved(resolvedTheme) : blockThemeForSeed(round.seed)
+	);
+	const themeStyle = $derived(
+		blockThemeStyle(theme) + ';' + (resolvedTheme ? proceduralStyle(resolvedTheme) : '')
+	);
 	const boardRows = Array.from({ length: BLOCK_BOARD_SIZE }, (_, row) =>
 		Array.from({ length: BLOCK_BOARD_SIZE }, (_, column) => row * BLOCK_BOARD_SIZE + column)
 	);
@@ -116,6 +132,7 @@
 	const entranceDelay = createActiveDelay(() => {
 		entrance?.settle();
 		entering = false;
+		onready?.();
 		busy = false;
 	});
 	let drag = $state<DragState | null>(null);
@@ -135,12 +152,22 @@
 	let suppressClick = false;
 	let gainId = 0;
 	let finished = false;
+	let finishFailed = $state(false);
+	const finishDelay = createActiveDelay(() => {
+		if (finished) return;
+		try {
+			onfinish(game.score, game.lines, game.placements, game.endReason, game.combo);
+			finished = true;
+		} catch {
+			finishFailed = true;
+			console.error('morphi:block_finish_failed');
+		}
+	});
 
 	let clearTimer: ReturnType<typeof setTimeout> | null = null;
 	let settleTimer: ReturnType<typeof setTimeout> | null = null;
 	let invalidTimer: ReturnType<typeof setTimeout> | null = null;
 	let gainTimer: ReturnType<typeof setTimeout> | null = null;
-	let finishTimer: ReturnType<typeof setTimeout> | null = null;
 	let suppressTimer: ReturnType<typeof setTimeout> | null = null;
 	let focusFrame: number | null = null;
 
@@ -209,6 +236,7 @@
 		const height = shape.height * value.cell + (shape.height - 1) * GAP;
 
 		return [
+			themeStyle,
 			`--ghost-cell:${value.cell}px`,
 			`--ghost-color:${pieceColor(value.piece)}`,
 			`width:${width}px`,
@@ -356,15 +384,7 @@
 		hideGhost();
 		sound.play('end');
 		announce(game.endReason === 'cap' ? t('block.statusCap') : t('block.statusEnded'));
-		clearTimerRef(finishTimer);
-		finishTimer = setTimeout(() => {
-			if (finished) {
-				return;
-			}
-
-			finished = true;
-			onfinish(game.score, game.lines, game.placements, game.endReason, game.combo);
-		}, END_MS);
+		finishDelay.start(motion.reduced() ? 0 : END_MS, document.hidden);
 	}
 
 	function finishPlacement(cleared: boolean, ended: boolean): void {
@@ -405,7 +425,7 @@
 		}
 
 		const refilling = game.tray.filter(Boolean).length === 1;
-		const result = placeBlockPiece(game, trayIndex, x, y);
+		const result = placeBlockPiece(game, trayIndex, x, y, scoring);
 		if (result.effect === 'invalid') {
 			const cell =
 				x >= 0 && x < BLOCK_BOARD_SIZE && y >= 0 && y < BLOCK_BOARD_SIZE
@@ -831,11 +851,13 @@
 
 	function handleVisibility(): void {
 		if (document.hidden) {
+			finishDelay.pause();
 			entrance?.pause();
 			entranceDelay.pause();
 			cancelDrag();
 			hideGhost();
 		} else {
+			finishDelay.resume();
 			entrance?.resume();
 			entranceDelay.resume();
 		}
@@ -846,22 +868,33 @@
 		hideGhost();
 	}
 
+	let mounted = $state(false);
+	let entranceStarted = false;
+	$effect(() => {
+		if (!mounted || !entranceReady || entranceStarted) return;
+		untrack(() => {
+			entranceStarted = true;
+			const duration = motion.reduced() ? 0 : BLOCK_ENTRANCE_MS;
+			entrance = motion.deal(
+				[
+					...Array.from(boardEl?.querySelectorAll<HTMLElement>('.cell') ?? []),
+					...Array.from(trayEl?.querySelectorAll<HTMLElement>('.tray-slot') ?? [])
+				],
+				duration
+			);
+			entranceDelay.start(duration, document.hidden);
+			sound.play('deal');
+		});
+	});
+
 	onMount(() => {
 		const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
 		const preferenceChanged = () => {
-			if (motionQuery.matches && entering) entranceDelay.start(0, document.hidden);
+			if (entranceStarted && motionQuery.matches && entering)
+				entranceDelay.start(0, document.hidden);
 		};
 		motionQuery.addEventListener('change', preferenceChanged);
-		const duration = motion.reduced() ? 0 : BLOCK_ENTRANCE_MS;
-		entrance = motion.deal(
-			[
-				...Array.from(boardEl?.querySelectorAll<HTMLElement>('.cell') ?? []),
-				...Array.from(trayEl?.querySelectorAll<HTMLElement>('.tray-slot') ?? [])
-			],
-			duration
-		);
-		entranceDelay.start(duration, document.hidden);
-		sound.play('deal');
+		mounted = true;
 		document.addEventListener('keydown', handleWindowKeydown);
 		document.addEventListener('visibilitychange', handleVisibility);
 		window.addEventListener('resize', handleResize);
@@ -879,7 +912,7 @@
 			clearTimerRef(settleTimer);
 			clearTimerRef(invalidTimer);
 			clearTimerRef(gainTimer);
-			clearTimerRef(finishTimer);
+			finishDelay.cancel();
 			entranceDelay.cancel();
 			entrance?.destroy();
 			clearTimerRef(suppressTimer);
@@ -888,15 +921,20 @@
 	});
 </script>
 
+{#if finishFailed}<p role="alert">{t('ending.error')}</p>{/if}
+
 <div
 	class="game"
 	class:is-over={ending}
-	style={themeStyle}
+	style={`${themeStyle};--block-grid-gap:${GAP}px`}
 	data-theme={theme.id}
+	data-theme-version={resolvedTheme?.themeConfigVersion}
+	data-theme-generator={resolvedTheme?.themeGeneratorVersion}
 	data-family="block"
+	data-round={roundNumber}
 	data-phase={entering ? 'dealing' : 'playing'}
 >
-	<h1 class="sr-only">{t('block.title')}</h1>
+	<h2 class="sr-only">{t('block.title')}</h2>
 
 	<header class="hud">
 		<button type="button" class="home-button" aria-label={t('block.home')} onclick={onhome}>
@@ -1047,6 +1085,8 @@
 
 <style>
 	.game {
+		position: relative;
+		isolation: isolate;
 		height: 100vh;
 		height: 100dvh;
 		display: grid;
@@ -1058,6 +1098,7 @@
 	}
 
 	.hud {
+		position: relative;
 		display: grid;
 		grid-template-columns: 44px minmax(0, 1fr) 44px;
 		align-items: center;
@@ -1165,6 +1206,7 @@
 	}
 
 	.board-wrap {
+		z-index: 1;
 		position: relative;
 		display: flex;
 		justify-content: center;
@@ -1175,7 +1217,7 @@
 		position: relative;
 		display: grid;
 		grid-template-rows: repeat(8, minmax(0, 1fr));
-		gap: 1px;
+		gap: var(--block-grid-gap, 1px);
 		width: min(100vw, 440px, calc(100dvh - 248px));
 		aspect-ratio: 1;
 		touch-action: none;
@@ -1184,11 +1226,12 @@
 	.row {
 		display: grid;
 		grid-template-columns: repeat(8, minmax(0, 1fr));
-		gap: 1px;
+		gap: var(--block-grid-gap, 1px);
 		min-height: 0;
 	}
 
 	.cell {
+		clip-path: var(--theme-clip, none);
 		position: relative;
 		min-width: 0;
 		min-height: 0;
@@ -1209,7 +1252,7 @@
 	}
 
 	.cell.is-filled {
-		border-color: transparent;
+		border-color: var(--block-cell-edge);
 	}
 
 	.cell.is-filled::before {
@@ -1218,6 +1261,31 @@
 		inset: 0;
 		border-radius: inherit;
 		background: var(--cell-color);
+	}
+
+	.game[data-theme-version] .cell {
+		border: 0;
+		background: var(--block-cell-edge);
+	}
+	.game[data-theme-version] .cell::after {
+		content: '';
+		position: absolute;
+		inset: 1px;
+		border-radius: inherit;
+		clip-path: inherit;
+		background: var(--block-cell);
+	}
+	.game[data-theme-version] .cell.is-filled::before {
+		inset: 1px;
+		z-index: 1;
+		clip-path: inherit;
+	}
+	.game[data-theme-version] .mini-cell {
+		clip-path: var(--theme-clip, none);
+		border-radius: var(--block-radius);
+	}
+	.ghost-cell {
+		clip-path: var(--theme-clip, none);
 	}
 
 	.cell.is-settling {

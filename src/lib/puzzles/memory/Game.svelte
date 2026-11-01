@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
 	import { onMount, untrack } from 'svelte';
 	import { motion } from '#lib/ui/motion.js';
 	import { memoryEntranceMs, MEMORY_PREVIEW_MS, MEMORY_HIDE_MS } from '#lib/round-timing.js';
@@ -19,8 +20,13 @@
 	import { formatDuration, formatNumber } from '#lib/ui/format.js';
 	import { memoryThemeForSeed, memoryThemeStyle } from '#lib/puzzles/memory/themes.js';
 	import { sound } from '#lib/ui/sound.js';
+	import { SYMBOLS } from '#lib/puzzles/memory/symbols.js';
+	import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
+	import { themeStyle as proceduralStyle } from '#lib/engine/theme/style.js';
+	import { memoryThemeFromResolved } from '#lib/puzzles/memory/themes.js';
 
 	let {
+		scoring = SCORE_DEFAULTS.memory,
 		round,
 		roundNumber,
 		soundEnabled,
@@ -30,7 +36,10 @@
 		onmove,
 		oncomplete,
 		paused = false,
-		rankedRound = false
+		rankedRound = false,
+		entranceReady = true,
+		onready,
+		resolvedTheme = null
 	}: {
 		round: MemoryRound;
 		roundNumber: number;
@@ -42,6 +51,10 @@
 		onmove?: (move: { index: number }) => void;
 		paused?: boolean;
 		rankedRound?: boolean;
+		entranceReady?: boolean;
+		onready?: () => void;
+		scoring?: ScoreValues;
+		resolvedTheme?: ResolvedTheme | null;
 	} = $props();
 
 	// svelte-ignore state_referenced_locally
@@ -83,7 +96,15 @@
 	let delayedFlipTimer: ReturnType<typeof setTimeout> | null = null;
 	let waveTimer: ReturnType<typeof setTimeout> | null = null;
 	let burstTimer: ReturnType<typeof setTimeout> | null = null;
-	let finishTimer: ReturnType<typeof setTimeout> | null = null;
+	let finishFailed = $state(false);
+	const finishDelay = createActiveDelay(() => {
+		try {
+			onfinish(scoreRound(game, elapsed, scoring), elapsed, game.moves);
+		} catch {
+			finishFailed = true;
+			console.error('morphi:memory_finish_failed');
+		}
+	});
 	let scoreDropTimer: ReturnType<typeof setTimeout> | null = null;
 	let previewTimer: ReturnType<typeof setTimeout> | null = null;
 	let previewRemaining = PREVIEW_MS;
@@ -109,14 +130,16 @@
 					: 4
 	);
 	const rows = $derived(Math.ceil(game.cards.length / columns));
-	const theme = $derived(memoryThemeForSeed(game.seed));
+	const theme = $derived(
+		resolvedTheme ? memoryThemeFromResolved(resolvedTheme) : memoryThemeForSeed(game.seed)
+	);
 	const symbolColors = $derived(
 		new Map<string, string>(
 			SYMBOL_COLORS.map((color, index) => [color, theme.symbols[index] ?? color])
 		)
 	);
 	const confettiColors = $derived([...theme.symbols, theme.mark]);
-	const score = $derived(currentScore(game, elapsed));
+	const score = $derived(currentScore(game, elapsed, scoring));
 	const showAll = $derived(phase === 'preview' || phase === 'dealing');
 	const locked = $derived(
 		phase !== 'playing' || game.revealed.length >= 2 || game.status === 'won'
@@ -240,6 +263,7 @@
 		}
 
 		phase = 'playing';
+		onready?.();
 		announcement = t('status.go');
 
 		if (!(document.hidden || paused)) {
@@ -249,6 +273,7 @@
 
 	function handleVisibility(): void {
 		if (document.hidden || paused) {
+			finishDelay.pause();
 			entrance?.pause();
 			entranceDelay.pause();
 			hideDelay.pause();
@@ -262,12 +287,13 @@
 		}
 
 		entrance?.resume();
+		finishDelay.resume();
 		entranceDelay.resume();
 		hideDelay.resume();
 		mismatchDelay.resume();
 		if (phase === 'preview') {
 			startPreviewClock();
-		} else if (phase === 'playing') {
+		} else if (phase === 'playing' && game.status === 'playing') {
 			if (!clockStarted) {
 				startClock();
 			} else {
@@ -361,12 +387,9 @@
 		}, WIN_BURST_DELAY_MS);
 
 		const seconds = freezeClock();
-		const finalScore = scoreRound(game, seconds);
+		const finalScore = scoreRound(game, seconds, scoring);
 		oncomplete?.(finalScore, seconds);
-		clearTimer(finishTimer);
-		finishTimer = setTimeout(() => {
-			onfinish(finalScore, seconds, game.moves);
-		}, WIN_FINISH_MS);
+		finishDelay.start(motion.reduced() ? 0 : WIN_FINISH_MS, document.hidden || paused);
 	}
 
 	$effect(() => {
@@ -375,6 +398,23 @@
 			if (value || typeof document !== 'undefined') handleVisibility();
 		});
 	});
+	let mounted = $state(false);
+	let entranceStarted = false;
+	$effect(() => {
+		if (!mounted || !entranceReady || entranceStarted) return;
+		untrack(() => {
+			entranceStarted = true;
+			const duration = motion.reduced() && !rankedRound ? 0 : memoryEntranceMs(game.pairs);
+			entrance = motion.deal(
+				Array.from(boardEl.querySelectorAll<HTMLElement>('.memory-card')),
+				duration
+			);
+			announcement = t('v1.game.arriving');
+			sound.play('deal');
+			entranceDelay.start(duration, document.hidden || paused);
+		});
+	});
+
 	onMount(() => {
 		document.addEventListener('visibilitychange', handleVisibility);
 		const wideQuery = window.matchMedia('(min-width: 1024px)');
@@ -396,22 +436,14 @@
 		wideQuery.addEventListener('change', updateLayout);
 		shortLandscapeQuery.addEventListener('change', updateLayout);
 		const motionQuery = window.matchMedia('(prefers-reduced-motion: reduce)');
-		const reducedMotion = motionQuery.matches;
 		const preferenceChanged = () => {
-			if (!rankedRound && motionQuery.matches && phase === 'dealing')
+			if (entranceStarted && !rankedRound && motionQuery.matches && phase === 'dealing')
 				entranceDelay.start(0, document.hidden || paused);
 		};
 		motionQuery.addEventListener('change', preferenceChanged);
 		hideDuration = MEMORY_HIDE_MS;
 
-		const duration = reducedMotion && !rankedRound ? 0 : memoryEntranceMs(game.pairs);
-		entrance = motion.deal(
-			Array.from(boardEl.querySelectorAll<HTMLElement>('.memory-card')),
-			duration
-		);
-		announcement = t('v1.game.arriving');
-		sound.play('deal');
-		entranceDelay.start(duration, document.hidden || paused);
+		mounted = true;
 
 		return () => {
 			motionQuery.removeEventListener('change', preferenceChanged);
@@ -430,19 +462,25 @@
 			clearTimer(delayedFlipTimer);
 			clearTimer(waveTimer);
 			clearTimer(burstTimer);
-			clearTimer(finishTimer);
+			finishDelay.cancel();
 			clearTimer(scoreDropTimer);
 		};
 	});
 </script>
 
+{#if finishFailed}<p role="alert">{t('ending.error')}</p>{/if}
+
 <div
 	class="game"
-	style={`--cols:${columns};--rows:${rows};${memoryThemeStyle(theme)}`}
+	style={`--cols:${columns};--rows:${rows};${memoryThemeStyle(theme)};${resolvedTheme ? proceduralStyle(resolvedTheme) : ''}`}
 	data-family="memory"
+	data-round={roundNumber}
+	data-theme-version={resolvedTheme?.themeConfigVersion}
+	data-theme-generator={resolvedTheme?.themeGeneratorVersion}
+	data-theme-recipe={resolvedTheme?.recipe}
 	data-phase={phase}
 >
-	<h1 class="sr-only">{t('game.title')}</h1>
+	<h2 class="sr-only">{t('game.title')}</h2>
 
 	<header class="hud">
 		<button type="button" class="home-button" aria-label={t('game.home')} onclick={onhome}>
@@ -472,7 +510,11 @@
 				>
 			</div>
 			<div class="stat">
-				<span class="stat-label">{t('v1.game.mismatches')}</span><strong>{game.mismatches}</strong>
+				<span class="stat-label"
+					><span class="mismatch-full">{t('v1.game.mismatches')}</span><span class="mismatch-short"
+						>{t('v11.game.mismatchesShort')}</span
+					></span
+				><strong>{game.mismatches}</strong>
 			</div>
 		</div>
 
@@ -495,6 +537,8 @@
 					{card}
 					{index}
 					symbolColor={symbolColors.get(card.color) ?? card.color}
+					glyph={resolvedTheme?.symbols[SYMBOLS.findIndex((symbol) => symbol.id === card.symbol)]}
+					fillMode={resolvedTheme?.style.fill}
 					faceUp={showAll || isFaceUp(game, index)}
 					matched={game.matched.includes(index)}
 					shaking={shake.includes(index)}
@@ -525,6 +569,8 @@
 
 <style>
 	.game {
+		position: relative;
+		isolation: isolate;
 		height: 100vh;
 		height: 100dvh;
 		display: grid;
@@ -537,6 +583,7 @@
 	}
 
 	.hud {
+		position: relative;
 		display: grid;
 		grid-template-columns: 44px minmax(0, 1fr) 44px;
 		align-items: center;
@@ -663,9 +710,10 @@
 	}
 
 	.board {
+		position: relative;
 		display: grid;
 		grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
-		gap: clamp(5px, 1.5vmin, 12px);
+		gap: clamp(5px, 1.5vmin, var(--theme-gap, 12px));
 		width: min(92vw, 720px, calc((100dvh - 100px) * var(--cols) * 0.72 / var(--rows)));
 	}
 

@@ -12,7 +12,16 @@ export type SoundKind =
 	| 'combo'
 	| 'refill'
 	| 'end'
-	| 'deal';
+	| 'deal'
+	| 'connect-start'
+	| 'connect-appear'
+	| 'connect-extend'
+	| 'connect-backtrack'
+	| 'connect-pair'
+	| 'connect-cut'
+	| 'connect-redraw'
+	| 'connect-invalid'
+	| 'connect-win';
 const kinds: SoundKind[] = [
 	'flip',
 	'match',
@@ -26,7 +35,16 @@ const kinds: SoundKind[] = [
 	'combo',
 	'refill',
 	'end',
-	'deal'
+	'deal',
+	'connect-start',
+	'connect-appear',
+	'connect-extend',
+	'connect-backtrack',
+	'connect-pair',
+	'connect-cut',
+	'connect-redraw',
+	'connect-invalid',
+	'connect-win'
 ];
 class SoundEngine {
 	private context: AudioContext | null = null;

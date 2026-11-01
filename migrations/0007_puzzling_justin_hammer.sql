@@ -1,0 +1,1 @@
+ALTER TABLE `play_session` ADD `card_opening_ms` integer DEFAULT 0 NOT NULL;

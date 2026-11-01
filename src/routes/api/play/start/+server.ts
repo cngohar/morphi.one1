@@ -7,7 +7,7 @@ export const POST: RequestHandler = async (event) => {
 		const body = await readPlayBody(event);
 		if (
 			Object.keys(body).sort().join(',') !== 'family,ownerKey' ||
-			(body.family !== 'block' && body.family !== 'memory') ||
+			(body.family !== 'block' && body.family !== 'memory' && body.family !== 'connect') ||
 			body.ownerKey !== (await ownerKey(event.locals.user!.id))
 		)
 			throw new RunError('payload');

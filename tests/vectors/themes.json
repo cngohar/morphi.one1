@@ -1,0 +1,56 @@
+[
+	{
+		"seed": "0",
+		"family": "memory",
+		"recipe": "tetradic",
+		"colors": ["#229ab3", "#5d3291", "#a2523a"],
+		"back": "#7fc2ce",
+		"container": "circle",
+		"style": "flat"
+	},
+	{
+		"seed": "0",
+		"family": "block",
+		"recipe": "preset-shapes",
+		"colors": ["#009a86", "#7d61ae", "#7c4100", "#003041"],
+		"back": "#a9bcdd",
+		"container": "hexagon",
+		"style": "blocky"
+	},
+	{
+		"seed": "42",
+		"family": "memory",
+		"recipe": "complementary",
+		"colors": ["#a57ec2", "#527227", "#802166"],
+		"back": "#caacd9",
+		"container": "rounded",
+		"style": "ink"
+	},
+	{
+		"seed": "42",
+		"family": "block",
+		"recipe": "free",
+		"colors": ["#8a202c", "#439f4c", "#835a89"],
+		"back": "#a6b6e6",
+		"container": "hexagon",
+		"style": "ink"
+	},
+	{
+		"seed": "18446744073709551615",
+		"family": "memory",
+		"recipe": "split",
+		"colors": ["#289d90", "#a1439c", "#8d1e0d"],
+		"back": "#83c4b7",
+		"container": "squircle",
+		"style": "flat"
+	},
+	{
+		"seed": "18446744073709551615",
+		"family": "block",
+		"recipe": "tetradic",
+		"colors": ["#773149", "#7e661c", "#239e86"],
+		"back": "#e1a8b6",
+		"container": "rounded",
+		"style": "ink"
+	}
+]

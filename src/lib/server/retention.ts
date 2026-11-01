@@ -2,6 +2,7 @@ import { createDatabase } from './db/index.js';
 import { adminActor, adminAudit, user } from './db/schema.js';
 import { eq } from 'drizzle-orm';
 import { RunError } from './runs.js';
+import { anonymizeExpiredUsers } from './user-lifecycle.js';
 
 // The longest configured auth limiter window is 60 seconds. A day is a
 // conservative cleanup buffer, not a promise of scheduled deletion.
@@ -20,6 +21,7 @@ async function requireAdmin(binding: D1Database, actor: string) {
 /** Operator-invoked maintenance. No background job or time-to-erasure guarantee. */
 export async function pruneExpiredRecords(binding: D1Database, actor: string, now = Date.now()) {
 	await requireAdmin(binding, actor);
+	await anonymizeExpiredUsers(binding, now);
 	const criteria = {
 		expiredAt: now,
 		authLimiterBefore: now - AUTH_LIMIT_CLEANUP_BUFFER_MS,

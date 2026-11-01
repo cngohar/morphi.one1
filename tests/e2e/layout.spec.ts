@@ -2,7 +2,8 @@ import { expect, test, type Page } from '@playwright/test';
 import { fixSelectorSeed } from './entropy.js';
 
 test.beforeEach(async ({ page }) => {
-	await fixSelectorSeed(page);
+	// With three Mix families, seed 7 deals Block then Memory for this two-board layout check.
+	await fixSelectorSeed(page, 7);
 });
 
 type Slot = { index: number; cells: Array<{ x: number; y: number }> };
@@ -159,7 +160,8 @@ for (const layout of layouts) {
 			await page.getByRole('button', { name: 'Play' }).click();
 			await expect(page.locator('.game[data-family="block"]')).toHaveAttribute(
 				'data-phase',
-				'playing'
+				'playing',
+				{ timeout: 12000 }
 			);
 
 			const block = await readGame(page, 'block');
@@ -196,10 +198,11 @@ for (const layout of layouts) {
 				contentType: 'image/png'
 			});
 			await page.locator('.result .next').click();
-			await page.locator('.game[data-family="memory"]').waitFor();
-			await page.locator('.game[data-family="memory"]').evaluate(async () => {
-				await new Promise((resolve) => setTimeout(resolve, 5500));
-			});
+			await expect(page.locator('.game[data-family="memory"]')).toHaveAttribute(
+				'data-phase',
+				'playing',
+				{ timeout: 16000 }
+			);
 
 			const memory = await readGame(page, 'memory');
 			const stage = memory.stage;

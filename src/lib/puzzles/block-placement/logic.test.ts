@@ -399,6 +399,7 @@ describe('placing pieces', () => {
 		expect(scorePlacement(2, 1)).toBe(250);
 		expect(scorePlacement(1, 2)).toBe(150);
 		expect(scorePlacement(3, 3)).toBe(500);
+		expect(scorePlacement(2, 3, { line: 300, extraLine: 20, combo: 30 })).toBe(680);
 	});
 
 	it('resets the combo when a placement clears nothing', () => {

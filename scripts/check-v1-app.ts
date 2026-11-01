@@ -1,5 +1,6 @@
 import { chromium, firefox, webkit } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { fixSelectorSeed } from '../tests/e2e/entropy.js';
 const output = 'build/v1-integration-review';
 await mkdir(output, { recursive: true });
 const findings: unknown[] = [];
@@ -17,20 +18,9 @@ for (const [browserName, launcher] of [
 		[568, 320],
 		[320, 480]
 	]) {
-		const page = await browser.newPage({ viewport: { width, height }, reducedMotion: 'reduce' });
+		let page = await browser.newPage({ viewport: { width, height }, reducedMotion: 'reduce' });
 		const errors: string[] = [];
 		page.on('pageerror', (error) => errors.push(error.message));
-		await page.addInitScript(() => {
-			const original = crypto.getRandomValues.bind(crypto);
-			crypto.getRandomValues = (array) => {
-				if (array instanceof Uint32Array && array.length === 2) {
-					array[0] = 0;
-					array[1] = 3;
-					return array;
-				}
-				return original(array);
-			};
-		});
 		const capture = async (name: string) => {
 			const dimensions = await page.evaluate(() => ({
 				width: innerWidth,
@@ -50,14 +40,16 @@ for (const [browserName, launcher] of [
 			await page.goto(`${origin}/demo/v1-screen.html?screen=home`, { waitUntil: 'networkidle' });
 			await capture('demo-home');
 		}
-		for (const [path, family] of [
-			['/memory', 'memory'],
-			['/block-puzzle', 'block']
+		for (const [seed, family] of [
+			[0, 'memory'],
+			[7, 'block']
 		] as const) {
-			await page.goto(origin + path, { waitUntil: 'networkidle' });
-			await capture(`app-${family}-ready`);
-			await page.getByRole('button', { name: 'Play', exact: true }).click();
-			await page.locator('.game').waitFor();
+			await page.close();
+			page = await browser.newPage({ viewport: { width, height }, reducedMotion: 'reduce' });
+			page.on('pageerror', (error) => errors.push(error.message));
+			await fixSelectorSeed(page, seed);
+			await page.goto(`${origin}/play`, { waitUntil: 'networkidle' });
+			await page.locator(`.game[data-family="${family}"]`).waitFor();
 			await page.waitForFunction(
 				() => document.querySelector('.game')?.getAttribute('data-phase') === 'playing'
 			);

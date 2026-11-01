@@ -1,0 +1,388 @@
+/* v1.1 accepted shell: viewport space, rather than fixed board-width caps. */
+.design-public .active-round {
+	--game-header-height: 80px;
+	--game-footer-height: calc(76px + var(--safe-bottom));
+	--game-gap: clamp(24px, 2.6vh, 32px);
+	position: relative;
+	isolation: isolate;
+	height: 100dvh;
+	background: var(--round-bg, var(--bg));
+}
+.design-public .active-round > .game-header {
+	height: var(--game-header-height);
+	background: transparent;
+}
+.design-public .active-round .active-wrap {
+	width: 100%;
+	max-width: none;
+	min-height: 0;
+	margin: 0;
+	padding: var(--game-gap) clamp(16px, 3vw, 64px);
+	align-items: center;
+	justify-content: center;
+}
+.design-public .active-round .game {
+	position: relative;
+	z-index: 1;
+	--panel-height: calc(
+		100dvh - var(--game-header-height) - var(--game-footer-height) - 2 * var(--game-gap)
+	);
+	height: 100%;
+	min-height: 0;
+	flex: 1 1 auto;
+	max-width: 100%;
+	padding: 16px 24px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	border: 1px solid
+		color-mix(in srgb, var(--round-edge, var(--border-strong)) 35%, var(--round-bg, var(--bg)));
+	border-radius: 24px;
+	background: color-mix(
+		in srgb,
+		var(--round-back, var(--surface-2)) 22%,
+		var(--round-bg, var(--bg))
+	) !important;
+	overflow: clip;
+}
+.design-public .active-round[data-family='memory'] .game {
+	width: min(
+		100%,
+		calc((var(--panel-height) - 110px) * var(--cols) * var(--theme-aspect, 1) / var(--rows) + 48px)
+	);
+}
+.design-public .active-round[data-family='block'] .game {
+	width: min(100%, calc(var(--panel-height) - 46px));
+}
+.design-public .active-round[data-family='connect'] .game {
+	width: min(100%, calc(var(--panel-height) - 46px));
+}
+.design-public .active-round[data-family='connect'][data-card-phase='arriving'] .puzzle-name {
+	opacity: 0;
+}
+.design-public .active-round[data-family='connect'] .game .hud > .stats {
+	display: grid;
+	grid-template-columns: repeat(3, minmax(0, 1fr));
+	align-items: start;
+	gap: 8px;
+}
+.design-public .active-round[data-family='connect'] .game .stat {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 4px;
+	min-width: 0;
+}
+.design-public .active-round[data-family='connect'] .game .stat-label {
+	font-size: 10px;
+	line-height: 1.2;
+	text-transform: uppercase;
+}
+.design-public .active-round[data-family='connect'] .game .stat strong {
+	margin: 0;
+	line-height: 1.1;
+}
+.design-public .active-round .game > .hud {
+	position: static;
+	width: 100%;
+	flex: 0 0 auto;
+	gap: 4px;
+	padding: 0 0 10px;
+	border-bottom: 1px solid
+		color-mix(in srgb, var(--round-edge, var(--border-strong)) 20%, transparent);
+}
+.design-public .active-round .game .hud > .stats {
+	display: flex;
+	flex-direction: row;
+	justify-content: space-around;
+	gap: 12px;
+}
+.design-public .active-round .game .round-meta {
+	display: none;
+}
+.design-public .active-round .game .stat-label {
+	color: var(--ink-2);
+}
+.design-public .active-round .game .stage {
+	position: relative;
+	container-type: size;
+	flex: 1 1 0;
+	width: 100%;
+	min-height: 0;
+	display: grid;
+	place-items: center;
+	padding: 0;
+	gap: 12px;
+}
+.design-public .active-round[data-family='memory'] .game .board {
+	--board-gap: clamp(5px, 1.5vmin, var(--theme-gap, 9px));
+	width: min(
+		100cqw,
+		calc(
+			(100cqh - (var(--rows) - 1) * var(--board-gap)) * var(--cols) * var(--theme-aspect, 1) /
+				var(--rows) + (var(--cols) - 1) * var(--board-gap)
+		)
+	);
+	gap: var(--board-gap);
+}
+.design-public .active-round[data-family='memory'] .game .memory-card {
+	aspect-ratio: var(--theme-aspect, 1);
+}
+.design-public .active-round[data-family='block'] .game .stage {
+	display: flex;
+	flex-direction: column;
+}
+.design-public .active-round[data-family='block'] .game .board-wrap {
+	width: min(100cqw, calc(100cqh - 84px));
+	flex: 0 0 auto;
+}
+.design-public .active-round[data-family='block'] .game .board {
+	width: 100%;
+}
+.design-public .active-round[data-family='block'] .game .tray {
+	width: min(100cqw, calc(100cqh - 84px));
+	height: 72px;
+	flex-shrink: 0;
+}
+.design-public .active-round .game .hint {
+	display: none;
+}
+.design-public .active-round .round-panel {
+	position: relative;
+	z-index: 2;
+	width: 100%;
+	height: var(--game-footer-height);
+	flex-shrink: 0;
+	padding: 10px max(20px, var(--safe-right)) calc(10px + var(--safe-bottom))
+		max(20px, var(--safe-left));
+	border-top: 1px solid
+		color-mix(in srgb, var(--round-edge, var(--border-strong)) 35%, var(--round-bg, var(--bg)));
+	background: color-mix(
+		in srgb,
+		var(--round-back, var(--surface-2)) 22%,
+		var(--round-bg, var(--bg))
+	);
+}
+.design-public .round-panel-inner {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 20px;
+	width: min(100%, 1000px);
+	height: 100%;
+	margin: auto;
+}
+.design-public .round-panel .help-controls {
+	position: static;
+	display: flex;
+	flex-direction: row;
+	gap: 10px;
+	width: auto;
+	margin: 0;
+	transform: none;
+}
+.design-public .round-panel .btn {
+	min-height: 44px;
+}
+.design-public .family-high {
+	display: flex;
+	flex-direction: column;
+	align-items: flex-end;
+	gap: 2px;
+}
+.design-public .family-high > span {
+	font-size: 10px;
+	font-weight: 900;
+	letter-spacing: 0.12em;
+	color: var(--ink-2);
+	text-transform: uppercase;
+}
+.design-public .family-high strong {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 24px;
+	font-weight: 950;
+}
+.design-public .family-high small {
+	font-size: 9px;
+	letter-spacing: 0.08em;
+	font-weight: 900;
+	color: var(--ink-2);
+	border: 1px solid var(--border-strong);
+	padding: 2px 4px;
+	border-radius: 4px;
+}
+.design-public .mismatch-short {
+	display: none;
+}
+@media (max-width: 600px) and (orientation: portrait) {
+	.design-public .active-round {
+		--game-header-height: 100px;
+		--game-footer-height: calc(96px + var(--safe-bottom));
+		--game-gap: 28px;
+	}
+	.design-public .active-round .game {
+		padding: 12px;
+		gap: 10px;
+		border-radius: 20px;
+	}
+	.design-public .active-round[data-family='memory'] .game,
+	.design-public .active-round[data-family='block'] .game {
+		width: 100%;
+	}
+	.design-public .active-round .game .stat strong {
+		font-size: 22px;
+	}
+	.design-public .active-round .game .stat-label {
+		font-size: 9px;
+	}
+	.design-public .mismatch-full {
+		display: none;
+	}
+	.design-public .mismatch-short {
+		display: inline;
+	}
+	.design-public .round-panel-inner {
+		flex-wrap: wrap;
+		justify-content: center;
+		align-content: center;
+		gap: 6px;
+	}
+	.design-public .family-high {
+		flex-direction: row;
+		align-items: center;
+		gap: 10px;
+		width: 100%;
+		justify-content: center;
+	}
+	.design-public .family-high strong {
+		font-size: 18px;
+	}
+	.design-public .round-panel .btn {
+		font-size: 12px;
+		padding: 6px 12px;
+	}
+}
+@media (orientation: landscape) and (max-height: 560px) {
+	.design-public .active-round {
+		--game-header-height: 52px;
+		--game-footer-height: calc(56px + var(--safe-bottom));
+		--game-gap: 20px;
+	}
+	.design-public .active-round .game {
+		width: 100% !important;
+		display: grid;
+		grid-template-columns: 116px minmax(0, 1fr);
+		grid-template-rows: minmax(0, 1fr);
+		gap: 14px;
+		padding: 8px 12px;
+		border-radius: 16px;
+	}
+	.design-public .active-round .game > .hud {
+		position: static;
+		grid-column: 1;
+		grid-row: 1;
+		align-self: center;
+		border: 0;
+		padding: 0;
+	}
+	.design-public .active-round .game .hud > .stats {
+		display: grid;
+		grid-template-columns: repeat(2, minmax(0, 1fr));
+		gap: 8px;
+	}
+	.design-public .active-round .game .stage {
+		grid-column: 2;
+		grid-row: 1;
+		height: 100%;
+	}
+	.design-public .active-round .game .stat strong {
+		font-size: 20px;
+	}
+	.design-public .active-round .game .stat-label {
+		font-size: 8px;
+	}
+	.design-public .active-round[data-family='block'] .game .stage {
+		flex-direction: row;
+	}
+	.design-public .active-round[data-family='block'] .game .board-wrap {
+		width: min(100cqh, calc(100cqw - 80px));
+	}
+	.design-public .active-round[data-family='block'] .game .tray {
+		width: 68px;
+		height: 100%;
+		flex-direction: column;
+		gap: 6px;
+		justify-content: center;
+	}
+	.design-public .active-round[data-family='block'] .game .tray-slot {
+		width: 68px;
+		height: 48px;
+		padding: 4px;
+	}
+	.design-public .active-round[data-family='block'] .game .mini {
+		--mini-cell: 12px;
+	}
+	.design-public .round-panel .btn {
+		min-height: 36px;
+		padding: 4px 12px;
+		font-size: 11px;
+	}
+	.design-public .family-high strong {
+		font-size: 20px;
+	}
+	.design-public .mismatch-full {
+		display: none;
+	}
+	.design-public .mismatch-short {
+		display: inline;
+	}
+}
+
+@media (max-width: 600px) and (orientation: portrait) and (max-height: 720px) {
+	.design-public .active-round {
+		--game-header-height: 88px;
+		--game-footer-height: calc(64px + var(--safe-bottom));
+		--game-gap: 24px;
+	}
+	.design-public .active-round .game-header {
+		grid-template-rows: 40px 24px;
+		row-gap: 4px;
+		padding: 8px 20px;
+	}
+	.design-public .active-round .game-header .puzzle-name {
+		font-size: 22px;
+	}
+	.design-public .round-panel {
+		padding: 8px 16px calc(8px + var(--safe-bottom));
+	}
+	.design-public .round-panel-inner {
+		flex-wrap: nowrap;
+		justify-content: space-between;
+		align-content: center;
+		gap: 10px;
+	}
+	.design-public .round-panel .help-controls {
+		gap: 6px;
+	}
+	.design-public .round-panel .btn {
+		font-size: 10px;
+		padding: 5px 8px;
+		min-height: 40px;
+	}
+	.design-public .family-high {
+		flex-direction: column;
+		align-items: flex-end;
+		gap: 0;
+		width: auto;
+	}
+	.design-public .family-high > span {
+		font-size: 8px;
+		letter-spacing: 0.03em;
+		white-space: nowrap;
+	}
+	.design-public .family-high strong {
+		font-size: 18px;
+	}
+}

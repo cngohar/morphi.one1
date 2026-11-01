@@ -1,3 +1,5 @@
+import { recordAccountActivity } from '#lib/server/activity.js';
+import { anonymizeExpiredUsers } from '#lib/server/user-lifecycle.js';
 import { operatorLimit } from '#lib/server/operator.js';
 import { digest } from '#lib/server/runs.js';
 import { building } from '$app/env';
@@ -15,6 +17,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.accountStatus = 'unavailable';
 	// Static public documents are rendered at build time without Worker bindings.
 	if (building) return resolve(event);
+	if (env.DB) {
+		try {
+			await anonymizeExpiredUsers(env.DB);
+		} catch {
+			console.error(JSON.stringify({ event: 'account_maintenance_failed' }));
+		}
+	}
 	const authPath = event.url.pathname.startsWith('/api/auth/');
 	const accountPath = event.url.pathname.startsWith('/account');
 	const adminPath =
@@ -60,6 +69,13 @@ export const handle: Handle = async ({ event, resolve }) => {
 				});
 				event.locals.user = current?.user ?? null;
 				event.locals.session = current?.session ?? null;
+				if (current?.user) {
+					try {
+						await recordAccountActivity(env.DB, current.user.id);
+					} catch {
+						console.error(JSON.stringify({ event: 'account_activity_failed' }));
+					}
+				}
 			}
 		} catch {
 			event.locals.accountStatus = 'unavailable';

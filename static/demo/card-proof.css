@@ -1,0 +1,921 @@
+@font-face {
+	font-family: Nunito;
+	src: url('/demo/nunito-latin-wght-normal.woff2') format('woff2');
+	font-weight: 200 1000;
+	font-display: swap;
+}
+:root {
+	font-family: Nunito, system-ui, sans-serif;
+	color: #1b2433;
+	background: #f6f8fc;
+	--round-bg: #f6f8fc;
+	--round-back: #dce5f1;
+	--round-edge: #36465e;
+	--header: 80px;
+	--footer: 84px;
+	--game-gap: 32px;
+	--card-width: 160px;
+	--card-height: 214px;
+}
+* {
+	box-sizing: border-box;
+}
+body {
+	margin: 0;
+}
+button,
+select {
+	font: inherit;
+	color: inherit;
+}
+button {
+	cursor: pointer;
+	border: 1px solid #aab4c5;
+	background: white;
+	border-radius: 12px;
+	padding: 9px 15px;
+	font-weight: 800;
+	min-height: 40px;
+}
+button:disabled {
+	opacity: 0.5;
+	cursor: default;
+}
+button:focus-visible,
+select:focus-visible,
+a:focus-visible,
+summary:focus-visible {
+	outline: 3px solid #1f5ddd;
+	outline-offset: 3px;
+}
+#proof {
+	height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	background: var(--round-bg);
+	overflow: clip;
+}
+header {
+	height: var(--header);
+	padding: 16px 32px;
+	display: grid;
+	grid-template-columns: 1fr auto 1fr;
+	align-items: center;
+	gap: 16px;
+	flex-shrink: 0;
+	position: relative;
+	z-index: 5;
+}
+.brand {
+	font-size: 26px;
+	font-weight: 950;
+	letter-spacing: -1px;
+	color: inherit;
+	text-decoration: none;
+}
+h1 {
+	font-size: 30px;
+	margin: 0;
+	min-height: 34px;
+}
+.proof-stage {
+	position: relative;
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	place-items: center;
+	padding: var(--game-gap) 120px;
+	isolation: isolate;
+}
+/* This single frame is the card, open board, and folding result card. */
+.proof-board {
+	position: relative;
+	z-index: 1;
+	width: min(100%, calc((100dvh - var(--header) - var(--footer) - 64px) * 1.05));
+	height: 100%;
+	min-height: 0;
+	border: 1px solid color-mix(in srgb, var(--round-edge) 35%, var(--round-bg));
+	border-radius: 24px;
+	background: color-mix(in srgb, var(--round-back) 22%, var(--round-bg));
+	padding: 18px 24px;
+	display: flex;
+	flex-direction: column;
+	visibility: hidden;
+	overflow: hidden;
+	transform-origin: center;
+}
+.proof-content {
+	width: 100%;
+	height: 100%;
+	min-height: 0;
+	display: flex;
+	flex-direction: column;
+	gap: 14px;
+	visibility: hidden;
+}
+.proof-hud {
+	display: flex;
+	justify-content: space-around;
+	gap: 12px;
+	font-size: 11px;
+	letter-spacing: 1px;
+	text-transform: uppercase;
+	flex-shrink: 0;
+}
+.proof-hud strong {
+	display: block;
+	text-align: center;
+	font-size: 25px;
+	letter-spacing: 0;
+}
+.proof-grid {
+	flex: 1;
+	min-height: 0;
+	display: grid;
+	grid-template-columns: repeat(4, minmax(0, 1fr));
+	gap: var(--gap, 8px);
+	width: 100%;
+	align-content: center;
+	margin: auto;
+}
+.proof-board[data-family='memory'] .proof-grid {
+	width: min(100%, calc((100dvh - var(--header) - var(--footer) - 150px) * 1.333));
+}
+.sample-memory {
+	display: block;
+	position: relative;
+	perspective: 700px;
+	aspect-ratio: 1;
+	min-height: 0;
+}
+.sample-inner {
+	position: absolute;
+	inset: 0;
+	transform-style: preserve-3d;
+	transition: transform 250ms ease-in-out;
+}
+.sample-front,
+.sample-back {
+	position: absolute;
+	inset: 0;
+	border: 2px solid var(--round-edge);
+	border-radius: var(--radius, 12px);
+	backface-visibility: hidden;
+	overflow: hidden;
+}
+.sample-front {
+	background: white;
+}
+.sample-front svg {
+	width: 100%;
+	height: 100%;
+	padding: 12%;
+}
+.sample-back {
+	background: var(--round-back);
+	transform: rotateY(180deg);
+	display: grid;
+	place-items: center;
+}
+.sample-back i {
+	display: block;
+	width: 23%;
+	aspect-ratio: 1;
+	border: 2px solid var(--round-edge);
+	border-radius: 4px;
+	transform: rotate(45deg);
+}
+.proof-board[data-family='block'] .proof-grid {
+	grid-template-columns: repeat(8, 1fr);
+	width: min(100%, calc(100dvh - var(--header) - var(--footer) - 150px));
+	aspect-ratio: 1;
+	flex: 0 1 auto;
+	gap: 4px;
+}
+.sample-block {
+	aspect-ratio: 1;
+	min-width: 0;
+	border-radius: var(--radius, 5px);
+	background: var(--round-back);
+	border: 1px solid color-mix(in srgb, var(--round-edge) 35%, transparent);
+}
+.proof-scatter {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+	opacity: 0;
+	z-index: 0;
+}
+.proof-scatter svg {
+	position: absolute;
+	top: var(--item-y);
+	width: clamp(28px, 7vw, 100px);
+	height: auto;
+}
+.proof-scatter svg[data-band='left'] {
+	left: calc(28px + max(0px, var(--scatter-left-space, 10vw) - 56px) * var(--item-x));
+}
+.proof-scatter svg[data-band='right'] {
+	left: calc(100% - 28px - max(0px, var(--scatter-right-space, 10vw) - 56px) * var(--item-x));
+}
+.proof-card {
+	position: absolute;
+	inset: 0;
+	z-index: 4;
+	perspective: 900px;
+	visibility: hidden;
+	pointer-events: none;
+}
+.proof-card-inner {
+	position: relative;
+	width: 100%;
+	height: 100%;
+	transform-style: preserve-3d;
+	border-radius: inherit;
+}
+.proof-card-back,
+.proof-card-front {
+	position: absolute;
+	inset: 0;
+	backface-visibility: hidden;
+	border-radius: inherit;
+	background: var(--round-back);
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 14px;
+	padding: 12px;
+	text-align: center;
+}
+.proof-card-front {
+	transform: rotateY(180deg);
+	background: white;
+}
+.proof-card-front strong {
+	font-size: 24px;
+	line-height: 1.1;
+}
+.proof-card-front span {
+	font-size: 12px;
+}
+.proof-card-back i,
+.waiting-card i {
+	width: 30px;
+	height: 30px;
+	border: 3px solid var(--round-edge);
+	transform: rotate(45deg);
+	border-radius: 8px;
+}
+.played-stack {
+	position: absolute;
+	right: 20px;
+	bottom: 28px;
+	width: 88px;
+	height: 100px;
+	z-index: 3;
+}
+.played-stack p {
+	position: absolute;
+	top: -25px;
+	margin: 0;
+	font-size: 11px;
+	font-weight: 850;
+	white-space: nowrap;
+}
+.stack-cards {
+	position: absolute;
+	left: 6px;
+	top: 6px;
+	width: 64px;
+	height: 86px;
+}
+.stack-cards span {
+	position: absolute;
+	width: 100%;
+	height: 100%;
+	left: 0;
+	top: 0;
+	border: 1px solid var(--round-edge);
+	border-radius: 8px;
+	background: var(--round-back);
+	font-size: 10px;
+	font-weight: 850;
+	display: grid;
+	align-content: center;
+	text-align: center;
+	padding: 4px;
+}
+.stack-cards span strong {
+	font-size: 15px;
+}
+.proof-result {
+	position: absolute;
+	inset: 0;
+	z-index: 2;
+	display: none;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+}
+.proof-result-inner {
+	width: min(480px, calc(100% - 48px));
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 18px;
+}
+.proof-result-summary h2 {
+	font-size: 32px;
+	margin: 0 0 12px;
+	font-weight: 950;
+	letter-spacing: -1px;
+}
+.proof-result-summary p {
+	font-size: 12px;
+	margin: 4px 0;
+	color: #485465;
+}
+.proof-result-summary b {
+	color: #1b2433;
+}
+.sample-score {
+	font-size: 64px;
+	line-height: 1.1;
+	letter-spacing: -2px;
+	display: block;
+	font-weight: 950;
+}
+.proof-result-stats {
+	display: flex;
+	justify-content: center;
+	gap: 30px;
+	margin: 0;
+}
+.proof-result-stats dt {
+	font-size: 10px;
+	color: #485465;
+}
+.proof-result-stats dd {
+	margin: 2px 0 0;
+	font-size: 18px;
+	font-weight: 850;
+}
+.proof-next-area {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 16px;
+}
+.proof-next-area button {
+	background: #1b2433;
+	color: white;
+}
+.waiting-card {
+	width: 60px;
+	height: 80px;
+	border: 1px solid var(--round-edge);
+	border-radius: 10px;
+	background: var(--round-back);
+	display: grid;
+	place-items: center;
+	transform: rotate(5deg);
+}
+footer {
+	height: var(--footer);
+	flex-shrink: 0;
+	border-top: 1px solid color-mix(in srgb, var(--round-edge) 35%, var(--round-bg));
+	background: color-mix(in srgb, var(--round-back) 22%, var(--round-bg));
+	padding: 10px 24px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	position: relative;
+	z-index: 5;
+}
+.proof-help {
+	display: flex;
+	gap: 28px;
+	font-size: 13px;
+	font-weight: 850;
+}
+#status {
+	font-size: 12px;
+	margin: 0;
+	min-height: 16px;
+}
+footer small {
+	font-size: 10px;
+}
+.review-tools {
+	justify-self: end;
+	position: relative;
+	font-size: 12px;
+}
+.review-tools summary {
+	cursor: pointer;
+	list-style: none;
+	border: 1px solid #aab4c5;
+	border-radius: 16px;
+	padding: 6px 12px;
+	background: white;
+	font-weight: 800;
+}
+.review-controls {
+	position: absolute;
+	right: 0;
+	top: 38px;
+	width: 250px;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	align-items: stretch;
+	gap: 8px;
+	background: white;
+	border: 1px solid #aab4c5;
+	border-radius: 14px;
+	z-index: 20;
+}
+.review-controls label {
+	font-size: 12px;
+	font-weight: 800;
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+select {
+	border: 1px solid #aab4c5;
+	border-radius: 8px;
+	background: white;
+	padding: 4px;
+	min-height: 32px;
+	width: 100%;
+}
+#finish {
+	background: #1b2433;
+	color: white;
+}
+#retry[hidden] {
+	display: none;
+}
+/* No animated clone, secondary board, or independently visible finished layer. */
+#proof:is([data-phase='idle'], [data-phase='failed'], [data-phase='result']) .proof-board {
+	display: none;
+}
+#proof:is([data-phase='dealing'], [data-phase='waiting'], [data-phase='flipping']) .proof-board {
+	width: var(--card-width);
+	height: var(--card-height);
+	padding: 0;
+	border-radius: 18px;
+	background: var(--round-back);
+	visibility: visible;
+	transform: rotate(-5deg);
+}
+#proof:is(
+		[data-phase='unfolding'],
+		[data-phase='arriving'],
+		[data-phase='preview'],
+		[data-phase='hiding'],
+		[data-phase='playing'],
+		[data-phase='folding']
+	)
+	.proof-board {
+	visibility: visible;
+}
+#proof:is(
+		[data-phase='dealing'],
+		[data-phase='waiting'],
+		[data-phase='flipping'],
+		[data-phase='unfolding'],
+		[data-phase='folding']
+	)
+	.proof-card {
+	visibility: visible;
+}
+#proof:is([data-phase='flipping'], [data-phase='unfolding'], [data-phase='folding'])
+	.proof-card-inner {
+	transform: rotateY(180deg);
+}
+#proof:is(
+		[data-phase='arriving'],
+		[data-phase='preview'],
+		[data-phase='hiding'],
+		[data-phase='playing']
+	)
+	.proof-card {
+	display: none;
+}
+#proof:is(
+		[data-phase='arriving'],
+		[data-phase='preview'],
+		[data-phase='hiding'],
+		[data-phase='playing'],
+		[data-phase='folding']
+	)
+	.proof-content {
+	visibility: visible;
+}
+#proof:is(
+		[data-phase='arriving'],
+		[data-phase='preview'],
+		[data-phase='hiding'],
+		[data-phase='playing'],
+		[data-phase='folding'],
+		[data-phase='result']
+	)
+	.proof-scatter {
+	opacity: 0.2;
+}
+#proof:is([data-phase='hiding'], [data-phase='playing'], [data-phase='folding']) .sample-inner {
+	transform: rotateY(180deg);
+}
+#proof[data-phase='result'] .proof-result {
+	display: flex;
+}
+#proof[data-static='true'] .sample-inner {
+	transition: none;
+}
+@media (max-width: 600px) and (orientation: portrait) {
+	:root {
+		--header: 100px;
+		--footer: 96px;
+		--game-gap: 28px;
+		--card-width: 130px;
+		--card-height: 174px;
+	}
+	header {
+		padding: 10px 20px;
+		grid-template-columns: 1fr auto;
+		grid-template-rows: 40px 28px;
+		gap: 8px;
+	}
+	h1 {
+		grid-row: 2;
+		grid-column: 1/-1;
+		text-align: center;
+		font-size: 25px;
+	}
+	.brand {
+		font-size: 24px;
+	}
+	.review-tools {
+		grid-row: 1;
+		grid-column: 2;
+	}
+	.review-controls {
+		width: 240px;
+	}
+	.proof-stage {
+		padding: 24px 16px 80px;
+	}
+	.proof-board {
+		width: 100%;
+		padding: 12px;
+		border-radius: 20px;
+	}
+	.proof-content {
+		gap: 10px;
+	}
+	.proof-hud {
+		font-size: 9px;
+	}
+	.proof-hud strong {
+		font-size: 21px;
+	}
+	.proof-board[data-family='block'] .proof-grid {
+		width: min(100%, calc(100dvh - var(--header) - var(--footer) - 145px));
+	}
+	.played-stack {
+		left: 22px;
+		right: auto;
+		bottom: 6px;
+		width: 86px;
+		height: 54px;
+	}
+	.played-stack p {
+		top: -12px;
+		font-size: 9px;
+	}
+	.stack-cards {
+		left: 8px;
+		top: 2px;
+		width: 40px;
+		height: 54px;
+	}
+	.stack-cards span {
+		font-size: 7px;
+		border-radius: 5px;
+	}
+	.stack-cards span strong {
+		font-size: 10px;
+	}
+	.proof-result-inner {
+		gap: 16px;
+		padding-bottom: 48px;
+	}
+	.proof-result-summary h2 {
+		font-size: 28px;
+	}
+	.sample-score {
+		font-size: 60px;
+	}
+	.proof-result-stats {
+		gap: 20px;
+	}
+	.waiting-card {
+		width: 50px;
+		height: 66px;
+	}
+
+	footer {
+		padding: 8px 12px;
+	}
+	footer small {
+		font-size: 9px;
+	}
+}
+@media (orientation: landscape) and (max-height: 560px) {
+	:root {
+		--header: 76px;
+		--footer: 60px;
+		--game-gap: 12px;
+		--card-width: 90px;
+		--card-height: 120px;
+	}
+	header {
+		padding: 4px 20px;
+		grid-template-columns: 1fr auto;
+		grid-template-rows: 32px 24px;
+		gap: 2px;
+	}
+	h1 {
+		grid-row: 2;
+		grid-column: 1/-1;
+		font-size: 22px;
+		text-align: center;
+	}
+	.brand {
+		font-size: 22px;
+	}
+	.review-tools {
+		grid-row: 1;
+		grid-column: 2;
+	}
+	.review-controls {
+		width: 330px;
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		padding: 12px;
+	}
+	.proof-stage {
+		padding: 10px 96px;
+	}
+	.proof-board {
+		padding: 8px 12px;
+		gap: 6px;
+		width: 100%;
+		border-radius: 16px;
+	}
+	.proof-content {
+		flex-direction: row;
+		gap: 6px;
+	}
+	.proof-hud {
+		width: 88px;
+		flex-direction: column;
+		justify-content: center;
+		gap: 6px;
+	}
+	.proof-hud strong {
+		font-size: 18px;
+	}
+	.proof-board[data-family='memory'] .proof-grid {
+		width: 100%;
+		height: 100%;
+		grid-template-columns: repeat(6, 1fr);
+		align-content: center;
+	}
+	.sample-memory {
+		max-height: 100%;
+	}
+	.proof-board[data-family='block'] .proof-grid {
+		width: auto;
+		height: 100%;
+		aspect-ratio: 1;
+	}
+	.proof-card-front strong {
+		font-size: 18px;
+	}
+	.proof-card-front span {
+		font-size: 10px;
+	}
+	.played-stack {
+		bottom: 16px;
+		right: 10px;
+		width: 70px;
+		height: 72px;
+	}
+	.stack-cards {
+		width: 48px;
+		height: 64px;
+	}
+	.stack-cards span {
+		font-size: 8px;
+	}
+	.stack-cards span strong {
+		font-size: 12px;
+	}
+	.proof-result-inner {
+		display: grid;
+		grid-template-columns: 1fr 1fr;
+		gap: 8px 32px;
+		width: min(520px, calc(100% - 180px));
+	}
+	.proof-result-summary {
+		grid-row: 1/3;
+	}
+	.proof-result-summary h2 {
+		font-size: 22px;
+		margin-bottom: 4px;
+	}
+	.sample-score {
+		font-size: 44px;
+	}
+	.proof-result-summary p {
+		font-size: 10px;
+	}
+	.proof-result-stats {
+		gap: 12px;
+	}
+	.proof-result-stats dt {
+		font-size: 9px;
+	}
+	.proof-result-stats dd {
+		font-size: 15px;
+	}
+	.proof-next-area {
+		flex-direction: row;
+		gap: 14px;
+		justify-content: center;
+	}
+	.waiting-card {
+		width: 40px;
+		height: 54px;
+	}
+	.waiting-card i {
+		width: 18px;
+		height: 18px;
+		border-width: 2px;
+	}
+	.proof-next-area button {
+		white-space: nowrap;
+	}
+	.proof-help {
+		font-size: 11px;
+	}
+	footer {
+		padding: 4px 12px;
+		gap: 2px;
+	}
+	footer small {
+		font-size: 8px;
+	}
+}
+@media (prefers-reduced-motion: reduce) {
+	.sample-inner {
+		transition: none;
+	}
+}
+.proof-mystery {
+	max-width: 250px;
+	text-align: center;
+	font-size: 11px;
+	line-height: 1.5;
+	color: #485465;
+	margin: 0;
+}
+@media (min-width: 1024px) and (min-height: 561px) {
+	.proof-result-inner {
+		width: min(1060px, calc(100% - 240px));
+		display: grid;
+		grid-template-columns: minmax(0, 1.3fr) minmax(280px, 0.9fr);
+		grid-template-rows: auto auto;
+		gap: 24px clamp(48px, 6vw, 96px);
+		text-align: left;
+		align-items: center;
+	}
+	.proof-result-summary {
+		grid-column: 1;
+		grid-row: 1;
+	}
+	.proof-result-summary h2 {
+		font-size: 44px;
+		margin-bottom: 16px;
+		letter-spacing: -1.5px;
+	}
+	.proof-result-summary p {
+		font-size: 14px;
+	}
+	.sample-score {
+		font-size: clamp(88px, 8vw, 112px);
+		letter-spacing: -4px;
+	}
+	.proof-result-stats {
+		grid-column: 1;
+		grid-row: 2;
+		width: 100%;
+		justify-content: flex-start;
+		gap: 48px;
+		border-top: 1px solid color-mix(in srgb, var(--round-edge) 20%, var(--round-bg));
+		padding-top: 18px;
+	}
+	.proof-result-stats dt {
+		font-size: 11px;
+	}
+	.proof-result-stats dd {
+		font-size: 24px;
+	}
+	.proof-next-area {
+		grid-column: 2;
+		grid-row: 1/3;
+		align-self: stretch;
+		justify-content: center;
+		gap: 22px;
+		padding-left: 32px;
+		border-left: 1px solid color-mix(in srgb, var(--round-edge) 20%, var(--round-bg));
+	}
+	.proof-next-area .waiting-card {
+		order: -1;
+		width: 120px;
+		height: 160px;
+	}
+	.proof-next-area button {
+		width: min(100%, 280px);
+		min-height: 56px;
+		font-size: 17px;
+	}
+	.proof-mystery {
+		font-size: 12px;
+	}
+}
+@media (orientation: landscape) and (max-height: 560px) {
+	.proof-mystery {
+		display: none;
+	}
+}
+#proof[data-phase='result'] #status {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+#proof[data-phase='result-leaving'] .proof-board {
+	display: none;
+}
+#proof[data-phase='result-leaving'] .proof-result {
+	display: flex;
+}
+#proof[data-phase='result-leaving'] .proof-scatter {
+	opacity: 0.2;
+}
+#proof[data-phase='result-leaving'] #status {
+	position: absolute;
+	width: 1px;
+	height: 1px;
+	padding: 0;
+	margin: -1px;
+	overflow: hidden;
+	clip-path: inset(50%);
+	white-space: nowrap;
+}
+.scramble-wrap {
+	position: relative;
+	display: inline-block;
+	max-width: 100%;
+	vertical-align: baseline;
+}
+.scramble-source {
+	opacity: 0;
+}
+.scramble-visual {
+	position: absolute;
+	inset: 0;
+	overflow: hidden;
+	pointer-events: none;
+	user-select: none;
+}
+
+/* Compact layouts have no spare side space for puzzle decoration. */
+@media (max-width: 900px), (orientation: landscape) and (max-height: 560px) {
+	.proof-scatter {
+		display: none;
+	}
+}

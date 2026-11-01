@@ -16,7 +16,7 @@ export function parseMeasurement(
 		typeof body.id !== 'string' ||
 		!/^[0-9a-f-]{36}$/.test(body.id) ||
 		!measurementEvents.includes(body.event as (typeof measurementEvents)[number]) ||
-		![null, 'block', 'memory'].includes(body.family as string | null) ||
+		![null, 'block', 'memory', 'connect'].includes(body.family as string | null) ||
 		![null, 'start', 'save', 'view'].includes(body.code as string | null)
 	)
 		return null;

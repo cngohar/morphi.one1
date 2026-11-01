@@ -1,13 +1,42 @@
+import { gameOverview, gameStatistics, changeGame } from '#lib/server/games.js';
+import { readAudit, exportAuditYear } from '#lib/server/audit.js';
+import { softDeleteUser, restoreDeletedUser } from '#lib/server/user-lifecycle.js';
+import { userDirectory, userDetail, userOverview } from '#lib/server/admin-users.js';
+import {
+	readLiveScoreConfig,
+	listScoreVersions,
+	rollbackScoreConfig,
+	saveScoreConfig
+} from '#lib/server/scoring.js';
+import { SCORE_FAMILIES, SCORE_DEFAULTS } from '#lib/engine/scoring.js';
+import type { PuzzleId } from '#lib/engine/contract.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { env } from 'cloudflare:workers';
 import { operatorRequest } from '#lib/server/operator-http.js';
 import { auditOperatorRead } from '#lib/server/operator.js';
-import { moderate, type ModerationAction } from '#lib/server/moderation.js';
+import {
+	moderate,
+	renamePlayerByOperator,
+	addModerationCase,
+	resolveModerationCase,
+	undoModeration,
+	type ModerationAction
+} from '#lib/server/moderation.js';
 import { validatePlayerName } from '#lib/server/players.js';
 import { deleteAccountForPrivacy } from '#lib/server/retention.js';
 import { RunError } from '#lib/server/runs.js';
 import type { Actions, PageServerLoad } from './$types';
-const views = ['dashboard', 'status', 'moderation', 'queue', 'audit', 'privacy'] as const;
+const views = [
+	'dashboard',
+	'users',
+	'status',
+	'moderation',
+	'queue',
+	'audit',
+	'privacy',
+	'scoring',
+	'games'
+] as const;
 const identifier = (value: unknown) =>
 	typeof value === 'string' && /^[A-Za-z0-9_-]{3,80}$/.test(value) ? value : null;
 const reasonValue = (value: unknown) =>
@@ -27,11 +56,44 @@ export const load: PageServerLoad = async (event) => {
 		if (e instanceof RunError) error(e.status, 'Access unavailable');
 		throw e;
 	}
+	const filters = Object.fromEntries(
+		['actor', 'audit_action', 'audit_target', 'from', 'to'].map((key) => [
+			key,
+			event.url.searchParams.get(key) ?? ''
+		])
+	);
 	const page = Number(event.url.searchParams.get('page') ?? 0);
 	if (!Number.isSafeInteger(page) || page < 0 || page > 1000) error(400, 'Invalid page');
 	const ranked = await env.DB.prepare("SELECT enabled FROM site_control WHERE key='ranked'").first<{
 		enabled: number;
 	}>();
+	let directory: Awaited<ReturnType<typeof userDirectory>> = { rows: [], more: false };
+	let detail: Awaited<ReturnType<typeof userDetail>> | null = null;
+	let usersOverview: Awaited<ReturnType<typeof userOverview>> | null = null;
+	let auditOverview: { total: number; recent: number; operators: number } | null = null;
+	const subview = event.url.searchParams.get('subview') ?? '';
+	const gameParam = event.url.searchParams.get('game');
+	if (
+		event.params.view === 'games' &&
+		gameParam !== null &&
+		!SCORE_FAMILIES.includes(gameParam as PuzzleId)
+	)
+		error(400, 'Invalid game');
+	const selectedGame = event.params.view === 'games' ? (gameParam as PuzzleId | null) : null;
+	const userSearch = event.url.searchParams.get('search') ?? '';
+	const userStatus = event.url.searchParams.get('status') ?? 'all';
+	const requestedTab = event.url.searchParams.get('tab') ?? 'stats';
+	const detailTab = ['stats', 'activity', 'rounds', 'actions'].includes(requestedTab)
+		? requestedTab
+		: 'stats';
+	let auditMore = false;
+	let scoring: (Awaited<ReturnType<typeof readLiveScoreConfig>>['config'] & {
+		family: PuzzleId;
+		liveVersion: string;
+		versions: Awaited<ReturnType<typeof listScoreVersions>>;
+	})[] = [];
+	let games: Awaited<ReturnType<typeof gameOverview>> = [];
+	let gameStats: Awaited<ReturnType<typeof gameStatistics>> = { rows: [], more: false };
 	let metrics: Record<string, number> = {},
 		daily: { day: string; total: number }[] = [],
 		split: { family: string; total: number }[] = [],
@@ -50,12 +112,39 @@ export const load: PageServerLoad = async (event) => {
 			action: string;
 			target: string;
 			reason: string;
+			before: string | null;
+			after: string | null;
 			created_at: number;
 		}[] = [];
 	try {
+		if (event.params.view === 'users') {
+			const id = event.url.searchParams.get('id');
+			if (id) {
+				if (!identifier(id)) error(400, 'Invalid reference');
+				detail = await userDetail(env.DB, actor, id, page);
+			} else if (subview === 'directory')
+				directory = await userDirectory(env.DB, actor, page, userSearch, userStatus);
+			else usersOverview = await userOverview(env.DB, actor);
+		}
+		if (event.params.view === 'games') {
+			games = await gameOverview(env.DB);
+			if (selectedGame) gameStats = await gameStatistics(env.DB, selectedGame);
+		}
+		if (event.params.view === 'scoring' || selectedGame)
+			scoring = await Promise.all(
+				(selectedGame ? [selectedGame] : SCORE_FAMILIES).map(async (family) => {
+					const { config, liveVersion } = await readLiveScoreConfig(env.DB, family);
+					return {
+						family,
+						...config,
+						liveVersion,
+						versions: await listScoreVersions(env.DB, family)
+					};
+				})
+			);
 		if (event.params.view === 'dashboard') {
 			const rows = await env.DB.prepare(
-				`SELECT (SELECT count(*) FROM user) accounts,(SELECT count(*) FROM completed_run) runs,(SELECT count(*) FROM play_session) starts,(SELECT count(*) FROM play_session WHERE payload_hash IS NOT NULL) claims,(SELECT count(*) FROM (SELECT user_id,rules_group FROM completed_run WHERE ranked=1 AND hidden=0 AND NOT EXISTS(SELECT 1 FROM player_ban b WHERE b.user_id=completed_run.user_id) GROUP BY user_id,rules_group)) entries,(SELECT count(*) FROM completed_run WHERE hidden=1) hidden,(SELECT count(*) FROM player_ban) bans,(SELECT count(DISTINCT target) FROM admin_audit WHERE action IN ('privacy-delete','account-deleted')) deletions`
+				`SELECT (SELECT count(*) FROM user) accounts,(SELECT count(*) FROM completed_run) runs,(SELECT count(*) FROM play_session) starts,(SELECT count(*) FROM play_session WHERE payload_hash IS NOT NULL) claims,(SELECT count(*) FROM (SELECT user_id,rules_group FROM completed_run WHERE ranked=1 AND hidden=0 AND NOT EXISTS(SELECT 1 FROM player_ban b WHERE b.user_id=completed_run.user_id AND (b.expires_at IS NULL OR b.expires_at>unixepoch()*1000)) AND NOT EXISTS(SELECT 1 FROM user_lifecycle l WHERE l.user_id=completed_run.user_id) GROUP BY user_id,rules_group)) entries,(SELECT count(*) FROM completed_run WHERE hidden=1) hidden,(SELECT count(*) FROM player_ban WHERE expires_at IS NULL OR expires_at>unixepoch()*1000) bans,(SELECT count(DISTINCT target) FROM admin_audit WHERE action IN ('privacy-delete','account-deleted')) deletions`
 			).first<Record<string, number>>();
 			metrics = rows ?? {};
 			const events = await env.DB.prepare(
@@ -83,7 +172,7 @@ export const load: PageServerLoad = async (event) => {
 				if (!identifier(search)) error(400, 'Invalid reference');
 				lookup = (
 					await env.DB.prepare(
-						'SELECT r.id,p.name,r.family,r.score,r.hidden,EXISTS(SELECT 1 FROM player_ban b WHERE b.user_id=p.user_id) ban FROM player p LEFT JOIN completed_run r ON r.user_id=p.user_id WHERE p.normalized_name=? OR r.id=? ORDER BY r.created_at DESC LIMIT 25'
+						'SELECT r.id,p.name,r.family,r.score,r.hidden,EXISTS(SELECT 1 FROM player_ban b WHERE b.user_id=p.user_id AND (b.expires_at IS NULL OR b.expires_at>unixepoch()*1000)) ban FROM player p LEFT JOIN completed_run r ON r.user_id=p.user_id WHERE p.normalized_name=? OR r.id=? ORDER BY r.created_at DESC LIMIT 25'
 					)
 						.bind(search.toLowerCase(), search)
 						.all<(typeof lookup)[number]>()
@@ -98,14 +187,39 @@ export const load: PageServerLoad = async (event) => {
 					.bind(page * 25)
 					.all<(typeof cases)[number]>()
 			).results;
-		if (event.params.view === 'audit')
-			audit = (
-				await env.DB.prepare(
-					'SELECT id,actor,action,target,reason,created_at FROM admin_audit ORDER BY created_at DESC,id LIMIT 26 OFFSET ?'
+		if (event.params.view === 'audit') {
+			if (subview !== 'viewer')
+				auditOverview = await env.DB.prepare(
+					`SELECT count(*) total, sum(CASE WHEN created_at>=? THEN 1 ELSE 0 END) recent, count(DISTINCT actor) operators FROM admin_audit`
 				)
-					.bind(page * 25)
-					.all<(typeof audit)[number]>()
-			).results;
+					.bind(Date.now() - 7 * 86400000)
+					.first<{ total: number; recent: number; operators: number }>();
+			const from = event.url.searchParams.get('from');
+			const to = event.url.searchParams.get('to');
+			const date = (value: string | null) => {
+				if (!value) return undefined;
+				if (!/^\d{4}-\d{2}-\d{2}$/.test(value)) error(400, 'Invalid date');
+				const timestamp = Date.parse(`${value}T00:00:00Z`);
+				if (!Number.isFinite(timestamp) || new Date(timestamp).toISOString().slice(0, 10) !== value)
+					error(400, 'Invalid date');
+				return timestamp;
+			};
+			const lower = date(from),
+				upper = date(to);
+			if (lower !== undefined && upper !== undefined && lower > upper)
+				error(400, 'Invalid date range');
+			const filter = {
+				actor: event.url.searchParams.get('actor') || undefined,
+				action: event.url.searchParams.get('audit_action') || undefined,
+				target: event.url.searchParams.get('audit_target') || undefined,
+				from: lower,
+				to: upper === undefined ? undefined : upper + 86400000,
+				page
+			};
+			const result = await readAudit(env.DB, actor.id, filter);
+			audit = result.rows;
+			auditMore = result.more;
+		}
 		await auditOperatorRead(
 			env.DB,
 			actor.id,
@@ -119,6 +233,19 @@ export const load: PageServerLoad = async (event) => {
 		console.error('morphi:operator_read_failed');
 		return {
 			actor,
+			filters,
+			subview,
+			selectedGame,
+			gameStats,
+			detailTab,
+			userSearch,
+			userStatus,
+			usersOverview,
+			auditOverview,
+			directory,
+			detail,
+			scoring: [],
+			games: [],
 			view: event.params.view,
 			ranked: ranked?.enabled !== 0,
 			metrics,
@@ -133,6 +260,19 @@ export const load: PageServerLoad = async (event) => {
 	}
 	return {
 		actor,
+		filters,
+		subview,
+		selectedGame,
+		gameStats,
+		detailTab,
+		userSearch,
+		userStatus,
+		usersOverview,
+		auditOverview,
+		directory,
+		detail,
+		scoring,
+		games,
 		view: event.params.view,
 		ranked: ranked?.enabled !== 0,
 		metrics,
@@ -141,7 +281,7 @@ export const load: PageServerLoad = async (event) => {
 		lookup,
 		cases: cases.slice(0, 25),
 		audit: audit.slice(0, 25),
-		more: cases.length > 25 || audit.length > 25,
+		more: cases.length > 25 || auditMore,
 		page,
 		unavailable: false
 	};
@@ -153,13 +293,35 @@ export const actions: Actions = {
 			if (
 				[...body.keys()].some(
 					(key) =>
-						!['action', 'target', 'reason', 'name', 'kind', 'confirm', 'offset'].includes(key)
+						![
+							'action',
+							'target',
+							'reason',
+							'name',
+							'kind',
+							'confirm',
+							'offset',
+							'expected',
+							'values',
+							'duration',
+							'year',
+							'cursor',
+							'sourceVersion'
+						].includes(key)
 				)
 			)
 				return fail(400, { code: 'input' });
 			const action = String(body.get('action') ?? '');
 			if (
 				![
+					'score-change',
+					'score-rollback',
+					'game-enable',
+					'game-disable',
+					'game-delete',
+					'game-restore',
+					'game-hard-delete',
+					'score-defaults',
 					'ranked-on',
 					'ranked-off',
 					'hide',
@@ -171,12 +333,24 @@ export const actions: Actions = {
 					'case-resolve',
 					'export',
 					'delete',
-					'logout'
+					'logout',
+					'user-delete',
+					'user-restore',
+					'undo',
+					'audit-export'
 				].includes(action)
 			)
 				return fail(400, { code: 'input' });
 			const permission =
-				action === 'logout' ? event.params.view : action.startsWith('ranked-') ? 'ranked' : action;
+				action === 'logout'
+					? event.params.view
+					: action.startsWith('game-')
+						? 'games'
+						: action.startsWith('score-')
+							? 'scoring'
+							: action.startsWith('ranked-')
+								? 'ranked'
+								: action;
 			const actor = await operatorRequest(event, permission, action !== 'logout');
 			const reason = reasonValue(body.get('reason')),
 				target = identifier(body.get('target'));
@@ -191,6 +365,77 @@ export const actions: Actions = {
 				redirect(303, '/admin/sign-in');
 			}
 			if (!reason || !target || body.get('confirm') !== 'yes') return fail(400, { code: 'input' });
+			if (action.startsWith('game-')) {
+				if (!SCORE_FAMILIES.includes(target as PuzzleId)) return fail(400, { code: 'input' });
+				const days = action === 'game-delete' ? Number(body.get('duration')) : 7;
+				await changeGame(
+					env.DB,
+					actor.id,
+					target as PuzzleId,
+					action as Parameters<typeof changeGame>[3],
+					reason,
+					days
+				);
+				return { success: true };
+			}
+			if (action === 'user-delete' || action === 'user-restore') {
+				if (action === 'user-delete') {
+					const duration = Number(body.get('duration'));
+					if (!Number.isSafeInteger(duration) || duration < 1 || duration > 365)
+						return fail(400, { code: 'input' });
+					await softDeleteUser(env.DB, actor.id, target, reason, duration);
+				} else await restoreDeletedUser(env.DB, actor.id, target, reason);
+				return { success: true };
+			}
+			if (action === 'undo') {
+				await undoModeration(env.DB, actor.id, target, reason);
+				return { success: true };
+			}
+			if (action === 'audit-export') {
+				const year = Number(body.get('year'));
+				const cursor = String(body.get('cursor') ?? '') || undefined;
+				const exported = await exportAuditYear(env.DB, actor.id, year, cursor);
+				return { success: true, exported: JSON.stringify(exported) };
+			}
+			if (action.startsWith('score-')) {
+				if (!SCORE_FAMILIES.includes(target as PuzzleId)) return fail(400, { code: 'input' });
+				const family = target as PuzzleId;
+				if (action === 'score-rollback') {
+					await rollbackScoreConfig(
+						env.DB,
+						actor.id,
+						family,
+						String(body.get('expected') ?? ''),
+						String(body.get('sourceVersion') ?? ''),
+						reason
+					);
+					return { success: true };
+				}
+				let values: unknown;
+				try {
+					values =
+						action === 'score-defaults'
+							? SCORE_DEFAULTS[family]
+							: JSON.parse(String(body.get('values')));
+				} catch {
+					return fail(400, { code: 'input' });
+				}
+				try {
+					await saveScoreConfig(
+						env.DB,
+						actor.id,
+						family,
+						String(body.get('expected')),
+						values,
+						reason,
+						action === 'score-defaults'
+					);
+				} catch (e) {
+					if (e instanceof RangeError) return fail(400, { code: 'input' });
+					throw e;
+				}
+				return { success: true };
+			}
 			if (action.startsWith('ranked-') && target !== 'ranked') return fail(400, { code: 'input' });
 			if (['ranked-on', 'ranked-off', 'hide', 'restore', 'ban', 'unban'].includes(action)) {
 				let resolved = target;
@@ -201,60 +446,32 @@ export const actions: Actions = {
 					if (!player) return fail(404, { code: 'missing' });
 					resolved = player.user_id;
 				}
-				await moderate(env.DB, actor.id, action as ModerationAction, resolved, reason);
+				const rawDuration = body.get('duration');
+				const duration = rawDuration === null || rawDuration === '' ? null : Number(rawDuration);
+				if (
+					duration !== null &&
+					(!Number.isSafeInteger(duration) || duration < 1 || duration > 36500 || action !== 'ban')
+				)
+					return fail(400, { code: 'input' });
+				await moderate(
+					env.DB,
+					actor.id,
+					action as ModerationAction,
+					resolved,
+					reason,
+					duration === null ? null : Date.now() + duration * 86400000
+				);
 			} else if (action === 'rename') {
 				const name = validatePlayerName(body.get('name'));
 				if (!name) return fail(400, { code: 'input' });
-				const old = await env.DB.prepare('SELECT user_id,name FROM player WHERE normalized_name=?')
-					.bind(target.toLowerCase())
-					.first<{ user_id: string; name: string }>();
-				if (!old) return fail(404, { code: 'missing' });
-				await env.DB.batch([
-					env.DB.prepare(
-						'UPDATE player SET name=?,normalized_name=?,updated_at=? WHERE user_id=?'
-					).bind(name, name.toLowerCase(), Date.now(), old.user_id),
-					env.DB.prepare(
-						"INSERT INTO admin_audit(id,actor,action,target,reason,before,after,created_at) VALUES(?,?,'rename',?,?,?,?,?)"
-					).bind(
-						crypto.randomUUID(),
-						actor.id,
-						old.user_id,
-						reason,
-						JSON.stringify({ name: old.name }),
-						JSON.stringify({ name }),
-						Date.now()
-					)
-				]);
+				await renamePlayerByOperator(env.DB, actor.id, target, name, reason);
 			} else if (action === 'case-add') {
 				const kind = String(body.get('kind'));
 				if (!['username', 'score'].includes(kind) || !/^CASE-[A-Za-z0-9_-]{3,55}$/.test(reason))
 					return fail(400, { code: 'input' });
-				await env.DB.batch([
-					env.DB.prepare(
-						"INSERT INTO moderation_case(id,kind,target,state,created_at) VALUES(?,?,?,'open',?)"
-					).bind(reason, kind, target, Date.now()),
-					env.DB.prepare(
-						"INSERT INTO admin_audit(id,actor,action,target,reason,before,after,created_at) VALUES(?,?,'case-add',?,?,NULL,?,?)"
-					).bind(
-						crypto.randomUUID(),
-						actor.id,
-						reason,
-						reason,
-						JSON.stringify({ kind, target, state: 'open' }),
-						Date.now()
-					)
-				]);
+				await addModerationCase(env.DB, actor.id, reason, kind, target, reason);
 			} else if (action === 'case-resolve') {
-				const current = await env.DB.prepare('SELECT id FROM moderation_case WHERE id=?')
-					.bind(target)
-					.first();
-				if (!current) return fail(404, { code: 'missing' });
-				await env.DB.batch([
-					env.DB.prepare("UPDATE moderation_case SET state='resolved' WHERE id=?").bind(target),
-					env.DB.prepare(
-						"INSERT INTO admin_audit(id,actor,action,target,reason,before,after,created_at) VALUES(?,?,'case-resolve',?,?,?, ?,?)"
-					).bind(crypto.randomUUID(), actor.id, target, reason, '"open"', '"resolved"', Date.now())
-				]);
+				await resolveModerationCase(env.DB, actor.id, target, reason);
 			} else if (action === 'delete' || action === 'export') {
 				if (!/^CASE-[A-Za-z0-9_-]{3,55}$/.test(reason)) return fail(400, { code: 'input' });
 				const player = await env.DB.prepare('SELECT user_id FROM player WHERE normalized_name=?')

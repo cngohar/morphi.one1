@@ -145,11 +145,7 @@ try {
 		await proxy.env.DB.batch([
 			proxy.env.DB.prepare('DELETE FROM admin_web_operator WHERE user_id=?').bind(fixtureId),
 			proxy.env.DB.prepare('DELETE FROM admin_actor WHERE id=?').bind(fixtureId),
-			proxy.env.DB.prepare('DELETE FROM user WHERE id=?').bind(fixtureId),
-			proxy.env.DB.prepare('DELETE FROM admin_audit WHERE actor=? OR target=?').bind(
-				fixtureId,
-				fixtureId
-			)
+			proxy.env.DB.prepare('DELETE FROM user WHERE id=?').bind(fixtureId)
 		]);
 	}
 	await proxy.dispose();

@@ -34,6 +34,18 @@ describe('local settings and best scores', () => {
 		expect(() => storage.saveBlockHintSeen()).not.toThrow();
 		expect(storage.loadBlockHintSeen()).toBe(true);
 	});
+	it('distinguishes a completed zero-score family from a new family, including blocked storage', () => {
+		expect(storage.loadFamilyPlayed('memory')).toBe(false);
+		setItem.mockImplementation(() => {
+			throw new Error('blocked');
+		});
+		storage.markFamilyPlayed('memory');
+		expect(storage.loadBestScore('memory')).toBe(0);
+		expect(storage.loadFamilyPlayed('memory')).toBe(true);
+		expect(storage.loadFamilyPlayed('block')).toBe(false);
+		disk.set('morphi.block.best', '100');
+		expect(storage.loadFamilyPlayed('block')).toBe(true);
+	});
 
 	it('keeps a new best when writes fail but the old best is still readable', () => {
 		disk.set('morphi.block.best', '100');

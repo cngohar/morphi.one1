@@ -14,7 +14,7 @@ export function measurementAllowed() {
 }
 export function measure(
 	event: 'play_clicked' | 'round_started' | 'round_completed' | 'next_clicked' | 'error',
-	family: 'memory' | 'block' | null = null,
+	family: 'memory' | 'block' | 'connect' | null = null,
 	code: 'start' | 'save' | 'view' | null = null
 ) {
 	if (!measurementAllowed()) return;

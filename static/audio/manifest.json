@@ -2,7 +2,7 @@
   "provider": "ElevenLabs",
   "model": "eleven_text_to_sound_v2",
   "sdk": "2.74.0",
-  "generated": "2026-10-25",
+  "generated": "2026-10-28",
   "sounds": {
     "flip": {
       "file": "flip.mp3",
@@ -107,6 +107,69 @@
       "sha256": "26444d66593fb5aa28723e93a4713a2e92476c33278a73a8bd01bc6909cb3dc9",
       "sourceSha256": "59f527883b50f8802e711c34a1ba243893f6a979aa825d1f5797f66ca6652470",
       "processing": "Leading silence trimmed, mono MP3 44.1 kHz / 64 kbps"
+    },
+    "connect-start": {
+      "file": "connect-start.mp3",
+      "durationSeconds": 0.5,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. One soft ceramic dot touches a felt grid, a clear restrained tap. Path begins, under 150 milliseconds.",
+      "sha256": "3055bca79b5ee222dc7c623194d1e010a8d8a2358bd5b099e68ecf159f16fed4",
+      "generatedAt": "2026-10-28"
+    },
+    "connect-appear": {
+      "file": "connect-appear.mp3",
+      "durationSeconds": 0.6,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. An original Connect puzzle board arriving: a brief inward ripple of small ceramic grid cells, then two dots landing together with a warm paired tick. No paper cards. Under 500 milliseconds.",
+      "sha256": "5102d3ddad20487146ad5a66616977acd408b39f4f3df9735d61363953b43d5d",
+      "generatedAt": "2026-10-28"
+    },
+    "connect-extend": {
+      "file": "connect-extend.mp3",
+      "durationSeconds": 0.5,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A single quiet flowing wooden bead slide across a felt grid, crisp and short, under 150 milliseconds.",
+      "sha256": "11ed40cdaa4c1234509308b01f8adb4892259f7098527bdddc5f1e0df0980f36",
+      "generatedAt": "2026-10-28"
+    },
+    "connect-backtrack": {
+      "file": "connect-backtrack.mp3",
+      "durationSeconds": 0.5,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A single tiny ceramic path bead slides backward along felt and settles softly, descending and shorter than a forward draw. Under 200 milliseconds.",
+      "sha256": "73e408463b085865961837eb0e707483d237cd14a7de01a08d59970e4f26cc23",
+      "generatedAt": "2026-10-28"
+    },
+    "connect-pair": {
+      "file": "connect-pair.mp3",
+      "durationSeconds": 0.5,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. Two small ceramic dots join with a warm resonant double tick, a gentle completed connection, under 300 milliseconds.",
+      "sha256": "5ea755c3c1a060dfb0b1992eb482c1aa99b161d70664a6a83158f091a0566d67",
+      "generatedAt": "2026-10-28"
+    },
+    "connect-cut": {
+      "file": "connect-cut.mp3",
+      "durationSeconds": 0.5,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A small line of felt beads retracts with a soft quick descending zip, friendly path cut, under 300 milliseconds.",
+      "sha256": "3b2a13dd09667359d257604896704da854cc24ee2ca60254778bfc9835c52d9e",
+      "generatedAt": "2026-10-28"
+    },
+    "connect-redraw": {
+      "file": "connect-redraw.mp3",
+      "durationSeconds": 0.5,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A muted dry wooden eraser flick and tiny low tick, calm redraw cost, under 200 milliseconds.",
+      "sha256": "7d302dd834f0bd001940bcd5e7c5d8b264be73243ef4bfecdae2a168b9f37dca",
+      "generatedAt": "2026-10-28"
+    },
+    "connect-invalid": {
+      "file": "connect-invalid.mp3",
+      "durationSeconds": 0.5,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A Connect path tip touches a closed ceramic edge and gently springs back with a short muted felt bump. No harsh buzzer, under 200 milliseconds.",
+      "sha256": "a7df0de934a2d78ca091094c7e9a461c30742621f2c5342c6532f836059365f1",
+      "generatedAt": "2026-10-28"
+    },
+    "connect-win": {
+      "file": "connect-win.mp3",
+      "durationSeconds": 0.8,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A full grid of tiny ceramic dots joins in one airy left-to-right cascade ending in a warm clear completion chord, under 700 milliseconds.",
+      "sha256": "54569bc8ee96b71e8bdc3460e405428719c1c69edd389492c219cf855d551115",
+      "generatedAt": "2026-10-28"
     }
   }
 }

@@ -1,9 +1,28 @@
 import { test, expect } from '@playwright/test';
+import { fixSelectorSeed } from './entropy.js';
+test('closing either help popup keeps the game visible during its exit', async ({ page }) => {
+	await fixSelectorSeed(page, 0);
+	await page.goto('/', { waitUntil: 'networkidle' });
+	await page.getByRole('button', { name: 'Play', exact: true }).click();
+	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'playing', { timeout: 16000 });
+	for (const name of ['How to play', 'Scoring & tips']) {
+		await page.getByRole('button', { name, exact: true }).click();
+		await expect(page.getByRole('dialog')).toBeVisible();
+		await page.waitForTimeout(550);
+		await page.mouse.click(2, 2);
+		const layer = page.locator('body > .design-public[aria-hidden="true"]');
+		await expect(layer).toBeAttached();
+		await expect(layer).toHaveCSS('background-color', 'rgba(0, 0, 0, 0)');
+		await expect(page.locator('.game')).toBeVisible();
+		await expect(layer).toHaveCount(0);
+	}
+});
 test('Help closes on backdrop, preserves inside clicks, and returns focus to its button', async ({
 	page
 }) => {
 	await page.emulateMedia({ reducedMotion: 'reduce' });
-	await page.goto('/memory', { waitUntil: 'networkidle' });
+	await fixSelectorSeed(page, 0);
+	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	const how = page.getByRole('button', { name: 'How to play', exact: true });
 	await how.click();

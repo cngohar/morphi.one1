@@ -1,3 +1,4 @@
+import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
 import { createRng, shuffle } from '#lib/engine/rng.js';
 import { SYMBOLS, type SymbolId } from '#lib/puzzles/memory/symbols.js';
 
@@ -126,19 +127,35 @@ export function isFaceUp(round: MemoryRound, index: number): boolean {
 	return round.matched.includes(index) || round.revealed.includes(index);
 }
 
-export function scoreFor(pairs: number, mismatches: number, elapsedSeconds: number): number {
+export function scoreFor(
+	pairs: number,
+	mismatches: number,
+	elapsedSeconds: number,
+	scoring: ScoreValues = SCORE_DEFAULTS.memory
+): number {
 	const seconds = Math.max(0, Math.floor(elapsedSeconds));
-	return Math.max(0, pairs * 1000 - mismatches * 150 - seconds * 5);
+	return Math.max(
+		0,
+		pairs * scoring.pair! - mismatches * scoring.mismatch! - seconds * scoring.second!
+	);
 }
 
-export function currentScore(round: MemoryRound, elapsedSeconds: number): number {
-	return scoreFor(round.pairs, round.mismatches, elapsedSeconds);
+export function currentScore(
+	round: MemoryRound,
+	elapsedSeconds: number,
+	scoring: ScoreValues = SCORE_DEFAULTS.memory
+): number {
+	return scoreFor(round.pairs, round.mismatches, elapsedSeconds, scoring);
 }
 
-export function scoreRound(round: MemoryRound, elapsedSeconds: number): number {
+export function scoreRound(
+	round: MemoryRound,
+	elapsedSeconds: number,
+	scoring: ScoreValues = SCORE_DEFAULTS.memory
+): number {
 	if (round.status !== 'won') {
 		return 0;
 	}
 
-	return scoreFor(round.pairs, round.mismatches, elapsedSeconds);
+	return scoreFor(round.pairs, round.mismatches, elapsedSeconds, scoring);
 }

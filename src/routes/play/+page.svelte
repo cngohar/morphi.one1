@@ -5,5 +5,7 @@
 	let { data }: PageProps = $props();
 </script>
 
-<svelte:head><title>{t('v1.play.title')}</title></svelte:head>
+<svelte:head
+	><title>{t('v1.play.title')}</title><meta name="robots" content="noindex" /></svelte:head
+>
 <PlaySession {data} />

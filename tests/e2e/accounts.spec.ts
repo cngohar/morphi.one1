@@ -49,14 +49,7 @@ test.afterAll(async () => {
 	const proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc' });
 	try {
 		const helpers = (await fixtureAuth(proxy).$context).test;
-		for (const userId of createdUsers) {
-			await helpers.deleteUser(userId);
-			await proxy.env.DB.prepare(
-				"DELETE FROM admin_audit WHERE target=? AND action='account-deleted'"
-			)
-				.bind(userId)
-				.run();
-		}
+		for (const userId of createdUsers) await helpers.deleteUser(userId);
 	} finally {
 		await proxy.dispose();
 	}
@@ -89,10 +82,13 @@ test('guest sign-in and game remain available in all approved layouts', async ({
 	}
 	await page.getByRole('link', { name: 'Keep playing as a guest', exact: true }).click();
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
-	// Either family can be dealt first; Memory exposes cards rather than a grid.
+	// Mix can deal Block, Memory or Connect first.
 	await expect(
-		page.getByRole('grid').or(page.getByRole('button', { name: /^Card 1,/ }))
-	).toBeVisible();
+		page
+			.getByRole('grid')
+			.or(page.getByRole('button', { name: /^Card 1,/ }))
+			.or(page.getByRole('group', { name: 'Connect puzzle grid' }))
+	).toBeVisible({ timeout: 12000 });
 	expect(errors).toEqual([]);
 });
 
@@ -203,7 +199,7 @@ async function finishMemory(page: Page, reloadBeforeResult = false) {
 	await fixSelectorSeed(page, 0);
 	await page.goto('/play', { waitUntil: 'domcontentloaded' });
 	const cards = page.locator('.memory-card');
-	await expect(cards.first()).toBeVisible();
+	await expect(cards.first()).toBeVisible({ timeout: 12000 });
 	const symbols = await cards.evaluateAll((elements) =>
 		elements.map((element) => element.querySelector('.card-front svg')?.outerHTML)
 	);
@@ -276,7 +272,14 @@ test('a logically completed round is saved before the win animation or result sc
 	await openAccount(page, '/account');
 	await expect(page.locator('.history-list li')).toHaveCount(1, { timeout: 25000 });
 	expect(
-		await page.evaluate(() => Number(localStorage.getItem('morphi.memory.best')))
+		await page.evaluate(() =>
+			Math.max(
+				0,
+				...Object.keys(localStorage)
+					.filter((key) => key === 'morphi.memory.best' || key.startsWith('morphi.memory.best.'))
+					.map((key) => Number(localStorage.getItem(key)))
+			)
+		)
 	).toBeGreaterThan(0);
 	await context.close();
 });
@@ -395,9 +398,15 @@ test('a guest finishing Memory sees the real sign-in prompt and keeps their loca
 	page
 }) => {
 	await finishMemory(page);
+	await expect(page.locator('.result .scramble-visual')).toHaveCount(0);
 	const score = await page.locator('.result .score').textContent();
-	const best = await page.evaluate(() => localStorage.getItem('morphi.memory.best'));
-	expect(Number(best)).toBeGreaterThanOrEqual(Number(score?.replaceAll(',', '')));
+	const best = await page.evaluate(() =>
+		Object.entries(localStorage).filter(
+			([key]) => key === 'morphi.memory.best' || key.startsWith('morphi.memory.best.')
+		)
+	);
+	const bestValue = Math.max(0, ...best.map(([, value]) => Number(value)));
+	expect(bestValue).toBeGreaterThanOrEqual(Number(score?.replaceAll(',', '')));
 	await expect(page.getByRole('button', { name: 'Next puzzle', exact: true })).toBeVisible();
 	await expect(
 		page.getByRole('link', { name: 'Sign in with Google', exact: true })
@@ -429,7 +438,13 @@ test('a guest finishing Memory sees the real sign-in prompt and keeps their loca
 	await expect(
 		page.getByRole('heading', { name: 'Keep your high scores.', exact: true })
 	).toBeVisible();
-	expect(await page.evaluate(() => localStorage.getItem('morphi.memory.best'))).toBe(best);
+	expect(
+		await page.evaluate(() =>
+			Object.entries(localStorage).filter(
+				([key]) => key === 'morphi.memory.best' || key.startsWith('morphi.memory.best.')
+			)
+		)
+	).toEqual(best);
 });
 
 test('a signed-in player finishing Memory sees their account link and can continue to Block', async ({

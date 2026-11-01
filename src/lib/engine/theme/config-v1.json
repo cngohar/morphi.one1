@@ -1,0 +1,98 @@
+{
+	"version": "theme-2026-10-26-1",
+	"recipes": [
+		{
+			"id": "analogous",
+			"offsets": [0, 60, -55, 30],
+			"jitter": 8,
+			"chroma": [0.1, 0.19],
+			"targets": [3.3, 5.5, 9]
+		},
+		{
+			"id": "complementary",
+			"offsets": [0, 180, 30, 210],
+			"jitter": 8,
+			"chroma": [0.1, 0.19],
+			"targets": [3.3, 5.5, 9]
+		},
+		{
+			"id": "split",
+			"offsets": [0, 150, 210, 30],
+			"jitter": 8,
+			"chroma": [0.1, 0.19],
+			"targets": [3.3, 5.5, 9]
+		},
+		{
+			"id": "triadic",
+			"offsets": [0, 120, 240, 60],
+			"jitter": 8,
+			"chroma": [0.1, 0.19],
+			"targets": [3.3, 5.5, 9]
+		},
+		{
+			"id": "tetradic",
+			"offsets": [0, 90, 180, 270],
+			"jitter": 8,
+			"chroma": [0.1, 0.19],
+			"targets": [3.3, 5.5, 9]
+		},
+		{
+			"id": "monochrome-accent",
+			"offsets": [0, 180, 25, 205],
+			"jitter": 8,
+			"chroma": [0.1, 0.19],
+			"targets": [3.3, 5.5, 9]
+		},
+		{
+			"id": "free",
+			"offsets": [],
+			"jitter": 0,
+			"chroma": [0.08, 0.19],
+			"targets": [3.3, 5.5, 9]
+		}
+	],
+	"styles": [
+		{
+			"id": "flat",
+			"radius": 12,
+			"border": 2,
+			"gap": 8,
+			"aspect": 1,
+			"fill": "solid"
+		},
+		{
+			"id": "outlined",
+			"radius": 12,
+			"border": 3,
+			"gap": 10,
+			"aspect": 1.06,
+			"fill": "outline"
+		},
+		{
+			"id": "ink",
+			"radius": 6,
+			"border": 3,
+			"gap": 7,
+			"aspect": 1.12,
+			"fill": "solid"
+		},
+		{
+			"id": "blocky",
+			"radius": 2,
+			"border": 2,
+			"gap": 6,
+			"aspect": 1.02,
+			"fill": "solid"
+		},
+		{
+			"id": "soft",
+			"radius": 24,
+			"border": 2,
+			"gap": 9,
+			"aspect": 1.08,
+			"fill": "solid"
+		}
+	],
+	"containers": ["rounded", "squircle", "circle", "hexagon"],
+	"backdrops": ["corners", "columns", "diagonal", "edges", "none"]
+}

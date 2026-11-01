@@ -190,7 +190,8 @@ export async function requireOperator(
 			now - 10 * 60000
 		)
 		.first<{ role: OperatorRole; created_at: number }>();
-	if (!row || !can(row.role, action)) throw new RunError('permission', 403);
+	if (!row) throw new RunError('signed_out', 401);
+	if (!can(row.role, action)) throw new RunError('permission', 403);
 	if (sensitive && (now - identity.authCreatedAt > 15 * 60000 || now - row.created_at > 15 * 60000))
 		throw new RunError('operator_reauth', 403);
 	await db

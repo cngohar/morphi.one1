@@ -10,3 +10,7 @@ bun.lockb
 
 /worker-configuration.d.ts
 /migrations/meta/
+
+# Owner-supplied design references; preserve the package byte for byte.
+/docs/morphi-v1.1-handoff-2026-10-26/
+/docs/evidence/v1.1-themes/contact-sheet.html
