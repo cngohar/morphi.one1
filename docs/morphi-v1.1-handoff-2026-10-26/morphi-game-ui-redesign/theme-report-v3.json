@@ -1,0 +1,50 @@
+{
+ "seed": 20261026,
+ "recipe": "complementary",
+ "base_hue": 186.7,
+ "attempt_used": 3,
+ "fallback": false,
+ "min_blind_diff": 25.9,
+ "symbol_colors": [
+  {
+   "hex": "#003136",
+   "contrast_on_white": 14.0,
+   "hue": 194.6,
+   "target": 14.0
+  },
+  {
+   "hex": "#8F2C46",
+   "contrast_on_white": 8.0,
+   "hue": 9.0,
+   "target": 8.0
+  },
+  {
+   "hex": "#007A94",
+   "contrast_on_white": 5.0,
+   "hue": 216.0,
+   "target": 5.0
+  },
+  {
+   "hex": "#DA6743",
+   "contrast_on_white": 3.5,
+   "hue": 37.6,
+   "target": 3.5
+  }
+ ],
+ "card_back": "#CA9EF6",
+ "card_back_vs_panel": 1.75,
+ "panel_bg": "#C9EFEA",
+ "page_bg": "#E7F8F5",
+ "backdrop": "dots",
+ "backdrop_vs_page": 1.27,
+ "symbol_families": [
+  "cross",
+  "ring",
+  "diamond",
+  "polygon5",
+  "hexagon",
+  "triangle"
+ ],
+ "container": "squircle",
+ "style": "blocky"
+}

@@ -1,0 +1,253 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1, user-scalable=no">
+<title>Connect — Morphi.One prototype</title>
+<style>
+  :root{--ink:#1B2433;--slate:#5A6B82;--label:#68798E;--bg:#EEF2F7;--board:#DFE9F5;--line:#C9D6E4;--coral:#E5532D}
+  *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
+  body{margin:0;background:var(--bg);color:var(--ink);font-family:"Noto Sans",system-ui,sans-serif;display:flex;flex-direction:column;align-items:center;padding:18px 12px 32px}
+  .logo{font-weight:900;font-size:22px;align-self:flex-start;max-width:520px;width:100%;margin:0 auto}
+  .logo b{color:var(--coral)}
+  h1{font-size:26px;margin:14px 0 2px;font-weight:900}
+  .sub{color:var(--slate);font-size:14px;margin:0 0 14px;text-align:center}
+  .panel{background:var(--board);border-radius:24px;padding:18px;width:100%;max-width:520px}
+  .hud{display:flex;justify-content:space-around;text-align:center;margin-bottom:12px}
+  .hud .lab{font-size:11px;letter-spacing:2.5px;color:var(--label);font-weight:700}
+  .hud .val{font-size:26px;font-weight:900}
+  #grid{display:grid;gap:3px;background:#C7D6E8;padding:3px;border-radius:14px;touch-action:none;user-select:none;margin:0 auto}
+  .cell{position:relative;background:#F4F8FC;border-radius:7px;aspect-ratio:1}
+  .cell .seg{position:absolute;background:currentColor;opacity:.4;border-radius:99px}
+  .cell .seg.h{left:-4px;right:-4px;top:50%;height:34%;transform:translateY(-50%)}
+  .cell .seg.v{top:-4px;bottom:-4px;left:50%;width:34%;transform:translateX(-50%)}
+  .cell .dot{position:absolute;inset:9%;border-radius:50%;display:flex;align-items:center;justify-content:center;color:#fff;font-weight:900;z-index:2;box-shadow:inset 0 0 0 2px rgba(255,255,255,.35)}
+  .cell .dot span{transform:translateY(-1px)}
+  .controls{display:flex;gap:8px;flex-wrap:wrap;justify-content:center;margin-top:14px;max-width:520px}
+  button{font:inherit;font-weight:700;border:2px solid var(--line);background:#fff;color:var(--ink);border-radius:12px;padding:9px 14px;cursor:pointer}
+  button.primary{background:var(--coral);border-color:var(--coral);color:#fff}
+  button.on{background:var(--ink);border-color:var(--ink);color:#fff}
+  .note{color:var(--slate);font-size:12.5px;max-width:520px;text-align:center;margin-top:12px;line-height:1.5}
+  #win{display:none;background:#fff;border:2px solid var(--line);border-radius:18px;padding:18px;max-width:520px;width:100%;text-align:center;margin-top:14px}
+  #win .big{font-size:38px;font-weight:900}
+  #win p{color:var(--slate);margin:6px 0;line-height:1.55;font-size:14px}
+</style>
+</head>
+<body>
+  <div class="logo">Morphi<b>.</b>One — prototype</div>
+  <h1>Connect</h1>
+  <p class="sub">Drag from a dot to its matching dot. Fill every cell — paths must not cross.</p>
+
+  <div class="panel">
+    <div class="hud">
+      <div><div class="lab">SCORE</div><div class="val" id="hScore">0</div></div>
+      <div><div class="lab">PAIRS</div><div class="val" id="hPairs">0 / 5</div></div>
+      <div><div class="lab">FILLED</div><div class="val" id="hFilled">0%</div></div>
+      <div><div class="lab">TIME</div><div class="val" id="hTime">0:00</div></div>
+    </div>
+    <div id="grid"></div>
+  </div>
+
+  <div id="win">
+    <div class="big" id="wScore">0</div>
+    <p id="wDetail"></p>
+    <p id="wHigh"></p>
+    <button class="primary" id="btnNext">New deal</button>
+  </div>
+
+  <div class="controls">
+    <button class="primary" id="btnNew">New deal</button>
+    <button id="btnSame">Replay this deal</button>
+    <span style="align-self:center;color:var(--label);font-size:12px;font-weight:700;letter-spacing:1.5px">TEST BAND</span>
+    <button data-band="1">5×5</button><button data-band="2">6×6</button><button data-band="3">7×7</button>
+  </div>
+  <p class="note">Prototype controls only — in Morphi.One the selector draws the band, the seed and the theme; the player chooses none of them.<br>Seed: <span id="seedOut"></span> · Every deal is solvable by construction: the seed first builds a full solution path, then cuts it into pairs.</p>
+
+<script>
+"use strict";
+// ---- SplitMix64 seeded RNG (same family of generator as the other puzzles) ----
+function splitmix64(seed){
+  let s = BigInt(seed) & 0xFFFFFFFFFFFFFFFFn;
+  return function(){
+    s = (s + 0x9E3779B97F4A7C15n) & 0xFFFFFFFFFFFFFFFFn;
+    let z = s;
+    z = ((z ^ (z >> 30n)) * 0xBF58476D1CE4E5B9n) & 0xFFFFFFFFFFFFFFFFn;
+    z = ((z ^ (z >> 27n)) * 0x94D049BB133111EBn) & 0xFFFFFFFFFFFFFFFFn;
+    z = z ^ (z >> 31n);
+    return Number(z >> 11n) / 9007199254740992; // [0,1)
+  };
+}
+const ri = (rnd,n)=>Math.floor(rnd()*n);
+function shuffle(a,rnd){for(let i=a.length-1;i>0;i--){const j=ri(rnd,i+1);[a[i],a[j]]=[a[j],a[i]];}return a;}
+
+// ---- Board generation: Hamiltonian path over all cells, cut into pairs ----
+function serpentine(N){
+  const p=[];for(let r=0;r<N;r++){if(r%2===0)for(let c=0;c<N;c++)p.push(r*N+c);else for(let c=N-1;c>=0;c--)p.push(r*N+c);}return p;
+}
+function hamiltonian(N,rnd){
+  // Serpentine Hamiltonian path, randomised by seeded "backbite" moves:
+  // an endpoint jumps to a grid-neighbour inside the path and the tail
+  // reverses. Every move keeps a valid full-coverage path, and it is fast
+  // and bounded — no search, no worst case.
+  let P=serpentine(N); const total=N*N;
+  const pos=new Int16Array(total);
+  const sync=()=>{for(let i=0;i<total;i++)pos[P[i]]=i;};
+  sync();
+  const nbrs=i=>{const r=Math.floor(i/N),c=i%N,out=[];
+    if(r>0)out.push(i-N); if(r<N-1)out.push(i+N); if(c>0)out.push(i-1); if(c<N-1)out.push(i+1); return out;};
+  for(let m=0;m<total*6;m++){
+    const end=P[total-1];
+    const cand=nbrs(end).map(x=>pos[x]).filter(k=>k<total-2);
+    if(!cand.length)continue;
+    const k=cand[ri(rnd,cand.length)];
+    P=P.slice(0,k+1).concat(P.slice(k+1).reverse());
+    sync();
+  }
+  if(rnd()<0.5)P.reverse();
+  return P;
+}
+const BANDS={1:{N:5,K:5,par:90},2:{N:6,K:6,par:125},3:{N:7,K:8,par:165}};
+const COLORS=["#E5532D","#2F6FED","#009A86","#F5A524","#7D61AE","#D94F8A","#5B8C2A","#4A7FB5"];
+const GLYPHS=["◆","★","▲","■","✚","⬢","♥","✿"];
+
+function generate(seed,band){
+  const {N,K}=BANDS[band], rnd=splitmix64(seed);
+  const sol=hamiltonian(N,rnd);
+  // cut the solution into K segments, each length >= 3
+  const total=N*N, lens=new Array(K).fill(3); let rest=total-3*K;
+  while(rest>0){const i=ri(rnd,K); if(lens[i]<12){lens[i]++;rest--;}}
+  shuffle(lens,rnd);
+  const pairs=[]; let at=0;
+  const order=shuffle([...Array(K).keys()],rnd);
+  for(let s=0;s<K;s++){const seg=sol.slice(at,at+lens[s]); at+=lens[s];
+    pairs.push({cells:seg,a:seg[0],b:seg[seg.length-1],color:COLORS[order[s]],glyph:GLYPHS[order[s]]});}
+  return {N,K,par:BANDS[band].par,pairs,solution:sol};
+}
+
+// ---- Game state ----
+let seed, band=1, G, paths, owner, endpointOf, score, penalties, strokes, startedAt, timerInt, won;
+const $=id=>document.getElementById(id);
+const gridEl=$("grid");
+
+function newGame(newSeed,newBand){
+  if(newBand)band=newBand;
+  seed = newSeed!==undefined ? newSeed : (BigInt(Math.floor(Math.random()*1e15)).toString());
+  G=generate(seed,band);
+  paths=G.pairs.map(()=>[]);
+  owner=new Int16Array(G.N*G.N).fill(-1);
+  endpointOf=new Map();
+  G.pairs.forEach((p,i)=>{endpointOf.set(p.a,i);endpointOf.set(p.b,i);});
+  score=0;penalties=0;strokes=0;won=false;startedAt=null;
+  clearInterval(timerInt); $("hTime").textContent="0:00";
+  $("win").style.display="none"; $("seedOut").textContent=seed+" · band "+band;
+  document.querySelectorAll("[data-band]").forEach(b=>b.classList.toggle("on",+b.dataset.band===band));
+  buildGrid(); render();
+}
+function buildGrid(){
+  gridEl.style.gridTemplateColumns=`repeat(${G.N},1fr)`;
+  gridEl.style.width=Math.min(480,G.N*76)+"px";
+  gridEl.innerHTML="";
+  for(let i=0;i<G.N*G.N;i++){const d=document.createElement("div");d.className="cell";d.dataset.i=i;gridEl.appendChild(d);}
+}
+function complete(i){const p=paths[i];return p.length>1 && endpointOf.get(p[p.length-1])===i && endpointOf.get(p[0])===i;}
+function filledCount(){return paths.reduce((s,p)=>s+p.length,0);}
+function liveScore(){return Math.max(0, G.pairs.filter((_,i)=>complete(i)).length*200 - penalties);}
+function render(){
+  const N=G.N;
+  const cells=gridEl.children;
+  for(let i=0;i<N*N;i++){
+    const el=cells[i]; el.innerHTML=""; el.style.color="";
+    const oi=owner[i];
+    if(oi>=0){
+      el.style.color=G.pairs[oi].color;
+      const pos=paths[oi].indexOf(i), p=paths[oi];
+      const add=(nb,cls)=>{if(p.includes(nb)){const s=document.createElement("div");s.className="seg "+cls;el.appendChild(s);}};
+      const r=Math.floor(i/N),c=i%N;
+      if(c>0)add(i-1,"h"); if(c<N-1)add(i+1,"h"); if(r>0)add(i-N,"v"); if(r<N-1)add(i+N,"v");
+      if(pos===0||pos===p.length-1){/* endpoint cap below */}
+    }
+    if(endpointOf.has(i)){
+      const pi=endpointOf.get(i), pr=G.pairs[pi];
+      const d=document.createElement("div");d.className="dot";d.style.background=pr.color;
+      const s=document.createElement("span");s.textContent=pr.glyph;s.style.fontSize="17px";d.appendChild(s);el.appendChild(d);
+    }
+  }
+  $("hScore").textContent=(won?score:liveScore()).toLocaleString();
+  $("hPairs").textContent=G.pairs.filter((_,i)=>complete(i)).length+" / "+G.K;
+  $("hFilled").textContent=Math.round(filledCount()/(N*N)*100)+"%";
+}
+function startTimer(){if(startedAt)return;startedAt=Date.now();
+  timerInt=setInterval(()=>{const s=Math.floor((Date.now()-startedAt)/1000);
+    $("hTime").textContent=Math.floor(s/60)+":"+String(s%60).padStart(2,"0");},250);}
+function checkWin(){
+  if(won)return;
+  if(filledCount()!==G.N*G.N)return;
+  if(!G.pairs.every((_,i)=>complete(i)))return;
+  won=true;clearInterval(timerInt);
+  const secs=startedAt?Math.floor((Date.now()-startedAt)/1000):0;
+  const timeBonus=Math.max(0,(G.par-secs))*10;
+  score=Math.max(0, G.K*200 + 1000 + timeBonus - penalties);
+  const key="connect_high"; const prev=+localStorage.getItem(key)||0;
+  if(score>prev)localStorage.setItem(key,score);
+  $("wScore").textContent=score.toLocaleString();
+  $("wDetail").innerHTML=`Pairs ${G.K} × 200 + grid complete 1,000 + time bonus ${timeBonus.toLocaleString()} − redraw penalties ${penalties}<br>Finished in ${Math.floor(secs/60)}:${String(secs%60).padStart(2,"0")} (par ${Math.floor(G.par/60)}:${String(G.par%60).padStart(2,"0")}) · ${strokes} strokes`;
+  $("wHigh").textContent="Your high score "+Math.max(prev,score).toLocaleString()+(score>prev?" — new!":"");
+  $("win").style.display="block"; render();
+}
+
+// ---- Drawing ----
+let active=-1, strokeCounted=false;
+function cellFromEvent(e){const r=gridEl.getBoundingClientRect();
+  const c=Math.floor((e.clientX-r.left)/r.width*G.N), rr=Math.floor((e.clientY-r.top)/r.height*G.N);
+  if(c<0||rr<0||c>=G.N||rr>=G.N)return -1; return rr*G.N+c;}
+function setPath(i,cells){ // rewrite owner map for pair i
+  for(const c of paths[i])if(owner[c]===i)owner[c]=-1;
+  paths[i]=cells; for(const c of cells)owner[c]=i;
+}
+function truncate(i,toPos){setPath(i,paths[i].slice(0,toPos+1));}
+gridEl.addEventListener("pointerdown",e=>{
+  if(won)return; const cell=cellFromEvent(e); if(cell<0)return;
+  let pi=endpointOf.has(cell)?endpointOf.get(cell):owner[cell];
+  if(pi===undefined||pi<0)return;
+  active=pi; strokeCounted=false; strokes++; startTimer();
+  const wasComplete=complete(pi);
+  if(endpointOf.has(cell) && endpointOf.get(cell)===pi){
+    const other = G.pairs[pi].a===cell?G.pairs[pi].b:G.pairs[pi].a;
+    if(paths[pi][0]===cell){truncate(pi,0);}
+    else if(paths[pi][paths[pi].length-1]===cell){setPath(pi,paths[pi].slice().reverse());}
+    else setPath(pi,[cell]);
+  } else { truncate(pi,paths[pi].indexOf(cell)); }
+  if(wasComplete){penalties+=50;}
+  gridEl.setPointerCapture(e.pointerId); render(); e.preventDefault();
+});
+gridEl.addEventListener("pointermove",e=>{
+  if(active<0||won)return; const cell=cellFromEvent(e); if(cell<0)return;
+  const p=paths[active]; if(!p.length)return;
+  const head=p[p.length-1]; if(cell===head)return;
+  const N=G.N, hr=Math.floor(head/N),hc=head%N, cr=Math.floor(cell/N),cc=cell%N;
+  if(Math.abs(hr-cr)+Math.abs(hc-cc)!==1)return;              // orthogonal only
+  if(complete(active))return;
+  if(p.includes(cell)){truncate(active,p.indexOf(cell));render();return;} // backtrack
+  const ep=endpointOf.get(cell);
+  if(ep!==undefined && ep!==active)return;                   // other pair's dot
+  if(ep===active){p.push(cell);owner[cell]=active;render();checkWin();return;}
+  const oi=owner[cell];
+  if(oi>=0 && oi!==active){const op=paths[oi]; truncate(oi,op.indexOf(cell)-1);} // cut other path
+  p.push(cell);owner[cell]=active; render(); checkWin();
+});
+const endStroke=()=>{active=-1;};
+gridEl.addEventListener("pointerup",endStroke);
+gridEl.addEventListener("pointercancel",endStroke);
+
+$("btnNew").onclick=()=>newGame();
+$("btnNext").onclick=()=>newGame();
+$("btnSame").onclick=()=>newGame(seed);
+document.querySelectorAll("[data-band]").forEach(b=>b.onclick=()=>newGame(undefined,+b.dataset.band));
+const q=new URLSearchParams(location.search);
+newGame(q.get("seed")||undefined, +(q.get("band")||1) in BANDS ? +(q.get("band")||1) : 1);
+
+// Exposed for automated verification
+window.ConnectGen={generate,splitmix64,BANDS};
+</script>
+</body>
+</html>

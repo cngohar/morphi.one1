@@ -1,0 +1,122 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>FAQ — Morphi.One</title>
+<meta name="description" content="Questions about Morphi.One: no account needed, no choosing a puzzle, a fresh puzzle every round, never the same kind twice in a row.">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#EFE9DC; font-family:"Avenir Next","Segoe UI",system-ui,sans-serif; color:#1B2433;
+         display:flex; flex-direction:column; align-items:center; padding:26px 0 40px; }
+  .page { position:relative; width:1200px; max-width:calc(100vw - 20px); background:#FBF7EF; border-radius:26px; overflow:hidden;
+          box-shadow:0 24px 70px rgba(27,36,51,.25); padding:0 56px 34px; }
+  .hdr { position:relative; height:74px; display:flex; align-items:center; justify-content:space-between; }
+  .logo { font-size:26px; font-weight:900; letter-spacing:-.02em; }
+  .logo i { font-style:normal; color:#FF6B57; }
+  .nav { display:flex; gap:26px; font-size:14.5px; font-weight:700; }
+  .nav a { color:#68798E; text-decoration:none; }
+  .nav a.on { color:#1B2433; border-bottom:3px solid #FF6B57; padding-bottom:3px; }
+  .eyebrow { font-size:11.5px; font-weight:900; letter-spacing:.26em; color:#C4502B; margin-top:16px; }
+  h1 { font-size:42px; font-weight:900; letter-spacing:-.02em; margin:8px 0 10px; }
+  .intro { font-size:17px; line-height:1.55; color:#3D4A5E; max-width:760px; }
+  .intro b { color:#1B2433; }
+  /* FAQ blocks — native <details>, no script, so each pair is one editable block for the later admin CMS */
+  .faqs { margin-top:28px; display:flex; flex-direction:column; gap:12px; max-width:820px; }
+  details { background:#fff; border:2px solid #EFE6D2; border-radius:16px; padding:18px 22px; }
+  summary { font-size:17px; font-weight:900; cursor:pointer; list-style:none; }
+  summary::-webkit-details-marker { display:none; }
+  summary::after { content:"+"; float:right; color:#FF6B57; font-size:20px; line-height:1; }
+  details[open] summary::after { content:"−"; }
+  details p { font-size:15.5px; line-height:1.55; color:#3D4A5E; margin-top:8px; }
+  details p b { color:#1B2433; }
+  .band { margin-top:30px; background:#1B2433; border-radius:20px; padding:26px 34px; display:flex;
+          align-items:center; justify-content:space-between; }
+  .band h2 { color:#fff; font-size:24px; font-weight:900; }
+  .band p { color:#A9B6C6; font-size:14.5px; margin-top:4px; }
+  .band a { background:#FF6B57; color:#fff; text-decoration:none; font-weight:900; font-size:17px;
+            border-radius:999px; padding:14px 34px; box-shadow:0 10px 26px rgba(255,107,87,.35); white-space:nowrap; }
+  .ftr { margin-top:24px; display:flex; gap:22px; justify-content:center; font-size:13.5px; font-weight:700; flex-wrap:wrap; }
+  .ftr a { color:#68798E; text-decoration:none; }
+  .note { max-width:1200px; margin-top:18px; font-size:14px; line-height:1.6; color:#5A6B82; padding:0 10px; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hdr">
+    <div class="logo">Morphi<i>.</i>One</div>
+    <div class="nav"><a href="how-it-works.html">How it works</a><a href="about.html">About</a><a href="faq.html" class="on">FAQ</a></div>
+  </div>
+
+  <!-- block: title -->
+  <div class="eyebrow">QUESTIONS, ANSWERED</div>
+  <h1>Frequently asked questions</h1>
+  <p class="intro">Short answers, no spoilers. If your question is “which puzzle will I get?” — that is the one thing
+  Morphi.One will not tell you in advance.</p>
+
+  <div class="faqs">
+    <!-- block: FAQ pair -->
+    <details open>
+      <summary>Do I need an account to play?</summary>
+      <p><b>No.</b> Press Play and you play as a guest — no sign-up, no download. Your high scores are kept on your
+      own device.</p>
+    </details>
+    <!-- block: FAQ pair -->
+    <details>
+      <summary>Can I pick which puzzle I play?</summary>
+      <p><b>No — and that is the point.</b> There is no menu, catalogue or list to pick from. Press Play and a puzzle
+      is dealt to you. Choosing would spoil the surprise the whole site is built around.</p>
+    </details>
+    <!-- block: FAQ pair -->
+    <details>
+      <summary>Will I get the same puzzle twice in a row?</summary>
+      <p><b>Never.</b> Every deal is fresh, and the deal never repeats the same kind twice in a row. Press Next after
+      a round and a different puzzle arrives.</p>
+    </details>
+    <!-- block: FAQ pair -->
+    <details>
+      <summary>How do high scores work?</summary>
+      <p>Each kind of puzzle keeps <b>its own high score</b> — shown as “Your high score” — saved on your device only.
+      Scores are not blended across kinds into one total, and a brand-new kind starts at 0 with a NEW tag until you
+      have played it.</p>
+    </details>
+    <!-- block: FAQ pair -->
+    <details>
+      <summary>Is Morphi.One free? Do I need to download anything?</summary>
+      <p><b>Yes, it is free, and no download is needed.</b> It runs in your browser, on your phone or computer, at morphi.one.</p>
+    </details>
+    <!-- block: FAQ pair -->
+    <details>
+      <summary>What if I do not like the puzzle I am dealt?</summary>
+      <p>Finish the round and press <b>Next</b> — a different puzzle is dealt. There is no way to browse ahead or to
+      request a particular one, because that would be a menu by another name.</p>
+    </details>
+    <!-- block: FAQ pair -->
+    <details>
+      <summary>Does it work on my phone?</summary>
+      <p><b>Yes — Morphi.One is phone-first.</b> Puzzles, boards and buttons are designed for a phone screen first,
+      and they scale up to larger screens from there.</p>
+    </details>
+    <!-- block: FAQ pair -->
+    <details>
+      <summary>Why is there no list of all the puzzles?</summary>
+      <p>Because a list would spoil the deal. The moment every puzzle is listed and reachable, pressing Play stops
+      being a surprise. So the site explains <i>how</i> the deal works — on the How it works page — without listing
+      what can be dealt.</p>
+    </details>
+  </div>
+
+  <!-- block: play band — every play link goes to Home/Play only, never to a game -->
+  <div class="band">
+    <div><h2>Still curious?</h2><p>The fastest answer is one press away — and it stays a surprise until it lands.</p></div>
+    <a href="https://morphi.one/">▶&nbsp; Play</a>
+  </div>
+
+  <div class="ftr"><a href="#">Privacy</a><a href="#">Terms</a><a href="how-it-works.html">How it works</a><a href="about.html">About</a><a href="faq.html">FAQ</a></div>
+</div>
+
+<p class="note"><b>Draft static page — FAQ.</b> Built from the shared block kit (header · title · FAQ pairs ·
+Play band · footer), so each question/answer pair is one block the later admin panel can edit with no redesign.
+No CMS is built in v1.1. It names no puzzle kinds and links only to Home/Play.</p>
+</body>
+</html>

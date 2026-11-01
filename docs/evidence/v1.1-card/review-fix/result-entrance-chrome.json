@@ -1,0 +1,16 @@
+{
+	"durationMs": 420,
+	"start": {
+		"opacity": 0,
+		"y": 20
+	},
+	"middle": {
+		"opacity": 0.6674,
+		"y": 6.6521
+	},
+	"settled": {
+		"opacity": 1,
+		"y": 0
+	},
+	"reducedMotionSettles": true
+}

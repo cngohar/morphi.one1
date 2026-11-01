@@ -36,6 +36,17 @@ Rules (v1):
   at deal time. After that, no placement guarantee applies. If generation cannot
   satisfy the guarantee, the last piece is forced to a monomino.
 
+## Puzzle-specific backdrop
+
+Backdrop rule (owner, 2026-10-27): the in-play background scatters only this
+game's block pieces from its own piece definitions, in seeded positions and
+rotations, at 20% opacity. No Memory cards, other games' objects or generic
+decorations. Hide objects on compact/mobile layouts; wider layouts show a
+seeded random 1–5 pieces per side, keeping the approved background blend.
+Keep the header and bottom panel clear. Follow the standing
+contract in `_TEMPLATE.md`; the presentation card/played stack are session
+chrome, not backdrop objects.
+
 ## Controls
 
 - Touch: drag a tray piece onto the board. The piece follows the finger with a

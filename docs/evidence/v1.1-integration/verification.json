@@ -1,0 +1,85 @@
+{
+	"date": "2026-10-28",
+	"scope": "Owner-approved Card animations integrated into the actual local app",
+	"result": "pass across the full verification stages and focused browser rechecks",
+	"primaryRun": {
+		"command": "bun run verify",
+		"log": "build/v1.1-integration/verify-final.log",
+		"exitCode": 1,
+		"browserPassed": 119,
+		"browserFailed": 12,
+		"note": "Initial browser failures are retained. Every affected case subsequently passed after probe corrections or isolated rechecks; the initial monolithic command is not represented as a clean pass."
+	},
+	"checks": {
+		"formatAndLint": "pass",
+		"typeCheck": "0 errors, 0 warnings",
+		"importBoundaries": "pass",
+		"palettes": 20000,
+		"unitTests": 116,
+		"localIntegrationTests": 23,
+		"browserCasesVerified": 131,
+		"builtWorkerChecks": 15,
+		"vectors": ["Node", "Bun", "Chromium", "Firefox", "WebKit", "workerd"],
+		"vectorFingerprint": "a8be9d5fdacc1818c3d078be2fa014cb279c349d6ba7313029f9a363b40b0ac4"
+	},
+	"browserRechecks": [
+		{
+			"cause": "Account probe read the score while the scramble overlay was active",
+			"fix": "Wait for the overlay to finish before comparing the earned score and saved best",
+			"result": "pass",
+			"log": "build/v1.1-integration/account-score-recheck.log"
+		},
+		{
+			"cause": "Four layout and three input probes retained the old five-second startup budget",
+			"fix": "Wait for logical playing phase with the new Card opening included; replace fixed Memory sleep with readiness",
+			"result": "pass: all four layouts and affected input cases, including final serial desktop/keyboard checks",
+			"logs": [
+				"build/v1.1-integration/layout-recheck.log",
+				"build/v1.1-integration/input-recheck.log",
+				"build/v1.1-integration/serial-recheck.log"
+			]
+		},
+		{
+			"cause": "Selector probes retained the previous startup budget and error-container copy",
+			"fix": "Allow Card/navigation readiness; match the error paragraph while retaining retry/Home controls and family-isolation checks",
+			"result": "pass",
+			"log": "build/v1.1-integration/serial-recheck.log"
+		},
+		{
+			"cause": "Parallel Playwright recheck removed a shared trace artifact during desktop cleanup",
+			"fix": "Use isolated output directories; repeat the desktop lifecycle case",
+			"result": "pass",
+			"log": "build/v1.1-integration/desktop-recheck.log"
+		},
+		{
+			"cause": "WebKit advanced one RAF at the exact fold/result deadline in a controlled-clock proof",
+			"fix": "Allow the first sampled frame within opacity 0–0.15 and vertical offset 17–20px, then require further progress and the same settled/score/visibility/reduced-motion states",
+			"result": "pass",
+			"log": "build/v1.1-integration/webkit-result-recheck.log"
+		}
+	],
+	"additionalChecks": {
+		"installedChrome": {
+			"version": "155.0.8059.79",
+			"viewport": "1920×923",
+			"result": "pass",
+			"log": "build/v1.1-integration/chrome.log"
+		},
+		"threeBrowserResize": {
+			"result": "pass",
+			"log": "build/v1.1-integration/resize-fixed.log"
+		},
+		"finalLint": "build/v1.1-integration/lint-last.log",
+		"finalTypeCheck": "build/v1.1-integration/check-last.log",
+		"latestBuild": "build/v1.1-integration/build-final.log"
+	},
+	"localReview": "http://localhost:5173/play",
+	"ownerStatus": "Demo animations approved; integrated-app physical-device and remaining Work 2 visual review pending",
+	"releaseAssetsExcludeReviewDemos": true,
+	"deployment": "none",
+	"waiversAdded": [],
+	"knownLimits": [
+		"Existing procedural-theme freshness vocabulary limits remain",
+		"Headless viewport and localhost measurements do not establish physical-device smoothness or cold phone/4G release performance"
+	]
+}

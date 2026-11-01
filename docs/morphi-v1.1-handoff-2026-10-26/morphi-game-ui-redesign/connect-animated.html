@@ -1,0 +1,196 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Connect — Anime.js motion design demo (Morphi.One shell)</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#DDD6EA; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; color:#1B2433;
+         display:flex; flex-direction:column; align-items:center; padding:26px 10px 34px; }
+  .screen { position:relative; width:1200px; height:800px; background:#F6F1FE; border-radius:18px;
+            overflow:hidden; box-shadow:0 18px 50px rgba(27,36,51,.25); flex:none; }
+  /* header (global) */
+  .hdr { position:absolute; top:0; left:0; right:0; height:66px; }
+  .logo { position:absolute; left:44px; top:17px; font-size:25px; font-weight:900; letter-spacing:-.02em; }
+  .logo i { color:#E5532D; font-style:normal; }
+  .gname { position:absolute; left:0; right:0; top:15px; text-align:center; font-size:25px; font-weight:900; opacity:0; }
+  .acct { position:absolute; right:118px; top:14px; border:2px solid #7A889E; background:#fff; color:#1B2433;
+          border-radius:999px; padding:8px 20px; font-size:13.5px; font-weight:700; }
+  .snd { position:absolute; right:44px; top:12px; width:42px; height:42px; border-radius:50%;
+         background:#fff; border:2px solid #C9D5E2; display:flex; align-items:center; justify-content:center; }
+  /* puzzle box (Connect's insides) */
+  .box { position:absolute; left:50%; margin-left:-330px; top:88px; width:660px; background:#ECE0FD;
+         border:2px solid #CDBCEC; border-radius:26px; padding:18px 0 16px; opacity:0; }
+  .hud { display:flex; padding:0 34px 14px; border-bottom:2px solid rgba(27,36,51,.08); }
+  .stat { flex:1; text-align:center; }
+  .stat b { display:block; font-size:10.5px; letter-spacing:.22em; color:#68798E; font-weight:700; margin-bottom:5px; }
+  .stat span { font-size:23px; font-weight:900; }
+  .boardwrap { position:relative; width:496px; height:496px; margin:14px auto 0; }
+  .grid { display:grid; grid-template-columns:repeat(6,76px); grid-template-rows:repeat(6,76px); gap:8px; }
+  .cell { background:rgba(255,255,255,.38); border:1px solid rgba(27,36,51,.07); border-radius:16px; opacity:0; }
+  .cell.tintA { background:rgba(146,83,190,.32); }
+  .cell.tintB { background:rgba(121,67,0,.30); }
+  svg.paths { position:absolute; inset:0; pointer-events:none; }
+  .dot { position:absolute; width:56px; height:56px; border-radius:50%; display:flex; align-items:center;
+         justify-content:center; color:#fff; font-size:23px; font-weight:900; opacity:0;
+         box-shadow:inset 0 0 0 3px rgba(0,0,0,.18); }
+  /* bottom panel (global) */
+  .bottombar { position:absolute; left:0; right:0; bottom:0; height:62px; background:#ECE0FD;
+               border-top:2px solid #CDBCEC; }
+  .pill { position:absolute; top:11px; background:#fff; border:2px solid #A98FD6; border-radius:999px;
+          padding:9px 20px; font-size:13.5px; font-weight:700; }
+  .hs { position:absolute; top:10px; text-align:right; }
+  .hs b { display:block; font-size:9.5px; letter-spacing:.22em; color:#68798E; margin-bottom:3px; }
+  .hs span { font-size:19px; font-weight:900; }
+  .newchip { font-style:normal; display:inline-block; background:#F7D08A; color:#1B2433;
+             font-size:8.5px; font-weight:900; letter-spacing:.14em; border-radius:999px;
+             padding:2px 7px 1px; margin-left:6px; vertical-align:2px; }
+  .motif { position:absolute; opacity:.2; pointer-events:none; }
+  .note { margin-top:16px; font-size:13.5px; color:#4A4358; text-align:center; max-width:900px; line-height:1.55; }
+  .note b { color:#1B2433; }
+</style>
+</head>
+<body>
+<div class="screen" id="screen">
+  <!-- scatter: Connect's own item (dot pair + bent path), 20% opacity -->
+  <svg class="motif" style="left:56px;top:150px" width="76" height="76" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#9253BE" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="12" fill="#9253BE"/><circle cx="62" cy="14" r="12" fill="#9253BE"/></svg>
+  <svg class="motif" style="left:150px;top:430px" width="64" height="64" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#DC5E87" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="12" fill="#DC5E87"/><circle cx="62" cy="14" r="12" fill="#DC5E87"/></svg>
+  <svg class="motif" style="right:70px;top:170px" width="70" height="70" viewBox="0 0 76 76"><polyline points="62,62 62,14 14,14" fill="none" stroke="#794300" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="62" cy="62" r="12" fill="#794300"/><circle cx="14" cy="14" r="12" fill="#794300"/></svg>
+  <svg class="motif" style="right:150px;top:470px" width="60" height="60" viewBox="0 0 76 76"><polyline points="62,62 62,14 14,14" fill="none" stroke="#003320" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="62" cy="62" r="12" fill="#003320"/><circle cx="14" cy="14" r="12" fill="#003320"/></svg>
+  <svg class="motif" style="left:96px;top:600px" width="56" height="56" viewBox="0 0 76 76"><polyline points="14,14 62,14 62,62" fill="none" stroke="#003320" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="12" fill="#003320"/><circle cx="62" cy="62" r="12" fill="#003320"/></svg>
+  <svg class="motif" style="right:44px;top:580px" width="66" height="66" viewBox="0 0 76 76"><polyline points="14,14 62,14 62,62" fill="none" stroke="#9253BE" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="12" fill="#9253BE"/><circle cx="62" cy="62" r="12" fill="#9253BE"/></svg>
+
+  <!-- header (global) -->
+  <div class="hdr">
+    <div class="logo">Morphi<i>.</i>One</div>
+    <div class="gname">Connect</div>
+    <div class="acct">Your account</div>
+    <div class="snd"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="4,9 8,9 13,4 13,20 8,15 4,15" fill="#1B2433"/><path d="M16 9c1.2 1.6 1.2 4.4 0 6M18.5 6.5c2.4 3.2 2.4 7.8 0 11" stroke="#1B2433" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>
+  </div>
+
+  <!-- puzzle box -->
+  <div class="box">
+    <div class="hud">
+      <div class="stat"><b>SCORE</b><span id="vScore">0</span></div>
+      <div class="stat"><b>PAIRS</b><span id="vPairs">0 / 6</span></div>
+      <div class="stat"><b>FILLED</b><span id="vFilled">0 / 36</span></div>
+    </div>
+    <div class="boardwrap">
+      <div class="grid" id="grid"></div>
+      <svg class="paths" width="496" height="496" viewBox="0 0 496 496">
+        <polyline id="pathA" points="38,38 38,122 38,206 122,206 122,290 122,374 122,458" fill="none"
+                  stroke="#9253BE" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"
+                  pathLength="100" style="stroke-dasharray:100;stroke-dashoffset:100"/>
+        <polyline id="pathB" points="290,122 374,122 374,206" fill="none"
+                  stroke="#794300" stroke-width="32" stroke-linecap="round" stroke-linejoin="round" opacity="0.45"
+                  pathLength="100" style="stroke-dasharray:100;stroke-dashoffset:100"/>
+      </svg>
+      <div id="dots"></div>
+    </div>
+  </div>
+
+  <!-- bottom panel (global) -->
+  <div class="bottombar">
+    <div class="pill" style="left:270px">How to play</div>
+    <div class="pill" style="left:415px">Scoring &amp; tips</div>
+    <div class="hs" style="right:270px"><b>YOUR HIGH SCORE<em class="newchip">NEW</em></b><span>0</span></div>
+  </div>
+</div>
+
+<p class="note"><b>Connect — motion design (Anime.js), loops automatically.</b>
+The shell enters first (box rises, bottom panel slides up, name fades in), the board is dealt
+(cells stagger in from the centre, dots pop), then a path <b>draws itself</b> the way a finger
+would — pair A connects, its dots pulse, and Score / Pairs / Filled count up. A second path
+starts and pauses mid-route, like a player thinking. The scattered dot-pairs drift gently.
+Same state as the static renders: Score 200 · Pairs 1/6 · Filled 10/36.</p>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script>
+  // ---- build cells + dots (same board state as the static renders) ----
+  var TINT_A = {0:1, 6:1, 12:1, 13:1, 19:1, 25:1, 31:1};
+  var TINT_B = {9:1, 10:1, 16:1};
+  var grid = document.getElementById('grid');
+  for (var i = 0; i < 36; i++) {
+    var c = document.createElement('div');
+    c.className = 'cell' + (TINT_A[i] ? ' tintA' : '') + (TINT_B[i] ? ' tintB' : '');
+    if (TINT_A[i] || TINT_B[i]) c.style.opacity = 0; // tint fades in with its path
+    grid.appendChild(c);
+  }
+  var PAIRS = [
+    { cls:'dotA', col:'#9253BE', sym:'⬢', a:[0,0], b:[5,1] },
+    { cls:'dotB', col:'#794300', sym:'◎', a:[1,3], b:[4,5] },
+    { cls:'',     col:'#003320', sym:'⬟', a:[0,4], b:[5,4] },
+    { cls:'',     col:'#DC5E87', sym:'▲', a:[0,2], b:[5,5] },
+    { cls:'',     col:'#9253BE', sym:'◆', a:[2,5], b:[4,0] },
+    { cls:'',     col:'#794300', sym:'★', a:[5,2], b:[3,5] }
+  ];
+  var dots = document.getElementById('dots');
+  PAIRS.forEach(function(p) {
+    [p.a, p.b].forEach(function(rc) {
+      var dEl = document.createElement('div');
+      dEl.className = 'dot ' + p.cls;
+      dEl.style.background = p.col;
+      dEl.style.left = (rc[1] * 84 + 10) + 'px';
+      dEl.style.top = (rc[0] * 84 + 10) + 'px';
+      dEl.textContent = p.sym;
+      dots.appendChild(dEl);
+    });
+  });
+
+  var vScore = document.getElementById('vScore'),
+      vPairs = document.getElementById('vPairs'),
+      vFilled = document.getElementById('vFilled');
+
+  // scatter drift — continuous, independent of the main timeline
+  anime({ targets: '.motif', translateY: [-7, 7], rotate: [-4, 4], duration: 2800,
+          direction: 'alternate', loop: true, easing: 'easeInOutSine',
+          delay: anime.stagger(220) });
+
+  function play() {
+    // reset
+    anime.set('.box', { translateY: 24, opacity: 0 });
+    anime.set('.bottombar', { translateY: '100%' });
+    anime.set('.gname', { opacity: 0, translateY: -8 });
+    anime.set('.cell', { scale: .55, opacity: 0 });
+    anime.set('.dot', { scale: 0, opacity: 0 });
+    anime.set(['#pathA', '#pathB'], { strokeDashoffset: 100 });
+    vScore.textContent = '0'; vPairs.textContent = '0 / 6'; vFilled.textContent = '0 / 36';
+    var state = { score: 0, filled: 0 };
+
+    // Absolute start times (ms) - anime.js 3.2.1 does not create
+    // timeline labels on the fly in add(); labelled children never run.
+    var tl = anime.timeline({ loop: false, complete: function() { setTimeout(play, 2000); } });
+    tl.add({ targets: '.box', translateY: [24, 0], opacity: [0, 1], duration: 600, easing: 'easeOutCubic' }, 0)
+      .add({ targets: '.bottombar', translateY: ['100%', '0%'], duration: 500, easing: 'easeOutCubic' }, 250)
+      .add({ targets: '.gname', opacity: [0, 1], translateY: [-8, 0], duration: 400, easing: 'easeOutQuad' }, 430)
+      .add({ targets: '.cell', scale: [.55, 1], duration: 550, easing: 'easeOutBack',
+             delay: anime.stagger(24, { grid: [6, 6], from: 'center' }) }, 700)
+      .add({ targets: '.cell:not(.tintA):not(.tintB)', opacity: [0, 1], duration: 550, easing: 'easeOutQuad',
+             delay: anime.stagger(24, { grid: [6, 6], from: 'center' }) }, 700)
+      .add({ targets: '.dot', scale: [0, 1], opacity: [0, 1], duration: 520, easing: 'easeOutBack',
+             delay: anime.stagger(45) }, 1080)
+      // pair A draws; cells tint in step; counters run with it
+      .add({ targets: '.tintA', opacity: [0, 1], duration: 300,
+             delay: anime.stagger(115) }, 1480)
+      .add({ targets: '#pathA', strokeDashoffset: [100, 0], duration: 1150, easing: 'easeInOutQuad' }, 1480)
+      .add({ targets: state, score: 200, filled: 7, duration: 1150, easing: 'easeInOutQuad',
+             update: function() {
+               vScore.textContent = Math.round(state.score).toLocaleString('en-US');
+               vFilled.textContent = Math.round(state.filled) + ' / 36';
+             } }, 1480)
+      // pair complete: dots pulse, Pairs flips
+      .add({ targets: '.dotA', scale: [1, 1.3, 1], duration: 480, easing: 'easeInOutSine',
+             begin: function() { vPairs.textContent = '1 / 6'; } }, 2710)
+      // pair B starts - draws part-way and stops
+      .add({ targets: '.tintB', opacity: [0, 1], duration: 260,
+             delay: anime.stagger(180) }, 3350)
+      .add({ targets: '#pathB', strokeDashoffset: [100, 0], duration: 640, easing: 'easeInOutQuad' }, 3350)
+      .add({ targets: state, filled: 10, duration: 640, easing: 'easeInOutQuad',
+             update: function() { vFilled.textContent = Math.round(state.filled) + ' / 36'; } }, 3350)
+      .add({ targets: '.dotB', scale: [1, 1.14, 1], duration: 380, easing: 'easeInOutSine' }, 4110);
+  }
+  play();
+</script>
+</body>
+</html>

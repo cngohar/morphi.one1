@@ -10,6 +10,23 @@
 
 Instructions for coding agents (Codex, OpenCode, Claude Code, etc.) working in this repo.
 
+## Subagent policy
+
+The owner authorizes delegation during repository tasks using this routing:
+
+- Planning and research: `gpt-6.1-sol`, reasoning effort `high`.
+- Coding, debugging and other execution: `gpt-6.1-terra`, reasoning effort `high`.
+- Testing and verification, including lint, E2E, Chromium, Playwright and `bun run verify`: `gpt-6-luna`, reasoning effort `max`.
+
+The parent agent coordinates tasks, integrates results and reports to the owner. Spawn with the explicit model and reasoning effort above, `fork_turns: "none"`, and supply the task context and applicable repository instructions. If a required model or effort is unavailable, report it rather than silently substituting. This policy applies only to this repository; existing scope limits and approval gates remain in force.
+
+For testing and verification:
+
+- Use 2–3 `gpt-6-luna` agents at `max` reasoning for independent checks when useful and concurrency and local resources permit. A suggested split is lint/type checks, unit tests, and integration/Worker/browser checks; coordinate shared setup dependencies first. Small tasks use one testing agent; neither three agents nor duplicate checks are required.
+- One agent owns browser testing. Preserve Playwright `workers: 1` unless an isolation or configuration change is separately justified.
+- Stabilize source before testing; do not edit or fix files while checks are active. Serialize conflicting builds, Svelte sync, generated-file writes, migrations/local database access, shared server ports and output artifacts.
+- Never run multiple `bun run verify` commands concurrently or overlap a full verify with its component commands.
+
 ## Source of truth
 
 `morphi-plan-simple.md` is the active day-to-day plan: games first, architecture second. The owner reaffirmed this on 2026-10-23. `docs/PLAN.md` is reference only; pull in relevant sections when the simple plan calls for them. The simple plan and explicit owner instructions take precedence over the full-plan phase requirements below; do not introduce the full platform architecture as a prerequisite to game work. `docs/DECISIONS.md` lists decisions already made. Use `docs/CODEMAP.md` to find code before running broad searches. Report unresolved conflicts to the owner.
@@ -47,6 +64,118 @@ all popups; app and demo now share its gesture handling. No production resource,
 secret installation, DNS/Google change or deployment is authorized. Local
 operator enrollment remains an explicit OS/TOTP owner command.
 
+## Owner-authorized v1.1 handoff — 2026-10-26
+
+The owner supplied `docs/morphi-v1.1-handoff-2026-10-26/CODEX-BRIEF.md`
+and authorized starting local v1.1 implementation. Its numbered order controls:
+procedural themes, UI/UX with The Card, Connect, scoring configuration, then
+public-door withdrawal and explainers. The adjacent `morphi-v1.1-scope.md`
+defines the scope; the brief supersedes its suggested ordering. Curated-only,
+two-game-only, and public-door restrictions from v1 are superseded for this
+local work. Theme contact-sheet and visual acceptance remain owner gates.
+Share links and `/admin/games/<name>` remain excluded. No deployment,
+production provisioning, secrets, DNS or Google changes are authorized.
+See `docs/V1.1_WORK.md` for the current slice and pending work.
+During the slice the owner supplied the 1920×923 small-board screenshot,
+requested the already-planned viewport-sizing fix and directed continuation.
+That bounded Work 2 shell/sizing follow-up is included while theme/Card/overall
+visual acceptance remains pending; no acceptance or deployment is inferred.
+On 2026-10-27 the owner approved the theme contact sheet, closing that
+palette/style taste gate. Work 2 UI/UX with The Card is next; Memory/Block Card
+proofs, phone played-stack placement and overall visual acceptance remain open.
+The owner then authorized starting Work 2 and added preparation during animation
+with loading/failure fallbacks as an explicit edge case. Prepare solo candidates
+without consuming selector draws or reserving ranked sessions; preserve the
+finished result and pending family on failure. See `docs/EDGE_CASES.md`.
+During Card review the owner reported a duplicate-board pop and requested the
+demo update. The Card must be one continuous frame that opens into the board;
+retain each game's own entrance afterwards. Memory keeps its random-position
+deal, full three-second preview and hide before input/timing. After fold-away,
+show the central result with score, Your high score, statistics and Next while
+the played stack stays visible. These demo corrections do not accept the design
+or authorize deployment.
+Owner review update (2026-10-28): every new Card, including after Next, enters
+from a fresh random viewport position/rotation. Only the large earned-score
+number scrambles for 500 ms; headings, labels, high score, statistics and Next
+text stay static. Retain the accepted result exit.
+Owner clarification (2026-10-28): randomness applies only to entry direction;
+the Card settles at the centre before unfolding. Finish folds into the played
+stack, never toward the random entry origin. Desktop backdrop objects scatter
+in two dimensions across the exposed background space, without lined-up
+columns or evenly spaced rows.
+Later result review: the owner accepted Next and requested a result entrance.
+Fade/rise the panel once over 420 ms after fold-away, with the existing 500 ms
+scramble on the large score only. Keep label/high-score/stat contents static.
+The accepted 350 ms exit starts from the current visual frame on early Next;
+reduced motion settles immediately.
+
+## Owner-authorized Card integration — 2026-10-28
+
+The owner approved the animations and explicitly authorized integration into
+the actual local app. This closes the demo-animation gate and supersedes the
+earlier proof-only restriction for this flow. Integrate the persistent Card,
+per-game entrances/Memory preview, session stack, real result entrance/score
+scramble and accepted exit. Preserve authoritative replay, durable completion,
+selector semantics and preparation failures. The app's account/save controls
+remain real. No deployment or next product phase is inferred. Real-app device
+review and the remaining Work 2 visual pass stay separate.
+
+## Owner-directed Connect review — 2026-10-29
+
+The owner closed the Card UI/UX progression gate and directed local Work 3
+Connect. Generate a distinct game-related sound for each Connect action using
+ElevenLabs offline. The owner reported off-centre symbols and the board showing
+before its entrance. Most importantly, the owner clarified that connecting
+every pair finishes Connect even when cells remain empty; full-grid coverage
+is an optional score bonus. This supersedes the earlier fill-to-win wording in
+the handoff's Connect brief. Local visual/device acceptance remains open, and
+no deployment or Work 4 is authorized by this review.
+
+## Owner acceptance of Connect — 2026-10-29
+
+The owner reviewed Connect locally on their own PC and explicitly accepted it.
+Work 3 is closed. This records a local PC acceptance, not a phone review or a
+public deployment. The next item in the numbered v1.1 handoff is Work 4:
+operator per-game scoring configuration in the existing admin panel. The owner
+asked to be told that next step; implementation and deployment are not implied
+by this acceptance.
+
+## Owner acceptance of Work 4 scoring — 2026-10-30
+
+The owner reviewed the per-game scoring section locally, confirmed it worked,
+and directed closeout after the scoring editor styling was corrected. Work 4
+is accepted on the local PC. The final `bun run verify` passed all stages,
+including 156/156 browser checks. This does not record public-test acceptance
+or authorize deployment. Work 5 was the next handoff item at that time; see
+the later Work 5 authorization below.
+
+## Owner-authorized Work 5 local implementation — 2026-10-31
+
+The owner authorized starting Work 5 locally. The selector-only route policy,
+static explainer pages, sitemap/robots updates and guest artifact changes are
+implemented. Full local verification passed, including 166/166 browser checks;
+the guest artifact was prepared and checked without `--live`. No deployment or
+production change is authorized. Owner visual acceptance was pending at this
+point and is recorded in the later acceptance entry below. See `docs/V1.1_WORK.md` and the latest entry in
+`docs/PHASE_REPORTS.md`.
+
+## Owner acceptance of Work 5 — 2026-10-31
+
+The owner reviewed and accepted Work 5 locally. This closes only the family-door
+withdrawal and static explainer work; it is not physical-device acceptance or
+deployment approval. At that point the separate Work 2 integrated visual/device
+review was still open; see the later acceptance below. See `docs/V1.1_WORK.md`.
+
+## Owner acceptance of Work 2 visual/device review — 2026-10-31
+
+The owner confirmed the overall integrated v1.1 visual/device review is complete
+and accepted locally, including Home/profile polish, Card and played-stack
+placement, and the phone-landscape title layout. Specific device/browser models
+were not supplied. No deployment is authorized. Global-release planning,
+including an admin-panel proposal, is the next phase; production provisioning
+and deployment remain separate approvals. The theme-freshness simulation stays
+a best-effort diagnostic; no numeric target was supplied.
+
 ## Rules
 
 1. **One phase at a time.** Stop when the acceptance criteria are met, write the report (format below), and wait for the owner.
@@ -69,6 +198,7 @@ operator enrollment remains an explicit OS/TOTP owner command.
 18. **The plan states requirements, not code.** Phase 0 writes `docs/CONTRACT.md` (types, serialization, hash, RNG, `engine_version`), and the owner approves it. Types, schemas, SQL, and config live in code, and a stale hint in the plan is fixed, not obeyed over the code.
 19. **Guard handlers.** `<svelte:boundary>` does not catch errors in event handlers, timers, or async and Worker callbacks, so wrap those and route errors to the failed state (section 11.4).
 20. **Rotation and shapes:** Next comes from the puzzle selector (section 11.14), never "the same puzzle type again" unless the player chose Stay. The selector takes an injected RNG and draws seeds with `crypto.getRandomValues`. Container shapes, proportions, gaps, and topology vary as cosmetic theme axes (section 11.2) and never change difficulty.
+    **Puzzle backdrops (owner, 2026-10-27):** every in-play page uses only objects belonging to its current puzzle: Block → block pieces; Memory → cards; future games must declare their own allowed objects in their design brief. Never mix another game's objects or generic decoration into a puzzle backdrop. Randomize positions/rotations from cosmetic seeded RNG; use 20% opacity and exclude header/bottom bands. Owner update (2026-10-28): hide these objects on compact/mobile layouts (portrait and landscape); wider layouts show a seeded random 1–5 objects on each side only. Preserve the approved background blend. Mixed-game decoration is allowed on Home only. Every new puzzle needs family-isolation and visible-backdrop checks; see `docs/puzzles/_TEMPLATE.md`.
 21. **Boundaries:** the engine never imports puzzles, a puzzle never imports another puzzle, and the app reaches puzzles through the generated registry (lint and CI enforce it). Each puzzle has its own `engine_version`, tests, and README (sections 5 and 11.11).
 22. **Puzzles are games:** before building a puzzle, get its design brief (`docs/puzzles/<id>.md`, section 11.16) approved. Use the page templates and stage modes (section 11.16), and keep per-puzzle style as data (a style profile in the manifest), with colors always from recipes and the checks.
 23. **If reality conflicts with the plan** (a doc changed, something is impossible, an assumption was wrong), stop and report it. Do not improvise a workaround that changes the design.

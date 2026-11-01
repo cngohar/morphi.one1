@@ -17,6 +17,390 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.1 Work 3: Connect local integration — 2026-10-29
+
+- **Built:** Added Connect as the third Mix family behind the generated puzzle
+  registry. Its deterministic 5×5, 6×6 and 7×7 bands use orthogonal stroke
+  replay, path cutting and redraw penalties. The server computes ranked scores
+  from issued sessions; client scores are never submitted. The accepted Card
+  opens into Connect's 2.5 s entrance, then its own board, HUD, help, result,
+  session stack, account save and Next. Procedural symbols/colors and a
+  Connect-only dot-path backdrop cover the three layout sizes. Nine original
+  ElevenLabs game cues were generated offline, one per action, with distinct
+  hashes in `static/audio/manifest.json` and no runtime provider call.
+- **Owner correction:** Connecting all pairs is the finish condition. Empty
+  cells do not block the result; filling the full grid at completion earns an
+  optional 1,000-point bonus. This supersedes the earlier brief. Corrected the
+  reported off-centre symbols and visible-before-entrance board, then added
+  first-frame and centring browser checks. The result now shows fill percentage;
+  Connect's phone result spacing keeps the played stack clear of save text.
+- **Skipped (and why):** No `/connect` door, share link, score editor, Work 4,
+  deployment, production resource or secret change. These are outside Work 3.
+- **Known issues:** The owner accepted Connect after a local PC review; phone
+  gesture, motion and audio checks were not reported. Headless browsers
+  do not establish real-phone smoothness. The initial full browser run had one
+  WebKit Block-backdrop failure: bounds were measured against the Card's
+  transient narrow frame. Bounds now recalculate when the backdrop becomes
+  visible; the affected case passed three WebKit repeats and a cross-browser
+  recheck. A single post-fix full-suite rerun was not performed.
+- **Decisions and pinned versions:** `connect-1` remains the pre-acceptance
+  local rules version; no Connect rules have been deployed. Full-grid bonus is
+  checked only on the winning move. TypeScript `~6.0.3`, anime.js `4.5.0`,
+  ElevenLabs SDK `2.74.0`, theme config `theme-2026-10-26-1`, and generator
+  `oklch-machado-1` remain pinned. See `docs/DECISIONS.md`.
+- **Questions for the owner:** None for Work 3. Work 4 is the next numbered item.
+- **Evidence table:**
+
+| Acceptance item                                                 | Evidence type and location                                                     | Result                                                                                                                                                                                                                                   |
+| --------------------------------------------------------------- | ------------------------------------------------------------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Deterministic bands, valid routes, cut/redraw and pair-only win | `src/lib/puzzles/connect/logic.test.ts`, `tests/vectors/connect*.json`         | 1,200 witnesses and 5 Connect units pass; 9 vectors match in six runtimes                                                                                                                                                                |
+| Authoritative ranked and pair-only saved replay                 | `tests/integration/runs.test.ts`; built Worker smoke                           | 25 D1/auth tests and 15 built-Worker checks pass                                                                                                                                                                                         |
+| Card entrance before visible board; centred symbols             | `tests/e2e/connect.spec.ts` first-frame samples and SVG geometry               | pass in Chromium, Firefox and WebKit                                                                                                                                                                                                     |
+| Phone/landscape/desktop fit, family-only backdrop and result    | Browser layout checks and [review captures](evidence/v1.1-connect/README.md)   | Connect passed in all three engines; Block wide-backdrop recheck passed after fix                                                                                                                                                        |
+| Unique game-related action sounds and mute                      | `static/audio/manifest.json`, nine MP3 hashes, browser request test            | nine distinct hash-verified assets; browser request/mute tests pass in three engines                                                                                                                                                     |
+| Format, type, boundaries, palette safety and full regressions   | `bun run verify` stages; `build/v1.1-connect/e2e-final.log`; focused follow-up | lint/check/boundaries, 30,000 palettes, 122 units, 25 D1/auth, 9 six-runtime vectors and 15 Worker checks pass; browser run 155/156 before the final backdrop fix, then 3/3 WebKit repeats and 3/3 cross-browser wide-layout checks pass |
+| Local Connect visual/audio acceptance                           | Owner review, 2026-10-29                                                       | accepted after checking locally on own PC; phone/public checks not claimed                                                                                                                                                               |
+
+- **Measurements:** The 2,500 ms Connect entrance is a configured animation
+  and input deadline, not a measured device frame-rate result. Browser layout
+  evidence uses unthrottled localhost and fresh navigation with round
+  preparation overlapping the Card on headless Chromium/Firefox/WebKit at
+  390×844, 844×390 and 1920×923; each case runs once in the suite, with three
+  repeated WebKit checks for the corrected wide Block backdrop. Median/p95
+  frame-time measurements are not available. Real-device smoothness is
+  an owner review gate; the owner accepted the local PC build without a
+  reported phone measurement. No performance waiver or phone result is inferred.
+- **Waivers:** None.
+- **Owner responsibilities:** Local Connect acceptance is complete. Decide when
+  to start Work 4; authorize any later production action separately.
+- **CODEMAP updated:** Yes, `docs/CODEMAP.md` includes Connect and its tests.
+- **Owner acceptance:** Work 3 closed on 2026-10-29. The owner explicitly
+  accepted Connect after local review on their own PC. No phone check or public
+  deployment is implied.
+
+## v1.1 popup dismissal correction and owner review — 2026-10-28
+
+- **Built:** The popup exit animation's temporary viewport-sized layer now has
+  a transparent background. Its inherited site background previously covered
+  the game until the 500ms exit completed. Both help buttons retain their
+  dismissal, focus and motion behavior.
+- **Owner review:** The owner reported phone and desktop passed and accepted
+  the other reviewed behavior; device/browser models were not supplied. The
+  remaining Home/profile UI pass is separate from this Card-flow review.
+- **Evidence:** Normal-motion help dismissal regression covers both buttons,
+  verifies the game remains visible and the exit layer is transparent, and
+  checks cleanup. Existing backdrop, inside-click, Escape and focus tests run
+  alongside it. Type checking and targeted lint are recorded in `build/popup-*.log`.
+- **Skipped / limitations:** No deployment or new game work. Physical-device
+  verification of this specific correction remains with the owner.
+- **Next:** Finish the remaining Work 2 UI/UX visual pass, then Connect in the
+  numbered handoff. No new version pins or waivers. CODEMAP remains current.
+
+## v1.1 actual Card integration — 2026-10-28
+
+- **Built:** The owner approved the reviewed animations and authorized local
+  app integration. `/play` now uses one persistent app-owned Card frame around
+  the real registry game view: fresh random entry, centre, flip/name, unfold,
+  then the game's own entrance. Memory keeps its 3/4/5-second entrance, full
+  three-second preview and hide before input/timing. Completion is queued before
+  win/fold motion. Finished rounds file into a session stack (eight visible
+  cards plus total count), followed by the actual result with a single 420ms
+  fade/rise and 500ms scramble of only the large score. Next retains the 350ms
+  exit, including early activation. Real account/save/sync controls remain.
+  Preparation overlaps motion; failed Next restores the finished result and
+  retains the pending selector family. Unmount cancels waits/preparation;
+  hidden tabs pause presentation deadlines. Responsive frame measurement waits
+  for the game's media-query update and suppresses CSS size transitions, which
+  otherwise returned stale widths in Firefox/WebKit under reduced motion.
+- **Skipped (and why):** Remaining Work 2 Home/profile/overall visual review,
+  real-device acceptance, Connect, score editor and public-door withdrawal
+  belong to later work in the numbered handoff. No production changes or
+  deployment. No XP/achievement fixtures or new dependencies.
+- **Known issues:** Headless viewport checks cannot establish physical-device
+  smoothness. Existing procedural-theme freshness limits and production gates
+  remain. The owner accepted the demo animations; this report does not accept
+  the integrated app's full visual pass or complete v1.1.
+- **Decisions and pinned versions:** Shared typed element-based presentation
+  in the existing anime.js 4.5.0 wrapper; app stage/layout and engine remain
+  separate from the isolated reference demo. Logical readiness uses fixed
+  visible-time deadlines, never animation callbacks. Ranked issuance follows
+  the neutral deal, with a server-owned 1200ms flip/unfold allowance in local
+  migration `0007`; legacy sessions default to zero. Replay wire/engine versions
+  are unchanged. TypeScript `~6.0.3` and Wrangler `4.151.3` remain pinned. See
+  `DECISIONS.md` for the D1 references and timing rationale.
+- **Questions for the owner:** No implementation clarification is required.
+  Real-app desktop/phone review and the remaining Work 2 visual pass are open.
+- **Evidence table:**
+
+| Acceptance item                                                                                        | Evidence type and location                                                                          | Result                                                          |
+| ------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Integrate the accepted animation flow                                                                  | Owner authorization in `AGENTS.md`; actual `/play`; [captures](evidence/v1.1-integration/README.md) | implemented locally; device review separate                     |
+| One continuous centred frame, real Memory completion, result, Next and stack                           | Normal-motion browser frame samples/screenshots; `tests/e2e/app-card.spec.ts`                       | see [verification](evidence/v1.1-integration/verification.json) |
+| Result arrives once; only large score scrambles; accepted exit                                         | Actual-result opacity samples plus shared `card.spec.ts` entrance/early-Next checks                 | see verification                                                |
+| Phone/landscape/desktop fit and resizing without restarting                                            | Four real-flow sizes in Chromium/Firefox/WebKit; 10-pair resize regression                          | see verification                                                |
+| Own-family scatter, mobile hiding and desktop 1–5 per side                                             | `themes.spec.ts`, backdrop property tests and captures                                              | see verification                                                |
+| Preparation failure retains result/family; duplicate Next commits once                                 | `preparation.spec.ts`, real lifecycle duplicate activation, preparation unit tests                  | see verification                                                |
+| Durable completion and real accounts/save/retry remain                                                 | Account browser regressions and local D1/auth integration                                           | see verification                                                |
+| Ranked timing remains authoritative and legacy-compatible                                              | `tests/integration/runs.test.ts`: equal real play time, legacy default, rejected client allowance   | pass: targeted 23-test integration run                          |
+| Format/lint, zero-warning type check, purity, palettes, units, vectors, built Worker and browser suite | `bun run verify`; summary and full local log linked in evidence                                     | see verification                                                |
+| Full Work 2 visual and real-device acceptance                                                          | Owner review of integrated app                                                                      | pending; no waiver                                              |
+| CODEMAP                                                                                                | `docs/CODEMAP.md` stage/layout/game gate/migration/test entries                                     | updated                                                         |
+
+- **Measurements:** The accepted Card budgets are 650ms entry, 400ms flip,
+  800ms unfold, 900ms fold/file, 420ms result entrance, 500ms score scramble
+  and 350ms exit. These are configured presentation budgets, not measured
+  device frame rates. Local preloaded Next diagnostics use headless desktop
+  Chromium, 1280×720, unthrottled localhost and reduced motion, five runs;
+  median 36.1ms and p95 52ms. Raw samples are in
+  [preparation measurements](evidence/v1.1-integration/preparation-measurements.json).
+  The metric ends at next-round DOM, before the game's entrance/preview; reduced
+  motion skips solo Card waits. It is a diagnostic goal only. Cold phone/4G,
+  physical-device frame-rate and production measurements were not taken and
+  are not waived or claimed as release evidence.
+- **Waivers:** None added. Earlier owner approvals/recorded exceptions remain
+  historical; the demo-animation gate is closed by explicit approval.
+  Required checks are recorded across the full verification pipeline and
+  focused browser rechecks: older startup/score/error-copy probes needed the
+  integrated flow's readiness conditions. A desktop cleanup artifact collision
+  from parallel test runs was rechecked with an isolated output directory.
+  The evidence summary preserves the first-run failures and recheck results.
+  All 131 browser cases have passing evidence across those runs; the initial
+  full command ended with 119 passes and 12 failures, rather than a clean exit.
+- **Owner responsibilities:** Review `/play` on desktop and a real phone,
+  including finish/result/Next, rotation and stack placement. Overall Work 2
+  visual acceptance and production authorization remain separate.
+- **CODEMAP updated:** yes.
+
+## v1.1 desktop Card/scatter correction and result entrance — 2026-10-28
+
+- **Built:** Reproduced the owner's Chrome/Firefox report with screenshots.
+  Random entry transforms were retained by later board animations, moving
+  unfolding and folding away from the centre. Each phase now explicitly resets
+  translation, rotation and scale. Entry alone is random; the Card settles and
+  unfolds at the centre, then retains the game's own arrival. Finish shrinks
+  at the centre and files into the actual played stack, matching its slot's
+  rotation. Backdrop adapter `own-items-4` draws independent x/y positions
+  across measured exposed background widths, replacing narrow columns and
+  regular rows. Keep 1–5 objects per side, mobile hiding, approved blend,
+  current-family isolation and 20% opacity. Resize/theme replacement updates
+  bounds without touching game state. The owner subsequently accepted Next
+  and requested a result entrance: one 420ms fade/rise of the panel, with only
+  the large number scrambling for 500ms. Labels/high score/stat contents stay
+  unchanged. Early Next preserves the current opacity/position before the
+  accepted 350ms exit, avoiding a reset flash. Reduced motion settles directly.
+- **Skipped (and why):** Actual Card integration still awaits the required
+  proof/phone-stack verdict. No new game, score logic, account change or
+  production action is included.
+- **Known issues:** The earlier passing identity/monotonic-size probes did not
+  check centre coordinates or stack landing and missed this defect. The new
+  geometry probe covers those positions across three consecutive rounds/Next.
+  Clock-controlled screenshots are geometry evidence, not device smoothness
+  acceptance. Prior freshness and production/device limits remain.
+- **Decisions:** Keep anime.js 4.5.0 and all game/theme snapshot versions.
+  Reset every animated board transform channel explicitly between phases.
+  Cosmetic scatter counts and x/y remain seeded; the DOM adapter measures only
+  available space. See `DECISIONS.md` for the installed source/official docs.
+- **Questions for the owner:** Review the updated concrete Card/phone-stack
+  proof; overall visual acceptance remains open.
+- **Evidence table:**
+
+| Acceptance item                                                                      | Evidence                                                                                            | Result                                                          |
+| ------------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------- | --------------------------------------------------------------- |
+| Random entry to centre, centred unfolding, fixed stack landing over three rounds     | `card.spec.ts`, [Chrome samples](evidence/v1.1-card/review-fix/centred-transitions-chrome.json)     | pass: Google Chrome, Chromium, Firefox, WebKit                  |
+| Two-dimensional scatter and visible objects in Chrome/Firefox                        | [live screenshots](evidence/v1.1-card/review-fix/README.md), backdrop property test                 | live capture/property pass                                      |
+| Mobile hiding, both puzzle families, wide/compact layouts and existing Card controls | targeted `card.spec.ts` / `themes.spec.ts` browser run                                              | pass: 54 targeted browser checks                                |
+| Result entrance once, score-only scramble, no early-Next flash and reduced motion    | [result evidence](evidence/v1.1-card/review-fix/README.md), `result-tests.log`, `chrome-result.log` | pass: nine three-engine checks plus two installed Chrome checks |
+| Type/format/lint checks                                                              | `build/v1.1-card/review-fix/` logs                                                                  | type check: zero errors/warnings; targeted lint pass            |
+| Owner visual acceptance                                                              | [local demo](http://localhost:5173/demo/card-proof.html)                                            | pending                                                         |
+
+- **Measurements:** Desktop 1920×923, localhost unthrottled, normal-motion
+  live captures in Chrome 155.0.8059.79 and Firefox. The regression samples
+  three rounds per browser with a controlled clock; centre error must be <1px
+  during flip/unfold/shrink and the nearing-stack centre error <12px. These
+  are geometry gates, not median/p95 runtime or physical-device performance
+  measurements. Prior five-run cached-Next diagnostics remain unchanged.
+- **Waivers:** None added. The earlier full verification remains baseline
+  evidence; it does not replace the new position checks.
+- **Owner responsibilities:** Review desktop transitions and phone stack
+  placement before actual Card integration.
+- **CODEMAP updated:** yes, including `ui/backdrop-layout.ts` and the revised
+  motion contract.
+
+## v1.1 Work 2 — backdrop/preparation fixes and Card presentation proofs — 2026-10-27–28
+
+- **Built:** Recorded contact-sheet approval and the owner's authorization to
+  start Work 2. Made current-puzzle-only backdrops a standing project/future
+  brief rule. Actual Memory backgrounds scatter cards; Block backgrounds draw
+  actual piece definitions through the generated registry. Every round gets
+  seeded scatter, including legacy blank layouts; 20% opacity, quiet contrast
+  and header/bottom exclusions remain. Owner update on Oct 28 hides objects
+  on compact/mobile layouts and limits wider layouts to a seeded random 1–5
+  objects on each side. The approved background blend remains unchanged.
+  A single next solo candidate prepares
+  during the current entrance and is reused on Next. No selector draw/history
+  commit or ranked reservation happens speculatively. Slow starts show a neutral
+  loading card and native Home link; Worker/storage waits are bounded, failures
+  retain the result/pending family, and navigation ignores late completion.
+  New run/save metadata commits only with a successful start. The underlying
+  result is inert during the loading overlay. Interactive Memory/Block Card
+  proofs include reveal/unfold, fold/stack, Next, slow/fail-once and static
+  controls. They use the shared motion wrapper and numeric absolute beats.
+  Owner review then reported a duplicate-board pop. The revised proof expands
+  one persistent frame before the existing per-game deal; Memory's six-pair
+  sample keeps three seconds of random travel, three full seconds of preview
+  and hiding before readiness. The result now shows score/high score, statistics
+  and Next centrally after folding, with no lingering animation layer over it.
+  The owner's subsequent desktop review requested a wider, animated result:
+  score/statistics and waiting-card/Next now occupy two desktop columns, with
+  compact phone and separate short-landscape profiles. The final owner revision
+  uses one 500 ms scramble on the large earned-score number only, initialized
+  before first paint,
+  with final accessible text preserved. The owner accepted the 350 ms exit on
+  Next; next-sample preparation starts during it. Each new Card enters from
+  a fresh random viewport edge position/rotation, including Next; initial
+  geometry is set before paint, with cosmetic entropy independent of puzzles.
+  Duplicate activation, replay
+  after visibility resume, cancellation and reduced motion are guarded.
+  Headings, labels, high score, statistics and Next text stay static, as the
+  owner clarified during review. Full local verification passed: 116 unit,
+  22 integration and 110 browser checks, 20,000 palettes, six-runtime vectors
+  and 15 built-Worker checks. Three additional browser checks cover unavailable
+  Card entropy and preparation/static fallbacks.
+- **Skipped (and why):** Actual Card integration awaits the specified
+  Memory/Block proof and phone stack review in `THE-CARD-decision.md`: “proofs
+  to be built the same way before Codex treats it as settled.” The complete
+  Home/result/profile pass and actual phone-landscape title exception remain
+  Work 2. No Connect, scoring editor, door withdrawal/explainers, share links,
+  admin game-test route, production resource/secret/DNS/Google work or deployment.
+- **Known issues:** Proof scenes are presentation samples, not playable games
+  or saved scores. Sample Card timing is a design-review candidate; actual
+  gameplay keeps its accepted entrance/preview/ranked allowances. The stack
+  retains all sample rounds in memory and renders the latest eight cards plus
+  the session count to bound DOM size. Freshness vocabulary limits and all
+  prior production/device acceptance limits remain.
+- **Decisions and pinned versions:** Presentation adapter `own-items-3` derives
+  motifs from the resolved snapshot without rewriting approved palettes or
+  changing score/RNG contracts. Keep anime.js 4.5.0, theme config
+  `theme-2026-10-26-1`, generator `oklch-machado-1`, and existing engine versions.
+  IndexedDB access has a 1.5 s deadline; generation retains its 5 s Worker
+  deadline and deterministic fallback. Native Home navigation also works before
+  hydration. Full decisions and the current Anime.js source are in `DECISIONS.md`.
+- **Questions for the owner:** Review `/demo/card-proof.html`: Memory/Block
+  Card transitions and the phone's bottom-left played stack. Open Preview for
+  controls, finish each sample and press Next. These concrete proofs satisfy
+  the required design-review deliverable; overall Work 2 acceptance is open.
+- **Evidence table:**
+
+| Acceptance item                                                                                      | Evidence type                                                             | Where                                                                                                                 | Result                                        |
+| ---------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Theme-sheet taste gate                                                                               | Explicit owner approval, 2026-10-27                                       | `DECISIONS.md`, `V1.1_WORK.md`                                                                                        | accepted; overall UI separate                 |
+| Current-puzzle-only objects, 1–5 per side on wide layouts, hidden on compact/mobile, blend preserved | Unit/property checks and 39 theme browser checks                          | `ui/puzzle-backdrop.test.ts`, `themes.spec.ts`, [app captures](evidence/v1.1-card/README.md)                          | pass                                          |
+| Single prepared candidate, failed speculation, family switch and cancellation                        | Deferred-promise regression tests                                         | `ui/prepare-ahead.test.ts`                                                                                            | pass                                          |
+| Stalled storage/Worker, leaving during loading, repeated Next and saved-result retention             | Four app fault-injection checks and storage unit checks                   | `preparation.spec.ts`, `theme-history.test.ts`, [Next measurements](evidence/v1.1-card/preparation-measurements.json) | pass                                          |
+| Continuous Card, random origin on Next, fold/stack and wide/phone results                            | 27 Card checks across Chromium, Firefox and WebKit; captures/frame probes | `card.spec.ts`, [review evidence](evidence/v1.1-card/README.md)                                                       | pass; owner visual gate separate              |
+| Only large earned score scrambles, static labels/high score/stats, accepted exit and no replay       | First-visible-frame sampling and immediate/duplicate Next                 | [motion checks](evidence/v1.1-card/motion-checks.json), `card.spec.ts`                                                | pass in all three browsers                    |
+| Reduced/failed motion, unavailable cosmetic entropy, slow/failed preparation and hidden identity     | Browser fault injection; independent logical deadlines                    | `card.spec.ts`, `build/v1.1-card/entropy-tests.log`                                                                   | pass in all three browsers                    |
+| Existing release checks, authoritative replay and six-runtime vectors                                | Full `bun run verify`                                                     | `build/v1.1-card/final-verify.log`, [summary](evidence/v1.1-card/verification.json)                                   | pass: 116 units, 22 integration, 110 browsers |
+| Actual Card/phone stack visual decision                                                              | Owner review                                                              | [local proof](http://localhost:5173/demo/card-proof.html), Card decision                                              | pending; no acceptance inferred               |
+| Project/future puzzle instructions and code map                                                      | Documentation review                                                      | `AGENTS.md`, simple plan, `EDGE_CASES.md`, `puzzles/_TEMPLATE.md`, `CODEMAP.md`                                       | updated                                       |
+
+- **Measurements:** Five preloaded solo Next activations are instrumented in
+  the app browser test, from activation to generated game DOM, excluding the
+  prescribed entrance/preview. Diagnostic environment: headless desktop
+  Chromium at 1280×720, unthrottled localhost development server, reduced
+  motion, five runs: median **29.9 ms**, p95 **36.0 ms**.
+  Evidence: [preparation measurements](evidence/v1.1-card/preparation-measurements.json).
+  These are local goals; cold-load, mid-range phone, throttled 4G and public
+  launch median/p95 gates remain unmeasured and unwaived. Proof fault controls
+  use 200 ms normal preparation and 4.5 s slow preparation; those are synthetic
+  scenarios, not measured generation performance.
+- **Waivers:** None added. Contact-sheet approval does not waive freshness,
+  Card/overall visual acceptance, physical-device or production gates.
+- **Owner responsibilities:** Review the linked concrete proofs and phone
+  stack placement, then the remaining integrated UI pass on actual devices.
+  Production actions remain separately authorized.
+- **CODEMAP updated:** yes.
+
+## v1.1 procedural themes and requested viewport sizing — local review slice — 2026-10-26–27
+
+- **Built:** Recipe-generated OKLCH palettes, bounded verification/fallback,
+  immutable theme data and versions, generated Memory silhouettes, four surface
+  shapes, five styles and five own-item scatter arrangements. Memory/Block use
+  resolved themes; solo solving runs in a Web Worker with a logged fallback.
+  IndexedDB retains the latest three appearances; local D1 migration `0006`
+  stores versions/snapshots on starts and completed results. Legacy queued runs
+  remain compatible. A reproducible 60-theme sheet is prepared for taste review.
+  The owner subsequently requested the planned 1920×923 screenshot sizing fix:
+  viewport/container sizing replaces the fixed caps, names sit in the header
+  (below it on narrow portrait), and a full-width bottom help/high-score panel
+  leaves a clear gap around the game box. A completed zero-score game loses NEW.
+  Landscape uses one full-height game row; tray slots remain reachable. Drag
+  previews inherit the dealt colors/shapes, and small HUD/footer labels meet
+  4.5:1 text contrast. Current game entrances remain unchanged.
+- **Skipped (and why):** This is a local review slice, not completed v1.1.
+  Theme taste acceptance remains open. The Card/full UI pass, Connect/audio,
+  scoring customization and public-door withdrawal/explainers remain queued.
+  Phone landscape title placement and Card proofs remain part of the full UI
+  pass. No share links, admin game-test routes, deployment, production resources,
+  secret installation, DNS or Google changes.
+- **Known issues:** Freshness is best effort. The small shared symbol-family
+  vocabulary overlaps every later theme; the full conjunction misses in 99.99%
+  of simulated rounds. All violation rates are reported without weakening the
+  rules. Block stores shared symbol metadata without painting glyphs on pieces.
+  Concurrent ranked starts can read the same last-three history; accessibility
+  stays mandatory and start caps remain atomic. Small Block cells on short
+  landscape screens retain the physical space constraint; no universal 44px
+  per-cell target, real-device acceptance or new waiver is claimed. Cold/Next
+  preparation latency and production CPU/heap/operations remain unmeasured gates
+  or goals under their existing release contract.
+- **Decisions and pinned versions:** `theme-2026-10-26-1`,
+  `oklch-machado-1`; six harmonies plus free mode; contrast targets 3.3/5.5/9.
+  Post-hex margins: symbols/edges 3.1, primary text 4.7, back 1.55, CIE76 22,
+  effective decoration ≤1.25 at 20% opacity. Use the documented verified
+  Shapes/Ocean/Garden/Candy anchors. No package, scoring or engine-version
+  changes. Sources and choices are in `docs/DECISIONS.md`.
+- **Questions for the owner:** Review the theme sheet and enlarged screens,
+  specify palette/surface changes, and set the freshness target after reviewing
+  the measured vocabulary limits. The required taste gate comes from Work 1 of
+  the handoff scope and AGENTS rule 1. No deployment approval is requested.
+- **Evidence table:**
+
+| Acceptance item                                                                        | Evidence type                            | Where                                                                                      | Result                                                                                                                          |
+| -------------------------------------------------------------------------------------- | ---------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------------------------------------------------------------------------------------- |
+| Recipes/free mode, structural axes and immutable versions                              | Unit tests and typed JSON                | `src/lib/engine/theme/`                                                                    | pass                                                                                                                            |
+| 10,000 accessible themes per existing family                                           | Property check                           | `docs/evidence/v1.1-themes/palettes.json`                                                  | pass: 20,000/20,000                                                                                                             |
+| ≤5% fallback per initial 30° hue bucket                                                | Property report                          | Same JSON                                                                                  | pass: worst Memory 3.89%, Block 3.69%                                                                                           |
+| Documented anchors checked; bad palettes rejected                                      | Table parser/unit tests                  | `scripts/check-palettes.ts`, `theme.test.ts`                                               | pass                                                                                                                            |
+| Bounded freshness and accessible last-candidate fallback                               | Regression/simulation                    | `freshness.ts`, `theme.test.ts`, palettes JSON                                             | measured; owner target pending                                                                                                  |
+| Theme taste and overall visual acceptance                                              | HTML/PNG review                          | `docs/evidence/v1.1-themes/contact-sheet.html`, `contact-sheet.png`                        | pending owner                                                                                                                   |
+| Authoritative snapshots, old queued runs, saves and deletion                           | Real local D1 integration                | `tests/integration/runs.test.ts`, migration `0006`                                         | pass: 22 integration tests overall                                                                                              |
+| Unchanged game vectors and six theme regression vectors                                | Node/Bun/Chromium/Firefox/WebKit/workerd | `tests/vectors/`                                                                           | pass in all six runtimes                                                                                                        |
+| Shapes, 24px silhouettes, text contrast, gaps, sizing, reachable trays and themed drag | Three-browser automation and 36 captures | `tests/e2e/themes.spec.ts`, `docs/evidence/v1.1-themes/layouts.json`, `build/v1.1-themes/` | pass: 39 theme checks                                                                                                           |
+| Worker/storage failure behavior                                                        | Unit/browser regressions                 | `solo-theme.test.ts`, `theme-history.test.ts`, account/recovery checks                     | pass                                                                                                                            |
+| Full local release verification                                                        | `bun run verify`, exit 0 on 2026-10-27   | `docs/evidence/v1.1-themes/verification.json`, `build/v1.1-themes/verify.log`              | pass: format/lint, 0 errors/warnings, boundaries, 111 units, 22 integration, palettes, vectors, built Worker, 79 browser checks |
+| Phase status, privacy inventory, decisions and code map                                | Documentation                            | `V1.1_WORK.md`, `PRIVACY_RETENTION.md`, `DECISIONS.md`, `CODEMAP.md`                       | updated                                                                                                                         |
+
+- **Measurements:** Local Linux x64 development machine, Bun 1.4.2, no network,
+  preloaded generator, 10,000 runs per family. Memory median/p95 0.99/3.67 ms;
+  Block 1.77/7.48 ms (worst 124.19 ms). These are informational generation
+  measurements, not cold-load, phone, Worker CPU or Instant Next passes. Exact
+  values are in the JSON. Fallbacks: Memory 276/10,000 (2.76%), Block 299/10,000
+  (2.99%). Per-10,000-round freshness violation rates (recipe/hue/style/container/
+  symbols): Memory 38.18/70.57/48.29/57.53/99.99%; Block
+  38.17/70.69/49.05/58.45/99.99%. No owner freshness target is inferred.
+  One capture per family/viewport/browser covers 360×640, 390×844, 844×390,
+  1280×800, 1920×923 and 1920×1080. At 1920×923, Memory's panel is about
+  855×719 with an 805px grid (previously about 642×472 and 440px). Both panels
+  use about 78% of viewport height. Desktop panel height ≥70%, limiting-dimension
+  use ≥95%, clear gaps and no scroll are automated geometric gates; human
+  visual/real-device acceptance is still pending.
+- **Waivers:** None added. Earlier Step 6 and public guest/privacy evidence is
+  preserved. Taste, real-device, freshness-target and production gates remain.
+- **Owner responsibilities:** Review the sheet/screens and give palette/style
+  feedback, then review the subsequent Card proofs/phone stack. Production
+  operations and every deployment remain separate owner decisions.
+- **CODEMAP updated:** yes.
+
 ## v1 operator sign-in follow-up — 2026-10-26
 
 - **Built:** Distinct sign-in messages for rejected/replayed codes, recovery
@@ -929,3 +1313,263 @@ Source-upload verification (2026-10-23): `bun run lint` passed; `bun run check` 
 - **Waivers:** Real-phone play is not waived; it is pending the owner's device test.
 - **Owner responsibilities:** Finish the 20-round real-phone gate and confirm the tuned values (pair sizes, 500 ms mismatch hold, score formula, 250-point so-close threshold).
 - **CODEMAP updated:** yes
+
+## v1.1 Work 4 — per-game scoring (accepted locally, 2026-10-29)
+
+**Built:** Admin-only scoring editor for Block, Memory and Connect; bounded
+integer validation, restore defaults, sensitive re-authentication, atomic audit
+and immutable versions. Ranked starts record their version; client scoring,
+help, saved runs and authoritative replay use it. Current-version leaderboards
+and versioned local bests avoid comparing scores across changed coefficients.
+
+**Skipped:** Par-time editing, public deployment and Work 5, per scope.
+
+**Known issues:** A solo round started offline uses brief defaults; its version
+is retained on later save. Owner acceptance applies to the local PC review only;
+public-test acceptance and deployment remain separate.
+
+**Decisions:** See `docs/DECISIONS.md`; no dependency changes.
+
+| Acceptance item                                                          | Evidence                                                       | Result               |
+| ------------------------------------------------------------------------ | -------------------------------------------------------------- | -------------------- |
+| Edit and restore coefficients, validate inputs, audit and access control | `tests/integration/runs.test.ts`, `tests/e2e/operator.spec.ts` | Pass locally         |
+| New, in-flight and past scores and server replay use their versions      | `tests/integration/runs.test.ts`                               | Pass locally         |
+| Immutable versions, race and stale-edit handling, leaderboard separation | `tests/integration/runs.test.ts`                               | Pass locally         |
+| Cross-runtime scoring vectors                                            | `tests/vectors/runner.ts`                                      | Pass in six runtimes |
+| Local owner review                                                       | Owner                                                          | Pass                 |
+
+**Measurements:** No new performance gate specified for this step; production
+resource evidence remains a separate release gate. **Waivers:** None.
+**Owner responsibilities:** Direct the next handoff item, Work 5. No deployment was authorized.
+**CODEMAP:** Updated. Final `bun run verify` passed all stages: 30,000 palettes, unit and D1/auth integration, six-runtime vectors, built Worker and 156/156 browser checks. Local review/acceptance applies to the owner PC only; public-test acceptance was not claimed. See `docs/V1.1_WORK.md`.
+
+## v1.1 Work 5 — family-door withdrawal and static explainers (2026-10-31)
+
+**Built:** Removed the Memory and Block door pages and shared door screen.
+Legacy family slugs now redirect Home in the local app; `/play` query
+parameters cannot select a family. Ranked family issuance remains server-owned.
+Added static, indexable `/how-it-works`, `/about` and `/faq` content pages with
+reusable blocks. How it works has an abstract interactive four-step deal with
+clickable steps, autoplay, pause/replay and reduced-motion handling through the
+existing motion wrapper. Sitemap and robots omit game routes, `/play` is
+noindex, and the assets-only guest artifact includes the new pages and matching
+slug redirects.
+
+**Skipped:** CMS/blog, share links, per-game public pages, new games and
+deployment. They are outside this Work 5 scope; the guest artifact stayed local.
+
+**Known issues:** The owner accepted the separate Work 2 overall visual/device
+pass locally on 2026-10-31; specific device/browser models were not supplied.
+The rerun theme simulation reports at least one freshness violation in 99.99%
+of sampled rounds for each family, with symbol-family overlap the main
+constraint. This remains an existing Work 1 best-effort diagnostic; no numeric
+target was supplied and no theme code changed here.
+
+**Decisions:** Public game choice remains selector-only, including on `/play`;
+internal ranked issuance is unchanged. SvelteKit 3 route matchers use
+`defineParams` from `@sveltejs/kit/params` in root `src/params.ts`; the family
+list stays inline to avoid a built-Worker alias resolution failure. No package
+versions changed. See `docs/DECISIONS.md`.
+
+**Questions for the owner:** No Work 5 or Work 2 visual acceptance remains.
+Global-release planning should set the theme-freshness target and define the
+production/admin proposal. This does not authorize provisioning or deployment.
+
+**Evidence table:**
+
+| Acceptance item                                                                         | Evidence type and location                                                                                 | Result                                                                                            |
+| --------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------- |
+| Legacy family slugs return to Home; no public family door remains                       | `tests/e2e/explainers.spec.ts`, `scripts/check-worker.ts`, `scripts/check-public-privacy.ts`               | Pass locally                                                                                      |
+| `/play` query parameters cannot select a family                                         | `tests/e2e/explainers.spec.ts`; existing selector and ranked replay checks                                 | Pass locally                                                                                      |
+| Three indexable explainers work; the interactive page supports steps and reduced motion | `src/lib/content-explainers.ts`, `src/lib/components/DealExplainer.svelte`, `tests/e2e/explainers.spec.ts` | Pass locally, including JavaScript-disabled text                                                  |
+| Sitemap and robots omit game routes                                                     | `src/routes/sitemap.xml/+server.ts`, `src/routes/robots.txt/`, `scripts/check-worker.ts`                   | Pass locally                                                                                      |
+| Guest-only candidate contains the reviewed pages and no account/replay exposure         | `build/public-privacy/`; `bun run prepare:public-privacy`, `bun run test:public-privacy`                   | Pass: 109 files prepared; local checks pass                                                       |
+| Repository verification                                                                 | `bun run verify`; Playwright configured for one worker                                                     | Pass: 123 unit, 27 account integration, six runtime vectors, Worker smoke, 166/166 browser checks |
+| Work 5 local visual acceptance                                                          | Owner review in this conversation, 2026-10-31                                                              | Pass locally                                                                                      |
+| Work 2 overall integrated visual/device acceptance                                      | Owner review in this conversation, 2026-10-31                                                              | Pass locally; exact device/browser models not supplied                                            |
+| CODEMAP                                                                                 | `docs/CODEMAP.md`                                                                                          | Updated                                                                                           |
+
+**Measurements:** No new Work 5 latency target was specified. Explainer layout
+checks ran in headless local browsers at 390×844, 844×390 and 1280×800; no
+network profile, physical-device timing, cold-load timing or median/p95 was
+collected for these pages. The full verify incidentally reran the existing
+preloaded palette-generation goal on local Linux x64 / Bun 1.4.2, no network,
+10,000 runs per family: Memory median 1.18 ms / p95 4.86 ms; Block 1.40 / 5.09
+ms; Connect 1.52 / 6.23 ms. These are diagnostic goals, not gates. Full details
+and freshness/fallback counts are in `docs/evidence/v1.1-themes/palettes.json`.
+
+**Waivers:** None. Work 2 visual/device acceptance is recorded as a local pass.
+
+**Owner responsibilities:** Plan the global release, including production
+operations/resources and an admin-panel proposal. The theme-freshness target
+remains an owner decision. No account, credential, production-resource or
+deployment action is authorized by this local work.
+
+**CODEMAP:** Updated.
+
+## Next phase assessment — local only (2026-10-31)
+
+**Built:** Gap assessment with code evidence, current behavior, undo matrix,
+proposed order and owner decisions in `docs/NEXT_PHASE_ASSESSMENT.md`.
+**Skipped:** Implementation, test execution, deployment and remote operations;
+this slice was assessment only. **Known issues:** Single web-operator enrollment,
+audit integrity limitations and incomplete statistics are detailed in the report.
+**Decisions:** None; no dependency changes. **Questions for the owner:** See the
+report's ten decision questions; approve a slice and order before implementation.
+
+| Acceptance item                                                     | Evidence type and location                                   | Result                            |
+| ------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------- |
+| Six requested gaps and current local implementation                 | Code/schema/test inspection, `docs/NEXT_PHASE_ASSESSMENT.md` | Assessed; owner decisions pending |
+| Existing features, undo limits, proposed order and decision context | Code inspection, same report                                 | Documented                        |
+| Local-only and behavior unchanged                                   | Working-tree inspection; report-only documentation changes   | Pass                              |
+
+**Measurements:** None requested or collected. **Waivers:** None.
+**Owner responsibilities:** Review the report, decide the open questions and
+approve the next slice. **CODEMAP:** Updated with the assessment location.
+
+## Next phase slice 1 — local user controls and audit (2026-10-31)
+
+**Built:** Existing operator panel gains an admin-only user directory and detail,
+timed or permanent bans, reversible ordinary account deletion with an adjustable
+restoration deadline, audit filters, yearly paged export, and undo for moderation.
+D1 guards audit updates/deletes and captures mutation snapshots in the transaction.
+The local application records future account activity and reported round starts
+and explicit departures; it does not backfill historical activity. Owner-approved
+expiry behavior makes restoration impossible at the deadline and finalizes on
+the next application request or local maintenance. The local privacy text now
+describes these account records and deletion behavior.
+
+**Skipped:** Slice 2 game controls and scoring rollback, slice 3 endings, broad
+profile editing, role editing, production provisioning and deployment; these are
+outside this slice. Player-visible profiles are unchanged.
+
+**Known issues:** Activity collection is best effort, excludes guests, and can
+miss starts, departures or completion acknowledgements; unknown exits are not
+invented as abandonments. The last observed authenticated request may be a
+background request. Historical plays, abandonment, last activity and warnings are
+not recorded. Final anonymization cannot run while the app receives no requests
+and maintenance is not run; restoration is already blocked. Audit is retained
+indefinitely and may contain public names in prior rename snapshots, so retained
+audit is pseudonymous rather than a promise that every independent record is
+anonymous. Provider records and other devices remain separate. Real-device owner
+review and production privacy/operations remain separate gates.
+
+**Decisions:** Owner approved no historical estimates, future tracking, and
+request/maintenance-driven anonymization. Undoing an unban creates a fresh
+permanent ban with a new reason; a later action can change it. Saved score
+summaries group by rules group and score version. D1 batches capture state and
+mutation atomically; see Cloudflare D1 database documentation. No dependency
+versions changed. See `docs/DECISIONS.md`.
+
+**Questions for the owner:** Review the local slice and its limitations before
+accepting it and directing slice 2. No deployment is authorized.
+
+| Acceptance item                                                                | Evidence type and location                                                                                                                    | Result                                                       |
+| ------------------------------------------------------------------------------ | --------------------------------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Admin-only user details, saved stats and restricted Google identity            | `src/lib/server/admin-users.ts`, `tests/e2e/operator.spec.ts`                                                                                 | Local focused browser checks pass; owner review pending      |
+| Timed/permanent bans, expiry, restore and gameplay restrictions                | `src/lib/server/moderation.ts`, `src/lib/server/runs.ts`, `tests/integration/runs.test.ts`, `tests/e2e/operator.spec.ts`                      | Local integration and focused browser checks pass            |
+| Reversible ordinary delete, deadline and finalization; privacy-delete separate | `src/lib/server/user-lifecycle.ts`, `migrations/0009_sticky_black_knight.sql`, `tests/integration/runs.test.ts`, `tests/e2e/operator.spec.ts` | Local integration and focused browser checks pass            |
+| Immutable audit, filters, archive and moderation undo                          | `src/lib/server/audit.ts`, `src/lib/server/moderation.ts`, `tests/integration/audit.test.ts`, `tests/e2e/operator.spec.ts`                    | Local integration and focused browser checks pass            |
+| Honest historical gaps and forward activity tracking                           | `src/lib/server/activity.ts`, `tests/integration/activity.test.ts`, `src/lib/server/admin-users.ts`                                           | Local integration checks pass; tracking is best effort       |
+| Three admin viewport sizes                                                     | `tests/e2e/operator.spec.ts`: 390×844, 844×390, 1280×800                                                                                      | Focused Chromium checks pass; physical device review pending |
+| Full repository verification                                                   | `bun run verify`                                                                                                                              | Pass: all stages, 167/167 browser checks                     |
+
+**Measurements:** No new performance target specified; no physical-device,
+network or latency measurements collected. **Waivers:** None; the owner chose
+request-driven anonymization and honest historical gaps as implementation rules.
+**Owner responsibilities:** Review locally, accept or request changes before
+slice 2, and separately decide any production/deployment work. **CODEMAP:** Updated.
+
+## Owner direction — combined review for next-phase slices (2026-10-31)
+
+The owner directed completing all three local slices before one combined owner
+review. Slice 1 remains review-pending; continuing implementation is not acceptance.
+Slices 2 and 3 and their verification remain required. Close the work only after
+the owner completes and accepts the combined review. No deployment or production
+change is authorized by this direction.
+
+## Owner quick-review changes — pending implementation/verification (2026-10-31)
+
+Owner requested Users and Audit overview/detail navigation, user search/filters
+and right-side quick view, structured individual detail, pre-fold ending text
+(minimum 500 ms) followed by a 500 ms fold, and investigation of signed-in 403s.
+See `docs/DECISIONS.md`. All three slices remain pending full owner review;
+this feedback is not acceptance. Combined verification/handoff remains required.
+
+Owner added styled Users tabs/sidebar submenus and a Games overview with dedicated
+per-game settings/statistics screens. The focused browser run was stopped for
+these changes after 8 checks passed; one active check was interrupted, not a
+completed assertion failure. Verification of the final UI remains pending.
+
+## Combined next-phase slices 2–3 and owner quick-review refinements — local (2026-10-31)
+
+**Built:** Central game overview and dedicated game statistics/settings screens,
+availability-aware selector, audited disable/re-enable and staged deletion that
+preserves history, scoring rollback as a new immutable version, and server-valid
+fallback for invalid live coefficients. Shared manifest-validated ending text now
+appears over the completed board: 420 ms entrance, at least 500 ms settled hold,
+then a 500 ms fold into the played stack and the existing result sequence.
+Reduced motion holds instant text for 500 ms and settles folding immediately.
+Completion queue/storage fallback and selected-family recovery are preserved.
+
+Owner quick-review changes add Users/Audit summary screens, expandable sidebar
+menus, styled section navigation, searchable/filterable directory, right-side
+quick view, structured individual-user tabs/cards/tables, and compact headers
+with full-width content. Expired admin grants now require sign-in (401), while
+real permission denials remain 403. Screenshot inspection prompted readable
+scrolling tables, a structured drawer and compact audit filter/export panels.
+
+**Skipped:** Deployment, remote provisioning, broader game settings, par times,
+role editing, CMS and new games. Existing overview cards and ending presentation
+were retained where screenshots showed a clear design.
+
+**Known issues:** Historical stats remain limited to retained saved rounds;
+unknown abandonment and end-type counts are not invented. Per-game grouped
+statistics disclose a 100-group display cap. Prospective account tracking is
+best effort. The separate live/static guest release has no backend availability
+control and is unchanged. Hard game deletion retires availability, retaining the
+installed replay code and history. The requested Block cap wording “Board full!”
+is retained, although a placement cap does not guarantee full grid occupancy.
+A transient local multi-process SQLite lock occurred during one capture run;
+the isolated rerun passed. Before captures include the already-completed first
+user-detail polish; no earlier screenshot is fabricated.
+
+**Decisions:** The owner explicitly authorized all slices before one combined
+review and supplied visual corrections. None of that constitutes final
+acceptance. See `docs/DECISIONS.md`. No dependency versions changed.
+
+**Questions for the owner:** Review `docs/NEXT_PHASE_REVIEW.md` and the local
+before/after gallery, then accept or request corrections. Closing the work waits
+for that acceptance; no production/deployment action follows automatically.
+
+| Acceptance item                                                                     | Evidence type/location                                                                   | Result                                                       |
+| ----------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| User/audit overview, directory/drawer/tabs, restricted identity and controls        | `tests/e2e/operator.spec.ts`, `server/admin-users.ts`, operator route                    | Focused Chromium pass                                        |
+| Expired grants distinguish sign-in from role denial                                 | `tests/integration/operator.test.ts`, `server/operator.ts`                               | Integration pass                                             |
+| Game state transitions, history preservation, ranked start guard                    | `tests/integration/runs.test.ts`, `server/games.ts`, migration `0010_game_lifecycle.sql` | Integration pass                                             |
+| New-version rollback and invalid-live fallback                                      | `tests/integration/scoring.test.ts`, `server/scoring.ts`                                 | Integration pass                                             |
+| Disabled families excluded, retry and all-disabled recovery                         | `selector.test.ts`, `tests/e2e/selector.spec.ts`                                         | Focused unit/browser pass                                    |
+| Ending declarations, text ordering/hold/fold, durable completion and reduced motion | `ending-contract.test.ts`, `tests/e2e/{ending,connect}.spec.ts`                          | Focused unit/browser pass                                    |
+| Screenshot review at required sizes plus owner desktop                              | `build/combined-review/{before,after}/`, local `index.html`                              | 63 matched pairs; 48 admin and 15 game images per stage      |
+| Final combined full verification                                                    | `bun run verify`                                                                         | Pass: 174/174 browser checks; all stages passed (2026-11-01) |
+
+**Measurements:** No new latency target specified. Screenshot sizes: 390×844,
+844×390 and 1280×800 for games/admin, plus 1920×923 for admin. Local headless
+Chromium, no network timing profile; these are layout checks, not device latency
+measurements. **Waivers:** None. **Owner responsibilities:** Complete combined
+local visual/device/functional review and acceptance; production remains a
+separate gate. **CODEMAP:** Updated. All slices remain owner-review pending.
+
+### Final combined verification — 2026-11-01
+
+`bun run verify` completed with exit 0 after the final quick-review styling and
+short-landscape sidebar fixes: format/lint, zero-error/zero-warning type check,
+import-boundary self-checks, 30,000 palettes, 126 unit tests, 37 account integration
+tests, vectors in Node/Bun/Chromium/Firefox/WebKit/workerd, 32 built-Worker smoke
+checks, and 174/174 browser checks (one worker, 35.8 minutes). Full persistent log:
+`build/combined-review/verify-final.log`. Final capture evidence has 63 matched
+before/after pairs; `docs/NEXT_PHASE_VISUAL_REVIEW.md` records findings.
+
+All implementation and automated checks are complete locally. All three slices
+and owner quick-review changes remain **pending combined owner acceptance**.
+No deployment occurred. CODEMAP and review handoff are updated.

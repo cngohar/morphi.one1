@@ -1,0 +1,29 @@
+{
+	"classification": "single headless run per browser, unthrottled localhost; diagnostic, not physical-device smoothness acceptance",
+	"browsers": [
+		{
+			"browser": "chromium",
+			"firstScoreFrameMasked": true,
+			"otherResultTextStatic": true,
+			"resolveMs": 511.5,
+			"oneContinuousFrame": true,
+			"previewMs": 2994.3000000000466
+		},
+		{
+			"browser": "firefox-themes",
+			"firstScoreFrameMasked": true,
+			"otherResultTextStatic": true,
+			"resolveMs": 486,
+			"oneContinuousFrame": true,
+			"previewMs": 3334
+		},
+		{
+			"browser": "webkit-themes",
+			"firstScoreFrameMasked": true,
+			"otherResultTextStatic": true,
+			"resolveMs": 513,
+			"oneContinuousFrame": true,
+			"previewMs": 3007
+		}
+	]
+}

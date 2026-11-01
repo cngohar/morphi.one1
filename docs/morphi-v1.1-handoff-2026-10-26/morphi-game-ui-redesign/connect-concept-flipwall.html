@@ -1,0 +1,231 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept 7 · The Flip Wall — the board is dealt in clattering tiles</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#C9CFDA; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; color:#1B2433;
+         display:flex; flex-direction:column; align-items:center; padding:26px 10px 34px; }
+  .screen { position:relative; width:1200px; height:800px; background:#E8EAF0; border-radius:18px;
+            overflow:hidden; box-shadow:0 18px 50px rgba(27,36,51,.28); flex:none; }
+  .hdr { position:absolute; top:0; left:0; right:0; height:66px; z-index:5; }
+  .logo { position:absolute; left:44px; top:17px; font-size:25px; font-weight:900; letter-spacing:-.02em; }
+  .logo i { color:#E5532D; font-style:normal; }
+  .gname { position:absolute; left:0; right:0; top:16px; text-align:center; font-size:23px; font-weight:900;
+           letter-spacing:.14em; font-family:"Consolas","SF Mono",monospace; }
+  .gname .fl { display:inline-block; background:#2E3442; color:#F2D38A; border-radius:6px; padding:3px 7px; margin:0 2px;
+               box-shadow:inset 0 -8px 0 rgba(0,0,0,.25); }
+  .acct { position:absolute; right:118px; top:14px; border:2px solid #7A889E; background:#fff; color:#1B2433;
+          border-radius:999px; padding:8px 20px; font-size:13.5px; font-weight:700; }
+  .snd { position:absolute; right:44px; top:12px; width:42px; height:42px; border-radius:50%;
+         background:#fff; border:2px solid #C9D5E2; display:flex; align-items:center; justify-content:center; }
+  .box { position:absolute; left:50%; margin-left:-330px; top:88px; width:660px; background:#D8DCE6;
+         border:2px solid #B9C0D0; border-radius:26px; padding:18px 0 16px; opacity:0; z-index:3; }
+  .hud { display:flex; padding:0 34px 14px; border-bottom:2px solid rgba(27,36,51,.10); }
+  .stat { flex:1; text-align:center; }
+  .stat b { display:block; font-size:10.5px; letter-spacing:.22em; color:#68798E; font-weight:700; margin-bottom:5px; }
+  .stat span { font-size:23px; font-weight:900; }
+  .boardwrap { position:relative; width:496px; height:496px; margin:14px auto 0; }
+  .grid { display:grid; grid-template-columns:repeat(6,76px); grid-template-rows:repeat(6,76px); gap:8px; }
+  .cell { position:relative; border-radius:10px; overflow:hidden; background:#2E3442;
+          background-image:linear-gradient(180deg, rgba(255,255,255,.08) 50%, rgba(0,0,0,.16) 50%);
+          display:flex; align-items:center; justify-content:center;
+          box-shadow:0 3px 6px rgba(27,36,51,.25); }
+  .cell::after { content:''; position:absolute; left:0; right:0; top:50%; height:2px; margin-top:-1px; background:rgba(0,0,0,.35); }
+  .cell .glyph { font-size:27px; font-weight:900; color:#C7D0DE; font-family:"Consolas","SF Mono",monospace; }
+  .dot { position:absolute; width:56px; height:56px; border-radius:50%; display:flex; align-items:center;
+         justify-content:center; color:#fff; font-size:23px; font-weight:900; opacity:0;
+         box-shadow:inset 0 0 0 3px rgba(0,0,0,.18); z-index:3; }
+  .bottombar { position:absolute; left:0; right:0; bottom:0; height:62px; background:#D8DCE6;
+               border-top:2px solid #B9C0D0; z-index:5; }
+  .pill { position:absolute; top:11px; background:#fff; border:2px solid #8E99B0; border-radius:999px;
+          padding:9px 20px; font-size:13.5px; font-weight:700; }
+  .hs { position:absolute; top:10px; text-align:right; }
+  .hs b { display:block; font-size:9.5px; letter-spacing:.22em; color:#68798E; margin-bottom:3px; }
+  .hs span { font-size:19px; font-weight:900; }
+  .newchip { font-style:normal; display:inline-block; background:#F7D08A; color:#1B2433;
+             font-size:8.5px; font-weight:900; letter-spacing:.14em; border-radius:999px;
+             padding:2px 7px 1px; margin-left:6px; vertical-align:2px; }
+  .motif { position:absolute; opacity:.18; pointer-events:none; }
+  .note { margin-top:16px; font-size:13.5px; color:#4A5064; text-align:center; max-width:940px; line-height:1.6; }
+  .note b { color:#1B2433; }
+  button.replay { background:#2E3442; color:#fff; border:none; border-radius:999px; padding:10px 22px;
+                  font-size:14px; font-weight:700; cursor:pointer; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="screen">
+  <svg class="motif" style="left:70px;top:200px" width="76" height="76" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#9253BE" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="12" fill="#9253BE"/><circle cx="62" cy="14" r="12" fill="#9253BE"/></svg>
+  <svg class="motif" style="right:84px;top:330px" width="66" height="66" viewBox="0 0 76 76"><polyline points="62,62 62,14 14,14" fill="none" stroke="#794300" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="62" cy="62" r="12" fill="#794300"/><circle cx="14" cy="14" r="12" fill="#794300"/></svg>
+
+  <div class="hdr">
+    <div class="logo">Morphi<i>.</i>One</div>
+    <div class="gname" id="gname"></div>
+    <div class="acct">Your account</div>
+    <div class="snd"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="4,9 8,9 13,4 13,20 8,15 4,15" fill="#1B2433"/><path d="M16 9c1.2 1.6 1.2 4.4 0 6M18.5 6.5c2.4 3.2 2.4 7.8 0 11" stroke="#1B2433" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>
+  </div>
+
+  <div class="box" id="box">
+    <div class="hud">
+      <div class="stat"><b>SCORE</b><span id="vScore">0</span></div>
+      <div class="stat"><b>PAIRS</b><span id="vPairs">0 / 6</span></div>
+      <div class="stat"><b>FILLED</b><span id="vFilled">0 / 36</span></div>
+    </div>
+    <div class="boardwrap">
+      <div class="grid" id="grid"></div>
+      <svg id="pathSvg" width="496" height="496" viewBox="0 0 496 496" style="position:absolute;left:0;top:0;pointer-events:none;z-index:2">
+        <polyline id="pathB" points="122,290 122,374 206,374 290,374 374,374 374,458" fill="none" stroke="#794300" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" opacity=".45" pathLength="100" style="stroke-dasharray:100;stroke-dashoffset:100"/>
+      </svg>
+      <div id="dots"></div>
+    </div>
+  </div>
+
+  <div class="bottombar">
+    <div class="pill" style="left:270px">How to play</div>
+    <div class="pill" style="left:415px">Scoring &amp; tips</div>
+    <div class="hs" style="right:270px"><b>YOUR HIGH SCORE<em class="newchip">NEW</em></b><span>0</span></div>
+  </div>
+</div>
+
+<p class="note"><b>CONCEPT 7 · THE FLIP WALL — the board is dealt in clattering tiles.</b> The whole screen is a split-flap board,
+like the old station departure wall. Press Play and all thirty-six tiles start <b>flapping</b> through symbols — clack-clack-clack —
+settling one by one until the puzzle stands revealed. Even the name is not shown: it is <i>spelled</i>, letter by letter, on flap
+tiles in the header. Next puzzle? The wall flaps again and deals a new board in new colours. Nothing on Morphi would ever sit still:
+the site itself deals with a sound and a shiver.</p>
+<button class="replay" id="replay">&#8635; Replay concept</button>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script>
+  var PAIRS = [
+    { col:'#9253BE', warm:'#C25E2E', sym:'\u2B22', a:[0,0], b:[5,1] },
+    { col:'#794300', warm:'#8A6D1F', sym:'\u25CE', a:[1,3], b:[4,5] },
+    { col:'#003320', warm:'#5B7444', sym:'\u2B1F', a:[0,4], b:[5,4] },
+    { col:'#DC5E87', warm:'#B23A68', sym:'\u25B2', a:[0,2], b:[5,5] },
+    { col:'#9253BE', warm:'#C25E2E', sym:'\u25C6', a:[2,5], b:[4,0] },
+    { col:'#794300', warm:'#8A6D1F', sym:'\u2605', a:[5,2], b:[3,5] }
+  ];
+  var pairAt = {};
+  PAIRS.forEach(function(p, pi) { [p.a, p.b].forEach(function(rc) { pairAt[rc[0] * 6 + rc[1]] = pi; }); });
+  var GLYPHS = '\u2605\u25C6\u25CF\u25B2\u25A0\u271A\u2726\u2665\u2660\u2663\u2666?\u273F';
+  var FAINT = ['\u2726', '?', '\u2727', '\u271A', '\u25C6'];
+  var grid = document.getElementById('grid'), cells = [], glyphs = [];
+  for (var gi = 0; gi < 36; gi++) {
+    var cell = document.createElement('div'); cell.className = 'cell';
+    var g = document.createElement('span'); g.className = 'glyph'; g.textContent = '?';
+    cell.appendChild(g); grid.appendChild(cell); cells.push(cell); glyphs.push(g);
+  }
+  var dotsEl = document.getElementById('dots'), dotEls = [], dotCell = [];
+  PAIRS.forEach(function(p) {
+    [p.a, p.b].forEach(function(rc) {
+      var d = document.createElement('div');
+      d.className = 'dot'; d.style.background = p.col;
+      d.style.left = (rc[1] * 84 + 10) + 'px'; d.style.top = (rc[0] * 84 + 10) + 'px';
+      d.textContent = p.sym; dotsEl.appendChild(d); dotEls.push(d); dotCell.push(rc[0] * 6 + rc[1]);
+    });
+  });
+  var gname = document.getElementById('gname'), nameSpans = [];
+  'CONNECT'.split('').forEach(function() {
+    var s = document.createElement('span'); s.className = 'fl'; s.textContent = '?';
+    gname.appendChild(s); nameSpans.push(s);
+  });
+  var pathB = document.getElementById('pathB'), vPairs = document.getElementById('vPairs'),
+      vFilled = document.getElementById('vFilled'), vScore = document.getElementById('vScore');
+  function hexA(hex, a) {
+    var n = parseInt(hex.slice(1), 16);
+    return 'rgba(' + (n >> 16 & 255) + ',' + (n >> 8 & 255) + ',' + (n & 255) + ',' + a + ')';
+  }
+  var timers = [];
+  function later(fn, ms) { var id = setTimeout(fn, ms); timers.push(id); return id; }
+  function clearTimers() { timers.forEach(clearTimeout); timers = []; if (flapInt) { clearInterval(flapInt); flapInt = null; } if (nameInt) { clearInterval(nameInt); nameInt = null; } }
+  var flapInt = null, nameInt = null;
+  function flapBoard(warm, onDone) {
+    var tick = 0;
+    var settleAt = cells.map(function(_, i) { return 5 + Math.round(i * .55) + Math.floor(Math.random() * 4); });
+    var settled = cells.map(function() { return false; });
+    flapInt = setInterval(function() {
+      tick++;
+      var allDone = true;
+      cells.forEach(function(cell, i) {
+        if (settled[i]) return;
+        if (tick >= settleAt[i]) {
+          settled[i] = true;
+          var pi = pairAt[i];
+          if (pi !== undefined) {
+            var col = warm ? PAIRS[pi].warm : PAIRS[pi].col;
+            cell.style.backgroundColor = hexA(col, .30);
+            glyphs[i].textContent = '';
+            var di = dotCell.indexOf(i);
+            anime({ targets: dotEls[di], opacity: [0, 1], scale: [.4, 1], duration: 300, easing: 'easeOutBack' });
+          } else {
+            glyphs[i].textContent = FAINT[i % FAINT.length];
+            glyphs[i].style.color = warm ? '#A2937A' : '#7C879C';
+            glyphs[i].style.opacity = '.55';
+          }
+        } else {
+          allDone = false;
+          glyphs[i].textContent = GLYPHS[Math.floor(Math.random() * GLYPHS.length)];
+          glyphs[i].style.color = warm ? '#D8CCAF' : '#C7D0DE';
+          glyphs[i].style.opacity = '1';
+          anime({ targets: glyphs[i], scaleY: [{ value: .15, duration: 26 }, { value: 1, duration: 28 }], easing: 'linear' });
+        }
+      });
+      if (allDone) { clearInterval(flapInt); flapInt = null; if (onDone) onDone(); }
+    }, 55);
+  }
+  function flapName() {
+    var target = 'CONNECT', tick = 0;
+    var settleAt = target.split('').map(function(_, i) { return 10 + i * 5; });
+    nameInt = setInterval(function() {
+      tick++;
+      var done = true;
+      nameSpans.forEach(function(s, i) {
+        if (tick >= settleAt[i]) { s.textContent = target[i]; }
+        else { done = false; s.textContent = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'[Math.floor(Math.random() * 26)]; }
+      });
+      if (done) { clearInterval(nameInt); nameInt = null; }
+    }, 55);
+  }
+  var st = { score: 0 };
+  function play() {
+    clearTimers();
+    anime.remove(['#box', '.dot', '#pathB']);
+    anime.set('#box', { opacity: 0 });
+    anime.set('.dot', { opacity: 0, scale: .4 });
+    anime.set(pathB, { strokeDashoffset: 100 });
+    cells.forEach(function(cell, i) {
+      cell.style.backgroundColor = '';
+      glyphs[i].textContent = '?'; glyphs[i].style.opacity = '1'; glyphs[i].style.color = '#C7D0DE';
+    });
+    dotEls.forEach(function(d, i) { d.style.background = PAIRS[Math.floor(i / 2)].col; });
+    pathB.setAttribute('stroke', '#794300');
+    st.score = 0; vScore.textContent = '0'; vPairs.textContent = '0 / 6'; vFilled.textContent = '0 / 36';
+    anime({ targets: '#box', opacity: [0, 1], duration: 450, easing: 'easeOutQuad' });
+    later(function() {
+      flapName();
+      flapBoard(false, function() {
+        anime({ targets: pathB, strokeDashoffset: [100, 0], duration: 620, easing: 'easeInOutQuad' });
+        vPairs.textContent = '1 / 6'; vFilled.textContent = '10 / 36';
+        anime({ targets: st, score: 200, duration: 620, easing: 'easeInOutQuad',
+                update: function() { vScore.textContent = Math.round(st.score); } });
+      });
+    }, 350);
+    // the wall flaps again: a new deal, warm (4800+)
+    later(function() {
+      anime({ targets: pathB, strokeDashoffset: [0, 100], duration: 300, easing: 'easeInQuad' });
+      anime({ targets: '.dot', opacity: [1, 0], duration: 280, easing: 'easeInQuad' });
+      vPairs.textContent = '0 / 6'; vFilled.textContent = '0 / 36'; vScore.textContent = '0'; st.score = 0;
+      later(function() {
+        dotEls.forEach(function(d, i) { d.style.background = PAIRS[Math.floor(i / 2)].warm; });
+        pathB.setAttribute('stroke', '#8A6D1F');
+        flapName();
+        flapBoard(true, null);
+      }, 420);
+    }, 4800);
+  }
+  play();
+  document.getElementById('replay').addEventListener('click', play);
+</script>
+</body>
+</html>

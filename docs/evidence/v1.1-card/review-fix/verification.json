@@ -1,0 +1,59 @@
+{
+	"date": "2026-10-28",
+	"scope": "desktop Card/scatter correction and result entrance",
+	"result": "pass",
+	"checks": [
+		{
+			"name": "Card and responsive backdrop checks",
+			"tests": 54,
+			"browsers": ["Chromium", "Firefox", "WebKit"],
+			"log": "build/v1.1-card/review-fix/browser.log"
+		},
+		{
+			"name": "installed Google Chrome Card geometry",
+			"tests": 1,
+			"log": "build/v1.1-card/review-fix/chrome.log"
+		},
+		{
+			"name": "result entrance, score-only scramble, early Next and reduced motion",
+			"tests": 9,
+			"browsers": ["Chromium", "Firefox", "WebKit"],
+			"log": "build/v1.1-card/review-fix/result-tests.log"
+		},
+		{
+			"name": "installed Google Chrome result entrance and early Next",
+			"tests": 2,
+			"log": "build/v1.1-card/review-fix/chrome-result.log"
+		}
+	],
+	"otherChecks": {
+		"typeCheck": "0 errors, 0 warnings",
+		"targetedLint": "pass",
+		"backdropPropertyTest": "pass (200 seeded themes)"
+	},
+	"geometry": {
+		"viewport": "1920\u00d7923",
+		"roundsPerBrowser": 3,
+		"centreTolerancePx": 1,
+		"approachingStackTolerancePx": 12,
+		"classification": "controlled browser clock; geometry gate, not a physical-device performance measurement"
+	},
+	"resultMotion": {
+		"entranceMs": 420,
+		"travelPx": 20,
+		"scoreScrambleMs": 500,
+		"acceptedExitMs": 350,
+		"earlyNext": "continues from current visual frame without a flash",
+		"reducedMotion": "settles immediately"
+	},
+	"backdrop": {
+		"adapter": "own-items-4",
+		"counts": "1\u20135 per side",
+		"placement": "independent seeded x/y mapped across actual exposed background space",
+		"compactLayouts": "object layer hidden",
+		"blendAndOpacity": "preserved"
+	},
+	"fullVerificationBaseline": "../verification.json (earlier 110-test full run; new position/result checks above supersede its geometry coverage)",
+	"ownerVisualAcceptance": "Card/phone stack and overall visual review remain separate",
+	"deployment": "none"
+}

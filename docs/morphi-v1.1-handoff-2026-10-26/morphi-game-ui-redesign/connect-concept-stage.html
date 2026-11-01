@@ -1,0 +1,234 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept 4 · The Stage — tonight's puzzle, performed live</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#171320; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; color:#F3EAD8;
+         display:flex; flex-direction:column; align-items:center; padding:26px 10px 34px; }
+  .screen { position:relative; width:1200px; height:800px; background:#241D31; border-radius:18px;
+            overflow:hidden; box-shadow:0 18px 50px rgba(0,0,0,.5); flex:none; }
+  .hdr { position:absolute; top:0; left:0; right:0; height:66px; z-index:5; }
+  .logo { position:absolute; left:44px; top:17px; font-size:25px; font-weight:900; letter-spacing:-.02em; color:#F3EAD8; }
+  .logo i { color:#E8B34B; font-style:normal; }
+  .gname { position:absolute; left:0; right:0; top:15px; text-align:center; font-size:25px; font-weight:900; opacity:0; color:#F3EAD8; }
+  .acct { position:absolute; right:118px; top:14px; border:2px solid #8D8272; background:transparent; color:#F3EAD8;
+          border-radius:999px; padding:8px 20px; font-size:13.5px; font-weight:700; }
+  .snd { position:absolute; right:44px; top:12px; width:42px; height:42px; border-radius:50%;
+         background:transparent; border:2px solid #8D8272; display:flex; align-items:center; justify-content:center; }
+  .house { position:absolute; left:0; right:0; top:66px; bottom:62px; background:#000; opacity:0; z-index:2; pointer-events:none; }
+  .box { position:absolute; left:50%; margin-left:-330px; top:104px; width:660px; background:#ECE0FD;
+         border:2px solid #CDBCEC; border-radius:26px; padding:18px 0 16px; opacity:0; z-index:3; color:#1B2433; }
+  .hud { display:flex; padding:0 34px 14px; border-bottom:2px solid rgba(27,36,51,.08); }
+  .stat { flex:1; text-align:center; }
+  .stat b { display:block; font-size:10.5px; letter-spacing:.22em; color:#68798E; font-weight:700; margin-bottom:5px; }
+  .stat span { font-size:23px; font-weight:900; }
+  .boardwrap { position:relative; width:496px; height:496px; margin:14px auto 0; }
+  .grid { display:grid; grid-template-columns:repeat(6,76px); grid-template-rows:repeat(6,76px); gap:8px; }
+  .cell { background:rgba(255,255,255,.38); border:1px solid rgba(27,36,51,.07); border-radius:16px; opacity:0; }
+  .dot { position:absolute; width:56px; height:56px; border-radius:50%; display:flex; align-items:center;
+         justify-content:center; color:#fff; font-size:23px; font-weight:900; opacity:0;
+         box-shadow:inset 0 0 0 3px rgba(0,0,0,.18); z-index:3; }
+  .spot { position:absolute; left:50%; top:96px; margin-left:-330px; width:660px; height:660px; border-radius:50%;
+          background:radial-gradient(closest-side, rgba(255,240,200,.30), rgba(255,240,200,0) 72%);
+          opacity:0; z-index:4; pointer-events:none; }
+  .applause { position:absolute; left:270px; right:270px; top:120px; bottom:70px; z-index:5; pointer-events:none; }
+  .applause i { position:absolute; bottom:0; width:9px; height:9px; border-radius:50%; background:#E8B34B; opacity:0; }
+  .curtain { position:absolute; top:66px; bottom:62px; width:50.6%; z-index:8;
+             background:repeating-linear-gradient(90deg, #5F1622 0 24px, #93303F 24px 46px, #7E2233 46px 72px, #4E111B 72px 84px);
+             box-shadow:inset 0 -18px 0 #E8B34B; }
+  #curtainL { left:0; border-right:4px solid #3D0D15; }
+  #curtainR { right:0; border-left:4px solid #3D0D15; }
+  .valance { position:absolute; left:0; right:0; top:66px; height:52px; z-index:9;
+             background:repeating-linear-gradient(90deg, #5F1622 0 24px, #93303F 24px 46px, #7E2233 46px 72px, #4E111B 72px 84px);
+             border-bottom:5px solid #E8B34B;
+             -webkit-mask-image:radial-gradient(circle 17px at 21px -4px, transparent 16px, #000 17px);
+             -webkit-mask-size:42px 52px; -webkit-mask-repeat:repeat-x;
+             mask-image:radial-gradient(circle 17px at 21px -4px, transparent 16px, #000 17px);
+             mask-size:42px 52px; mask-repeat:repeat-x; }
+  .titlecard { position:absolute; left:50%; top:308px; margin-left:-200px; width:400px; z-index:10; opacity:0;
+               background:#171220; border:2px solid #E8B34B; border-radius:14px; padding:26px 0 22px; text-align:center;
+               box-shadow:0 24px 60px rgba(0,0,0,.55); }
+  .titlecard .act { font-size:12px; font-weight:900; letter-spacing:.34em; color:#E8B34B; }
+  .titlecard .ttl { font-size:40px; font-weight:900; color:#F3EAD8; margin:8px 0 4px; }
+  .titlecard .sub { font-size:13.5px; color:#B9AC93; font-weight:600; }
+  .bottombar { position:absolute; left:0; right:0; bottom:0; height:62px; background:#2C2438;
+               border-top:2px solid #4A3F5E; z-index:5; }
+  .pill { position:absolute; top:11px; background:transparent; border:2px solid #8D8272; color:#F3EAD8; border-radius:999px;
+          padding:9px 20px; font-size:13.5px; font-weight:700; }
+  .hs { position:absolute; top:10px; text-align:right; color:#F3EAD8; }
+  .hs b { display:block; font-size:9.5px; letter-spacing:.22em; color:#B9AC93; margin-bottom:3px; }
+  .hs span { font-size:19px; font-weight:900; }
+  .newchip { font-style:normal; display:inline-block; background:#F7D08A; color:#1B2433;
+             font-size:8.5px; font-weight:900; letter-spacing:.14em; border-radius:999px;
+             padding:2px 7px 1px; margin-left:6px; vertical-align:2px; }
+  .note { margin-top:16px; font-size:13.5px; color:#B9AC93; text-align:center; max-width:940px; line-height:1.6; }
+  .note b { color:#F3EAD8; }
+  button.replay { background:#E8B34B; color:#1B2433; border:none; border-radius:999px; padding:10px 22px;
+                  font-size:14px; font-weight:800; cursor:pointer; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="house" id="house"></div>
+
+  <div class="box" id="box">
+    <div class="hud">
+      <div class="stat"><b>SCORE</b><span id="vScore">0</span></div>
+      <div class="stat"><b>PAIRS</b><span id="vPairs">0 / 6</span></div>
+      <div class="stat"><b>FILLED</b><span id="vFilled">0 / 36</span></div>
+    </div>
+    <div class="boardwrap">
+      <div class="grid" id="grid"></div>
+      <svg id="pathSvg" width="496" height="496" viewBox="0 0 496 496" style="position:absolute;left:0;top:0;pointer-events:none;z-index:2">
+        <polyline id="pathB" points="122,290 122,374 206,374 290,374 374,374 374,458" fill="none" stroke="#794300" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" opacity=".45" pathLength="100" style="stroke-dasharray:100;stroke-dashoffset:100"/>
+      </svg>
+      <div id="dots"></div>
+    </div>
+  </div>
+  <div class="spot" id="spot"></div>
+  <div class="applause" id="applause"></div>
+
+  <div class="hdr">
+    <div class="logo">Morphi<i>.</i>One</div>
+    <div class="gname" id="gname">Connect</div>
+    <div class="acct">Your account</div>
+    <div class="snd"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="4,9 8,9 13,4 13,20 8,15 4,15" fill="#F3EAD8"/><path d="M16 9c1.2 1.6 1.2 4.4 0 6M18.5 6.5c2.4 3.2 2.4 7.8 0 11" stroke="#F3EAD8" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>
+  </div>
+
+  <div class="curtain" id="curtainL"></div>
+  <div class="curtain" id="curtainR"></div>
+  <div class="valance"></div>
+  <div class="titlecard" id="titlecard">
+    <div class="act" id="tcAct">ACT I</div>
+    <div class="ttl">Connect</div>
+    <div class="sub">a puzzle, dealt to you</div>
+  </div>
+
+  <div class="bottombar" id="bottombar">
+    <div class="pill" style="left:270px">How to play</div>
+    <div class="pill" style="left:415px">Scoring &amp; tips</div>
+    <div class="hs" style="right:270px"><b>YOUR HIGH SCORE<em class="newchip">NEW</em></b><span>0</span></div>
+  </div>
+</div>
+
+<p class="note"><b>CONCEPT 4 · THE STAGE — tonight's puzzle, performed live.</b> The house lights dim. A title card announces the act —
+and until that moment, not even the header knows what is playing. The curtains part, the spotlight finds the board, and the puzzle
+<b>takes the stage</b>. Play, take a bow (watch for the applause), and the curtains close — then reopen on <b>Act II</b>: the same stage,
+a new production, warm colours. Every deal is a performance with a beginning and an end; the puzzle is not a page, it is a show you are
+seated for. The shell is the theatre: header the marquee, bottom panel the orchestra pit.</p>
+<button class="replay" id="replay">&#8635; Replay concept</button>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script>
+  var PAIRS = [
+    { col:'#9253BE', warm:'#C25E2E', sym:'\u2B22', a:[0,0], b:[5,1] },
+    { col:'#794300', warm:'#8A6D1F', sym:'\u25CE', a:[1,3], b:[4,5] },
+    { col:'#003320', warm:'#5B7444', sym:'\u2B1F', a:[0,4], b:[5,4] },
+    { col:'#DC5E87', warm:'#B23A68', sym:'\u25B2', a:[0,2], b:[5,5] },
+    { col:'#9253BE', warm:'#C25E2E', sym:'\u25C6', a:[2,5], b:[4,0] },
+    { col:'#794300', warm:'#8A6D1F', sym:'\u2605', a:[5,2], b:[3,5] }
+  ];
+  var grid = document.getElementById('grid');
+  for (var gi = 0; gi < 36; gi++) { var gc = document.createElement('div'); gc.className = 'cell'; grid.appendChild(gc); }
+  var dotsEl = document.getElementById('dots'), dotEls = [];
+  PAIRS.forEach(function(p) {
+    [p.a, p.b].forEach(function(rc) {
+      var d = document.createElement('div');
+      d.className = 'dot'; d.style.background = p.col;
+      d.style.left = (rc[1] * 84 + 10) + 'px'; d.style.top = (rc[0] * 84 + 10) + 'px';
+      d.textContent = p.sym; dotsEl.appendChild(d); dotEls.push(d);
+    });
+  });
+  var appl = document.getElementById('applause');
+  for (var ai = 0; ai < 12; ai++) {
+    var s = document.createElement('i');
+    s.style.left = (4 + ai * 8.2) + '%';
+    appl.appendChild(s);
+  }
+  var box = document.getElementById('box'), pathB = document.getElementById('pathB'),
+      vPairs = document.getElementById('vPairs'), tcAct = document.getElementById('tcAct');
+  var WARM = { box: '#F3E9CF', border: '#D9C48F' };
+  function applyWarm(warm) {
+    box.style.background = warm ? WARM.box : '#ECE0FD';
+    box.style.borderColor = warm ? WARM.border : '#CDBCEC';
+    dotEls.forEach(function(d, i) { d.style.background = warm ? PAIRS[Math.floor(i / 2)].warm : PAIRS[Math.floor(i / 2)].col; });
+    pathB.setAttribute('stroke', warm ? '#8A6D1F' : '#794300');
+  }
+  function pairDelay(step) { return function(el, i) { return Math.floor(i / 2) * step; }; }
+  var currentTl = null;
+  function killCurrent() {
+    if (currentTl) { currentTl.pause(); currentTl = null; }
+    anime.remove(['#curtainL', '#curtainR', '#titlecard', '#box', '.cell', '.dot', '#spot', '#house', '#gname', '#pathB', '.applause i']);
+  }
+  function play() {
+    killCurrent();
+    applyWarm(false);
+    anime.set(['#curtainL'], { translateX: 0 }); anime.set(['#curtainR'], { translateX: 0 });
+    anime.set('#titlecard', { opacity: 0, scale: .94 });
+    anime.set('#box', { opacity: 0 });
+    anime.set('.cell', { opacity: 0, scale: .5 });
+    anime.set('.dot', { opacity: 0, scale: 0 });
+    anime.set('#spot', { opacity: 0, translateX: -50 });
+    anime.set('#house', { opacity: 0 });
+    anime.set('#gname', { opacity: 0, translateY: -12 });
+    anime.set(pathB, { strokeDashoffset: 100 });
+    anime.set('.applause i', { opacity: 0, translateY: 0 });
+    tcAct.textContent = 'ACT I';
+    vPairs.textContent = '0 / 6';
+    // ABSOLUTE positions only (anime.js 3.2.1 does not create timeline labels on the fly).
+    var tl = anime.timeline({ loop: false });
+    currentTl = tl;
+    // house lights dim; the title card announces the act (0-2100)
+    tl.add({ targets: '#house', opacity: [0, .3], duration: 600, easing: 'easeOutQuad' }, 100)
+      .add({ targets: '#titlecard', opacity: [0, 1], scale: [.94, 1], duration: 500, easing: 'easeOutCubic' }, 500)
+      .add({ targets: '#titlecard', opacity: [1, 0], scale: [1, .96], duration: 400, easing: 'easeInQuad' }, 1650)
+      // curtains part; the board takes the stage (2050-3600)
+      .add({ targets: '#curtainL', translateX: [0, '-626px'], duration: 1300, easing: 'easeInOutCubic' }, 2050)
+      .add({ targets: '#curtainR', translateX: [0, '626px'], duration: 1300, easing: 'easeInOutCubic' }, 2050)
+      .add({ targets: '#house', opacity: [.3, 0], duration: 900, easing: 'easeOutQuad' }, 2200)
+      .add({ targets: '#box', opacity: [0, 1], duration: 500, easing: 'easeOutQuad' }, 2250)
+      .add({ targets: '#spot', opacity: [0, 1], translateX: [-50, 26], duration: 1500, easing: 'easeInOutSine' }, 2250)
+      .add({ targets: '.cell', opacity: [0, 1], scale: [.5, 1], duration: 360, easing: 'easeOutBack',
+             delay: anime.stagger(12, { grid: [6, 6], from: 'center' }) }, 2450)
+      .add({ targets: '.dot', opacity: [0, 1], scale: [0, 1], duration: 340, easing: 'easeOutBack',
+             delay: pairDelay(80) }, 2750)
+      .add({ targets: '#gname', opacity: [0, 1], translateY: [-12, 0], duration: 450, easing: 'easeOutCubic' }, 3000)
+      // a taste of the performance (3600-4300)
+      .add({ targets: pathB, strokeDashoffset: [100, 0], duration: 620, easing: 'easeInOutQuad',
+             begin: function() { vPairs.textContent = '1 / 6'; } }, 3650)
+      // the bow + applause (4700-5800)
+      .add({ targets: '#box', scale: [1, 1.018, 1], duration: 560, easing: 'easeInOutSine' }, 4750)
+      .add({ targets: '.applause i', opacity: [0, 1, 0], translateY: [0, -130], duration: 950, easing: 'easeOutQuad',
+             delay: anime.stagger(85) }, 4800)
+      // curtains close on Act I (5900-6900)
+      .add({ targets: '#gname', opacity: [1, 0], duration: 300, easing: 'easeInQuad' }, 5900)
+      .add({ targets: '#spot', opacity: [1, 0], duration: 500, easing: 'easeInQuad' }, 5900)
+      .add({ targets: '#curtainL', translateX: ['-626px', 0], duration: 1000, easing: 'easeInOutCubic' }, 5950)
+      .add({ targets: '#curtainR', translateX: ['626px', 0], duration: 1000, easing: 'easeInOutCubic' }, 5950)
+      .add({ targets: '#box', duration: 1, begin: function() {
+               applyWarm(true);
+               anime.set('#box', { opacity: 0 });
+               anime.set('.dot', { opacity: 0, scale: 0 });
+               anime.set(pathB, { strokeDashoffset: 100 });
+               tcAct.textContent = 'ACT II';
+               vPairs.textContent = '0 / 6';
+             } }, 7000)
+      // Act II: a new production (7050-9200)
+      .add({ targets: '#titlecard', opacity: [0, 1], scale: [.94, 1], duration: 450, easing: 'easeOutCubic' }, 7100)
+      .add({ targets: '#titlecard', opacity: [1, 0], scale: [1, .96], duration: 380, easing: 'easeInQuad' }, 7950)
+      .add({ targets: '#curtainL', translateX: [0, '-626px'], duration: 1200, easing: 'easeInOutCubic' }, 8400)
+      .add({ targets: '#curtainR', translateX: [0, '626px'], duration: 1200, easing: 'easeInOutCubic' }, 8400)
+      .add({ targets: '#box', opacity: [0, 1], duration: 500, easing: 'easeOutQuad' }, 8600)
+      .add({ targets: '#spot', opacity: [0, 1], translateX: [26, -30], duration: 1200, easing: 'easeInOutSine' }, 8600)
+      .add({ targets: '.dot', opacity: [0, 1], scale: [0, 1], duration: 340, easing: 'easeOutBack',
+             delay: pairDelay(70) }, 8850)
+      .add({ targets: '#gname', opacity: [0, 1], translateY: [-12, 0], duration: 450, easing: 'easeOutCubic' }, 9050);
+  }
+  play();
+  document.getElementById('replay').addEventListener('click', play);
+</script>
+</body>
+</html>

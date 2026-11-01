@@ -1,0 +1,31 @@
+{
+	"date": "2026-10-28",
+	"scope": "local v1.1 Work 2 review slice",
+	"command": "bun run verify",
+	"result": "pass",
+	"log": "build/v1.1-card/final-verify.log",
+	"checks": {
+		"formatAndLint": "pass",
+		"typeCheck": "0 errors, 0 warnings",
+		"importBoundaries": "pass",
+		"palettes": 20000,
+		"unitTests": 116,
+		"localIntegrationTests": 22,
+		"browserTests": 110,
+		"vectors": ["Node", "Bun", "Chromium", "Firefox", "WebKit", "workerd"],
+		"builtWorkerChecks": 15
+	},
+	"additionalFailureChecks": {
+		"tests": 3,
+		"result": "pass",
+		"browsers": ["Chromium", "Firefox", "WebKit"],
+		"log": "build/v1.1-card/entropy-tests.log",
+		"scenario": "unavailable Card entropy, slow/failed preparation and static fallback"
+	},
+	"reviewDemosExcludedFromReleaseAssets": true,
+	"ownerVisualAcceptance": "pending: Card proofs, phone stack and overall UI",
+	"knownLimit": "Existing theme freshness vocabulary limits remain; no new waiver.",
+	"deployment": "none",
+	"followUpReview": "review-fix/verification.json",
+	"geometryCoverageNote": "Later owner review found a position defect missed by width/identity probes; follow-up checks verify centre/stack coordinates and the result entrance."
+}

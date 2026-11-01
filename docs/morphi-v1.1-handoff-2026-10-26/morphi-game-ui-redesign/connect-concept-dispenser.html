@@ -1,0 +1,217 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept 5 · The Dispenser — the machine deals you one</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#DCE8DC; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; color:#1B2433;
+         display:flex; flex-direction:column; align-items:center; padding:26px 10px 34px; }
+  .screen { position:relative; width:1200px; height:800px; background:#F2F7EE; border-radius:18px;
+            overflow:hidden; box-shadow:0 18px 50px rgba(27,36,51,.25); flex:none; }
+  .hdr { position:absolute; top:0; left:0; right:0; height:66px; z-index:5; }
+  .logo { position:absolute; left:44px; top:17px; font-size:25px; font-weight:900; letter-spacing:-.02em; }
+  .logo i { color:#E5532D; font-style:normal; }
+  .gname { position:absolute; left:0; right:0; top:15px; text-align:center; font-size:25px; font-weight:900; opacity:0; }
+  .acct { position:absolute; right:118px; top:14px; border:2px solid #7A889E; background:#fff; color:#1B2433;
+          border-radius:999px; padding:8px 20px; font-size:13.5px; font-weight:700; }
+  .snd { position:absolute; right:44px; top:12px; width:42px; height:42px; border-radius:50%;
+         background:#fff; border:2px solid #C9D5E2; display:flex; align-items:center; justify-content:center; }
+  /* the machine */
+  .dome { position:absolute; left:88px; top:100px; width:190px; height:122px; z-index:6;
+          background:rgba(255,255,255,.5); border:3px solid #8FAE97; border-radius:95px 95px 16px 16px;
+          box-shadow:inset 0 10px 18px rgba(255,255,255,.8), 0 10px 22px rgba(27,36,51,.10); overflow:hidden; }
+  .miniCap { position:absolute; width:37px; height:21px; border-radius:999px; border:2px solid rgba(27,36,51,.25); }
+  .machineBase { position:absolute; left:80px; top:222px; width:206px; height:20px; z-index:6;
+                 background:#7A9B84; border-radius:10px; box-shadow:0 6px 14px rgba(27,36,51,.18); }
+  .knob { position:absolute; left:158px; top:250px; width:50px; height:50px; z-index:6; border-radius:50%;
+          background:#FF6B57; border:3px solid #D84E38; box-shadow:0 8px 18px rgba(255,107,87,.4); }
+  .knob::after { content:''; position:absolute; left:50%; top:6px; width:5px; height:14px; margin-left:-2.5px;
+                 background:#fff; border-radius:3px; }
+  .machinelab { position:absolute; left:80px; top:312px; width:206px; text-align:center; z-index:6;
+                font-size:10.5px; font-weight:900; letter-spacing:.24em; color:#7A9B84; }
+  .chute { position:absolute; left:168px; top:352px; width:470px; height:11px; z-index:1;
+           background:#B9CDBE; border-radius:999px; transform:rotate(15deg); transform-origin:0 50%;
+           box-shadow:0 4px 8px rgba(27,36,51,.10); }
+  .capsule { position:absolute; left:140px; top:238px; width:96px; height:58px; z-index:7; opacity:0; }
+  .capHalf { position:absolute; top:0; width:50%; height:100%; border:3px solid rgba(27,36,51,.35); }
+  #capL { left:0; background:#9253BE; border-radius:29px 4px 4px 29px; border-right:none; }
+  #capR { right:0; background:#DC5E87; border-radius:4px 29px 29px 4px; border-left:none; }
+  .capsule .shine { position:absolute; left:12px; top:7px; width:30px; height:11px; border-radius:999px;
+                    background:rgba(255,255,255,.55); z-index:2; }
+  /* the board */
+  .box { position:absolute; left:50%; margin-left:-330px; top:88px; width:660px; background:#ECE0FD;
+         border:2px solid #CDBCEC; border-radius:26px; padding:18px 0 16px; opacity:0; z-index:3; }
+  .hud { display:flex; padding:0 34px 14px; border-bottom:2px solid rgba(27,36,51,.08); }
+  .stat { flex:1; text-align:center; }
+  .stat b { display:block; font-size:10.5px; letter-spacing:.22em; color:#68798E; font-weight:700; margin-bottom:5px; }
+  .stat span { font-size:23px; font-weight:900; }
+  .boardwrap { position:relative; width:496px; height:496px; margin:14px auto 0; }
+  .grid { display:grid; grid-template-columns:repeat(6,76px); grid-template-rows:repeat(6,76px); gap:8px; }
+  .cell { background:rgba(255,255,255,.38); border:1px solid rgba(27,36,51,.07); border-radius:16px; opacity:0; }
+  .dot { position:absolute; width:56px; height:56px; border-radius:50%; display:flex; align-items:center;
+         justify-content:center; color:#fff; font-size:23px; font-weight:900; opacity:0;
+         box-shadow:inset 0 0 0 3px rgba(0,0,0,.18); z-index:3; }
+  .bottombar { position:absolute; left:0; right:0; bottom:0; height:62px; background:#ECE0FD;
+               border-top:2px solid #CDBCEC; z-index:5; }
+  .pill { position:absolute; top:11px; background:#fff; border:2px solid #A98FD6; border-radius:999px;
+          padding:9px 20px; font-size:13.5px; font-weight:700; }
+  .hs { position:absolute; top:10px; text-align:right; }
+  .hs b { display:block; font-size:9.5px; letter-spacing:.22em; color:#68798E; margin-bottom:3px; }
+  .hs span { font-size:19px; font-weight:900; }
+  .newchip { font-style:normal; display:inline-block; background:#F7D08A; color:#1B2433;
+             font-size:8.5px; font-weight:900; letter-spacing:.14em; border-radius:999px;
+             padding:2px 7px 1px; margin-left:6px; vertical-align:2px; }
+  .note { margin-top:16px; font-size:13.5px; color:#43584A; text-align:center; max-width:940px; line-height:1.6; }
+  .note b { color:#1B2433; }
+  button.replay { background:#1B2433; color:#fff; border:none; border-radius:999px; padding:10px 22px;
+                  font-size:14px; font-weight:700; cursor:pointer; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="screen">
+  <div class="hdr">
+    <div class="logo">Morphi<i>.</i>One</div>
+    <div class="gname" id="gname">Connect</div>
+    <div class="acct">Your account</div>
+    <div class="snd"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="4,9 8,9 13,4 13,20 8,15 4,15" fill="#1B2433"/><path d="M16 9c1.2 1.6 1.2 4.4 0 6M18.5 6.5c2.4 3.2 2.4 7.8 0 11" stroke="#1B2433" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>
+  </div>
+
+  <div class="dome" id="dome"></div>
+  <div class="machineBase"></div>
+  <div class="knob"></div>
+  <div class="machinelab">THE DEAL MACHINE</div>
+  <div class="chute"></div>
+  <div class="capsule" id="capsule"><div class="capHalf" id="capL"></div><div class="capHalf" id="capR"></div><div class="shine"></div></div>
+
+  <div class="box" id="box">
+    <div class="hud">
+      <div class="stat"><b>SCORE</b><span id="vScore">0</span></div>
+      <div class="stat"><b>PAIRS</b><span id="vPairs">0 / 6</span></div>
+      <div class="stat"><b>FILLED</b><span id="vFilled">0 / 36</span></div>
+    </div>
+    <div class="boardwrap">
+      <div class="grid" id="grid"></div>
+      <svg id="pathSvg" width="496" height="496" viewBox="0 0 496 496" style="position:absolute;left:0;top:0;pointer-events:none;z-index:2">
+        <polyline id="pathB" points="122,290 122,374 206,374 290,374 374,374 374,458" fill="none" stroke="#794300" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" opacity=".45" pathLength="100" style="stroke-dasharray:100;stroke-dashoffset:100"/>
+      </svg>
+      <div id="dots"></div>
+    </div>
+  </div>
+
+  <div class="bottombar">
+    <div class="pill" style="left:270px">How to play</div>
+    <div class="pill" style="left:415px">Scoring &amp; tips</div>
+    <div class="hs" style="right:270px"><b>YOUR HIGH SCORE<em class="newchip">NEW</em></b><span>0</span></div>
+  </div>
+</div>
+
+<p class="note"><b>CONCEPT 5 · THE DISPENSER — the machine deals you one.</b> Morphi's selector is invisible; here it gets a body.
+A capsule drops out of the deal machine, rolls down the chute — and <b>cracks open</b> in the middle of the stage. That is the reveal:
+the name appears, and the puzzle's pieces <b>spill out of the capsule</b> and bounce into place, the board forming around them.
+Play your round, and when you are done the machine takes its pieces back — they stream up into the hopper, and the next capsule is
+already waiting its turn. Nobody can see what is inside a capsule. That is rather the point of Morphi.</p>
+<button class="replay" id="replay">&#8635; Replay concept</button>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script>
+  var PAIRS = [
+    { col:'#9253BE', sym:'\u2B22', a:[0,0], b:[5,1] },
+    { col:'#794300', sym:'\u25CE', a:[1,3], b:[4,5] },
+    { col:'#003320', sym:'\u2B1F', a:[0,4], b:[5,4] },
+    { col:'#DC5E87', sym:'\u25B2', a:[0,2], b:[5,5] },
+    { col:'#9253BE', sym:'\u25C6', a:[2,5], b:[4,0] },
+    { col:'#794300', sym:'\u2605', a:[5,2], b:[3,5] }
+  ];
+  // mini capsules inside the dome
+  var dome = document.getElementById('dome');
+  var capCols = [['#9253BE','#DC5E87'], ['#794300','#F7D08A'], ['#003320','#7FB069'], ['#DC5E87','#9253BE'], ['#F7D08A','#794300'], ['#7FB069','#003320']];
+  var capPos = [[16,16,-14], [66,8,10], [118,18,-6], [34,52,18], [92,54,-16], [132,58,8]];
+  capPos.forEach(function(p, i) {
+    var m = document.createElement('div');
+    m.className = 'miniCap';
+    m.style.left = p[0] + 'px'; m.style.top = p[1] + 'px'; m.style.transform = 'rotate(' + p[2] + 'deg)';
+    m.style.background = 'linear-gradient(90deg, ' + capCols[i][0] + ' 50%, ' + capCols[i][1] + ' 50%)';
+    dome.appendChild(m);
+  });
+  var grid = document.getElementById('grid');
+  for (var gi = 0; gi < 36; gi++) { var gc = document.createElement('div'); gc.className = 'cell'; grid.appendChild(gc); }
+  var dotsEl = document.getElementById('dots'), dotEls = [];
+  PAIRS.forEach(function(p) {
+    [p.a, p.b].forEach(function(rc) {
+      var d = document.createElement('div');
+      d.className = 'dot'; d.style.background = p.col;
+      d.style.left = (rc[1] * 84 + 10) + 'px'; d.style.top = (rc[0] * 84 + 10) + 'px';
+      d.textContent = p.sym;
+      var cx = rc[1] * 84 + 38, cy = rc[0] * 84 + 38;
+      d._ox = 248 - cx; d._oy = 248 - cy;        // offset from the crack point (board centre)
+      d._sx = -169 - cx; d._sy = -20 - cy;       // sweep target: the dome, in board coords
+      dotsEl.appendChild(d); dotEls.push(d);
+    });
+  });
+  var vScore = document.getElementById('vScore'), vPairs = document.getElementById('vPairs'),
+      vFilled = document.getElementById('vFilled'), pathB = document.getElementById('pathB');
+  var st = { score: 0 };
+  var currentTl = null;
+  function killCurrent() {
+    if (currentTl) { currentTl.pause(); currentTl = null; }
+    anime.remove(['#capsule', '#capL', '#capR', '#box', '.cell', '.dot', '#gname', '#pathB', '.miniCap']);
+  }
+  function play() {
+    killCurrent();
+    anime.set('#capsule', { opacity: 0, translateX: 0, translateY: 0, rotate: 0 });
+    anime.set(['#capL', '#capR'], { translateX: 0, rotate: 0, opacity: 1 });
+    anime.set('#box', { opacity: 0 });
+    anime.set('.cell', { opacity: 0, scale: .5 });
+    dotEls.forEach(function(d) { anime.set(d, { translateX: d._ox, translateY: d._oy, scale: .3, opacity: 0 }); });
+    anime.set('#gname', { opacity: 0, translateY: -12 });
+    anime.set(pathB, { strokeDashoffset: 100 });
+    st.score = 0; vScore.textContent = '0'; vPairs.textContent = '0 / 6'; vFilled.textContent = '0 / 36';
+    // ABSOLUTE positions only (anime.js 3.2.1 does not create timeline labels on the fly).
+    var tl = anime.timeline({ loop: false });
+    currentTl = tl;
+    // the capsule drops and rolls down the chute (200-1800)
+    tl.add({ targets: '.miniCap', translateY: [0, -5, 0], duration: 380, easing: 'easeInOutSine',
+             delay: anime.stagger(40) }, 200)
+      .add({ targets: '#capsule', opacity: [0, 1], duration: 160, easing: 'easeOutQuad' }, 250)
+      .add({ targets: '#capsule', translateY: [{ value: 96, duration: 340, easing: 'easeInQuad' },
+                                              { value: 84, duration: 110, easing: 'easeOutQuad' },
+                                              { value: 96, duration: 110, easing: 'easeInQuad' }] }, 350)
+      .add({ targets: '#capsule', translateX: [0, 412], translateY: [96, 165], rotate: [0, 190],
+             duration: 850, easing: 'easeInQuad' }, 980)
+      // THE CRACK: the capsule splits and the pieces spill into place (1900-2700)
+      .add({ targets: '#capL', translateX: [0, -54], rotate: [0, -26], opacity: [1, 0], duration: 480, easing: 'easeOutQuad' }, 1900)
+      .add({ targets: '#capR', translateX: [0, 54], rotate: [0, 26], opacity: [1, 0], duration: 480, easing: 'easeOutQuad' }, 1900)
+      .add({ targets: '#box', opacity: [0, 1], duration: 450, easing: 'easeOutQuad' }, 1900)
+      .add({ targets: '.cell', opacity: [0, 1], scale: [.5, 1], duration: 330, easing: 'easeOutBack',
+             delay: anime.stagger(10, { grid: [6, 6], from: 'center' }) }, 2000)
+      .add({ targets: '.dot', translateX: function(el) { return [el._ox, 0]; },
+             translateY: function(el) { return [el._oy, 0]; },
+             scale: [.3, 1], opacity: [0, 1], duration: 640, easing: 'easeOutBack',
+             delay: anime.stagger(38) }, 1950)
+      .add({ targets: '#gname', opacity: [0, 1], translateY: [-12, 0], duration: 450, easing: 'easeOutCubic' }, 2100)
+      // a taste of play (2850-3500)
+      .add({ targets: pathB, strokeDashoffset: [100, 0], duration: 620, easing: 'easeInOutQuad',
+             begin: function() { vPairs.textContent = '1 / 6'; vFilled.textContent = '10 / 36'; } }, 2900)
+      .add({ targets: st, score: 200, duration: 620, easing: 'easeInOutQuad',
+             update: function() { vScore.textContent = Math.round(st.score); } }, 2900)
+      // the machine takes its pieces back (3900-4900)
+      .add({ targets: '#gname', opacity: [1, 0], duration: 300, easing: 'easeInQuad' }, 3900)
+      .add({ targets: '.dot', translateX: function(el) { return el._sx; },
+             translateY: function(el) { return el._sy; },
+             scale: [.3, .3], opacity: [1, 0], duration: 880, easing: 'easeInQuad',
+             delay: anime.stagger(28) }, 3950)
+      .add({ targets: '#box', opacity: [1, 0], duration: 500, easing: 'easeInQuad' }, 4300)
+      // the next capsule is dispensed and waits (5000-5600)
+      .add({ targets: '#capsule', duration: 1, begin: function() {
+               anime.set('#capsule', { translateX: 0, translateY: 0, rotate: 0 });
+               anime.set(['#capL', '#capR'], { translateX: 0, rotate: 0, opacity: 1 });
+             } }, 5000)
+      .add({ targets: '#capsule', opacity: [0, 1], translateY: [0, 96, 84, 96], duration: 560, easing: 'easeOutQuad' }, 5050);
+  }
+  play();
+  document.getElementById('replay').addEventListener('click', play);
+</script>
+</body>
+</html>

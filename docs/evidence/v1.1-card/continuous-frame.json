@@ -1,0 +1,331 @@
+{
+	"viewport": {
+		"width": 1280,
+		"height": 720
+	},
+	"sample": "one headless desktop run, unthrottled localhost; diagnostic, not a real-device smoothness gate",
+	"oneFrame": true,
+	"expansion": [
+		{
+			"phase": "unfolding",
+			"width": 178.04248046875,
+			"height": 227.1305694580078,
+			"count": 1,
+			"same": true,
+			"time": 1128.3999999999069
+		},
+		{
+			"phase": "unfolding",
+			"width": 178.042236328125,
+			"height": 227.13034057617188,
+			"count": 1,
+			"same": true,
+			"time": 1144.6999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 178.10498046875,
+			"height": 227.18002319335938,
+			"count": 1,
+			"same": true,
+			"time": 1163.1000000000931
+		},
+		{
+			"phase": "unfolding",
+			"width": 178.359619140625,
+			"height": 227.39553833007812,
+			"count": 1,
+			"same": true,
+			"time": 1181.3000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 178.882568359375,
+			"height": 227.81204223632812,
+			"count": 1,
+			"same": true,
+			"time": 1201.3000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 179.897705078125,
+			"height": 228.6424560546875,
+			"count": 1,
+			"same": true,
+			"time": 1219.6999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 181.307861328125,
+			"height": 229.78814697265625,
+			"count": 1,
+			"same": true,
+			"time": 1237.8000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 183.28857421875,
+			"height": 231.41238403320312,
+			"count": 1,
+			"same": true,
+			"time": 1254.8000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 185.7900390625,
+			"height": 233.449951171875,
+			"count": 1,
+			"same": true,
+			"time": 1257.8000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 186.29638671875,
+			"height": 233.8636474609375,
+			"count": 1,
+			"same": true,
+			"time": 1274
+		},
+		{
+			"phase": "unfolding",
+			"width": 189.60107421875,
+			"height": 236.5579833984375,
+			"count": 1,
+			"same": true,
+			"time": 1290.6999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 193.422119140625,
+			"height": 239.6601104736328,
+			"count": 1,
+			"same": true,
+			"time": 1307.6000000000931
+		},
+		{
+			"phase": "unfolding",
+			"width": 198.2958984375,
+			"height": 243.6413116455078,
+			"count": 1,
+			"same": true,
+			"time": 1325.1999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 204.48046875,
+			"height": 248.66116333007812,
+			"count": 1,
+			"same": true,
+			"time": 1342.8999999999069
+		},
+		{
+			"phase": "unfolding",
+			"width": 211.37451171875,
+			"height": 254.25125122070312,
+			"count": 1,
+			"same": true,
+			"time": 1360.1999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 219.847412109375,
+			"height": 261.11737060546875,
+			"count": 1,
+			"same": true,
+			"time": 1377.6000000000931
+		},
+		{
+			"phase": "unfolding",
+			"width": 229.042236328125,
+			"height": 268.5469970703125,
+			"count": 1,
+			"same": true,
+			"time": 1395.6999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 240.13330078125,
+			"height": 277.4931640625,
+			"count": 1,
+			"same": true,
+			"time": 1413.3000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 252.677734375,
+			"height": 287.5740051269531,
+			"count": 1,
+			"same": true,
+			"time": 1432.1999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 267.57861328125,
+			"height": 299.5190734863281,
+			"count": 1,
+			"same": true,
+			"time": 1450.3000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 283.3583984375,
+			"height": 312.1195373535156,
+			"count": 1,
+			"same": true,
+			"time": 1468.1999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 300.803955078125,
+			"height": 326.00067138671875,
+			"count": 1,
+			"same": true,
+			"time": 1506.1000000000931
+		},
+		{
+			"phase": "unfolding",
+			"width": 343.37139892578125,
+			"height": 359.5830383300781,
+			"count": 1,
+			"same": true,
+			"time": 1525.8999999999069
+		},
+		{
+			"phase": "unfolding",
+			"width": 366.919677734375,
+			"height": 377.99395751953125,
+			"count": 1,
+			"same": true,
+			"time": 1547.8999999999069
+		},
+		{
+			"phase": "unfolding",
+			"width": 391.62005615234375,
+			"height": 397.1881103515625,
+			"count": 1,
+			"same": true,
+			"time": 1572.8000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 416.03692626953125,
+			"height": 416.00653076171875,
+			"count": 1,
+			"same": true,
+			"time": 1596.3999999999069
+		},
+		{
+			"phase": "unfolding",
+			"width": 436.151611328125,
+			"height": 431.4151916503906,
+			"count": 1,
+			"same": true,
+			"time": 1622
+		},
+		{
+			"phase": "unfolding",
+			"width": 453.9501953125,
+			"height": 444.9522705078125,
+			"count": 1,
+			"same": true,
+			"time": 1648.1999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 469.90631103515625,
+			"height": 457.0279846191406,
+			"count": 1,
+			"same": true,
+			"time": 1675.5
+		},
+		{
+			"phase": "unfolding",
+			"width": 482.82952880859375,
+			"height": 466.77789306640625,
+			"count": 1,
+			"same": true,
+			"time": 1706.6999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 494.40478515625,
+			"height": 475.4595947265625,
+			"count": 1,
+			"same": true,
+			"time": 1734.8999999999069
+		},
+		{
+			"phase": "unfolding",
+			"width": 502.24554443359375,
+			"height": 481.3135986328125,
+			"count": 1,
+			"same": true,
+			"time": 1761.5
+		},
+		{
+			"phase": "unfolding",
+			"width": 507.79022216796875,
+			"height": 485.4543151855469,
+			"count": 1,
+			"same": true,
+			"time": 1786.6000000000931
+		},
+		{
+			"phase": "unfolding",
+			"width": 511.4462890625,
+			"height": 488.1671142578125,
+			"count": 1,
+			"same": true,
+			"time": 1804.8000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 513.3186645507812,
+			"height": 489.5589904785156,
+			"count": 1,
+			"same": true,
+			"time": 1824.1000000000931
+		},
+		{
+			"phase": "unfolding",
+			"width": 514.806396484375,
+			"height": 490.662109375,
+			"count": 1,
+			"same": true,
+			"time": 1841.6999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 515.6720581054688,
+			"height": 491.31884765625,
+			"count": 1,
+			"same": true,
+			"time": 1859.6000000000931
+		},
+		{
+			"phase": "unfolding",
+			"width": 516.1807250976562,
+			"height": 491.6835632324219,
+			"count": 1,
+			"same": true,
+			"time": 1876.8000000000466
+		},
+		{
+			"phase": "unfolding",
+			"width": 516.4546508789062,
+			"height": 491.89306640625,
+			"count": 1,
+			"same": true,
+			"time": 1895.6999999999534
+		},
+		{
+			"phase": "unfolding",
+			"width": 516.5651245117188,
+			"height": 491.987060546875,
+			"count": 1,
+			"same": true,
+			"time": 1912.1000000000931
+		}
+	],
+	"previewMs": 2994.3000000000466
+}

@@ -1,0 +1,225 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept 2 · The Living Sketch — Connect, drawn in ink</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#D8CFBB; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; color:#2B2620;
+         display:flex; flex-direction:column; align-items:center; padding:26px 10px 34px; }
+  .screen { position:relative; width:1200px; height:800px; background:#F3ECD9; border-radius:18px;
+            overflow:hidden; box-shadow:0 18px 50px rgba(43,38,32,.3); flex:none;
+            background-image:repeating-linear-gradient(0deg, rgba(43,38,32,.018) 0 2px, transparent 2px 5px); }
+  .hdr { position:absolute; top:0; left:0; right:0; height:66px; z-index:5; }
+  .logo { position:absolute; left:44px; top:17px; font-size:25px; font-weight:900; letter-spacing:-.02em; color:#2B2620; }
+  .logo i { color:#C4502B; font-style:normal; }
+  .hand { font-family:"Segoe Print","Bradley Hand","Comic Sans MS",cursive; }
+  .gname { position:absolute; left:0; right:0; top:12px; text-align:center; font-size:29px; font-weight:700; opacity:0; }
+  .gname u { text-decoration:none; border-bottom:3px solid rgba(43,38,32,.55); border-radius:50%; padding:0 14px 3px; }
+  .acct { position:absolute; right:118px; top:14px; border:2px solid #2B2620; background:#FBF6E9; color:#2B2620;
+          border-radius:255px 15px 225px 15px/15px 225px 15px 255px; padding:8px 20px; font-size:13.5px; font-weight:700; }
+  .snd { position:absolute; right:44px; top:12px; width:42px; height:42px; border-radius:50% 46% 52% 48%;
+         background:#FBF6E9; border:2px solid #2B2620; display:flex; align-items:center; justify-content:center; }
+  .box { position:absolute; left:50%; margin-left:-330px; top:88px; width:660px; background:#FBF6E9;
+         border:2.5px solid #2B2620; border-radius:255px 18px 225px 18px/18px 225px 18px 255px;
+         padding:18px 0 16px; opacity:0; z-index:3; transform:rotate(-.3deg);
+         box-shadow:3px 6px 0 rgba(43,38,32,.12); }
+  .hud { display:flex; padding:0 34px 12px; border-bottom:2px dashed rgba(43,38,32,.35); }
+  .stat { flex:1; text-align:center; }
+  .stat b { display:block; font-size:10.5px; letter-spacing:.22em; color:#7A6F5C; font-weight:700; margin-bottom:5px; }
+  .stat span { font-size:25px; font-weight:700; }
+  .boardwrap { position:relative; width:496px; height:496px; margin:14px auto 0; }
+  .eraser { position:absolute; width:112px; height:62px; background:#FBF6E9; border:2.5px solid #2B2620;
+            border-radius:14px 5px 16px 6px; z-index:6; opacity:0; box-shadow:2px 4px 0 rgba(43,38,32,.18);
+            display:flex; align-items:center; justify-content:center; font-size:12px; font-weight:700; color:#7A6F5C;
+            font-family:"Segoe Print","Bradley Hand",cursive; }
+  .sig { position:absolute; right:34px; bottom:12px; z-index:4; opacity:1; }
+  .bottombar { position:absolute; left:0; right:0; bottom:0; height:62px; background:#EFE5CB;
+               border-top:2.5px solid #2B2620; z-index:5; }
+  .pill { position:absolute; top:11px; background:#FBF6E9; border:2px solid #2B2620;
+          border-radius:255px 15px 225px 15px/15px 225px 15px 255px;
+          padding:9px 20px; font-size:13.5px; font-weight:700; }
+  .hs { position:absolute; top:10px; text-align:right; }
+  .hs b { display:block; font-size:9.5px; letter-spacing:.22em; color:#7A6F5C; margin-bottom:3px; }
+  .hs span { font-size:19px; font-weight:900; }
+  .newchip { font-style:normal; display:inline-block; background:#F7D08A; color:#2B2620;
+             font-size:8.5px; font-weight:900; letter-spacing:.14em; border-radius:999px;
+             padding:2px 7px 1px; margin-left:6px; vertical-align:2px; }
+  .motifsk { position:absolute; opacity:.16; pointer-events:none; }
+  .note { margin-top:16px; font-size:13.5px; color:#4A4358; text-align:center; max-width:940px; line-height:1.6; }
+  .note b { color:#1B2433; }
+  button.replay { background:#2B2620; color:#fff; border:none; border-radius:999px; padding:10px 22px;
+                  font-size:14px; font-weight:700; cursor:pointer; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="screen">
+  <svg class="motifsk" style="left:60px;top:170px" width="76" height="76" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#2B2620" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="10" fill="none" stroke="#2B2620" stroke-width="6"/><circle cx="62" cy="14" r="10" fill="none" stroke="#2B2620" stroke-width="6"/></svg>
+  <svg class="motifsk" style="right:80px;top:200px" width="66" height="66" viewBox="0 0 76 76"><polyline points="62,62 62,14 14,14" fill="none" stroke="#2B2620" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="62" cy="62" r="10" fill="none" stroke="#2B2620" stroke-width="6"/><circle cx="14" cy="14" r="10" fill="none" stroke="#2B2620" stroke-width="6"/></svg>
+  <svg class="motifsk" style="left:170px;top:520px" width="58" height="58" viewBox="0 0 76 76"><polyline points="14,14 62,14 62,62" fill="none" stroke="#2B2620" stroke-width="10" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="10" fill="none" stroke="#2B2620" stroke-width="6"/><circle cx="62" cy="62" r="10" fill="none" stroke="#2B2620" stroke-width="6"/></svg>
+
+  <div class="hdr">
+    <div class="logo">Morphi<i>.</i>One</div>
+    <div class="gname hand" id="gname"><u>Connect</u></div>
+    <div class="acct">Your account</div>
+    <div class="snd"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="4,9 8,9 13,4 13,20 8,15 4,15" fill="#2B2620"/><path d="M16 9c1.2 1.6 1.2 4.4 0 6M18.5 6.5c2.4 3.2 2.4 7.8 0 11" stroke="#2B2620" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>
+  </div>
+
+  <div class="box" id="box">
+    <div class="hud">
+      <div class="stat"><b>SCORE</b><span class="hand" id="vScore">0</span></div>
+      <div class="stat"><b>PAIRS</b><span class="hand" id="vPairs">0 / 6</span></div>
+      <div class="stat"><b>FILLED</b><span class="hand" id="vFilled">0 / 36</span></div>
+    </div>
+    <div class="boardwrap">
+      <svg id="sketch" width="496" height="496" viewBox="0 0 496 496" style="position:absolute;left:0;top:0"></svg>
+      <div class="eraser" id="eraser">rub</div>
+    </div>
+    <div class="sig"><svg width="230" height="46" viewBox="0 0 230 46"><path id="sigPath" d="M14,32 C50,4 74,44 108,22 C134,6 150,38 178,24 C196,15 208,26 220,20" fill="none" stroke="#2B2620" stroke-width="3" stroke-linecap="round" pathLength="100" style="stroke-dasharray:100;stroke-dashoffset:100"/></svg></div>
+  </div>
+
+  <div class="bottombar">
+    <div class="pill" style="left:270px">How to play</div>
+    <div class="pill" style="left:415px">Scoring &amp; tips</div>
+    <div class="hs" style="right:270px"><b>YOUR HIGH SCORE<em class="newchip">NEW</em></b><span>0</span></div>
+  </div>
+</div>
+
+<p class="note"><b>CONCEPT 2 · THE LIVING SKETCH — the board draws itself.</b> The screen is one sheet of paper and an invisible hand
+draws the round in ink: the grid strokes itself in, line by line; the dots are drawn <b>pair by pair</b> and washed with colour;
+the path is a real ink line. A slip leaves an <b>ink blot</b> — and out comes the eraser to rub it away (that is the backtrack).
+Finish, and the hand <b>signs the corner</b> while the score writes itself up. Ink colour, paper tone and the wobble of the hand are
+all procedural, from the deal's seed — no two boards are even <i>drawn</i> alike. The shell, gaps and bottom panel stay exactly where they are;
+only the rendering language changes.</p>
+<button class="replay" id="replay">&#8635; Replay concept</button>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script>
+  var NS = 'http://www.w3.org/2000/svg';
+  var svg = document.getElementById('sketch');
+  var seed = 1234567;
+  function rnd() { seed = (seed * 1103515245 + 12345) % 2147483648; return seed / 2147483648; }
+  function jit(v) { return v + (rnd() * 4 - 2); }
+  function wobLine(x1, y1, x2, y2) {
+    var d = 'M' + jit(x1).toFixed(1) + ',' + jit(y1).toFixed(1);
+    for (var s = 1; s <= 4; s++) {
+      var t = s / 4;
+      d += ' L' + jit(x1 + (x2 - x1) * t).toFixed(1) + ',' + jit(y1 + (y2 - y1) * t).toFixed(1);
+    }
+    return d;
+  }
+  function mk(tag, attrs) {
+    var e = document.createElementNS(NS, tag);
+    for (var k in attrs) e.setAttribute(k, attrs[k]);
+    return e;
+  }
+  // grid: 7 wobbly lines each way
+  var gridG = mk('g', {});
+  var step = 496 / 6;
+  for (var li = 0; li <= 6; li++) {
+    var p = Math.round(li * step);
+    gridG.appendChild(mk('path', { d: wobLine(p, 2, p, 494), fill: 'none', stroke: '#2B2620', 'stroke-width': 2.4,
+      'stroke-linecap': 'round', pathLength: 100, style: 'stroke-dasharray:100;stroke-dashoffset:100', 'class': 'gline' }));
+    gridG.appendChild(mk('path', { d: wobLine(2, p, 494, p), fill: 'none', stroke: '#2B2620', 'stroke-width': 2.4,
+      'stroke-linecap': 'round', pathLength: 100, style: 'stroke-dasharray:100;stroke-dashoffset:100', 'class': 'gline' }));
+  }
+  svg.appendChild(gridG);
+  // path-cell washes (pair B route)
+  var ROUTE = [[1,3],[1,4],[2,4],[3,4],[4,4],[4,5]];
+  var washG = mk('g', {});
+  ROUTE.forEach(function(rc) {
+    washG.appendChild(mk('rect', { x: rc[1] * 84 + 5, y: rc[0] * 84 + 5, width: 74, height: 74, rx: 12,
+      fill: '#794300', opacity: 0, 'class': 'wash' }));
+  });
+  svg.appendChild(washG);
+  // ink path
+  var inkPath = mk('path', { d: 'M122,290 L122,374 L206,374 L290,374 L374,374 L374,458', fill: 'none', stroke: '#2B2620',
+    'stroke-width': 12, 'stroke-linecap': 'round', 'stroke-linejoin': 'round', opacity: .82, pathLength: 100,
+    style: 'stroke-dasharray:100;stroke-dashoffset:100' });
+  svg.appendChild(inkPath);
+  // dots: outline circle (drawn) + colour wash + symbol
+  var PAIRS = [
+    { col:'#9253BE', sym:'\u2B22', a:[0,0], b:[5,1] },
+    { col:'#794300', sym:'\u25CE', a:[1,3], b:[4,5] },
+    { col:'#003320', sym:'\u2B1F', a:[0,4], b:[5,4] },
+    { col:'#DC5E87', sym:'\u25B2', a:[0,2], b:[5,5] },
+    { col:'#9253BE', sym:'\u25C6', a:[2,5], b:[4,0] },
+    { col:'#794300', sym:'\u2605', a:[5,2], b:[3,5] }
+  ];
+  var dotsG = mk('g', {});
+  PAIRS.forEach(function(p) {
+    [p.a, p.b].forEach(function(rc) {
+      var cx = rc[1] * 84 + 38, cy = rc[0] * 84 + 38;
+      dotsG.appendChild(mk('circle', { cx: cx + 2, cy: cy + 3, r: 27, fill: p.col, opacity: 0, 'class': 'dfill' }));
+      dotsG.appendChild(mk('circle', { cx: cx, cy: cy, r: 27, fill: 'none', stroke: '#2B2620', 'stroke-width': 3,
+        pathLength: 100, style: 'stroke-dasharray:100;stroke-dashoffset:100', 'class': 'dring' }));
+      var tx = mk('text', { x: cx, y: cy + 8, 'text-anchor': 'middle', 'font-size': 23, 'font-weight': 900,
+        fill: '#2B2620', opacity: 0, 'class': 'dsym' });
+      tx.textContent = p.sym;
+      dotsG.appendChild(tx);
+    });
+  });
+  svg.appendChild(dotsG);
+  // ink blot (the slip) at cell (4,3) area, beside the route
+  var blot = mk('g', { opacity: 0, 'class': 'blot' });
+  [[374,268,7],[388,282,5],[362,284,4],[381,256,3]].forEach(function(b) {
+    blot.appendChild(mk('circle', { cx: b[0], cy: b[1], r: b[2], fill: '#2B2620', opacity: .85 }));
+  });
+  svg.appendChild(blot);
+
+  var vScore = document.getElementById('vScore'), vPairs = document.getElementById('vPairs'),
+      vFilled = document.getElementById('vFilled');
+  var st = { score: 0 };
+  var currentTl = null;
+  function killCurrent() {
+    if (currentTl) { currentTl.pause(); currentTl = null; }
+    anime.remove(['.gline', '.dring', '.dfill', '.dsym', '.wash', '#sketch path', '#box', '#gname', '#eraser', '#sigPath', '.blot']);
+  }
+  function play() {
+    killCurrent();
+    anime.set('#box', { opacity: 0 });
+    anime.set('#gname', { opacity: 0, translateY: -8 });
+    anime.set('.gline', { strokeDashoffset: 100 });
+    anime.set('.dring', { strokeDashoffset: 100 });
+    anime.set(['.dfill', '.dsym', '.wash', '.blot'], { opacity: 0 });
+    anime.set(inkPath, { strokeDashoffset: 100 });
+    anime.set('#sigPath', { strokeDashoffset: 100 });
+    anime.set('#eraser', { opacity: 0, left: '250px', top: '238px', rotate: -8 });
+    st.score = 0; vScore.textContent = '0'; vPairs.textContent = '0 / 6'; vFilled.textContent = '0 / 36';
+    // ABSOLUTE positions only (anime.js 3.2.1 does not create timeline labels on the fly).
+    var tl = anime.timeline({ loop: false });
+    currentTl = tl;
+    // the sheet lands + the name is written in (0-600)
+    tl.add({ targets: '#box', opacity: [0, 1], duration: 450, easing: 'easeOutQuad' }, 0)
+      .add({ targets: '#gname', opacity: [0, 1], translateY: [-8, 0], duration: 400, easing: 'easeOutQuad' }, 250)
+      // the grid draws itself (300-1700)
+      .add({ targets: '.gline', strokeDashoffset: [100, 0], duration: 480, easing: 'easeInOutQuad',
+             delay: anime.stagger(65) }, 300)
+      // dots drawn PAIR BY PAIR, then washed with colour (1600-2900)
+      .add({ targets: '.dring', strokeDashoffset: [100, 0], duration: 360, easing: 'easeInOutQuad',
+             delay: function(el, i) { return Math.floor(i / 2) * 170; } }, 1600)
+      .add({ targets: '.dfill', opacity: [0, .8], duration: 300, easing: 'easeOutQuad',
+             delay: function(el, i) { return Math.floor(i / 2) * 170; } }, 1780)
+      .add({ targets: '.dsym', opacity: [0, 1], duration: 260,
+             delay: function(el, i) { return Math.floor(i / 2) * 170; } }, 1860)
+      // the ink path is played (3000-3900)
+      .add({ targets: '.wash', opacity: [0, .16], duration: 260, delay: anime.stagger(130) }, 3000)
+      .add({ targets: inkPath, strokeDashoffset: [100, 0], duration: 780, easing: 'easeInOutQuad',
+             begin: function() { vPairs.textContent = '1 / 6'; vFilled.textContent = '10 / 36'; } }, 3000)
+      // the slip: an ink blot (3400), then the eraser rubs it away (3950-4700)
+      .add({ targets: '.blot', opacity: [0, 1], scale: [.4, 1], duration: 220, easing: 'easeOutBack' }, 3450)
+      .add({ targets: '#eraser', opacity: [0, 1], left: ['250px', '318px'], duration: 320, easing: 'easeOutQuad' }, 3950)
+      .add({ targets: '#eraser', translateX: [0, 12, -8, 10, 0], duration: 520, easing: 'easeInOutSine' }, 4300)
+      .add({ targets: '.blot', opacity: [1, 0], duration: 420, easing: 'easeOutQuad' }, 4360)
+      .add({ targets: '#eraser', opacity: [1, 0], left: ['318px', '390px'], duration: 300, easing: 'easeInQuad' }, 4860)
+      // the hand signs the corner; the score writes itself up (5000-5800)
+      .add({ targets: '#sigPath', strokeDashoffset: [100, 0], duration: 620, easing: 'easeInOutQuad' }, 5050)
+      .add({ targets: st, score: 850, duration: 750, easing: 'easeInOutQuad',
+             update: function() { vScore.textContent = Math.round(st.score).toLocaleString('en-US'); } }, 5050);
+  }
+  play();
+  document.getElementById('replay').addEventListener('click', play);
+</script>
+</body>
+</html>

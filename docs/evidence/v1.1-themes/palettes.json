@@ -1,0 +1,136 @@
+{
+	"config": "theme-2026-10-26-1",
+	"generator": "oklch-machado-1",
+	"seedsPerPuzzle": 10000,
+	"roundsPerPuzzle": 10000,
+	"colorModel": "Machado 2009 severity 1.0 on linear sRGB; CIE76 D65; 8-bit hex checked after conversion",
+	"memory": {
+		"accessible": 10000,
+		"totalFallbacks": 276,
+		"buckets": [
+			{ "hue": "0–29", "seeds": 847, "fallbacks": 26, "rate": 3.07 },
+			{ "hue": "30–59", "seeds": 795, "fallbacks": 22, "rate": 2.77 },
+			{ "hue": "60–89", "seeds": 830, "fallbacks": 22, "rate": 2.65 },
+			{ "hue": "90–119", "seeds": 828, "fallbacks": 23, "rate": 2.78 },
+			{ "hue": "120–149", "seeds": 786, "fallbacks": 15, "rate": 1.91 },
+			{ "hue": "150–179", "seeds": 817, "fallbacks": 21, "rate": 2.57 },
+			{ "hue": "180–209", "seeds": 873, "fallbacks": 34, "rate": 3.89 },
+			{ "hue": "210–239", "seeds": 874, "fallbacks": 22, "rate": 2.52 },
+			{ "hue": "240–269", "seeds": 817, "fallbacks": 24, "rate": 2.94 },
+			{ "hue": "270–299", "seeds": 882, "fallbacks": 28, "rate": 3.17 },
+			{ "hue": "300–329", "seeds": 835, "fallbacks": 18, "rate": 2.16 },
+			{ "hue": "330–359", "seeds": 816, "fallbacks": 21, "rate": 2.57 }
+		],
+		"freshness": {
+			"anyViolation": 9999,
+			"violations": {
+				"recipe": 3818,
+				"hue": 7057,
+				"style": 4829,
+				"container": 5753,
+				"symbols": 9999
+			},
+			"ratesPercent": {
+				"recipe": 38.18,
+				"hue": 70.57,
+				"style": 48.29,
+				"container": 57.53,
+				"symbols": 99.99
+			}
+		},
+		"generationMs": {
+			"runs": 10000,
+			"median": 0.9183580000008078,
+			"p95": 3.5296200000000226,
+			"worst": 9.351566999999704,
+			"environment": "local linux x64, Bun 1.4.2, preloaded generator, no network",
+			"target": "reported goal; no owner-approved gate"
+		}
+	},
+	"block": {
+		"accessible": 10000,
+		"totalFallbacks": 299,
+		"buckets": [
+			{ "hue": "0–29", "seeds": 801, "fallbacks": 25, "rate": 3.12 },
+			{ "hue": "30–59", "seeds": 856, "fallbacks": 31, "rate": 3.62 },
+			{ "hue": "60–89", "seeds": 832, "fallbacks": 23, "rate": 2.76 },
+			{ "hue": "90–119", "seeds": 833, "fallbacks": 27, "rate": 3.24 },
+			{ "hue": "120–149", "seeds": 870, "fallbacks": 26, "rate": 2.99 },
+			{ "hue": "150–179", "seeds": 795, "fallbacks": 23, "rate": 2.89 },
+			{ "hue": "180–209", "seeds": 824, "fallbacks": 24, "rate": 2.91 },
+			{ "hue": "210–239", "seeds": 876, "fallbacks": 26, "rate": 2.97 },
+			{ "hue": "240–269", "seeds": 839, "fallbacks": 31, "rate": 3.69 },
+			{ "hue": "270–299", "seeds": 867, "fallbacks": 22, "rate": 2.54 },
+			{ "hue": "300–329", "seeds": 809, "fallbacks": 14, "rate": 1.73 },
+			{ "hue": "330–359", "seeds": 798, "fallbacks": 27, "rate": 3.38 }
+		],
+		"freshness": {
+			"anyViolation": 9999,
+			"violations": {
+				"recipe": 3817,
+				"hue": 7069,
+				"style": 4905,
+				"container": 5845,
+				"symbols": 9999
+			},
+			"ratesPercent": {
+				"recipe": 38.17,
+				"hue": 70.69,
+				"style": 49.05,
+				"container": 58.45,
+				"symbols": 99.99
+			}
+		},
+		"generationMs": {
+			"runs": 10000,
+			"median": 1.1781650000193622,
+			"p95": 4.153922000026796,
+			"worst": 13.170821999985492,
+			"environment": "local linux x64, Bun 1.4.2, preloaded generator, no network",
+			"target": "reported goal; no owner-approved gate"
+		}
+	},
+	"connect": {
+		"accessible": 10000,
+		"totalFallbacks": 266,
+		"buckets": [
+			{ "hue": "0–29", "seeds": 842, "fallbacks": 24, "rate": 2.85 },
+			{ "hue": "30–59", "seeds": 805, "fallbacks": 23, "rate": 2.86 },
+			{ "hue": "60–89", "seeds": 823, "fallbacks": 25, "rate": 3.04 },
+			{ "hue": "90–119", "seeds": 842, "fallbacks": 19, "rate": 2.26 },
+			{ "hue": "120–149", "seeds": 862, "fallbacks": 15, "rate": 1.74 },
+			{ "hue": "150–179", "seeds": 864, "fallbacks": 29, "rate": 3.36 },
+			{ "hue": "180–209", "seeds": 822, "fallbacks": 24, "rate": 2.92 },
+			{ "hue": "210–239", "seeds": 863, "fallbacks": 26, "rate": 3.01 },
+			{ "hue": "240–269", "seeds": 824, "fallbacks": 24, "rate": 2.91 },
+			{ "hue": "270–299", "seeds": 839, "fallbacks": 17, "rate": 2.03 },
+			{ "hue": "300–329", "seeds": 783, "fallbacks": 17, "rate": 2.17 },
+			{ "hue": "330–359", "seeds": 831, "fallbacks": 23, "rate": 2.77 }
+		],
+		"freshness": {
+			"anyViolation": 9999,
+			"violations": {
+				"recipe": 3787,
+				"hue": 7045,
+				"style": 4905,
+				"container": 5826,
+				"symbols": 9999
+			},
+			"ratesPercent": {
+				"recipe": 37.87,
+				"hue": 70.45,
+				"style": 49.05,
+				"container": 58.26,
+				"symbols": 99.99
+			}
+		},
+		"generationMs": {
+			"runs": 10000,
+			"median": 1.1390380000229925,
+			"p95": 4.207686000037938,
+			"worst": 6.756976999982726,
+			"environment": "local linux x64, Bun 1.4.2, preloaded generator, no network",
+			"target": "reported goal; no owner-approved gate"
+		}
+	}
+}

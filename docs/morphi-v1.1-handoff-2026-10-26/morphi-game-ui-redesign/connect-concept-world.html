@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Concept 3 · The Suspended World — every deal is a little place</title>
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#DDD6EA; font-family:"Segoe UI", system-ui, -apple-system, sans-serif; color:#1B2433;
+         display:flex; flex-direction:column; align-items:center; padding:26px 10px 34px; }
+  .screen { position:relative; width:1200px; height:800px; border-radius:18px;
+            overflow:hidden; box-shadow:0 18px 50px rgba(27,36,51,.25); flex:none;
+            background:radial-gradient(1200px 800px at 50% 38%, #FAF7FF, #E7DEF7); }
+  .layer { position:absolute; inset:0; }
+  #layerFar { z-index:1; } #layerMid { z-index:3; } #layerNear { z-index:4; pointer-events:none; }
+  .hdr { position:absolute; top:0; left:0; right:0; height:66px; z-index:5; }
+  .logo { position:absolute; left:44px; top:17px; font-size:25px; font-weight:900; letter-spacing:-.02em; }
+  .logo i { color:#E5532D; font-style:normal; }
+  .gname { position:absolute; left:0; right:0; top:15px; text-align:center; font-size:25px; font-weight:900; opacity:0; }
+  .acct { position:absolute; right:118px; top:14px; border:2px solid #7A889E; background:#fff; color:#1B2433;
+          border-radius:999px; padding:8px 20px; font-size:13.5px; font-weight:700; }
+  .snd { position:absolute; right:44px; top:12px; width:42px; height:42px; border-radius:50%;
+         background:#fff; border:2px solid #C9D5E2; display:flex; align-items:center; justify-content:center; }
+  .box { position:absolute; left:50%; margin-left:-330px; top:88px; width:660px; background:#ECE0FD;
+         border:2px solid #CDBCEC; border-radius:26px; padding:18px 0 16px; opacity:0;
+         box-shadow:0 30px 60px rgba(27,36,51,.22); }
+  .hud { display:flex; padding:0 34px 14px; border-bottom:2px solid rgba(27,36,51,.08); }
+  .stat { flex:1; text-align:center; }
+  .stat b { display:block; font-size:10.5px; letter-spacing:.22em; color:#68798E; font-weight:700; margin-bottom:5px; }
+  .stat span { font-size:23px; font-weight:900; }
+  .boardwrap { position:relative; width:496px; height:496px; margin:14px auto 0; }
+  .grid { display:grid; grid-template-columns:repeat(6,76px); grid-template-rows:repeat(6,76px); gap:8px; }
+  .cell { background:rgba(255,255,255,.38); border:1px solid rgba(27,36,51,.07); border-radius:16px; opacity:0; }
+  .dot { position:absolute; width:56px; height:56px; border-radius:50%; display:flex; align-items:center;
+         justify-content:center; color:#fff; font-size:23px; font-weight:900; opacity:0;
+         box-shadow:inset 0 0 0 3px rgba(0,0,0,.18); z-index:3; }
+  .bottombar { position:absolute; left:0; right:0; bottom:0; height:62px; background:#ECE0FD;
+               border-top:2px solid #CDBCEC; z-index:5; }
+  .pill { position:absolute; top:11px; background:#fff; border:2px solid #A98FD6; border-radius:999px;
+          padding:9px 20px; font-size:13.5px; font-weight:700; }
+  .hs { position:absolute; top:10px; text-align:right; }
+  .hs b { display:block; font-size:9.5px; letter-spacing:.22em; color:#68798E; margin-bottom:3px; }
+  .hs span { font-size:19px; font-weight:900; }
+  .newchip { font-style:normal; display:inline-block; background:#F7D08A; color:#1B2433;
+             font-size:8.5px; font-weight:900; letter-spacing:.14em; border-radius:999px;
+             padding:2px 7px 1px; margin-left:6px; vertical-align:2px; }
+  .motif { position:absolute; pointer-events:none; }
+  .note { margin-top:16px; font-size:13.5px; color:#4A4358; text-align:center; max-width:940px; line-height:1.6; }
+  .note b { color:#1B2433; }
+  button.replay { background:#1B2433; color:#fff; border:none; border-radius:999px; padding:10px 22px;
+                  font-size:14px; font-weight:700; cursor:pointer; margin-top:12px; }
+</style>
+</head>
+<body>
+<div class="screen" id="screen">
+  <div class="layer" id="layerFar">
+    <div id="farA">
+      <svg class="motif" style="left:40px;top:140px;filter:blur(1.6px);opacity:.5" width="110" height="110" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#9253BE" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="12" fill="#9253BE"/><circle cx="62" cy="14" r="12" fill="#9253BE"/></svg>
+      <svg class="motif" style="left:180px;top:520px;filter:blur(1.6px);opacity:.5" width="90" height="90" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#DC5E87" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="12" fill="#DC5E87"/><circle cx="62" cy="14" r="12" fill="#DC5E87"/></svg>
+      <svg class="motif" style="right:60px;top:160px;filter:blur(1.6px);opacity:.5" width="100" height="100" viewBox="0 0 76 76"><polyline points="62,62 62,14 14,14" fill="none" stroke="#794300" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="62" cy="62" r="12" fill="#794300"/><circle cx="14" cy="14" r="12" fill="#794300"/></svg>
+      <svg class="motif" style="right:200px;top:540px;filter:blur(1.6px);opacity:.5" width="84" height="84" viewBox="0 0 76 76"><polyline points="14,14 62,14 62,62" fill="none" stroke="#003320" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="12" fill="#003320"/><circle cx="62" cy="62" r="12" fill="#003320"/></svg>
+    </div>
+    <div id="farB" style="opacity:0">
+      <svg class="motif" style="left:70px;top:180px;filter:blur(1.6px);opacity:.5" width="100" height="100" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#C25E2E" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="12" fill="#C25E2E"/><circle cx="62" cy="14" r="12" fill="#C25E2E"/></svg>
+      <svg class="motif" style="left:230px;top:480px;filter:blur(1.6px);opacity:.5" width="86" height="86" viewBox="0 0 76 76"><polyline points="62,62 62,14 14,14" fill="none" stroke="#8A6D1F" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="62" cy="62" r="12" fill="#8A6D1F"/><circle cx="14" cy="14" r="12" fill="#8A6D1F"/></svg>
+      <svg class="motif" style="right:90px;top:220px;filter:blur(1.6px);opacity:.5" width="108" height="108" viewBox="0 0 76 76"><polyline points="14,14 62,14 62,62" fill="none" stroke="#5B7444" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="14" r="12" fill="#5B7444"/><circle cx="62" cy="62" r="12" fill="#5B7444"/></svg>
+      <svg class="motif" style="right:230px;top:520px;filter:blur(1.6px);opacity:.5" width="80" height="80" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#B23A68" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="12" fill="#B23A68"/><circle cx="62" cy="14" r="12" fill="#B23A68"/></svg>
+    </div>
+  </div>
+
+  <div class="layer" id="layerMid">
+    <div class="box" id="box">
+      <div class="hud">
+        <div class="stat"><b>SCORE</b><span id="vScore">0</span></div>
+        <div class="stat"><b>PAIRS</b><span id="vPairs">0 / 6</span></div>
+        <div class="stat"><b>FILLED</b><span id="vFilled">0 / 36</span></div>
+      </div>
+      <div class="boardwrap">
+        <div class="grid" id="grid"></div>
+        <svg id="pathSvg" width="496" height="496" viewBox="0 0 496 496" style="position:absolute;left:0;top:0;pointer-events:none;z-index:2">
+          <polyline id="pathB" points="122,290 122,374 206,374 290,374 374,374 374,458" fill="none" stroke="#794300" stroke-width="30" stroke-linecap="round" stroke-linejoin="round" opacity=".45" pathLength="100" style="stroke-dasharray:100;stroke-dashoffset:100"/>
+        </svg>
+        <div id="dots"></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hdr">
+    <div class="logo">Morphi<i>.</i>One</div>
+    <div class="gname" id="gname">Connect</div>
+    <div class="acct">Your account</div>
+    <div class="snd"><svg width="20" height="20" viewBox="0 0 24 24"><polygon points="4,9 8,9 13,4 13,20 8,15 4,15" fill="#1B2433"/><path d="M16 9c1.2 1.6 1.2 4.4 0 6M18.5 6.5c2.4 3.2 2.4 7.8 0 11" stroke="#1B2433" stroke-width="2.2" fill="none" stroke-linecap="round"/></svg></div>
+  </div>
+
+  <div class="layer" id="layerNear" style="opacity:0">
+    <svg class="motif" style="left:-30px;bottom:36px;filter:blur(2.6px);opacity:.35" width="170" height="170" viewBox="0 0 76 76"><polyline points="14,62 14,14 62,14" fill="none" stroke="#9253BE" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="14" cy="62" r="12" fill="#9253BE"/><circle cx="62" cy="14" r="12" fill="#9253BE"/></svg>
+    <svg class="motif" id="nearB" style="right:-24px;bottom:120px;filter:blur(2.6px);opacity:.35" width="150" height="150" viewBox="0 0 76 76"><polyline points="62,62 62,14 14,14" fill="none" stroke="#794300" stroke-width="17" stroke-linecap="round" stroke-linejoin="round"/><circle cx="62" cy="62" r="12" fill="#794300"/><circle cx="14" cy="14" r="12" fill="#794300"/></svg>
+  </div>
+
+  <div class="bottombar" id="bottombar">
+    <div class="pill" style="left:270px">How to play</div>
+    <div class="pill" style="left:415px">Scoring &amp; tips</div>
+    <div class="hs" style="right:270px"><b>YOUR HIGH SCORE<em class="newchip">NEW</em></b><span>0</span></div>
+  </div>
+</div>
+
+<p class="note"><b>CONCEPT 3 · THE SUSPENDED WORLD — every deal is a little place.</b> The puzzle does not sit <i>on</i> the page; it floats
+in a small world made of three depths: the scattered pieces far away in soft mist, the board suspended in the middle, and large blurred
+pieces drifting close to you. <b>Move your mouse (or drag) over the screen</b> — the layers shift against each other, like looking through
+a window. On Next, the world <b>dissolves</b> and a different one <b>condenses</b> — new colours, new air (watch the second deal: it arrives
+warm). The shell stays put; what changes is that every deal now has <i>weather</i>.</p>
+<button class="replay" id="replay">&#8635; Replay concept</button>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script>
+  var PAIRS = [
+    { col:'#9253BE', warm:'#C25E2E', sym:'\u2B22', a:[0,0], b:[5,1] },
+    { col:'#794300', warm:'#8A6D1F', sym:'\u25CE', a:[1,3], b:[4,5] },
+    { col:'#003320', warm:'#5B7444', sym:'\u2B1F', a:[0,4], b:[5,4] },
+    { col:'#DC5E87', warm:'#B23A68', sym:'\u25B2', a:[0,2], b:[5,5] },
+    { col:'#9253BE', warm:'#C25E2E', sym:'\u25C6', a:[2,5], b:[4,0] },
+    { col:'#794300', warm:'#8A6D1F', sym:'\u2605', a:[5,2], b:[3,5] }
+  ];
+  var grid = document.getElementById('grid');
+  for (var gi = 0; gi < 36; gi++) { var gc = document.createElement('div'); gc.className = 'cell'; grid.appendChild(gc); }
+  var dotsEl = document.getElementById('dots'), dotEls = [];
+  PAIRS.forEach(function(p) {
+    [p.a, p.b].forEach(function(rc) {
+      var d = document.createElement('div');
+      d.className = 'dot'; d.style.background = p.col;
+      d.style.left = (rc[1] * 84 + 10) + 'px'; d.style.top = (rc[0] * 84 + 10) + 'px';
+      d.textContent = p.sym; dotsEl.appendChild(d); dotEls.push(d);
+    });
+  });
+  var screen = document.getElementById('screen'), box = document.getElementById('box'),
+      farA = document.getElementById('farA'), farB = document.getElementById('farB'),
+      layerFar = document.getElementById('layerFar'), layerMid = document.getElementById('layerMid'),
+      layerNear = document.getElementById('layerNear'), pathB = document.getElementById('pathB'),
+      vPairs = document.getElementById('vPairs');
+  var WORLD1 = { bg: 'radial-gradient(1200px 800px at 50% 38%, #FAF7FF, #E7DEF7)', box: '#ECE0FD', border: '#CDBCEC', bar: '#ECE0FD' };
+  var WORLD2 = { bg: 'radial-gradient(1200px 800px at 50% 38%, #FBF3DC, #EDDFBA)', box: '#F3E9CF', border: '#D9C48F', bar: '#F3E9CF' };
+  function applyWorld(w, warm) {
+    screen.style.background = w.bg;
+    box.style.background = w.box; box.style.borderColor = w.border;
+    document.getElementById('bottombar').style.background = w.bar;
+    dotEls.forEach(function(d, i) { d.style.background = warm ? PAIRS[Math.floor(i / 2)].warm : PAIRS[Math.floor(i / 2)].col; });
+    pathB.setAttribute('stroke', warm ? '#8A6D1F' : '#794300');
+  }
+  // gentle idle sway on the far pieces + mouse parallax between the layers
+  var sway = anime({ targets: '#layerFar .motif', translateY: [-6, 6], duration: 3400, direction: 'alternate',
+                     loop: true, easing: 'easeInOutSine', delay: anime.stagger(260) });
+  screen.addEventListener('mousemove', function(ev) {
+    var r = screen.getBoundingClientRect();
+    var nx = ((ev.clientX - r.left) / r.width - .5) * 2, ny = ((ev.clientY - r.top) / r.height - .5) * 2;
+    anime({ targets: layerFar, translateX: nx * 10, translateY: ny * 8, duration: 700, easing: 'easeOutQuad' });
+    anime({ targets: layerMid, translateX: nx * 4, translateY: ny * 3, duration: 700, easing: 'easeOutQuad' });
+    anime({ targets: layerNear, translateX: nx * -14, translateY: ny * -10, duration: 700, easing: 'easeOutQuad' });
+  });
+  var currentTl = null;
+  function killCurrent() {
+    if (currentTl) { currentTl.pause(); currentTl = null; }
+    anime.remove(['#box', '.cell', '.dot', '#farA', '#farB', '#layerNear', '#layerMid', '#gname', '#pathB']);
+  }
+  function pairDelay(step) { return function(el, i) { return Math.floor(i / 2) * step; }; }
+  function play() {
+    killCurrent();
+    applyWorld(WORLD1, false);
+    anime.set(farA, { opacity: 0 }); anime.set(farB, { opacity: 0 });
+    anime.set(box, { opacity: 0, scale: .94, filter: 'blur(8px)' });
+    anime.set(layerMid, { filter: 'blur(0px)', opacity: 1 });
+    anime.set(layerNear, { opacity: 0 });
+    anime.set('.cell', { opacity: 0, scale: .5 });
+    anime.set('.dot', { opacity: 0, scale: 0 });
+    anime.set('#gname', { opacity: 0, translateY: -12 });
+    anime.set(pathB, { strokeDashoffset: 100 });
+    vPairs.textContent = '0 / 6';
+    // ABSOLUTE positions only (anime.js 3.2.1 does not create timeline labels on the fly).
+    var tl = anime.timeline({ loop: false });
+    currentTl = tl;
+    // world 1 condenses (0-2300)
+    tl.add({ targets: farA, opacity: [0, .45], duration: 1000, easing: 'easeOutQuad' }, 0)
+      .add({ targets: box, opacity: [0, 1], scale: [.94, 1], filter: ['blur(8px)', 'blur(0px)'],
+             duration: 950, easing: 'easeOutCubic' }, 300)
+      .add({ targets: layerNear, opacity: [0, 1], duration: 800, easing: 'easeOutQuad' }, 800)
+      .add({ targets: '#gname', opacity: [0, 1], translateY: [-12, 0], duration: 450, easing: 'easeOutCubic' }, 900)
+      .add({ targets: '.cell', opacity: [0, 1], scale: [.5, 1], duration: 380, easing: 'easeOutBack',
+             delay: anime.stagger(14, { grid: [6, 6], from: 'center' }) }, 1150)
+      .add({ targets: '.dot', opacity: [0, 1], scale: [0, 1], duration: 340, easing: 'easeOutBack',
+             delay: pairDelay(90) }, 1450)
+      // a taste of play (2500-3200)
+      .add({ targets: pathB, strokeDashoffset: [100, 0], duration: 620, easing: 'easeInOutQuad',
+             begin: function() { vPairs.textContent = '1 / 6'; } }, 2550)
+      // the world dissolves (3500-4300); at the bottom of the dissolve, the new world swaps in
+      .add({ targets: layerMid, filter: ['blur(0px)', 'blur(7px)'], opacity: [1, .3], duration: 700, easing: 'easeInQuad' }, 3500)
+      .add({ targets: farA, opacity: [.45, 0], duration: 700, easing: 'easeInQuad' }, 3500)
+      .add({ targets: layerNear, opacity: [1, 0], duration: 600, easing: 'easeInQuad' }, 3500)
+      .add({ targets: '#gname', opacity: [1, 0], duration: 300, easing: 'easeInQuad' }, 3500)
+      .add({ targets: '.dot', duration: 1, begin: function() {
+               applyWorld(WORLD2, true);
+               anime.set('.dot', { opacity: 0, scale: 0 });
+               anime.set(farB, { opacity: 0 });
+             } }, 4250)
+      // world 2 condenses, warm (4300-5800)
+      .add({ targets: farB, opacity: [0, .45], duration: 900, easing: 'easeOutQuad' }, 4350)
+      .add({ targets: layerMid, filter: ['blur(7px)', 'blur(0px)'], opacity: [.3, 1], duration: 900, easing: 'easeOutCubic' }, 4350)
+      .add({ targets: '#gname', opacity: [0, 1], translateY: [-12, 0], duration: 450, easing: 'easeOutCubic' }, 4700)
+      .add({ targets: '.dot', opacity: [0, 1], scale: [0, 1], duration: 340, easing: 'easeOutBack',
+             delay: pairDelay(80) }, 4800)
+      .add({ targets: layerNear, opacity: [0, 1], duration: 800, easing: 'easeOutQuad' }, 5100);
+  }
+  play();
+  document.getElementById('replay').addEventListener('click', play);
+</script>
+</body>
+</html>

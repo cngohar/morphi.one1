@@ -1,0 +1,11 @@
+{
+	"device": "Headless desktop Chromium, 1280×720, local development server",
+	"network": "localhost, unthrottled",
+	"load": "preloaded solo Memory, reduced motion",
+	"metric": "Next activation to generated game DOM; excludes prescribed entrance/preview",
+	"runs": 5,
+	"milliseconds": [29.899999999906868, 36, 28.199999999953434, 32.89999999990687, 25],
+	"median": 29.899999999906868,
+	"p95": 36,
+	"classification": "diagnostic goal only; no phone/4G/public-launch acceptance"
+}

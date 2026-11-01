@@ -28,6 +28,16 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 
 ## 3. Input
 
+Connect v1.1: an out-of-range, diagonal or foreign-endpoint step, a repeated
+cell, a move after win, or a nonmonotonic stroke/timestamp is rejected by the
+pure reducer and server replay. Crossing another path cuts its tail; restarting
+a previously connected pair incurs exactly one redraw penalty for the stroke.
+An all-pairs board with empty cells still wins; only full coverage receives the
+grid bonus. The result reports its fill percentage.
+Pointer cancellation ends a stroke, while resize leaves the seeded board and
+paths intact. `puzzles/connect/logic.test.ts` and `tests/e2e/connect.spec.ts`
+cover the main reducer and browser flows.
+
 - Simple-build regression: a failed seed draw must not consume the next puzzle family; retry still starts that family. Two synchronous Play activations start one round only (`tests/e2e/reliability.spec.ts`).
 - Simple-build regression: Block drops use the final release coordinates; secondary pointers cannot replace the active drag; lost capture or window blur cancels it; repeated Enter/Space cannot select and place unintentionally (`tests/e2e/reliability.spec.ts`).
 
@@ -65,6 +75,12 @@ Catalog of edge cases with the expected behavior. Every case needs a test (unit,
 
 ## 6. Engine
 
+Connect v1.1: 1,200 seeded full-grid witnesses have distinct cells, orthogonal
+steps and segments of at least three; a replayed witness wins. The witness is
+never consulted for a player's win. Known board/score vectors for all three
+bands run in six runtimes; local D1 replays ranked strokes and rejects an
+incomplete log. Per-puzzle move caps prevent unbounded replay work.
+
 V1 selector regressions (2026-10-24): both starting families must be reachable;
 a failed seed/generation attempt retains the pending family; repeated peeks do
 not consume it. Every eligible family appears exactly once per cycle, with the
@@ -86,6 +102,39 @@ process, never through a shipped family-selection bypass.
 - Extremely long game (thousands of moves) → performance cap and a move limit.
 
 ## 7. Rendering and accessibility
+
+Connect v1.1: dot pairs always use a generated symbol as well as color. The
+board and its own dot-path backdrop fit phone portrait, short landscape and
+desktop; compact backdrops hide and wide layouts show 1–5 objects per side.
+The Card gate blocks early input, and a fixed visible-time deadline owns
+Connect readiness. Nine original static sounds exist for its actions; starting
+muted prevents audio fetches, and enabling sound loads them. These are covered
+by `tests/e2e/connect.spec.ts`; real-phone gesture and audio quality review
+remain open.
+
+Card-to-board backdrop regression (2026-10-29): while the Card unfolds, its
+transformed frame is narrower than the final board. Measure scatter bounds
+when the backdrop becomes visible, then on resize, so objects stay outside the
+board. The 1920×923 Block WebKit check caught this; repeated WebKit and
+cross-browser rechecks pass in `tests/e2e/themes.spec.ts`.
+
+V1.1 owner screenshot regression (2026-10-26): a 1920×923 viewport previously
+kept the panel near 642×472 and Memory's cards capped at 440px wide. Size from
+the viewport/container instead. Desktop panel height must reach 70% of the
+viewport, with at least 95% use of the board's limiting container dimension;
+header/box/bottom-panel gaps, full-width flush bottom anchoring, no scroll and
+corner chrome are asserted in `tests/e2e/themes.spec.ts`. The four required
+viewports plus 1920×923 and 360×640 run in Chromium/Firefox/WebKit. Non-rectangular
+cards retain an outer keyboard focus ring; their symbols are checked at 24px
+in solid and outline styles. Zero-score completed games do not regain NEW.
+
+V1.1 theme failures: eight inaccessible palette attempts → documented verified
+preset; eight freshness misses → last accessible candidate, with violation rates
+reported. Blocked Worker → logged synchronous deterministic fallback; unmount →
+terminate the worker; blocked IndexedDB → latest-three memory history. Cosmetic
+metadata never changes game scores or legal moves. Legacy queued runs without
+theme metadata remain valid. See `engine/theme/theme.test.ts`,
+`ui/solo-theme.test.ts`, `ui/theme-history.test.ts`, and D1 run integration tests.
 
 Oct 25 design demo checks (`bun run test:demo`): bounded scatter stays outside
 foreground safe zones, never creates links/focus targets and re-deals only on
@@ -198,6 +247,90 @@ Privacy-page regressions (2026-10-23): `/privacy` is public, prerendered, and re
 - Block placement: block and Memory bests → stored under separate keys; clearing or changing one never changes the other.
 
 ## 16. Rotation and selection
+
+V1.1 preparation during animation (owner, 2026-10-27): prepare one next solo
+candidate during the current entrance, without consuming the selector peek or
+reserving a ranked start. On Next use that candidate only for the pending
+family; ranked issuance still supplies its own seed/theme. Slow preparation
+shows a neutral face-down loading card without revealing the next family.
+Failed speculation is caught/logged, then gets one foreground retry; failure
+retains the family and finished result with Retry/Next and Home available.
+Worker waits and IndexedDB opens/transactions are bounded. Navigation aborts
+preparation and ignores late completions; duplicate Next cannot commit twice.
+Reduced/failed motion never controls readiness. See `ui/prepare-ahead.test.ts`,
+`theme-history.test.ts`, `tests/e2e/preparation.spec.ts` and `card.spec.ts`.
+
+V1.1 backdrop isolation (standing owner rule, 2026-10-27): in-play decoration
+contains only current-puzzle objects. Every Memory round has cards; every Block
+round has actual block-piece shapes. Legacy `none` snapshots get seeded own-item
+scatter, never another game's motifs. Owner update (2026-10-28): compact/mobile
+portrait and landscape hide the object layer; wider layouts show a seeded random
+1–5 own objects per side, scattered in two dimensions throughout the exposed
+background space rather than fixed columns or regular rows. Keep the approved
+background blend.
+Rotation/reflow must update visibility without changing puzzle state. All motifs stay at
+20% opacity outside header/bottom bands, with effective contrast ≤1.25. Future
+puzzle briefs must declare and test their own allowed objects; mixed-game
+decoration is Home-only. See `ui/puzzle-backdrop.test.ts`, `themes.spec.ts` and
+`docs/puzzles/_TEMPLATE.md`. The Card/played stack are session chrome.
+
+Actual Card integration (owner approved, 2026-10-28): mount the game with
+entrance deferred. The Card's logical deadlines, independent of Anime callbacks,
+release each puzzle's own entrance; never start Memory preview/time under the
+folded Card. Visibility pauses Card deadlines; resize/reduced motion settles
+visual state without losing the logical phase. Abort resolves pending UI waits
+and cannot commit a late candidate. Save completion before any fold/result
+presentation. Failed Next restores the finished result and pending family;
+repeated Next commits one round. Record ranked flip/unfold allowance on issuance,
+with zero for legacy sessions; never accept opening time from a client payload.
+The session stack is bounded chrome, not a saved-history copy.
+When resizing across Memory's four/five-column boundary, measure after the
+reactive layout update and without CSS size transitions. Even a tiny global
+reduced-motion transition can return the previous width in Firefox/WebKit.
+Check useful desktop width and unchanged round/card identity, not only viewport
+fit; a tiny board can pass a no-overflow test.
+
+V1.1 Card random arrival (owner, 2026-10-28): every new Card, including after
+Next, starts at a fresh random viewport edge position and rotation. Entry
+settles at the stage centre; unfolding stays centred, and finishing folds into
+the played stack. Reset every transform channel between phases so a cached
+entry translation or prior scale cannot leak into unfold/fold/replay. Cosmetic
+entropy must not consume puzzle selector/seed draws. Reduced motion and failed
+entropy settle to the static Card without blocking preparation. Check distinct
+origins across Next while retaining the accepted result exit and single frame.
+
+V1.1 Card review regression (owner, 2026-10-27): enlargement must not fade out
+a small board and insert a second full board. Keep one frame node, expand its
+geometry continuously, then retain the puzzle's own arrival. Memory's random
+travel precedes a full three-second preview and hide. Fold-away must leave no
+visible animation child covering the central score/statistics/Next result.
+Test frame identity/count and monotonic expansion, random travel, preview time,
+hidden-page pause, reduced motion, result visibility and four viewport sizes.
+See `tests/e2e/card.spec.ts`; actual game timings remain covered separately by
+`entrance.spec.ts`.
+
+Desktop result review (owner, 2026-10-27): a desktop result must use the available
+width rather than repeat the phone stack. Keep score/high score/stats separate
+from the Next-card column. Decorative result entrance must not delay readiness,
+change score text, or break an immediate Next. Cancelling it, switching reduced
+motion, or rotating retains the logical result. Test desktop columns, phone/
+landscape fit, animation presence, static fallback and an interrupted entrance
+in `tests/e2e/card.spec.ts`.
+
+Final result review (owner, 2026-10-28): do not replay a completed result
+on visibility resume or layer multiple reveals. Only the large earned-score
+number gets a single 500 ms digit scramble. The panel itself fades/rises once
+over 420 ms after fold-away (owner follow-up). Early Next captures current
+opacity/translation before cancelling entrance; the accepted exit must not
+flash back to full opacity. Reduced motion settles the panel immediately. The heading, “Your score”, high
+score, stats and Next stay static. Install the aria-hidden score overlay before
+the first visible frame; keep final accessible text/layout and Next's name
+stable. Restore the original nodes once, including on cancellation or reduced
+motion. Do not expose the final score, hide it, then replay a reveal. Next
+locks duplicate activation, prepares during the accepted 350 ms exit, then
+deals the next Card. Static motion skips travel without delaying readiness.
+`card.spec.ts` samples the first score frame, resolve duration, static labels,
+visible departure, preparation overlap, distinct Card origins and no replay.
 
 - Only one eligible family → repetition is allowed; no error.
 - Every family disabled, excluded by the player, or turned off by a kill switch → show the unavailable state with Home and Retry (plan section 11.14). No family is served as a fallback, including a default one, so no kill switch is bypassed.

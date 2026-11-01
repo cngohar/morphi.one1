@@ -1,0 +1,28 @@
+{
+	"verified_on": "2026-10-27",
+	"command": "bun run verify",
+	"exit_code": 0,
+	"format_lint": "pass",
+	"typecheck": {
+		"errors": 0,
+		"warnings": 0
+	},
+	"boundaries": "pass",
+	"unit_tests": 111,
+	"integration_tests": 22,
+	"palettes": {
+		"seeds_per_family": 10000,
+		"families": ["memory", "block"],
+		"result": "pass"
+	},
+	"vectors": {
+		"runtimes": ["Node", "Bun", "Chromium", "Firefox", "WebKit", "workerd"],
+		"theme_vectors_per_runtime": 6,
+		"result": "pass"
+	},
+	"built_worker": "pass",
+	"browser_tests": 79,
+	"browser_theme_tests": 39,
+	"raw_log": "build/v1.1-themes/verify.log",
+	"release_status": "local review slice; owner theme/visual acceptance pending; not deployed"
+}

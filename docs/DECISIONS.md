@@ -1,5 +1,261 @@
 # DECISIONS.md
 
+## 2026-10-29 — Connect objective correction during local review
+
+- The owner clarified that connecting every pair is the win condition even
+  when cells remain empty. The earlier full-grid requirement in the handoff
+  brief and local implementation is superseded. Full-grid coverage is an
+  optional 1,000-point bonus if achieved on the winning move; the time bonus
+  applies to every all-pairs win. The result reports fill percentage.
+- Keep `connect-1` during this unaccepted local Work 3 slice; no Connect rules
+  or ranked sessions have been deployed. Server replay and client completion
+  use the same corrected reducer. First-frame hiding and a 48×48 SVG viewport
+  correct the reported entrance flash and off-centre symbols.
+- Measure puzzle backdrop bounds when it becomes visible after the Card unfolds.
+  Measuring the concealed layer against the animated narrow frame left some
+  Block objects under the final board in WebKit. The existing ResizeObserver
+  continues to track later size changes; no theme or puzzle version changes.
+
+## 2026-10-28 — Connect as the third local Mix family
+
+- The owner closed the puzzle Card UI/UX progression gate and directed Work 3.
+  Connect is in the generated registry and weighted Mix selector only. There is
+  no new public door, play parameter, deployment or production resource change.
+  The existing Home/profile polish note is separate from this Card decision.
+- Pin rules as `connect-1`: SplitMix64 chooses a 5×5/5, 6×6/6 or 7×7/8 band,
+  bounded backbite preserves a full-grid witness, and pair segments have at
+  least three cells. The witness is excluded from win validation. Canonical
+  path-cell moves contain pair, cell, stroke and monotonic elapsed milliseconds.
+  Replay rejects bad order, foreign endpoints, diagonal steps, post-win moves
+  and logs above 1,000. Score uses +200 per connected pair, +1,000 complete grid,
+  +10 per whole second under par, −50 for redrawing a previously connected
+  pair, floored at zero. Ranked time uses server wall time minus the issued Card
+  allowance and fixed 2,500 ms Connect opening, never a client score.
+- Connect uses the already pinned procedural theme config
+  `theme-2026-10-26-1`, generator `oklch-machado-1`, TypeScript `~6.0.3`,
+  anime.js 4.5.0 through `ui/motion.ts`, and ElevenLabs SDK 2.74.0 offline.
+  The installed SDK's `CreateSoundEffectRequest` type confirms
+  `durationSeconds`, `promptInfluence`, `modelId` and `outputFormat`; nine
+  original Connect cues were generated as static MP3s. The prompt and hash of
+  each are in `static/audio/manifest.json`. Runtime never calls ElevenLabs.
+- The accepted shell and Card stay shared. Connect adds its own dot-path-only
+  backdrop and a 2.5-second centre ripple/paired-dot entrance; active-time
+  deadlines, not Anime completion, gate input. Reduced-motion and muted play
+  preserve the rules. The game offers no new public route.
+
+## 2026-10-28 — Approved Card flow in the local app
+
+- Owner approved the reviewed animations and authorized actual app integration.
+  `RoundStage.svelte` owns one persistent frame around real puzzle views. The
+  typed `cardSceneMotion` wrapper accepts app-owned elements; the reference
+  adapter remains separate. No prototype puzzle logic or demo DOM is imported.
+- Game views accept an entrance-ready signal. Memory starts its own 3/4/5 s
+  deal only after the Card unfolds, then its full 3 s preview and hide. Block
+  keeps its own entrance. Logical active-time deadlines own readiness, not
+  Anime completion callbacks. Completion persistence precedes presentation.
+- Stack chrome retains the latest eight cards plus a session count, clearing
+  on leaving the play loop; it is not a saved-history store. Real results keep
+  account links, local best and save/sync states in the approved responsive
+  result composition.
+- Frame measurement runs after responsive game columns update. Disable CSS
+  size transitions on the measured containers: the global tiny reduced-motion
+  transition otherwise makes Firefox/WebKit return the previous Card width.
+  The 10-pair phone-to-desktop regression checks useful board width, unchanged
+  round/card identity and no entrance replay in all three browser engines.
+- Ranked issuance waits until the neutral 650 ms deal finishes. A session stores
+  a server-owned 1200 ms flip/unfold allowance in `card_opening_ms`; migration
+  `0007` defaults earlier rows to zero. Memory replay subtracts that issued
+  value as well as the existing per-puzzle opening, never a client field. Old
+  issued/claimed sessions retain their previous scoring timing. Reduced-motion
+  ranked openings retain fixed deadlines, matching the existing Memory policy.
+- Keep TypeScript `~6.0.3`, anime.js 4.5.0 and the existing game/theme versions.
+  Local D1 only; no binding, secret, DNS, OAuth or deployment change. Checked
+  [D1 SQL](https://developers.cloudflare.com/d1/sql-api/sql-statements/) and
+  [local migration commands](https://developers.cloudflare.com/d1/wrangler-commands/),
+  with installed Wrangler 4.151.3 help.
+
+## 2026-10-28 — Result entrance after the Card correction
+
+- Owner accepted Next and reported that the result appeared suddenly. Add one
+  420ms panel fade/rise (20px) after folding, alongside the existing 500ms
+  score-only scramble. Text contents remain static apart from the large score.
+  Initialize the hidden panel before paint. Completed motion never replays.
+- Preserve the approved 350ms exit. For an immediate Next, capture the current
+  opacity/translation before reverting the entrance, and initialize the exit
+  from that frame to prevent a flash. Logical readiness remains immediate;
+  reduced motion or cancellation restores the final result and score.
+- Verify entrance progress, final state, visibility resume, early/duplicate Next
+  and a reduced-motion switch in Chromium/Firefox/WebKit plus installed Chrome.
+
+## 2026-10-28 — Desktop Card transform and scatter correction
+
+- Owner Chrome/Firefox review found lined-up objects and broken arrival/finish.
+  Frame screenshots reproduced a retained random entry translation during
+  unfold and fold. Reset all board transform channels in inline styles before
+  each phase; restore/revert alone did not clear the retained parsed values.
+  Entry alone is random: settle at the centre, unfold there, then fold into the
+  played stack. Match the flying Card's final rotation to its stack slot.
+- Checked anime.js 4.5.0 source and its current
+  [transform documentation](https://animejs.com/documentation/animation/animatable-properties/css-transforms):
+  JS animation reads individual transforms from inline styles. Keep Anime
+  calls in the existing motion wrapper; no engine or readiness change.
+- Presentation adapter `own-items-4` uses independent seeded x/y positions.
+  Measure exposed background widths for two-dimensional scatter across each
+  side, rather than narrow fixed columns or evenly spaced rows. Recompute on
+  resize and theme/board replacement. Keep 1–5 objects per side, current-game
+  isolation, mobile hiding, blend and opacity. No snapshot/config change.
+- Browser regression now checks centre positions during entry/unfold/shrink
+  and landing at the actual played stack over three rounds, in addition to
+  frame identity/monotonic size. Test installed Google Chrome as well as
+  Chromium/Firefox/WebKit and retain screenshots for visual review.
+
+## 2026-10-28 — Card arrival and backdrop review corrections
+
+- Owner requires fresh random Card arrival positions on Next, rather than the
+  fixed left origin. The proof draws independent cosmetic entropy for viewport
+  edge, position and rotation, preserving the continuous frame, accepted exit
+  and per-game entrances. Reduced motion bypasses travel; failed entropy uses
+  the existing logged static fallback. No selector or puzzle seed is consumed.
+- Owner approved the background blend and requested no backdrop objects on
+  mobile, plus 1–5 objects per side on wider layouts. Presentation adapter
+  `own-items-3` derives left/right counts and positions from the existing theme
+  seed without changing approved palette snapshots. Compact means width ≤900px
+  or short landscape height ≤560px, using CSS layout queries in app and proof.
+  Family isolation, 20% opacity and the approved blend remain unchanged.
+
+## 2026-10-27 — Work 2 backgrounds, preparation and Card proofs
+
+- Owner review correction: a shrinking/replaced board produced a visible pop.
+  The presentation now uses one persistent frame whose dimensions grow into
+  the board, then runs the game's own arrival. Preserve Memory's random-position
+  deal and full preview/hide contract. The proof's fixed six-pair sample uses
+  the existing three-second mapping; actual 6/8/10-pair 3/4/5 s remains intact.
+  After fold-away, put score, Your high score, statistics and Next in the
+  centre, with the stack at the side/bottom-left. The owner requested the demo
+  update and continuation, not design acceptance.
+- Subsequent owner result review requested animation and a desktop composition
+  rather than the phone stack. The proof uses a wide two-column desktop result,
+  compact portrait and separate short-landscape layout. Summary/score, stats
+  and waiting-card/Next motion is decorative (700 ms, absolute positions),
+  interruptible by Next and skipped for reduced motion. Score text is final
+  immediately; no counter animation or completion callback computes a result
+  or enables input. Actual app result/save behavior remains unchanged pending
+  the design gate.
+- The owner then reported duplicate result animation and asked for a flipping
+  score and an exit on Next. Replace the overlapping reveal groups with one
+  composition entrance and a score-only 3D flip (final text is present
+  immediately). Guard completed Anime.js timelines on visibility resume.
+  Next starts preparation behind a 350 ms result exit, ignores duplicate
+  activation, and then deals the new Card. Reduced motion uses logical/static
+  equivalents; no animation completion callback gates the next puzzle.
+- Final owner update replaces the score flip (which visibly preflashed) with
+  one 500 ms random-text reveal across the whole result. The owner explicitly
+  accepted the existing exit animation; retain its 350 ms timing. Use pinned
+  anime.js 4.5.0's [scrambleText helper](https://animejs.com/documentation/text/scrambletext)
+  on temporary aria-hidden overlays, with final accessible source text keeping
+  layout stable. Initialize overlays before showing the result, restore original
+  nodes on completion/cancel/reduced motion, and never animate a computed score
+  or gate readiness. This supersedes the intermediate flip/stagger choices.
+- Owner clarification: the random reveal applies only to the large earned-score
+  number (for example the big 450). Keep “Your score”, “Your high score 450”,
+  the heading, statistics and Next text static. The implementation now targets
+  `.sample-score` only with numeric glyphs; the previously accepted exit is
+  unchanged. This narrows the preceding scramble decision.
+
+- The owner directed starting the next step and made puzzle-specific backdrops
+  a standing rule for all future puzzles. Block backgrounds contain actual
+  block pieces only; Memory backgrounds contain cards only. No cross-game or
+  generic background motifs in play. Home alone may mix game objects. Add this
+  contract and its isolation/visual evidence to every future puzzle brief.
+- `own-items-2` is a presentation adapter derived from the existing resolved
+  theme seed. It supplies visible scatter even for old `none` arrangements and
+  uses actual Block shapes exposed by the generated catalog/registry. Do not
+  rewrite the approved palette/config snapshots or alter game RNG/scores.
+  Effective decoration contrast stays ≤1.25 at 20% opacity; header/bottom bands
+  clip decoration. Presentation cards/stacks are chrome, not backdrop motifs.
+- Prepare at most one next solo candidate during the current entrance, with
+  one foreground retry after failed speculation. Peek never consumes a draw;
+  only a successful start commits family/history. A ranked start is issued
+  only when requested, and its authoritative seed/theme supersedes the solo
+  fallback candidate. No ranked reservation, clock change, or early seed leak.
+- Bound IndexedDB access to 1.5 s and retain in-memory history on failure.
+  Worker generation retains its 5 s deadline and deterministic fallback.
+  A neutral loading card plus a normal Home link handles slow preparation;
+  cancellation suppresses late commits and motion never signals readiness.
+- Deliver interactive Memory/Block Card proofs before actual integration,
+  following the owner's [Card decision](morphi-v1.1-handoff-2026-10-26/morphi-game-ui-redesign/THE-CARD-decision.md).
+  Phone stack placement remains an owner verdict. The sample has isolated
+  replay/finish/slow/failure/static controls, no account or score persistence,
+  and is excluded from build output with all other demos. Eight visible stack
+  cards bound the DOM; the completed-round count grows throughout the session.
+- Retain anime.js 4.5.0 and use the sole `motion.ts` wrapper, with numeric
+  absolute positions as required by the brief. Checked against the current
+  [timeline position documentation](https://animejs.com/documentation/timeline/time-position).
+  No package upgrades, scoring/engine changes or deployment authorization.
+
+## 2026-10-27 — v1.1 contact-sheet approval
+
+The owner approved the procedural-theme contact sheet. Its palette/style taste
+gate is accepted. Next is Work 2: the UI/UX pass with The Card, beginning with
+Memory and Block visual proofs and phone played-stack placement for review.
+Overall visual acceptance, a numerical freshness target, real-device review and
+production gates remain separate; no deployment is authorized.
+
+## 2026-10-26 — v1.1 local theme review slice
+
+The owner authorized the [v1.1 brief](morphi-v1.1-handoff-2026-10-26/CODEX-BRIEF.md)
+and adjacent scope. Follow the brief's numbered order and retain the required
+theme taste review. During the theme slice the owner supplied the 1920×923
+small-board screenshot, explicitly requested the planned sizing fix, then
+directed work to continue. That authorizes the bounded Work 2 shell/sizing
+follow-up while theme/Card/overall visual acceptance remains pending. No
+deployment authorization.
+
+- Algorithm `oklch-machado-1`, immutable data snapshot
+  `theme-2026-10-26-1`; no dependency upgrades. Recipes use the plan's
+  3.3/5.5/9 contrast-target alternative, not the less reliable four-color
+  3.5/5/8/14 trial. Chroma is reduced into sRGB gamut; checks operate on the
+  final 8-bit colors. Maximum eight palette tries, then documented presets.
+- Use the published severity-1 Machado matrices on **linear** sRGB, then
+  CIE76 in D65 Lab. The handoff Python reference uses different matrices in
+  gamma space; its numbers are not acceptance evidence. Matrix values were
+  checked against the [Colour project's published dataset](https://github.com/colour-science/colour/blob/develop/colour/blindness/datasets/machado2010.py).
+  Contrast follows [WCAG 2.2](https://www.w3.org/TR/WCAG22/#dfn-relative-luminance);
+  cosmetic OKLCH conversion follows [CSS Color 4](https://www.w3.org/TR/css-color-4/#ok-lab).
+  Acceptance margins: symbol/edge ≥3.1, text ≥4.7, card back ≥1.55,
+  pairwise color difference ≥22, effective decoration ≤1.25 at 20% opacity.
+- Keep the PLAN's Shapes/Ocean/Garden/Candy as checked anchors and fallbacks.
+  Do not silently promote the legacy app's Sky/Ocean/Garden palettes to safe
+  procedural fallbacks; some fail the stricter color-separation rule. Their
+  existing guest build path and historical owner-approved evidence remain.
+- Theme streams are domain-separated from puzzle RNG. Neither engine versions
+  nor known game vectors change. Generated Memory glyphs map onto existing
+  logical identities, preserving replay while changing only presentation.
+- Solo palette solving uses a Web Worker. A blocked/missing Worker logs an
+  event and uses the same bounded, deterministic accessible fallback on the
+  main thread. Theme history is the latest three dealt snapshots in IndexedDB,
+  with in-memory fallback; it contains no account identity. Block generates
+  symbol metadata for the shared theme vocabulary but does not paint glyphs
+  on its pieces. Freshness reports this shared-family limitation explicitly;
+  no novelty waiver or successful freshness gate is inferred.
+- Ranked starts select up to eight candidates on the server, using the user's
+  last three issued snapshots. D1 stores config/generator versions and the
+  resolved snapshot on starts and completions; the client submits only cosmetic
+  version IDs alongside its existing replay data. Pending results keep a local
+  snapshot separately. Old queued runs remain readable as `curated-v1`.
+  Per-round theme versioning never re-scores or regroups results. Local schema
+  migration is `0006_awesome_killraven.sql`.
+- CLI/migrations follow the current [D1 migrations documentation](https://developers.cloudflare.com/d1/reference/migrations/)
+  and [prepared-statement API](https://developers.cloudflare.com/d1/worker-api/prepared-statements/),
+  using the existing pinned Drizzle/Wrangler stack and local D1 only.
+- Remove v1's fixed 690px wrap and 440/330px board caps for in-play screens.
+  Use viewport height and container size, preserving gameplay and seeds. The
+  title moves to the accepted header position, help/high score to the bottom
+  viewport panel, and own-item scatter to the stage outside both bands. Add
+  explicit ≥70%-height desktop panel and limiting-dimension use assertions,
+  including the owner's exact screenshot size. The Card and full visual
+  acceptance remain separate; the size fix does not waive them.
+
 ## Oct 25 owner follow-up — demo timing and phone layout
 
 - The owner's subsequent review supersedes the package's 350 ms timing:
@@ -532,3 +788,85 @@ and `select_account`, not `login`. See the
 Ranked Memory retains its fixed opening deadline even under reduced motion
 (cards settle immediately and stay visible), keeping the server timing allowance
 consistent. Solo reduced motion can skip the entrance deadline.
+
+### v1.1 Work 4 scoring versions (2026-10-29)
+
+Score coefficients are nonnegative integers bounded at 10,000; par times stay
+fixed. Each operator save creates an immutable, audited version, including a
+restore to brief defaults. Ranked issuance records the live version atomically;
+legacy sessions and offline rounds use `brief-v1`. Solo rounds obtain the live
+version when available and retain brief defaults if configuration cannot be
+loaded. Leaderboards display only the current version and its identifier, while
+older entries remain stored. Local best scores are keyed by scoring version.
+No dependency versions changed.
+
+### v1.1 Work 5 — selector-only entry and static explainers (2026-10-31)
+
+Only the selector may choose a public puzzle family. Legacy family slugs
+redirect to Home, `/play` query parameters do not choose a family, and the
+sitemap/robots omit game routes. Internal ranked issuance remains server-owned.
+The static `/how-it-works`, `/about` and `/faq` pages use reusable content
+blocks; the first page animates an abstract four-step deal through the existing
+motion wrapper. No CMS, blog, share links or puzzle-specific public pages were
+added. The assets-only guest candidate mirrors the page set and uses `_redirects`
+for legacy slugs; it was prepared and checked locally, not deployed.
+
+SvelteKit 3 route matching uses `defineParams` from `@sveltejs/kit/params` in
+root `src/params.ts`. The matcher keeps the four accepted legacy slugs inline
+so the built Worker does not need to resolve an application alias at startup.
+No dependency versions changed.
+
+## Local next-phase slice 1 (2026-10-31)
+
+- Account activity is tracked prospectively only; missing historical plays,
+  abandonments, last activity and warnings are labelled not recorded. Explicit
+  departures are reports, not an estimate of all abandonment.
+- Ordinary admin deletion becomes irreversible at its adjustable deadline;
+  physical anonymization runs on the next local app request or maintenance, as
+  authorized by the owner. Verified privacy deletion remains immediate and final.
+- Local audit is append-only with no automatic expiry; yearly exports are paged.
+  Undo writes another audit and unban undo creates a new permanent ban with a new
+  reason. Retained past audit may include public-name snapshots.
+- D1 batch behavior checked against the [Cloudflare D1 database API](https://developers.cloudflare.com/d1/worker-api/d1-database/): statements are sequential and a failed statement rolls back the batch. No versions changed.
+
+- Next-phase review cadence: the owner directed completing all three local slices
+  before one combined review. Slice 1 remains pending review; do not mark any
+  slice accepted or close the work until the owner accepts the combined review.
+  This does not authorize deployment.
+
+## Owner quick review — next-phase work (2026-10-31)
+
+The owner requested a Users overview with metric cards and dropdown navigation,
+a searchable/filterable user directory with an accessible right-side quick view,
+and a structured detailed account view. Quick views and directory rows exclude
+Google name/email; those remain restricted to the individual admin-only detail.
+Audit opens an overview with summary counts and recent entries, leading to the
+existing detailed filter/export viewer. Metrics must use retained data honestly.
+
+The owner corrected the ending order: game completion → ending text over the open
+board → text clears → Card folds into the played stack → existing results. The
+ending must hold at least 500 ms before folding; folding should take 500 ms.
+This supersedes the prior post-fold ending interstitial and two-second hold.
+The intermittent signed-in 403 behavior must be investigated while retaining
+operator permissions, TOTP and session freshness limits.
+
+This quick review does not accept the work. Complete implementation and
+verification, then provide one combined review handoff; closure requires owner
+acceptance. No deployment is authorized.
+
+- Quick-review timing clarification: normal ending entrance is 420 ms followed
+  by at least 500 ms fully settled text, then a 500 ms fold. Reduced motion
+  displays instantly for 500 ms and settles the fold immediately. Continue taps
+  cannot shorten the minimum hold. Contract continue mode is `auto_500ms`.
+
+- Additional owner quick-review navigation update: replace plain Users dropdown
+  with styled section tabs and expandable sidebar submenus for Users and Audit.
+  Games opens a statistics overview, with individual game links opening dedicated
+  game settings/statistics screens and styled game navigation. Reuse the existing
+  operator workspace and distinct query URLs; do not invent new game mechanics,
+  scoring fields or par-time settings. Review/acceptance remains pending.
+
+- Owner requested additional individual-user detail styling: status/identity
+  header, summary cards, readable grouped tables, stronger accessible tabs and
+  responsive action cards. Existing account fields and privacy boundaries stay
+  intact. This is visual feedback, not acceptance.

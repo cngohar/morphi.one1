@@ -1,5 +1,52 @@
 # Morphi: Simple Plan
 
+## Owner-authorized v1.1 — 2026-10-26
+
+The owner authorized the local [v1.1 brief](docs/morphi-v1.1-handoff-2026-10-26/CODEX-BRIEF.md)
+and its adjacent scope. Work order: procedural themes → UI/UX and The Card →
+Connect → operator scoring configuration → public-door withdrawal/explainers.
+This supersedes the v1 curated-only theme, two-game and door decisions within
+that scope. Stop for the required theme taste/visual review; do not infer
+deployment or production-operation approval. Share links and admin game-test
+routes remain excluded. Status and evidence: [V1.1_WORK.md](docs/V1.1_WORK.md).
+
+During this slice the owner supplied the 1920×923 small-board screenshot and
+explicitly requested the planned viewport-sizing fix, then directed continuation.
+That bounded Work 2 shell/sizing follow-up is included while theme/Card/overall
+visual acceptance remains open; it is not a deployment or acceptance decision.
+
+On 2026-10-27 the owner approved the theme contact sheet and authorized starting
+Work 2. Puzzle backdrops must contain only current-puzzle objects, including
+future games; mixed-game decoration is Home-only. Prepare the next solo puzzle
+while the current entrance plays, with bounded loading/failure/navigation
+fallbacks and no speculative ranked reservation. The Card's Memory/Block proofs
+and phone played-stack placement remain the next visual review gate.
+Owner update (2026-10-28): hide puzzle backdrop objects on compact/mobile
+layouts; wider layouts get a seeded random 1–5 own objects per side, keeping
+the approved blend. New Cards enter from fresh random positions, including
+on Next, settle at the centre and unfold there; finishing folds into the played
+stack. Backdrop positions scatter across both dimensions of exposed space,
+without fixed columns/rows. Only the large result score scrambles; other result
+text stays static.
+
+Owner update (2026-10-28): animations are approved and actual local Card
+integration is authorized. Preserve real game entrances, authoritative timing,
+account/save behavior and failure recovery. The animation-demo gate is closed;
+the rest of Work 2 and real-app device review remain separate.
+
+Owner update (2026-10-29): the Card UI/UX progression gate is closed and local
+Connect Work 3 is authorized. Generate its own game-related action sounds with
+ElevenLabs. The owner corrected Connect's objective: all pairs connected ends
+the round; full-grid coverage is an optional score bonus. This supersedes the
+handoff brief's fill-to-win wording. Fix the reported symbol centring and
+pre-entrance board visibility. Connect real-device visual/audio review remains
+open; no Work 4 or deployment is inferred.
+
+Owner update (2026-10-29): the owner reviewed Connect locally on their own PC
+and accepted Work 3. No phone or public-release acceptance is recorded. The
+next numbered item is Work 4, operator per-game scoring configuration; this
+acceptance does not start Work 4 or authorize deployment.
+
 ## Owner integration authorization — 2026-10-25
 
 The owner accepted the v1 preview and authorized integration into the actual

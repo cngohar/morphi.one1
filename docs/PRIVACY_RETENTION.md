@@ -76,3 +76,34 @@ Audits include self-service deletions so the local dashboard counts deletions;
 they retain an internal target reference after active account records are removed.
 Audits/cases have no automatic TTL; justified retention and production operations
 remain owner release gates. The panel has no audit-delete or role-editor action.
+
+## Local v1.1 theme inventory — 2026-10-27
+
+Local `play_session` and `completed_run` rows now also retain theme configuration
+and generator version IDs and a resolved cosmetic snapshot. They follow their
+existing row retention and account-deletion cascades. Legacy rows retain the
+`curated-v1` marker. This adds appearance data to existing rounds; it does not
+introduce a new account identifier, expiry schedule or production service.
+
+Browser IndexedDB `morphi-themes` retains the latest three dealt appearance
+snapshots for freshness, including the seeds and cosmetic parameters. It holds
+no name, email or account identifier and falls back to memory if storage is
+blocked. It has no time-based expiry; new deals replace the oldest snapshot.
+Clearing site data removes it. Pending replay entries also keep their resolved
+appearance locally; the replay request sends version IDs, and the server uses
+its issued snapshot or regenerates the solo appearance from the validated seed.
+
+Local `morphi.block.played` and `morphi.memory.played` flags distinguish an
+unplayed family from a completed zero-score round for the NEW tag. They contain
+only `1` and remain until site storage is cleared or evicted. Theme history and
+these flags are device data, not an account-owned cross-device history or an
+operator-controlled remote wipe mechanism.
+
+No theme seeds, snapshots or new theme fields were added to the optional
+measurement endpoint. The published guest/privacy deployment is unchanged;
+this inventory describes the authorized local build only.
+
+Local Card integration (2026-10-28) adds `play_session.card_opening_ms`, a
+server-owned numeric presentation allowance for authoritative timing. Earlier
+rows default to zero. It follows the existing ranked-start retention/deletion
+rules and introduces no additional identifiers or collection purpose.

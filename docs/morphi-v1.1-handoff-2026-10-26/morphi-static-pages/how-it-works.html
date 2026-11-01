@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>How Morphi.One Works — A Random Puzzle, Dealt Fresh Every Round</title>
+<meta name="description" content="No catalogue, no choosing. Press Play and Morphi.One deals you a puzzle — fresh every round, never the same kind twice in a row. Here is how the deal works.">
+<style>
+  * { margin:0; padding:0; box-sizing:border-box; }
+  body { background:#EFE9DC; font-family:"Avenir Next","Segoe UI",system-ui,sans-serif; color:#1B2433;
+         display:flex; flex-direction:column; align-items:center; padding:26px 0 40px; }
+  .page { position:relative; width:1200px; background:#FBF7EF; border-radius:26px; overflow:hidden;
+          box-shadow:0 24px 70px rgba(27,36,51,.25); padding:0 56px 34px; }
+  /* header */
+  .hdr { position:relative; height:74px; display:flex; align-items:center; justify-content:space-between; }
+  .logo { font-size:26px; font-weight:900; letter-spacing:-.02em; }
+  .logo i { font-style:normal; color:#FF6B57; }
+  .nav { display:flex; gap:26px; font-size:14.5px; font-weight:700; }
+  .nav a { color:#68798E; text-decoration:none; }
+  .nav a.on { color:#1B2433; border-bottom:3px solid #FF6B57; padding-bottom:3px; }
+  /* title block */
+  .eyebrow { font-size:11.5px; font-weight:900; letter-spacing:.26em; color:#C4502B; margin-top:16px; }
+  h1 { font-size:42px; font-weight:900; letter-spacing:-.02em; margin:8px 0 10px; }
+  .intro { font-size:17px; line-height:1.55; color:#3D4A5E; max-width:760px; }
+  .intro b { color:#1B2433; }
+  /* main row */
+  .main { display:flex; gap:26px; margin-top:26px; }
+  .stagecard { width:724px; background:#fff; border:2px solid #EFE6D2; border-radius:22px; padding:20px 20px 16px;
+               box-shadow:0 8px 26px rgba(27,36,51,.06); }
+  .stage { position:relative; width:684px; height:470px; background:#FDFBF6; border-radius:16px; overflow:hidden; }
+  .cap { margin-top:14px; min-height:26px; font-size:16.5px; font-weight:700; text-align:center; color:#1B2433; }
+  .cap small { display:block; font-size:13px; font-weight:600; color:#68798E; margin-top:3px; }
+  /* steps column */
+  .steps { width:338px; display:flex; flex-direction:column; gap:12px; }
+  .step { background:#fff; border:2px solid #EFE6D2; border-radius:16px; padding:15px 18px 14px 58px; position:relative;
+          cursor:pointer; transition:border-color .2s, box-shadow .2s; }
+  .step .num { position:absolute; left:16px; top:14px; width:30px; height:30px; border-radius:50%;
+               background:#EFE9DC; color:#68798E; font-weight:900; font-size:15px; display:flex; align-items:center; justify-content:center; }
+  .step h3 { font-size:16.5px; font-weight:900; margin-bottom:3px; }
+  .step p { font-size:13.5px; line-height:1.45; color:#68798E; }
+  .step.on { border-color:#FF6B57; box-shadow:0 8px 22px rgba(255,107,87,.16); }
+  .step.on .num { background:#FF6B57; color:#fff; }
+  .controls { display:flex; gap:10px; margin-top:2px; }
+  .controls button { flex:1; border:2px solid #1B2433; background:#fff; color:#1B2433; border-radius:999px;
+                     padding:9px 0; font-size:13.5px; font-weight:800; cursor:pointer; font-family:inherit; }
+  .controls button.dark { background:#1B2433; color:#fff; }
+  /* stage pieces */
+  .grp { position:absolute; inset:0; }
+  .playwrap { position:absolute; left:50%; top:150px; transform:translate(-50%,-50%); width:240px; height:240px; }
+  .playbtn { position:absolute; left:50%; top:50%; transform:translate(-50%,-50%); width:132px; height:132px; border-radius:50%;
+             background:#FF6B57; color:#fff; font-size:52px; display:flex; align-items:center; justify-content:center;
+             box-shadow:0 14px 34px rgba(255,107,87,.4); padding-left:8px; }
+  .orb { position:absolute; width:26px; height:26px; border-radius:7px; }
+  .qrow { position:absolute; left:50%; top:330px; transform:translateX(-50%); display:flex; gap:12px; }
+  .qtile { width:52px; height:52px; border-radius:12px; background:#EFE9FB; border:2px solid #D9CCF3;
+           display:flex; align-items:center; justify-content:center; font-size:24px; font-weight:900; color:#5B4B9E; }
+  .board { position:absolute; left:50%; top:44px; transform:translateX(-50%); }
+  .tile { position:absolute; border-radius:13px; display:flex; align-items:center; justify-content:center;
+          font-weight:900; backface-visibility:hidden; }
+  .stamp { position:absolute; left:50%; top:356px; transform:translateX(-50%); background:#1B2433; color:#fff;
+           font-size:13px; font-weight:900; letter-spacing:.18em; border-radius:999px; padding:9px 20px; white-space:nowrap; }
+  .scorechip { position:absolute; background:#fff; border:2px solid #EFE6D2; border-radius:14px; padding:10px 16px;
+               box-shadow:0 8px 20px rgba(27,36,51,.08); }
+  .scorechip b { display:block; font-size:9.5px; letter-spacing:.22em; color:#68798E; margin-bottom:2px; }
+  .scorechip span { font-size:21px; font-weight:900; }
+  .badge { position:absolute; left:50%; top:368px; transform:translateX(-50%); background:#D8EFEA; color:#14532D;
+           font-size:13.5px; font-weight:900; letter-spacing:.1em; border-radius:999px; padding:10px 20px; white-space:nowrap; }
+  /* play band + footer */
+  .band { margin-top:30px; background:#1B2433; border-radius:20px; padding:26px 34px; display:flex;
+          align-items:center; justify-content:space-between; }
+  .band h2 { color:#fff; font-size:24px; font-weight:900; }
+  .band p { color:#A9B6C6; font-size:14.5px; margin-top:4px; }
+  .band a { background:#FF6B57; color:#fff; text-decoration:none; font-weight:900; font-size:17px;
+            border-radius:999px; padding:14px 34px; box-shadow:0 10px 26px rgba(255,107,87,.35); white-space:nowrap; }
+  .ftr { margin-top:24px; display:flex; gap:22px; justify-content:center; font-size:13.5px; font-weight:700; }
+  .ftr a { color:#68798E; text-decoration:none; }
+  .note { width:1200px; margin-top:18px; font-size:14px; line-height:1.6; color:#5A6B82; }
+</style>
+</head>
+<body>
+<div class="page">
+  <div class="hdr">
+    <div class="logo">Morphi<i>.</i>One</div>
+    <div class="nav"><a href="how-it-works.html" class="on">How it works</a><a href="about.html">About</a><a href="faq.html">FAQ</a></div>
+  </div>
+
+  <div class="eyebrow">THE DEAL, EXPLAINED</div>
+  <h1>How Morphi.One works</h1>
+  <p class="intro">There is no catalogue and no menu of games to pick from. You press <b>Play</b>, and Morphi.One
+  <b>deals you a puzzle</b> — the kind, the layout and the look are all decided by the draw. Watch it happen:</p>
+
+  <div class="main">
+    <div class="stagecard">
+      <div class="stage" id="stage"></div>
+      <div class="cap" id="cap"></div>
+    </div>
+    <div class="steps" id="steps"></div>
+  </div>
+
+  <div class="band">
+    <div><h2>Ready when you are.</h2><p>Your first puzzle is one press away — and it stays a surprise until it lands.</p></div>
+    <a href="https://morphi.one/">▶&nbsp; Play</a>
+  </div>
+
+  <div class="ftr"><a href="#">Privacy</a><a href="#">Terms</a><a href="how-it-works.html">How it works</a><a href="about.html">About</a><a href="faq.html">FAQ</a></div>
+</div>
+
+<p class="note"><b>Design demo — the interactive “How it works” page.</b> The infographic is the page’s centrepiece: it auto-plays
+through the four steps, and every step card is clickable (clicking pauses the auto-play; “Auto-play” resumes it). The animation is
+Anime.js, the boards are abstract on purpose — the page explains the <i>deal</i>, it never shows or names the puzzles themselves.
+Reduced-motion: the steps switch instantly with no motion. The page is assembled from the shared block kit (header · title ·
+stage · step cards · Play band · footer), so its words can later be edited from the admin panel like the other static pages.</p>
+
+<script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+<script>
+  var stage = document.getElementById('stage');
+  var capEl = document.getElementById('cap');
+  var RM = window.matchMedia && window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+  var SYMS = ['⬢','▲','●','◆','★','◎','⬟','✚'];
+  var PALA = ['#5B4B9E','#0E7C86','#C4502B','#2E6B34'];
+  var PALB = ['#8A6D1F','#7A4E9E','#B23A48','#33691E'];
+  var PATH = [0, 1, 2, 6, 10, 11]; // row-major tiles the demo "plays" in step 3
+
+  function el(cls, styles) {
+    var d = document.createElement('div');
+    if (cls) d.className = cls;
+    if (styles) for (var k in styles) d.style[k] = styles[k];
+    return d;
+  }
+
+  /* ---------- STEP 1 pieces: the Play button ---------- */
+  var gPlay = el('grp');
+  var ring = el('', { left:'270px', top:'78px', width:'144px', height:'144px', border:'3px solid #FF6B57',
+                      borderRadius:'50%', position:'absolute', opacity:.5 });
+  var orbit = el('', { left:'222px', top:'30px', width:'240px', height:'240px', position:'absolute' });
+  [[0,0],[214,0],[0,214],[214,214]].forEach(function(p, i) {
+    orbit.appendChild(el('orb', { left:p[0]+'px', top:p[1]+'px',
+      background:['#DCEBF7','#D8EFEA','#F7E7C3','#EFE9FB'][i], border:'2px solid #E3D9BE' }));
+  });
+  var playBtn = el('playbtn', { left:'276px', top:'84px', transform:'none' });
+  playBtn.textContent = '▶';
+  var qrow = el('qrow');
+  for (var q = 0; q < 5; q++) qrow.appendChild(el('qtile')).textContent = '?';
+  qrow.childNodes.forEach(function(t) { t.textContent = '?'; });
+  gPlay.appendChild(ring); gPlay.appendChild(orbit); gPlay.appendChild(playBtn); gPlay.appendChild(qrow);
+  stage.appendChild(gPlay);
+
+  /* ---------- Board A (steps 2-3) ---------- */
+  var boardA = el('board', { width:'272px', height:'272px', top:'44px' });
+  var tilesA = [];
+  for (var r = 0; r < 4; r++) for (var c = 0; c < 4; c++) {
+    var i = r * 4 + c;
+    var t = el('tile tileA', { left:(c*70)+'px', top:(r*70)+'px', width:'62px', height:'62px',
+      background:'#EFE9FB', border:'2px solid #D9CCF3', fontSize:'26px', color:PALA[i % 4] });
+    t.textContent = '?';
+    t.setAttribute('data-sym', SYMS[i % 8]);
+    boardA.appendChild(t); tilesA.push(t);
+  }
+  stage.appendChild(boardA);
+  var pathSvg = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+  pathSvg.setAttribute('viewBox', '0 0 272 272');
+  pathSvg.style.cssText = 'position:absolute;left:50%;top:44px;transform:translateX(-50%);width:272px;height:272px;pointer-events:none;';
+  var pl = document.createElementNS('http://www.w3.org/2000/svg', 'polyline');
+  pl.setAttribute('points', '31,31 101,31 171,31 171,101 171,171 241,171');
+  pl.setAttribute('fill', 'none'); pl.setAttribute('stroke', '#5B4B9E'); pl.setAttribute('stroke-width', '11');
+  pl.setAttribute('stroke-linecap', 'round'); pl.setAttribute('stroke-linejoin', 'round'); pl.setAttribute('opacity', '.8');
+  pl.setAttribute('pathLength', '100'); pl.style.strokeDasharray = '100'; pl.style.strokeDashoffset = '100';
+  pathSvg.appendChild(pl); stage.appendChild(pathSvg);
+  var stamp = el('stamp'); stamp.textContent = 'DEALT TO YOU — NOT CHOSEN'; stage.appendChild(stamp);
+  var scoreChip = el('scorechip', { left:'30px', top:'352px' });
+  scoreChip.innerHTML = '<b>SCORE</b><span id="scoreVal">0</span>'; stage.appendChild(scoreChip);
+  var hsChip = el('scorechip', { right:'30px', top:'352px' });
+  hsChip.innerHTML = '<b>YOUR HIGH SCORE</b><span>850</span>'; stage.appendChild(hsChip);
+
+  /* ---------- Board B (step 4: a different deal) ---------- */
+  var boardB = el('board', { width:'302px', height:'178px', top:'104px' });
+  var tilesB = [];
+  for (var r2 = 0; r2 < 3; r2++) for (var c2 = 0; c2 < 5; c2++) {
+    var j = r2 * 5 + c2;
+    var tb = el('tile tileB', { left:(c2*62)+'px', top:(r2*62)+'px', width:'54px', height:'54px',
+      background:'#F7EFDA', border:'2px solid #EAD9A8', fontSize:'22px', color:PALB[j % 4] });
+    tb.textContent = SYMS[(j + 3) % 8];
+    boardB.appendChild(tb); tilesB.push(tb);
+  }
+  stage.appendChild(boardB);
+  var badge = el('badge'); badge.textContent = '✓ NEVER THE SAME TWICE IN A ROW'; stage.appendChild(badge);
+
+  /* ---------- Steps column ---------- */
+  var STEPS = [
+    { h:'Press Play', p:'One button is the whole menu. No browsing, no picking, nothing to set up.',
+      cap:'Step 1 · You press Play', sub:'That is the only choice Morphi.One ever asks you to make.' },
+    { h:'A puzzle is dealt to you', p:'The draw decides the kind, the layout and the look — fresh every round, like a card off the top of the deck.',
+      cap:'Step 2 · The deal lands', sub:'You did not choose this one. That is the point.' },
+    { h:'Play it and score', p:'Solve it your way. Every puzzle keeps its own “Your high score”, so there is always a mark to beat.',
+      cap:'Step 3 · Play, and chase your high score', sub:'Scores are kept per puzzle — beat your own best next time it comes around.' },
+    { h:'Next — a different one', p:'Press Next and a new puzzle is dealt. The same kind never comes twice in a row, guaranteed.',
+      cap:'Step 4 · Next deals something different', sub:'Same kind twice in a row? Never. The surprise is the game.' }
+  ];
+  var stepsEl = document.getElementById('steps');
+  var cards = STEPS.map(function(s, i) {
+    var d = el('step');
+    d.innerHTML = '<div class="num">' + (i + 1) + '</div><h3>' + s.h + '</h3><p>' + s.p + '</p>';
+    d.addEventListener('click', function() { stopAuto(); goto(i); });
+    stepsEl.appendChild(d);
+    return d;
+  });
+  var controls = el('controls');
+  controls.innerHTML = '<button id="prevBtn">‹ Prev</button><button id="autoBtn" class="dark">Auto-play on</button><button id="nextBtn">Next ›</button>';
+  stepsEl.appendChild(controls);
+
+  /* ---------- Controller ---------- */
+  var cur = -1, auto = !RM, timer = null, tl = null, loops = [];
+  var scoreObj = { v: 0 };
+
+  function killAll() {
+    if (tl) { tl.pause(); tl = null; }
+    loops.forEach(function(a) { a.pause(); }); loops = [];
+    anime.remove(['.tileA', '.tileB', '#orbit', '#ring', '.qtile', '#gPlay', '#stamp', '#scoreChip', '#hsChip', '#badge']);
+  }
+  function hideAll() {
+    anime.set([gPlay, boardA, boardB, pathSvg, stamp, scoreChip, hsChip, badge], { opacity: 0 });
+    anime.set(pl, { strokeDashoffset: 100 });
+  }
+  function resetTilesA(faceUp) {
+    tilesA.forEach(function(t) {
+      t.textContent = faceUp ? t.getAttribute('data-sym') : '?';
+      t.style.background = '#EFE9FB';
+    });
+    anime.set('.tileA', { scale: 1, rotateY: 0, opacity: 1, translateX: 0, translateY: 0 });
+  }
+  function setCap(i) {
+    capEl.innerHTML = STEPS[i].cap + '<small>' + STEPS[i].sub + '</small>';
+    cards.forEach(function(cd, k) { cd.classList.toggle('on', k === i); });
+  }
+
+  function goto(i) {
+    cur = i; killAll(); hideAll(); setCap(i);
+    if (RM) { finalState(i); return; }
+    tl = anime.timeline({ loop: false });
+    if (i === 0) {
+      anime.set(gPlay, { opacity: 1 });
+      anime.set('.qtile', { opacity: 1, translateY: 0 });
+      tl.add({ targets: gPlay, opacity: [0, 1], duration: 350, easing: 'easeOutQuad' }, 0);
+      loops.push(anime({ targets: orbit, rotate: 360, duration: 26000, loop: true, easing: 'linear' }));
+      loops.push(anime({ targets: ring, scale: [1, 1.14], opacity: [.5, 0], duration: 1600, loop: true, easing: 'easeOutQuad' }));
+      loops.push(anime({ targets: '.qtile', translateY: [0, -7], duration: 900, direction: 'alternate',
+                         loop: true, easing: 'easeInOutSine', delay: anime.stagger(110) }));
+    }
+    if (i === 1) {
+      resetTilesA(false);
+      anime.set(boardA, { opacity: 1 });
+      anime.set('.tileA', { scale: .4, opacity: 0 });
+      tl.add({ targets: '.tileA', scale: [.4, 1], opacity: [0, 1], duration: 480, easing: 'easeOutBack',
+               delay: anime.stagger(26, { grid: [4, 4], from: 'center' }) }, 100)
+        .add({ targets: '.tileA', rotateY: [0, 90], duration: 150, easing: 'easeInQuad',
+               delay: anime.stagger(42) }, 900)
+        .add({ targets: '.tileA', duration: 1,
+               begin: function() { tilesA.forEach(function(t) { t.textContent = t.getAttribute('data-sym'); }); } }, 1620)
+        .add({ targets: '.tileA', rotateY: [90, 0], duration: 150, easing: 'easeOutQuad',
+               delay: anime.stagger(42) }, 1640)
+        .add({ targets: stamp, opacity: [0, 1], scale: [1.5, 1], duration: 320, easing: 'easeOutBack' }, 2050);
+      anime.set(stamp, { opacity: 0 });
+    }
+    if (i === 2) {
+      resetTilesA(true);
+      anime.set(boardA, { opacity: 1 });
+      anime.set(pathSvg, { opacity: 1 });
+      anime.set([scoreChip, hsChip], { opacity: 0 });
+      scoreObj.v = 0; document.getElementById('scoreVal').textContent = '0';
+      tl.add({ targets: pl, strokeDashoffset: [100, 0], duration: 1000, easing: 'easeInOutQuad' }, 150)
+        .add({ targets: PATH.map(function(k) { return tilesA[k]; }), background: ['#EFE9FB', '#D9CCF3'],
+               duration: 300, delay: anime.stagger(150) }, 150)
+        .add({ targets: scoreChip, opacity: [0, 1], translateY: [10, 0], duration: 300, easing: 'easeOutQuad' }, 350)
+        .add({ targets: scoreObj, v: 850, duration: 1000, easing: 'easeInOutQuad',
+               update: function() { document.getElementById('scoreVal').textContent = Math.round(scoreObj.v).toLocaleString('en-US'); } }, 350)
+        .add({ targets: hsChip, opacity: [0, 1], scale: [1.6, 1], duration: 340, easing: 'easeOutBack' }, 1500);
+    }
+    if (i === 3) {
+      resetTilesA(true);
+      anime.set(boardA, { opacity: 1 });
+      anime.set(boardB, { opacity: 1 });
+      anime.set('.tileB', { scale: .4, opacity: 0 });
+      anime.set(badge, { opacity: 0 });
+      tl.add({ targets: '.tileA', translateY: -26, opacity: [1, 0], duration: 420, easing: 'easeInQuad',
+               delay: anime.stagger(24) }, 100)
+        .add({ targets: boardA, opacity: 0, duration: 1 }, 800)
+        .add({ targets: '.tileB', scale: [.4, 1], opacity: [0, 1], duration: 480, easing: 'easeOutBack',
+               delay: anime.stagger(24, { grid: [3, 5], from: 'center' }) }, 850)
+        .add({ targets: badge, opacity: [0, 1], scale: [1.4, 1], duration: 340, easing: 'easeOutBack' }, 1750);
+    }
+  }
+
+  function finalState(i) {
+    if (i === 0) { anime.set(gPlay, { opacity: 1 }); }
+    if (i === 1) { resetTilesA(true); anime.set(boardA, { opacity: 1 }); anime.set(stamp, { opacity: 1 }); }
+    if (i === 2) {
+      resetTilesA(true); anime.set(boardA, { opacity: 1 }); anime.set(pathSvg, { opacity: 1 });
+      anime.set(pl, { strokeDashoffset: 0 });
+      PATH.forEach(function(k) { tilesA[k].style.background = '#D9CCF3'; });
+      anime.set([scoreChip, hsChip], { opacity: 1 });
+      document.getElementById('scoreVal').textContent = '850';
+    }
+    if (i === 3) { anime.set(boardB, { opacity: 1 }); anime.set('.tileB', { opacity: 1, scale: 1 }); anime.set(badge, { opacity: 1 }); }
+  }
+
+  function stopAuto() {
+    auto = false;
+    if (timer) { clearInterval(timer); timer = null; }
+    document.getElementById('autoBtn').textContent = 'Auto-play off';
+  }
+  function startAuto() {
+    auto = true;
+    document.getElementById('autoBtn').textContent = 'Auto-play on';
+    if (timer) clearInterval(timer);
+    timer = setInterval(function() { goto((cur + 1) % 4); }, 4600);
+  }
+  document.getElementById('prevBtn').addEventListener('click', function() { stopAuto(); goto((cur + 3) % 4); });
+  document.getElementById('nextBtn').addEventListener('click', function() { stopAuto(); goto((cur + 1) % 4); });
+  document.getElementById('autoBtn').addEventListener('click', function() { if (auto) stopAuto(); else startAuto(); });
+
+  goto(0);
+  if (auto) startAuto(); else stopAuto();
+</script>
+</body>
+</html>
