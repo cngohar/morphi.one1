@@ -15,7 +15,7 @@ Instructions for coding agents (Codex, OpenCode, Claude Code, etc.) working in t
 The owner authorizes delegation during repository tasks using this routing:
 
 - Planning and research: `gpt-6.1-sol`, reasoning effort `high`.
-- Coding, debugging and other execution: `gpt-6.1-terra`, reasoning effort `high`.
+- Coding, debugging and other execution: `gpt-6.1-sol`, reasoning effort `high`.
 - Testing and verification, including lint, E2E, Chromium, Playwright and `bun run verify`: `gpt-6-luna`, reasoning effort `max`.
 
 The parent agent coordinates tasks, integrates results and reports to the owner. Spawn with the explicit model and reasoning effort above, `fork_turns: "none"`, and supply the task context and applicable repository instructions. If a required model or effort is unavailable, report it rather than silently substituting. This policy applies only to this repository; existing scope limits and approval gates remain in force.

@@ -1,7 +1,8 @@
 import { afterAll, beforeAll, expect, it } from 'vitest';
 import { readFile, readdir } from 'node:fs/promises';
 import { getPlatformProxy } from 'wrangler';
-import { SCORE_DEFAULTS, SCORE_DEFAULT_VERSION } from '../../src/lib/engine/scoring.js';
+import { SCORE_DEFAULT_VERSION } from '../../src/lib/engine/scoring.js';
+import { catalog } from '../../src/lib/catalog.js';
 import {
 	listScoreVersions,
 	readLiveScoreConfig,
@@ -34,7 +35,7 @@ it('rolls back by creating an audited version while preserving the old values', 
 		'operator',
 		'memory',
 		SCORE_DEFAULT_VERSION,
-		{ ...SCORE_DEFAULTS.memory, pair: 2000 },
+		{ ...catalog.memory.scoring.defaults, pair: 2000 },
 		'Edit'
 	);
 	const rollback = await rollbackScoreConfig(
@@ -46,7 +47,7 @@ it('rolls back by creating an audited version while preserving the old values', 
 		'Restore'
 	);
 	expect(rollback.version).not.toBe(SCORE_DEFAULT_VERSION);
-	expect(rollback.values).toEqual(SCORE_DEFAULTS.memory);
+	expect(rollback.values).toEqual(catalog.memory.scoring.defaults);
 	expect(await readScoreConfig(db, 'memory', edit.version)).toEqual(edit);
 	const audit = await db
 		.prepare("SELECT before,after FROM admin_audit WHERE action='score-rollback'")
@@ -65,7 +66,7 @@ it('falls back to the last valid server version for a new ranked start and rejec
 		'operator',
 		'connect',
 		SCORE_DEFAULT_VERSION,
-		{ ...SCORE_DEFAULTS.connect, pair: 300 },
+		{ ...catalog.connect.scoring.defaults, pair: 300 },
 		'Edit'
 	);
 	const invalid = crypto.randomUUID();

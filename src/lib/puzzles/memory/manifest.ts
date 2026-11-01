@@ -1,10 +1,14 @@
+import { messages } from './messages.js';
 import type { PuzzleManifest } from '#lib/engine/contract.js';
+import { scoring } from './scoring.js';
 import { createMemoryRound, flipCard, resolveMismatch, scoreRound } from './logic.js';
 
-export const manifest: PuzzleManifest = {
+export const manifest = {
 	id: 'memory',
 	engineVersion: 'memory-1',
+	scoring,
 	maxMoves: 120,
+	messages,
 	ending: {
 		kind: 'completion',
 		headlines: { default: 'ending.memory.headline' },
@@ -31,4 +35,4 @@ export const manifest: PuzzleManifest = {
 			moves: round.moves
 		};
 	}
-};
+} satisfies PuzzleManifest;

@@ -1603,3 +1603,160 @@ report records screenshot dimensions and verification context. **Waivers:** None
 reported; no physical-mobile waiver is inferred. **Owner responsibilities:**
 Decide any future work and separately authorize production actions or deployment.
 **CODEMAP:** Updated.
+
+## Engine refactor Slice 0 — Freeze the base (2026-11-01)
+
+**Built:** Confirmed local HEAD before proceeding:
+`1303c9c4bdb1718bb558886dc43b7b48c597a02a`, "Record combined local
+acceptance", the post-acceptance v1.2 base. Local annotated tag
+`v1.2-local-complete` freezes that commit. The approved single brief is supplied
+as `docs/morphi-engine-refactor-brief.md`.
+
+v1.2 is complete locally: the owner accepted all three slices and quick-review
+changes after reviewing on their own PC and checking mobile layouts through
+browser responsive tools, with no corrections noted. This is local acceptance;
+physical mobile review was not reported, device/browser models were not supplied,
+and no deployment occurred. The preceding combined verification and acceptance
+reports retain the implementation evidence, including 174/174 browser checks.
+
+**Skipped:** Slice 1 and all implementation, database resets, deployments,
+production provisioning, secrets, DNS and Google changes. No puzzle rules,
+gameplay, scoring logic, vectors or replay results changed. Per-type indexable
+pages and game doors remain withdrawn. Only this report and CODEMAP were edited;
+the tag is local and was not pushed. Existing owner changes to `AGENTS.md` and
+the untracked brief were preserved.
+
+**Known issues:** Written owner confirmation of this freeze remains pending.
+The brief requires `tests/slices/slice0-base-tag.test.ts`; that file is deferred
+to the pre-Slice 1 gate because the owner's explicit Slice 0 instruction allows
+only the tag and documentation updates. It was not added or claimed as passed.
+Before Slice 1, both `git rev-parse HEAD` and
+`git rev-parse 'v1.2-local-complete^{commit}'` must still equal the full base
+hash above, and the required base-tag test must pass. No documentation commit
+was made in Slice 0, preserving HEAD at the required base.
+
+**Decisions:** Database-reset permission covers **local D1 only**, including
+later local refactor schema work. It grants no production D1 reset, remote
+migration, provisioning or deployment permission. No database was reset here.
+The earlier public guest/privacy release remains separate from the undeployed
+local v1.2 account build. No dependencies or pinned versions changed.
+
+**Questions for the owner:** Confirm the frozen base in writing before Slice 1.
+The brief's remaining pre-Slice 1 owner decisions remain for that gate; no answer
+or authorization is inferred from this freeze.
+
+| Acceptance item                           | Evidence type and location                                              | Result                                                                      |
+| ----------------------------------------- | ----------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Correct post-acceptance base and title    | Local `git rev-parse HEAD` and `git log -1 --format=%s`                 | Pass: required full hash and title confirmed before proceeding              |
+| Base tag targets the required commit      | Local `git rev-parse 'v1.2-local-complete^{commit}'`                    | Pass: required full hash                                                    |
+| v1.2 completion and review scope recorded | Owner instructions; preceding combined local acceptance report; CODEMAP | Recorded: PC review, mobile responsive tools, no corrections, no deployment |
+| Reset permission restricted to local D1   | Owner Slice 0 instruction and approved brief; this report               | Recorded; no reset performed                                                |
+| Documentation-only scope                  | Local diff and status review                                            | Only PHASE_REPORTS and CODEMAP edited by this slice; no application changes |
+| Owner confirms frozen base in writing     | Owner response to this Slice 0 handoff                                  | Pending; Slice 1 must not start                                             |
+| Required base-tag test file               | Brief's pre-Slice 1 gate                                                | Deferred under explicit Slice 0 no-code scope; not passed or waived         |
+
+**Measurements:** No performance target applies to this documentation/tag slice.
+No device/network, cold/preloaded, run-count, median or p95 measurements were
+collected. Prior app checks were not rerun; no new app-test result is claimed.
+**Waivers:** None inferred; the deferred base-tag test remains required before
+Slice 1. **Owner responsibilities:** Confirm the base in writing and resolve
+the brief's remaining pre-Slice 1 decisions. Production actions require separate
+authorization. **CODEMAP:** Updated with the brief, frozen base and next-slice gate.
+
+## Engine refactor Slice 1 — Core identity and manifest source of truth (2026-11-01)
+
+**Status:** Implementation and full local verification complete. The owner resumed
+this slice after the PC shutdown pause. Slice 2 has not started and requires the
+owner's written confirmation. This report records local evidence, not deployment
+or owner acceptance of Slice 1.
+
+**Built:** Started from frozen base `v1.2-local-complete`; both pre-start HEAD
+and `git rev-parse 'v1.2-local-complete^{commit}'` matched
+`1303c9c4bdb1718bb558886dc43b7b48c597a02a`, and the resumed/final checks still
+match. The owner's instruction confirms Slice 0 and authorizes only Slice 1.
+Existing Slice 0 documentation and owner edits were preserved.
+
+`PuzzleId` is a generic string. Each manifest supplies its scoring fields,
+defaults and default version through family-local data shared with replay and
+view defaults. The engine contains only generic scoring definitions and bounded
+integer validation; `SCORE_FAMILIES` and the hardcoded engine default map were
+removed. Catalog-based helpers serve the UI/server; game lists and membership in
+server, API and admin code read the catalog. Operator saves and rollback retain
+immutable audited versions and in-flight version lookup. Every existing engine
+version and coefficient is unchanged.
+
+Puzzle-specific strings moved into each manifest's family bundle. Generated
+aggregation preserves literal message-key types and the existing `t` API; shared
+`messages.ts` retains shell/site/admin copy. Ending declaration validation reads
+the supplied family bundle without importing stale generated output. The exact
+comparison against the frozen base passed for all 799 message keys and values.
+
+Added `tests/slices/slice1-manifest-scoring.test.ts` to normal unit discovery.
+Its three tests scan/load all manifests, check manifest-owned scoring/messages,
+reject unknown/prototype family names, and generate/type-check an isolated extra
+manifest with a novel id, scoring field, version and strings, without engine edits.
+Existing validation, audit, rollback and browser regressions also passed.
+
+**Skipped:** Slice 2 and all later slices; eager registry exports, PlaySession's
+family-specific state, move/timing/group dispatch, schema/lifecycle seeding,
+selector persistence and theme administration remain for their assigned slices.
+No rules, generation, move validation, scoring formulas, gameplay, endings or
+sounds were changed. No games or per-type indexable pages/game doors were added.
+No deployment, provisioning, secrets, DNS, Google changes, database reset, remote
+migration, commit or push occurred. The owner-supplied brief is excluded alongside
+existing owner references in `.prettierignore`, preserving its original bytes.
+
+**Known issues:** `tests/slices/slice0-base-tag.test.ts` was deferred and remains
+outstanding. It was not added, run, passed or waived by this slice. The owner
+explicitly carried it forward while authorizing Slice 1; actual HEAD/tag checks
+passed. Shared message aggregation currently loads headless manifests eagerly;
+lazy loading remains Slice 2. Manifest-only registration/type-checking is covered
+here; generic new-family gameplay, server dispatch and D1 lifecycle setup belong
+to later slices. No new physical-device or production-load evidence is claimed.
+
+**Decisions:** Small family-local scoring data modules avoid manifest/replay
+import cycles while the manifest supplies the public scoring contract. Existing
+families keep `brief-v1`, immutable operator versions and legacy best-score
+storage compatibility. No dependencies or pinned versions changed. See
+`docs/DECISIONS.md`.
+
+**Questions for the owner:** Review Slice 1 and provide written confirmation
+before Slice 2. No earlier Slice 0 decision is reopened.
+
+| Acceptance item                                   | Evidence type and location                                                                                                       | Result                                                                             |
+| ------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------- |
+| Frozen base and owner confirmation                | Owner Slice 1 instruction; pre-start, resumed and final HEAD/tag commit checks                                                   | Pass: required full hash                                                           |
+| Generic identity and manifest-owned scoring       | Engine contract/scoring, family manifests/data, `lib/scoring.ts`; Slice 1 acceptance tests                                       | Pass                                                                               |
+| Extra manifest requires no engine edit            | Isolated registry generation + TypeScript check in `tests/slices/slice1-manifest-scoring.test.ts`; full unit run                 | Pass: novel id, field, version and messages                                        |
+| Family message ownership and unchanged copy       | Manifest bundles and generated aggregation; `build/slice1/message-preservation.log`                                              | Pass: exact 799/799 keys and values                                                |
+| Server/admin catalog source and immutable scoring | Catalog-driven routes/helpers; 37 D1/auth tests, including scoring/rollback and two audit tests; browser operator/scoring checks | Pass                                                                               |
+| Original vectors and checker unchanged            | Final `git diff --exit-code HEAD -- tests/vectors scripts/check-vectors.ts`; `build/slice1/verify-final.log`                     | Pass: 9 known + 6 theme vectors in each of six runtimes                            |
+| Theme regression                                  | Full palette check; `build/slice1/theme-sheet.log`; pre/post contact-sheet hashes                                                | Pass: 30,000 palettes; HTML/PNG byte-identical                                     |
+| Full local verification                           | `bun run verify`; `build/slice1/verify-final.log`                                                                                | Pass, exit 0: 131 units, 37 D1/auth tests, 174/174 browser tests, all other stages |
+| Deferred Slice 0 test                             | `tests/slices/slice0-base-tag.test.ts`                                                                                           | Deferred and outstanding; not passed or waived                                     |
+| Slice and production boundaries                   | Final diff and local command review                                                                                              | Slice 1 only; no production changes                                                |
+
+**Measurements:** Local desktop, AMD PRO A8-8650B, Linux x64, Bun 1.4.2;
+preloaded generator with no network, 10,000 measured runs per family. Values are
+reported goals/diagnostics, not a new performance gate. Evidence:
+`docs/evidence/v1.1-themes/palettes.json` and `build/slice1/RESUME.md`.
+
+| Family  | Runs   | Median   | p95      | Status          |
+| ------- | ------ | -------- | -------- | --------------- |
+| Block   | 10,000 | 1.178 ms | 4.213 ms | Diagnostic goal |
+| Memory  | 10,000 | 0.916 ms | 3.526 ms | Diagnostic goal |
+| Connect | 10,000 | 1.100 ms | 4.086 ms | Diagnostic goal |
+
+All 30,000 palette checks passed. Freshness remains best effort; no numeric target
+was introduced. No phone, cold-load, LCP/INP/CLS or production-load measurement was
+performed. Browser regression coverage completed in 38.5 minutes with
+`workers: 1` across Chromium, Firefox and WebKit; this is suite duration, not a
+product-performance measurement. The earlier owner-interrupted run is preserved
+as `build/slice1/verify-interrupted.log`. Tooling emitted color-environment notices;
+the app type-check passed with zero errors and zero warnings.
+
+**Waivers:** None inferred; the deferred Slice 0 test remains outstanding.
+**Owner responsibilities:** Review Slice 1 and explicitly confirm before Slice 2.
+Production authorization remains separate. **CODEMAP:** Updated with the completed
+Slice 1 implementation, evidence paths and next-slice boundary. Saved handoff:
+`build/slice1/RESUME.md`. No automatic continuation to Slice 2 is authorized.

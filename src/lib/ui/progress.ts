@@ -1,4 +1,4 @@
-import { validateScoreValues, type ScoreConfig } from '#lib/engine/scoring.js';
+import { validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
 import type { CompletedRun, PuzzleId } from '#lib/engine/contract.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { paletteIssues } from '#lib/engine/theme/generator.js';

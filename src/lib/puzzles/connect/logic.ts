@@ -1,4 +1,5 @@
-import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
+import type { ScoreValues } from '#lib/engine/scoring.js';
+import { scoring as scoringDefinition } from './scoring.js';
 import { createRng, shuffle } from '#lib/engine/rng.js';
 
 export const CONNECT_ENGINE_VERSION = 'connect-1';
@@ -123,7 +124,7 @@ export function connectedCount(round: ConnectRound): number {
 export function connectScore(
 	round: ConnectRound,
 	seconds: number,
-	scoring: ScoreValues = SCORE_DEFAULTS.connect
+	scoring: ScoreValues = scoringDefinition.defaults
 ): number {
 	if (!Number.isSafeInteger(seconds) || seconds < 0) throw new RangeError('elapsed');
 	const pairs = connectedCount(round);

@@ -1,4 +1,5 @@
-import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
+import type { ScoreValues } from '#lib/engine/scoring.js';
+import { scoring as scoringDefinition } from './scoring.js';
 import { createRng, shuffle } from '#lib/engine/rng.js';
 import { SYMBOLS, type SymbolId } from '#lib/puzzles/memory/symbols.js';
 
@@ -131,7 +132,7 @@ export function scoreFor(
 	pairs: number,
 	mismatches: number,
 	elapsedSeconds: number,
-	scoring: ScoreValues = SCORE_DEFAULTS.memory
+	scoring: ScoreValues = scoringDefinition.defaults
 ): number {
 	const seconds = Math.max(0, Math.floor(elapsedSeconds));
 	return Math.max(
@@ -143,7 +144,7 @@ export function scoreFor(
 export function currentScore(
 	round: MemoryRound,
 	elapsedSeconds: number,
-	scoring: ScoreValues = SCORE_DEFAULTS.memory
+	scoring: ScoreValues = scoringDefinition.defaults
 ): number {
 	return scoreFor(round.pairs, round.mismatches, elapsedSeconds, scoring);
 }
@@ -151,7 +152,7 @@ export function currentScore(
 export function scoreRound(
 	round: MemoryRound,
 	elapsedSeconds: number,
-	scoring: ScoreValues = SCORE_DEFAULTS.memory
+	scoring: ScoreValues = scoringDefinition.defaults
 ): number {
 	if (round.status !== 'won') {
 		return 0;

@@ -1,3 +1,4 @@
+import type { PuzzleId } from '../contract.js';
 import { createRng, normalizeSeed, shuffle } from '../rng.js';
 import { blend, colorAtContrast, contrast, minimumDifference, oklch } from './color.js';
 import { THEME_CONFIG, THEME_CONFIG_VERSION, THEME_GENERATOR_VERSION } from './config.js';
@@ -18,7 +19,7 @@ export const PRESETS = [
 export interface ResolvedTheme {
 	themeConfigVersion: string;
 	themeGeneratorVersion: string;
-	family: 'memory' | 'block' | 'connect';
+	family: PuzzleId;
 	seed: string;
 	recipe: string;
 	baseHue: number;

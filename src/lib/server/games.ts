@@ -1,4 +1,4 @@
-import { SCORE_FAMILIES } from '#lib/engine/scoring.js';
+import { catalog } from '#lib/catalog.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { RunError } from './runs.js';
 
@@ -15,7 +15,7 @@ export async function gameAvailable(db: D1Database, family: PuzzleId) {
 
 export async function gameOverview(db: D1Database) {
 	return Promise.all(
-		SCORE_FAMILIES.map(async (family) => {
+		Object.keys(catalog).map(async (family) => {
 			const state = await db
 				.prepare('SELECT state,restore_until FROM game_lifecycle WHERE family=?')
 				.bind(family)
@@ -43,7 +43,7 @@ export async function gameOverview(db: D1Database) {
 }
 
 export async function gameStatistics(db: D1Database, family: PuzzleId) {
-	if (!SCORE_FAMILIES.includes(family)) throw new RunError('input');
+	if (!Object.hasOwn(catalog, family)) throw new RunError('input');
 	const rows = (
 		await db
 			.prepare(
@@ -77,7 +77,7 @@ export async function changeGame(
 	now = Date.now()
 ) {
 	if (
-		!SCORE_FAMILIES.includes(family) ||
+		!Object.hasOwn(catalog, family) ||
 		!['game-enable', 'game-disable', 'game-delete', 'game-restore', 'game-hard-delete'].includes(
 			action
 		) ||

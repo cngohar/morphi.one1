@@ -4,6 +4,16 @@ A short map of the codebase so agents can find things without broad searches. Ke
 
 ## Current build (combined next-phase work accepted locally)
 
+Engine refactor Slice 0: `docs/morphi-engine-refactor-brief.md` is the approved
+single brief. v1.2 is complete locally; frozen base tag `v1.2-local-complete`
+points to `1303c9c4bdb1718bb558886dc43b7b48c597a02a` ("Record combined local
+acceptance"). See the Slice 0 report in `docs/PHASE_REPORTS.md`. Database-reset
+permission covers local D1 only; no reset was performed. The owner confirmed Slice 0 and authorized Slice 1 only. Slice 1's pre-start
+HEAD/tag commit checks matched that base. The deferred
+`tests/slices/slice0-base-tag.test.ts` remains outstanding, as explicitly carried
+forward by the owner. Slice 1 is implemented and fully verified locally; Slice 2
+requires written confirmation.
+
 Block, Memory and Connect are dealt through the selector on `/play`; old family URLs redirect to Home in the local app. Work 5 pages and its assets-only guest candidate passed local verification but are not deployed. The owner accepted Work 5 and the overall Work 2 visual/device pass locally on 2026-10-31. The subsequent three next-phase slices and quick-review changes were accepted locally on 2026-11-01; production resources, eligibility and deployment remain separate. The live guest/privacy release remains the owner-approved 2026-10-24 version (`b50a7a18-2e85-4406-bd40-77f27c4b3da3`). Work 4 and Step 6 are accepted locally. Cloudflare Web Analytics is injected at delivery and absent from build files by design. See `docs/PHASE_REPORTS.md` for evidence.
 
 Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-10-23 the owner accepted the public-test result (45+ players, over 60% positive feedback) and requested the next-step approach. Step 5 closes by owner judgment with the measured replay gate waived; The owner approved Google sign-in, all account screens, and Step 6 implementation (`docs/STEP6.md`). Local account/session/name/deletion, durable progress retries, server-ranked runs, and all-time leaderboards are implemented. Owner PC/mobile functional review is accepted on 2026-10-24 (`STEP6_REVIEW.md`); global-release/admin-panel planning follows, with production operations/resource evidence still open. No account backend has been deployed. Owner-authorized private source repository: `https://github.com/cngohar/morphi.one1`; no automatic deployment.
@@ -28,7 +38,7 @@ Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-
 | `src/lib/puzzles/memory/Card.svelte`                                                                            | Memory card motion, themed faces/back mark, reduced-motion states                                                                              |
 | `src/lib/puzzles/memory/Symbol.svelte`                                                                          | Retained inline SVG Memory shapes, no text                                                                                                     |
 | `src/lib/puzzles/memory/Confetti.svelte`                                                                        | Deterministic Memory win burst with theme colors, under one second                                                                             |
-| `src/lib/i18n/messages.ts`                                                                                      | Every user-facing string, English only                                                                                                         |
+| `src/lib/i18n/messages.ts`                                                                                      | Shell/site/admin copy plus generated family bundle aggregation, English only                                                                   |
 | `src/lib/puzzles/block-placement/themes.ts`                                                                     | Four fixed themes with per-theme backdrop, board cell/edge, picker tray/slot, pieces; seed selection; CSS serialization                        |
 | `src/lib/puzzles/memory/themes.ts`                                                                              | Same four theme ids for Memory: card back/edge/face/matched, back mark, symbol palette; seed selection; CSS serialization                      |
 | `src/lib/ui/sound.ts`                                                                                           | Static ElevenLabs cues through Web Audio; bounded voices, mute/background stop, no runtime generation                                          |
@@ -98,7 +108,7 @@ Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-
 | Path                                                                                                       | Purpose                                                                                              |
 | ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
 | `src/lib/engine/contract.ts`, `src/lib/seeds.ts`                                                           | Pure run/manifest contract; external cryptographic entropy                                           |
-| `src/lib/puzzles/<id>/`                                                                                    | Each puzzle owns its logic, manifest, version, view, themes, README, and tests                       |
+| `src/lib/puzzles/<id>/`                                                                                    | Each puzzle owns logic, manifest, version, scoring data, messages, view, themes, README, and tests   |
 | `src/lib/catalog.ts`, `src/lib/registry.ts`, `scripts/generate-registry.ts`                                | Generated headless catalog and app views; run `bun run registry:generate`                            |
 | `eslint.config.js`, `scripts/check-boundaries.ts`                                                          | Engine purity and cross-puzzle/app import enforcement and deliberate-violation checks                |
 | `src/lib/server/runs.ts`, `play-http.ts`                                                                   | Bounded replay, owned history, ranked D1 claims/caps/recovery, public rankings, API guards           |
@@ -185,3 +195,19 @@ Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-
 - Combined review handoff: `docs/NEXT_PHASE_REVIEW.md` (accepted locally). `/admin/users` overview/directory/detail tabs and `/admin/audit` overview/explorer use `admin-users.ts` and the existing operator route. `games.ts`, migration `0010_game_lifecycle.sql`, scoring rollback and availability-aware selector implement game controls. Ending declarations/checks live in manifests, `scripts/validate-ending.ts` and `ending-contract.test.ts`; PlaySession shows text before the 500 ms fold. Final combined verification passed on 2026-11-01 (174 browser checks); the owner accepted all three slices and quick-review changes locally on 2026-11-01 after PC review and mobile browser responsive emulation. Physical mobile review was not reported; device/browser models are unspecified.
 
 - Visual audit: `docs/NEXT_PHASE_VISUAL_REVIEW.md`; local ignored `build/combined-review/index.html` compares 63 before/after pairs. Final verification output: `build/combined-review/verify-final.log`.
+
+## Engine refactor Slice 1 (complete locally; awaiting owner confirmation)
+
+Full `bun run verify` passed: 131 unit tests, 37 D1/auth tests, six-runtime
+vectors, build/Worker smoke and 174/174 browser tests. Theme-sheet HTML/PNG stayed
+byte-identical; all 799 message keys/values match the frozen base. Evidence and
+handoff: `build/slice1/RESUME.md`, `build/slice1/verify-final.log` and the latest
+Slice 1 phase report. The interrupted log is preserved separately. Slice 2 has
+not started and requires written owner confirmation. The Slice 0 test remains
+deferred and outstanding.
+
+- `src/lib/engine/contract.ts`, `scoring.ts`: string puzzle ids and family-free scoring definitions/validation; existing engine versions and coefficients preserved.
+- `src/lib/puzzles/*/manifest.ts`, `scoring.ts`, `messages.ts`: manifest-owned scoring contract and family strings; tiny local scoring data modules avoid replay/manifest cycles.
+- `src/lib/scoring.ts`: catalog-driven family scoring access; server/admin/API family membership and lists also read the catalog.
+- `scripts/generate-registry.ts`, `validate-ending.ts`: discover manifests and aggregate typed message bundles; ending validation reads the supplied family bundle without importing stale generated output. Eager exports remain for Slice 2.
+- `tests/slices/slice1-manifest-scoring.test.ts`, `vitest.config.ts`: discovered manifest checks plus an isolated synthetic-family generation/type-check test, included in normal units/verify. Report and verification evidence: `docs/PHASE_REPORTS.md`, ignored `build/slice1/`.

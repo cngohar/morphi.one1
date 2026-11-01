@@ -1,9 +1,4 @@
-import {
-	defaultScoreConfig,
-	SCORE_DEFAULT_VERSION,
-	validateScoreValues,
-	type ScoreConfig
-} from '#lib/engine/scoring.js';
+import { defaultScoreConfig, validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { RunError } from './runs.js';
 
@@ -21,14 +16,15 @@ function parseScoreRow(family: PuzzleId, row: ScoreRow): ScoreConfig | null {
 }
 
 export async function readLiveScoreConfig(db: D1Database, family: PuzzleId) {
+	const defaultVersion = defaultScoreConfig(family).version;
 	const live = await db
 		.prepare('SELECT version FROM score_live WHERE family=?')
 		.bind(family)
 		.first<{ version: string }>();
-	const liveVersion = live?.version ?? SCORE_DEFAULT_VERSION;
+	const liveVersion = live?.version ?? defaultVersion;
 	let version = liveVersion;
 	const seen = new Set<string>();
-	while (version !== SCORE_DEFAULT_VERSION && !seen.has(version)) {
+	while (version !== defaultVersion && !seen.has(version)) {
 		seen.add(version);
 		const row = await db
 			.prepare(
@@ -44,7 +40,7 @@ export async function readLiveScoreConfig(db: D1Database, family: PuzzleId) {
 		}
 		version = row.parent;
 	}
-	if (liveVersion !== SCORE_DEFAULT_VERSION) console.warn('morphi:score_live_invalid', family);
+	if (liveVersion !== defaultVersion) console.warn('morphi:score_live_invalid', family);
 	return { liveVersion, config: defaultScoreConfig(family) };
 }
 
@@ -54,7 +50,7 @@ export async function readScoreConfig(
 	version?: string
 ): Promise<ScoreConfig> {
 	if (!version) return (await readLiveScoreConfig(db, family)).config;
-	if (version === SCORE_DEFAULT_VERSION) return defaultScoreConfig(family);
+	if (version === defaultScoreConfig(family).version) return defaultScoreConfig(family);
 	const row = await db
 		.prepare(
 			'SELECT version,parent,values_json,created_at FROM score_config WHERE family=? AND version=?'
@@ -74,7 +70,7 @@ export async function listScoreVersions(db: D1Database, family: PuzzleId) {
 		.bind(family)
 		.all<ScoreRow>();
 	return [
-		{ version: SCORE_DEFAULT_VERSION, createdAt: null },
+		{ version: defaultScoreConfig(family).version, createdAt: null },
 		...rows.results
 			.filter((row) => parseScoreRow(family, row))
 			.map((row) => ({ version: row.version, createdAt: row.created_at }))

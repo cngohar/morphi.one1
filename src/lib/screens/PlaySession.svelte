@@ -1,9 +1,5 @@
 <script lang="ts">
-	import {
-		defaultScoreConfig,
-		validateScoreValues,
-		type ScoreConfig
-	} from '#lib/engine/scoring.js';
+	import { defaultScoreConfig, validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
 	let scoring = $state<ScoreConfig>(defaultScoreConfig('block'));
 	import { measure } from '#lib/ui/measurement.js';
 	import { reportAccountRound } from '#lib/ui/account-activity.js';

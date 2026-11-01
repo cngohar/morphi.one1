@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
+	import type { ScoreValues } from '#lib/engine/scoring.js';
+	import { scoring as defaultScoring } from './scoring.js';
 	import { onMount, untrack } from 'svelte';
 	import { motion } from '#lib/ui/motion.js';
 	import { memoryEntranceMs, MEMORY_PREVIEW_MS, MEMORY_HIDE_MS } from '#lib/round-timing.js';
@@ -26,7 +27,7 @@
 	import { memoryThemeFromResolved } from '#lib/puzzles/memory/themes.js';
 
 	let {
-		scoring = SCORE_DEFAULTS.memory,
+		scoring = defaultScoring.defaults,
 		round,
 		roundNumber,
 		soundEnabled,

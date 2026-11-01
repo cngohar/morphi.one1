@@ -1,5 +1,5 @@
 /** Platform-free wire contract. Puzzle implementations never import each other. */
-export type PuzzleId = 'block' | 'memory' | 'connect';
+export type PuzzleId = string;
 export interface Move {
 	index?: number;
 	trayIndex?: number;
@@ -33,6 +33,8 @@ export interface PuzzleManifest {
 	id: PuzzleId;
 	engineVersion: string;
 	maxMoves: number;
+	scoring: import('./scoring.js').ScoreDefinition;
+	messages: Readonly<Record<string, string>>;
 	ending: {
 		kind: 'completion' | 'run_over';
 		headlines: { default: string; cap?: string };

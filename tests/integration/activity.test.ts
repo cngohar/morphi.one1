@@ -62,6 +62,8 @@ it('validates activity payloads strictly', () => {
 	const runId = crypto.randomUUID();
 	const valid = { action: 'start', ownerKey: 'key', runId, family: 'memory', rankedSession: null };
 	expect(parseRoundActivity(valid).round.runId).toBe(runId);
+	for (const family of ['unknown', '__proto__', 'constructor', null, 1])
+		expect(() => parseRoundActivity({ ...valid, family })).toThrow();
 	expect(() => parseRoundActivity({ ...valid, extra: true })).toThrow();
 	expect(() => parseRoundActivity({ ...valid, rankedSession: crypto.randomUUID() })).toThrow();
 });

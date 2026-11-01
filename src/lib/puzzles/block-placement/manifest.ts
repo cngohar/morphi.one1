@@ -1,10 +1,14 @@
+import { messages } from './messages.js';
 import type { PuzzleManifest } from '#lib/engine/contract.js';
+import { scoring } from './scoring.js';
 import { BLOCK_ENGINE_VERSION, replayBlockMoves } from './logic.js';
 
-export const manifest: PuzzleManifest = {
+export const manifest = {
 	id: 'block',
 	engineVersion: BLOCK_ENGINE_VERSION,
+	scoring,
 	maxMoves: 300,
+	messages,
 	ending: {
 		kind: 'run_over',
 		headlines: { default: 'ending.block.noMoves', cap: 'ending.block.cap' },
@@ -35,4 +39,4 @@ export const manifest: PuzzleManifest = {
 			moves: round.placements
 		};
 	}
-};
+} satisfies PuzzleManifest;

@@ -1,6 +1,6 @@
 import { completionActivityStatement } from './activity.js';
 import { readLiveScoreConfig, readScoreConfig } from './scoring.js';
-import { SCORE_DEFAULT_VERSION } from '#lib/engine/scoring.js';
+import { defaultScoreConfig } from '#lib/scoring.js';
 import { memoryOpeningMs, CONNECT_ENTRANCE_MS, CARD_RANKED_OPENING_MS } from '#lib/round-timing.js';
 import { and, asc, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 import { catalog } from '#lib/catalog.js';
@@ -39,7 +39,8 @@ export function parseRun(value: unknown): CompletedRun {
 		run.version !== 1 ||
 		typeof run.id !== 'string' ||
 		!UUID.test(run.id) ||
-		!['block', 'memory', 'connect'].includes(run.family) ||
+		typeof run.family !== 'string' ||
+		!Object.hasOwn(catalog, run.family) ||
 		typeof run.seed !== 'string' ||
 		run.seed.length > 20 ||
 		!Number.isSafeInteger(run.elapsedSeconds) ||
@@ -60,7 +61,8 @@ export function parseRun(value: unknown): CompletedRun {
 	if (
 		run.scoreConfigVersion !== undefined &&
 		(typeof run.scoreConfigVersion !== 'string' ||
-			!/^(brief-v1|[0-9a-f-]{36})$/.test(run.scoreConfigVersion))
+			(run.scoreConfigVersion !== catalog[run.family].scoring.version &&
+				!/^[0-9a-f-]{36}$/.test(run.scoreConfigVersion)))
 	)
 		throw new RunError('score_version', 409);
 	try {
@@ -146,7 +148,7 @@ export async function startRanked(
 		AND NOT EXISTS (SELECT 1 FROM player_ban WHERE user_id=${userId} AND (expires_at IS NULL OR expires_at>${now}))
 		AND NOT EXISTS (SELECT 1 FROM user_lifecycle WHERE user_id=${userId})
 		AND EXISTS (SELECT 1 FROM game_lifecycle WHERE family=${family} AND state='enabled')
-		AND COALESCE((SELECT version FROM score_live WHERE family=${family}),'brief-v1')=${liveVersion}
+		AND COALESCE((SELECT version FROM score_live WHERE family=${family}),${defaultScoreConfig(family).version})=${liveVersion}
 		AND NOT EXISTS (SELECT 1 FROM site_control WHERE key='ranked' AND enabled=0)
 		AND (SELECT count(*) FROM play_session WHERE user_id=${userId} AND created_at>${now - 3600000}) < 30
 		AND (SELECT count(*) FROM play_session WHERE ip_hash=${ipHash} AND created_at>${now - 3600000}) < 30
@@ -165,7 +167,7 @@ export async function startRanked(
 				.prepare('SELECT version FROM score_live WHERE family=?')
 				.bind(family)
 				.first<{ version: string }>();
-			if ((current?.version ?? 'brief-v1') !== liveVersion) continue;
+			if ((current?.version ?? defaultScoreConfig(family).version) !== liveVersion) continue;
 			throw new RunError('start_limited', 429);
 		}
 		return {
@@ -217,7 +219,7 @@ export async function saveRun(
 	let scoring = await readScoreConfig(
 		binding,
 		run.family,
-		run.scoreConfigVersion ?? SCORE_DEFAULT_VERSION
+		run.scoreConfigVersion ?? defaultScoreConfig(run.family).version
 	);
 	let seconds = run.elapsedSeconds;
 	let submittedAt = now;

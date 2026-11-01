@@ -6,6 +6,11 @@ import { manifest as manifest2 } from './puzzles/memory/manifest.js';
 export const catalog: Record<PuzzleId, PuzzleManifest> = Object.fromEntries(
 	[manifest0, manifest1, manifest2].map((manifest) => [manifest.id, manifest])
 ) as Record<PuzzleId, PuzzleManifest>;
+export const puzzleMessages = {
+	...manifest0.messages,
+	...manifest1.messages,
+	...manifest2.messages
+} as const;
 export {
 	createBlockRound,
 	replayBlockMoves,

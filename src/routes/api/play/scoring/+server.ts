@@ -1,9 +1,9 @@
 import { env } from 'cloudflare:workers';
 import { readScoreConfig } from '#lib/server/scoring.js';
-import { SCORE_FAMILIES } from '#lib/engine/scoring.js';
+import { catalog } from '#lib/catalog.js';
 import type { RequestHandler } from './$types';
 export const GET: RequestHandler = async ({ url }) => {
-	const family = SCORE_FAMILIES.find((family) => family === url.searchParams.get('family'));
+	const family = Object.keys(catalog).find((family) => family === url.searchParams.get('family'));
 	if (!family) return Response.json({ code: 'input' }, { status: 400 });
 	try {
 		return Response.json(await readScoreConfig(env.DB, family), {

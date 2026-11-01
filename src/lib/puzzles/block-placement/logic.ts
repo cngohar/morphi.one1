@@ -1,4 +1,5 @@
-import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
+import type { ScoreValues } from '#lib/engine/scoring.js';
+import { scoring as scoringDefinition } from './scoring.js';
 import { createRng, shuffle } from '#lib/engine/rng.js';
 
 export const BLOCK_ENGINE_VERSION = 'block-placement-1';
@@ -320,7 +321,7 @@ function fullLines(board: readonly BoardCell[]): { rows: number[]; columns: numb
 export function scorePlacement(
 	lines: number,
 	combo: number,
-	scoring: ScoreValues = SCORE_DEFAULTS.block
+	scoring: ScoreValues = scoringDefinition.defaults
 ): number {
 	if (lines <= 0) {
 		return 0;
@@ -334,7 +335,7 @@ export function placeBlockPiece(
 	trayIndex: number,
 	x: number,
 	y: number,
-	scoring: ScoreValues = SCORE_DEFAULTS.block
+	scoring: ScoreValues = scoringDefinition.defaults
 ): PlaceResult {
 	const pieceId = round.tray[trayIndex];
 
@@ -407,7 +408,7 @@ export function placeBlockPiece(
 export function replayBlockMoves(
 	seed: string,
 	moves: readonly BlockMove[],
-	scoring: ScoreValues = SCORE_DEFAULTS.block
+	scoring: ScoreValues = scoringDefinition.defaults
 ): BlockRound {
 	let round = createBlockRound(seed);
 

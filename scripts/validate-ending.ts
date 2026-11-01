@@ -1,6 +1,8 @@
-import { messages } from '../src/lib/i18n/messages.js';
-
-export function validateEnding(id: string, ending: unknown): void {
+export function validateEnding(
+	id: string,
+	ending: unknown,
+	catalog: Readonly<Record<string, string>>
+): void {
 	const fail = () => {
 		throw new Error(`Invalid ending declaration for ${id}`);
 	};
@@ -20,7 +22,6 @@ export function validateEnding(id: string, ending: unknown): void {
 		return fail();
 	const headlines = value.headlines as Record<string, unknown>;
 	const subline = value.subline as Record<string, unknown>;
-	const catalog = messages as Record<string, string>;
 	if (
 		typeof headlines.default !== 'string' ||
 		(id === 'block' &&

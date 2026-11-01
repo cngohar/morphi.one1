@@ -879,3 +879,29 @@ and checked mobile layouts using browser responsive emulation without noting
 corrections. Browser/device models were not supplied; physical mobile review was
 not reported. This supersedes the pending acceptance directions above. It does
 not authorize deployment, production release or further implementation.
+
+## Engine refactor Slice 1 — manifest identity and scoring (2026-11-01)
+
+The owner confirmed Slice 0 and authorized Slice 1 only, on frozen base
+`v1.2-local-complete` at `1303c9c4bdb1718bb558886dc43b7b48c597a02a`.
+`PuzzleId` is a string; registered manifests define scoring fields, defaults,
+and the default scoring version. The engine validates a supplied definition
+without importing the catalog or naming puzzle families. Catalog-based access
+lives in `src/lib/scoring.ts`; server/admin lists and membership use the catalog.
+
+Each manifest references its own tiny `scoring.ts` data module so puzzle replay
+and view defaults share the same values without a manifest/logic import cycle.
+All three existing default versions remain `brief-v1`, every coefficient and
+per-puzzle engine version is unchanged, and operator edits/rollback still create
+immutable audited versions. The engine's legacy default-version constant remains
+for existing local-best storage compatibility; generic storage is later work.
+
+Each manifest references a family message bundle. Generated typed aggregation
+keeps the existing `t` API, keys and copy while shared `messages.ts` owns only
+shell/site/admin copy. Ending validation consumes the bundle directly, so
+registry generation does not depend on stale generated output. Eager catalog
+and registry exports remain until Slice 2. No dependency versions changed.
+
+The Slice 0 base-tag test remains deferred and outstanding under the owner's
+explicit Slice 1 instruction; the actual pre-start HEAD/tag checks both passed.
+No Slice 2 or production action is authorized.

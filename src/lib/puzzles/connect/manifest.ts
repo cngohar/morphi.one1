@@ -1,4 +1,6 @@
+import { messages } from './messages.js';
 import type { PuzzleManifest } from '#lib/engine/contract.js';
+import { scoring } from './scoring.js';
 import {
 	applyConnectMove,
 	connectScore,
@@ -7,10 +9,12 @@ import {
 	type ConnectMove
 } from './logic.js';
 
-export const manifest: PuzzleManifest = {
+export const manifest = {
 	id: 'connect',
 	engineVersion: CONNECT_ENGINE_VERSION,
+	scoring,
 	maxMoves: 1000,
+	messages,
 	ending: {
 		kind: 'completion',
 		headlines: { default: 'ending.connect.headline' },
@@ -35,4 +39,4 @@ export const manifest: PuzzleManifest = {
 			moves: round.strokes
 		};
 	}
-};
+} satisfies PuzzleManifest;

@@ -40,9 +40,9 @@
 		},
 		"generationMs": {
 			"runs": 10000,
-			"median": 0.9183580000008078,
-			"p95": 3.5296200000000226,
-			"worst": 9.351566999999704,
+			"median": 0.9162999999998647,
+			"p95": 3.526010000000042,
+			"worst": 10.78525400000035,
 			"environment": "local linux x64, Bun 1.4.2, preloaded generator, no network",
 			"target": "reported goal; no owner-approved gate"
 		}
@@ -83,9 +83,9 @@
 		},
 		"generationMs": {
 			"runs": 10000,
-			"median": 1.1781650000193622,
-			"p95": 4.153922000026796,
-			"worst": 13.170821999985492,
+			"median": 1.1779339999775402,
+			"p95": 4.213137999991886,
+			"worst": 7.445635000010952,
 			"environment": "local linux x64, Bun 1.4.2, preloaded generator, no network",
 			"target": "reported goal; no owner-approved gate"
 		}
@@ -126,9 +126,9 @@
 		},
 		"generationMs": {
 			"runs": 10000,
-			"median": 1.1390380000229925,
-			"p95": 4.207686000037938,
-			"worst": 6.756976999982726,
+			"median": 1.09997999999905,
+			"p95": 4.086156999983359,
+			"worst": 9.46276600001147,
 			"environment": "local linux x64, Bun 1.4.2, preloaded generator, no network",
 			"target": "reported goal; no owner-approved gate"
 		}

@@ -9,7 +9,7 @@ export default defineConfig({
 	test: {
 		environment: 'node',
 		expect: { requireAssertions: true },
-		include: ['src/**/*.{test,spec}.{js,ts}'],
+		include: ['src/**/*.{test,spec}.{js,ts}', 'tests/slices/**/*.test.ts'],
 		exclude: ['src/**/*.svelte.{test,spec}.{js,ts}']
 	}
 });

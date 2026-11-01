@@ -1,5 +1,6 @@
 <script lang="ts">
-	import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
+	import type { ScoreValues } from '#lib/engine/scoring.js';
+	import { scoring as defaultScoring } from './scoring.js';
 	import { onMount, tick, untrack } from 'svelte';
 	import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 	import { themeStyle } from '#lib/engine/theme/style.js';
@@ -19,7 +20,7 @@
 	} from './logic.js';
 
 	let {
-		scoring = SCORE_DEFAULTS.connect,
+		scoring = defaultScoring.defaults,
 		round,
 		roundNumber,
 		resolvedTheme = null,

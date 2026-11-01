@@ -8,7 +8,7 @@ import {
 	rollbackScoreConfig,
 	saveScoreConfig
 } from '#lib/server/scoring.js';
-import { SCORE_FAMILIES, SCORE_DEFAULTS } from '#lib/engine/scoring.js';
+import { catalog } from '#lib/catalog.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { env } from 'cloudflare:workers';
@@ -73,11 +73,7 @@ export const load: PageServerLoad = async (event) => {
 	let auditOverview: { total: number; recent: number; operators: number } | null = null;
 	const subview = event.url.searchParams.get('subview') ?? '';
 	const gameParam = event.url.searchParams.get('game');
-	if (
-		event.params.view === 'games' &&
-		gameParam !== null &&
-		!SCORE_FAMILIES.includes(gameParam as PuzzleId)
-	)
+	if (event.params.view === 'games' && gameParam !== null && !Object.hasOwn(catalog, gameParam))
 		error(400, 'Invalid game');
 	const selectedGame = event.params.view === 'games' ? (gameParam as PuzzleId | null) : null;
 	const userSearch = event.url.searchParams.get('search') ?? '';
@@ -132,7 +128,7 @@ export const load: PageServerLoad = async (event) => {
 		}
 		if (event.params.view === 'scoring' || selectedGame)
 			scoring = await Promise.all(
-				(selectedGame ? [selectedGame] : SCORE_FAMILIES).map(async (family) => {
+				(selectedGame ? [selectedGame] : Object.keys(catalog)).map(async (family) => {
 					const { config, liveVersion } = await readLiveScoreConfig(env.DB, family);
 					return {
 						family,
@@ -366,7 +362,7 @@ export const actions: Actions = {
 			}
 			if (!reason || !target || body.get('confirm') !== 'yes') return fail(400, { code: 'input' });
 			if (action.startsWith('game-')) {
-				if (!SCORE_FAMILIES.includes(target as PuzzleId)) return fail(400, { code: 'input' });
+				if (!Object.hasOwn(catalog, target)) return fail(400, { code: 'input' });
 				const days = action === 'game-delete' ? Number(body.get('duration')) : 7;
 				await changeGame(
 					env.DB,
@@ -398,7 +394,7 @@ export const actions: Actions = {
 				return { success: true, exported: JSON.stringify(exported) };
 			}
 			if (action.startsWith('score-')) {
-				if (!SCORE_FAMILIES.includes(target as PuzzleId)) return fail(400, { code: 'input' });
+				if (!Object.hasOwn(catalog, target)) return fail(400, { code: 'input' });
 				const family = target as PuzzleId;
 				if (action === 'score-rollback') {
 					await rollbackScoreConfig(
@@ -415,7 +411,7 @@ export const actions: Actions = {
 				try {
 					values =
 						action === 'score-defaults'
-							? SCORE_DEFAULTS[family]
+							? catalog[family].scoring.defaults
 							: JSON.parse(String(body.get('values')));
 				} catch {
 					return fail(400, { code: 'input' });

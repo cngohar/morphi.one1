@@ -13,4 +13,5 @@ bun.lockb
 
 # Owner-supplied design references; preserve the package byte for byte.
 /docs/morphi-v1.1-handoff-2026-10-26/
+/docs/morphi-engine-refactor-brief.md
 /docs/evidence/v1.1-themes/contact-sheet.html

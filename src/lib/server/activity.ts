@@ -1,3 +1,4 @@
+import { catalog } from '#lib/catalog.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { RunError } from './runs.js';
 
@@ -17,7 +18,8 @@ export function parseRoundActivity(value: Record<string, unknown>): {
 		(value.action !== 'start' && value.action !== 'abandon') ||
 		typeof value.runId !== 'string' ||
 		!UUID.test(value.runId) ||
-		(value.family !== 'block' && value.family !== 'memory' && value.family !== 'connect') ||
+		typeof value.family !== 'string' ||
+		!Object.hasOwn(catalog, value.family) ||
 		(value.rankedSession !== null && value.rankedSession !== value.runId)
 	)
 		throw new RunError('payload');

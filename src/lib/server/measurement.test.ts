@@ -15,6 +15,9 @@ it('accepts only consented coarse events and rejects personal data or seeds', ()
 		{ score: 200 },
 		{ consent: false },
 		{ family: 'unknown' },
+		{ family: '__proto__' },
+		{ family: 'constructor' },
+		{ family: 1 },
 		{ code: 'private error message' }
 	])
 		expect(parseMeasurement({ ...value, ...addition })).toBeNull();

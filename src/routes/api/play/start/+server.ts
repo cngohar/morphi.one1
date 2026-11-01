@@ -1,3 +1,4 @@
+import { catalog } from '#lib/catalog.js';
 import { env } from 'cloudflare:workers';
 import { digest, RunError, startRanked } from '#lib/server/runs.js';
 import { ownerKey, playFailure, readPlayBody } from '#lib/server/play-http.js';
@@ -7,7 +8,8 @@ export const POST: RequestHandler = async (event) => {
 		const body = await readPlayBody(event);
 		if (
 			Object.keys(body).sort().join(',') !== 'family,ownerKey' ||
-			(body.family !== 'block' && body.family !== 'memory' && body.family !== 'connect') ||
+			typeof body.family !== 'string' ||
+			!Object.hasOwn(catalog, body.family) ||
 			body.ownerKey !== (await ownerKey(event.locals.user!.id))
 		)
 			throw new RunError('payload');

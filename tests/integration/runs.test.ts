@@ -471,7 +471,6 @@ describe('completed progress and ranked runs against real local D1', () => {
 
 it('versions scoring edits, freezes in-flight/past replay, separates boards and audits defaults', async () => {
 	const { readScoreConfig, saveScoreConfig } = await import('../../src/lib/server/scoring.js');
-	const { SCORE_DEFAULTS } = await import('../../src/lib/engine/scoring.js');
 	const { catalog } = await import('../../src/lib/catalog.js');
 	const db = proxy.env.DB,
 		userId = await owner();
@@ -487,7 +486,7 @@ it('versions scoring edits, freezes in-flight/past replay, separates boards and 
 		'test-operator',
 		'memory',
 		before.version,
-		{ ...SCORE_DEFAULTS.memory, pair: 2000 },
+		{ ...catalog.memory.scoring.defaults, pair: 2000 },
 		'Local scoring test'
 	);
 	expect(edited.version).not.toBe(before.version);
@@ -542,25 +541,32 @@ it('versions scoring edits, freezes in-flight/past replay, separates boards and 
 			'test-operator',
 			'memory',
 			edited.version,
-			{ ...SCORE_DEFAULTS.memory, pair: -1 },
+			{ ...catalog.memory.scoring.defaults, pair: -1 },
 			'Invalid'
 		)
 	).rejects.toThrow();
 	expect(await readScoreConfig(db, 'memory')).toEqual(edited);
 	await expect(
-		saveScoreConfig(db, 'test-operator', 'memory', before.version, SCORE_DEFAULTS.memory, 'Stale')
+		saveScoreConfig(
+			db,
+			'test-operator',
+			'memory',
+			before.version,
+			catalog.memory.scoring.defaults,
+			'Stale'
+		)
 	).rejects.toMatchObject({ code: 'score_conflict' });
 	const restored = await saveScoreConfig(
 		db,
 		'test-operator',
 		'memory',
 		edited.version,
-		SCORE_DEFAULTS.memory,
+		catalog.memory.scoring.defaults,
 		'Restore',
 		true
 	);
 	expect(restored.version).not.toBe(before.version);
-	expect(restored.values).toEqual(SCORE_DEFAULTS.memory);
+	expect(restored.values).toEqual(catalog.memory.scoring.defaults);
 	await expect(
 		db
 			.prepare('UPDATE score_config SET values_json=? WHERE version=?')
@@ -571,7 +577,7 @@ it('versions scoring edits, freezes in-flight/past replay, separates boards and 
 });
 it('serializes concurrent score saves without orphan versions or audit records', async () => {
 	const { readScoreConfig, saveScoreConfig } = await import('../../src/lib/server/scoring.js');
-	const { SCORE_DEFAULTS } = await import('../../src/lib/engine/scoring.js');
+	const { catalog } = await import('../../src/lib/catalog.js');
 	const db = proxy.env.DB,
 		before = await readScoreConfig(db, 'connect');
 	const outcomes = await Promise.allSettled(
@@ -581,7 +587,7 @@ it('serializes concurrent score saves without orphan versions or audit records',
 				'race-operator',
 				'connect',
 				before.version,
-				{ ...SCORE_DEFAULTS.connect, pair },
+				{ ...catalog.connect.scoring.defaults, pair },
 				'Concurrent test'
 			)
 		)

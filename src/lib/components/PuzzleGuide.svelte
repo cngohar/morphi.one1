@@ -1,18 +1,20 @@
 <script lang="ts">
-	import { SCORE_DEFAULTS, type ScoreValues } from '#lib/engine/scoring.js';
+	import { catalog } from '#lib/catalog.js';
+	import type { PuzzleId } from '#lib/engine/contract.js';
+	import type { ScoreValues } from '#lib/engine/scoring.js';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	let {
 		family,
 		scoring,
 		section = 'all'
 	}: {
-		family: 'block' | 'memory' | 'connect';
+		family: PuzzleId;
 		scoring?: ScoreValues;
 		section?: 'all' | 'how' | 'scoring' | 'scoring-tips' | 'right';
 	} = $props();
 	const key = (suffix: string) => `v1.game.${family}.${suffix}` as MessageKey;
-	const fields = $derived(Object.keys(SCORE_DEFAULTS[family]));
-	const values: ScoreValues = $derived(scoring ?? SCORE_DEFAULTS[family]);
+	const fields = $derived(catalog[family].scoring.fields);
+	const values: ScoreValues = $derived(scoring ?? catalog[family].scoring.defaults);
 	function scoreValue(row: number) {
 		const field = fields[row - 1];
 		if (!field) return t(key(`value${row}`));

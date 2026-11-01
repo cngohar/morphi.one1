@@ -1,3 +1,4 @@
+import { catalog } from '#lib/catalog.js';
 export const measurementEvents = [
 	'play_clicked',
 	'round_started',
@@ -16,7 +17,8 @@ export function parseMeasurement(
 		typeof body.id !== 'string' ||
 		!/^[0-9a-f-]{36}$/.test(body.id) ||
 		!measurementEvents.includes(body.event as (typeof measurementEvents)[number]) ||
-		![null, 'block', 'memory', 'connect'].includes(body.family as string | null) ||
+		(body.family !== null &&
+			(typeof body.family !== 'string' || !Object.hasOwn(catalog, body.family))) ||
 		![null, 'start', 'save', 'view'].includes(body.code as string | null)
 	)
 		return null;

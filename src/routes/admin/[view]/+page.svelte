@@ -126,8 +126,8 @@
 					<section class="admin-card">
 						<h2>{t('v1.admin.dashboard.split')}</h2>
 						{#each data.split as game (game.family)}<p class="summary-row">
-								<span>{t(game.family === 'memory' ? 'v1.game.memory' : 'v1.game.block')}</span
-								><strong>{game.total}</strong>
+								<span>{t(`v1.game.${game.family}` as MessageKey)}</span><strong>{game.total}</strong
+								>
 							</p>{/each}
 						<p>
 							<a href="https://dash.cloudflare.com" rel="external noreferrer"
