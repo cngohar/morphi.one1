@@ -1,15 +1,12 @@
 import { completionActivityStatement } from './activity.js';
-import { readLiveScoreConfig, readScoreConfig } from './scoring.js';
+import { readScoreConfig } from './scoring.js';
 import { defaultScoreConfig } from '#lib/scoring.js';
-import { memoryOpeningMs, CONNECT_ENTRANCE_MS, CARD_RANKED_OPENING_MS } from '#lib/round-timing.js';
 import { and, asc, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 import { catalog } from '#lib/catalog.js';
 import { normalizeSeed } from '#lib/engine/rng.js';
-import type { CompletedRun, PuzzleId } from '#lib/engine/contract.js';
-import { randomSeed } from '#lib/seeds.js';
+import type { CompletedRun } from '#lib/engine/contract.js';
 import { createDatabase } from './db/index.js';
 import { completedRun, playSession } from './db/schema.js';
-import { drawFreshTheme } from '#lib/engine/theme/freshness.js';
 import { generateTheme, type ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { THEME_CONFIG_VERSION, THEME_GENERATOR_VERSION } from '#lib/engine/theme/config.js';
 
@@ -79,17 +76,12 @@ export function parseRun(value: unknown): CompletedRun {
 		run.moves.some((move) => !move || typeof move !== 'object' || Array.isArray(move))
 	)
 		throw new RunError('moves');
-	// Canonical field order makes reordered JSON keys an identical retry.
-	for (const move of run.moves) {
-		if (
-			Object.keys(move).sort().join(',') !==
-			(run.family === 'memory'
-				? 'index'
-				: run.family === 'connect'
-					? 'at,cell,pair,stroke'
-					: 'trayIndex,x,y')
-		)
-			throw new RunError('move');
+	// The family owns wire fields; canonical order makes reordered keys an identical retry.
+	let moves;
+	try {
+		moves = run.moves.map((move) => manifest.parseMove(move));
+	} catch {
+		throw new RunError('move');
 	}
 	return {
 		version: 1,
@@ -98,13 +90,7 @@ export function parseRun(value: unknown): CompletedRun {
 		family: run.family,
 		engineVersion: run.engineVersion,
 		seed: run.seed,
-		moves: run.moves.map((move) =>
-			run.family === 'memory'
-				? { index: move.index }
-				: run.family === 'connect'
-					? { pair: move.pair, cell: move.cell, stroke: move.stroke, at: move.at }
-					: { trayIndex: move.trayIndex, x: move.x, y: move.y }
-		),
+		moves,
 		elapsedSeconds: run.elapsedSeconds,
 		rankedSession: run.rankedSession,
 		...(run.theme
@@ -118,77 +104,14 @@ export function parseRun(value: unknown): CompletedRun {
 	};
 }
 
-export async function startRanked(
-	binding: D1Database,
-	userId: string,
-	family: PuzzleId,
-	ipHash: string,
-	now = Date.now()
-) {
-	const db = createDatabase(binding);
-	const id = crypto.randomUUID();
-	const recent = await db
-		.select({ snapshot: playSession.themeSnapshot })
-		.from(playSession)
-		.where(eq(playSession.userId, userId))
-		.orderBy(desc(playSession.sequence))
-		.limit(3);
-	const history = recent.flatMap((row) =>
-		row.snapshot ? [JSON.parse(row.snapshot) as ResolvedTheme] : []
-	);
-	const theme = drawFreshTheme(family, history, randomSeed);
-	const seed = theme.seed;
-	// One conditional statement serializes caps and insertion. No read/check/write gap.
-	for (let attempt = 0; attempt < 3; attempt++) {
-		const { config: scoring, liveVersion } = await readLiveScoreConfig(binding, family);
-		const rows = await db.all<{ id: string }>(sql`
-		INSERT INTO play_session (id,user_id,family,seed,engine_version,created_at,expires_at,ip_hash,theme_config_version,theme_generator_version,theme_snapshot,card_opening_ms,score_config_version)
-		SELECT ${id},${userId},${family},${seed},${catalog[family].engineVersion},${now},${now + 7200000},${ipHash},${theme.themeConfigVersion},${theme.themeGeneratorVersion},${JSON.stringify(theme)},${CARD_RANKED_OPENING_MS},${scoring.version}
-		WHERE EXISTS (SELECT 1 FROM player WHERE user_id=${userId})
-		AND NOT EXISTS (SELECT 1 FROM player_ban WHERE user_id=${userId} AND (expires_at IS NULL OR expires_at>${now}))
-		AND NOT EXISTS (SELECT 1 FROM user_lifecycle WHERE user_id=${userId})
-		AND EXISTS (SELECT 1 FROM game_lifecycle WHERE family=${family} AND state='enabled')
-		AND COALESCE((SELECT version FROM score_live WHERE family=${family}),${defaultScoreConfig(family).version})=${liveVersion}
-		AND NOT EXISTS (SELECT 1 FROM site_control WHERE key='ranked' AND enabled=0)
-		AND (SELECT count(*) FROM play_session WHERE user_id=${userId} AND created_at>${now - 3600000}) < 30
-		AND (SELECT count(*) FROM play_session WHERE ip_hash=${ipHash} AND created_at>${now - 3600000}) < 30
-		AND (SELECT count(*) FROM play_session s WHERE s.user_id=${userId} AND s.created_at>${now - 3600000}
-			AND s.payload_hash IS NULL AND EXISTS
-			(SELECT 1 FROM play_session newer WHERE newer.user_id=s.user_id AND newer.family=s.family AND newer.sequence>s.sequence))
- + CASE WHEN EXISTS (SELECT 1 FROM play_session current WHERE current.user_id=${userId} AND current.family=${family} AND current.payload_hash IS NULL AND current.created_at>${now - 3600000} AND NOT EXISTS (SELECT 1 FROM play_session newer WHERE newer.user_id=current.user_id AND newer.family=current.family AND newer.sequence>current.sequence)) THEN 1 ELSE 0 END <= 10
-		RETURNING id`);
-		if (!rows.length) {
-			const available = await binding
-				.prepare('SELECT state FROM game_lifecycle WHERE family=?')
-				.bind(family)
-				.first<{ state: string }>();
-			if (available?.state !== 'enabled') throw new RunError('game_disabled', 409);
-			const current = await binding
-				.prepare('SELECT version FROM score_live WHERE family=?')
-				.bind(family)
-				.first<{ version: string }>();
-			if ((current?.version ?? defaultScoreConfig(family).version) !== liveVersion) continue;
-			throw new RunError('start_limited', 429);
-		}
-		return {
-			scoring,
-			id,
-			seed,
-			family,
-			theme,
-			engineVersion: catalog[family].engineVersion,
-			startedAt: now,
-			expiresAt: now + 7200000
-		};
-	}
-	throw new RunError('score_conflict', 409);
-}
+export { startRanked } from './ranked-session.js';
 
 export async function saveRun(
 	binding: D1Database,
 	userId: string,
 	input: unknown,
-	now = Date.now()
+	now = Date.now(),
+	cache?: KVNamespace
 ) {
 	const db = createDatabase(binding);
 	const run = parseRun(input);
@@ -219,7 +142,8 @@ export async function saveRun(
 	let scoring = await readScoreConfig(
 		binding,
 		run.family,
-		run.scoreConfigVersion ?? defaultScoreConfig(run.family).version
+		run.scoreConfigVersion ?? defaultScoreConfig(run.family).version,
+		cache
 	);
 	let seconds = run.elapsedSeconds;
 	let submittedAt = now;
@@ -243,7 +167,7 @@ export async function saveRun(
 			throw new RunError('session', 403);
 		if (run.scoreConfigVersion && run.scoreConfigVersion !== issued.scoreConfigVersion)
 			throw new RunError('score_version', 409);
-		scoring = await readScoreConfig(binding, run.family, issued.scoreConfigVersion);
+		scoring = await readScoreConfig(binding, run.family, issued.scoreConfigVersion, cache);
 		cardOpeningMs = issued.cardOpeningMs;
 		// The issued snapshot is authoritative, including for a queued legacy client.
 		resolvedTheme = issued.themeSnapshot
@@ -264,8 +188,8 @@ export async function saveRun(
 					and(
 						eq(playSession.id, run.id),
 						isNull(playSession.payloadHash),
+						isNull(playSession.abandonedAt),
 						gt(playSession.expiresAt, now),
-						sql`NOT EXISTS (SELECT 1 FROM play_session newer WHERE newer.user_id=${userId} AND newer.family=${run.family} AND newer.sequence>${issued.sequence})`,
 						sql`NOT EXISTS (SELECT 1 FROM player_ban WHERE user_id=${userId} AND (expires_at IS NULL OR expires_at>${now}))`,
 						sql`NOT EXISTS (SELECT 1 FROM user_lifecycle WHERE user_id=${userId})`,
 						sql`NOT EXISTS (SELECT 1 FROM site_control WHERE key='ranked' AND enabled=0)`
@@ -287,21 +211,27 @@ export async function saveRun(
 	const replayStarted = performance.now();
 	try {
 		result = catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values);
-	} catch {
-		throw new RunError('invalid_replay');
+		const timing = catalog[run.family].rankedTiming;
+		if (run.rankedSession && timing) {
+			seconds = Math.floor(
+				Math.max(0, rankedWallMs - timing.openingMs(result) - cardOpeningMs) / 1000
+			);
+			result = catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values);
+			if (seconds < timing.minimumSeconds(result)) throw new RunError('too_fast');
+		}
+	} catch (error) {
+		// Terminal validation failures release the lock; storage failures retain retry rights.
+		if (run.rankedSession)
+			await binding
+				.prepare(
+					`UPDATE play_session SET abandoned_at=? WHERE id=? AND user_id=?
+				AND payload_hash=? AND abandoned_at IS NULL
+				AND NOT EXISTS (SELECT 1 FROM completed_run WHERE id=play_session.id)`
+				)
+				.bind(now, run.id, userId, hash)
+				.run();
+		throw error instanceof RunError ? error : new RunError('invalid_replay');
 	}
-	if (run.rankedSession && run.family === 'memory') {
-		seconds = Math.floor(
-			Math.max(0, rankedWallMs - memoryOpeningMs(result.pairs!) - cardOpeningMs) / 1000
-		);
-		result = catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values);
-	}
-	if (run.rankedSession && run.family === 'connect') {
-		seconds = Math.floor(Math.max(0, rankedWallMs - CONNECT_ENTRANCE_MS - cardOpeningMs) / 1000);
-		result = catalog.connect.replay(run.seed, run.moves, seconds, scoring.values);
-	}
-	if (run.rankedSession && run.family === 'memory' && seconds < result.pairs! * 0.4)
-		throw new RunError('too_fast');
 	console.info(
 		JSON.stringify({
 			event: 'run_replayed',
@@ -357,6 +287,12 @@ export async function accountHistory(binding: D1Database, userId: string) {
 		.where(eq(completedRun.userId, userId))
 		.orderBy(desc(completedRun.createdAt), asc(completedRun.id))
 		.limit(30);
+	const defaultVersion = sql`CASE ${completedRun.family} ${sql.join(
+		Object.values(catalog).map(
+			(manifest) => sql`WHEN ${manifest.id} THEN ${manifest.scoring.version}`
+		),
+		sql` `
+	)} END`;
 	const bests = await db
 		.select({
 			family: completedRun.family,
@@ -368,7 +304,7 @@ export async function accountHistory(binding: D1Database, userId: string) {
 		.where(
 			and(
 				eq(completedRun.userId, userId),
-				sql`${completedRun.scoreConfigVersion} = COALESCE((SELECT version FROM score_live WHERE family=${completedRun.family}), 'brief-v1')`
+				sql`${completedRun.scoreConfigVersion} = COALESCE((SELECT version FROM score_live WHERE family=${completedRun.family}), ${defaultVersion})`
 			)
 		)
 		.groupBy(completedRun.family, completedRun.group, completedRun.scoreConfigVersion);
@@ -385,36 +321,22 @@ export async function accountHistory(binding: D1Database, userId: string) {
 	return { history, bests, summary };
 }
 
-export const BOARD_GROUPS = [
-	'block-placement-1',
-	'memory-1:6',
-	'memory-1:8',
-	'memory-1:10',
-	'connect-1:1',
-	'connect-1:2',
-	'connect-1:3'
-] as const;
+export const BOARD_GROUPS = Object.values(catalog).flatMap(
+	(manifest) => manifest.leaderboardGroups
+);
 export async function leaderboard(
 	binding: D1Database,
 	group: string,
 	offset: number,
-	viewer: string | null
+	viewer: string | null,
+	cache?: KVNamespace
 ) {
-	if (
-		!(BOARD_GROUPS as readonly string[]).includes(group) ||
-		!Number.isSafeInteger(offset) ||
-		offset < 0 ||
-		offset > 9900 ||
-		offset % 25
-	)
+	const manifest = Object.values(catalog).find((entry) => entry.leaderboardGroups.includes(group));
+	if (!manifest || !Number.isSafeInteger(offset) || offset < 0 || offset > 9900 || offset % 25)
 		throw new RunError('board');
 	const db = createDatabase(binding);
-	const family: PuzzleId = group.startsWith('memory')
-		? 'memory'
-		: group.startsWith('connect')
-			? 'connect'
-			: 'block';
-	const scoring = await readScoreConfig(binding, family);
+	const family = manifest.id;
+	const scoring = await readScoreConfig(binding, family, undefined, cache);
 	// Each player occupies one place, using their best eligible result.
 	const query = sql`WITH eligible AS (
 		SELECT r.*, p.name, row_number() OVER (PARTITION BY r.user_id ORDER BY r.score DESC,r.created_at,r.id) AS personal

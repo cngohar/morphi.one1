@@ -10,6 +10,12 @@ export const manifest = {
 	engineVersion: BLOCK_ENGINE_VERSION,
 	scoring,
 	maxMoves: 300,
+	parseMove(move) {
+		if (Object.keys(move).sort().join(',') !== 'trayIndex,x,y') throw new RangeError('move');
+		return { trayIndex: move.trayIndex, x: move.x, y: move.y };
+	},
+	leaderboardGroups: [BLOCK_ENGINE_VERSION],
+	rankedTiming: null,
 	messages,
 	createRound: createBlockRound,
 	replayRound: replayBlockMoves,

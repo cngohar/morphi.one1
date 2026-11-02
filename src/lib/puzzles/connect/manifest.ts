@@ -2,6 +2,7 @@ import { messages } from './messages.js';
 import type { PuzzleManifest } from '#lib/engine/contract.js';
 import type { ScoreValues } from '#lib/engine/scoring.js';
 import { scoring } from './scoring.js';
+import { CONNECT_ENTRANCE_MS } from '#lib/round-timing.js';
 import {
 	applyConnectMove,
 	connectScore,
@@ -17,6 +18,15 @@ export const manifest = {
 	engineVersion: CONNECT_ENGINE_VERSION,
 	scoring,
 	maxMoves: 1000,
+	parseMove(move) {
+		if (Object.keys(move).sort().join(',') !== 'at,cell,pair,stroke') throw new RangeError('move');
+		return { pair: move.pair, cell: move.cell, stroke: move.stroke, at: move.at };
+	},
+	leaderboardGroups: [1, 2, 3].map((band) => `${CONNECT_ENGINE_VERSION}:${band}`),
+	rankedTiming: {
+		openingMs: () => CONNECT_ENTRANCE_MS,
+		minimumSeconds: () => 0
+	},
 	messages,
 	createRound: createConnectRound,
 	ending: {

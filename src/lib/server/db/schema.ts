@@ -103,12 +103,14 @@ export const playSession = sqliteTable(
 		expiresAt: integer('expires_at').notNull(),
 		ipHash: text('ip_hash').notNull(),
 		payloadHash: text('payload_hash'),
-		claimedAt: integer('claimed_at')
+		claimedAt: integer('claimed_at'),
+		abandonedAt: integer('abandoned_at')
 	},
 	(table) => [
 		index('play_owner_family').on(table.userId, table.family, table.sequence),
 		index('play_start_time').on(table.createdAt),
-		index('play_ip_time').on(table.ipHash, table.createdAt)
+		index('play_ip_time').on(table.ipHash, table.createdAt),
+		index('play_owner_expiry').on(table.userId, table.expiresAt)
 	]
 );
 
@@ -253,7 +255,7 @@ export const anonymousEvent = sqliteTable(
 		event: text('event', {
 			enum: ['play_clicked', 'round_started', 'round_completed', 'next_clicked', 'error']
 		}).notNull(),
-		family: text('family', { enum: ['block', 'memory'] }),
+		family: text('family'),
 		code: text('code', { enum: ['start', 'save', 'view'] }),
 		createdAt: integer('created_at').notNull()
 	},
@@ -285,4 +287,30 @@ export const gameLifecycle = sqliteTable('game_lifecycle', {
 	family: text('family').primaryKey(),
 	state: text('state', { enum: ['enabled', 'disabled', 'deleted', 'hard-deleted'] }).notNull(),
 	restoreUntil: integer('restore_until')
+});
+
+// Family ids stay text: adding a manifest never requires a schema migration.
+export const gameConfig = sqliteTable('game_config', {
+	version: text('version').primaryKey(),
+	family: text('family').notNull(),
+	parent: text('parent').notNull(),
+	valuesJson: text('values_json').notNull(),
+	createdAt: integer('created_at').notNull()
+});
+export const themeConfig = sqliteTable('theme_config', {
+	version: text('version').primaryKey(),
+	parent: text('parent').notNull(),
+	valuesJson: text('values_json').notNull(),
+	createdAt: integer('created_at').notNull()
+});
+export const styleConfig = sqliteTable('style_config', {
+	version: text('version').primaryKey(),
+	family: text('family').notNull(),
+	parent: text('parent').notNull(),
+	valuesJson: text('values_json').notNull(),
+	createdAt: integer('created_at').notNull()
+});
+export const configLive = sqliteTable('config_live', {
+	key: text('key').primaryKey(),
+	version: text('version').notNull()
 });

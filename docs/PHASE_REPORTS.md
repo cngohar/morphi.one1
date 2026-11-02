@@ -1877,3 +1877,119 @@ authorizes committing and pushing the completed Slice 2 source, tests and docs,
 including the owner's existing brief edits. The earlier skipped commit/push
 entry records the original closeout. This handoff does not authorize Slice 3,
 deployment or production changes.
+
+## Engine refactor Slice 3 — Server validation and D1/KV config (2026-11-02)
+
+**Built:** Worked from owner-confirmed Slice 2 push `7a84063`, "Refactor lazy
+puzzle registry and generic play session". Only Slice 3 was implemented.
+
+Manifests own move shapes/canonical mapping, replay/scoring validation, existing
+ranked opening/minimum timing and leaderboard groups. Shared server validation
+uses these contracts without family branches. A synthetic manifest-only family
+with novel numeric fields starts, replays, scores, retries canonically, and appears
+in server history/rankings without family-specific server/schema/migration edits.
+
+D1 family columns are plain text. Missing lifecycle rows come from catalog lookup
+without reviving disabled/deleted entries. Migration
+`0011_catalog_config_sessions.sql` adds immutable game/theme/style snapshots,
+live config pointers and ranked abandonment. It removes the stale measurement
+family SQL check while preserving rows, remaining checks and indexes, invalidates
+older unclaimed tokens, and preserves claimed retries. Existing columns, tables,
+defaults and request envelopes remain usable for one release.
+**Database-reset permission covers local D1 only, including this schema; no reset
+was performed.** No remote database or namespace was provisioned.
+
+Config readers use D1 live pointers, validated immutable KV snapshots, bounded
+parent fallback and safe code defaults. KV failures fall through to D1; issued
+historical scoring versions never substitute new defaults. The local-only
+`CONFIG_CACHE` binding/types are ready. Applying selector weights remains Slice 4;
+theme/style application and admin publishing remain Slice 5.
+
+Ranked issuance permits one active round per account across families with the
+existing two-hour TTL. A second browser sees a conflict and must explicitly take
+over. Takeover/issuance commit together; failed starts preserve the first session.
+Home abandons an exact unclaimed session; stale requests cannot release a
+replacement. Valid claimed submissions remain locked/retryable through storage
+failure. Review found and fixed terminal replay/timing rejection retaining the
+lock: terminal failures release only their own session, retain hash/claim time,
+and count toward the existing abandon cap. Puzzle rules and scores are unchanged.
+
+**Skipped:** Slice 4 and later work; new games or public game doors; production
+provisioning, secrets, DNS, Google changes, deployment, commit and push. Existing
+owner edits to the brief were preserved. **The Slice 0 base-tag test remains
+deferred and outstanding; it was not added or claimed as passed.**
+
+**Known issues:** No known Slice 3 functional failure remains in the checks below.
+Live production D1/KV behavior, resource/load measurements and physical-device or
+phone/4G performance remain unverified. Theme freshness remains the existing
+best-effort diagnostic for its assigned later slice. The missing automated
+base-tag assertion remains an evidence gap.
+
+**Decisions:** Code owns rules, validation, timing/security and typed defaults;
+D1 owns config/live pointers and enforcement; KV caches immutable config only.
+New families require no schema or migration seed-list edits. Details are in
+`docs/DECISIONS.md` and `docs/EDGE_CASES.md`. Dependency versions and compatibility
+date are unchanged: Wrangler 4.151.3, Drizzle 0.45.4, TypeScript ~6.0.3.
+
+**Verification method:** Development used fast static/unit/D1 checks without
+palettes or the full browser suite. One milestone `bun run verify` passed through
+Worker/bundle checks, then a host restart interrupted browsers; that invocation
+has no final exit status. Only the browser stage restarted: **177/177 passed**
+with `workers: 1`. After the bounded lock-recovery fix, affected units, D1/auth,
+lint/types, Worker/bundle and **3/3** Chromium cases passed. No second full verify,
+palette or vector run was started. A new cap test initially expected rejection
+one attempt early; only its expectation was corrected to preserve the existing
+"more than ten abandons" rule, then its entire affected suite passed.
+
+**Evidence table:**
+
+| Acceptance item                                                                               | Evidence type and location                                                                                   | Result                                                                                          |
+| --------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------------------------------------- |
+| Novel manifest-only family starts/replays/scores; canonical moves, timing, groups and history | Real isolated D1; `tests/slices/slice3-catalog-server-validation.test.ts`; `build/slice3/units-recovery.log` | Pass; 6 Slice 3 cases within 143/143 units                                                      |
+| Catalog lifecycle/config/weights, text family keys and Connect measurements                   | Synthetic D1 config/cache/fallback and measurement inserts in Slice 3 suite                                  | Pass                                                                                            |
+| Compatible migration; legacy measurement rows/indexes and claimed hashes/times preserved      | Before/after 0011 D1 fixtures in Slice 3 suite                                                               | Pass; no reset                                                                                  |
+| Account-wide lock, concurrency, explicit takeover/abandon and two-hour TTL                    | Real D1 tests and two-browser account test; `build/slice3/e2e-final.log`, `e2e-recovery.log`                 | Pass                                                                                            |
+| Terminal rejection recovery, protected valid retries, unchanged abuse cap                     | Trigger-injected D1 failure/rejection tests; `build/slice3/accounts-recovery.log`, `runs-recovery-final.log` | All 41 cases covered: other 19 passed; affected run suite 22/22 passed after fixture correction |
+| Formatting/lint, zero-warning types and import boundaries                                     | `build/slice3/verify-final.log`, `lint-recovery.log`, `lint-runs-recovery.log`, `check-recovery.log`         | Pass; 0 errors/0 warnings                                                                       |
+| Palettes, vectors, built Worker and lazy isolation                                            | `build/slice3/verify-final.log`, `worker-recovery.log`, `bundle-recovery.log`                                | 30,000 palettes; 9 vectors in each of six runtimes; Worker/bundle pass                          |
+| Gameplay, endings, sounds, layouts and withdrawn doors                                        | 177 browser checks; 3 affected reruns after recovery fix; unchanged game views, vector files and audio       | Pass                                                                                            |
+| Slice 0 automated base-tag test                                                               | Owner-recorded deferral in prior reports and this handoff                                                    | Deferred and outstanding, not a pass                                                            |
+
+**Measurements:** Theme diagnostics used local Linux x64/Bun 1.4.2, a preloaded
+generator, no network and 10,000 runs per family. Results are preserved in
+`build/slice3/palettes.json`; timing-only changes to the historical tracked palette
+artifact were removed. These are diagnostic goals without an owner-approved
+numeric gate, not phone/4G release evidence.
+
+| Measurement                                                                                |   Runs |   Median |      p95 | Status                                         |
+| ------------------------------------------------------------------------------------------ | -----: | -------: | -------: | ---------------------------------------------- |
+| Memory theme generation                                                                    | 10,000 | 1.037 ms | 3.884 ms | Diagnostic goal                                |
+| Block theme generation                                                                     | 10,000 | 1.391 ms | 5.118 ms | Diagnostic goal                                |
+| Connect theme generation                                                                   | 10,000 | 1.261 ms | 4.589 ms | Diagnostic goal                                |
+| Mid-range phone/4G LCP ≤2.5 s, INP ≤200 ms, CLS ≤0.1; cold/preloaded critical path ~150 KB |      0 |        — |        — | Unmeasured release targets; no waiver inferred |
+| Production D1/KV latency, throughput and resource targets                                  |      0 |        — |        — | Unmeasured; separate production evidence       |
+
+The browser stage took 35m38.66s on the local desktop host, unthrottled localhost,
+Chromium/Firefox/WebKit, one worker. Recovery Worker smoke took 37.77s; the three
+affected Chromium checks took 91.82s. These are test durations, not user-performance
+measurements.
+
+**Waivers:** No new waivers. The owner's permission to proceed with the Slice 0
+test deferred remains in force; that test and its missing freeze assertion remain
+outstanding rather than silently waived or closed.
+
+**Questions for the owner / owner responsibilities:** Review this local Slice 3
+handoff and provide written confirmation before Slice 4. No next-slice work or
+production/deployment action is inferred. Existing release/device/Google and
+operations responsibilities remain separate.
+
+**CODEMAP:** Updated with manifest server contracts, config/cache readers,
+ranked ownership/recovery, migration/test evidence and the Slice 4 stop boundary.
+
+**Owner Git handoff — 2026-11-02:** The owner explicitly requested updating the
+Git repository and pushing to GitHub. This authorizes committing and pushing the
+completed Slice 3 source, tests and documentation, including the owner's existing
+brief edits. The skipped commit/push entry above records the original closeout.
+This handoff does not accept Slice 3, authorize Slice 4, or authorize deployment
+or production changes. Existing verification evidence is retained; app tests
+were not repeated for this Git handoff.

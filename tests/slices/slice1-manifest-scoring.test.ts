@@ -14,6 +14,9 @@ const synthetic: PuzzleManifest = {
 	id: syntheticId,
 	engineVersion: 'synthetic-engine-1',
 	maxMoves: 1,
+	parseMove: (move) => ({ novel: move.novel }),
+	leaderboardGroups: ['synthetic-engine-1'],
+	rankedTiming: null,
 	scoring: { version: 'synthetic-score-1', fields: ['novel'], defaults: { novel: 37 } },
 	messages: { 'synthetic.headline': 'Finished', 'synthetic.subline': 'Score {score}' },
 	createRound: (seed) => ({ seed }),
@@ -100,7 +103,7 @@ it('generates and type-checks a catalog with an extra manifest and its messages 
 		const declaration = JSON.stringify({ ...synthetic, replay: undefined }).slice(0, -1);
 		await writeFile(
 			join(fixturePuzzles, syntheticId, 'manifest.ts'),
-			`import type { PuzzleManifest } from '${resolve('src/lib/engine/contract.js')}';\nexport const manifest = ${declaration}, createRound: (seed: string) => ({seed}), replay: () => ({score:37,group:"synthetic-engine-1",pairs:null,moves:1}) } satisfies PuzzleManifest;\n`
+			`import type { PuzzleManifest } from '${resolve('src/lib/engine/contract.js')}';\nexport const manifest = ${declaration}, createRound: (seed: string) => ({seed}), parseMove: (move) => ({novel:move.novel}), replay: () => ({score:37,group:"synthetic-engine-1",pairs:null,moves:1}) } satisfies PuzzleManifest;\n`
 		);
 		const generated = spawnSync('bun', [resolve('scripts/generate-registry.ts')], {
 			cwd: fixture,

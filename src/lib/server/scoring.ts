@@ -1,6 +1,7 @@
 import { defaultScoreConfig, validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { RunError } from './runs.js';
+import { cachedConfigRow } from './config-cache.js';
 
 type ScoreRow = { version: string; parent: string; values_json: string; created_at: number };
 
@@ -15,48 +16,68 @@ function parseScoreRow(family: PuzzleId, row: ScoreRow): ScoreConfig | null {
 	}
 }
 
-export async function readLiveScoreConfig(db: D1Database, family: PuzzleId) {
-	const defaultVersion = defaultScoreConfig(family).version;
-	const live = await db
-		.prepare('SELECT version FROM score_live WHERE family=?')
-		.bind(family)
-		.first<{ version: string }>();
-	const liveVersion = live?.version ?? defaultVersion;
-	let version = liveVersion;
-	const seen = new Set<string>();
-	while (version !== defaultVersion && !seen.has(version)) {
-		seen.add(version);
-		const row = await db
-			.prepare(
-				'SELECT version,parent,values_json,created_at FROM score_config WHERE family=? AND version=?'
-			)
-			.bind(family, version)
-			.first<ScoreRow>();
-		if (!row) break;
-		const config = parseScoreRow(family, row);
-		if (config) {
-			if (version !== liveVersion) console.warn('morphi:score_live_invalid', family);
-			return { liveVersion, config };
+async function scoreRow(db: D1Database, family: PuzzleId, version: string, cache?: KVNamespace) {
+	return cachedConfigRow(
+		cache,
+		`config-v1:score:${family}:${version}`,
+		() =>
+			db
+				.prepare(
+					'SELECT version,parent,values_json,created_at FROM score_config WHERE family=? AND version=?'
+				)
+				.bind(family, version)
+				.first<ScoreRow>(),
+		(value) => {
+			if (!value || typeof value !== 'object') return null;
+			const row = value as ScoreRow;
+			return row.version === version &&
+				typeof row.parent === 'string' &&
+				typeof row.created_at === 'number' &&
+				parseScoreRow(family, row)
+				? row
+				: null;
 		}
-		version = row.parent;
+	);
+}
+
+export async function readLiveScoreConfig(db: D1Database, family: PuzzleId, cache?: KVNamespace) {
+	const defaultVersion = defaultScoreConfig(family).version;
+	try {
+		const live = await db
+			.prepare('SELECT version FROM score_live WHERE family=?')
+			.bind(family)
+			.first<{ version: string }>();
+		const liveVersion = live?.version ?? defaultVersion;
+		let version = liveVersion;
+		const seen = new Set<string>();
+		while (version !== defaultVersion && !seen.has(version) && seen.size < 32) {
+			seen.add(version);
+			const row = await scoreRow(db, family, version, cache);
+			if (!row) break;
+			const config = parseScoreRow(family, row);
+			if (config) {
+				if (version !== liveVersion) console.warn('morphi:score_live_invalid', family);
+				return { liveVersion, config };
+			}
+			version = row.parent;
+		}
+		if (liveVersion !== defaultVersion) console.warn('morphi:score_live_invalid', family);
+		return { liveVersion, config: defaultScoreConfig(family) };
+	} catch {
+		console.warn('morphi:score_config_unavailable', family);
+		return { liveVersion: defaultVersion, config: defaultScoreConfig(family) };
 	}
-	if (liveVersion !== defaultVersion) console.warn('morphi:score_live_invalid', family);
-	return { liveVersion, config: defaultScoreConfig(family) };
 }
 
 export async function readScoreConfig(
 	db: D1Database,
 	family: PuzzleId,
-	version?: string
+	version?: string,
+	cache?: KVNamespace
 ): Promise<ScoreConfig> {
-	if (!version) return (await readLiveScoreConfig(db, family)).config;
+	if (!version) return (await readLiveScoreConfig(db, family, cache)).config;
 	if (version === defaultScoreConfig(family).version) return defaultScoreConfig(family);
-	const row = await db
-		.prepare(
-			'SELECT version,parent,values_json,created_at FROM score_config WHERE family=? AND version=?'
-		)
-		.bind(family, version)
-		.first<ScoreRow>();
+	const row = await scoreRow(db, family, version, cache);
 	const config = row && parseScoreRow(family, row);
 	if (!config) throw new RunError('score_version', 409);
 	return config;

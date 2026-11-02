@@ -87,16 +87,53 @@ export async function removePending(id: string) {
 		durableStorage = false;
 	}
 }
-export async function startSession(family: PuzzleId, owner: string) {
+export interface ActiveRankedSession {
+	id: string;
+	expiresAt: number;
+	saving: boolean;
+}
+export class RankedSessionConflict extends Error {
+	constructor(public active: ActiveRankedSession) {
+		super('ranked_active');
+	}
+}
+export async function abandonSession(session: string, owner: string): Promise<void> {
+	const response = await fetch('/api/play/abandon', {
+		method: 'POST',
+		credentials: 'same-origin',
+		headers: { 'Content-Type': 'application/json' },
+		body: JSON.stringify({ session, ownerKey: owner }),
+		keepalive: true,
+		signal: AbortSignal.timeout(8000)
+	});
+	if (!response.ok) throw new Error('ranked_abandon_unavailable');
+}
+export async function startSession(family: PuzzleId, owner: string, takeoverSession?: string) {
 	const response = await fetch('/api/play/start', {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: { 'Content-Type': 'application/json' },
-		body: JSON.stringify({ family, ownerKey: owner }),
+		body: JSON.stringify({
+			family,
+			ownerKey: owner,
+			...(takeoverSession ? { takeoverSession } : {})
+		}),
 		signal: AbortSignal.timeout(8000)
 	});
 	if (!response.ok) {
-		const failure = (await response.json().catch(() => null)) as { code?: string } | null;
+		const failure = (await response.json().catch(() => null)) as {
+			code?: string;
+			active?: ActiveRankedSession;
+		} | null;
+		if (
+			response.status === 409 &&
+			failure?.code === 'ranked_active' &&
+			failure.active &&
+			typeof failure.active.id === 'string' &&
+			typeof failure.active.saving === 'boolean' &&
+			Number.isSafeInteger(failure.active.expiresAt)
+		)
+			throw new RankedSessionConflict(failure.active);
 		throw new Error(failure?.code === 'game_disabled' ? 'game_disabled' : 'ranked_unavailable');
 	}
 	const value = (await response.json()) as Record<string, unknown>;

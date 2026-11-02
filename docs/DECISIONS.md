@@ -943,3 +943,50 @@ race: inputs filled before hydration were reset to server values. The operator
 shell now exposes the same `onMount`/`data-ready` signal as AccountShell, and the
 audit test waits for it before navigation/input. Filtering, permissions and
 operator actions are unchanged; no arbitrary sleep or relaxed assertion was added.
+
+## Engine refactor Slice 3 — catalog server contract and local config (2026-11-02)
+
+Owner-confirmed Slice 2 base: `7a84063`. Only Slice 3 is authorized in this
+handoff. The manifest owns exact move fields/canonical mapping, existing replay
+and scoring, allowed leaderboard groups, and existing ranked opening/minimum
+allowances. The shared wire move type permits numeric family-owned fields.
+Server envelope/auth/ownership validation stays shared. No game rules, generation,
+validation outcomes, scoring logic, endings or sounds are changed.
+
+D1 family ids are text, including `anonymous_event.family`. Missing lifecycle
+rows are initialized from the discovered catalog without reviving disabled or
+deleted rows. Additive migration `0011_catalog_config_sessions.sql` retains all
+old tables/columns/defaults for one release; its new game/theme/style version
+and live-pointer tables have safe defaults in code rather than family seed
+lists. Version snapshots reject updates/deletes, matching scoring's existing
+immutability guards. The migration rebuilds the measurement table to remove its
+old two-family SQL check while preserving rows, other checks and indexes. It
+marks older unclaimed legacy tokens abandoned while preserving claimed
+retries. The owner-approved reset permission covers local D1 only, including
+this schema; no reset is required or performed.
+
+The local-only `CONFIG_CACHE` binding caches validated immutable version rows.
+Live pointers, lifecycle states, ranked caps and session ownership remain D1
+reads/conditions, so stale KV cannot bypass enforcement or postpone a rollback.
+KV failure falls through to D1; unavailable/invalid live config falls back to
+code defaults. Historical issued scoring versions fail closed if unavailable.
+Theme/style storage and readers prepare Slice 5; no theme publishing or selector
+v2 work is included. Dependency pins and compatibility date remain unchanged
+(Wrangler 4.151.3, Drizzle 0.45.4, TypeScript ~6.0.3).
+
+One active ranked session per account replaces implicit per-family supersession.
+Conditional issuance and exact-id takeover abandonment share a D1 batch; failure
+preserves the prior round. Home can explicitly abandon an unclaimed session.
+Valid claimed unfinished submissions retain their retry rights and lock until completion
+or the existing two-hour TTL. Starts/abandons still obey the existing abuse caps.
+A second browser gets a visible conflict and must explicitly take over.
+Terminal replay/timing rejections release the exact claim's lock and count toward
+the abandon cap without clearing its hash or claim time. Storage failures retain
+valid claims; a failed terminal-cleanup write remains retryable.
+
+API behavior checked against Cloudflare's [D1 batch transactions](https://developers.cloudflare.com/d1/worker-api/d1-database/#batch),
+[KV consistency](https://developers.cloudflare.com/kv/concepts/how-kv-works/),
+and [KV writes](https://developers.cloudflare.com/kv/api/write-key-value-pairs/),
+plus the installed Wrangler binding schema. No remote resource was created.
+The Slice 0 base-tag test remains deferred and outstanding. Written owner
+confirmation is required before Slice 4; no deployment is authorized.

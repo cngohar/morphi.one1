@@ -67,6 +67,8 @@ it('generates a novel id independently of its folder and rejects duplicate or mi
 		id: 'novel-id',
 		engineVersion: 'novel-1',
 		maxMoves: 1,
+		leaderboardGroups: ['novel-1'],
+		rankedTiming: null,
 		scoring: { version: 'novel-score-1', fields: ['novel'], defaults: { novel: 7 } },
 		messages: { 'novel.headline': 'Finished', 'novel.subline': 'Score {score}' },
 		ending: {
@@ -79,7 +81,7 @@ it('generates a novel id independently of its folder and rejects duplicate or mi
 		}
 	};
 	const declaration = (id: string | null) =>
-		`export const manifest = {...${JSON.stringify({ ...manifest, id })}, createRound: seed => ({seed}), replay: () => ({score:7,group:'novel-1',pairs:null,moves:1})};`;
+		`export const manifest = {...${JSON.stringify({ ...manifest, id })}, createRound: seed => ({seed}), parseMove: move => ({novel:move.novel}), replay: () => ({score:7,group:'novel-1',pairs:null,moves:1})};`;
 	const generate = () =>
 		spawnSync('bun', [resolve('scripts/generate-registry.ts')], {
 			cwd: fixture,

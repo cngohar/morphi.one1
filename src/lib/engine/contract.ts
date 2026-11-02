@@ -1,14 +1,7 @@
 /** Platform-free wire contract. Puzzle implementations never import each other. */
 export type PuzzleId = string;
 export interface Move {
-	index?: number;
-	trayIndex?: number;
-	x?: number;
-	y?: number;
-	pair?: number;
-	cell?: number;
-	stroke?: number;
-	at?: number;
+	[field: string]: number | undefined;
 }
 export interface CompletedRun {
 	scoreConfigVersion?: string;
@@ -35,6 +28,14 @@ export interface PuzzleManifest {
 	titleAfterEntrance?: boolean;
 	engineVersion: string;
 	maxMoves: number;
+	/** Validates exact wire fields and returns their canonical order. */
+	parseMove(move: Move): Move;
+	leaderboardGroups: readonly string[];
+	/** Null preserves games whose ranked score has no presentation allowance. */
+	rankedTiming: {
+		openingMs(result: ReplayedResult): number;
+		minimumSeconds(result: ReplayedResult): number;
+	} | null;
 	scoring: import('./scoring.js').ScoreDefinition;
 	messages: Readonly<Record<string, string>>;
 	createRound(seed: string): { seed: string };

@@ -1,3 +1,4 @@
+import type { Move } from '#lib/engine/contract.js';
 import type { ScoreValues } from '#lib/engine/scoring.js';
 import { scoring as scoringDefinition } from './scoring.js';
 import { createRng, shuffle } from '#lib/engine/rng.js';
@@ -123,7 +124,7 @@ export interface BlockRound {
 	endReason: BlockEndReason;
 }
 
-export interface BlockMove {
+export interface BlockMove extends Move {
 	trayIndex: number;
 	x: number;
 	y: number;

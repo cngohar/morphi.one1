@@ -196,7 +196,7 @@ Local account regressions (2026-10-23): `tests/integration/accounts.test.ts` and
 ## 11. Anti-cheat
 
 - Modified client, replayed submissions, bots with human-like timing → server replay, signed single-use seeds, and anomaly flags.
-- Seed shopping (starting many ranked sessions and abandoning the hard ones) → caps on session starts, one active session per type, and abandoned sessions counted.
+- Seed shopping (starting many ranked sessions and abandoning the hard ones) → caps on session starts, one active ranked session per account across all families, and abandoned sessions counted.
 - Multi-account farming → Turnstile, rate limits, and review tools.
 - Usernames with HTML, scripts, or look-alike Unicode → escaped everywhere, normalized for uniqueness, and run through the profanity filter.
 - Two submits of one session at once, a start racing a submit, a Worker crash between the claim and the insert, or expiry during scoring → at most one score; a retry with the same payload returns the same result; a different payload is rejected (plan section 9.2).
@@ -422,3 +422,37 @@ load enters the existing failed-start path without consuming the selector draw
 or discarding a finished result. Navigation cancels the wait and ignores late
 imports. Code loads before any ranked seed is issued. Check the Slice 2 unit,
 client-bundle and lazy-registry browser regressions.
+
+## Engine refactor Slice 3: catalog validation, config and ranked ownership
+
+- A manifest-only family supplies move parsing/canonical field order, replay,
+  scoring fields, leaderboard groups and ranked presentation/minimum timing.
+  Unknown families, malformed moves and client-supplied scores still fail closed.
+- Missing catalog lifecycle rows are inserted without changing existing disabled
+  or deleted rows. Family ids are plain text, including anonymous measurements.
+- Live config pointers and lifecycle/lock enforcement read D1. Only validated
+  immutable version snapshots use KV. Corrupt/missing cache entries read D1;
+  cache outages do not block a valid D1 read. Missing/invalid/unreachable live
+  config uses code defaults; invalid versions follow a bounded parent chain.
+  An explicitly issued historical scoring version never substitutes new defaults.
+- Two browsers starting the same account, even different families, produce one
+  active ranked session. The losing browser shows the conflict and offers
+  takeover. An explicit exact-id takeover and issuance commit together; a failed
+  issuance leaves the old session valid. Stale takeover/abandon requests cannot
+  release a replacement. Cross-family departures count toward the abandon cap.
+- A valid claimed unfinished replay holds the lock until completion or the two-hour
+  expiry and cannot be abandoned. Identical claimed retries survive expiry and
+  later starts. A completed result remains idempotent. Legacy older unclaimed
+  tokens are marked abandoned during migration; claimed retries are preserved.
+- Terminal replay/timing rejection releases only that session's lock and counts
+  toward the abandon cap. Its hash and claim time remain fixed, so retrying the
+  rejected payload cannot release a replacement. Transient storage failures keep
+  valid claims locked and retryable; a failed rejection-cleanup write is retryable.
+- Home sends an explicit ranked abandon independently of optional activity
+  reporting. Closing a tab does not rely on unload handlers; the next start
+  shows the conflict and the server TTL remains authoritative.
+
+Coverage: `tests/slices/slice3-catalog-server-validation.test.ts`,
+`tests/integration/runs.test.ts`, and the two-browser case in
+`tests/e2e/accounts.spec.ts`. Theme/style readers are storage contracts for
+Slice 5; the existing generation and selector algorithms remain unchanged.

@@ -6,7 +6,7 @@ export const GET: RequestHandler = async ({ url }) => {
 	const family = Object.keys(catalog).find((family) => family === url.searchParams.get('family'));
 	if (!family) return Response.json({ code: 'input' }, { status: 400 });
 	try {
-		return Response.json(await readScoreConfig(env.DB, family), {
+		return Response.json(await readScoreConfig(env.DB, family, undefined, env.CONFIG_CACHE), {
 			headers: { 'Cache-Control': 'no-store' }
 		});
 	} catch {

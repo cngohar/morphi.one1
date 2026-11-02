@@ -1,11 +1,13 @@
 import { catalog } from '#lib/catalog.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { RunError } from './runs.js';
+import { ensureCatalogFamily } from './config.js';
 
 type GameAction =
 	'game-enable' | 'game-disable' | 'game-delete' | 'game-restore' | 'game-hard-delete';
 
 export async function gameAvailable(db: D1Database, family: PuzzleId) {
+	await ensureCatalogFamily(db, family);
 	const row = await db
 		.prepare('SELECT state FROM game_lifecycle WHERE family=?')
 		.bind(family)
@@ -16,6 +18,7 @@ export async function gameAvailable(db: D1Database, family: PuzzleId) {
 export async function gameOverview(db: D1Database) {
 	return Promise.all(
 		Object.keys(catalog).map(async (family) => {
+			await ensureCatalogFamily(db, family);
 			const state = await db
 				.prepare('SELECT state,restore_until FROM game_lifecycle WHERE family=?')
 				.bind(family)
@@ -89,6 +92,7 @@ export async function changeGame(
 		days > 365
 	)
 		throw new RunError('input');
+	await ensureCatalogFamily(db, family);
 	const next =
 		action === 'game-enable'
 			? 'enabled'

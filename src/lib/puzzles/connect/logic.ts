@@ -1,3 +1,4 @@
+import type { Move } from '#lib/engine/contract.js';
 import type { ScoreValues } from '#lib/engine/scoring.js';
 import { scoring as scoringDefinition } from './scoring.js';
 import { createRng, shuffle } from '#lib/engine/rng.js';
@@ -13,7 +14,7 @@ export interface ConnectPair {
 	a: number;
 	b: number;
 }
-export interface ConnectMove {
+export interface ConnectMove extends Move {
 	pair: number;
 	cell: number;
 	stroke: number;

@@ -756,6 +756,14 @@ export const messages = {
 	'result.announce': 'Round ended. Score {score}. {summary}',
 	'result.next': 'Next puzzle',
 	'round.starting': 'Dealing your puzzle…',
+	'ranked.activeTitle': 'A ranked round is already active.',
+	'ranked.activeConflict':
+		'This account has a round open in another tab or browser. You can abandon that round and start here. Its result can still be saved as unranked.',
+	'ranked.savingConflict':
+		'Your previous ranked result is still saving. Retry when it finishes, or wait for the two-hour session to expire.',
+	'ranked.takeover': 'Abandon previous round and play here',
+	'ranked.retry': 'Retry ranked start',
+	'ranked.keepCurrent': 'Return Home',
 	'round.startError': 'Your puzzle could not start. Please try again.',
 	'result.home': 'Home'
 } as const;

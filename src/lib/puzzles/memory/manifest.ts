@@ -2,6 +2,7 @@ import { messages } from './messages.js';
 import type { PuzzleManifest } from '#lib/engine/contract.js';
 import type { ScoreValues } from '#lib/engine/scoring.js';
 import { scoring } from './scoring.js';
+import { memoryOpeningMs } from '#lib/round-timing.js';
 import { createMemoryRound, flipCard, resolveMismatch, scoreRound } from './logic.js';
 
 export const manifest = {
@@ -10,6 +11,15 @@ export const manifest = {
 	engineVersion: 'memory-1',
 	scoring,
 	maxMoves: 120,
+	parseMove(move) {
+		if (Object.keys(move).sort().join(',') !== 'index') throw new RangeError('move');
+		return { index: move.index };
+	},
+	leaderboardGroups: ['memory-1:6', 'memory-1:8', 'memory-1:10'],
+	rankedTiming: {
+		openingMs: (result) => memoryOpeningMs(result.pairs!),
+		minimumSeconds: (result) => result.pairs! * 0.4
+	},
 	messages,
 	createRound: createMemoryRound,
 	ending: {

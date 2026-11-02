@@ -54,6 +54,9 @@
 		enqueue,
 		syncProgress,
 		startSession,
+		abandonSession,
+		RankedSessionConflict,
+		type ActiveRankedSession,
 		durableStorage,
 		pendingRuns,
 		type SavedResult
@@ -166,6 +169,7 @@
 	);
 	let soundEnabled = $state(true);
 	let startError = $state(false);
+	let rankedConflict = $state<ActiveRankedSession | null>(null);
 	let startErrorFamily = $state<PuzzleFamily>(families[0]!);
 	let resultAnnouncement = $state('');
 	let roundNumber = $state(0);
@@ -240,14 +244,18 @@
 		return selector;
 	}
 
-	function startRound(): void {
-		void prepareRound().catch(() => {
+	function startRound(takeoverSession?: string): void {
+		void prepareRound(takeoverSession).catch(() => {
 			starting = false;
 			startError = true;
 			console.error('morphi:round_start_failed');
 		});
 	}
-	async function makeCandidate(chosen: PuzzleFamily, rankedGate: Promise<void>) {
+	async function makeCandidate(
+		chosen: PuzzleFamily,
+		rankedGate: Promise<void>,
+		takeoverSession?: string
+	) {
 		const view = await loadPuzzleView(puzzleViews[chosen], generationLifetime.signal);
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 		let seed = randomSeed();
@@ -260,14 +268,19 @@
 			await rankedGate;
 			if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 			try {
-				const issued = await startSession(chosen, nextOwner);
+				const issued = await startSession(chosen, nextOwner, takeoverSession);
 				seed = issued.seed;
 				nextTheme = issued.theme;
 				nextScoring = issued.scoring;
 				nextRunId = issued.id;
 				nextSession = issued.id;
 			} catch (error) {
-				if (error instanceof Error && error.message === 'game_disabled') throw error;
+				if (
+					takeoverSession ||
+					error instanceof RankedSessionConflict ||
+					(error instanceof Error && error.message === 'game_disabled')
+				)
+					throw error;
 				console.warn('morphi:ranked_start_unavailable');
 			}
 		}
@@ -344,10 +357,11 @@
 		if (!data || typeof data !== 'object' || !('available' in data) || data.available !== true)
 			throw new Error('game_unavailable');
 	}
-	async function prepareRound(): Promise<void> {
+	async function prepareRound(takeoverSession?: string): Promise<void> {
 		if (screen === 'game' || starting || (screen === 'result' && cardPhase !== 'result')) return;
 		starting = true;
 		startError = false;
+		rankedConflict = null;
 		let releaseRanked = () => {};
 		try {
 			sound.unlock();
@@ -359,14 +373,14 @@
 			const rankedGate = new Promise<void>((resolveGate) => {
 				releaseRanked = resolveGate;
 			});
-			const work = makeCandidate(chosen, rankedGate).then(
+			const work = makeCandidate(chosen, rankedGate, takeoverSession).then(
 				(value) => {
 					ready = true;
 					return { value };
 				},
-				() => {
+				(error: unknown) => {
 					ready = true;
-					return { value: null };
+					return { value: null, error };
 				}
 			);
 			if (screen === 'result') {
@@ -380,7 +394,7 @@
 			if (generationLifetime.signal.aborted) return;
 			if (!ready) cardPhase = 'waiting';
 			const prepared = await work;
-			if (!prepared.value) throw new Error('round_preparation_failed');
+			if (!prepared.value) throw prepared.error;
 			const { nextRound, nextView, nextTheme, nextOwner, nextSession, nextRunId, nextScoring } =
 				prepared.value;
 			if (generationLifetime.signal.aborted) return;
@@ -423,11 +437,12 @@
 			cardPhase = 'arriving';
 			cardReady = true;
 			measure('round_started', chosen);
-		} catch {
+		} catch (error) {
 			if (generationLifetime.signal.aborted) return;
+			if (error instanceof RankedSessionConflict) rankedConflict = error.active;
 			console.error('morphi:round_start_failed', { family: startErrorFamily });
 			stage?.stop();
-			startError = true;
+			startError = !rankedConflict;
 			cardPhase = result ? 'result' : 'failed';
 			revealed = Boolean(result);
 		} finally {
@@ -590,6 +605,11 @@
 	}
 
 	function goHome(): void {
+		if (screen === 'game' && completedQueuedId !== roundId && roundOwner && rankedSession) {
+			void abandonSession(rankedSession, roundOwner).catch(() =>
+				console.warn('morphi:ranked_abandon_failed')
+			);
+		}
 		if (screen === 'game' && completedQueuedId !== roundId && roundOwner && roundActivity) {
 			const owner = roundOwner,
 				id = roundId,
@@ -645,7 +665,7 @@
 		failed={startError}
 		{stack}
 		{playedCount}
-		onretry={startRound}
+		onretry={() => startRound()}
 	>
 		{#key roundId}
 			{#if round && View}
@@ -686,7 +706,7 @@
 					{syncStatus}
 					{savedScore}
 					{starting}
-					onnext={startRound}
+					onnext={() => startRound()}
 				/>
 			{/if}
 		{/snippet}
@@ -716,10 +736,54 @@
 		</div>
 	</footer>
 </div>
+{#if rankedConflict}
+	<aside class="ranked-conflict" aria-live="polite" aria-labelledby="ranked-conflict-title">
+		<h2 id="ranked-conflict-title">{t('ranked.activeTitle')}</h2>
+		<p>{t(rankedConflict.saving ? 'ranked.savingConflict' : 'ranked.activeConflict')}</p>
+		{#if !rankedConflict.saving}<button
+				type="button"
+				disabled={starting}
+				onclick={() => startRound(rankedConflict!.id)}>{t('ranked.takeover')}</button
+			>{/if}
+		<button type="button" disabled={starting} onclick={() => startRound()}
+			>{t('ranked.retry')}</button
+		>
+		<button type="button" onclick={goHome}>{t('ranked.keepCurrent')}</button>
+	</aside>
+{/if}
 {#if startError && result}<p class="start-error" role="alert">{t('round.startError')}</p>{/if}
 <p class="sr-only" aria-live="polite" aria-atomic="true">{resultAnnouncement}</p>
 
 <style>
+	.ranked-conflict {
+		position: fixed;
+		inset: 50% auto auto 50%;
+		transform: translate(-50%, -50%);
+		z-index: 40;
+		width: min(90vw, 420px);
+		max-height: 90dvh;
+		overflow: auto;
+		padding: 24px;
+		border: 2px solid var(--ink);
+		border-radius: 16px;
+		background: var(--surface);
+		color: var(--ink);
+		text-align: center;
+	}
+	.ranked-conflict h2 {
+		font-size: var(--text-20);
+		margin: 0 0 12px;
+	}
+	.ranked-conflict p {
+		margin: 0 0 16px;
+	}
+	.ranked-conflict button {
+		display: block;
+		width: 100%;
+		min-height: 44px;
+		margin-top: 8px;
+	}
+
 	.ending {
 		position: absolute;
 		inset: 0;

@@ -10,9 +10,12 @@ export const POST: RequestHandler = async (event) => {
 			body.ownerKey !== (await ownerKey(event.locals.user!.id))
 		)
 			throw new RunError('account_changed', 409);
-		return Response.json(await saveRun(env.DB, event.locals.user!.id, body.run), {
-			headers: { 'Cache-Control': 'private, no-store' }
-		});
+		return Response.json(
+			await saveRun(env.DB, event.locals.user!.id, body.run, undefined, env.CONFIG_CACHE),
+			{
+				headers: { 'Cache-Control': 'private, no-store' }
+			}
+		);
 	} catch (error) {
 		return playFailure(error);
 	}

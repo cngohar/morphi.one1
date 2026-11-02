@@ -17,6 +17,13 @@
 			"remote": false
 		}
 	],
+	"kv_namespaces": [
+		{
+			"binding": "CONFIG_CACHE",
+			"id": "local-morphi-config-cache",
+			"remote": false
+		}
+	],
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare"

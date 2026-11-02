@@ -1,3 +1,4 @@
+import { abandonRanked } from '../../src/lib/server/ranked-session.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readFile, readdir } from 'node:fs/promises';
 import { getPlatformProxy } from 'wrangler';
@@ -265,15 +266,23 @@ describe('accounts against local D1 and Better Auth', () => {
 		const committed = await startRanked(proxy.env.DB, user.id, 'memory', 'old-ip', old);
 		const run = solvedMemory(committed.seed, committed.id);
 		const saved = await saveRun(proxy.env.DB, user.id, run, old + 30_000);
-		const unresolved = await startRanked(proxy.env.DB, user.id, 'memory', 'old-ip', old + 60_000);
+		const unused = await startRanked(proxy.env.DB, user.id, 'memory', 'old-ip', old + 60_000);
+		await abandonRanked(proxy.env.DB, user.id, unused.id, old + 61_000);
+		const unresolved = await startRanked(proxy.env.DB, user.id, 'memory', 'old-ip', old + 120_000);
 		const recovery = solvedMemory(unresolved.seed, unresolved.id);
 		await db
 			.update(schema.playSession)
-			.set({ payloadHash: await digest(JSON.stringify(recovery)), claimedAt: old + 90_000 })
+			.set({ payloadHash: await digest(JSON.stringify(recovery)), claimedAt: old + 150_000 })
 			.where(eq(schema.playSession.id, unresolved.id));
-		const unused = await startRanked(proxy.env.DB, user.id, 'memory', 'old-ip', old + 120_000);
 		const superseded = await startRanked(proxy.env.DB, user.id, 'memory', 'current-ip', now - 2000);
-		const latest = await startRanked(proxy.env.DB, user.id, 'memory', 'current-ip', now - 1000);
+		const latest = await startRanked(
+			proxy.env.DB,
+			user.id,
+			'memory',
+			'current-ip',
+			now - 1000,
+			superseded.id
+		);
 		await saveRun(proxy.env.DB, user.id, solvedMemory(latest.seed, latest.id), now + 30_000);
 		await proxy.env.DB.prepare(
 			`CREATE TRIGGER reject_retention_audit BEFORE INSERT ON admin_audit

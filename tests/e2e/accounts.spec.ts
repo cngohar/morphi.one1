@@ -503,3 +503,67 @@ test('Google authorization leaves the real sign-in form with the canonical callb
 		)
 	).toBe(true);
 });
+
+test('a second browser must explicitly take over the account ranked session', async ({
+	browser
+}) => {
+	const { login } = await fixtureUser();
+	const first = await browser.newContext({ baseURL: 'http://localhost:5173' });
+	const second = await browser.newContext({ baseURL: 'http://localhost:5173' });
+	try {
+		await first.addCookies(login.cookies);
+		await second.addCookies(login.cookies);
+		const page = await first.newPage();
+		const peer = await second.newPage();
+		await chooseName(page, `p_${crypto.randomUUID().slice(0, 8)}`);
+		const firstStart = page.waitForResponse(
+			(response) => new URL(response.url()).pathname === '/api/play/start'
+		);
+		await page.goto('/play');
+		const started = await firstStart;
+		expect(started.status()).toBe(200);
+		const old = await started.json();
+		const { ownerKey } = started.request().postDataJSON();
+		const conflictResponse = peer.waitForResponse(
+			(response) => new URL(response.url()).pathname === '/api/play/start'
+		);
+		await peer.goto('/play');
+		expect((await conflictResponse).status()).toBe(409);
+		await expect(
+			peer.getByRole('heading', { name: 'A ranked round is already active.', exact: true })
+		).toBeVisible();
+		await expect(peer.locator('.game')).toHaveCount(0);
+		const takeover = peer.waitForResponse(
+			(response) => new URL(response.url()).pathname === '/api/play/start'
+		);
+		await peer
+			.getByRole('button', { name: 'Abandon previous round and play here', exact: true })
+			.click();
+		const replaced = await takeover;
+		expect(replaced.status()).toBe(200);
+		expect(replaced.request().postDataJSON().takeoverSession).toBe(old.id);
+		const replacement = await replaced.json();
+		await expect(peer.locator('.ranked-conflict')).toHaveCount(0);
+		await expect(peer.locator('.game')).toBeVisible();
+		// A delayed abandon from the original browser must leave the replacement locked.
+		const abandon = await first.request.post('/api/play/abandon', {
+			headers: { origin: 'http://localhost:5173' },
+			data: { ownerKey, session: old.id }
+		});
+		expect(abandon.status()).toBe(200);
+		const stillLocked = await first.request.post('/api/play/start', {
+			headers: { origin: 'http://localhost:5173' },
+			data: { ownerKey, family: 'memory' }
+		});
+		expect(stillLocked.status()).toBe(409);
+		expect((await stillLocked.json()).active.id).toBe(replacement.id);
+		const hostile = await first.request.post('/api/play/abandon', {
+			headers: { origin: 'https://untrusted.example' },
+			data: { ownerKey, session: replacement.id }
+		});
+		expect(hostile.status()).toBe(403);
+	} finally {
+		await first.close();
+		await second.close();
+	}
+});

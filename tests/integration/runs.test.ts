@@ -3,6 +3,7 @@ import {
 	restoreDeletedUser,
 	softDeleteUser
 } from '../../src/lib/server/user-lifecycle.js';
+import { abandonRanked, activeRanked } from '../../src/lib/server/ranked-session.js';
 import { memoryOpeningMs, CARD_RANKED_OPENING_MS } from '../../src/lib/round-timing.js';
 import { afterAll, beforeAll, describe, expect, it } from 'vitest';
 import { readFile, readdir } from 'node:fs/promises';
@@ -180,6 +181,42 @@ describe('completed progress and ranked runs against real local D1', () => {
 		await expect(
 			saveRun(proxy.env.DB, a, { ...connect(), moves: run.moves.slice(0, -1) }, now)
 		).rejects.toMatchObject({ code: 'invalid_replay' });
+	});
+	it('releases an invalid claimed replay and keeps an old retry from unlocking its replacement', async () => {
+		const a = await owner();
+		const issued = await startRanked(proxy.env.DB, a, 'memory', a, now);
+		const complete = memory(issued.seed, issued.id);
+		const invalid = {
+			...complete,
+			rankedSession: issued.id,
+			moves: complete.moves.slice(0, -1)
+		};
+		const hash = await digest(JSON.stringify(parseRun(invalid)));
+
+		expect(await activeRanked(proxy.env.DB, a, now)).toMatchObject({
+			id: issued.id,
+			saving: false
+		});
+		await expect(saveRun(proxy.env.DB, a, invalid, now + 30000)).rejects.toMatchObject({
+			code: 'invalid_replay'
+		});
+		expect(
+			await proxy.env.DB.prepare(
+				'SELECT payload_hash AS payloadHash,claimed_at AS claimedAt,abandoned_at AS abandonedAt FROM play_session WHERE id=?'
+			)
+				.bind(issued.id)
+				.first()
+		).toEqual({ payloadHash: hash, claimedAt: now + 30000, abandonedAt: now + 30000 });
+		expect(await activeRanked(proxy.env.DB, a, now + 30000)).toBeNull();
+
+		const replacement = await startRanked(proxy.env.DB, a, 'block', a, now + 30001);
+		await expect(saveRun(proxy.env.DB, a, invalid, now + 30002)).rejects.toMatchObject({
+			code: 'invalid_replay'
+		});
+		expect(await activeRanked(proxy.env.DB, a, now + 30002)).toMatchObject({
+			id: replacement.id,
+			saving: false
+		});
 	});
 	it('accepts a Connect all-pairs win with gaps and omits the grid bonus', async () => {
 		const a = await owner();
@@ -360,7 +397,7 @@ describe('completed progress and ranked runs against real local D1', () => {
 		await expect(
 			saveRun(proxy.env.DB, a, { ...run, seed: first.seed === '42' ? '43' : '42' }, now + 30000)
 		).rejects.toMatchObject({ code: 'session' });
-		const next = await startRanked(proxy.env.DB, a, 'memory', a, now + 1);
+		const next = await startRanked(proxy.env.DB, a, 'memory', a, now + 1, first.id);
 		await expect(saveRun(proxy.env.DB, a, run, now + 30000)).rejects.toMatchObject({
 			code: 'expired_or_superseded'
 		});
@@ -372,15 +409,24 @@ describe('completed progress and ranked runs against real local D1', () => {
 				now + 7200001
 			)
 		).rejects.toMatchObject({ status: 410 });
-		const fast = await startRanked(proxy.env.DB, a, 'memory', a, now + 2);
-		await expect(
-			saveRun(
-				proxy.env.DB,
-				a,
-				{ ...memory(fast.seed, fast.id), rankedSession: fast.id },
-				now + 1002
-			)
-		).rejects.toMatchObject({ code: 'too_fast' });
+		const fast = await startRanked(proxy.env.DB, a, 'memory', a, now + 7200002);
+		const fastRun = { ...memory(fast.seed, fast.id), rankedSession: fast.id };
+		await expect(saveRun(proxy.env.DB, a, fastRun, now + 7201002)).rejects.toMatchObject({
+			code: 'too_fast'
+		});
+		const fastSession = await proxy.env.DB.prepare(
+			'SELECT payload_hash AS payloadHash,claimed_at AS claimedAt,abandoned_at AS abandonedAt FROM play_session WHERE id=?'
+		)
+			.bind(fast.id)
+			.first();
+		expect(fastSession).toEqual({
+			payloadHash: await digest(JSON.stringify(parseRun(fastRun))),
+			claimedAt: now + 7201002,
+			abandonedAt: now + 7201002
+		});
+		expect(await activeRanked(proxy.env.DB, a, now + 7201002)).toBeNull();
+		const afterFast = await startRanked(proxy.env.DB, a, 'memory', a, now + 7201003);
+		expect((await activeRanked(proxy.env.DB, a, now + 7201003))?.id).toBe(afterFast.id);
 	});
 	it('resumes an interrupted claimed submission after expiry and a later start', async () => {
 		const a = await owner();
@@ -390,9 +436,15 @@ describe('completed progress and ranked runs against real local D1', () => {
 			.update(playSession)
 			.set({ payloadHash: await digest(JSON.stringify(parseRun(run))), claimedAt: now + 30000 })
 			.where(eq(playSession.id, run.id));
-		await startRanked(proxy.env.DB, a, 'memory', a, now + 40000);
+		await expect(
+			startRanked(proxy.env.DB, a, 'block', a, now + 40000, issued.id)
+		).rejects.toMatchObject({ code: 'ranked_active' });
+		await abandonRanked(proxy.env.DB, a, issued.id, now + 40000);
+		expect((await activeRanked(proxy.env.DB, a, now + 40000))?.saving).toBe(true);
+		const replacement = await startRanked(proxy.env.DB, a, 'memory', a, now + 7200000);
 		const saved = await saveRun(proxy.env.DB, a, run, now + 9000000);
 		expect(saved.ranked).toBe(true);
+		expect((await activeRanked(proxy.env.DB, a, now + 9000000))?.id).toBe(replacement.id);
 		expect(saved.score).toBe(
 			createMemoryRound(run.seed).pairs * 1000 -
 				Math.floor(
@@ -424,15 +476,119 @@ describe('completed progress and ranked runs against real local D1', () => {
 		]);
 		expect((await accountHistory(proxy.env.DB, a)).history.length).toBeLessThanOrEqual(2);
 	});
-	it('enforces durable seed-shopping caps including concurrent starts', async () => {
+	it('serializes account-wide starts, explicit takeover and stale-tab abandonment', async () => {
 		const a = await owner();
 		const starts = await Promise.allSettled(
-			Array.from({ length: 20 }, (_, i) => startRanked(proxy.env.DB, a, 'memory', a, now + i))
+			['memory', 'block', 'connect'].map((family) => startRanked(proxy.env.DB, a, family, a, now))
 		);
-		expect(starts.filter((result) => result.status === 'fulfilled').length).toBeLessThanOrEqual(11);
-		await expect(startRanked(proxy.env.DB, a, 'memory', a, now + 100)).rejects.toMatchObject({
+		const successful = starts.filter((result) => result.status === 'fulfilled');
+		expect(successful).toHaveLength(1);
+		expect(
+			starts
+				.filter((result) => result.status === 'rejected')
+				.every((result) => result.reason.code === 'ranked_active')
+		).toBe(true);
+		const old = successful[0]!.value;
+		await expect(startRanked(proxy.env.DB, a, 'block', a, now + 7200000 - 1)).rejects.toMatchObject(
+			{ code: 'ranked_active' }
+		);
+		const next = await startRanked(proxy.env.DB, a, 'connect', a, now + 100, old.id);
+		await abandonRanked(proxy.env.DB, a, old.id, now + 101);
+		expect((await activeRanked(proxy.env.DB, a, now + 101))?.id).toBe(next.id);
+		await expect(
+			startRanked(proxy.env.DB, a, 'memory', a, now + 102, old.id)
+		).rejects.toMatchObject({ code: 'ranked_active' });
+		const expired = await startRanked(proxy.env.DB, a, 'memory', a, now + 7200100);
+		expect((await activeRanked(proxy.env.DB, a, now + 7200100))?.id).toBe(expired.id);
+	});
+	it('counts cross-family abandons and takeovers toward the cap without losing the prior round', async () => {
+		const a = await owner();
+		let current = await startRanked(proxy.env.DB, a, 'memory', a, now);
+		await abandonRanked(proxy.env.DB, a, current.id, now + 1);
+		current = await startRanked(proxy.env.DB, a, 'connect', a, now + 2);
+		const families = ['memory', 'connect', 'block'];
+		for (let index = 2; index <= 10; index++) {
+			current = await startRanked(
+				proxy.env.DB,
+				a,
+				families[index % 3]!,
+				a,
+				now + index + 1,
+				current.id
+			);
+		}
+		await expect(
+			startRanked(proxy.env.DB, a, 'memory', a, now + 100, current.id)
+		).rejects.toMatchObject({ status: 429 });
+		expect((await activeRanked(proxy.env.DB, a, now + 101))?.id).toBe(current.id);
+		const row = await proxy.env.DB.prepare('SELECT abandoned_at FROM play_session WHERE id=?')
+			.bind(current.id)
+			.first<{ abandoned_at: number | null }>();
+		expect(row?.abandoned_at).toBeNull();
+	});
+	it('counts terminal replay failures toward the ranked abandonment cap', async () => {
+		const a = await owner();
+		for (let index = 0; index < 11; index++) {
+			const startedAt = now + index * 1000;
+			const issued = await startRanked(proxy.env.DB, a, 'memory', a, startedAt);
+			const complete = memory(issued.seed, issued.id);
+			const invalid = {
+				...complete,
+				rankedSession: issued.id,
+				moves: complete.moves.slice(0, -1)
+			};
+			const failedAt = startedAt + 500;
+			await expect(saveRun(proxy.env.DB, a, invalid, failedAt)).rejects.toMatchObject({
+				code: 'invalid_replay'
+			});
+			const row = await proxy.env.DB.prepare(
+				'SELECT abandoned_at AS abandonedAt FROM play_session WHERE id=?'
+			)
+				.bind(issued.id)
+				.first<{ abandonedAt: number | null }>();
+			expect(row?.abandonedAt).toBe(failedAt);
+		}
+		expect(await activeRanked(proxy.env.DB, a, now + 11000)).toBeNull();
+		await expect(startRanked(proxy.env.DB, a, 'memory', a, now + 11000)).rejects.toMatchObject({
 			status: 429
 		});
+	});
+	it('keeps a valid claimed run retryable when its completed-run insert fails', async () => {
+		const a = await owner();
+		const issued = await startRanked(proxy.env.DB, a, 'memory', a, now);
+		const run = { ...memory(issued.seed, issued.id), rankedSession: issued.id };
+		const hash = await digest(JSON.stringify(parseRun(run)));
+		const trigger = `reject_run_${issued.id.replaceAll('-', '')}`;
+		await proxy.env.DB.prepare(
+			`CREATE TRIGGER ${trigger} BEFORE INSERT ON completed_run WHEN NEW.id='${issued.id}' BEGIN SELECT RAISE(FAIL,'injected storage failure'); END`
+		).run();
+		try {
+			await expect(saveRun(proxy.env.DB, a, run, now + 30000)).rejects.toBeDefined();
+			expect(
+				await proxy.env.DB.prepare(
+					'SELECT payload_hash AS payloadHash,claimed_at AS claimedAt,abandoned_at AS abandonedAt FROM play_session WHERE id=?'
+				)
+					.bind(issued.id)
+					.first()
+			).toEqual({ payloadHash: hash, claimedAt: now + 30000, abandonedAt: null });
+			expect(await activeRanked(proxy.env.DB, a, now + 30000)).toMatchObject({
+				id: issued.id,
+				saving: true
+			});
+			await expect(startRanked(proxy.env.DB, a, 'block', a, now + 30001)).rejects.toMatchObject({
+				code: 'ranked_active'
+			});
+			await expect(
+				startRanked(proxy.env.DB, a, 'block', a, now + 30001, issued.id)
+			).rejects.toMatchObject({ code: 'ranked_active' });
+		} finally {
+			await proxy.env.DB.prepare(`DROP TRIGGER ${trigger}`).run();
+		}
+		await expect(saveRun(proxy.env.DB, a, run, now + 30002)).resolves.toMatchObject({
+			id: issued.id,
+			ranked: true
+		});
+		expect(await activeRanked(proxy.env.DB, a, now + 30002)).toBeNull();
 	});
 	it('reflects hidden scores, bans, and account deletion in public rankings', async () => {
 		const a = await owner();
