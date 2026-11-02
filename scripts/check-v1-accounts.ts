@@ -6,7 +6,7 @@ import { chromium } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { createAuth } from '../src/lib/server/auth.js';
 import { savePlayerName } from '../src/lib/server/players.js';
-import { createMemoryRound } from '../src/lib/catalog.js';
+import { catalog } from '../src/lib/catalog.js';
 import { saveRun } from '../src/lib/server/runs.js';
 import { encryptOperatorSecret, totpAt } from '../src/lib/server/operator.js';
 const output = 'build/v1-integration-review';
@@ -35,7 +35,7 @@ try {
 	const login = await helpers.login({ userId: user.id });
 	const name = `WWWWWWWWWWWW${user.id.replaceAll('-', '').slice(0, 8)}`;
 	await savePlayerName(proxy.env.DB, user.id, name);
-	const round = createMemoryRound('3');
+	const round = catalog.memory.createRound('3');
 	const moves = [...new Set(round.cards.map((card) => card.symbol))].flatMap((symbol) =>
 		round.cards.flatMap((card, index) => (card.symbol === symbol ? [{ index }] : []))
 	);

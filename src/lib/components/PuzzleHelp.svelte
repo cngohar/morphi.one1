@@ -9,7 +9,7 @@
 		onpause = () => {}
 	}: {
 		scoring?: import('#lib/engine/scoring.js').ScoreValues;
-		family: 'memory' | 'block' | 'connect';
+		family: import('#lib/engine/contract.js').PuzzleId;
 		onpause?: (paused: boolean) => void;
 	} = $props();
 	let dialog: HTMLDialogElement, anchor: HTMLElement;

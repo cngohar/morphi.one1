@@ -1,11 +1,11 @@
 import { expect, it } from 'vitest';
-import { PIECES } from '#lib/catalog.js';
+import { catalog } from '#lib/catalog.js';
 import { blend, contrast } from '#lib/engine/theme/color.js';
 import { generateTheme } from '#lib/engine/theme/generator.js';
 import { puzzleBackdrop } from './puzzle-backdrop.js';
 
 it('always scatters only the current puzzle objects without mutating its approved snapshot', () => {
-	const knownPieces = new Set(PIECES.map((piece) => piece.id));
+	const knownPieces = new Set(catalog.block.backdropPieces.map((piece) => piece.id));
 	const reached = new Set<string>();
 	const counts = new Set<number>();
 	const horizontal = new Set<number>();
@@ -34,7 +34,9 @@ it('always scatters only the current puzzle objects without mutating its approve
 				horizontal.add(Math.floor(item.x * 10));
 				if (family === 'memory') expect(item.kind).toBe('card');
 				else {
-					expect(knownPieces.has(item.kind as (typeof PIECES)[number]['id'])).toBe(true);
+					expect(
+						knownPieces.has(item.kind as (typeof catalog.block.backdropPieces)[number]['id'])
+					).toBe(true);
 					reached.add(item.kind);
 				}
 			}

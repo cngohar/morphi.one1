@@ -31,10 +31,13 @@ export interface ReplayedResult {
 }
 export interface PuzzleManifest {
 	id: PuzzleId;
+	selectionOrder?: number;
+	titleAfterEntrance?: boolean;
 	engineVersion: string;
 	maxMoves: number;
 	scoring: import('./scoring.js').ScoreDefinition;
 	messages: Readonly<Record<string, string>>;
+	createRound(seed: string): { seed: string };
 	ending: {
 		kind: 'completion' | 'run_over';
 		headlines: { default: string; cap?: string };

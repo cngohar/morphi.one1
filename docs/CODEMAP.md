@@ -1,213 +1,117 @@
 # CODEMAP.md
 
-A short map of the codebase so agents can find things without broad searches. Keep it under about 150 lines and update it at the end of every step or phase.
+Read this map before searching. Types and implementation live in code; decisions and historical evidence live in the linked docs.
 
-## Current build (combined next-phase work accepted locally)
+## Current scope
 
-Engine refactor Slice 0: `docs/morphi-engine-refactor-brief.md` is the approved
-single brief. v1.2 is complete locally; frozen base tag `v1.2-local-complete`
-points to `1303c9c4bdb1718bb558886dc43b7b48c597a02a` ("Record combined local
-acceptance"). See the Slice 0 report in `docs/PHASE_REPORTS.md`. Database-reset
-permission covers local D1 only; no reset was performed. The owner confirmed Slice 0 and authorized Slice 1 only. Slice 1's pre-start
-HEAD/tag commit checks matched that base. The deferred
-`tests/slices/slice0-base-tag.test.ts` remains outstanding, as explicitly carried
-forward by the owner. Slice 1 is implemented and fully verified locally; Slice 2
-requires written confirmation.
+- Engine refactor Slice 1 is owner-confirmed at `e906e87` ("Refactor puzzle identity and manifest-owned scoring"). Slice 2 is complete locally: generated headless catalog/lazy views and generic PlaySession. Final `bun run verify` passed 137 units, 37 D1/auth tests, six-runtime vectors, Worker smoke, bundle isolation and 176/176 browser tests. Evidence: `build/slice2/verify-final.log`, `docs/PHASE_REPORTS.md`. Stop for written owner confirmation before Slice 3.
+- Approved brief: `docs/morphi-engine-refactor-brief.md`. Frozen base tag `v1.2-local-complete` points to `1303c9c4bdb1718bb558886dc43b7b48c597a02a`. The Slice 0 base-tag test remains deferred and outstanding; no reset was performed. Owner edits to the brief are preserved.
+- v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/NEXT_PHASE_REVIEW.md`, `docs/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
+- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved engine brief controls this refactor. No deployment, production provisioning, secrets, DNS or Google changes are authorized.
+- The published guest/privacy version remains `b50a7a18-2e85-4406-bd40-77f27c4b3da3` at `https://morphi.one` and `https://morphi-one.electrasincng.workers.dev`. Cloudflare injects its intentional analytics beacon at delivery. Source repository: `https://github.com/cngohar/morphi.one1`; pushing does not authorize deployment.
 
-Block, Memory and Connect are dealt through the selector on `/play`; old family URLs redirect to Home in the local app. Work 5 pages and its assets-only guest candidate passed local verification but are not deployed. The owner accepted Work 5 and the overall Work 2 visual/device pass locally on 2026-10-31. The subsequent three next-phase slices and quick-review changes were accepted locally on 2026-11-01; production resources, eligibility and deployment remain separate. The live guest/privacy release remains the owner-approved 2026-10-24 version (`b50a7a18-2e85-4406-bd40-77f27c4b3da3`). Work 4 and Step 6 are accepted locally. Cloudflare Web Analytics is injected at delivery and absent from build files by design. See `docs/PHASE_REPORTS.md` for evidence.
+## Engine and registration
 
-Active plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference only. On 2026-10-23 the owner accepted the public-test result (45+ players, over 60% positive feedback) and requested the next-step approach. Step 5 closes by owner judgment with the measured replay gate waived; The owner approved Google sign-in, all account screens, and Step 6 implementation (`docs/STEP6.md`). Local account/session/name/deletion, durable progress retries, server-ranked runs, and all-time leaderboards are implemented. Owner PC/mobile functional review is accepted on 2026-10-24 (`STEP6_REVIEW.md`); global-release/admin-panel planning follows, with production operations/resource evidence still open. No account backend has been deployed. Owner-authorized private source repository: `https://github.com/cngohar/morphi.one1`; no automatic deployment.
+| Path                                                            | Purpose                                                                                                                      |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/engine/contract.ts`, `scoring.ts`                      | Platform-free string ids, moves, runs and manifest/scoring contracts; manifest `createRound` supplies headless generation    |
+| `src/lib/engine/rng.ts`, `src/lib/seeds.ts`                     | Pure SplitMix64 v1 and canonical seed handling; external cryptographic entropy                                               |
+| `src/lib/puzzles/<directory>/manifest.ts`                       | Puzzle id/version, generation, replay, scoring definition, messages, ending declaration and presentation/order metadata      |
+| `src/lib/puzzles/*/scoring.ts`, `messages.ts`                   | Family-owned coefficients/default versions and text bundles; no replay/manifest import cycle                                 |
+| `scripts/generate-registry.ts`                                  | Discovers/sorts packages and validates ids/endings; emits catalog and lazy view map, with no hardcoded logic or Game exports |
+| `src/lib/catalog.ts`                                            | Generated headless manifest catalog and typed message aggregation; no Svelte views                                           |
+| `src/lib/registry.ts`                                           | Generated app `puzzleViews[id]()` dynamic imports of each package's `View.svelte`                                            |
+| `src/lib/scoring.ts`                                            | Catalog-driven scoring defaults and validation for UI/server/admin                                                           |
+| `src/lib/selector.ts`                                           | Injected-RNG weighted family bag, minimum gap and stable peek; existing algorithm unchanged                                  |
+| `eslint.config.js`, `scripts/check-boundaries.ts`               | Engine purity, cross-puzzle/app boundaries and deliberate-violation self-checks                                              |
+| `scripts/validate-ending.ts`, `src/lib/ending-contract.test.ts` | Ending declaration validation against each family's supplied messages                                                        |
+| `tests/slices/slice1-manifest-scoring.test.ts`                  | Manifest discovery, ownership and isolated novel-family generation/type-check                                                |
+| `tests/slices/slice2-lazy-registry.test.ts`                     | Lazy discovery, novel id/folder mapping, invalid ids, bundle graph regressions, generic storage and bounded view loading     |
 
-| Path                                                                                                            | Purpose                                                                                                                                        |
-| --------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
-| `src/routes/+page.svelte`                                                                                       | Prerendered accepted landing page; the real loop now lives in `/play` and `PlaySession.svelte`                                                 |
-| `src/routes/+layout.svelte`                                                                                     | Global font and CSS imports                                                                                                                    |
-| `src/app.css`                                                                                                   | Design tokens: palette, type, motion, safe areas, block surface and piece colors                                                               |
-| `src/env.ts`                                                                                                    | SvelteKit 3 env schema; optional `ELEVENLABS_API_KEY` for the unused server stub, no secret in source                                          |
-| `src/lib/server/elevenlabs.ts`                                                                                  | Unused server-only ElevenLabs client stub; reads the optional key from `$app/env/private`                                                      |
-| `src/lib/engine/rng.ts`                                                                                         | Pure SplitMix64 v1, unbiased integer draws, Fisher-Yates shuffle, seed parsing; entropy lives in `src/lib/seeds.ts`                            |
-| `src/lib/puzzles/block-placement/logic.ts`                                                                      | Pure block rules: supply, fair opening trays, placement, clears, combo score, cap, replay                                                      |
-| `src/lib/puzzles/memory/logic.ts`                                                                               | Pure Memory rules: seeded generation, flip/match/mismatch, win, scoring; routed again for rotation                                             |
-| `src/lib/puzzles/memory/symbols.ts`                                                                             | Retained Memory symbol ids, labels, verified symbol colors                                                                                     |
-| `src/lib/screens/HomeScreen.svelte`                                                                             | Title, Play, best score, sound toggle                                                                                                          |
-| `src/lib/selector.ts`                                                                                           | Pure weighted family bag: RNG-selected first family, one pick per cycle, minimum gap, stable peek                                              |
-| `src/lib/puzzles/block-placement/Game.svelte`                                                                   | HUD/themes, 3 s locked arrival, responsive 8x8 board/tray, tap/drag/keyboard, ghost, clears, result                                            |
-| `src/lib/puzzles/memory/Game.svelte`                                                                            | Themed Memory: 3/4/5 s arrival, 3 s preview, hide before input/time; visible-time deadlines, flips and result                                  |
-| `src/lib/screens/ResultScreen.svelte`                                                                           | Approved result layout; score/best, Next, guest Google sign-in prompt, signed-in account link, local/pending/saved/ranked status               |
-| `src/lib/components/SoundToggle.svelte`                                                                         | Mute control                                                                                                                                   |
-| `src/lib/puzzles/memory/Card.svelte`                                                                            | Memory card motion, themed faces/back mark, reduced-motion states                                                                              |
-| `src/lib/puzzles/memory/Symbol.svelte`                                                                          | Retained inline SVG Memory shapes, no text                                                                                                     |
-| `src/lib/puzzles/memory/Confetti.svelte`                                                                        | Deterministic Memory win burst with theme colors, under one second                                                                             |
-| `src/lib/i18n/messages.ts`                                                                                      | Shell/site/admin copy plus generated family bundle aggregation, English only                                                                   |
-| `src/lib/puzzles/block-placement/themes.ts`                                                                     | Four fixed themes with per-theme backdrop, board cell/edge, picker tray/slot, pieces; seed selection; CSS serialization                        |
-| `src/lib/puzzles/memory/themes.ts`                                                                              | Same four theme ids for Memory: card back/edge/face/matched, back mark, symbol palette; seed selection; CSS serialization                      |
-| `src/lib/ui/sound.ts`                                                                                           | Static ElevenLabs cues through Web Audio; bounded voices, mute/background stop, no runtime generation                                          |
-| `src/lib/ui/storage.ts`                                                                                         | Per-game best keys, `morphi.block.hintSeen`, sound, with memory fallback                                                                       |
-| `src/lib/ui/active-delay.ts`                                                                                    | Pausable visible-time deadlines for Memory hide and mismatch transitions; cancellation on unmount                                              |
-| `src/lib/ui/format.ts`                                                                                          | Number and clock formatting                                                                                                                    |
-| `src/lib/engine/rng.test.ts`                                                                                    | RNG vectors, range, shuffle, seed tests                                                                                                        |
-| `src/lib/puzzles/block-placement/logic.test.ts`                                                                 | 27 block tests: vectors, fairness, clears, combo, cap, no-fit, replay                                                                          |
-| `src/lib/puzzles/memory/logic.test.ts`                                                                          | Retained Memory determinism, solvability, flip rules, mismatch, scoring tests                                                                  |
-| `src/lib/puzzles/block-placement/themes.test.ts`                                                                | Theme count, palette uniqueness, board/picker contrast floors, seed determinism, reachability, serialization                                   |
-| `src/lib/puzzles/memory/themes.test.ts`                                                                         | Memory card/symbol contrast, palette uniqueness, seed determinism, serialization; shared consistency in `src/lib/theme-consistency.test.ts`    |
-| `src/lib/ui/storage.test.ts`                                                                                    | Settings/best regressions: failed writes with readable stale data, later read blocking, recovery, malformed scores, per-game bests             |
-| `src/lib/ui/active-delay.test.ts`                                                                               | Visible-time deadline tests: background pauses, repeated resume, hidden start, cancellation, zero-delay motion                                 |
-| `static/demo/accounts.html`                                                                                     | Local review harness for five account screens at three viewport sizes; sample connection/auth states                                           |
-| `static/demo/accounts-screen.html`, `accounts.css`, `accounts.js`, `accounts.messages.js`, `accounts-review.js` | Responsive account prototype, isolated catalog and review controls; no backend                                                                 |
-| `static/demo/block.html`                                                                                        | Unlinked interactive visual sample for Block placement; not production code                                                                    |
-| `playwright.config.ts`                                                                                          | Project Playwright config: Chromium, dev-server reuse, `test-results/` output, 120 s timeout                                                   |
-| `tests/e2e/layout.spec.ts`                                                                                      | Four-viewport layout audit: boards, HUD, real Block result/sign-in prompt, no-scroll fit, Memory layout                                        |
-| `tests/e2e/reliability.spec.ts`                                                                                 | Failed-start retry, duplicate Play, final drag coordinates, secondary pointers, lost capture/blur, keyboard repeat, hidden mismatch hold       |
-| `wrangler.jsonc`                                                                                                | Cloudflare Worker `morphi-one`: built Worker, static assets, compatibility date/flags, logs/traces/issues; custom domain is dashboard-attached |
-| `vite.config.ts`                                                                                                | SvelteKit + Cloudflare adapter configuration                                                                                                   |
-| `vitest.config.ts`                                                                                              | Pure Node unit tests, independent of the SvelteKit/Cloudflare runtime; no Worker listener or secrets loading                                   |
+## Games and presentation
 
-## Account implementation
+| Path                                                                                     | Purpose                                                                                                                          |
+| ---------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/puzzles/block-placement/logic.ts`                                               | Deterministic 8×8 Block supply, placement, clears, combos, cap and replay                                                        |
+| `src/lib/puzzles/memory/logic.ts`                                                        | Deterministic Memory generation, flips, mismatch resolution, completion and scoring                                              |
+| `src/lib/puzzles/connect/logic.ts`                                                       | Deterministic all-pairs path game; empty cells are allowed, full-grid coverage is a score bonus                                  |
+| `src/lib/puzzles/*/Game.svelte`                                                          | Existing per-game rendering, input, entrances, timing, endings and sounds; unchanged by Slice 2                                  |
+| `src/lib/puzzles/*/View.svelte`                                                          | Lazy adapters from generic shell props to each Game and its existing result presentation                                         |
+| `src/lib/ui/puzzle-view.ts`                                                              | Common round/view/result props and eight-second view-load timeout with navigation cancellation                                   |
+| `src/lib/puzzles/*/themes.ts`, `memory/symbols.ts`                                       | Legacy themes and procedural adapters; retained Memory symbols                                                                   |
+| `src/lib/puzzles/memory/{Card,Symbol,Confetti}.svelte`                                   | Memory card presentation, inline symbols and deterministic win burst                                                             |
+| `src/lib/engine/theme/`                                                                  | Cosmetic OKLCH/Machado math, JSON recipes/styles, seeded silhouettes and bounded freshness; excluded from game determinism hash  |
+| `scripts/check-palettes.ts`, `theme-sheet.ts`                                            | Palette safety/freshness diagnostics and owner-approved contact sheet; `docs/evidence/v1.1-themes/`                              |
+| `src/lib/ui/solo-theme.ts`, `theme-worker.ts`, `theme-history.ts`                        | Worker solving, bounded IndexedDB history and fallback                                                                           |
+| `src/lib/ui/puzzle-backdrop.ts`, `backdrop-layout.ts`, `components/ThemeBackdrop.svelte` | Seeded current-game-only objects, exposed-space sizing, compact-layout hiding; Block piece data comes from its headless manifest |
+| `src/lib/ui/prepare-ahead.ts`                                                            | One speculative solo candidate, no selector draw/ranked reservation; generation does not download the next view                  |
+| `src/lib/ui/motion.ts`, `active-delay.ts`, `src/lib/round-timing.ts`                     | Sole anime.js wrapper, visible-time delays and server-known entrance/Card allowances                                             |
+| `src/lib/ui/sound.ts`, `static/audio/`, `scripts/generate-sounds.ts`                     | Original offline ElevenLabs cues, bounded Web Audio playback and provenance; no runtime generation                               |
+| `src/lib/ui/storage.ts`, `storage.test.ts`                                               | Id-derived versioned best/played keys, unchanged legacy bytes, sound/hint settings and blocked-storage fallback                  |
+| `src/lib/ui/format.ts`, `dismiss-dialog.ts`                                              | Number/clock formatting and guarded backdrop dismissal                                                                           |
 
-| Path                                                              | Purpose                                                                                                                              |
-| ----------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------ |
-| `src/hooks.server.ts`                                             | Per-request Worker-bound auth, signed session resolution, 16 KiB body cap, private/no-store responses, auth failure handling         |
-| `src/lib/server/auth.ts`                                          | Better Auth + Drizzle factory; Google-only, explicit CSRF/origin checks, encrypted provider tokens, D1 rate limiting, fresh deletion |
-| `src/lib/server/db/`, `migrations/`, `drizzle.config.ts`          | Core auth and public player-name schema, generated local D1 migrations                                                               |
-| `src/lib/server/players.ts`                                       | Public-name validation, case-insensitive uniqueness, account-owned edits                                                             |
-| `src/lib/server/request-body.ts`                                  | Bounded request streaming for account/auth mutations                                                                                 |
-| `src/routes/account/`                                             | Sign-in, name setup/edit, profile, sign-out, delete confirmation and server actions                                                  |
-| `src/lib/components/account/`, `src/lib/ui/account.css`           | Approved responsive account layouts and guarded form handling                                                                        |
-| `src/routes/+layout.server.ts`, `src/app.d.ts`                    | Minimal session status and typed request locals; no private user fields sent to public pages                                         |
-| `scripts/setup-accounts.ts`, `.dev.vars.example`                  | Ignored local secret creation and blank OAuth configuration example                                                                  |
-| `tests/integration/accounts.test.ts`, `vitest.accounts.config.ts` | Isolated real D1 + Better Auth session/security/deletion integration checks                                                          |
-| `tests/e2e/accounts.spec.ts`                                      | Account layouts/lifecycle, completed Memory guest sign-in flow, signed-in result/Next rotation, retained local best                  |
+## App shell and public pages
 
-## Privacy page
+| Path                                                                                            | Purpose                                                                                                                     |
+| ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
+| `src/routes/play/`, `src/lib/screens/PlaySession.svelte`                                        | Selector-only Mix loop; one generic round/view, id-derived names/bests/played flags, Card orchestration and durable results |
+| `src/lib/components/RoundStage.svelte`                                                          | Persistent Card, entrances, played stack, ending overlay and result stage                                                   |
+| `src/lib/screens/{HomeScreen,ResultScreen}.svelte`                                              | Approved landing/result views, actual account/save controls and Next                                                        |
+| `src/routes/+page.svelte`, `+page.ts`, `+layout.svelte`                                         | Prerendered Home and global styles/fonts; account status refresh stays private                                              |
+| `src/app.css`, `src/lib/ui/{v1,game-shell,card-shell}.css`                                      | Design tokens, accepted presentation and viewport-based game sizing                                                         |
+| `src/lib/components/{SiteHeader,SiteFooter,SoundToggle,PuzzleHelp,PuzzleGuide}.svelte`          | Viewport chrome, policy link, sound and catalog-backed help/scoring copy                                                    |
+| `src/lib/i18n/messages.ts`                                                                      | Shell/site/admin copy plus generated family bundle aggregation; English only                                                |
+| `src/params.ts`, `src/routes/[family=family]/`                                                  | Accepted legacy family slugs redirect Home; no per-type public game doors                                                   |
+| `src/routes/{how-it-works,about,faq}/`, `src/lib/content-explainers.ts`, `ContentBlocks.svelte` | Static explainer content and reusable rendering; no CMS                                                                     |
+| `src/routes/{privacy,terms,sitemap.xml,robots.txt}/`, `components/Seo.svelte`, `static/og/`     | Existing public policies, SEO assets and selector-only crawl policy                                                         |
+| `src/lib/content/privacy.ts`                                                                    | Owner contact and approved general-audience privacy copy                                                                    |
 
-- `src/routes/privacy/`: prerendered policy; account build includes an opt-in measurement control, guest artifact remains readable without app JS; intentional delivered Cloudflare beacon.
-- `src/lib/content/privacy.ts`, `src/lib/i18n/messages.ts`: owner contact/audience and structured sections; escaped catalog-backed policy copy.
-- `src/lib/components/SiteFooter.svelte`: Home/account/content privacy link, absent during gameplay.
-- `tests/e2e/privacy.spec.ts`, `docs/PRIVACY_REVIEW.md`: no-JavaScript/readability/navigation/layout checks, approved general audience, local readiness, pending deployment/Google/account gates.
+## Accounts, replay and operations
 
-- `src/lib/server/retention.ts`, `scripts/admin-local.ts`, `docs/PRIVACY_RETENTION.md`, `PRIVACY_REQUESTS.md`: tested local admin cleanup/request deletion and real retention/provider limits.
-- `scripts/prepare-public-privacy.ts`, `check-public-privacy.ts`, `wrangler.public-privacy.jsonc`, `docs/PUBLIC_PRIVACY_RELEASE.md`: hashed guest-only assets, local/live checks and owner-approved publication evidence.
-- `src/routes/+page.ts`: prerender Home in both builds; private session status refreshes through `/api/account/status`.
+| Path                                                                                                                               | Purpose                                                                                                                                                        |
+| ---------------------------------------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/hooks.server.ts`, `src/app.d.ts`, `src/routes/+layout.server.ts`                                                              | Request auth, bounded bodies, private/no-store responses and minimal account status                                                                            |
+| `src/lib/server/auth.ts`, `players.ts`, `request-body.ts`                                                                          | Better Auth/Drizzle factory, Google-only sessions, public names, CSRF/origin/rate guards and bounded input                                                     |
+| `src/lib/server/db/`, `migrations/`, `drizzle.config.ts`                                                                           | Local D1 schema/migrations for auth, public profiles, runs and operator controls                                                                               |
+| `src/routes/account/`, `src/lib/components/account/`, `src/lib/ui/account.css`                                                     | Real account lifecycle/profile layouts; AccountShell readiness is the house hydration pattern                                                                  |
+| `src/lib/ui/progress.ts`                                                                                                           | IndexedDB pending replays, ownership, guest import, retries and memory fallback                                                                                |
+| `src/lib/server/runs.ts`, `play-http.ts`, `src/routes/api/play/`                                                                   | Ranked issuance/caps, authoritative bounded replay, immutable scoring versions and availability; per-family server dispatch remains for Slice 3                |
+| `src/routes/api/progress/`, `src/routes/leaderboard/`                                                                              | Saved history and server-computed rankings                                                                                                                     |
+| `src/lib/server/operator*.ts`, `admin-totp.ts`, `src/routes/admin/`, `scripts/admin-local.ts`                                      | Protected local operator workspace, role/TOTP/freshness guards, owner enrollment and audit; operator shell exposes readiness for browser input synchronization |
+| `src/lib/server/{user-lifecycle,activity,admin-users,audit,moderation,games}.ts`                                                   | User controls, prospective activity, append-only audit, game lifecycle/statistics and scoring rollback                                                         |
+| `src/lib/ui/account-activity.ts`, `src/routes/api/play/activity/`                                                                  | Existing account round-start/abandon reports                                                                                                                   |
+| `src/lib/server/retention.ts`, `docs/PRIVACY_RETENTION.md`, `PRIVACY_REQUESTS.md`                                                  | Local cleanup/request deletion and documented retention/operator limits                                                                                        |
+| `src/lib/server/measurement.ts`, `src/lib/ui/measurement.ts`, `src/routes/api/measurement/`, `components/MeasurementChoice.svelte` | Default-off coarse measurement, consent/DNT/GPC and withdrawal; families validate against catalog                                                              |
+| `src/env.ts`, `src/lib/server/elevenlabs.ts`                                                                                       | Optional key schema and unused server stub; offline sound generation remains manual                                                                            |
 
-## Design docs
+## Build, verification and evidence
 
-- `docs/GOOGLE_OAUTH_PUBLIC.md`: production OAuth guide; owner reports setup complete, console/callback validation unrecorded; no account backend provisioned by the agent.
-- `docs/V1_RELEASE_CHECKLIST.md`, `V1_WORK.md`: active owner-supplied v2 handoff, local implementation/decisions and demo review; `V1_RELEASE_PLAN.md` is the historical proposal.
-- `static/demo/v1.html`, `v1-screen.html`, `v1-design.css`, `v1*.js`: Oct 25 public designs, hybrid doors, Foundation v2 profile; admin retained; synthetic data only. `scripts/demo-motion.ts`, `build-demo-motion.ts`, `check-v1-demo.ts`: anime wrapper/build and isolated demo checks (1 s / Home 1.5 s / help 0.5 s, centred phone boards, rotation/overflow/frame probes).
-- `docs/ADMIN_LOCAL.md`: local OS/TOTP moderation commands and owner enrollment/reset for the protected Stage 1 operator panel.
-- `docs/STEP6_WORK.md`: delivery checklist and global-release boundaries.
-- `docs/STEP6_MEASUREMENTS.md`: reproducible local replay CPU/heap measurements and limits.
-- `docs/GOOGLE_AUTH_SETUP.md`: Google OAuth setup/status, exact localhost callback, Testing vs public brand verification, and production prerequisites.
-- `docs/STEP6.md`: Google sign-in choice, account demo review, proposed implementation sequence, database/admin boundaries, and acceptance checks.
-- `docs/puzzles/_TEMPLATE.md`, `block-placement.md`: required brief structure and approved Block brief/build status.
-- `docs/PHASE_REPORTS.md`: game implementation, engineering reliability, agent setup, and production deployment evidence and known issues.
-- `docs/CLOUDFLARE_AGENT_SETUP.md`: project-local skills/MCP setup completed; OAuth and read-only Worker API access verified. No global configuration or deployment changes.
+| Path                                                                                                 | Purpose                                                                                                                                                         |
+| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vite.config.ts`, `scripts/check-lazy-bundle.ts`                                                     | Client chunk membership/static/dynamic graph in ignored `build/slice2/client-chunks.json`; rejects eager/transitive Game imports and cross-family view closures |
+| `package.json`, `vitest.config.ts`                                                                   | Bun commands and headless units, including Slice acceptance tests; verify runs bundle analysis after Worker build                                               |
+| `tests/integration/`, `vitest.accounts.config.ts`                                                    | Isolated real D1/auth, scoring, lifecycle, audit and activity integration tests                                                                                 |
+| `tests/vectors/`, `scripts/check-vectors.ts`, `measure-replay.ts`                                    | Unchanged known vectors in Node/Bun/Chromium/Firefox/WebKit/workerd and local replay-cost diagnostics                                                           |
+| `scripts/check-worker.ts`, `finish-build.ts`                                                         | Isolated built-Worker smoke and removal of demo assets from release output                                                                                      |
+| `playwright.config.ts`, `tests/e2e/`                                                                 | One browser worker; account, Card, game, recovery, operator, policy, selector and layout regressions across configured browsers                                 |
+| `tests/e2e/lazy-registry.spec.ts`                                                                    | Actual selected-view-only requests during preparation/Next, failed import retry and retained result                                                             |
+| `static/demo/`, `scripts/{card-proof,build-card-proof,check-v1-app,check-v1-demo}.ts`                | Reference demos and isolated visual checks; never production game logic                                                                                         |
+| `wrangler.jsonc`, `wrangler.public-privacy.jsonc`                                                    | Local-account Worker configuration versus published assets-only guest/privacy configuration; never deploy without specific approval                             |
+| `scripts/{prepare-public-privacy,check-public-privacy,setup-accounts}.ts`                            | Guest artifact validation and ignored local credential setup                                                                                                    |
+| `docs/PHASE_REPORTS.md`, `docs/DECISIONS.md`, `docs/EDGE_CASES.md`                                   | Acceptance evidence, locked choices and required failure behavior                                                                                               |
+| `docs/ADMIN_LOCAL.md`, `GOOGLE_AUTH_SETUP.md`, `GOOGLE_OAUTH_PUBLIC.md`, `CLOUDFLARE_AGENT_SETUP.md` | Owner-only local enrollment, Google setup/release gates and project-local Cloudflare tooling                                                                    |
+| `docs/{STEP6_WORK,STEP6_REVIEW,STEP6_MEASUREMENTS,V1_WORK,V1.1_WORK,NEXT_PHASE_REVIEW}.md`           | Historical accepted local implementation/review and remaining production boundaries                                                                             |
+| `docs/puzzles/`, `docs/morphi-v1.1-handoff-2026-10-26/`                                              | Approved per-game briefs, templates and historical v1.1 handoff                                                                                                 |
+| `docs/NEXT_PHASE_VISUAL_REVIEW.md`, `build/combined-review/`                                         | Earlier combined visual comparison and verification evidence                                                                                                    |
+| `build/slice1/`, `build/slice2/`                                                                     | Ignored local refactor logs, handoff, chunk graph and measurements; Slice 2 initial failed run is retained separately                                           |
 
-## Step 6 additions
+## Commands and conventions
 
-| Path                                                                                                       | Purpose                                                                                              |
-| ---------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------- |
-| `src/lib/engine/contract.ts`, `src/lib/seeds.ts`                                                           | Pure run/manifest contract; external cryptographic entropy                                           |
-| `src/lib/puzzles/<id>/`                                                                                    | Each puzzle owns logic, manifest, version, scoring data, messages, view, themes, README, and tests   |
-| `src/lib/catalog.ts`, `src/lib/registry.ts`, `scripts/generate-registry.ts`                                | Generated headless catalog and app views; run `bun run registry:generate`                            |
-| `eslint.config.js`, `scripts/check-boundaries.ts`                                                          | Engine purity and cross-puzzle/app import enforcement and deliberate-violation checks                |
-| `src/lib/server/runs.ts`, `play-http.ts`                                                                   | Bounded replay, owned history, ranked D1 claims/caps/recovery, public rankings, API guards           |
-| `src/routes/api/play/start/`, `src/routes/api/progress/`, `src/routes/leaderboard/`                        | Account-bound start/save/history endpoints and approved board screen                                 |
-| `src/lib/ui/progress.ts`                                                                                   | IndexedDB pending runs, opt-in guest import, account ownership, backoff, and memory fallback         |
-| `src/lib/server/moderation.ts`, `admin-totp.ts`, `scripts/admin-local.ts`                                  | Local-only moderation, OS/role/TOTP checks, transactional audits, ranked kill switch                 |
-| `tests/integration/runs.test.ts`, `tests/vectors/`, `scripts/check-worker.ts`, `scripts/measure-replay.ts` | D1 race/security tests, independent multi-runtime vectors, built Worker smoke, CPU/heap measurements |
-
-## v1 app integration (local only, owner-authorized Oct 25)
-
-- `src/routes/play/`, `src/lib/screens/PlaySession.svelte`: selector-only Mix loop, ranked starts/saves; family query parameters cannot select a game.
-- `src/params.ts`, `src/routes/[family=family]/`: legacy family slugs redirect Home. `/how-it-works`, `/about` and `/faq` use `src/lib/content-explainers.ts` and reusable `ContentBlocks.svelte`; no CMS.
-- `src/lib/ui/motion.ts`, `dismiss-dialog.ts`, `round-timing.ts`: sole application anime.js wrapper, safe backdrop gestures and server-known opening allowances. Template: `docs/puzzles/_TEMPLATE.md`.
-- `static/audio/`, `scripts/generate-sounds.ts`: 13 generated/trimmed cues and provenance; API key stays in ignored local configuration, generation is manual.
-- `src/lib/ui/v1.css`, `components/account/ProfileContent.svelte`: accepted presentation and real profile tabs/totals/history; future XP/achievement fixtures omitted.
-- `src/routes/terms/`, `sitemap.xml/`, `robots.txt/`, `components/Seo.svelte`, `static/og/`: local content/SEO; core/accounts/admin remain noindex. `scripts/finish-build.ts` removes demos from release assets.
-- `src/routes/admin/`, `server/operator.ts`, `operator-http.ts`, `operator-permissions.ts`, migrations `0003`–`0005`: protected local Stage 1 operator UI, owner-only CLI enrollment/reset, TOTP/recovery, bounds/RBAC/audits and deletion counts.
-- `src/routes/api/measurement/`, `server/measurement.ts`, `ui/measurement.ts`, `components/MeasurementChoice.svelte`: default-off coarse events, DNT/GPC, withdrawal and disclosed cleanup. `api/account/status/` refreshes static chrome privately.
-- `tests/e2e/entrance.spec.ts`, `dialogs.spec.ts`, `operator.spec.ts`, `tests/integration/operator.test.ts`: entrance/timer/lifecycle, backdrop and actual operator permission/action regressions.
-- `src/routes/admin/sign-in/`: Google plus the separate Morphi.One second factor; actionable rejected-code, temporary-lock and request-limit messages. Manual authenticator setup is documented in `docs/ADMIN_LOCAL.md`.
-- `scripts/check-v1-app.ts`, `build/v1-integration-review/`: actual/demo viewport captures and persistent verification logs. `docs/V1_WORK.md` / latest phase report hold delivery/release boundaries.
-
-## Conventions
-
-- v1.1 theme slice: `docs/V1.1_WORK.md` tracks the Oct 26 brief/order and pending owner taste gate. `src/lib/engine/theme/` owns cosmetic OKLCH/Machado math, immutable JSON recipes/styles, generated silhouettes and bounded freshness; puzzle rules stay integer-only. `scripts/check-palettes.ts` checks the documented presets plus 10,000 seeds/rounds per puzzle; `theme-sheet.ts` writes the 60-theme HTML/PNG in `docs/evidence/v1.1-themes/`.
-- `src/lib/ui/theme-history.ts`, `components/ThemeBackdrop.svelte`, puzzle `themes.ts` adapters: bounded IndexedDB history/fallback, own-item scatter and actual procedural rendering. Migration `0006` records versions/resolved snapshots on ranked starts/completions, preserving legacy queued runs. `tests/e2e/themes.spec.ts` covers actual views/snapshots and small silhouettes; six-runtime theme regression vectors live in `tests/vectors/themes.json`.
-- `src/lib/ui/game-shell.css`: owner-requested viewport sizing follow-up to the 1920×923 screenshot; replaces fixed board caps, names in the header and full-width bottom help/high-score panel. `solo-theme.ts` / `theme-worker.ts` move solving off the main thread; `storage.ts` distinguishes new families from completed zero-score games. Theme browser checks run in Chromium/Firefox/WebKit, including panel space-use and gap assertions.
-- Work 2 review slice: `ui/puzzle-backdrop.ts` / `components/ThemeBackdrop.svelte` render seeded current-puzzle-only motifs (two-dimensional scatter, 1–5 per side on wide layouts, hidden on compact/mobile); `ui/backdrop-layout.ts` measures exposed space when the Card reveals the backdrop and on later resize, including legacy blank layouts. `ui/prepare-ahead.ts` / `components/RoundStage.svelte` overlap one solo candidate with arrival, bound failures and cancel stale work; `theme-history.ts` bounds IndexedDB waits. Regression coverage: `tests/e2e/preparation.spec.ts`, `themes.spec.ts` and matching unit files.
-- `static/demo/card-proof.html`, `card-proof.css`, generated `card-proof.js`, `scripts/card-proof.ts`, `build-card-proof.ts`: interactive Memory/Block Card proofs with fresh random Card arrivals that settle/unfold at centre, fixed stack landings and score-only scrambling, isolated sample completion/slow/failure/static controls and phone stack review; regenerate with `bun run demo:card`. The sole anime wrapper is `ui/motion.ts`; `tests/e2e/card.spec.ts` captures four viewports in three browsers under `build/v1.1-card/`. The owner approved animations and actual Card integration on Oct 28; the remaining UI pass/device review stay separate. Future puzzle backdrop/loading contracts are in `docs/puzzles/_TEMPLATE.md`.
-
-- Actual Card integration: `components/RoundStage.svelte`, `ui/card-shell.css`, `screens/PlaySession.svelte` orchestrate the persistent frame, deferred game entrances, session stack and real result/save flow. `ui/motion.ts` shares typed element-based presentation with the isolated proof. `round-timing.ts`, migration `0007` and `server/runs.ts` keep ranked opening allowances server-owned and legacy-compatible. `tests/e2e/app-card.spec.ts` covers real Memory/result/Next at four sizes in three browsers.
-
-- Work 3 Connect (accepted locally on the owner's PC, 2026-10-29): `puzzles/connect/logic.ts`, `manifest.ts`, `Game.svelte`, `README.md` and `docs/puzzles/connect.md` own the seeded all-pairs path game with optional full-grid bonus, stroke replay, 2.5 s entrance and HUD. `PlaySession.svelte`, generated `registry.ts`/`catalog.ts`, selector and `server/runs.ts` integrate Mix, ranked saving and leaderboards. `ui/puzzle-backdrop.ts` supplies its dot-path-only scatter; `ui/motion.ts` owns Connect presentation. `scripts/generate-sounds.ts` created nine unique static cues documented in `static/audio/manifest.json`. `tests/vectors/connect.json`, `connect-partial.json`, `puzzles/connect/logic.test.ts`, `tests/integration/runs.test.ts` and `tests/e2e/connect.spec.ts` cover rules, six runtimes, D1 and browser flows. Captures: `docs/evidence/v1.1-connect/`; local logs: ignored `build/v1.1-connect/`. The Card UI/UX progression gate was closed by the owner; Connect local PC review is accepted; phone and public-release checks were not reported.
-
-- Path alias: `#lib` (declared in `package.json` `imports`); imports use explicit `.js` extensions.
-- Pure rules live in `src/lib/engine` and each `src/lib/puzzles/<id>/logic.ts`; no DOM, no `Date.now`, no `Math.random`, no approximated math. ESLint enforces this.
-- All visible text goes through `src/lib/i18n/messages.ts`.
-- Layout uses the tokens in `src/app.css`; no shadows, gradients, glows, or emoji.
-- Block engine state is plain data and replays from seed plus moves. The client never submits a score.
-- Block colors are shape-position safe: color is not the only cue.
-
-## Commands
-
-- Install: `bun install`; first accounts setup: `bun run accounts:setup`, `bun run cf:types`, `bun run db:migrate:local`
-- Dev: `bun run dev --host 0.0.0.0` (phone testing over the local network)
-- Type-check: `bun run check`
-- Lint and format check: `bun run lint`
-- Full local verification: `bun run verify`; boundary self-check: `bun run check:boundaries`
-- Replay vectors: `bun run test:vectors`; replay costs: `bun run measure:replay`; isolated built Worker: `bun run test:worker`
-- Unit tests: `bun run test:unit -- --run`; D1/auth integration: `bun run test:accounts`
-- Browser account/recovery/layout tests: `bun run test:e2e` (installs nothing; run `bunx playwright install chromium` once on a new machine)
-- Build: `bun run build`
-- Local Worker preview: `bun run preview:worker`
-- Validate the deploy bundle without uploading: `bun run deploy:dry`
-- Public guest/privacy deploy: `bunx wrangler deploy --config wrangler.public-privacy.jsonc` only with approval for that deployment; normal local-account config is not a guest release
-- Live Step 5 Worker: `https://morphi.one` (Worker `morphi-one`); `https://morphi-one.electrasincng.workers.dev` also works
-
-## Where to look for...
-
-- Block rules, score, supply, fairness, cap, replay: `src/lib/puzzles/block-placement/logic.ts`
-- Block themes, board/picker/piece palettes, seed selection: `src/lib/puzzles/block-placement/themes.ts`
-- Memory themes, card/symbol palettes, seed selection: `src/lib/puzzles/memory/themes.ts`
-- Block interaction, HUD, fill-only clear, hint, themed tray layout, end feel: `src/lib/puzzles/block-placement/Game.svelte`
-- Screen flow, family rotation, saved runs and results: `src/lib/screens/PlaySession.svelte`
-- Puzzle family selection: `src/lib/selector.ts`
-- Shared result card: `src/lib/screens/ResultScreen.svelte`
-- Seeded randomness: `src/lib/engine/rng.ts`
-- Text: `src/lib/i18n/messages.ts`
-- Colors and motion tokens: `src/app.css`
-- Storage keys: `src/lib/ui/storage.ts`
-- Memory game: `src/lib/puzzles/memory/logic.ts`, `src/lib/puzzles/memory/Game.svelte`, `src/lib/puzzles/memory/Card.svelte`, `src/lib/puzzles/memory/themes.ts`
-- Connect game: `src/lib/puzzles/connect/logic.ts`, `manifest.ts`, `Game.svelte`; design brief at `docs/puzzles/connect.md`
-- Layout regressions: `tests/e2e/layout.spec.ts`; screenshots and traces under the ignored `test-results/` directory
-- Deployment: `wrangler.jsonc`, `vite.config.ts`; custom domain and DNS are active, `www` and HTTP redirect to the apex
-
-- Work 4 scoring, Work 5 door withdrawal/explainers, and the Work 2 overall visual/device review are accepted locally. Verification and acceptance evidence are in `docs/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`. The later combined next-phase work is accepted locally as recorded below; no production provisioning or deployment is authorized.
-
-- Historical next-phase assessment: `docs/NEXT_PHASE_ASSESSMENT.md`. The owner later authorized local implementation of all three slices and one combined review; no deployment is authorized.
-
-- Next-phase slice 1 (local): `src/lib/server/user-lifecycle.ts`, `activity.ts`, `admin-users.ts`, `audit.ts` and `moderation.ts`, `migrations/0009_sticky_black_knight.sql`, `/admin/users` and `/admin/audit` implement account controls, prospective activity and append-only audit. `tests/integration/{runs,activity,audit}.test.ts` and `tests/e2e/operator.spec.ts` cover the paths. Full verification passed; combined owner acceptance is recorded below.
-
-- Owner direction (2026-10-31): finish next-phase slices 1–3 locally, then request one combined owner review; this historical review-pending direction is superseded by the acceptance below. See `docs/PHASE_REPORTS.md`.
-
-- Combined review handoff: `docs/NEXT_PHASE_REVIEW.md` (accepted locally). `/admin/users` overview/directory/detail tabs and `/admin/audit` overview/explorer use `admin-users.ts` and the existing operator route. `games.ts`, migration `0010_game_lifecycle.sql`, scoring rollback and availability-aware selector implement game controls. Ending declarations/checks live in manifests, `scripts/validate-ending.ts` and `ending-contract.test.ts`; PlaySession shows text before the 500 ms fold. Final combined verification passed on 2026-11-01 (174 browser checks); the owner accepted all three slices and quick-review changes locally on 2026-11-01 after PC review and mobile browser responsive emulation. Physical mobile review was not reported; device/browser models are unspecified.
-
-- Visual audit: `docs/NEXT_PHASE_VISUAL_REVIEW.md`; local ignored `build/combined-review/index.html` compares 63 before/after pairs. Final verification output: `build/combined-review/verify-final.log`.
-
-## Engine refactor Slice 1 (complete locally; awaiting owner confirmation)
-
-Full `bun run verify` passed: 131 unit tests, 37 D1/auth tests, six-runtime
-vectors, build/Worker smoke and 174/174 browser tests. Theme-sheet HTML/PNG stayed
-byte-identical; all 799 message keys/values match the frozen base. Evidence and
-handoff: `build/slice1/RESUME.md`, `build/slice1/verify-final.log` and the latest
-Slice 1 phase report. The interrupted log is preserved separately. Slice 2 has
-not started and requires written owner confirmation. The Slice 0 test remains
-deferred and outstanding.
-
-- `src/lib/engine/contract.ts`, `scoring.ts`: string puzzle ids and family-free scoring definitions/validation; existing engine versions and coefficients preserved.
-- `src/lib/puzzles/*/manifest.ts`, `scoring.ts`, `messages.ts`: manifest-owned scoring contract and family strings; tiny local scoring data modules avoid replay/manifest cycles.
-- `src/lib/scoring.ts`: catalog-driven family scoring access; server/admin/API family membership and lists also read the catalog.
-- `scripts/generate-registry.ts`, `validate-ending.ts`: discover manifests and aggregate typed message bundles; ending validation reads the supplied family bundle without importing stale generated output. Eager exports remain for Slice 2.
-- `tests/slices/slice1-manifest-scoring.test.ts`, `vitest.config.ts`: discovered manifest checks plus an isolated synthetic-family generation/type-check test, included in normal units/verify. Report and verification evidence: `docs/PHASE_REPORTS.md`, ignored `build/slice1/`.
+- Install: `bun install`; local setup: `bun run accounts:setup`, `bun run cf:types`, `bun run db:migrate:local`.
+- Dev: `bun run dev --host 0.0.0.0`; type-check: `bun run check`; format/lint: `bun run lint`.
+- Full gate: `bun run verify`; targeted commands: `test:unit -- --run`, `test:accounts`, `test:vectors`, `test:worker`, `test:e2e`, `check:boundaries`, `check:lazy-bundle`.
+- Generate registry: `bun run registry:generate`; palette diagnostics: `bun run test:palettes`; contact sheet: `bun run theme:sheet`.
+- Build/local Worker: `bun run build`, `bun run preview:worker`. Deployment and even a remote preview still require explicit owner approval.
+- App alias: `#lib`, explicit `.js` extensions. Pure engine imports only engine; puzzle packages never import each other; app reaches puzzles through generated files.
+- Core logic is deterministic integer-only; cosmetic theme math has a separate boundary. Every family owns its version, vectors, manifest, messages, view and README.
+- User-facing copy uses the catalog; motion uses the wrapper. Themes never affect rules/score. No user-agent layout sniffing, gradients, glows or shadows on game objects.

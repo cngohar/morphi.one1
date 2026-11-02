@@ -413,3 +413,12 @@ visible departure, preparation overlap, distinct Card origins and no replay.
 Coverage: `tests/e2e/entrance.spec.ts`, `dialogs.spec.ts`, `operator.spec.ts`,
 existing account/recovery/layout tests, `tests/integration/operator.test.ts`,
 `src/lib/server/measurement.test.ts`, and `scripts/check-worker.ts`.
+
+## Engine refactor Slice 2: lazy views
+
+Only the foreground selected view is imported; preparing the next solo round
+uses its headless manifest generator. A rejected or eight-second stalled view
+load enters the existing failed-start path without consuming the selector draw
+or discarding a finished result. Navigation cancels the wait and ignores late
+imports. Code loads before any ranked seed is issued. Check the Slice 2 unit,
+client-bundle and lazy-registry browser regressions.

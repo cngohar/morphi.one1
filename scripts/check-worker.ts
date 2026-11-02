@@ -10,7 +10,7 @@ import { testUtils } from 'better-auth/plugins';
 import { createAuth } from '../src/lib/server/auth.js';
 import { savePlayerName } from '../src/lib/server/players.js';
 import { digest } from '../src/lib/server/runs.js';
-import { createMemoryRound } from '../src/lib/catalog.js';
+import { catalog } from '../src/lib/catalog.js';
 import type { CompletedRun } from '../src/lib/engine/contract.js';
 
 const directory = await mkdtemp(join(tmpdir(), 'morphi-built-worker-'));
@@ -202,7 +202,7 @@ try {
 		throw new Error('built ranked start: ' + start.status + ' ' + (await start.text()));
 	check(true, 'built ranked start');
 	const issued = (await start.json()) as { id: string; seed: string; engineVersion: string };
-	const round = createMemoryRound(issued.seed);
+	const round = catalog.memory.createRound(issued.seed);
 	const moves = [...new Set(round.cards.map((card) => card.symbol))].flatMap((symbol) =>
 		round.cards.flatMap((card, index) => (card.symbol === symbol ? [{ index }] : []))
 	);

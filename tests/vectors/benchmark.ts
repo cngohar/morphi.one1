@@ -1,7 +1,7 @@
-import { catalog, createMemoryRound } from '../../src/lib/catalog.js';
+import { catalog } from '../../src/lib/catalog.js';
 import block from './block-cap.json';
 const memorySeed = '18446744073709551615';
-const round = createMemoryRound(memorySeed);
+const round = catalog.memory.createRound(memorySeed);
 const symbols = [...new Set(round.cards.map((card) => card.symbol))];
 const pairs = symbols.map((symbol) =>
 	round.cards.flatMap((card, index) => (card.symbol === symbol ? [index] : []))

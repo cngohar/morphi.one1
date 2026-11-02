@@ -16,7 +16,7 @@ import {
 	saveRun,
 	startRanked
 } from '../../src/lib/server/runs.js';
-import { createMemoryRound } from '../../src/lib/catalog.js';
+import { catalog } from '../../src/lib/catalog.js';
 import type { CompletedRun } from '../../src/lib/engine/contract.js';
 
 const settings: AuthSettings = {
@@ -425,7 +425,7 @@ describe('accounts against local D1 and Better Auth', () => {
 });
 
 function solvedMemory(seed: string, id: string): CompletedRun {
-	const round = createMemoryRound(seed);
+	const round = catalog.memory.createRound(seed);
 	return {
 		version: 1,
 		id,

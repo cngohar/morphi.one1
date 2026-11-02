@@ -1,9 +1,4 @@
-import {
-	catalog,
-	createMemoryRound,
-	createConnectRound,
-	replayBlockMoves
-} from '../../src/lib/catalog.js';
+import { catalog } from '../../src/lib/catalog.js';
 import { createRng } from '../../src/lib/engine/rng.js';
 import expected from './reference.json';
 import themes from './themes.json';
@@ -16,7 +11,7 @@ export async function verifyVectors() {
 	const vectors = {
 		rng: Array.from({ length: 5 }, () => rng.nextU64().toString(16)),
 		memory: expected.memory.map(({ seed }) => {
-			const round = createMemoryRound(seed);
+			const round = catalog.memory.createRound(seed);
 			const symbols = [...new Set(round.cards.map((card) => card.symbol))];
 			const moves = symbols.flatMap((symbol) =>
 				round.cards.flatMap((card, index) => (card.symbol === symbol ? [{ index }] : []))
@@ -58,7 +53,7 @@ export async function verifyVectors() {
 				[0, 2, 1],
 				[1, 6, 1]
 			];
-			const round = replayBlockMoves(
+			const round = catalog.block.replayRound(
 				'0',
 				coordinates.map(([trayIndex, x, y]) => ({ trayIndex: trayIndex!, x: x!, y: y! }))
 			);
@@ -91,7 +86,7 @@ export async function verifyVectors() {
 	if (JSON.stringify(themeVectors) !== JSON.stringify(themes))
 		throw new Error('Theme regression vector mismatch');
 	const connectVectors = connect.map(({ seed }) => {
-		const round = createConnectRound(seed);
+		const round = catalog.connect.createRound(seed);
 		const moves = round.solution.flatMap((path, pair) =>
 			path.map((cell, at) => ({ pair, cell, stroke: pair, at: pair * 100 + at }))
 		);
@@ -115,7 +110,7 @@ export async function verifyVectors() {
 	if (JSON.stringify(connectVectors) !== JSON.stringify(connect))
 		throw new Error('Connect vector mismatch');
 	const partialVectors = connectPartial.map(({ seed, shortcuts }) => {
-		const round = createConnectRound(seed);
+		const round = catalog.connect.createRound(seed);
 		const paths = round.solution.map((path, pair) => {
 			const shortcut = shortcuts.find((item) => item.pair === pair);
 			return shortcut ? [...path.slice(0, shortcut.from + 1), ...path.slice(shortcut.to)] : path;

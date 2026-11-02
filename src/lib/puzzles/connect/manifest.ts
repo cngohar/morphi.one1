@@ -1,5 +1,6 @@
 import { messages } from './messages.js';
 import type { PuzzleManifest } from '#lib/engine/contract.js';
+import type { ScoreValues } from '#lib/engine/scoring.js';
 import { scoring } from './scoring.js';
 import {
 	applyConnectMove,
@@ -11,10 +12,13 @@ import {
 
 export const manifest = {
 	id: 'connect',
+	selectionOrder: 2,
+	titleAfterEntrance: true,
 	engineVersion: CONNECT_ENGINE_VERSION,
 	scoring,
 	maxMoves: 1000,
 	messages,
+	createRound: createConnectRound,
 	ending: {
 		kind: 'completion',
 		headlines: { default: 'ending.connect.headline' },
@@ -23,7 +27,7 @@ export const manifest = {
 		continue: 'auto_500ms',
 		condition: 'Every pair is connected; filling every cell is not required.'
 	},
-	replay(seed, moves, seconds, scoring) {
+	replay(seed, moves, seconds, scoring?: ScoreValues) {
 		if (moves.length > this.maxMoves) throw new RangeError('move_limit');
 		let round = createConnectRound(seed);
 		for (const move of moves) {

@@ -602,6 +602,7 @@ test('admin can inspect and manage a user and filter and export the audit', asyn
 		).toBeNull();
 
 		await page.goto('/admin/audit');
+		await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
 		await expect(page.locator('.sidebar-group[open]')).toContainText(
 			'Open audit viewer and export'
 		);
@@ -612,6 +613,7 @@ test('admin can inspect and manage a user and filter and export the audit', asyn
 			.getByRole('link', { name: 'Open audit viewer and export' })
 			.click();
 		await expect(page.locator('input[name=actor]')).toBeVisible();
+		await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
 		await captureAdmin(page, 'audit-explorer');
 		await page.locator('input[name=actor]').fill(operator.id);
 		await page.locator('form[method=GET] input[name=audit_action]').fill('ban');

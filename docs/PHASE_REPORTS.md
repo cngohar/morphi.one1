@@ -1760,3 +1760,120 @@ the app type-check passed with zero errors and zero warnings.
 Production authorization remains separate. **CODEMAP:** Updated with the completed
 Slice 1 implementation, evidence paths and next-slice boundary. Saved handoff:
 `build/slice1/RESUME.md`. No automatic continuation to Slice 2 is authorized.
+
+## 2026-11-02 — Engine refactor Slice 2: lazy registry and generic PlaySession
+
+**Built:** The owner confirmed Slice 1 at `e906e87f2894934965a702bebfb716c62dc774cd`
+("Refactor puzzle identity and manifest-owned scoring") and authorized Slice 2
+only. Work started at that HEAD; the owner's existing brief edits were preserved.
+Slice 1's acceptance was not reopened.
+
+The generator now emits a headless manifest/message catalog and a separate lazy
+`puzzleViews` map, discovered from manifest ids and package directories. Neither
+file exports hardcoded puzzle logic or eager Game components. Each manifest
+references its existing round generator; Block's existing headless backdrop data
+and replay helper remain available through its manifest. Existing consumers and
+the Slice 1 synthetic fixture were migrated to this interface.
+
+PlaySession keeps one generic round and one generic view. Small per-package
+`View.svelte` adapters preserve each unchanged Game's props, completion callback
+and result presentation. Names, bests, played flags and best-score storage keys
+derive from ids, retaining existing key bytes/version suffixes. Manifest metadata
+preserves the original seeded selection order and Connect title reveal timing.
+Solo preparation still generates one candidate without drawing the selector or
+reserving ranked play; it does not download an unplayed view. Only the foreground
+view loads, before ranked issuance, with an eight-second timeout and cancellation
+on departure. Failed loading retains the pending family and any finished result.
+
+Added `tests/slices/slice2-lazy-registry.test.ts`, actual browser request/retry
+coverage, and a client chunk-graph report/check in `verify` after the Worker build.
+The checker rejects direct or transitive static Game imports from the shell and
+cross-family Game dependencies in a selected view. Its regression fixtures include
+indirect imports and merged views. Diagnostic output stays outside release assets.
+
+The first full browser run exposed a preexisting hydration race in the operator
+audit test. Trace inspection showed actor/action inputs populated, then reset
+during late hydration before submission, with no intervening data request. The
+operator shell now reuses AccountShell's readiness signal; the test waits for
+hydration before navigation/input. Filter logic and assertions are unchanged.
+The targeted test and the fresh full suite passed. Earlier failed-run logs remain
+in `build/slice2/`; the failed run was stopped before changing source.
+
+**Skipped:** Slice 3 and later slices, server dispatch/config refactoring, new
+puzzles, per-type indexable pages/game doors, deployment, provisioning, secrets,
+DNS, Google changes, database reset, commit and push. No puzzle rules, generation
+functions, validation, scoring logic/data, Game components, ending declarations,
+messages, vector data or sounds changed. Vector harness imports changed only to
+use manifest methods. The Slice 0 base-tag test remains deferred and outstanding;
+it was not added, run, passed or waived by Slice 2.
+
+**Known issues:** No functional regression remains from this slice's checks.
+View code loads on demand; real-phone/4G cold-load and Next timing remain
+unmeasured. Headless manifest/message aggregation remains eager; this slice's
+acceptance isolates Game views, not every headless engine module. No physical-device,
+production-load or launch-performance acceptance is claimed.
+
+**Decisions:** Reuse existing generators and unchanged Game components behind
+small adapters; preserve storage compatibility and seeded selector ordering.
+Use actual emitted static/dynamic chunk edges for the bundle gate and the existing
+shell readiness pattern for reliable input synchronization. No dependencies or
+pinned versions changed. See `docs/DECISIONS.md` and `docs/EDGE_CASES.md`.
+
+**Questions for the owner:** Written confirmation is required before Slice 3.
+No further implementation has started.
+
+| Acceptance item                                             | Evidence type and location                                                                                              | Result                                                                                                                                                                          |
+| ----------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Required Slice 1 starting point and scope                   | Initial HEAD `e906e87`; owner instruction and final local diff                                                          | Pass; Slice 2 only                                                                                                                                                              |
+| Generated headless catalog and lazy id-to-view map          | `scripts/generate-registry.ts`, generated files; Slice 2 unit discovery/synthetic-folder fixture                        | Pass; no hardcoded logic/eager Game exports                                                                                                                                     |
+| Generic session and id-derived state/storage                | `PlaySession.svelte`, per-game adapters, storage regression; full account/Card/result/browser coverage                  | Pass; one round/view pair, compatible saved keys                                                                                                                                |
+| Unplayed Game views excluded on first Play                  | Emitted graph `build/slice2/client-chunks.json`; `check:lazy-bundle`; `tests/e2e/lazy-registry.spec.ts`                 | Pass; shell isolated and 3 independent Game views; speculative preparation requests no other view                                                                               |
+| Load failure, retry, cancellation and retained result       | Slice 2 loader units, actual failed-import/retry browser test and existing preparation/recovery checks                  | Pass; no selector draw or lost result on failure                                                                                                                                |
+| Existing gameplay, endings, sounds and selector-only routes | Unchanged Game/logic/scoring/message/audio/vector files; six-runtime vectors; browser game/ending/sound/redirect checks | Pass                                                                                                                                                                            |
+| Operator audit input synchronization                        | `build/slice2/operator-hydration.log`; test 70 in final full browser run                                                | Pass; targeted 1/1 and final full suite                                                                                                                                         |
+| Full local verification                                     | `bun run verify`, `build/slice2/verify-final.log`                                                                       | Pass, exit 0: lint, zero-error/zero-warning types, boundaries, 30,000 palettes, 137 units, 37 D1/auth tests, six runtimes, isolated Worker smoke, bundle gate, 176/176 browsers |
+| Deferred Slice 0 base-tag test                              | Owner's explicit carry-forward; `tests/slices/slice0-base-tag.test.ts` remains absent                                   | Deferred and outstanding; not passed or waived                                                                                                                                  |
+| Production and next-slice boundary                          | Local command/diff review                                                                                               | No deployment/production changes; Slice 3 not started                                                                                                                           |
+
+**Measurements:** Bundle isolation is a structural acceptance gate, checked on
+one local production build, rather than a latency target. The following chunk
+sizes are diagnostics from that build (raw/gzip bytes, no network/device or
+median/p95 interpretation). Each contains only its own Game/View; shared chunks
+are additional. Evidence: `build/slice2/client-chunks.json` and built client output.
+
+| Family  | Independent chunk | Raw bytes | Gzip bytes |
+| ------- | ----------------- | --------- | ---------- |
+| Memory  | `zQ15A06p.js`     | 15,750    | 5,969      |
+| Block   | `D2Js6mbM.js`     | 17,873    | 6,852      |
+| Connect | `Brd-x7R9.js`     | 9,630     | 3,970      |
+
+The existing Next measurement ran on headless desktop Chromium, 1280×720, on an
+unthrottled localhost development server: preloaded solo Memory-to-selector
+transitions, fresh session each run, reduced motion, 5 runs. Next activation to
+next-round DOM measured **median 497.3 ms, p95 907.5 ms**; this excludes per-game
+entrance/preview. This remains a diagnostic goal, not phone/4G or public-launch
+acceptance. Evidence: `build/v1.1-card/preparation-measurements.json`. LCP/INP/CLS,
+physical devices and production resource targets were not measured in this slice.
+Palette diagnostics from this run are preserved in `build/slice2/palettes.json`;
+timing-only changes to the tracked historical palette artifact were removed.
+All 30,000 palette checks passed; freshness remains best effort with no new target.
+The full browser suite used `workers: 1` across Chromium, Firefox and WebKit and
+took 39.0 minutes; that is suite duration, not product performance.
+
+**Waivers:** None inferred. The Slice 0 base-tag test remains deferred and
+outstanding under the owner's explicit instruction; its missing automated
+freeze check remains an evidence gap, not a Slice 2 pass.
+
+**Owner responsibilities:** Review Slice 2 and provide written confirmation
+before any Slice 3 work. Production/resource, deployment, Google and physical-device
+release responsibilities remain separate; no new approval is inferred.
+
+**CODEMAP:** Updated and condensed to the current package/shell/testing map,
+including lazy registration, generic views, evidence and the Slice 3 stop boundary.
+
+**Owner Git handoff — 2026-11-02:** After the local closeout above, the owner
+explicitly requested updating the Git repository and pushing to GitHub. This
+authorizes committing and pushing the completed Slice 2 source, tests and docs,
+including the owner's existing brief edits. The earlier skipped commit/push
+entry records the original closeout. This handoff does not authorize Slice 3,
+deployment or production changes.

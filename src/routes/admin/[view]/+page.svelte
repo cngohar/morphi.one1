@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { untrack } from 'svelte';
+	import { onMount, untrack } from 'svelte';
 	import ScoringEditor from '#lib/components/ScoringEditor.svelte';
 	import Brand from '#lib/components/Brand.svelte';
 	import { resolve } from '$app/paths';
@@ -8,6 +8,10 @@
 	import { can } from '#lib/operator-permissions.js';
 	import type { PageProps } from './$types';
 	let { data, form }: PageProps = $props();
+	let ready = $state(false);
+	onMount(() => {
+		ready = true;
+	});
 	const views = [
 		'dashboard',
 		'users',
@@ -36,7 +40,7 @@
 	><title>{t(key(`nav.${data.view === 'privacy' ? 'operator' : data.view}`))} · Morphi.One</title
 	><meta name="robots" content="noindex" /></svelte:head
 >
-<div class="operator-shell">
+<div class="operator-shell" data-ready={ready}>
 	<aside class="operator-sidebar">
 		<a class="brand" href={resolve('/')}><Brand /></a>
 		<p class="eyebrow">{t('v1.admin.workspace')}</p>

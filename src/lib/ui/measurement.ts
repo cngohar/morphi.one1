@@ -1,4 +1,5 @@
 import { resolve } from '$app/paths';
+import type { PuzzleId } from '#lib/engine/contract.js';
 let memoryChoice: boolean | null = null;
 export function measurementAllowed() {
 	try {
@@ -14,7 +15,7 @@ export function measurementAllowed() {
 }
 export function measure(
 	event: 'play_clicked' | 'round_started' | 'round_completed' | 'next_clicked' | 'error',
-	family: 'memory' | 'block' | 'connect' | null = null,
+	family: PuzzleId | null = null,
 	code: 'start' | 'save' | 'view' | null = null
 ) {
 	if (!measurementAllowed()) return;

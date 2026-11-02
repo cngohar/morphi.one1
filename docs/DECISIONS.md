@@ -905,3 +905,41 @@ and registry exports remain until Slice 2. No dependency versions changed.
 The Slice 0 base-tag test remains deferred and outstanding under the owner's
 explicit Slice 1 instruction; the actual pre-start HEAD/tag checks both passed.
 No Slice 2 or production action is authorized.
+
+## Engine refactor Slice 2 — lazy registry and generic session (2026-11-02)
+
+The owner accepted Slice 1 at `e906e87` and authorized Slice 2 only. The generator
+emits a headless manifest catalog with typed message aggregation and an app-only
+map of dynamic `View.svelte` imports. Existing round generators are referenced
+by their manifests; no generator, replay, scoring, ending or sound logic changed.
+The Block manifest also retains the headless piece data and replay helper used
+by existing backdrop/vector consumers, replacing their old generated exports.
+
+PlaySession holds one generic round and one generic view. Each puzzle's small
+view adapter owns its existing result presentation and callback shape; its
+`Game.svelte` stays unchanged. Solo preparation uses the headless generator and
+does not fetch an unplayed view. The chosen view loads before ranked issuance,
+with an eight-second timeout and navigation cancellation. Failures retain the
+pending family and the finished result for retry. Manifest presentation metadata
+preserves the existing Connect title timing and seeded selector ordering.
+
+Family names, local bests and played flags derive from the puzzle id. Existing
+storage key bytes and scoring-version suffixes are preserved, so local bests do
+not need migration. The selector algorithm and weights remain unchanged.
+
+The build records client chunk membership and static/dynamic edges outside the
+release assets. Verification rejects a Game view in the shell's static import
+closure, including indirect imports, or a selected view containing another
+family's Game. No dependency versions changed. Current APIs checked against
+[Svelte dynamic component markup](https://svelte.dev/docs/svelte/basic-markup),
+[Svelte module scripts](https://svelte.dev/docs/svelte/svelte-files) and
+[Vite dynamic imports](https://vite.dev/guide/features).
+
+The Slice 0 base-tag test remains deferred and outstanding. Slice 3 requires
+the owner's written confirmation; no deployment or production action is included.
+
+The changed client module graph exposed an existing operator browser-test hydration
+race: inputs filled before hydration were reset to server values. The operator
+shell now exposes the same `onMount`/`data-ready` signal as AccountShell, and the
+audit test waits for it before navigation/input. Filtering, permissions and
+operator actions are unchanged; no arbitrary sleep or relaxed assertion was added.

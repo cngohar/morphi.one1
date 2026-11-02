@@ -1,14 +1,19 @@
 import { messages } from './messages.js';
 import type { PuzzleManifest } from '#lib/engine/contract.js';
+import type { ScoreValues } from '#lib/engine/scoring.js';
 import { scoring } from './scoring.js';
-import { BLOCK_ENGINE_VERSION, replayBlockMoves } from './logic.js';
+import { BLOCK_ENGINE_VERSION, createBlockRound, PIECES, replayBlockMoves } from './logic.js';
 
 export const manifest = {
 	id: 'block',
+	selectionOrder: 0,
 	engineVersion: BLOCK_ENGINE_VERSION,
 	scoring,
 	maxMoves: 300,
 	messages,
+	createRound: createBlockRound,
+	replayRound: replayBlockMoves,
+	backdropPieces: PIECES,
 	ending: {
 		kind: 'run_over',
 		headlines: { default: 'ending.block.noMoves', cap: 'ending.block.cap' },
@@ -18,7 +23,7 @@ export const manifest = {
 		condition:
 			'Cap when placements reach BLOCK_MOVE_CAP; otherwise no-fit when the tray is empty or no tray piece fits.'
 	},
-	replay(seed, moves, _seconds, scoring) {
+	replay(seed, moves, _seconds, scoring?: ScoreValues) {
 		for (const move of moves) {
 			if (
 				Object.keys(move).sort().join(',') !== 'trayIndex,x,y' ||
@@ -39,4 +44,7 @@ export const manifest = {
 			moves: round.placements
 		};
 	}
-} satisfies PuzzleManifest;
+} satisfies PuzzleManifest & {
+	replayRound: typeof replayBlockMoves;
+	backdropPieces: typeof PIECES;
+};

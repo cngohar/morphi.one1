@@ -3,22 +3,13 @@ import type { PuzzleId, PuzzleManifest } from './engine/contract.js';
 import { manifest as manifest0 } from './puzzles/block-placement/manifest.js';
 import { manifest as manifest1 } from './puzzles/connect/manifest.js';
 import { manifest as manifest2 } from './puzzles/memory/manifest.js';
-export const catalog: Record<PuzzleId, PuzzleManifest> = Object.fromEntries(
-	[manifest0, manifest1, manifest2].map((manifest) => [manifest.id, manifest])
-) as Record<PuzzleId, PuzzleManifest>;
+export const catalog: Record<PuzzleId, PuzzleManifest> & {
+	block: typeof manifest0;
+	connect: typeof manifest1;
+	memory: typeof manifest2;
+} = { ['block']: manifest0, ['connect']: manifest1, ['memory']: manifest2 };
 export const puzzleMessages = {
 	...manifest0.messages,
 	...manifest1.messages,
 	...manifest2.messages
 } as const;
-export {
-	createBlockRound,
-	replayBlockMoves,
-	BLOCK_SO_CLOSE_GAP
-} from './puzzles/block-placement/logic.js';
-export { PIECES } from './puzzles/block-placement/logic.js';
-export type { BlockRound, BlockEndReason } from './puzzles/block-placement/logic.js';
-export { createMemoryRound } from './puzzles/memory/logic.js';
-export type { MemoryRound } from './puzzles/memory/logic.js';
-export { createConnectRound } from './puzzles/connect/logic.js';
-export type { ConnectRound } from './puzzles/connect/logic.js';

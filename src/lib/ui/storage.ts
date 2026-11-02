@@ -1,13 +1,9 @@
 import { SCORE_DEFAULT_VERSION } from '#lib/engine/scoring.js';
-const BEST_KEYS = {
-	block: 'morphi.block.best',
-	memory: 'morphi.memory.best',
-	connect: 'morphi.connect.best'
-} as const;
+import type { PuzzleId } from '#lib/engine/contract.js';
 const SOUND_KEY = 'morphi.sound';
 const BLOCK_HINT_KEY = 'morphi.block.hintSeen';
 
-export type BestGame = keyof typeof BEST_KEYS;
+export type BestGame = PuzzleId;
 
 const memoryStore = new Map<string, string>();
 const failedWrites = new Set<string>();
@@ -45,7 +41,7 @@ function write(key: string, value: string): void {
 
 export function loadBestScore(game: BestGame = 'block', version = SCORE_DEFAULT_VERSION): number {
 	const stored = read(
-		version === SCORE_DEFAULT_VERSION ? BEST_KEYS[game] : `${BEST_KEYS[game]}.${version}`
+		version === SCORE_DEFAULT_VERSION ? `morphi.${game}.best` : `morphi.${game}.best.${version}`
 	);
 	const score = stored !== null && /^\d+$/.test(stored) ? Number(stored) : 0;
 	return Number.isSafeInteger(score) && score > 0 ? score : 0;
@@ -61,7 +57,7 @@ export function saveBestScore(
 	}
 
 	write(
-		version === SCORE_DEFAULT_VERSION ? BEST_KEYS[game] : `${BEST_KEYS[game]}.${version}`,
+		version === SCORE_DEFAULT_VERSION ? `morphi.${game}.best` : `morphi.${game}.best.${version}`,
 		String(score)
 	);
 }

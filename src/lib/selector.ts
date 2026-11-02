@@ -1,6 +1,6 @@
 import type { Rng } from '#lib/engine/rng.js';
 
-export type PuzzleFamily = 'block' | 'memory' | 'connect';
+export type PuzzleFamily = import('#lib/engine/contract.js').PuzzleId;
 
 export interface FamilyWeight<Family extends string = PuzzleFamily> {
 	family: Family;

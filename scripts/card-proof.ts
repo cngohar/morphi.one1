@@ -1,5 +1,5 @@
 /** Isolated visual proof. No play route, account/network calls or saved scores. */
-import { createMemoryRound, createBlockRound } from '../src/lib/catalog.js';
+import { catalog } from '../src/lib/catalog.js';
 import { generateTheme, type ResolvedTheme } from '../src/lib/engine/theme/generator.js';
 import { t, type MessageKey } from '../src/lib/i18n/messages.js';
 import { motion, cardProofMotion } from '../src/lib/ui/motion.js';
@@ -109,7 +109,7 @@ function renderBoard(value: ResolvedTheme) {
 			? stat('game.score', '0') + stat('game.time', '0:00') + stat('v1.game.pairs', '0 / 6')
 			: stat('block.score', '0') + stat('block.lines', '0') + stat('block.streak', '—');
 	if (currentFamily === 'memory') {
-		const round = createMemoryRound(value.seed);
+		const round = catalog.memory.createRound(value.seed);
 		const shown = [...round.cards.slice(0, 6), ...round.cards.slice(0, 6)];
 		node('.proof-grid').innerHTML = shown
 			.map(
@@ -118,7 +118,7 @@ function renderBoard(value: ResolvedTheme) {
 			)
 			.join('');
 	} else {
-		const round = createBlockRound(value.seed);
+		const round = catalog.block.createRound(value.seed);
 		node('.proof-grid').innerHTML = round.board
 			.map(
 				(_, i) =>

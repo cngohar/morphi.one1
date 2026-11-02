@@ -1,4 +1,4 @@
-import { PIECES } from '#lib/catalog.js';
+import { catalog } from '#lib/catalog.js';
 import { createRng, normalizeSeed } from '#lib/engine/rng.js';
 import { blend, contrast } from '#lib/engine/theme/color.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
@@ -25,7 +25,7 @@ export function puzzleBackdrop(theme: ResolvedTheme) {
 	const rightCount = 1 + rng.nextInt(5);
 	const items = Array.from({ length: leftCount + rightCount }, (_, i) => {
 		const band = i < leftCount ? 'left' : 'right';
-		const piece = PIECES[rng.nextInt(PIECES.length)];
+		const piece = catalog.block.backdropPieces[rng.nextInt(catalog.block.backdropPieces.length)];
 		const glyph = theme.symbols[rng.nextInt(theme.symbols.length)];
 		return {
 			band,

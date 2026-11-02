@@ -20,7 +20,7 @@
 		stats,
 		onnext
 	}: {
-		family: 'memory' | 'block' | 'connect';
+		family: import('#lib/engine/contract.js').PuzzleId;
 		title: string;
 		summary: string;
 		score: number;
@@ -42,13 +42,7 @@
 <main class="result-main result">
 	<section class="result-summary">
 		<p class="eyebrow">
-			{title} · {t(
-				family === 'memory'
-					? 'v1.game.memory'
-					: family === 'connect'
-						? 'v1.game.connect'
-						: 'v1.game.block'
-			)}
+			{title} · {t(`v1.game.${family}` as MessageKey)}
 		</p>
 		<h1>{t('v1.result.title')}</h1>
 		<section class="result-score" aria-label={t('result.score')}>

@@ -1,6 +1,5 @@
 <script lang="ts">
 	import { defaultScoreConfig, validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
-	let scoring = $state<ScoreConfig>(defaultScoreConfig('block'));
 	import { measure } from '#lib/ui/measurement.js';
 	import { reportAccountRound } from '#lib/ui/account-activity.js';
 	import SiteHeader from '#lib/components/SiteHeader.svelte';
@@ -22,33 +21,26 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { createRng } from '#lib/engine/rng.js';
+	import { puzzleViews } from '#lib/registry.js';
+	import type { Component } from 'svelte';
 	import {
-		BLOCK_SO_CLOSE_GAP,
-		createBlockRound,
-		type BlockEndReason,
-		type BlockRound
-	} from '#lib/registry.js';
-	import { createMemoryRound, type MemoryRound } from '#lib/registry.js';
-	import {
-		createConnectRound,
-		type ConnectRound,
-		ConnectGame as ConnectGameScreen
-	} from '#lib/registry.js';
+		loadPuzzleView,
+		type PuzzleRound,
+		type PuzzleResult,
+		type PuzzleViewProps
+	} from '#lib/ui/puzzle-view.js';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	import { createPuzzleSelector, type PuzzleFamily, type PuzzleSelector } from '#lib/selector.js';
-	import { BlockGame as BlockGameScreen, MemoryGame as GameScreen } from '#lib/registry.js';
 
 	import ResultScreen from '#lib/screens/ResultScreen.svelte';
-	import { formatDuration, formatNumber } from '#lib/ui/format.js';
+	import { formatNumber } from '#lib/ui/format.js';
 	import { sound } from '#lib/ui/sound.js';
 	import {
 		loadBestScore,
 		loadFamilyPlayed,
 		markFamilyPlayed,
-		loadBlockHintSeen,
 		loadSoundEnabled,
 		saveBestScore,
-		saveBlockHintSeen,
 		saveSoundEnabled
 	} from '#lib/ui/storage.js';
 
@@ -66,6 +58,11 @@
 		pendingRuns,
 		type SavedResult
 	} from '#lib/ui/progress.js';
+
+	const families = Object.values(catalog)
+		.sort((a, b) => (a.selectionOrder ?? 0) - (b.selectionOrder ?? 0))
+		.map((manifest) => manifest.id);
+	let scoring = $state<ScoreConfig>(defaultScoreConfig(families[0]!));
 
 	let { data }: { data: { account: { signedIn: boolean; ownerKey: string | null } } } = $props();
 	// svelte-ignore state_referenced_locally
@@ -142,18 +139,10 @@
 		}
 	}
 	let screen = $state<Screen>('home');
-	let family = $state<PuzzleFamily>('block');
-	let blockRound = $state<BlockRound | null>(null);
-	let memoryRound = $state<MemoryRound | null>(null);
-	let connectRound = $state<ConnectRound | null>(null);
-	const familyName = (value: PuzzleFamily) =>
-		t(
-			value === 'memory'
-				? 'v1.game.memory'
-				: value === 'connect'
-					? 'v1.game.connect'
-					: 'v1.game.block'
-		);
+	let family = $state<PuzzleFamily>(families[0]!);
+	let round = $state<PuzzleRound | null>(null);
+	let View = $state<Component<PuzzleViewProps> | null>(null);
+	const familyName = (value: PuzzleFamily) => t(`v1.game.${value}` as MessageKey);
 	let resolvedTheme = $state<ResolvedTheme | null>(null);
 	const generationLifetime = new AbortController();
 	const preparation = createPreparationSlot(async (chosen, signal) => {
@@ -163,26 +152,23 @@
 		return {
 			theme,
 			seed,
-			block: chosen === 'block' ? createBlockRound(seed) : null,
-			memory: chosen === 'memory' ? createMemoryRound(seed) : null,
-			connect: chosen === 'connect' ? createConnectRound(seed) : null
+			round: catalog[chosen].createRound(seed)
 		};
 	});
 	let result = $state<ResultData | null>(null);
 	let ending = $state<{ headline: string; subline: string } | null>(null);
 	let endingNode = $state<HTMLDivElement>();
-	let bests = $state<Record<PuzzleFamily, number>>({ block: 0, memory: 0, connect: 0 });
-	let played = $state<Record<PuzzleFamily, boolean>>({
-		block: false,
-		memory: false,
-		connect: false
-	});
+	let bests = $state<Record<PuzzleFamily, number>>(
+		Object.fromEntries(families.map((id) => [id, 0]))
+	);
+	let played = $state<Record<PuzzleFamily, boolean>>(
+		Object.fromEntries(families.map((id) => [id, false]))
+	);
 	let soundEnabled = $state(true);
 	let startError = $state(false);
-	let startErrorFamily = $state<PuzzleFamily>('block');
+	let startErrorFamily = $state<PuzzleFamily>(families[0]!);
 	let resultAnnouncement = $state('');
 	let roundNumber = $state(0);
-	let showHint = $state(false);
 	let selector: PuzzleSelector | null = null;
 	let starting = $state(false);
 	let helpOpen = $state(false);
@@ -221,16 +207,8 @@
 	}
 
 	onMount(() => {
-		bests = {
-			block: loadBestScore('block'),
-			memory: loadBestScore('memory'),
-			connect: loadBestScore('connect')
-		};
-		played = {
-			block: loadFamilyPlayed('block'),
-			memory: loadFamilyPlayed('memory'),
-			connect: loadFamilyPlayed('connect')
-		};
+		bests = Object.fromEntries(families.map((id) => [id, loadBestScore(id)]));
+		played = Object.fromEntries(families.map((id) => [id, loadFamilyPlayed(id)]));
 		soundEnabled = loadSoundEnabled();
 		sound.setEnabled(soundEnabled);
 		startRound();
@@ -256,11 +234,7 @@
 
 	function getSelector(): PuzzleSelector {
 		selector ??= createPuzzleSelector({
-			families: [
-				{ family: 'block', weight: 1 },
-				{ family: 'memory', weight: 1 },
-				{ family: 'connect', weight: 1 }
-			],
+			families: families.map((family) => ({ family, weight: 1 })),
 			rng: createRng(randomSeed())
 		});
 		return selector;
@@ -274,6 +248,8 @@
 		});
 	}
 	async function makeCandidate(chosen: PuzzleFamily, rankedGate: Promise<void>) {
+		const view = await loadPuzzleView(puzzleViews[chosen], generationLifetime.signal);
+		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 		let seed = randomSeed();
 		let nextTheme: ResolvedTheme | null = null;
 		let nextScoring = defaultScoreConfig(chosen);
@@ -323,17 +299,13 @@
 		}
 		if (accountsEnabled) nextTheme ??= generateTheme(seed, chosen);
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
-		const nextBlock = candidate?.block ?? (chosen === 'block' ? createBlockRound(seed) : null);
-		const nextMemory = candidate?.memory ?? (chosen === 'memory' ? createMemoryRound(seed) : null);
-		const nextConnect =
-			candidate?.connect ?? (chosen === 'connect' ? createConnectRound(seed) : null);
+		const nextRound = candidate?.round ?? catalog[chosen].createRound(seed);
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 
 		return {
 			chosen,
-			nextBlock,
-			nextMemory,
-			nextConnect,
+			nextRound,
+			nextView: view,
 			nextTheme,
 			nextOwner,
 			nextSession,
@@ -355,7 +327,7 @@
 			!('available' in data) ||
 			!Array.isArray(data.available) ||
 			data.available.some(
-				(family: unknown) => family !== 'block' && family !== 'memory' && family !== 'connect'
+				(family: unknown) => typeof family !== 'string' || !Object.hasOwn(catalog, family)
 			)
 		)
 			throw new Error('game_unavailable');
@@ -409,24 +381,15 @@
 			if (!ready) cardPhase = 'waiting';
 			const prepared = await work;
 			if (!prepared.value) throw new Error('round_preparation_failed');
-			const {
-				nextBlock,
-				nextMemory,
-				nextConnect,
-				nextTheme,
-				nextOwner,
-				nextSession,
-				nextRunId,
-				nextScoring
-			} = prepared.value;
+			const { nextRound, nextView, nextTheme, nextOwner, nextSession, nextRunId, nextScoring } =
+				prepared.value;
 			if (generationLifetime.signal.aborted) return;
 			if (!nextSession) await assertGameAvailable(chosen);
 			// Commit rotation only after generation succeeds. Retry keeps the same family.
 			getSelector().next();
 			family = chosen;
-			blockRound = nextBlock;
-			memoryRound = nextMemory;
-			connectRound = nextConnect;
+			round = nextRound;
+			View = nextView;
 			resolvedTheme = nextTheme;
 			scoring = nextScoring;
 			bests = { ...bests, [chosen]: loadBestScore(chosen, scoring.version) };
@@ -438,13 +401,6 @@
 			runMoves = [];
 			savedScore = null;
 			syncStatus = nextOwner ? 'progress.unranked' : '';
-
-			if (chosen === 'block') {
-				showHint = !loadBlockHintSeen();
-				saveBlockHintSeen();
-			} else {
-				showHint = false;
-			}
 
 			roundNumber += 1;
 			result = null;
@@ -486,20 +442,20 @@
 		saveSoundEnabled(soundEnabled);
 	}
 
-	function recordResult(
-		score: number,
-		previousBest: number,
-		title: string,
-		summary: string,
-		game: PuzzleFamily,
-		announcement: string,
-		stats: { label: string; value: string }[],
-		endingValues: Record<string, string | number>,
+	function recordResult({
+		score,
+		title,
+		summary,
+		announcement,
+		stats,
+		endingValues,
 		cap = false
-	): void {
+	}: PuzzleResult): void {
+		const game = family;
+		const previousBest = bests[game];
 		const isNewBest = score > previousBest;
 		const gap = Math.max(0, previousBest - score);
-		const isSoClose = !isNewBest && previousBest > 0 && gap > 0 && gap <= BLOCK_SO_CLOSE_GAP;
+		const isSoClose = !isNewBest && previousBest > 0 && gap > 0 && gap <= 250;
 
 		if (isNewBest) {
 			bests = { ...bests, [game]: score };
@@ -587,12 +543,7 @@
 		// The policy-only guest release keeps the existing best/settings behavior;
 		// recording account-importable replays belongs to the later account release.
 		if (!accountsEnabled) return;
-		const seed =
-			family === 'block'
-				? blockRound!.seed
-				: family === 'memory'
-					? memoryRound!.seed
-					: connectRound!.seed;
+		const seed = round!.seed;
 		const run: CompletedRun = {
 			scoreConfigVersion: scoring.version,
 			version: 1,
@@ -638,87 +589,6 @@
 			});
 	}
 
-	function finishBlockRound(
-		score: number,
-		lines: number,
-		pieces: number,
-		endReason: BlockEndReason,
-		streak: number
-	): void {
-		const summary = t('block.result.summary', { lines, pieces });
-		const endSummary = t(endReason === 'cap' ? 'block.result.cap' : 'block.result.noFit', {
-			summary
-		});
-		recordResult(
-			score,
-			bests.block,
-			t('block.result.title'),
-			endSummary,
-			'block',
-			t('block.result.announce', { score: formatNumber(score), summary }),
-			[
-				{ label: t('block.lines'), value: formatNumber(lines) },
-				{ label: t('v1.game.moves'), value: formatNumber(pieces) },
-				{ label: t('block.streak'), value: streak > 0 ? `×${streak}` : '—' }
-			],
-			{ score: formatNumber(score), pieces: formatNumber(pieces) },
-			endReason === 'cap'
-		);
-	}
-
-	function finishMemoryRound(score: number, seconds: number, moves: number): void {
-		const summary = t('result.summary', {
-			pairs: memoryRound?.pairs ?? 0,
-			moves,
-			time: formatDuration(seconds)
-		});
-		recordResult(
-			score,
-			bests.memory,
-			t('result.title'),
-			summary,
-			'memory',
-			t('result.announce', { score: formatNumber(score), summary }),
-			[
-				{ label: t('v1.game.pairs'), value: String(memoryRound?.pairs ?? 0) },
-				{ label: t('v1.game.mismatches'), value: String(moves - (memoryRound?.pairs ?? 0)) },
-				{ label: t('game.time'), value: formatDuration(seconds) }
-			],
-			{ pairs: memoryRound?.pairs ?? 0, time: formatDuration(seconds) }
-		);
-	}
-
-	function finishConnectRound(
-		score: number,
-		seconds: number,
-		strokes: number,
-		filled: number
-	): void {
-		const filledPercent = connectRound
-			? Math.round((filled * 100) / (connectRound.size * connectRound.size))
-			: 0;
-		const summary = t('connect.result.summary', {
-			pairs: connectRound?.pairs.length ?? 0,
-			time: formatDuration(seconds),
-			filled: filledPercent
-		});
-		recordResult(
-			score,
-			bests.connect,
-			t('connect.result.title'),
-			summary,
-			'connect',
-			t('connect.result.announce', { score: formatNumber(score) }),
-			[
-				{ label: t('v1.game.pairs'), value: String(connectRound?.pairs.length ?? 0) },
-				{ label: t('connect.filled'), value: `${filledPercent}%` },
-				{ label: t('connect.strokes'), value: String(strokes) },
-				{ label: t('game.time'), value: formatDuration(seconds) }
-			],
-			{ filled: filledPercent }
-		);
-	}
-
 	function goHome(): void {
 		if (screen === 'game' && completedQueuedId !== roundId && roundOwner && roundActivity) {
 			const owner = roundOwner,
@@ -733,9 +603,8 @@
 		stopCardWaits();
 		stage?.stop();
 		preparation.dispose();
-		blockRound = null;
-		memoryRound = null;
-		connectRound = null;
+		round = null;
+		View = null;
 		result = null;
 		ending = null;
 		resultAnnouncement = '';
@@ -762,7 +631,7 @@
 		{soundEnabled}
 		ontogglesound={toggleSound}
 		onhome={goHome}
-		gameTitle={revealed && (family !== 'connect' || cardReady || screen === 'result')
+		gameTitle={revealed && (!catalog[family].titleAfterEntrance || cardReady || screen === 'result')
 			? familyName(family)
 			: ''}
 		gameMode
@@ -779,53 +648,21 @@
 		onretry={startRound}
 	>
 		{#key roundId}
-			{#if family === 'block' && blockRound}
-				<BlockGameScreen
+			{#if round && View}
+				<View
+					{round}
 					{resolvedTheme}
 					scoring={scoring.values}
-					round={blockRound}
 					{roundNumber}
-					best={bests.block}
-					{showHint}
-					{soundEnabled}
-					ontogglesound={toggleSound}
-					onfinish={finishBlockRound}
-					onhome={goHome}
-					onmove={(move) => runMoves.push(move)}
-					oncomplete={(score) => persistRound(0, score)}
-					traySide="right"
-					entranceReady={cardReady}
-					onready={gameReady}
-				/>
-			{:else if family === 'memory' && memoryRound}
-				<GameScreen
-					{resolvedTheme}
-					scoring={scoring.values}
+					best={bests[family]}
 					paused={helpOpen || !cardReady}
-					round={memoryRound}
-					{roundNumber}
 					{soundEnabled}
-					ontogglesound={toggleSound}
 					{rankedRound}
+					ontogglesound={toggleSound}
+					onfinish={recordResult}
+					onhome={goHome}
 					onmove={(move) => runMoves.push(move)}
 					oncomplete={(score, seconds) => persistRound(seconds, score)}
-					onfinish={finishMemoryRound}
-					onhome={goHome}
-					entranceReady={cardReady}
-					onready={gameReady}
-				/>
-			{:else if family === 'connect' && connectRound}
-				<ConnectGameScreen
-					{resolvedTheme}
-					scoring={scoring.values}
-					round={connectRound}
-					{roundNumber}
-					paused={helpOpen || !cardReady}
-					{rankedRound}
-					onmove={(move) => runMoves.push(move)}
-					oncomplete={(score, seconds) => persistRound(seconds, score)}
-					onfinish={finishConnectRound}
-					onhome={goHome}
 					entranceReady={cardReady}
 					onready={gameReady}
 				/>

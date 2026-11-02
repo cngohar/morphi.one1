@@ -1,14 +1,17 @@
 import { messages } from './messages.js';
 import type { PuzzleManifest } from '#lib/engine/contract.js';
+import type { ScoreValues } from '#lib/engine/scoring.js';
 import { scoring } from './scoring.js';
 import { createMemoryRound, flipCard, resolveMismatch, scoreRound } from './logic.js';
 
 export const manifest = {
 	id: 'memory',
+	selectionOrder: 1,
 	engineVersion: 'memory-1',
 	scoring,
 	maxMoves: 120,
 	messages,
+	createRound: createMemoryRound,
 	ending: {
 		kind: 'completion',
 		headlines: { default: 'ending.memory.headline' },
@@ -17,7 +20,7 @@ export const manifest = {
 		continue: 'auto_500ms',
 		condition: 'All pairs have been matched.'
 	},
-	replay(seed, moves, seconds, scoring) {
+	replay(seed, moves, seconds, scoring?: ScoreValues) {
 		let round = createMemoryRound(seed);
 		if (moves.length > 12 * round.pairs) throw new RangeError('move_limit');
 		for (const move of moves) {
