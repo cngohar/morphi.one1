@@ -1,5 +1,5 @@
 <script lang="ts">
-	import { catalog } from '#lib/catalog.js';
+	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
 	import type { PuzzleId } from '#lib/engine/contract.js';
 	import type { ScoreValues } from '#lib/engine/scoring.js';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
@@ -13,8 +13,8 @@
 		section?: 'all' | 'how' | 'scoring' | 'scoring-tips' | 'right';
 	} = $props();
 	const key = (suffix: string) => `v1.game.${family}.${suffix}` as MessageKey;
-	const fields = $derived(catalog[family].scoring.fields);
-	const values: ScoreValues = $derived(scoring ?? catalog[family].scoring.defaults);
+	const fields = $derived(puzzleMetadata[family].scoring.fields);
+	const values: ScoreValues = $derived(scoring ?? puzzleMetadata[family].scoring.defaults);
 	function scoreValue(row: number) {
 		const field = fields[row - 1];
 		if (!field) return t(key(`value${row}`));

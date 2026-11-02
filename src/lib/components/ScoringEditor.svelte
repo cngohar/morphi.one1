@@ -3,7 +3,7 @@
 	import AccountForm from './account/AccountForm.svelte';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	import { SCORE_MAX, type ScoreConfig } from '#lib/engine/scoring.js';
-	import { catalog } from '#lib/catalog.js';
+	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
 	import type { PuzzleId } from '#lib/engine/contract.js';
 	let {
 		config
@@ -77,9 +77,9 @@
 				<label>
 					<span>{t('scoring.rollbackVersion')}</span>
 					<select name="sourceVersion" required>
-						{#each config.versions.filter((version) => version.version !== config.liveVersion || version.version === catalog[config.family].scoring.version) as version (version.version)}
+						{#each config.versions.filter((version) => version.version !== config.liveVersion || version.version === puzzleMetadata[config.family].scoring.version) as version (version.version)}
 							<option value={version.version}
-								>{version.version === catalog[config.family].scoring.version
+								>{version.version === puzzleMetadata[config.family].scoring.version
 									? t('scoring.defaultVersion')
 									: `${version.version} · ${new Date(version.createdAt!).toLocaleString()}`}</option
 							>

@@ -1993,3 +1993,116 @@ brief edits. The skipped commit/push entry above records the original closeout.
 This handoff does not accept Slice 3, authorize Slice 4, or authorize deployment
 or production changes. Existing verification evidence is retained; app tests
 were not repeated for this Git handoff.
+
+## Engine refactor Slice 4 — Selector v2 (2026-11-02)
+
+**Scope/base:** Owner confirmed Slice 3 and authorized Slice 4 only, starting at
+`4cffb4e` ("Refactor catalog validation, config and ranked sessions"). Slice 3's
+acceptance/evidence is retained. Slice 5 has not started and requires written
+owner confirmation.
+
+**Built:** Replaced recursive backtracking and repeated weighted scans with one
+weighted exponential key per family, eight fixed radix passes and greedy gap
+repair bounded by five recent families. Every family appears exactly once per
+completed stable-eligibility cycle; no immediate repeat and
+`gap = clamp(floor(eligible / 3), 1, 5)` hold across cycles. The existing sole-family
+repeat exception remains. A 2x discovery weight favors never-completed families
+without extra appearances. D1 config weights, lifecycle availability and manifest
+viewport/orientation flags filter selection between rounds, retaining an active
+board through resize.
+
+The generated 443-byte TypeScript family index contains selection metadata only.
+Browser scoring/presentation/messages use generated data projections; the eager
+manifest catalog remains server-side. The chosen/pending procedural variant pool
+loads through a dynamic manifest import using its unchanged `createRound`;
+preparation still defers the next view and never consumes a pick. Pool/view loads
+share the existing cancellation and eight-second timeout path.
+
+Versioned localStorage snapshots retain eligible ids, queue, recent families and
+cycle position per guest/account on this browser. A peeked refill and successful
+round commit save immediately; failed generation retains the pending family.
+Invalid/stale snapshots reset safely and blocked storage uses the existing memory
+fallback. The actual refresh test verifies the saved snapshot is read intact,
+then advances exactly one queued family. Retention and edge cases are documented.
+
+**Skipped:** Slice 5 and later work, new variants/games, mid-round checkpoint or
+ranked-resume UI (assigned to Slice 6), per-type public pages/game doors, commit
+and push. No puzzle rules, generation, validation, scoring logic, gameplay,
+endings or sounds changed. No deployment, provisioning, secrets, DNS or Google
+changes occurred. Existing owner edits to the brief were preserved.
+**The Slice 0 base-tag test remains deferred and outstanding.**
+
+**Known issues:** Storage clearing, another browser/profile, or simultaneous tabs
+can bypass/reorder local selector continuity; this is not anti-cheat. Blocked
+storage cannot preserve the in-memory fallback through reload. Eligibility
+changes reconcile a partial cycle; if its new gap is impossible, a fresh cycle
+retains recent-family exclusions. Phone/4G and production resource behavior are
+unmeasured. No unresolved Slice 4 failure remains in the authorized checks.
+
+**Decisions:** No dependencies or pins changed. The linear bound comes from fixed
+radix passes and bounded repair, supported by deterministic work counters and
+adversarial timing. Existing procedural pools are reused without new variant
+selection or puzzle parameters. See `docs/DECISIONS.md`, `docs/EDGE_CASES.md` and
+`docs/PRIVACY_RETENTION.md`.
+
+**Verification method:** Fast checks only. Lint, zero-warning type-check and
+boundaries passed. The broad unit rerun passed 157/158; one existing Connect seed
+loop exceeded its 5-second timeout under concurrent host load (5.13 s). Its
+unchanged file passed all 5 cases in isolation (2.16 s), covering all 158 cases
+across the runs. The explicit Slice 4 file passed 15/15; the focused Chromium
+reload test passed 1/1 with `workers: 1`. Initial fixture/type/lint issues were
+corrected before the final checks; source edits and checks were serialized.
+
+No `bun run verify`, palette suite, account integration suite, vector matrix,
+Worker build/smoke or full browser suite ran. The next full milestone is after
+Slice 6, with the final full run after Slice 7; this fast-only handoff remains
+provisional until that milestone. The reload test stubs availability/scoring
+responses and exercises the real page, loaders, selector and browser storage;
+it makes no claim about account/backend integration.
+
+**Evidence table:**
+
+| Acceptance item                                                                      | Evidence type and location                                                                                                             | Result                                                                      |
+| ------------------------------------------------------------------------------------ | -------------------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
+| Exactly once/cycle, no immediate repeat, gap formula and weighted discovery          | Seeded properties in `tests/slices/slice4-selector-property.test.ts`, plus existing selector units; `build/slice4/slice4-targeted.log` | Pass; 15/15 Slice 4 cases, including 2–50-family sequences                  |
+| Linear work and no backtracking blow-up at 50 families                               | Adversarial weighted cycles, RNG/repair counters and instrumented timing in the Slice 4 file/log                                       | Pass; 50 RNG draws/cycle; bounded repair                                    |
+| Small family index, lazy pools and unchanged manifest projections                    | Generated-index/projection consistency, browser import guards, synthetic generator fixtures and lazy-pool round equivalence            | Pass in Slice 1/2/4 unit coverage                                           |
+| Reload preserves queue/recent/position; account/guest isolation and failure fallback | Storage units plus `tests/e2e/selector-reload.spec.ts`; `build/slice4/reload-chromium.log`                                             | Pass; actual Chromium refresh, one worker                                   |
+| Lint, types, boundaries and units                                                    | `build/slice4/lint-final.log`, `check-final.log`, `boundaries.log`, `unit-rerun.log`, `connect-rerun.log`                              | Pass; 0 errors/0 warnings; all 158 unit cases covered across suite/recovery |
+| Full milestone verification                                                          | Owner-authorized fast-check schedule                                                                                                   | Deferred to after Slice 6, then final after Slice 7                         |
+| Slice 0 automated base-tag test                                                      | Recorded owner deferral                                                                                                                | Deferred and outstanding; not a pass or closed waiver                       |
+
+**Measurements:** Local Linux x64 desktop host, Node v24.14.1, Vitest, no network.
+Selector code was preloaded; 10/25/50-family bound checks warmed it before 25
+samples, each containing ten complete 50-family cycles with adversarial weights.
+Selector construction/setup was excluded; the repair counter instrumentation was
+included. The median was **1.948 ms** and p95 **2.830 ms per ten-cycle sample**;
+50 RNG draws and 6.2 repair checks per cycle were observed in the recorded sample.
+The test's p95 <1,000 ms guard and linear-work bounds passed. These are local
+algorithm checks, not phone/rendering benchmarks. Chromium refresh took 10.8 s
+(22.3 s including command/server startup), without network throttling; that is a
+test duration, not a user-performance target. LCP ≤2.5 s, INP ≤200 ms, CLS ≤0.1,
+cold/preloaded phone/4G transfer and production resource targets have zero runs in
+this slice; no release-performance pass or waiver is inferred.
+
+**Waivers:** No new waivers. The Slice 0 base-tag test remains deferred and
+outstanding. Fast-only verification follows the owner's explicit schedule.
+
+**Questions for the owner / owner responsibilities:** Review the local Slice 4
+handoff and provide written confirmation before Slice 5. No next-slice or
+production/deployment action is inferred. Existing release/device/Google and
+operations responsibilities remain separate.
+
+**CODEMAP:** Updated for selector state/eligibility, generated small index/data
+projections, lazy procedural pools, acceptance tests, evidence and the Slice 5
+stop boundary.
+
+**Owner acceptance and Git handoff — 2026-11-02:** The owner explicitly accepted
+Slice 4 and authorized pushing it to GitHub. Commit and push the completed
+Slice 4 source, tests and documentation, including the existing owner brief
+updates. The earlier skipped commit/push entry records the original closeout.
+Acceptance follows the fast-check schedule and remains provisional until the
+full milestone after Slice 6; the Slice 0 base-tag test remains deferred and
+outstanding. This Git handoff does not start Slice 5 or authorize deployment or
+production changes. Existing app-test evidence is retained; app tests were not
+repeated for this documentation/Git handoff.

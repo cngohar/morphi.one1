@@ -4,7 +4,7 @@ Read this map before searching. Types and implementation live in code; decisions
 
 ## Current scope
 
-- Engine refactor Slice 2 is owner-confirmed at `7a84063` ("Refactor lazy puzzle registry and generic play session"). Slice 3 is complete locally: manifest-owned server validation/timing/groups, catalog lifecycle initialization, D1/KV config, compatible migration and account-wide ranked ownership with terminal-failure recovery. All verification stages passed: 143 units, all 41 D1/auth cases covered by the suite plus affected rerun, six-runtime vectors, palettes, Worker smoke, bundle isolation, 177 browser checks and 3 affected browser reruns. A host restart interrupted the one full verify invocation during browsers; that stage completed separately. Evidence: `build/slice3/`, `docs/PHASE_REPORTS.md`. Stop for written owner confirmation before Slice 4; selector v2 has not started.
+- Engine refactor Slice 3 is owner-confirmed at `4cffb4e` ("Refactor catalog validation, config and ranked sessions"). Slice 4 is owner-accepted locally (2026-11-02): linear weighted selector with bounded gap repair, generated small family index/lazy procedural pools, viewport/orientation and config eligibility, discovery boost and browser/account selector continuity. Fast checks passed: lint, zero-warning types, boundaries, all 158 units covered across the suite plus isolated timeout recovery, 15 Slice 4 acceptance cases and one Chromium refresh case. Evidence: `build/slice4/`, `docs/PHASE_REPORTS.md`. This fast-only result is provisional until the full milestone after Slice 6. The owner authorized committing and pushing Slice 4. Slice 5 has not started; await the next explicit work instruction.
 - Approved brief: `docs/morphi-engine-refactor-brief.md`. Frozen base tag `v1.2-local-complete` points to `1303c9c4bdb1718bb558886dc43b7b48c597a02a`. The Slice 0 base-tag test remains deferred and outstanding; no reset was performed. Owner edits to the brief are preserved.
 - v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/NEXT_PHASE_REVIEW.md`, `docs/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
 - Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved engine brief controls this refactor. No deployment, production provisioning, secrets, DNS or Google changes are authorized.
@@ -12,22 +12,26 @@ Read this map before searching. Types and implementation live in code; decisions
 
 ## Engine and registration
 
-| Path                                                            | Purpose                                                                                                                                    |
-| --------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------ |
-| `src/lib/engine/contract.ts`, `scoring.ts`                      | Platform-free ids, numeric family-owned moves, canonical parser, ranked timing, leaderboard groups, runs and scoring contracts             |
-| `src/lib/engine/rng.ts`, `src/lib/seeds.ts`                     | Pure SplitMix64 v1 and canonical seed handling; external cryptographic entropy                                                             |
-| `src/lib/puzzles/<directory>/manifest.ts`                       | Family-owned generation/replay, move shape/canonical order, ranked timing/groups, scoring, messages, endings and presentation metadata     |
-| `src/lib/puzzles/*/scoring.ts`, `messages.ts`                   | Family-owned coefficients/default versions and text bundles; no replay/manifest import cycle                                               |
-| `scripts/generate-registry.ts`                                  | Discovers/sorts packages and validates ids/endings; emits catalog and lazy view map, with no hardcoded logic or Game exports               |
-| `src/lib/catalog.ts`                                            | Generated headless manifest catalog and typed message aggregation; no Svelte views                                                         |
-| `src/lib/registry.ts`                                           | Generated app `puzzleViews[id]()` dynamic imports of each package's `View.svelte`                                                          |
-| `src/lib/scoring.ts`                                            | Catalog-driven scoring defaults and validation for UI/server/admin                                                                         |
-| `src/lib/selector.ts`                                           | Injected-RNG weighted family bag, minimum gap and stable peek; existing algorithm unchanged                                                |
-| `eslint.config.js`, `scripts/check-boundaries.ts`               | Engine purity, cross-puzzle/app boundaries and deliberate-violation self-checks                                                            |
-| `scripts/validate-ending.ts`, `src/lib/ending-contract.test.ts` | Ending declaration validation against each family's supplied messages                                                                      |
-| `tests/slices/slice1-manifest-scoring.test.ts`                  | Manifest discovery, ownership and isolated novel-family generation/type-check                                                              |
-| `tests/slices/slice2-lazy-registry.test.ts`                     | Lazy discovery, novel id/folder mapping, invalid ids, bundle graph regressions, generic storage and bounded view loading                   |
-| `tests/slices/slice3-catalog-server-validation.test.ts`         | Real local D1 synthetic-family issuance/replay/scoring, canonical retries, config/cache fallback, lock/TTL and legacy upgrade preservation |
+| Path                                                            | Purpose                                                                                                                                        |
+| --------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
+| `src/lib/engine/contract.ts`, `scoring.ts`                      | Platform-free ids, numeric family-owned moves, canonical parser, ranked timing, leaderboard groups, runs and scoring contracts                 |
+| `src/lib/engine/rng.ts`, `src/lib/seeds.ts`                     | Pure SplitMix64 v1 and canonical seed handling; external cryptographic entropy                                                                 |
+| `src/lib/puzzles/<directory>/manifest.ts`                       | Family-owned generation/replay, move shape/canonical order, ranked timing/groups, scoring, messages, endings and presentation metadata         |
+| `src/lib/puzzles/*/scoring.ts`, `messages.ts`                   | Family-owned coefficients/default versions and text bundles; no replay/manifest import cycle                                                   |
+| `scripts/generate-registry.ts`                                  | Discovers/sorts packages and validates ids/endings; emits server catalog, small family index, browser data projections and lazy view/pool maps |
+| `src/lib/catalog.ts`                                            | Generated eager server manifest catalog; browser messages are in generated `puzzle-messages.ts`                                                |
+| `src/lib/registry.ts`                                           | Generated `puzzleViews[id]()` and `puzzlePools[id]()` dynamic imports; pools retain unchanged procedural generators                            |
+| `src/lib/scoring.ts`                                            | Generated manifest-data scoring defaults and validation for UI/server/admin; no eager logic imports                                            |
+| `src/lib/selector.ts`                                           | Linear injected-RNG weighted cycles, bounded gap repair, stable peek and validated queue/recent/position snapshots                             |
+| `src/lib/family-index.ts`                                       | Generated small selection-only index: ids, weights, enablement, orientation and viewport limits                                                |
+| `src/lib/puzzle-metadata.ts`, `puzzle-messages.ts`              | Generated browser data projections for scoring/presentation/messages; no manifest or logic value imports                                       |
+| `src/lib/ui/selector-eligibility.ts`                            | Validates availability/weights and filters by manifest viewport/orientation between rounds                                                     |
+| `eslint.config.js`, `scripts/check-boundaries.ts`               | Engine purity, cross-puzzle/app boundaries and deliberate-violation self-checks                                                                |
+| `scripts/validate-ending.ts`, `src/lib/ending-contract.test.ts` | Ending declaration validation against each family's supplied messages                                                                          |
+| `tests/slices/slice1-manifest-scoring.test.ts`                  | Manifest discovery, ownership and isolated novel-family generation/type-check                                                                  |
+| `tests/slices/slice2-lazy-registry.test.ts`                     | Lazy discovery, novel id/folder mapping, invalid ids, bundle graph regressions, generic storage and bounded view loading                       |
+| `tests/slices/slice3-catalog-server-validation.test.ts`         | Real local D1 synthetic-family issuance/replay/scoring, canonical retries, config/cache fallback, lock/TTL and legacy upgrade preservation     |
+| `tests/slices/slice4-selector-property.test.ts`                 | Seeded cycle/gap/discovery properties, linear-work/timing bounds, small-index/pool consistency and storage/eligibility recovery                |
 
 ## Games and presentation
 
@@ -48,7 +52,7 @@ Read this map before searching. Types and implementation live in code; decisions
 | `src/lib/ui/prepare-ahead.ts`                                                            | One speculative solo candidate, no selector draw/ranked reservation; generation does not download the next view                  |
 | `src/lib/ui/motion.ts`, `active-delay.ts`, `src/lib/round-timing.ts`                     | Sole anime.js wrapper, visible-time delays and server-known entrance/Card allowances                                             |
 | `src/lib/ui/sound.ts`, `static/audio/`, `scripts/generate-sounds.ts`                     | Original offline ElevenLabs cues, bounded Web Audio playback and provenance; no runtime generation                               |
-| `src/lib/ui/storage.ts`, `storage.test.ts`                                               | Id-derived versioned best/played keys, unchanged legacy bytes, sound/hint settings and blocked-storage fallback                  |
+| `src/lib/ui/storage.ts`, `storage.test.ts`                                               | Id-derived best/played keys, sound/hint settings and versioned guest/account selector snapshots with blocked-storage fallback    |
 | `src/lib/ui/format.ts`, `dismiss-dialog.ts`                                              | Number/clock formatting and guarded backdrop dismissal                                                                           |
 
 ## App shell and public pages
@@ -97,7 +101,7 @@ Read this map before searching. Types and implementation live in code; decisions
 | `tests/vectors/`, `scripts/check-vectors.ts`, `measure-replay.ts`                                    | Unchanged known vectors in Node/Bun/Chromium/Firefox/WebKit/workerd and local replay-cost diagnostics                                                           |
 | `scripts/check-worker.ts`, `finish-build.ts`                                                         | Isolated built-Worker smoke and removal of demo assets from release output                                                                                      |
 | `playwright.config.ts`, `tests/e2e/`                                                                 | One browser worker; account, Card, game, recovery, operator, policy, selector and layout regressions across configured browsers                                 |
-| `tests/e2e/lazy-registry.spec.ts`                                                                    | Actual selected-view-only requests during preparation/Next, failed import retry and retained result                                                             |
+| `tests/e2e/lazy-registry.spec.ts`, `selector-reload.spec.ts`                                         | Selected-view-only requests, failed import retry/retained result, and actual page-refresh selector continuity                                                   |
 | `static/demo/`, `scripts/{card-proof,build-card-proof,check-v1-app,check-v1-demo}.ts`                | Reference demos and isolated visual checks; never production game logic                                                                                         |
 | `wrangler.jsonc`, `wrangler.public-privacy.jsonc`                                                    | Local-account Worker configuration versus published assets-only guest/privacy configuration; never deploy without specific approval                             |
 | `scripts/{prepare-public-privacy,check-public-privacy,setup-accounts}.ts`                            | Guest artifact validation and ignored local credential setup                                                                                                    |
@@ -106,12 +110,13 @@ Read this map before searching. Types and implementation live in code; decisions
 | `docs/{STEP6_WORK,STEP6_REVIEW,STEP6_MEASUREMENTS,V1_WORK,V1.1_WORK,NEXT_PHASE_REVIEW}.md`           | Historical accepted local implementation/review and remaining production boundaries                                                                             |
 | `docs/puzzles/`, `docs/morphi-v1.1-handoff-2026-10-26/`                                              | Approved per-game briefs, templates and historical v1.1 handoff                                                                                                 |
 | `docs/NEXT_PHASE_VISUAL_REVIEW.md`, `build/combined-review/`                                         | Earlier combined visual comparison and verification evidence                                                                                                    |
-| `build/slice1/`, `build/slice2/`, `build/slice3/`                                                    | Ignored refactor logs/chunk graphs/measurements; Slice 3 retains interrupted verify, full browser result and affected recovery reruns                           |
+| `build/slice1/`, `build/slice2/`, `build/slice3/`, `build/slice4/`                                   | Ignored refactor logs/measurements; Slice 3 milestone evidence retained; Slice 4 fast checks, timing and focused reload evidence                                |
 
 ## Commands and conventions
 
 - Install: `bun install`; local setup: `bun run accounts:setup`, `bun run cf:types`, `bun run db:migrate:local`.
 - Dev: `bun run dev --host 0.0.0.0`; type-check: `bun run check`; format/lint: `bun run lint`.
+- Slice 4 uses fast checks plus its focused Chromium reload test; no full verify. Next full milestone is after Slice 6 and the final full run after Slice 7.
 - Full gate: `bun run verify`; targeted commands: `test:unit -- --run`, `test:accounts`, `test:vectors`, `test:worker`, `test:e2e`, `check:boundaries`, `check:lazy-bundle`.
 - Generate registry: `bun run registry:generate`; palette diagnostics: `bun run test:palettes`; contact sheet: `bun run theme:sheet`.
 - Build/local Worker: `bun run build`, `bun run preview:worker`. Deployment and even a remote preview still require explicit owner approval.

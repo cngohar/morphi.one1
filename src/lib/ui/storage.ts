@@ -1,5 +1,6 @@
 import { SCORE_DEFAULT_VERSION } from '#lib/engine/scoring.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
+import type { PuzzleSelectorState } from '#lib/selector.js';
 const SOUND_KEY = 'morphi.sound';
 const BLOCK_HINT_KEY = 'morphi.block.hintSeen';
 
@@ -37,6 +38,27 @@ function write(key: string, value: string): void {
 		failedWrites.add(key);
 		// The in-memory fallback still keeps this session playable.
 	}
+}
+
+function selectorKey(ownerKey: string | null): string {
+	return `morphi.selector.v2.${ownerKey === null ? 'guest' : `account:${encodeURIComponent(ownerKey)}`}`;
+}
+
+export function loadSelectorState(ownerKey: string | null): unknown {
+	const stored = read(selectorKey(ownerKey));
+	if (stored === null) return undefined;
+	try {
+		return JSON.parse(stored);
+	} catch {
+		console.warn('morphi:selector_state_invalid');
+		return undefined;
+	}
+}
+
+export function saveSelectorState(ownerKey: string | null, state: PuzzleSelectorState): void {
+	const key = selectorKey(ownerKey);
+	write(key, JSON.stringify(state));
+	if (failedWrites.has(key)) console.warn('morphi:selector_storage_unavailable');
 }
 
 export function loadBestScore(game: BestGame = 'block', version = SCORE_DEFAULT_VERSION): number {

@@ -7,6 +7,7 @@ import { BLOCK_ENGINE_VERSION, createBlockRound, PIECES, replayBlockMoves } from
 export const manifest = {
 	id: 'block',
 	selectionOrder: 0,
+	orientation: 'any',
 	engineVersion: BLOCK_ENGINE_VERSION,
 	scoring,
 	maxMoves: 300,

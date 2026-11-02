@@ -3,6 +3,7 @@ import { readFile, readdir } from 'node:fs/promises';
 import { getPlatformProxy } from 'wrangler';
 import { catalog } from '../../src/lib/catalog.js';
 import type { CompletedRun, PuzzleManifest } from '../../src/lib/engine/contract.js';
+import { puzzleMetadata } from '../../src/lib/puzzle-metadata.js';
 import { THEME_CONFIG } from '../../src/lib/engine/theme/config.js';
 import { accountHistory, leaderboard, saveRun, startRanked } from '../../src/lib/server/runs.js';
 import { activeRanked, abandonRanked } from '../../src/lib/server/ranked-session.js';
@@ -175,10 +176,16 @@ beforeAll(async () => {
 		.run();
 	for (const file of files.slice(upgrade)) await applyMigration(file);
 	catalog[family] = manifest;
+	puzzleMetadata[family] = {
+		engineVersion: manifest.engineVersion,
+		scoring: manifest.scoring,
+		ending: manifest.ending
+	};
 }, 30_000);
 
 afterAll(async () => {
 	delete catalog[family];
+	delete puzzleMetadata[family];
 	await proxy?.dispose();
 });
 

@@ -1,4 +1,4 @@
-import { puzzleMessages } from '../catalog.js';
+import { puzzleMessages } from '../puzzle-messages.js';
 
 export const messages = {
 	...puzzleMessages,

@@ -7,15 +7,31 @@ export interface FamilyWeight<Family extends string = PuzzleFamily> {
 	weight: number;
 }
 
+export interface PuzzleSelectorState<Family extends string = PuzzleFamily> {
+	version: 1;
+	eligible: Family[];
+	queue: Family[];
+	recent: Family[];
+	cyclePosition: number;
+}
+
 export interface PuzzleSelector<Family extends string = PuzzleFamily> {
 	next(): Family;
 	peek(): Family;
 	setAvailable(families: readonly Family[]): void;
+	snapshot(): PuzzleSelectorState<Family>;
 }
 
 export interface PuzzleSelectorOptions<Family extends string = PuzzleFamily> {
 	families: readonly FamilyWeight<Family>[];
 	rng: Rng;
+	state?: unknown;
+	weight?: (entry: FamilyWeight<Family>) => number;
+	onChange?: (state: PuzzleSelectorState<Family>) => void;
+}
+
+export function selectorGap(count: number): number {
+	return count <= 1 ? 0 : Math.min(5, Math.max(1, Math.floor(count / 3)));
 }
 
 export function createPuzzleSelector<Family extends string = PuzzleFamily>(
@@ -33,72 +49,160 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 	if (!Number.isSafeInteger(totalWeight)) throw new Error('Puzzle weight total is too large.');
 	const eligible = options.families.filter((entry) => entry.weight > 0);
 	if (eligible.length === 0) throw new Error('At least one puzzle family must be eligible.');
+	const eligibleIds = new Set(eligible.map((entry) => entry.family));
 
 	let available = eligible;
-	const gap = () =>
-		available.length === 1 ? 0 : Math.min(5, Math.max(1, Math.floor(available.length / 3)));
 	let recent: Family[] = [];
 	let queue: Family[] = [];
+	let cursor = 0;
+	let cyclePosition = 0;
 
-	function weightedOrder(entries: readonly FamilyWeight<Family>[]): Family[] {
-		const remaining = entries.slice();
-		const ordered: Family[] = [];
-		while (remaining.length) {
-			let draw = options.rng.nextInt(remaining.reduce((sum, entry) => sum + entry.weight, 0));
-			const index = remaining.findIndex((entry) => {
-				draw -= entry.weight;
-				return draw < 0;
-			});
-			ordered.push(remaining.splice(index, 1)[0]!.family);
+	function restore(value: unknown): boolean {
+		if (!value || typeof value !== 'object') return false;
+		const state = value as Record<string, unknown>;
+		function familyList(value: unknown, allowed: Set<Family>, limit: number): value is Family[] {
+			return (
+				Array.isArray(value) &&
+				value.length <= limit &&
+				value.every((family) => typeof family === 'string' && allowed.has(family as Family))
+			);
 		}
-		return ordered;
+		if (
+			state.version !== 1 ||
+			!familyList(state.eligible, eligibleIds, eligible.length) ||
+			state.eligible.length === 0 ||
+			new Set(state.eligible).size !== state.eligible.length ||
+			!familyList(state.queue, new Set(state.eligible), state.eligible.length) ||
+			new Set(state.queue).size !== state.queue.length ||
+			!familyList(state.recent, ids, 5) ||
+			typeof state.cyclePosition !== 'number' ||
+			!Number.isSafeInteger(state.cyclePosition) ||
+			state.cyclePosition < 0 ||
+			(state.queue.length + state.cyclePosition !== state.eligible.length &&
+				!(state.queue.length === 0 && state.cyclePosition === 0))
+		)
+			return false;
+		const selected = new Set(state.eligible);
+		const restored = state.queue.slice();
+		if (!repair(restored, state.recent, selected.size)) return false;
+		available = eligible.filter((entry) => selected.has(entry.family));
+		queue = restored;
+		recent = state.recent.slice();
+		cyclePosition = state.cyclePosition;
+		return true;
 	}
 
-	function refill(): Family[] {
-		const ordered = weightedOrder(available);
-		// Plan the whole cycle before exposing a pick. If its tail violates the
-		// minimum gap, revisit earlier positions without dropping/duplicating a family.
-		function arrange(remaining: Family[], history: Family[]): Family[] | null {
-			if (remaining.length === 0) return [];
-			for (let index = 0; index < remaining.length; index += 1) {
-				const family = remaining[index]!;
-				if (history.includes(family)) continue;
-				const rest = arrange(
-					remaining.filter((_, position) => position !== index),
-					gap() === 0 ? [] : [...history, family].slice(-gap())
-				);
-				if (rest) return [family, ...rest];
+	function snapshot(): PuzzleSelectorState<Family> {
+		return {
+			version: 1,
+			eligible: available.map((entry) => entry.family),
+			queue: queue.slice(cursor),
+			recent: recent.slice(),
+			cyclePosition
+		};
+	}
+
+	function changed(): void {
+		options.onChange?.(snapshot());
+	}
+
+	function weightedOrder(): Family[] {
+		const view = new DataView(new ArrayBuffer(8));
+		let ordered = available.map((entry) => {
+			const weight = options.weight?.(entry) ?? entry.weight;
+			if (!Number.isSafeInteger(weight) || weight <= 0)
+				throw new Error('Eligible puzzle weights must be positive safe integers.');
+			const uniform = (options.rng.nextInt(0x100000000) + 1) / 0x100000001;
+			view.setFloat64(0, -Math.log(uniform) / weight);
+			return { family: entry.family, high: view.getUint32(0), low: view.getUint32(4) };
+		});
+		let scratch = ordered.slice();
+		const counts = new Uint32Array(256);
+		// Positive exponential-race keys give weighted order; eight radix passes
+		// keep the shuffle linear instead of sorting or repeatedly scanning weights.
+		for (let byte = 0; byte < 8; byte++) {
+			counts.fill(0);
+			const shift = (byte % 4) * 8;
+			const key = byte < 4 ? 'low' : 'high';
+			for (const entry of ordered) counts[(entry[key] >>> shift) & 255]!++;
+			let offset = 0;
+			for (let bucket = 0; bucket < counts.length; bucket++) {
+				const count = counts[bucket]!;
+				counts[bucket] = offset;
+				offset += count;
 			}
-			return null;
+			for (const entry of ordered) scratch[counts[(entry[key] >>> shift) & 255]!++] = entry;
+			[ordered, scratch] = [scratch, ordered];
 		}
-		const cycle = arrange(ordered, gap() === 0 ? [] : recent.slice(-gap()));
-		if (!cycle) throw new Error('No puzzle rotation satisfies the minimum gap.');
-		return cycle;
+		return ordered.map((entry) => entry.family);
 	}
 
-	function peek(): Family {
-		if (queue.length === 0) queue = refill();
-		return queue[0]!;
+	function repair(pending: Family[], history: readonly Family[], count: number): boolean {
+		const gap = selectorGap(count);
+		const blocked = history.slice(-gap);
+		if (gap === 0) return true;
+		// A cycle contains unique families, so only its first <=5 positions can
+		// conflict with the preceding cycle. Greedily swap in the first legal pick.
+		for (let index = 0; index < Math.min(gap, pending.length); index++) {
+			let candidate = index;
+			while (candidate < pending.length && blocked.includes(pending[candidate]!)) candidate++;
+			if (candidate === pending.length) return false;
+			[pending[index], pending[candidate]] = [pending[candidate]!, pending[index]!];
+			blocked.push(pending[index]!);
+			if (blocked.length > gap) blocked.shift();
+		}
+		return true;
 	}
+
+	function ensureQueue(): boolean {
+		if (cursor < queue.length) return false;
+		const cycle = weightedOrder();
+		if (!repair(cycle, recent, available.length))
+			throw new Error('No puzzle rotation satisfies the minimum gap.');
+		queue = cycle;
+		cursor = 0;
+		cyclePosition = 0;
+		return true;
+	}
+
+	if (options.state !== undefined && !restore(options.state))
+		console.warn('morphi:selector_state_invalid');
 
 	return {
-		peek,
+		snapshot,
+		peek() {
+			if (ensureQueue()) changed();
+			return queue[cursor]!;
+		},
 		setAvailable(families) {
 			const selected = new Set(families);
 			const nextAvailable = eligible.filter((entry) => selected.has(entry.family));
 			if (!nextAvailable.length) throw new Error('At least one puzzle family must be eligible.');
 			const previous = new Set(available.map((entry) => entry.family));
-			queue = queue.filter((family) => selected.has(family));
-			if (queue.length) {
+			if (
+				nextAvailable.length === available.length &&
+				nextAvailable.every((entry) => previous.has(entry.family))
+			)
+				return;
+			const pending = queue.slice(cursor).filter((family) => selected.has(family));
+			if (pending.length) {
 				for (const entry of nextAvailable)
-					if (!previous.has(entry.family)) queue.push(entry.family);
+					if (!previous.has(entry.family)) pending.push(entry.family);
 			}
 			available = nextAvailable;
+			// Availability can make an incomplete cycle impossible; start a new
+			// cycle only in that case, keeping the recent-family exclusion intact.
+			queue = repair(pending, recent, available.length) ? pending : [];
+			cursor = 0;
+			cyclePosition = available.length - queue.length;
+			changed();
 		},
 		next() {
-			const family = peek();
-			queue.shift();
+			ensureQueue();
+			const family = queue[cursor++]!;
+			cyclePosition++;
 			recent = [...recent, family].slice(-5);
+			changed();
 			return family;
 		}
 	};

@@ -14,6 +14,7 @@ import {
 export const manifest = {
 	id: 'connect',
 	selectionOrder: 2,
+	orientation: 'any',
 	titleAfterEntrance: true,
 	engineVersion: CONNECT_ENGINE_VERSION,
 	scoring,

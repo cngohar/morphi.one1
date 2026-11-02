@@ -8,8 +8,4 @@ export const catalog: Record<PuzzleId, PuzzleManifest> & {
 	connect: typeof manifest1;
 	memory: typeof manifest2;
 } = { ['block']: manifest0, ['connect']: manifest1, ['memory']: manifest2 };
-export const puzzleMessages = {
-	...manifest0.messages,
-	...manifest1.messages,
-	...manifest2.messages
-} as const;
+export { puzzleMessages } from './puzzle-messages.js';

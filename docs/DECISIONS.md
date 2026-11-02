@@ -990,3 +990,47 @@ and [KV writes](https://developers.cloudflare.com/kv/api/write-key-value-pairs/)
 plus the installed Wrangler binding schema. No remote resource was created.
 The Slice 0 base-tag test remains deferred and outstanding. Written owner
 confirmation is required before Slice 4; no deployment is authorized.
+
+## Engine refactor Slice 4 — Selector v2 (2026-11-02)
+
+Owner-confirmed base: `4cffb4e` (Slice 3). This work is Slice 4 only; Slice 5
+requires written owner confirmation. The Slice 0 base-tag test remains deferred
+and outstanding. No dependency versions changed.
+
+A weighted exponential key per eligible family and eight fixed radix passes
+replace repeated weighted scans and recursive backtracking. Greedy boundary
+swaps inspect at most five positions, preserving one occurrence per completed
+cycle and the gap `clamp(floor(eligible / 3), 1, 5)`. One eligible family retains
+the existing repetition exception. Discovery uses a 2x weight for families with
+no completed-play marker; weights change order, never cycle frequency. The
+current D1 game-config weight is read alongside lifecycle availability; zero
+weight, manifest enabled flag and viewport/orientation eligibility all exclude
+families before selection. Eligibility changes between rounds reconcile the
+pending queue; an impossible partial cycle starts a fresh eligible cycle while
+retaining recent-family exclusions. An active board is never replaced on resize.
+
+The generated family index contains only selection metadata. Browser presentation,
+scoring defaults and messages use generated data projections, leaving the eager
+manifest catalog on the server. Each current procedural variant pool is its
+unchanged manifest `createRound` generator, imported lazily through the generated
+registry; this adds no variants or new variant-selection rules. Next preparation
+may load the pending family's pool while its view stays deferred until selected.
+Pool loads share the existing bounded/cancelable module-load path.
+
+Selector snapshots store eligible ids, pending queue, recent families and cycle
+position in versioned localStorage keys scoped to guest or account on this browser.
+Writes occur when state changes, including a new peeked cycle and a successful
+round commit; failed generation never consumes a pick. Invalid/incompatible state
+starts safely fresh. Existing in-memory storage fallback keeps blocked-storage
+sessions playable, but cannot survive a browser reload with storage blocked.
+Storage clearing, other browser profiles and simultaneous tabs can bypass/reorder
+this local continuity; it is a suspense improvement, not an anti-cheat mechanism.
+Ranked enforcement remains server-owned. Mid-round checkpoints and ranked resume
+remain assigned to Slice 6.
+
+Reference checks: [weighted random sampling research](https://arxiv.org/abs/1012.0256)
+and [MDN localStorage persistence and exceptions](https://developer.mozilla.org/en-US/docs/Web/API/Window/localStorage).
+The algorithm's linear bound follows from its fixed-width radix passes and
+bounded gap, rather than a timing-only inference. Slice 4 runs only the authorized
+fast checks and targeted reload test; the next full verification is after Slice 6,
+with the final full run after Slice 7. No deployment is authorized.

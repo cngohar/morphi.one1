@@ -30,7 +30,7 @@ function lazyImports(source: string): Record<string, string> {
 		) {
 			const argument = node.initializer.body.arguments[0];
 			expect(ts.isStringLiteral(argument)).toBe(true);
-			if (ts.isStringLiteral(argument)) {
+			if (ts.isStringLiteral(argument) && argument.text.endsWith('/View.svelte')) {
 				const name = node.name;
 				if (ts.isIdentifier(name) || ts.isStringLiteral(name)) result[name.text] = argument.text;
 			}
@@ -80,8 +80,8 @@ it('generates a novel id independently of its folder and rejects duplicate or mi
 			condition: 'Synthetic fixture finishes.'
 		}
 	};
-	const declaration = (id: string | null) =>
-		`export const manifest = {...${JSON.stringify({ ...manifest, id })}, createRound: seed => ({seed}), parseMove: move => ({novel:move.novel}), replay: () => ({score:7,group:'novel-1',pairs:null,moves:1})};`;
+	const declaration = (id: string | null, selectorMetadata: Record<string, unknown> = {}) =>
+		`export const manifest = {...${JSON.stringify({ ...manifest, ...selectorMetadata, id })}, createRound: seed => ({seed}), parseMove: move => ({novel:move.novel}), replay: () => ({score:7,group:'novel-1',pairs:null,moves:1})};`;
 	const generate = () =>
 		spawnSync('bun', [resolve('scripts/generate-registry.ts')], {
 			cwd: fixture,
@@ -116,6 +116,13 @@ it('generates a novel id independently of its folder and rejects duplicate or mi
 		const missing = generate();
 		expect(missing.status).not.toBe(0);
 		expect(missing.stderr).toContain('Missing or duplicate puzzle id');
+		await writeFile(
+			join(duplicate, 'manifest.ts'),
+			declaration('bad-metadata-id', { orientation: 'square' })
+		);
+		const invalidMetadata = generate();
+		expect(invalidMetadata.status).not.toBe(0);
+		expect(invalidMetadata.stderr).toContain('Invalid selector metadata');
 	} finally {
 		await rm(fixture, { recursive: true, force: true });
 	}

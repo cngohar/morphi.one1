@@ -41,6 +41,10 @@ export async function loadPuzzleView(
 	load: () => Promise<{ default: Component<PuzzleViewProps> }>,
 	signal: AbortSignal
 ): Promise<Component<PuzzleViewProps>> {
+	return (await loadPuzzleModule(load, signal)).default;
+}
+
+export async function loadPuzzleModule<T>(load: () => Promise<T>, signal: AbortSignal): Promise<T> {
 	if (signal.aborted) throw new Error('round_cancelled');
 	let timeout: ReturnType<typeof setTimeout> | undefined;
 	let cancel = () => {};
@@ -50,7 +54,7 @@ export async function loadPuzzleView(
 			signal.addEventListener('abort', cancel, { once: true });
 			timeout = setTimeout(() => reject(new Error('view_load_timeout')), 8000);
 		});
-		return (await Promise.race([load(), unavailable])).default;
+		return await Promise.race([load(), unavailable]);
 	} finally {
 		clearTimeout(timeout);
 		signal.removeEventListener('abort', cancel);

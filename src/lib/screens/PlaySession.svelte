@@ -21,10 +21,14 @@
 	import { goto } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import { createRng } from '#lib/engine/rng.js';
-	import { puzzleViews } from '#lib/registry.js';
+	import { puzzleViews, puzzlePools } from '#lib/registry.js';
+	import { familyIndex } from '#lib/family-index.js';
+	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
+	import { eligibleFamilies, selectorAvailability } from '#lib/ui/selector-eligibility.js';
 	import type { Component } from 'svelte';
 	import {
 		loadPuzzleView,
+		loadPuzzleModule,
 		type PuzzleRound,
 		type PuzzleResult,
 		type PuzzleViewProps
@@ -37,6 +41,8 @@
 	import { sound } from '#lib/ui/sound.js';
 	import {
 		loadBestScore,
+		loadSelectorState,
+		saveSelectorState,
 		loadFamilyPlayed,
 		markFamilyPlayed,
 		loadSoundEnabled,
@@ -44,7 +50,6 @@
 		saveSoundEnabled
 	} from '#lib/ui/storage.js';
 
-	import { catalog } from '#lib/catalog.js';
 	import { generateTheme, type ResolvedTheme } from '#lib/engine/theme/generator.js';
 	import { soloTheme } from '#lib/ui/solo-theme.js';
 	import { createPreparationSlot } from '#lib/ui/prepare-ahead.js';
@@ -62,9 +67,8 @@
 		type SavedResult
 	} from '#lib/ui/progress.js';
 
-	const families = Object.values(catalog)
-		.sort((a, b) => (a.selectionOrder ?? 0) - (b.selectionOrder ?? 0))
-		.map((manifest) => manifest.id);
+	const families = familyIndex.map((entry) => entry.id);
+	const weights = new SvelteMap(familyIndex.map((entry) => [entry.id, entry.weight]));
 	let scoring = $state<ScoreConfig>(defaultScoreConfig(families[0]!));
 
 	let { data }: { data: { account: { signedIn: boolean; ownerKey: string | null } } } = $props();
@@ -155,7 +159,7 @@
 		return {
 			theme,
 			seed,
-			round: catalog[chosen].createRound(seed)
+			round: (await loadPuzzleModule(puzzlePools[chosen], signal)).manifest.createRound(seed)
 		};
 	});
 	let result = $state<ResultData | null>(null);
@@ -238,8 +242,12 @@
 
 	function getSelector(): PuzzleSelector {
 		selector ??= createPuzzleSelector({
-			families: families.map((family) => ({ family, weight: 1 })),
-			rng: createRng(randomSeed())
+			families: familyIndex.map((entry) => ({ family: entry.id, weight: entry.weight })),
+			weight: (entry) =>
+				(weights.get(entry.family) ?? entry.weight) * (played[entry.family] ? 1 : 2),
+			rng: createRng(randomSeed()),
+			state: loadSelectorState(account.ownerKey),
+			onChange: (state) => saveSelectorState(account.ownerKey, state)
 		});
 		return selector;
 	}
@@ -312,7 +320,11 @@
 		}
 		if (accountsEnabled) nextTheme ??= generateTheme(seed, chosen);
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
-		const nextRound = candidate?.round ?? catalog[chosen].createRound(seed);
+		const nextRound =
+			candidate?.round ??
+			(await loadPuzzleModule(puzzlePools[chosen], generationLifetime.signal)).manifest.createRound(
+				seed
+			);
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 
 		return {
@@ -327,24 +339,26 @@
 		};
 	}
 	async function refreshAvailableGames(): Promise<void> {
-		if (!accountsEnabled) return;
-		const response = await fetch(resolve('/api/play/availability'), {
-			signal: AbortSignal.timeout(3000),
-			cache: 'no-store'
-		});
-		if (!response.ok) throw new Error('game_unavailable');
-		const data: unknown = await response.json();
-		if (
-			!data ||
-			typeof data !== 'object' ||
-			!('available' in data) ||
-			!Array.isArray(data.available) ||
-			data.available.some(
-				(family: unknown) => typeof family !== 'string' || !Object.hasOwn(catalog, family)
+		let available: readonly string[] = families;
+		if (accountsEnabled) {
+			const response = await fetch(resolve('/api/play/availability'), {
+				signal: AbortSignal.timeout(3000),
+				cache: 'no-store'
+			});
+			if (!response.ok) throw new Error('game_unavailable');
+			const data = selectorAvailability(familyIndex, await response.json());
+			available = data.available;
+			for (const entry of familyIndex)
+				weights.set(entry.id, data.weights[entry.id] ?? entry.weight);
+		}
+		getSelector().setAvailable(
+			eligibleFamilies(
+				familyIndex,
+				available.filter((id) => (weights.get(id) ?? 0) > 0),
+				window.innerWidth,
+				window.innerHeight
 			)
-		)
-			throw new Error('game_unavailable');
-		getSelector().setAvailable(data.available);
+		);
 	}
 	async function assertGameAvailable(chosen: PuzzleFamily): Promise<void> {
 		if (!accountsEnabled) return;
@@ -478,7 +492,7 @@
 		}
 
 		resultAnnouncement = announcement;
-		const endingSpec = catalog[game].ending;
+		const endingSpec = puzzleMetadata[game].ending;
 		ending = {
 			headline: t(
 				(cap
@@ -564,7 +578,7 @@
 			version: 1,
 			id: roundId,
 			family,
-			engineVersion: catalog[family].engineVersion,
+			engineVersion: puzzleMetadata[family].engineVersion,
 			seed,
 			moves: runMoves.slice(),
 			elapsedSeconds,
@@ -651,7 +665,8 @@
 		{soundEnabled}
 		ontogglesound={toggleSound}
 		onhome={goHome}
-		gameTitle={revealed && (!catalog[family].titleAfterEntrance || cardReady || screen === 'result')
+		gameTitle={revealed &&
+		(!puzzleMetadata[family].titleAfterEntrance || cardReady || screen === 'result')
 			? familyName(family)
 			: ''}
 		gameMode

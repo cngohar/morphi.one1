@@ -107,3 +107,16 @@ Local Card integration (2026-10-28) adds `play_session.card_opening_ms`, a
 server-owned numeric presentation allowance for authoritative timing. Earlier
 rows default to zero. It follows the existing ranked-start retention/deletion
 rules and introduces no additional identifiers or collection purpose.
+
+## Local selector continuity — engine refactor Slice 4 (2026-11-02)
+
+The local app stores only family ids for the pending queue, recent picks, eligible
+set and cycle position in `morphi.selector.v2.guest` or
+`morphi.selector.v2.account:<encoded owner key>` in localStorage. Each browser
+profile/device keeps its own copies. There are no seeds, moves, scores, tokens
+or uploads in these records. They remain until overwritten, site data is cleared,
+or the browser evicts them. Signing out preserves that account's local cycle for
+a later sign-in; account deletion does not promise a browser-storage wipe. The
+operator cannot erase a remote browser's copy. Blocked storage falls back to
+session memory, which cannot persist through reload. This local-only change has
+not been published and does not change the recorded guest/privacy deployment.

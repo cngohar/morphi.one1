@@ -22,9 +22,34 @@ export interface ReplayedResult {
 	pairs: number | null;
 	moves: number;
 }
+export interface PuzzleFamilyEntry {
+	id: PuzzleId;
+	weight: number;
+	enabled: boolean;
+	orientation: 'any' | 'portrait' | 'landscape';
+	minViewportWidth?: number;
+	minViewportHeight?: number;
+	selectionOrder?: number;
+}
+export type PuzzleMetadata = Pick<
+	PuzzleManifest,
+	'engineVersion' | 'titleAfterEntrance' | 'scoring' | 'ending'
+> & {
+	backdropPieces?: readonly {
+		id: string;
+		width: number;
+		height: number;
+		cells: readonly { x: number; y: number }[];
+	}[];
+};
 export interface PuzzleManifest {
 	id: PuzzleId;
 	selectionOrder?: number;
+	weight?: number;
+	enabled?: boolean;
+	orientation?: PuzzleFamilyEntry['orientation'];
+	minViewportWidth?: number;
+	minViewportHeight?: number;
 	titleAfterEntrance?: boolean;
 	engineVersion: string;
 	maxMoves: number;

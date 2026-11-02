@@ -456,3 +456,29 @@ Coverage: `tests/slices/slice3-catalog-server-validation.test.ts`,
 `tests/integration/runs.test.ts`, and the two-browser case in
 `tests/e2e/accounts.spec.ts`. Theme/style readers are storage contracts for
 Slice 5; the existing generation and selector algorithms remain unchanged.
+
+## Engine refactor Slice 4: selector continuity and eligibility
+
+- Each stable eligible set completes a weighted cycle with each family exactly
+  once; the last `clamp(floor(eligible / 3), 1, 5)` picks stay excluded across
+  refills. A sole eligible family may repeat. Greedy repair never backtracks.
+- Discovery doubles only never-completed families' ordering weight. Completion
+  removes the boost at subsequent refills without duplicating a family.
+- The generated small index supplies manifest orientation and viewport limits;
+  lifecycle/weight exclusions also apply before a round. Empty eligibility uses
+  the existing unavailable/Retry/Home path, without serving a fallback family.
+  Orientation changes affect the next round, never the active puzzle.
+- Reload restores the same queue, recent families and cycle position from the
+  guest/account key before making the next successful draw. Guest and separate
+  accounts do not share a selector cycle. This supersedes the historical simple
+  build's reload-reset behavior in section 16 above.
+- Corrupt, stale, duplicate or inconsistent saved state resets safely. Blocked
+  storage retains session memory and logs the persistence failure; storage
+  clearing or switching browsers restarts continuity and is not anti-cheat.
+- A failed or stalled lazy procedural pool/view load preserves the pending
+  family and completed result. Preparation can load only a pending pool, and
+  never consumes a selector draw or reserves a ranked session.
+
+Coverage: `tests/slices/slice4-selector-property.test.ts`, existing selector and
+preparation units, and the focused `tests/e2e/selector-reload.spec.ts` refresh test.
+Full browser/account/palette checks are deferred to the authorized later milestone.

@@ -8,6 +8,7 @@ import { createMemoryRound, flipCard, resolveMismatch, scoreRound } from './logi
 export const manifest = {
 	id: 'memory',
 	selectionOrder: 1,
+	orientation: 'any',
 	engineVersion: 'memory-1',
 	scoring,
 	maxMoves: 120,

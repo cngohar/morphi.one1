@@ -5,6 +5,7 @@ import { resolve, join } from 'node:path';
 import { spawnSync } from 'node:child_process';
 import { catalog } from '../../src/lib/catalog.js';
 import type { PuzzleId, PuzzleManifest } from '../../src/lib/engine/contract.js';
+import { puzzleMetadata } from '../../src/lib/puzzle-metadata.js';
 import { defaultScoreConfig, validateScoreValues } from '../../src/lib/scoring.js';
 import { messages, t, type MessageKey } from '../../src/lib/i18n/messages.js';
 
@@ -41,14 +42,20 @@ it('discovers every puzzle manifest and uses its scoring fields, defaults, versi
 			manifest: PuzzleManifest;
 		};
 		ids.push(manifest.id);
-		expect(catalog[manifest.id]).toBe(manifest);
+		expect(catalog[manifest.id]).toMatchObject({
+			id: manifest.id,
+			engineVersion: manifest.engineVersion,
+			scoring: manifest.scoring,
+			messages: manifest.messages,
+			ending: manifest.ending
+		});
 		expect(manifest.engineVersion.length).toBeGreaterThan(0);
 		expect(manifest.scoring.fields).toEqual(Object.keys(manifest.scoring.defaults));
 		expect(defaultScoreConfig(manifest.id)).toEqual({
 			version: manifest.scoring.version,
 			values: manifest.scoring.defaults
 		});
-		expect(defaultScoreConfig(manifest.id).values).toBe(manifest.scoring.defaults);
+		expect(defaultScoreConfig(manifest.id).values).toEqual(manifest.scoring.defaults);
 		expect(validateScoreValues(manifest.id, manifest.scoring.defaults)).toEqual(
 			manifest.scoring.defaults
 		);
@@ -74,6 +81,11 @@ it('discovers every puzzle manifest and uses its scoring fields, defaults, versi
 
 it('accepts a novel family and fields without extending the engine', () => {
 	catalog[syntheticId] = synthetic;
+	puzzleMetadata[syntheticId] = {
+		engineVersion: synthetic.engineVersion,
+		scoring: synthetic.scoring,
+		ending: synthetic.ending
+	};
 	try {
 		expect(defaultScoreConfig(syntheticId)).toEqual({
 			version: 'synthetic-score-1',
@@ -83,6 +95,7 @@ it('accepts a novel family and fields without extending the engine', () => {
 		expect(() => validateScoreValues(syntheticId, { pair: 37 })).toThrow('score_values');
 	} finally {
 		delete catalog[syntheticId];
+		delete puzzleMetadata[syntheticId];
 	}
 	for (const family of ['missing-family', '__proto__', 'constructor', 'toString']) {
 		expect(() => defaultScoreConfig(family)).toThrow('score_family');
@@ -114,12 +127,21 @@ it('generates and type-checks a catalog with an extra manifest and its messages 
 			'bun',
 			[
 				'-e',
-				`import {catalog,puzzleMessages} from ${JSON.stringify(join(fixtureLib, 'catalog.ts'))}; console.log(JSON.stringify({scoring:catalog[${JSON.stringify(syntheticId)}].scoring,message:puzzleMessages['synthetic.headline']}));`
+				`import {catalog,puzzleMessages} from ${JSON.stringify(join(fixtureLib, 'catalog.ts'))}; import {familyIndex} from ${JSON.stringify(join(fixtureLib, 'family-index.ts'))}; import {puzzleMetadata} from ${JSON.stringify(join(fixtureLib, 'puzzle-metadata.ts'))}; console.log(JSON.stringify({scoring:catalog[${JSON.stringify(syntheticId)}].scoring,message:puzzleMessages['synthetic.headline'],metadata:puzzleMetadata[${JSON.stringify(syntheticId)}],family:familyIndex.find(entry=>entry.id===${JSON.stringify(syntheticId)})}));`
 			],
 			{ cwd: fixture, encoding: 'utf8' }
 		);
 		expect(loaded.status, loaded.stderr).toBe(0);
-		expect(JSON.parse(loaded.stdout)).toEqual({ scoring: synthetic.scoring, message: 'Finished' });
+		expect(JSON.parse(loaded.stdout)).toEqual({
+			scoring: synthetic.scoring,
+			message: 'Finished',
+			metadata: {
+				engineVersion: synthetic.engineVersion,
+				scoring: synthetic.scoring,
+				ending: synthetic.ending
+			},
+			family: { id: syntheticId, weight: 1, enabled: true, orientation: 'any' }
+		});
 		await writeFile(
 			join(fixture, 'tsconfig.json'),
 			JSON.stringify({
@@ -133,7 +155,11 @@ it('generates and type-checks a catalog with an extra manifest and its messages 
 					types: [],
 					paths: { '#lib/*': [resolve('src/lib/*')] }
 				},
-				files: [join(fixtureLib, 'catalog.ts')]
+				files: [
+					join(fixtureLib, 'catalog.ts'),
+					join(fixtureLib, 'family-index.ts'),
+					join(fixtureLib, 'puzzle-metadata.ts')
+				]
 			})
 		);
 		const checked = spawnSync(
