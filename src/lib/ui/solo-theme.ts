@@ -1,14 +1,30 @@
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
-import { drawFreshTheme } from '#lib/engine/theme/freshness.js';
+import { THEME_CONFIG, themeProfile, type ThemeConfig } from '#lib/engine/theme/config.js';
 import { randomSeed } from '#lib/seeds.js';
 
 /** Keep palette solving off the interaction thread. Entropy stays outside the engine. */
-export async function soloTheme(
+export function soloTheme(
 	family: ResolvedTheme['family'],
 	history: ResolvedTheme[],
-	signal: AbortSignal
+	signal: AbortSignal,
+	config: Readonly<ThemeConfig> = THEME_CONFIG
 ): Promise<ResolvedTheme> {
-	const seeds = Array.from({ length: 8 }, randomSeed);
+	return workerTheme(
+		family,
+		history,
+		Array.from({ length: themeProfile(config, family).freshness.candidates }, randomSeed),
+		signal,
+		config
+	);
+}
+
+export async function workerTheme(
+	family: ResolvedTheme['family'],
+	history: ResolvedTheme[],
+	seeds: string[],
+	signal: AbortSignal,
+	config: Readonly<ThemeConfig>
+): Promise<ResolvedTheme> {
 	try {
 		return await new Promise<ResolvedTheme>((resolve, reject) => {
 			const worker = new Worker(new URL('./theme-worker.ts', import.meta.url), { type: 'module' });
@@ -41,7 +57,7 @@ export async function soloTheme(
 				return;
 			}
 			try {
-				worker.postMessage({ family, history, seeds });
+				worker.postMessage({ family, history, seeds, config });
 			} catch {
 				fail();
 			}
@@ -49,7 +65,6 @@ export async function soloTheme(
 	} catch (error) {
 		if (signal.aborted) throw error;
 		console.warn('morphi:theme_worker_unavailable');
-		let index = 0;
-		return drawFreshTheme(family, history, () => seeds[index++]);
+		throw error;
 	}
 }

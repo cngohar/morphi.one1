@@ -8,7 +8,7 @@ import type { CompletedRun } from '#lib/engine/contract.js';
 import { createDatabase } from './db/index.js';
 import { completedRun, playSession } from './db/schema.js';
 import { generateTheme, type ResolvedTheme } from '#lib/engine/theme/generator.js';
-import { THEME_CONFIG_VERSION, THEME_GENERATOR_VERSION } from '#lib/engine/theme/config.js';
+import { readThemeVersion } from './config.js';
 
 export class RunError extends Error {
 	constructor(
@@ -51,8 +51,10 @@ export function parseRun(value: unknown): CompletedRun {
 		(!run.theme ||
 			typeof run.theme !== 'object' ||
 			Object.keys(run.theme).sort().join(',') !== 'configVersion,generatorVersion' ||
-			run.theme.configVersion !== THEME_CONFIG_VERSION ||
-			run.theme.generatorVersion !== THEME_GENERATOR_VERSION)
+			typeof run.theme.configVersion !== 'string' ||
+			!/^[a-zA-Z0-9-]{1,80}$/.test(run.theme.configVersion) ||
+			typeof run.theme.generatorVersion !== 'string' ||
+			!/^[a-zA-Z0-9-]{1,80}$/.test(run.theme.generatorVersion))
 	)
 		throw new RunError('theme_version', 409);
 	if (
@@ -149,9 +151,11 @@ export async function saveRun(
 	let submittedAt = now;
 	let rankedWallMs = 0;
 	let cardOpeningMs = 0;
-	let resolvedTheme = run.theme
-		? generateTheme(run.seed, run.family, run.theme.configVersion)
-		: null;
+	let resolvedTheme: ResolvedTheme | null = null;
+	if (run.theme && !run.rankedSession) {
+		const config = await readThemeVersion(binding, run.theme.configVersion);
+		resolvedTheme = generateTheme(run.seed, run.family, config);
+	}
 	if (run.rankedSession) {
 		const issued = await db
 			.select()

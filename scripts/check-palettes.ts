@@ -11,9 +11,14 @@ import {
 import {
 	drawFreshTheme,
 	FRESHNESS_RULES,
-	freshnessViolations
+	freshnessViolations,
+	freshnessScore
 } from '../src/lib/engine/theme/freshness.js';
-import { THEME_CONFIG_VERSION, THEME_GENERATOR_VERSION } from '../src/lib/engine/theme/config.js';
+import {
+	THEME_CONFIG,
+	THEME_CONFIG_VERSION,
+	THEME_GENERATOR_VERSION
+} from '../src/lib/engine/theme/config.js';
 
 // Read the documented anchors themselves: a stale, failing plan must fail verification.
 const plan = await readFile('docs/PLAN.md', 'utf8');
@@ -39,11 +44,14 @@ for (const preset of PRESETS) {
 	)
 		throw new Error(`Unsafe documented preset: ${preset.id}`);
 }
+const directory = 'docs/evidence/slice5-themes';
+// Freshness is a best-effort diagnostic; the palette safety gate keeps 10,000 seeds.
+const freshnessRounds = 1000;
 const report: Record<string, unknown> = {
 	config: THEME_CONFIG_VERSION,
 	generator: THEME_GENERATOR_VERSION,
 	seedsPerPuzzle: 10000,
-	roundsPerPuzzle: 10000,
+	roundsPerPuzzle: freshnessRounds,
 	colorModel:
 		'Machado 2009 severity 1.0 on linear sRGB; CIE76 D65; 8-bit hex checked after conversion'
 };
@@ -78,13 +86,20 @@ for (const family of ['memory', 'block', 'connect'] as const) {
 	let history: ResolvedTheme[] = [];
 	const violations = Object.fromEntries(FRESHNESS_RULES.map((rule) => [rule, 0]));
 	let anyViolation = 0;
-	for (let i = 0; i < 10000; i++) {
+	const freshnessScores: number[] = [];
+	const symbolSubsets = new Set<string>();
+	for (let i = 0; i < freshnessRounds; i++) {
 		const theme = drawFreshTheme(family, history, () => rng.nextU64().toString());
 		const failed = freshnessViolations(theme, history);
+		freshnessScores.push(freshnessScore(theme, history));
+		symbolSubsets.add([...new Set(theme.symbols.map(({ family }) => family))].sort().join(','));
 		if (failed.length) anyViolation++;
 		for (const rule of failed) violations[rule]++;
 		history = [...history, theme].slice(-3);
 	}
+	if (symbolSubsets.size < 2 || violations.symbols >= freshnessRounds - 1)
+		throw new Error(`${family}: symbol freshness still fails by construction`);
+	freshnessScores.sort((a, b) => a - b);
 	times.sort((a, b) => a - b);
 	const worstMs = times.at(-1)!;
 	report[family] = {
@@ -94,7 +109,15 @@ for (const family of ['memory', 'block', 'connect'] as const) {
 		freshness: {
 			anyViolation,
 			violations,
-			ratesPercent: Object.fromEntries(Object.entries(violations).map(([k, v]) => [k, v / 100]))
+			profile: THEME_CONFIG.profiles.default.freshness,
+			symbolSubsets: symbolSubsets.size,
+			weightedScore: {
+				median: freshnessScores[Math.floor(freshnessRounds * 0.5)],
+				p95: freshnessScores[Math.floor(freshnessRounds * 0.95)]
+			},
+			ratesPercent: Object.fromEntries(
+				Object.entries(violations).map(([k, v]) => [k, (v * 100) / freshnessRounds])
+			)
 		},
 		generationMs: {
 			runs: 10000,
@@ -109,11 +132,11 @@ for (const family of ['memory', 'block', 'connect'] as const) {
 		`${family}: 10,000 palettes pass; ${totalFallbacks} fallbacks; freshness violations ${JSON.stringify(violations)}`
 	);
 }
-await mkdir('docs/evidence/v1.1-themes', { recursive: true });
+await mkdir(directory, { recursive: true });
 await writeFile(
-	'docs/evidence/v1.1-themes/palettes.json',
+	`${directory}/palettes.json`,
 	await format(JSON.stringify(report), {
-		...(await resolveConfig('docs/evidence/v1.1-themes/palettes.json')),
+		...(await resolveConfig(`${directory}/palettes.json`)),
 		parser: 'json'
 	})
 );

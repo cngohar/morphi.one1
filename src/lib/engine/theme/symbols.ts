@@ -31,13 +31,29 @@ function polygon(sides: number, inner = 18): string {
 		).join(' ') + 'Z'
 	);
 }
-/** Ten distinct silhouettes; shape identity never comes from color. */
-export function generateSymbols(rng: Rng): ThemeSymbol[] {
+export const SYMBOL_FAMILIES: readonly string[] = [
+	'circle',
+	'triangle',
+	'square',
+	'pentagon',
+	'hexagon',
+	'star',
+	'ring',
+	'cross',
+	'arc',
+	'petals',
+	'diamond',
+	'heart'
+];
+/** Select distinct silhouettes; shape identity never comes from color. */
+export function generateSymbols(rng: Rng, count = 10, allowed = SYMBOL_FAMILIES): ThemeSymbol[] {
 	const inner = 7 + rng.nextInt(3);
-	return shuffle(rng, [
-		{ family: 'polygon', label: 'triangle', path: polygon(3) },
-		{ family: 'polygon', label: 'pentagon', path: polygon(5) },
-		{ family: 'polygon', label: 'hexagon', path: polygon(6) },
+	const silhouettes = [
+		{ family: 'circle', label: 'circle', path: 'M42 24a18 18 0 1 1-36 0a18 18 0 1 1 36 0Z' },
+		{ family: 'square', label: 'square', path: 'M7 7H41V41H7Z' },
+		{ family: 'triangle', label: 'triangle', path: polygon(3) },
+		{ family: 'pentagon', label: 'pentagon', path: polygon(5) },
+		{ family: 'hexagon', label: 'hexagon', path: polygon(6) },
 		{ family: 'star', label: 'star', path: polygon(5, inner) },
 		{
 			family: 'ring',
@@ -57,5 +73,9 @@ export function generateSymbols(rng: Rng): ThemeSymbol[] {
 			label: 'heart',
 			path: 'M24 43S5 31 5 17C5 4 20 3 24 12C28 3 43 4 43 17C43 31 24 43 24 43Z'
 		}
-	] satisfies ThemeSymbol[]);
+	] satisfies ThemeSymbol[];
+	const available = silhouettes.filter((s) => allowed.includes(s.family));
+	if (!Number.isSafeInteger(count) || count < 1 || count > available.length)
+		throw new RangeError('theme_symbols');
+	return shuffle(rng, available).slice(0, count);
 }

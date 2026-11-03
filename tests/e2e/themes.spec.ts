@@ -193,14 +193,14 @@ for (const family of ['memory', 'block'] as const)
 				await expect(page.locator('.ghost')).toHaveCount(0);
 			}
 			const history = await page.evaluate(
-				() =>
+				(key) =>
 					new Promise<unknown>((resolve, reject) => {
 						const opening = indexedDB.open('morphi-themes', 1);
 						opening.onerror = () => reject(opening.error);
 						opening.onsuccess = () => {
 							const db = opening.result,
 								tx = db.transaction('history'),
-								req = tx.objectStore('history').get('recent');
+								req = tx.objectStore('history').get(key);
 							tx.oncomplete = () => {
 								db.close();
 								resolve(req.result);
@@ -210,7 +210,8 @@ for (const family of ['memory', 'block'] as const)
 								reject(tx.error);
 							};
 						};
-					})
+					}),
+				`${family}:${THEME_CONFIG_VERSION}`
 			);
 			expect(history).toEqual([expected]);
 			const dimensions = await page.evaluate(() => ({

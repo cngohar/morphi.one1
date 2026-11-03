@@ -34,13 +34,17 @@
 	padding: 16px 24px;
 	display: flex;
 	flex-direction: column;
-	gap: 12px;
-	border: 1px solid
-		color-mix(in srgb, var(--round-edge, var(--border-strong)) 35%, var(--round-bg, var(--bg)));
-	border-radius: 24px;
+	gap: var(--space-12, 12px);
+	border: var(--line-1, 1px) solid
+		color-mix(
+			in srgb,
+			var(--round-edge, var(--border-strong)) var(--frame-edge-blend, 35%),
+			var(--round-bg, var(--bg))
+		);
+	border-radius: var(--radius-24, 24px);
 	background: color-mix(
 		in srgb,
-		var(--round-back, var(--surface-2)) 22%,
+		var(--round-back, var(--surface-2)) var(--frame-back-blend, 22%),
 		var(--round-bg, var(--bg))
 	) !important;
 	overflow: clip;
@@ -64,13 +68,13 @@
 	display: grid;
 	grid-template-columns: repeat(3, minmax(0, 1fr));
 	align-items: start;
-	gap: 8px;
+	gap: var(--space-8, 8px);
 }
 .design-public .active-round[data-family='connect'] .game .stat {
 	display: flex;
 	flex-direction: column;
 	align-items: center;
-	gap: 4px;
+	gap: var(--space-4, 4px);
 	min-width: 0;
 }
 .design-public .active-round[data-family='connect'] .game .stat-label {
@@ -86,16 +90,20 @@
 	position: static;
 	width: 100%;
 	flex: 0 0 auto;
-	gap: 4px;
+	gap: var(--space-4, 4px);
 	padding: 0 0 10px;
-	border-bottom: 1px solid
-		color-mix(in srgb, var(--round-edge, var(--border-strong)) 20%, transparent);
+	border-bottom: var(--line-1, 1px) solid
+		color-mix(
+			in srgb,
+			var(--round-edge, var(--border-strong)) var(--hud-edge-blend, 20%),
+			transparent
+		);
 }
 .design-public .active-round .game .hud > .stats {
 	display: flex;
 	flex-direction: row;
 	justify-content: space-around;
-	gap: 12px;
+	gap: var(--space-12, 12px);
 }
 .design-public .active-round .game .round-meta {
 	display: none;
@@ -112,7 +120,7 @@
 	display: grid;
 	place-items: center;
 	padding: 0;
-	gap: 12px;
+	gap: var(--space-12, 12px);
 }
 .design-public .active-round[data-family='memory'] .game .board {
 	--board-gap: clamp(5px, 1.5vmin, var(--theme-gap, 9px));
@@ -155,11 +163,15 @@
 	flex-shrink: 0;
 	padding: 10px max(20px, var(--safe-right)) calc(10px + var(--safe-bottom))
 		max(20px, var(--safe-left));
-	border-top: 1px solid
-		color-mix(in srgb, var(--round-edge, var(--border-strong)) 35%, var(--round-bg, var(--bg)));
+	border-top: var(--line-1, 1px) solid
+		color-mix(
+			in srgb,
+			var(--round-edge, var(--border-strong)) var(--frame-edge-blend, 35%),
+			var(--round-bg, var(--bg))
+		);
 	background: color-mix(
 		in srgb,
-		var(--round-back, var(--surface-2)) 22%,
+		var(--round-back, var(--surface-2)) var(--frame-back-blend, 22%),
 		var(--round-bg, var(--bg))
 	);
 }
@@ -167,7 +179,7 @@
 	display: flex;
 	align-items: center;
 	justify-content: space-between;
-	gap: 20px;
+	gap: var(--space-20, 20px);
 	width: min(100%, 1000px);
 	height: 100%;
 	margin: auto;
@@ -176,7 +188,7 @@
 	position: static;
 	display: flex;
 	flex-direction: row;
-	gap: 10px;
+	gap: var(--space-10, 10px);
 	width: auto;
 	margin: 0;
 	transform: none;
@@ -188,7 +200,7 @@
 	display: flex;
 	flex-direction: column;
 	align-items: flex-end;
-	gap: 2px;
+	gap: var(--space-2, 2px);
 }
 .design-public .family-high > span {
 	font-size: 10px;
@@ -200,7 +212,7 @@
 .design-public .family-high strong {
 	display: flex;
 	align-items: center;
-	gap: 8px;
+	gap: var(--space-8, 8px);
 	font-size: 24px;
 	font-weight: 950;
 }
@@ -209,9 +221,9 @@
 	letter-spacing: 0.08em;
 	font-weight: 900;
 	color: var(--ink-2);
-	border: 1px solid var(--border-strong);
+	border: var(--line-1, 1px) solid var(--border-strong);
 	padding: 2px 4px;
-	border-radius: 4px;
+	border-radius: var(--radius-4, 4px);
 }
 .design-public .mismatch-short {
 	display: none;
@@ -224,8 +236,8 @@
 	}
 	.design-public .active-round .game {
 		padding: 12px;
-		gap: 10px;
-		border-radius: 20px;
+		gap: var(--space-10, 10px);
+		border-radius: var(--radius-20, 20px);
 	}
 	.design-public .active-round[data-family='memory'] .game,
 	.design-public .active-round[data-family='block'] .game {
@@ -247,12 +259,12 @@
 		flex-wrap: wrap;
 		justify-content: center;
 		align-content: center;
-		gap: 6px;
+		gap: var(--space-6, 6px);
 	}
 	.design-public .family-high {
 		flex-direction: row;
 		align-items: center;
-		gap: 10px;
+		gap: var(--space-10, 10px);
 		width: 100%;
 		justify-content: center;
 	}
@@ -275,9 +287,9 @@
 		display: grid;
 		grid-template-columns: 116px minmax(0, 1fr);
 		grid-template-rows: minmax(0, 1fr);
-		gap: 14px;
+		gap: var(--space-14, 14px);
 		padding: 8px 12px;
-		border-radius: 16px;
+		border-radius: var(--radius-16, 16px);
 	}
 	.design-public .active-round .game > .hud {
 		position: static;
@@ -290,7 +302,7 @@
 	.design-public .active-round .game .hud > .stats {
 		display: grid;
 		grid-template-columns: repeat(2, minmax(0, 1fr));
-		gap: 8px;
+		gap: var(--space-8, 8px);
 	}
 	.design-public .active-round .game .stage {
 		grid-column: 2;
@@ -313,7 +325,7 @@
 		width: 68px;
 		height: 100%;
 		flex-direction: column;
-		gap: 6px;
+		gap: var(--space-6, 6px);
 		justify-content: center;
 	}
 	.design-public .active-round[data-family='block'] .game .tray-slot {
@@ -348,7 +360,7 @@
 	}
 	.design-public .active-round .game-header {
 		grid-template-rows: 40px 24px;
-		row-gap: 4px;
+		row-gap: var(--space-4, 4px);
 		padding: 8px 20px;
 	}
 	.design-public .active-round .game-header .puzzle-name {
@@ -361,10 +373,10 @@
 		flex-wrap: nowrap;
 		justify-content: space-between;
 		align-content: center;
-		gap: 10px;
+		gap: var(--space-10, 10px);
 	}
 	.design-public .round-panel .help-controls {
-		gap: 6px;
+		gap: var(--space-6, 6px);
 	}
 	.design-public .round-panel .btn {
 		font-size: 10px;

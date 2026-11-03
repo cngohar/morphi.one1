@@ -1,5 +1,13 @@
+import legacyThemeDefaults from '#lib/engine/theme/config-v1.json' with { type: 'json' };
 import { catalog } from '#lib/catalog.js';
-import { THEME_CONFIG, type ThemeConfig } from '#lib/engine/theme/config.js';
+import {
+	THEME_CONFIG,
+	validateThemeConfig,
+	validateStyleConfig,
+	type ThemeConfig
+} from '#lib/engine/theme/config.js';
+import { checkThemeConfig } from '#lib/engine/theme/generator.js';
+export { validateThemeConfig, validateStyleConfig };
 import { cachedConfigRow } from './config-cache.js';
 import { RunError } from './runs.js';
 
@@ -42,81 +50,6 @@ export function validateGameConfig(value: unknown): GameConfig {
 	return { weight: config.weight };
 }
 
-function finite(value: unknown, min: number, max: number): value is number {
-	return typeof value === 'number' && Number.isFinite(value) && value >= min && value <= max;
-}
-function strings(value: unknown): value is string[] {
-	return (
-		Array.isArray(value) &&
-		value.length > 0 &&
-		value.length <= 64 &&
-		value.every((item) => typeof item === 'string' && /^[a-z][a-z0-9-]{0,63}$/.test(item)) &&
-		new Set(value).size === value.length
-	);
-}
-export function validateStyleConfig(value: unknown): ThemeConfig['styles'] {
-	if (!Array.isArray(value) || value.length === 0 || value.length > 64)
-		throw new RangeError('style_config');
-	const styles = value as ThemeConfig['styles'];
-	if (
-		styles.some(
-			(style) =>
-				!style ||
-				Object.keys(style).sort().join(',') !== 'aspect,border,fill,gap,id,radius' ||
-				!strings([style.id]) ||
-				!finite(style.radius, 0, 32) ||
-				!finite(style.border, 1, 4) ||
-				!finite(style.gap, 0, 16) ||
-				!finite(style.aspect, 0.8, 1.2) ||
-				!['solid', 'outline'].includes(style.fill)
-		) ||
-		new Set(styles.map((style) => style.id)).size !== styles.length
-	)
-		throw new RangeError('style_config');
-	return styles;
-}
-export function validateThemeConfig(value: unknown, version?: string): ThemeConfig {
-	if (!value || typeof value !== 'object' || Array.isArray(value))
-		throw new RangeError('theme_config');
-	const config = value as ThemeConfig;
-	if (
-		Object.keys(config).sort().join(',') !== 'backdrops,containers,recipes,styles,version' ||
-		typeof config.version !== 'string' ||
-		!/^[a-zA-Z0-9-]{1,80}$/.test(config.version) ||
-		(version !== undefined && config.version !== version) ||
-		!strings(config.containers) ||
-		!strings(config.backdrops) ||
-		!Array.isArray(config.recipes) ||
-		config.recipes.length === 0 ||
-		config.recipes.length > 64
-	)
-		throw new RangeError('theme_config');
-	validateStyleConfig(config.styles);
-	for (const recipe of config.recipes) {
-		if (
-			!recipe ||
-			Object.keys(recipe).sort().join(',') !== 'chroma,id,jitter,offsets,targets' ||
-			!strings([recipe.id]) ||
-			!Array.isArray(recipe.offsets) ||
-			recipe.offsets.length > 16 ||
-			!recipe.offsets.every((n) => finite(n, -360, 360)) ||
-			!finite(recipe.jitter, 0, 30) ||
-			!Array.isArray(recipe.chroma) ||
-			recipe.chroma.length !== 2 ||
-			!recipe.chroma.every((n) => finite(n, 0, 0.19)) ||
-			recipe.chroma[0] > recipe.chroma[1] ||
-			!Array.isArray(recipe.targets) ||
-			recipe.targets.length < 3 ||
-			recipe.targets.length > 16 ||
-			!recipe.targets.every((n) => finite(n, 3.3, 21))
-		)
-			throw new RangeError('theme_config');
-	}
-	if (new Set(config.recipes.map((recipe) => recipe.id)).size !== config.recipes.length)
-		throw new RangeError('theme_config');
-	return config;
-}
-
 async function readConfig<T>(
 	db: D1Database,
 	cache: KVNamespace | undefined,
@@ -146,12 +79,7 @@ async function readConfig<T>(
 					typeof row.values_json !== 'string'
 				)
 					return null;
-				try {
-					validate(JSON.parse(row.values_json), row.version);
-					return row;
-				} catch {
-					return null;
-				}
+				return row;
 			};
 			const row = await cachedConfigRow(
 				cache,
@@ -192,17 +120,22 @@ export function readGameConfig(db: D1Database, family: string, cache?: KVNamespa
 		validateGameConfig
 	);
 }
-// Storage/read contracts only. Theme generation and admin publishing belong to Slice 5.
+// CPU-only cache of immutable public snapshots; live pointers still come from D1.
+const themeSafety = new Map<string, boolean>();
+function safeTheme(value: unknown, version?: string): ThemeConfig {
+	const config = validateThemeConfig(value, version);
+	const key = JSON.stringify(config);
+	let safe = themeSafety.get(key);
+	if (safe === undefined) {
+		safe = checkThemeConfig(config).length === 0;
+		if (themeSafety.size >= 16) themeSafety.delete(themeSafety.keys().next().value!);
+		themeSafety.set(key, safe);
+	}
+	if (!safe) throw new RangeError('theme_palette');
+	return config;
+}
 export function readThemeConfig(db: D1Database, cache?: KVNamespace) {
-	return readConfig(
-		db,
-		cache,
-		'theme',
-		null,
-		THEME_CONFIG.version,
-		THEME_CONFIG,
-		validateThemeConfig
-	);
+	return readConfig(db, cache, 'theme', null, THEME_CONFIG.version, THEME_CONFIG, safeTheme);
 }
 export function readStyleConfig(db: D1Database, family: string, cache?: KVNamespace) {
 	defaultGameConfig(family);
@@ -215,4 +148,25 @@ export function readStyleConfig(db: D1Database, family: string, cache?: KVNamesp
 		THEME_CONFIG.styles,
 		validateStyleConfig
 	);
+}
+
+export async function readLiveThemeConfig(db: D1Database, cache?: KVNamespace) {
+	const live = await db
+		.prepare("SELECT version FROM config_live WHERE key='theme'")
+		.first<{ version: string }>();
+	return {
+		liveVersion: live?.version ?? THEME_CONFIG.version,
+		...(await readThemeConfig(db, cache))
+	};
+}
+export async function readThemeVersion(db: D1Database, version: string): Promise<ThemeConfig> {
+	if (version === THEME_CONFIG.version) return THEME_CONFIG;
+	// Queued solo results from the previous build retain their version and safe cosmetics.
+	if (version === legacyThemeDefaults.version) return { ...THEME_CONFIG, version };
+	const row = await db
+		.prepare('SELECT values_json FROM theme_config WHERE version=?')
+		.bind(version)
+		.first<{ values_json: string }>();
+	if (!row) throw new RunError('theme_version', 409);
+	return safeTheme(JSON.parse(row.values_json), version);
 }

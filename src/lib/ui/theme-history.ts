@@ -1,15 +1,18 @@
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { THEME_CONFIG_VERSION, THEME_GENERATOR_VERSION } from '#lib/engine/theme/config.js';
 
-let recent: ResolvedTheme[] = [];
-function valid(value: unknown): value is ResolvedTheme[] {
+const recent = new Map<string, ResolvedTheme[]>();
+const shadow = new Set<string>();
+const historyKey = (family: string, version: string) => `${family}:${version}`;
+function valid(value: unknown, family: string, version: string): value is ResolvedTheme[] {
 	return (
 		Array.isArray(value) &&
-		value.length <= 3 &&
+		value.length <= 8 &&
 		value.every(
 			(t) =>
 				t &&
-				t.themeConfigVersion === THEME_CONFIG_VERSION &&
+				t.family === family &&
+				t.themeConfigVersion === version &&
 				t.themeGeneratorVersion === THEME_GENERATOR_VERSION &&
 				typeof t.recipe === 'string' &&
 				typeof t.baseHue === 'number' &&
@@ -20,7 +23,7 @@ function valid(value: unknown): value is ResolvedTheme[] {
 		)
 	);
 }
-async function access(write?: ResolvedTheme[]): Promise<unknown> {
+async function access(key: string, write?: ResolvedTheme[]): Promise<unknown> {
 	return new Promise((resolve, reject) => {
 		const opening = indexedDB.open('morphi-themes', 1);
 		let settled = false;
@@ -56,7 +59,7 @@ async function access(write?: ResolvedTheme[]): Promise<unknown> {
 				const tx = db.transaction('history', write ? 'readwrite' : 'readonly');
 				transaction = tx;
 				const store = tx.objectStore('history');
-				const req = write ? store.put(write, 'recent') : store.get('recent');
+				const req = write ? store.put(write, key) : store.get(key);
 				tx.oncomplete = () => {
 					clearTimeout(timeout);
 					settled = true;
@@ -74,23 +77,29 @@ async function access(write?: ResolvedTheme[]): Promise<unknown> {
 		};
 	});
 }
-let shadow = false;
-export async function themeHistory(): Promise<ResolvedTheme[]> {
-	if (!shadow)
+export async function themeHistory(
+	family = 'memory',
+	version = THEME_CONFIG_VERSION,
+	limit = 3
+): Promise<ResolvedTheme[]> {
+	const key = historyKey(family, version);
+	if (!shadow.has(key))
 		try {
-			const stored = await access();
-			if (valid(stored)) recent = stored;
+			const stored = await access(key);
+			if (valid(stored, family, version)) recent.set(key, stored);
 		} catch {
 			console.warn('morphi:theme_history_unavailable');
 		}
-	return recent.slice();
+	return (recent.get(key) ?? []).slice(-limit);
 }
 export async function rememberTheme(theme: ResolvedTheme): Promise<void> {
-	recent = [...recent, theme].slice(-3);
-	shadow = true;
+	const key = historyKey(theme.family, theme.themeConfigVersion);
+	const history = [...(recent.get(key) ?? []), theme].slice(-8);
+	recent.set(key, history);
+	shadow.add(key);
 	try {
-		await access(JSON.parse(JSON.stringify(recent)));
-		shadow = false;
+		await access(key, JSON.parse(JSON.stringify(history)));
+		shadow.delete(key);
 	} catch {
 		console.warn('morphi:theme_history_unavailable');
 	}

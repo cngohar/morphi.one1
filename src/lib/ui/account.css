@@ -7,7 +7,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: center;
-	gap: 16px;
+	gap: var(--space-16, 16px);
 	padding: calc(24px + var(--safe-top)) calc(40px + var(--safe-right)) 24px
 		calc(40px + var(--safe-left));
 }
@@ -24,9 +24,9 @@
 	place-items: center;
 	width: 44px;
 	height: 44px;
-	border: 1px solid var(--border);
+	border: var(--line-1, 1px) solid var(--border);
 	background: var(--surface);
-	border-radius: 50%;
+	border-radius: var(--radius-50percent, 50%);
 }
 .account-close svg {
 	width: 20px;
@@ -41,7 +41,7 @@
 .account-signin {
 	display: grid;
 	grid-template-columns: 1.1fr 1fr;
-	gap: 92px;
+	gap: var(--space-92, 92px);
 	align-items: center;
 }
 .account-eyebrow {
@@ -72,12 +72,12 @@
 	display: grid;
 	grid-template-columns: repeat(4, 32px);
 	grid-template-rows: repeat(3, 32px);
-	gap: 5px;
+	gap: var(--space-5, 5px);
 	margin-top: 44px;
 	width: max-content;
 }
 .account-art i {
-	border-radius: 7px;
+	border-radius: var(--radius-7, 7px);
 	background: var(--primary);
 }
 .account-art i:nth-child(3n) {
@@ -111,12 +111,12 @@
 	min-height: 52px;
 	padding: 12px 22px;
 	border: 0;
-	border-radius: 14px;
+	border-radius: var(--radius-14, 14px);
 	font-weight: 800;
 	display: inline-flex;
 	align-items: center;
 	justify-content: center;
-	gap: 12px;
+	gap: var(--space-12, 12px);
 	text-decoration: none;
 	background: var(--primary);
 	color: var(--surface);
@@ -128,14 +128,14 @@
 .account-button.secondary {
 	color: var(--ink);
 	background: var(--surface);
-	border: 1px solid var(--border-strong);
+	border: var(--line-1, 1px) solid var(--border-strong);
 }
 .account-button.secondary:hover {
 	background: var(--surface-2);
 }
 .account-button:disabled {
 	cursor: default;
-	opacity: 0.65;
+	opacity: var(--disabled-opacity, 0.65);
 }
 .account-google {
 	width: 100%;
@@ -165,12 +165,12 @@
 .account-auth .account-optional {
 	margin-top: 22px;
 	padding-top: 20px;
-	border-top: 1px solid var(--border);
+	border-top: var(--line-1, 1px) solid var(--border);
 	font-size: var(--text-13);
 }
 .account-notice {
 	margin-top: 18px;
-	border-left: 3px solid var(--primary);
+	border-left: var(--line-3, 3px) solid var(--primary);
 	padding: 10px 14px;
 	font-size: var(--text-15);
 	background: var(--surface);
@@ -202,8 +202,8 @@
 .account-input {
 	width: 100%;
 	height: 56px;
-	border: 1px solid var(--border-strong);
-	border-radius: 12px;
+	border: var(--line-1, 1px) solid var(--border-strong);
+	border-radius: var(--radius-12, 12px);
 	padding: 12px 16px;
 	background: var(--surface);
 	margin-top: 8px;
@@ -221,7 +221,7 @@
 	display: flex;
 	justify-content: space-between;
 	align-items: flex-end;
-	gap: 20px;
+	gap: var(--space-20, 20px);
 	margin-bottom: 32px;
 }
 .account-page-top .account-title {
@@ -242,7 +242,7 @@
 .account-profile-grid {
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 48px;
+	gap: var(--space-48, 48px);
 }
 .account-section-title {
 	font-size: var(--text-20);
@@ -251,13 +251,13 @@
 	margin-top: 16px;
 	display: grid;
 	grid-template-columns: 1fr 1fr;
-	gap: 12px;
+	gap: var(--space-12, 12px);
 }
 .account-stat {
 	padding: 20px;
 	background: var(--surface);
-	border: 1px solid var(--border);
-	border-radius: 16px;
+	border: var(--line-1, 1px) solid var(--border);
+	border-radius: var(--radius-16, 16px);
 }
 .account-stat-name {
 	font-size: var(--text-15);
@@ -278,10 +278,10 @@
 	line-height: 1.6;
 }
 .account-actions {
-	border-top: 1px solid var(--border);
+	border-top: var(--line-1, 1px) solid var(--border);
 	display: flex;
 	align-items: center;
-	gap: 24px;
+	gap: var(--space-24, 24px);
 	margin-top: 32px;
 	flex-wrap: wrap;
 }
@@ -294,8 +294,8 @@
 	color: var(--danger);
 }
 .account-dialog {
-	border: 1px solid var(--border);
-	border-radius: 20px;
+	border: var(--line-1, 1px) solid var(--border);
+	border-radius: var(--radius-20, 20px);
 	padding: 28px;
 	background: var(--surface);
 	color: var(--ink);
@@ -303,7 +303,7 @@
 }
 .account-dialog::backdrop {
 	background: var(--ink);
-	opacity: 0.28;
+	opacity: var(--dialog-backdrop-opacity, 0.28);
 }
 .account-dialog p {
 	font-size: var(--text-15);
@@ -335,7 +335,7 @@
 	.account-signin {
 		grid-template-columns: 1fr;
 		align-content: center;
-		gap: 40px;
+		gap: var(--space-40, 40px);
 	}
 	.account-intro .account-title {
 		font-size: 56px;
@@ -349,7 +349,7 @@
 	.account-art {
 		grid-template-columns: repeat(4, 24px);
 		grid-template-rows: repeat(3, 24px);
-		gap: 4px;
+		gap: var(--space-4, 4px);
 		margin-top: 24px;
 	}
 	.account-auth {
@@ -386,7 +386,7 @@
 	}
 	.account-profile-grid {
 		grid-template-columns: 1fr;
-		gap: 28px;
+		gap: var(--space-28, 28px);
 	}
 	.account-stat {
 		padding: 16px;
@@ -395,7 +395,7 @@
 		font-size: 32px;
 	}
 	.account-actions {
-		gap: 10px 24px;
+		gap: var(--space-10, 10px) var(--space-24, 24px);
 		margin-top: 24px;
 	}
 	.account-actions .account-delete {
@@ -410,7 +410,7 @@
 		padding: 12px 32px 20px;
 	}
 	.account-signin {
-		gap: 48px;
+		gap: var(--space-48, 48px);
 	}
 	.account-intro .account-title {
 		font-size: 48px;
@@ -422,7 +422,7 @@
 	.account-art {
 		grid-template-columns: repeat(4, 22px);
 		grid-template-rows: repeat(3, 22px);
-		gap: 4px;
+		gap: var(--space-4, 4px);
 		margin-top: 18px;
 	}
 	.account-auth .account-heading {
@@ -449,7 +449,7 @@
 		max-width: 740px;
 		display: grid;
 		grid-template-columns: 1fr 1fr;
-		column-gap: 32px;
+		column-gap: var(--space-32, 32px);
 		align-content: center;
 	}
 	.account-narrow .account-eyebrow,

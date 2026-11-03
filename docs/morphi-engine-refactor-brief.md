@@ -68,12 +68,24 @@ and Slice 4 is authorised to start, with fast checks for the
 remaining slices as previously decided. Slice 4 must stop for
 owner confirmation before Slice 5, and must NOT run a full
 bun run verify; the next full milestone is after Slice 6.
-Owner confirmation, 2026-11-02: Slice 4 is accepted locally and
-committing/pushing its completed changes to GitHub is authorised.
-This is fast-only acceptance pending the full milestone after
-Slice 6. The Slice 0 base-tag test remains deferred and outstanding.
-Slice 5 has not started; this Git handoff does not start it or
-authorise deployment or production changes.
+Update 2026-11-02 ~18:49 PKT: owner pushed Slice 4 and assistant
+verified: commit 2cbaf49, "Refactor selector cycles, lazy pools
+and persistence", full hash 2cbaf49f77de952a7032f8aaefed0a6d8bfba005,
+2026-11-02 18:49:40 +0500, 32 files, 1705 insertions, 329
+deletions. Diff inspection confirms selector rewritten with
+gap = min(5, max(1, floor(count/3))), a small generated
+family-index, selector-eligibility, slice4 property test
+(392 lines) and selector-reload e2e test present. Assistant did
+not rerun fast checks itself; Codex's fast-check pass (15 Slice 4
+cases, Chromium refresh test, ten 50-family cycles at 1.95 ms
+median / 2.83 ms p95) remains Codex-reported. Slice 4 is NOT
+owner-confirmed yet. Slice 5 has not started. Total Slice 4 time
+reported: 24m 44s, versus 1h 46m for Slice 2 with full verify.
+Owner confirmation, 2026-11-02 ~18:54 PKT: Slice 4 is confirmed
+and Slice 5 is authorised to start, with fast checks. Slice 5
+must stop for owner confirmation before Slice 6, and must NOT
+run a full bun run verify; the next full milestone is after
+Slice 6.
 Progress, Codex-reported 2026-11-01 ~18:33 PKT, NOT yet owner-
 confirmed, NOT committed or pushed to GitHub: Slice 1 is
 complete locally — manifest-owned scoring and messages, generic

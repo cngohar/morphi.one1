@@ -12,6 +12,7 @@ export const permissions = {
 		'undo',
 		'audit-export',
 		'scoring',
+		'themes',
 		'dashboard',
 		'status',
 		'moderation',

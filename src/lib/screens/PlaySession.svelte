@@ -50,7 +50,9 @@
 		saveSoundEnabled
 	} from '#lib/ui/storage.js';
 
-	import { generateTheme, type ResolvedTheme } from '#lib/engine/theme/generator.js';
+	import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
+	import { loadThemeConfig } from '#lib/ui/theme-config.js';
+	import { themeProfile } from '#lib/engine/theme/config.js';
 	import { soloTheme } from '#lib/ui/solo-theme.js';
 	import { createPreparationSlot } from '#lib/ui/prepare-ahead.js';
 	import { rememberTheme, themeHistory } from '#lib/ui/theme-history.js';
@@ -153,7 +155,19 @@
 	let resolvedTheme = $state<ResolvedTheme | null>(null);
 	const generationLifetime = new AbortController();
 	const preparation = createPreparationSlot(async (chosen, signal) => {
-		const theme = accountsEnabled ? await soloTheme(chosen, await themeHistory(), signal) : null;
+		const config = accountsEnabled ? await loadThemeConfig() : null;
+		const theme = config
+			? await soloTheme(
+					chosen,
+					await themeHistory(
+						chosen,
+						config.version,
+						themeProfile(config, chosen).freshness.history
+					),
+					signal,
+					config
+				)
+			: null;
 		if (signal.aborted) throw new Error('round_cancelled');
 		const seed = theme?.seed ?? randomSeed();
 		return {
@@ -318,7 +332,7 @@
 				console.warn('morphi:score_defaults_offline');
 			}
 		}
-		if (accountsEnabled) nextTheme ??= generateTheme(seed, chosen);
+		if (accountsEnabled && !nextTheme) throw new Error('round_theme_missing');
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 		const nextRound =
 			candidate?.round ??

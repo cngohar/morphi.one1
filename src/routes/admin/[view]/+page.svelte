@@ -1,5 +1,6 @@
 <script lang="ts">
 	import { onMount, untrack } from 'svelte';
+	import ThemeEditor from '#lib/components/ThemeEditor.svelte';
 	import ScoringEditor from '#lib/components/ScoringEditor.svelte';
 	import Brand from '#lib/components/Brand.svelte';
 	import { resolve } from '$app/paths';
@@ -21,7 +22,8 @@
 		'queue',
 		'audit',
 		'privacy',
-		'scoring'
+		'scoring',
+		'themes'
 	];
 	let ref = $state('');
 	const key = (suffix: string) => `v1.admin.${suffix}` as MessageKey;
@@ -1004,6 +1006,11 @@
 								/>{/each}{/if}
 					{/each}
 				{/if}
+			{:else if data.view === 'themes' && data.themes}
+				{#if form && 'themeIssues' in form}<p role="status">
+						{form.themeIssues?.length ? form.themeIssues.join(', ') : t('themes.checked')}
+					</p>{/if}
+				<ThemeEditor config={data.themes} />
 			{:else if data.view === 'scoring'}
 				{#each data.scoring as config (`${config.family}:${config.version}`)}<ScoringEditor
 						{config}

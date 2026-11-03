@@ -567,7 +567,7 @@ it('uses safe defaults for invalid and unreachable config', async () => {
 			.bind(`game:${family}`, gameInvalid),
 		db()
 			.prepare('INSERT INTO theme_config(version,parent,values_json,created_at) VALUES(?,?,?,?)')
-			.bind(themeInvalid, THEME_CONFIG.version, '{', now),
+			.bind(themeInvalid, crypto.randomUUID(), '{', now),
 		db().prepare('INSERT INTO config_live(key,version) VALUES(?,?)').bind('theme', themeInvalid),
 		db()
 			.prepare(

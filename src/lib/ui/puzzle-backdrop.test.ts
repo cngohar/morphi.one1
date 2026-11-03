@@ -50,3 +50,12 @@ it('always scatters only the current puzzle objects without mutating its approve
 		puzzleBackdrop(generateTheme('2', 'memory'))
 	);
 });
+
+it('uses configured backdrop choices in the actual scatter without changing palette or family objects', () => {
+	const theme = generateTheme('42', 'memory');
+	const corners = puzzleBackdrop({ ...theme, backdrop: { ...theme.backdrop, kind: 'corners' } });
+	const diagonal = puzzleBackdrop({ ...theme, backdrop: { ...theme.backdrop, kind: 'diagonal' } });
+	expect(corners.items).not.toEqual(diagonal.items);
+	expect(corners.color).toBe(diagonal.color);
+	expect([...corners.items, ...diagonal.items].every((item) => item.kind === 'card')).toBe(true);
+});

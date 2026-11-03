@@ -10,7 +10,11 @@ export function puzzleBackdrop(theme: ResolvedTheme) {
 		boolean
 	>;
 	if (!Object.hasOwn(families, theme.family)) throw new RangeError('backdrop_family');
-	const rng = createRng((normalizeSeed(theme.seed) ^ 0x73636174746572n).toString());
+	let scatterSeed = normalizeSeed(theme.seed) ^ 0x73636174746572n;
+	// Published backdrop choices must affect the rendered layout as well as its label.
+	for (const character of theme.backdrop.kind)
+		scatterSeed = BigInt.asUintN(64, scatterSeed * 257n + BigInt(character.codePointAt(0)!));
+	const rng = createRng(scatterSeed.toString());
 	const fraction = () => rng.nextInt(1000) / 1000;
 	let color = theme.backdrop.color;
 	for (const strength of [0.65, 0.6, 0.55, 0.5]) {

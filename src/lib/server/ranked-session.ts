@@ -1,16 +1,17 @@
-import { desc, eq } from 'drizzle-orm';
+import { and, desc, eq } from 'drizzle-orm';
 import { catalog } from '#lib/catalog.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { randomSeed } from '#lib/seeds.js';
 import { defaultScoreConfig } from '#lib/scoring.js';
 import { CARD_RANKED_OPENING_MS } from '#lib/round-timing.js';
+import { themeProfile } from '#lib/engine/theme/config.js';
 import { drawFreshTheme } from '#lib/engine/theme/freshness.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { createDatabase } from './db/index.js';
 import { playSession } from './db/schema.js';
 import { readLiveScoreConfig } from './scoring.js';
 import { RunError } from './runs.js';
-import { ensureCatalogFamily } from './config.js';
+import { ensureCatalogFamily, readThemeConfig } from './config.js';
 
 export async function activeRanked(binding: D1Database, userId: string, now = Date.now()) {
 	const row = await binding
@@ -54,16 +55,17 @@ export async function startRanked(
 	await ensureCatalogFamily(binding, family);
 	const db = createDatabase(binding);
 	const id = crypto.randomUUID();
+	const { values: themeConfig } = await readThemeConfig(binding, cache);
 	const recent = await db
 		.select({ snapshot: playSession.themeSnapshot })
 		.from(playSession)
-		.where(eq(playSession.userId, userId))
+		.where(and(eq(playSession.userId, userId), eq(playSession.family, family)))
 		.orderBy(desc(playSession.sequence))
-		.limit(3);
+		.limit(themeProfile(themeConfig, family).freshness.history);
 	const history = recent.flatMap((row) =>
 		row.snapshot ? [JSON.parse(row.snapshot) as ResolvedTheme] : []
 	);
-	const theme = drawFreshTheme(family, history, randomSeed);
+	const theme = drawFreshTheme(family, history, randomSeed, themeConfig);
 	const seed = theme.seed;
 	// One conditional statement serializes caps and insertion. No read/check/write gap.
 	for (let attempt = 0; attempt < 3; attempt++) {

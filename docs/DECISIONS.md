@@ -1034,3 +1034,59 @@ The algorithm's linear bound follows from its fixed-width radix passes and
 bounded gap, rather than a timing-only inference. Slice 4 runs only the authorized
 fast checks and targeted reload test; the next full verification is after Slice 6,
 with the final full run after Slice 7. No deployment is authorized.
+
+## Engine refactor Slice 5 — Theme and style administration (2026-11-03)
+
+Owner-confirmed base: `2cbaf49` (Slice 4). Slice 5 only; no Slice 6 work or deployment.
+
+- Publish one coherent `theme_config` snapshot containing recipes, style definitions,
+  container/backdrop pools, family profiles and 94 site token values. A family may
+  override the `default` profile. Existing Slice 3 style read contracts remain
+  available; publishing the combined snapshot prevents palette/style/token drift.
+- Migration `0012_theme_admin.sql` adds immutable drafts and a unique theme parent.
+  Draft/check/preview do not advance live play. Publishing and rollback atomically
+  write an immutable child, advance the D1 pointer and append an audit record.
+  Concurrent/stale publication fails rather than overwriting an intervening edit.
+  Rollback creates a new version with the selected prior values and records its
+  source. Admin access and sensitive writes reuse the existing role/TOTP/freshness
+  guards. No new dependencies or package-version changes were introduced.
+- Default theme configuration is `theme-2026-11-02-1`; cosmetic generator is
+  `oklch-machado-2`. Puzzle engine versions, rules, score logic, canonical hashes,
+  endings and sounds are unchanged. Only cosmetic theme vector fixtures changed.
+  Ranked runs retain their authoritative issued snapshots. The previous bundled
+  solo config identifier remains readable with safe default profiles/tokens so
+  queued scores are not rejected solely for that older cosmetic identifier.
+- Freshness minimizes weighted penalties over up to eight candidates by default,
+  with an early exit at zero. Default weights are recipe 3, hue 2, style 2,
+  container 1 and symbols 2. History is isolated by family and configuration;
+  configured history is bounded to eight, default three. Repeats remain preferences,
+  not generation failures. Ten distinct silhouettes are selected from twelve by
+  default. Admin counts are limited to 10–12 because current renderers index ten
+  identities; no cut-out variants or ambiguous duplicate accessible names were added.
+- Cache contrast solves by recipe, one-degree hue bucket, chroma rounded to 0.01,
+  target and ground color. The cache is bounded to 32,768 entries. Runtime readers
+  follow invalid snapshot parents, with a 32-version traversal bound, and use a
+  bounded CPU-only safety-result cache. D1 remains authoritative for live pointers;
+  KV caches immutable version rows only. An invalid cached palette cannot become
+  an effective live theme.
+- Keep OKLCH gamut reduction, Machado checks and site text contrast as publishing
+  gates. Raw CSS, arbitrary token names and unsafe token dimensions are rejected.
+  CSS fallbacks preserve first-load/guest rendering; conflicting wrapper overrides
+  were removed. Circle/squircle radii and the hexagon clip are recorded in resolved
+  snapshots. Structural layout, responsive fitting and input geometry stay in code.
+  See `docs/SLICE5_CSS_AUDIT.md` for the four-file audit.
+- Normal solo generation uses a Web Worker; Worker failure surfaces through the
+  existing retry/result-preservation flow, without synchronous palette solving.
+  The live snapshot is passed into preparation. Generation scatters backdrop
+  coordinates independently rather than using evenly spaced columns/diagonals.
+  The actual rendered scatter seed includes the configured backdrop kind, so
+  editing its pool changes the visible layout as well as metadata.
+- Keep 10,000 palette safety samples per family. The best-effort freshness
+  diagnostic uses 1,000 rounds per family under the owner's fast-check method;
+  no numeric freshness acceptance target was supplied. The earlier longer
+  diagnostic was stopped without a result. Full verification remains after
+  Slice 6 and after Slice 7. The Slice 0 base-tag test remains deferred and outstanding.
+
+D1 transaction behavior was checked against the current
+[Cloudflare D1 batch documentation](https://developers.cloudflare.com/d1/worker-api/d1-database/).
+Real local D1 concurrency, fallback and rollback tests corroborate this flow.

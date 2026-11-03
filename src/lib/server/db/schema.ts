@@ -314,3 +314,10 @@ export const configLive = sqliteTable('config_live', {
 	key: text('key').primaryKey(),
 	version: text('version').notNull()
 });
+
+export const themeDraft = sqliteTable('theme_draft', {
+	id: text('id').primaryKey(),
+	baseVersion: text('base_version').notNull(),
+	valuesJson: text('values_json').notNull(),
+	createdAt: integer('created_at').notNull()
+});

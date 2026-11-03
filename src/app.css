@@ -2,11 +2,11 @@
 	color-scheme: light;
 	--bg: #eef2f7;
 	--surface: #ffffff;
-	--surface-2: #eef3fc;
+	--surface-2: #e5edf7;
 	--border: #c9d6e4;
 	--border-strong: #7a889e;
 	--ink: #1b2433;
-	--ink-2: #3b475c;
+	--ink-2: #344257;
 	--muted: #5a6b82;
 	--primary: #e5532d;
 	--primary-strong: #c9441f;
@@ -22,9 +22,9 @@
 	--danger: #b42318;
 	--focus: #2f6fed;
 
-	--memory-bg: #e8f0fc;
-	--memory-back: #a9bcdd;
-	--memory-edge: var(--border-strong);
+	--memory-bg: #dfe9f5;
+	--memory-back: #a9bfdf;
+	--memory-edge: #90aac9;
 	--memory-face: #ffffff;
 	--memory-matched: #eef3fc;
 	--memory-mark: var(--success);

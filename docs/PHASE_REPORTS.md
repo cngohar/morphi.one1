@@ -2106,3 +2106,122 @@ full milestone after Slice 6; the Slice 0 base-tag test remains deferred and
 outstanding. This Git handoff does not start Slice 5 or authorize deployment or
 production changes. Existing app-test evidence is retained; app tests were not
 repeated for this documentation/Git handoff.
+
+## Engine refactor Slice 5 — Theme/style admin, freshness and palette cache (2026-11-03)
+
+**Status:** complete locally for owner review, from owner-confirmed Slice 4 push
+`2cbaf49` ("Refactor selector cycles, lazy pools and persistence"). Work resumed
+following the interrupted 2026-11-02 session. Slice 4 was not reopened. Slice 6
+has not started and requires the owner's written confirmation. This fast-only
+result remains provisional until the full milestone after Slice 6.
+
+**Built:** `/admin/themes` provides immutable JSON drafts, palette/config checks,
+protected Worker previews, publish and rollback using the existing sensitive
+operator guards and audit flow. The versioned D1 snapshot includes recipes,
+styles, containers, backdrops, per-family profiles and site tokens. Migration
+`0012_theme_admin.sql` preserves existing rows and adds immutable drafts and
+single-child publication conflict protection. Live readers follow bad versions
+back to their last valid parent, including invalid cached rows. Rollback restores
+prior values in a new audited version without changing code. The local browser
+fixture restores its original values after exercising publication and rollback.
+
+Freshness now selects the lowest weighted penalty among bounded candidates,
+using family/version history and varying distinct symbol subsets. Palette solves
+are cached by recipe, hue bucket, chroma, target and ground. OKLCH/Machado safety
+and site contrast remain hard publishing gates. Normal solo generation stays in
+its Worker; a Worker failure uses existing recovery instead of blocking the main
+thread with synchronous solving. New backdrop positions scatter independently in
+two dimensions. The actual scatter seed includes its configured backdrop kind,
+so admin pool edits affect the rendered layout. The legacy CSS audit covers all four requested files, removes
+conflicting wrapper colors, connects cosmetic values to 94 editable tokens, and
+retains structural sizing/layout. Container shapes are carried in round snapshots.
+
+**Skipped:** Slice 6; full `bun run verify`; full accounts and browser suites;
+six-runtime vectors; guest artifact/deployment checks; production measurements;
+physical-device testing; commits/pushes and all deployment/provisioning/secret/DNS/
+Google changes. No game doors or per-family indexable pages were introduced.
+No puzzle rules, generation/validation/scoring logic, gameplay, endings or sounds
+were changed. Only cosmetic theme vector fixtures were regenerated.
+
+**Known issues/limits:** two existing 5-second unit cases timed out during the
+combined run under concurrent machine load. Both passed isolated reruns with the
+same timeout; no timeout or game logic was changed. All 173 unit cases are covered
+across that run and the isolated recovery. The preview is Chromium responsive
+emulation, not physical phone review. Freshness is a preference score, so some
+weighted repeats remain; the previous construction that always repeated the
+symbol set is gone. Local generation timings include machine contention and
+must not be interpreted as phone/Web Vitals measurements. The previous solo
+cosmetic identifier is accepted with safe current profile/token defaults; exact
+historical solo art is not asserted. Issued ranked snapshots remain authoritative.
+
+**Decisions:** `theme-2026-11-02-1` configuration and `oklch-machado-2` cosmetic
+generator; one combined theme/style/token version; bounded immutable caches;
+10-of-12 distinct symbols by default, with a 10–12 admin bound protecting the
+current ten renderer slots. Existing Memory pair counts remain 6/8/10. No
+package changes or new dependencies. Details and the D1 reference are recorded
+in `docs/DECISIONS.md`.
+
+**Questions for the owner:** confirm Slice 5 in writing, or provide corrections,
+before Slice 6 may begin.
+
+### Evidence
+
+| Acceptance item                                                                                                      | Evidence type and location                                                                                                                                            | Result                                                                                                      |
+| -------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------- |
+| D1 draft/check/publish flow, family profiles, immutable versions, audit and conflicting edits                        | Real isolated D1: `tests/slices/slice5-theme-admin-rollback.test.ts`; `build/slice5/units-final.log`                                                                  | Pass, 4/4 Slice 5 cases; per-family style/container/symbol values exercised after publish                   |
+| Bad palette rejected by normal publication                                                                           | Actual publishing gate in the Slice 5 D1 test; engine safety unit cases                                                                                               | Pass                                                                                                        |
+| Invalid live palette/config falls back to previous effective version, then rollback restores values without redeploy | D1/KV bad-palette and invalid-JSON parent-chain test; actual HTTP/browser workflow in `tests/e2e/theme-admin-preview.spec.ts`; `build/slice5/theme-preview-final.log` | Pass; unsafe publication is fault-injected through D1 because the normal admin gate correctly rejects it    |
+| Preview before publish/invalid-live/rollback at 390×844, 844×390 and 1280×800                                        | One Chromium workflow, `workers: 1`; three PNGs in `build/slice5/browser/theme-admin-preview-operat-5995d-lls-back-without-a-redeploy-chromium/`                      | Pass; captures inspected locally                                                                            |
+| Weighted best-of-N, family/version isolation, distinct symbol subsets and palette reuse                              | `src/lib/engine/theme/theme.test.ts`, `src/lib/ui/theme-history.test.ts`; `docs/evidence/slice5-themes/palettes.json`                                                 | Pass; all 66 possible 10-of-12 subsets reached per family in the diagnostic                                 |
+| Palette safety, gamut reduction and Machado separation                                                               | `build/slice5/palettes-pass.log`; `docs/evidence/slice5-themes/palettes.json`; negative publishing tests                                                              | Pass, 30,000 palettes; every hue bucket below the existing 5% fallback gate                                 |
+| Worker normal path and explicit failure recovery                                                                     | Worker config/failure unit tests; preview observes real `theme-worker` instances                                                                                      | Pass; no synchronous solver fallback                                                                        |
+| Four-file legacy CSS audit and editable safe tokens/shapes                                                           | `docs/SLICE5_CSS_AUDIT.md`; site-token/schema/shape tests; responsive previews                                                                                        | Pass; structural layout retained                                                                            |
+| Theme sheet and scattered backdrop coordinates                                                                       | `docs/evidence/slice5-themes/contact-sheet.html` and `contact-sheet.png`; engine scatter and existing family-isolation tests                                          | Pass; 60 samples across all three families; sheet inspected                                                 |
+| Fast lint, zero-warning types and boundaries                                                                         | `build/slice5/lint-pass.log`, `check-pass.log`, `boundaries-final.log`; final fixture/document closeout logs in the same directory                                    | Pass; 0 type errors, 0 warnings                                                                             |
+| Units                                                                                                                | `build/slice5/units-final.log`, `timeouts-connect.log`, `timeouts-backdrop.log`, `backdrop-final.log`                                                                 | All 173 cases covered: 170 in combined run, 2 isolated timeout recoveries and the final backdrop regression |
+| Rules/scoring/endings/sounds and public-door boundaries unchanged                                                    | Source diff review and unit coverage; no gameplay vector files changed                                                                                                | Pass for scoped source review; full runtime/vector milestone deferred                                       |
+| Slice 0 base-tag test                                                                                                | Owner's recorded deferral; no reset performed                                                                                                                         | **Deferred and outstanding**, not passed or waived                                                          |
+
+### Measurements
+
+Local Linux x64 desktop, Bun 1.4.2; preloaded generator and progressively warm
+bounded cache, no network; 10,000 palette-generation runs per family. Other local
+jobs were active. These are reported **goals**, not phone performance gates.
+
+| Family  | Median generation | p95 generation | Fallbacks / 10,000 | Worst hue-bucket fallback rate |
+| ------- | ----------------: | -------------: | -----------------: | -----------------------------: |
+| Memory  |           1.42 ms |       10.24 ms |                245 |                          3.71% |
+| Block   |           2.60 ms |       20.69 ms |                286 |                          4.52% |
+| Connect |           4.43 ms |       25.92 ms |                265 |                          3.46% |
+
+The final best-effort freshness diagnostic runs 1,000 rounds per family with
+three-theme history and at most eight candidates. Weighted score median/p95 was
+3/5 for each family; symbol penalties occurred in 41.1% / 42.3% / 40.6% of
+Memory/Block/Connect choices, rather than being unavoidable. There is no
+owner-supplied numeric freshness target. The palette safety gate retained
+10,000 samples per family; the earlier 10,000-round freshness diagnostic attempt
+was stopped before producing a result. Browser functional review used one local
+Chromium workflow with three viewport captures, not repeated performance runs.
+No phone, cold/4G, LCP, INP or CLS result is claimed in this fast slice.
+
+**Waivers:** no new acceptance waiver. The owner requested fast checks and
+explicitly deferred full verification to after Slice 6, then after Slice 7.
+The Slice 0 base-tag test remains deferred and outstanding. Deferral retains the
+risk that the later full milestone finds integration issues beyond this slice.
+
+**Owner responsibilities:** review the theme/admin result and confirm Slice 5
+in writing before Slice 6. Production authorization and any physical-device or
+launch measurements remain separate owner gates; no such acceptance is inferred.
+
+**CODEMAP:** updated for Slice 5 runtime/admin/config paths, tests and evidence.
+
+### Slice 5 Git handoff — owner authorization (2026-11-03)
+
+The owner requested updating the local Git repository and pushing the completed
+Slice 5 work to GitHub. Include the source, tests, evidence, phase documentation
+and the existing owner updates to the engine brief. The earlier skipped
+commit/push entry records the original local closeout. Existing fast-check
+evidence is retained; app tests are not repeated for this Git handoff. This
+instruction authorizes source publication only: Slice 6 still requires written
+confirmation, and no deployment or production change is authorized. The Slice 0
+base-tag test remains deferred and outstanding.

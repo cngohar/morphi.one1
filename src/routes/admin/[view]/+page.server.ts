@@ -1,3 +1,12 @@
+import { readLiveThemeConfig } from '#lib/server/config.js';
+import {
+	listThemeDrafts,
+	listThemeVersions,
+	saveThemeDraft,
+	checkThemeDraft,
+	publishThemeDraft,
+	rollbackThemeConfig
+} from '#lib/server/theme-admin.js';
 import { gameOverview, gameStatistics, changeGame } from '#lib/server/games.js';
 import { readAudit, exportAuditYear } from '#lib/server/audit.js';
 import { softDeleteUser, restoreDeletedUser } from '#lib/server/user-lifecycle.js';
@@ -35,6 +44,7 @@ const views = [
 	'audit',
 	'privacy',
 	'scoring',
+	'themes',
 	'games'
 ] as const;
 const identifier = (value: unknown) =>
@@ -88,6 +98,11 @@ export const load: PageServerLoad = async (event) => {
 		liveVersion: string;
 		versions: Awaited<ReturnType<typeof listScoreVersions>>;
 	})[] = [];
+	let themes: {
+		live: Awaited<ReturnType<typeof readLiveThemeConfig>>;
+		drafts: Awaited<ReturnType<typeof listThemeDrafts>>;
+		versions: Awaited<ReturnType<typeof listThemeVersions>>;
+	} | null = null;
 	let games: Awaited<ReturnType<typeof gameOverview>> = [];
 	let gameStats: Awaited<ReturnType<typeof gameStatistics>> = { rows: [], more: false };
 	let metrics: Record<string, number> = {},
@@ -113,6 +128,12 @@ export const load: PageServerLoad = async (event) => {
 			created_at: number;
 		}[] = [];
 	try {
+		if (event.params.view === 'themes')
+			themes = {
+				live: await readLiveThemeConfig(env.DB, env.CONFIG_CACHE),
+				drafts: await listThemeDrafts(env.DB),
+				versions: await listThemeVersions(env.DB)
+			};
 		if (event.params.view === 'users') {
 			const id = event.url.searchParams.get('id');
 			if (id) {
@@ -240,6 +261,7 @@ export const load: PageServerLoad = async (event) => {
 			auditOverview,
 			directory,
 			detail,
+			themes: null,
 			scoring: [],
 			games: [],
 			view: event.params.view,
@@ -267,6 +289,7 @@ export const load: PageServerLoad = async (event) => {
 		auditOverview,
 		directory,
 		detail,
+		themes,
 		scoring,
 		games,
 		view: event.params.view,
@@ -310,6 +333,10 @@ export const actions: Actions = {
 			const action = String(body.get('action') ?? '');
 			if (
 				![
+					'theme-draft',
+					'theme-check',
+					'theme-publish',
+					'theme-rollback',
 					'score-change',
 					'score-rollback',
 					'game-enable',
@@ -340,13 +367,15 @@ export const actions: Actions = {
 			const permission =
 				action === 'logout'
 					? event.params.view
-					: action.startsWith('game-')
-						? 'games'
-						: action.startsWith('score-')
-							? 'scoring'
-							: action.startsWith('ranked-')
-								? 'ranked'
-								: action;
+					: action.startsWith('theme-')
+						? 'themes'
+						: action.startsWith('game-')
+							? 'games'
+							: action.startsWith('score-')
+								? 'scoring'
+								: action.startsWith('ranked-')
+									? 'ranked'
+									: action;
 			const actor = await operatorRequest(event, permission, action !== 'logout');
 			const reason = reasonValue(body.get('reason')),
 				target = identifier(body.get('target'));
@@ -361,6 +390,39 @@ export const actions: Actions = {
 				redirect(303, '/admin/sign-in');
 			}
 			if (!reason || !target || body.get('confirm') !== 'yes') return fail(400, { code: 'input' });
+			if (action.startsWith('theme-')) {
+				const expected = String(body.get('expected') ?? '');
+				try {
+					if (action === 'theme-draft')
+						return {
+							success: true,
+							themeDraft: await saveThemeDraft(
+								env.DB,
+								actor.id,
+								expected,
+								JSON.parse(String(body.get('values'))),
+								reason
+							)
+						};
+					if (action === 'theme-check')
+						return { success: true, themeIssues: await checkThemeDraft(env.DB, actor.id, target) };
+					if (action === 'theme-publish')
+						await publishThemeDraft(env.DB, actor.id, target, expected, reason);
+					if (action === 'theme-rollback')
+						await rollbackThemeConfig(
+							env.DB,
+							actor.id,
+							expected,
+							String(body.get('sourceVersion') ?? ''),
+							reason
+						);
+				} catch (e) {
+					if (e instanceof SyntaxError || e instanceof RangeError)
+						return fail(400, { code: 'input' });
+					throw e;
+				}
+				return { success: true };
+			}
 			if (action.startsWith('game-')) {
 				if (!Object.hasOwn(catalog, target)) return fail(400, { code: 'input' });
 				const days = action === 'game-delete' ? Number(body.get('duration')) : 7;

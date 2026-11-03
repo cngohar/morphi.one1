@@ -765,6 +765,17 @@ export const messages = {
 	'ranked.retry': 'Retry ranked start',
 	'ranked.keepCurrent': 'Return Home',
 	'round.startError': 'Your puzzle could not start. Please try again.',
+	'v1.admin.nav.themes': 'Themes and style',
+	'themes.preview': 'Theme preview',
+	'themes.previewNote':
+		'Review this draft at phone portrait, phone landscape and desktop sizes before publishing.',
+	'themes.values': 'Theme and site token values (JSON)',
+	'themes.saveDraft': 'Save draft',
+	'themes.draft': 'Draft',
+	'themes.check': 'Check palette and configuration',
+	'themes.checked': 'Palette and configuration checks passed.',
+	'themes.publish': 'Publish draft',
+	'themes.failed': 'Theme preview failed. Retry the preview.',
 	'result.home': 'Home'
 } as const;
 

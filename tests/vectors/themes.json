@@ -2,55 +2,55 @@
 	{
 		"seed": "0",
 		"family": "memory",
-		"recipe": "tetradic",
-		"colors": ["#229ab3", "#5d3291", "#a2523a"],
-		"back": "#7fc2ce",
-		"container": "circle",
-		"style": "flat"
+		"recipe": "complementary",
+		"colors": ["#a877db", "#577115", "#702c79"],
+		"back": "#c0afe0",
+		"container": "hexagon",
+		"style": "outlined"
 	},
 	{
 		"seed": "0",
 		"family": "block",
-		"recipe": "preset-shapes",
-		"colors": ["#009a86", "#7d61ae", "#7c4100", "#003041"],
-		"back": "#a9bcdd",
-		"container": "hexagon",
-		"style": "blocky"
+		"recipe": "triadic",
+		"colors": ["#6e6c02", "#2b98bf", "#811d6c"],
+		"back": "#bfb985",
+		"container": "circle",
+		"style": "ink"
 	},
 	{
 		"seed": "42",
 		"family": "memory",
-		"recipe": "complementary",
-		"colors": ["#a57ec2", "#527227", "#802166"],
-		"back": "#caacd9",
+		"recipe": "triadic",
+		"colors": ["#ad4276", "#484c06", "#3a97ba"],
+		"back": "#dca8c4",
 		"container": "rounded",
-		"style": "ink"
+		"style": "outlined"
 	},
 	{
 		"seed": "42",
 		"family": "block",
-		"recipe": "free",
-		"colors": ["#8a202c", "#439f4c", "#835a89"],
-		"back": "#a6b6e6",
-		"container": "hexagon",
-		"style": "ink"
-	},
-	{
-		"seed": "18446744073709551615",
-		"family": "memory",
-		"recipe": "split",
-		"colors": ["#289d90", "#a1439c", "#8d1e0d"],
-		"back": "#83c4b7",
-		"container": "squircle",
+		"recipe": "triadic",
+		"colors": ["#1b7475", "#a07fc7", "#65410f"],
+		"back": "#7fc4c0",
+		"container": "circle",
 		"style": "flat"
 	},
 	{
 		"seed": "18446744073709551615",
-		"family": "block",
+		"family": "memory",
 		"recipe": "tetradic",
-		"colors": ["#773149", "#7e661c", "#239e86"],
-		"back": "#e1a8b6",
+		"colors": ["#9d4d7d", "#604409", "#31a068"],
+		"back": "#dba8c5",
+		"container": "circle",
+		"style": "outlined"
+	},
+	{
+		"seed": "18446744073709551615",
+		"family": "block",
+		"recipe": "triadic",
+		"colors": ["#3c96c5", "#ac456b", "#454d00"],
+		"back": "#8ebee0",
 		"container": "rounded",
-		"style": "ink"
+		"style": "flat"
 	}
 ]

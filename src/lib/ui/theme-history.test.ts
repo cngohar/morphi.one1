@@ -39,3 +39,21 @@ it('retains the latest three themes when persistent storage is blocked', async (
 	for (const t of themes) await rememberTheme(t);
 	expect(await themeHistory()).toEqual(themes.slice(-3));
 });
+
+it('isolates recent themes by family and config version', async () => {
+	vi.resetModules();
+	vi.spyOn(console, 'warn').mockImplementation(() => {});
+	vi.stubGlobal('indexedDB', {
+		open: () => {
+			throw new Error('blocked');
+		}
+	});
+	const { themeHistory, rememberTheme } = await import('./theme-history.js');
+	const memory = generateTheme('1', 'memory');
+	const block = generateTheme('2', 'block');
+	const newer = { ...memory, themeConfigVersion: 'new-theme' };
+	for (const theme of [memory, block, newer]) await rememberTheme(theme);
+	expect(await themeHistory('memory', memory.themeConfigVersion)).toEqual([memory]);
+	expect(await themeHistory('block', block.themeConfigVersion)).toEqual([block]);
+	expect(await themeHistory('memory', 'new-theme')).toEqual([newer]);
+});
