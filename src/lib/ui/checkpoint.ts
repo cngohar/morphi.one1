@@ -71,7 +71,9 @@ export function validCheckpoint(
 				Object.values(move).every(Number.isSafeInteger)
 		) &&
 		!!v.state &&
-		['dealing', 'preview', 'hiding', 'playing', 'arrival', 'finished'].includes(v.state.phase) &&
+		typeof v.state.phase === 'string' &&
+		v.state.phase.trim().length > 0 &&
+		v.state.phase.length <= 80 &&
 		Number.isFinite(v.state.elapsedMs) &&
 		v.state.elapsedMs >= 0 &&
 		v.state.elapsedMs <= 86400000 &&

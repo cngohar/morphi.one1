@@ -1179,3 +1179,22 @@ Combined browser coverage is 190/190; no app/shared code changed, and no second
 full verify was run. The accepted Slice 5 palette artifact was restored after
 the palette stage changed timing fields only. Keep final evidence under
 `docs/evidence/slice6/`; remove temporary restart saves after final doc checks.
+
+## 2026-11-04 — Final engine refactor Slice 7 contract audit
+
+- Retain SplitMix64 v1, integer-only Block/Memory/Connect, existing engine and
+  `brief-v1` scoring versions, canonical replay and immutable D1 score snapshots.
+  No language, framework, package or puzzle-rule change.
+- Reuse the existing six-runtime vector harness from the Slice 7 acceptance test.
+  Gameplay fixtures stay byte-identical to the frozen base; cosmetic fixtures
+  retain the explicitly versioned, owner-confirmed Slice 5 baseline `5811356`.
+- Shared checkpoints validate bounded nonempty package-owned phase names rather
+  than existing-game phase names. Server fallback weight and initial enablement
+  come from manifests; existing lifecycle rows remain authoritative.
+- Add retrospective annotated-base-tag integrity coverage. The original
+  pre-Slice-1 HEAD gate cannot be recreated after the fact and remains outstanding
+  for an explicit owner waiver decision at final acceptance.
+- Keep owner-local editor MCP configuration outside formatting checks without
+  modifying its contents. Detailed audit: `docs/SLICE7_CONTRACT_AUDIT.md`.
+- Written owner confirmation is still required for local refactor acceptance;
+  no deployment or post-refactor work is authorized.

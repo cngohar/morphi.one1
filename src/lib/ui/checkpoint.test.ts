@@ -42,6 +42,17 @@ it('rejects stale, future-version, malformed and different-owner checkpoints', (
 	])
 		expect(validCheckpoint(invalid, null)).toBe(false);
 });
+it('accepts family-owned checkpoint phases while rejecting malformed or unbounded phases', () => {
+	const value = checkpoint();
+	expect(
+		validCheckpoint(
+			{ ...value, family: 'novel-family', state: { ...value.state, phase: 'solving' } },
+			null
+		)
+	).toBe(true);
+	for (const phase of ['', ' ', 'a'.repeat(81), null, 1])
+		expect(validCheckpoint({ ...value, state: { ...value.state, phase } }, null)).toBe(false);
+});
 it('retains the latest checkpoint in memory when storage fails and clears exact ids only', async () => {
 	vi.resetModules();
 	vi.spyOn(console, 'warn').mockImplementation(() => {});

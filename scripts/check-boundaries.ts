@@ -26,7 +26,12 @@ const cases = [
 		file: 'src/lib/engine/probe.ts',
 		source: 'Math.random(); Date.now();',
 		rule: 'no-restricted-properties'
-	}
+	},
+	...['sin', 'cos', 'tan', 'exp', 'log', 'pow', 'sqrt'].map((method) => ({
+		file: 'src/lib/engine/probe.ts',
+		source: `Math.${method}(1);`,
+		rule: 'no-restricted-properties'
+	}))
 ];
 for (const probe of cases) {
 	const [result] = await eslint.lintText(probe.source, { filePath: resolve(probe.file) });

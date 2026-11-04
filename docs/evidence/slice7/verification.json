@@ -1,0 +1,100 @@
+{
+	"scope": "Slice 7 development checks and final full verification",
+	"fullVerify": "pass",
+	"runs": [
+		{
+			"command": "bunx prettier --check <changed source files>",
+			"result": "pass",
+			"details": "Final focused format check passed after src/lib/server/config.ts was formatted.",
+			"log": "build/slice7/01-prettier-final.log"
+		},
+		{
+			"command": "bunx prettier --check <changed source files>",
+			"result": "fail then pass",
+			"details": "Initial check failed on src/lib/server/config.ts; parent formatted it and the final check passed.",
+			"log": "build/slice7/00-prettier.log"
+		},
+		{
+			"command": "bun run lint",
+			"result": "pass",
+			"durationMs": 80543,
+			"details": "Repo-wide Prettier and ESLint passed. An earlier run failed because owner-local .cursor/mcp.json and .vscode/mcp.json were included by Prettier; parent excluded those files in .prettierignore before the passing rerun.",
+			"log": "build/slice7/03-lint-final.log"
+		},
+		{
+			"command": "bun run lint",
+			"result": "fail",
+			"durationMs": 23769,
+			"details": "Prettier flagged .cursor/mcp.json and .vscode/mcp.json.",
+			"log": "build/slice7/02-lint.log"
+		},
+		{
+			"command": "bun run check",
+			"result": "pass",
+			"durationMs": 31934,
+			"details": "svelte-check found 0 errors and 0 warnings.",
+			"log": "build/slice7/04-check.log"
+		},
+		{
+			"command": "bun run check:boundaries",
+			"result": "pass",
+			"durationMs": 1662,
+			"details": "Engine purity and puzzle import boundary self-checks passed.",
+			"log": "build/slice7/05-boundaries.log"
+		},
+		{
+			"command": "bun run test:unit -- --run",
+			"result": "pass",
+			"durationMs": 38026,
+			"testFiles": { "passed": 36, "failed": 0 },
+			"tests": { "passed": 212, "failed": 0 },
+			"details": "Includes the Slice 0 and Slice 7 determinism six-runtime tests.",
+			"log": "build/slice7/06-unit.log"
+		},
+		{
+			"command": "bun run test:vectors",
+			"result": "pass",
+			"durationMs": 11389,
+			"runtimes": ["node", "bun", "Chromium", "Firefox", "WebKit", "Worker (workerd)"],
+			"vectorsPerRuntime": 9,
+			"themeVectorsPerRuntime": 6,
+			"fingerprint": "a8be9d5fdacc1818c3d078be2fa014cb279c349d6ba7313029f9a363b40b0ac4",
+			"log": "build/slice7/07-vectors.log"
+		},
+		{
+			"command": "bun run verify",
+			"result": "pass",
+			"durationMs": 2740768,
+			"stages": {
+				"lint": "pass",
+				"typeCheck": { "result": "pass", "errors": 0, "warnings": 0 },
+				"boundaries": "pass",
+				"palettes": {
+					"result": "pass",
+					"samplesPerPuzzle": 10000,
+					"puzzles": ["memory", "block", "connect"]
+				},
+				"unit": { "result": "pass", "testFiles": 36, "tests": 212 },
+				"accounts": { "result": "pass", "testFiles": 6, "tests": 41 },
+				"vectors": {
+					"result": "pass",
+					"runtimes": ["node", "bun", "Chromium", "Firefox", "WebKit", "Worker (workerd)"],
+					"vectorsPerRuntime": 9,
+					"themeVectorsPerRuntime": 6,
+					"fingerprint": "a8be9d5fdacc1818c3d078be2fa014cb279c349d6ba7313029f9a363b40b0ac4"
+				},
+				"builtWorker": { "result": "pass", "checks": 45 },
+				"lazyBundle": "pass",
+				"browser": {
+					"result": "pass",
+					"workers": 1,
+					"testsPassed": 190,
+					"testsFailed": 0,
+					"duration": "39.8m"
+				}
+			},
+			"log": "build/slice7/verify-final.log"
+		}
+	],
+	"browserSuite": { "result": "pass", "workers": 1, "testsPassed": 190, "testsFailed": 0 }
+}

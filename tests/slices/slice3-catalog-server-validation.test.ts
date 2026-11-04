@@ -424,6 +424,23 @@ it('serializes competing ranked starts, permits explicit takeover and unlocks at
 	expect(afterExpiry.expiresAt).toBe(replacement.expiresAt + 7_200_000);
 }, 30_000);
 
+it('honors novel manifest selection defaults without reviving its existing lifecycle state', async () => {
+	const { gameAvailable } = await import('../../src/lib/server/games.js');
+	catalog[family] = { ...manifest, weight: 7, enabled: false };
+	try {
+		expect(await readGameConfig(db(), family)).toEqual({
+			version: 'catalog-v1',
+			values: { weight: 7 }
+		});
+		expect(await gameAvailable(db(), family)).toBe(false);
+		catalog[family] = { ...manifest, weight: 0, enabled: true };
+		expect((await readGameConfig(db(), family)).values.weight).toBe(0);
+		expect(await gameAvailable(db(), family)).toBe(false);
+	} finally {
+		catalog[family] = manifest;
+	}
+});
+
 it('reads catalog config from D1, ignores stale live cache entries and falls back through parents', async () => {
 	const kv = cache();
 	const defaults = await Promise.all([

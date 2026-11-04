@@ -20,7 +20,7 @@ const GAME_CONFIG_VERSION = 'catalog-v1';
 
 export function defaultGameConfig(family: string): GameConfig {
 	if (!Object.hasOwn(catalog, family)) throw new RunError('input');
-	return { weight: 1 };
+	return { weight: catalog[family].weight ?? 1 };
 }
 
 /** Insert missing catalog entries only; never revive disabled/deleted families. */
@@ -29,10 +29,8 @@ export async function ensureCatalogFamily(db: D1Database, family: string) {
 	if (await db.prepare('SELECT family FROM game_lifecycle WHERE family=?').bind(family).first())
 		return;
 	await db
-		.prepare(
-			"INSERT INTO game_lifecycle(family,state) VALUES (?,'enabled') ON CONFLICT(family) DO NOTHING"
-		)
-		.bind(family)
+		.prepare('INSERT INTO game_lifecycle(family,state) VALUES (?,?) ON CONFLICT(family) DO NOTHING')
+		.bind(family, catalog[family].enabled === false ? 'disabled' : 'enabled')
 		.run();
 }
 

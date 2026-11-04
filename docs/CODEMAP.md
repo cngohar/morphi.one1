@@ -4,8 +4,8 @@ Read this map before searching. Types and implementation live in code; decisions
 
 ## Current scope
 
-- Engine refactor Slice 5 is owner-confirmed at `5811356` ("Refactor theme admin, freshness and palette caching"). Slice 6 is complete locally (2026-11-04), awaiting owner confirmation: one full milestone invocation plus one corrected-fixture browser rerun covers all required checks; 20 cold/preloaded performance samples are archived. Scope: manifest-driven presentation/admin audit, idle preloading, cache/SEO hardening and device-local checkpoint recovery. Phone evidence is owner-approved emulation; physical validation is outstanding. Every verification pass is saved temporarily to resume interruptions; temporary saves are deleted only when the slice fully passes. Slice 7 requires written owner confirmation. No deployment is authorized.
-- Approved brief: `docs/morphi-engine-refactor-brief.md`. Frozen base tag `v1.2-local-complete` points to `1303c9c4bdb1718bb558886dc43b7b48c597a02a`. The Slice 0 base-tag test remains deferred and outstanding; no reset was performed. Owner edits to the brief are preserved.
+- Engine refactor Slice 6 is owner-confirmed at `77ce70f` ("Harden catalog UI, recovery, performance and SEO"). Slice 7 is the final authorized refactor slice: determinism/contract/generic-boundary audit, focused regressions and final full verification (passed: 212 units, 41 D1/auth, six vector runtimes, 190 browser checks). Written owner confirmation is required before the refactor is accepted complete locally; no post-refactor work or deployment is authorized.
+- Approved brief: `docs/morphi-engine-refactor-brief.md`. Frozen annotated base `v1.2-local-complete` points to `1303c9c4bdb1718bb558886dc43b7b48c597a02a`. Slice 7 adds a retrospective Slice 0 tag-integrity test; the original pre-Slice-1 HEAD check remains outstanding for an explicit owner waiver decision. No reset was performed. Gameplay vectors are frozen at Slice 0; cosmetic fixtures retain the accepted Slice 5 version. See `docs/SLICE7_CONTRACT_AUDIT.md` and the final phase report.
 - v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/NEXT_PHASE_REVIEW.md`, `docs/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
 - Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved engine brief controls this refactor. No deployment, production provisioning, secrets, DNS or Google changes are authorized.
 - The published guest/privacy version remains `b50a7a18-2e85-4406-bd40-77f27c4b3da3` at `https://morphi.one` and `https://morphi-one.electrasincng.workers.dev`. Cloudflare injects its intentional analytics beacon at delivery. Source repository: `https://github.com/cngohar/morphi.one1`; pushing does not authorize deployment.
@@ -151,10 +151,19 @@ Slice 6 additions:
 
 - Install: `bun install`; local setup: `bun run accounts:setup`, `bun run cf:types`, `bun run db:migrate:local`.
 - Dev: `bun run dev --host 0.0.0.0`; type-check: `bun run check`; format/lint: `bun run lint`.
-- Slice 6 uses fast lint/types/boundaries/units, focused recovery/admin/SEO browsers and explicit `test:public-privacy` / `test:demo`, then one full milestone `bun run verify`. Final full verification remains after owner-authorized Slice 7. Never overlap verify with its components.
+- Slice 7 uses fast lint/types/boundaries/units and six-runtime vectors during development, then one final `bun run verify`. Never overlap verify with its components; after fixes rerun only affected suites unless shared code changes.
 - Full gate: `bun run verify`; targeted commands: `test:unit -- --run`, `test:accounts`, `test:vectors`, `test:worker`, `test:e2e`, `check:boundaries`, `check:lazy-bundle`.
 - Generate registry: `bun run registry:generate`; palette diagnostics: `bun run test:palettes`; contact sheet: `bun run theme:sheet`.
 - Build/local Worker: `bun run build`, `bun run preview:worker`. Deployment and even a remote preview still require explicit owner approval.
 - App alias: `#lib`, explicit `.js` extensions. Pure engine imports only engine; puzzle packages never import each other; app reaches puzzles through generated files.
 - Core logic is deterministic integer-only; cosmetic theme math has a separate boundary. Every family owns its version, vectors, manifest, messages, view and README.
 - User-facing copy uses the catalog; motion uses the wrapper. Themes never affect rules/score. No user-agent layout sniffing, gradients, glows or shadows on game objects.
+
+## Slice 7 final audit
+
+- `docs/SLICE7_CONTRACT_AUDIT.md`: per-family determinism classes, canonical replay/hash/scoring audit, generic boundaries and the recorded Slice 5 cosmetic-vector exception.
+- `tests/slices/slice7-determinism-six-runtimes.test.ts`: frozen fixtures, rejection sampling/Fisher–Yates, cosmetic RNG isolation and actual existing six-runtime harness execution.
+- `tests/slices/slice0-base-tag.test.ts`: retrospective annotated-tag target and ancestry integrity; does not assert the original timed gate ran.
+- `scripts/check-boundaries.ts`: explicit approximate-math negative probes in addition to purity/import checks.
+- `src/lib/ui/checkpoint.ts`, `src/lib/server/config.ts`: package-owned bounded phases and manifest-derived weight/initial enablement; checkpoint/Slice 3 regressions.
+- `docs/evidence/slice7/verification.json`, `build/slice7/`: compact permanent verification evidence and local detailed logs.

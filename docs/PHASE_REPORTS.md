@@ -2432,3 +2432,94 @@ and permanent evidence to the existing `origin/main`. Existing verification
 results and outstanding Slice 0, physical-phone and performance-goal limitations
 above remain unchanged. This source-only handoff does not infer Slice 6
 acceptance, Slice 7 authorization or deployment approval.
+
+## Engine refactor Slice 7 — Final determinism and contract audit (2026-11-04)
+
+**Status:** final authorized refactor slice, from owner-confirmed Slice 6 push
+`77ce70f` ("Harden catalog UI, recovery, performance and SEO"). Development checks and the single final full `bun run verify` passed.
+No fixes or suite reruns were needed after that final run. Stop for written owner
+confirmation before accepting the refactor complete locally. Slice 6 is not reopened.
+
+**Built:** audited all three integer-only games (Block `block-placement-1`, Memory
+`memory-1`, Connect `connect-1`); there are no physics-class games. Preserved
+SplitMix64, unsigned 64-bit decimal seeds, unbiased shuffle, separate cosmetic
+streams, canonical replay, authoritative scoring and immutable scoring versions.
+The detailed audit is `docs/SLICE7_CONTRACT_AUDIT.md`. Added the required Slice 7
+six-runtime test using the unchanged harness, frozen-fixture comparisons, RNG
+rejection/shuffle and cosmetic isolation regressions, and approximate-math
+boundary probes. Added a retrospective Slice 0 base-tag integrity test.
+
+The generic audit found and closed two extension gaps: checkpoints now accept
+bounded nonempty package-owned phase strings; server fallback weight and initial
+lifecycle enablement honor manifests. Synthetic-family tests prove those fixes
+without changing shipped-game defaults or gameplay. Formatting ignores the
+pre-existing untracked editor MCP settings; their contents are untouched.
+
+**Skipped:** new games, languages/frameworks, expansions, Mahjong, full-screen,
+knowledge graphs, post-refactor/release work, deployment, production provisioning,
+secrets, DNS and Google changes. No game doors or per-type indexable pages added.
+Development skipped the full browser suite as directed. No new device/Web Vitals
+measurements or physical-device review were commissioned in this audit.
+
+**Known issues:** gameplay fixture files are byte-identical to Slice 0, but the
+six cosmetic theme fixtures were deliberately regenerated in accepted Slice 5
+`5811356` for `oklch-machado-2`. Tests preserve that explicit exception; this is
+not a claim that all vector files are unchanged. Rules, generation, validation,
+scoring logic, gameplay, endings and sounds retain their frozen behavior; the
+already-authorized recovery additions and prior recorded fixes remain recorded
+in their slices. The original timed Slice 0 HEAD gate cannot be proven now.
+
+**Decisions:** no dependency/version upgrades. Preserve existing contract and
+vectors, generic manifest ownership and package boundaries. Submission retry
+hashing includes theme version metadata; cosmetic output stays outside the
+separate gameplay determinism fingerprint. See DECISIONS and the audit.
+
+**Questions for the owner:** review the final results, explicitly decide the
+outstanding original Slice 0 timed-gate waiver, then confirm local refactor
+acceptance in writing or supply corrections. No next work is inferred.
+
+| Acceptance item                                                     | Evidence type and location                                                                              | Result                                                                                                                        |
+| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Per-family integer-only contract, seeds/RNG, replay, score versions | Static frozen-base audit in `docs/SLICE7_CONTRACT_AUDIT.md`; existing puzzle/scoring units and D1 tests | Pass: audit and final verification                                                                                            |
+| All six runtimes reproduce exact results                            | `tests/slices/slice7-determinism-six-runtimes.test.ts`, existing vector harness; `build/slice7/`        | Pass: Node, Bun, Chromium, Firefox, WebKit, workerd; 9 gameplay and 6 cosmetic vectors each                                   |
+| Gameplay fixtures unchanged; cosmetic exception explicit            | Slice 7 byte comparisons to frozen base and accepted Slice 5 commit                                     | Pass with recorded cosmetic baseline; no new fixture changes                                                                  |
+| Generic registry/catalog/server/themes/selector/checkpoint/admin    | Audit plus synthetic-family Slice 1–4/presentation regressions, new checkpoint/default tests            | Pass; no active family dispatch required for new packages                                                                     |
+| Core integer-only/import boundaries                                 | Lint and strengthened `scripts/check-boundaries.ts`                                                     | Pass                                                                                                                          |
+| Development fast checks                                             | `docs/evidence/slice7/verification.json`, `build/slice7/`                                               | Pass: lint, zero-error/zero-warning types, boundaries, 36 unit files / 212 cases, six-runtime vectors                         |
+| Retrospective Slice 0 base-tag integrity                            | `tests/slices/slice0-base-tag.test.ts`                                                                  | Pass: annotated target and ancestry; does not prove original timed check                                                      |
+| Original pre-Slice-1 HEAD/base gate                                 | Original deferral; retrospective audit cannot reconstruct execution                                     | **Deferred and outstanding**; owner waiver decision required, not passed or waived                                            |
+| Single final full `bun run verify`                                  | `build/slice7/verify-final.log`, permanent verification summary                                         | Pass: 212 units, 41 D1/auth, six runtimes, 45 built-Worker checks, bundle isolation, 190/190 browsers (one worker); 45m 40.8s |
+
+**Measurements:** local workstation checks only, with no network shaping or
+phone-performance claim. Command durations are in the permanent summary. No new
+performance acceptance target is introduced. The final palette gate also records
+local preloaded generator diagnostics in `docs/evidence/slice7/palettes.json`:
+
+| Family  | Runs   | Median ms | p95 ms | Environment / status                                               |
+| ------- | ------ | --------- | ------ | ------------------------------------------------------------------ |
+| Memory  | 10,000 | 0.730     | 3.136  | Local Linux x64, Bun 1.4.2, preloaded, no network; diagnostic goal |
+| Block   | 10,000 | 1.038     | 5.456  | Same; diagnostic goal                                              |
+| Connect | 10,000 | 1.407     | 6.896  | Same; diagnostic goal                                              |
+
+Retain Slice 6's 20 cold/preloaded
+samples and its recorded median/p95/goal misses without re-measuring them here.
+
+**Waivers:** none newly granted. The original timed Slice 0 check remains
+outstanding even though retrospective tag integrity now passes. The Slice 5
+cosmetic change is an already-recorded, owner-confirmed versioned change.
+
+**Owner responsibilities:** decide the Slice 0 historical-gate waiver and provide
+written final local acceptance. Physical-device and production/release gates
+remain separate; confirmation alone does not authorize deployment.
+
+**CODEMAP:** updated with final audit, tests, evidence and acceptance boundary.
+
+### Slice 7 Git handoff — 2026-11-04
+
+The owner requested updating the Git repository and pushing Slice 7 to GitHub.
+This source-only handoff includes the completed audit, bounded fixes, tests,
+documentation and permanent verification evidence on the existing `origin/main`.
+The final verification evidence above is retained; app tests were not repeated
+for this documentation/Git handoff. Local refactor acceptance and the original
+Slice 0 timing-gate waiver still require the owner's explicit written decision.
+No deployment, production changes or post-refactor implementation are authorized.

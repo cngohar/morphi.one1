@@ -17,3 +17,7 @@ bun.lockb
 /docs/evidence/v1.1-themes/contact-sheet.html
 
 /docs/evidence/slice5-themes/contact-sheet.html
+
+# Workspace-local editor connection settings.
+/.cursor/
+/.vscode/mcp.json
