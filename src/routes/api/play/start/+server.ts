@@ -9,7 +9,7 @@ export const POST: RequestHandler = async (event) => {
 		const body = await readPlayBody(event);
 		if (
 			Object.keys(body)
-				.filter((key) => key !== 'takeoverSession')
+				.filter((key) => key !== 'takeoverSession' && key !== 'variant')
 				.sort()
 				.join(',') !== 'family,ownerKey' ||
 			(body.takeoverSession !== undefined &&
@@ -17,6 +17,7 @@ export const POST: RequestHandler = async (event) => {
 					!/^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/.test(
 						body.takeoverSession
 					))) ||
+			(body.variant !== undefined && typeof body.variant !== 'string') ||
 			typeof body.family !== 'string' ||
 			!Object.hasOwn(catalog, body.family) ||
 			body.ownerKey !== (await ownerKey(event.locals.user!.id))
@@ -32,7 +33,8 @@ export const POST: RequestHandler = async (event) => {
 				ipHash,
 				Date.now(),
 				(body.takeoverSession as string | undefined) ?? null,
-				env.CONFIG_CACHE
+				env.CONFIG_CACHE,
+				body.variant as string | undefined
 			),
 			{
 				headers: { 'Cache-Control': 'private, no-store' }

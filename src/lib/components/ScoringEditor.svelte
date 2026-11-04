@@ -4,6 +4,7 @@
 	import AccountForm from './account/AccountForm.svelte';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	import { SCORE_MAX, type ScoreConfig } from '#lib/engine/scoring.js';
+	import { scoreDefinition } from '#lib/scoring.js';
 	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
 	import type { PuzzleId } from '#lib/engine/contract.js';
 	let {
@@ -11,17 +12,29 @@
 	}: {
 		config: ScoreConfig & {
 			family: PuzzleId;
+			variant?: string;
+			sharedVariants?: string[];
 			liveVersion: string;
 			versions: { version: string; createdAt: number | null }[];
 		};
 	} = $props();
+	const definition = $derived(scoreDefinition(config.family, config.variant)!);
 	let draft = $state(untrack(() => ({ ...config.values })));
 </script>
 
 <section class="scoring-card">
 	<header class="scoring-heading">
 		<div>
-			<h2>{familyName(config.family)}</h2>
+			<h2>
+				{familyName(config.family, config.variant)}{config.sharedVariants?.length
+					? ` · ${t('admin.variants.sharedScoring')}`
+					: ''}
+			</h2>
+			{#if config.sharedVariants?.length}<p>
+					{t('admin.variants.sharedNotice', {
+						variants: config.sharedVariants.map((name) => t(name as MessageKey)).join(', ')
+					})}
+				</p>{/if}
 			<p>{t('scoring.version')} <code>{config.version}</code></p>
 			{#if config.liveVersion !== config.version}<p role="status">
 					{t('scoring.liveInvalid')}
@@ -31,10 +44,11 @@
 	<AccountForm>
 		{#snippet children(pending)}
 			<input type="hidden" name="target" value={config.family} />
+			{#if config.variant}<input type="hidden" name="variant" value={config.variant} />{/if}
 			<input type="hidden" name="expected" value={config.liveVersion} />
 			<input type="hidden" name="values" value={JSON.stringify(draft)} />
 			<div class="scoring-fields">
-				{#each puzzleMetadata[config.family].scoring.fields as field (field)}
+				{#each definition.fields as field (field)}
 					<label>
 						<span
 							>{t(
@@ -77,14 +91,15 @@
 	<AccountForm>
 		{#snippet children(pending)}
 			<input type="hidden" name="target" value={config.family} />
+			{#if config.variant}<input type="hidden" name="variant" value={config.variant} />{/if}
 			<input type="hidden" name="expected" value={config.liveVersion} />
 			<div class="rollback">
 				<label>
 					<span>{t('scoring.rollbackVersion')}</span>
 					<select name="sourceVersion" required>
-						{#each config.versions.filter((version) => version.version !== config.liveVersion || version.version === puzzleMetadata[config.family].scoring.version) as version (version.version)}
+						{#each config.versions.filter((version) => version.version !== config.liveVersion || version.version === definition.version) as version (version.version)}
 							<option value={version.version}
-								>{version.version === puzzleMetadata[config.family].scoring.version
+								>{version.version === definition.version
 									? t('scoring.defaultVersion')
 									: `${version.version} · ${new Date(version.createdAt!).toLocaleString()}`}</option
 							>

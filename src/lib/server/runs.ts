@@ -1,10 +1,10 @@
 import { completionActivityStatement } from './activity.js';
 import { readScoreConfig } from './scoring.js';
-import { defaultScoreConfig } from '#lib/scoring.js';
+import { defaultScoreConfig, puzzleVariant, scoreScope } from '#lib/scoring.js';
 import { and, asc, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 import { catalog } from '#lib/catalog.js';
 import { normalizeSeed } from '#lib/engine/rng.js';
-import type { CompletedRun } from '#lib/engine/contract.js';
+import type { CompletedRun, PuzzleManifest } from '#lib/engine/contract.js';
 import { createDatabase } from './db/index.js';
 import { completedRun, playSession } from './db/schema.js';
 import { generateTheme, type ResolvedTheme } from '#lib/engine/theme/generator.js';
@@ -30,7 +30,7 @@ export function parseRun(value: unknown): CompletedRun {
 	const run = value as CompletedRun;
 	if (
 		Object.keys(run)
-			.filter((key) => key !== 'theme' && key !== 'scoreConfigVersion')
+			.filter((key) => key !== 'theme' && key !== 'scoreConfigVersion' && key !== 'variant')
 			.sort()
 			.join(',') !== 'elapsedSeconds,engineVersion,family,id,moves,rankedSession,seed,version' ||
 		run.version !== 1 ||
@@ -57,10 +57,18 @@ export function parseRun(value: unknown): CompletedRun {
 			!/^[a-zA-Z0-9-]{1,80}$/.test(run.theme.generatorVersion))
 	)
 		throw new RunError('theme_version', 409);
+	let variant;
+	try {
+		if (run.variant !== undefined && typeof run.variant !== 'string')
+			throw new RangeError('variant');
+		variant = puzzleVariant(run.family, run.variant);
+	} catch {
+		throw new RunError('variant');
+	}
 	if (
 		run.scoreConfigVersion !== undefined &&
 		(typeof run.scoreConfigVersion !== 'string' ||
-			(run.scoreConfigVersion !== catalog[run.family].scoring.version &&
+			(run.scoreConfigVersion !== defaultScoreConfig(run.family, run.variant).version &&
 				!/^[0-9a-f-]{36}$/.test(run.scoreConfigVersion)))
 	)
 		throw new RunError('score_version', 409);
@@ -74,7 +82,7 @@ export function parseRun(value: unknown): CompletedRun {
 	if (
 		!Array.isArray(run.moves) ||
 		!run.moves.length ||
-		run.moves.length > manifest.maxMoves ||
+		run.moves.length > (variant?.maxMoves ?? manifest.maxMoves) ||
 		run.moves.some((move) => !move || typeof move !== 'object' || Array.isArray(move))
 	)
 		throw new RunError('moves');
@@ -87,6 +95,7 @@ export function parseRun(value: unknown): CompletedRun {
 	}
 	return {
 		version: 1,
+		...(run.variant ? { variant: run.variant } : {}),
 		...(run.scoreConfigVersion ? { scoreConfigVersion: run.scoreConfigVersion } : {}),
 		id: run.id,
 		family: run.family,
@@ -141,11 +150,26 @@ export async function saveRun(
 		.bind(userId, now)
 		.first();
 	if (!active) throw new RunError('unavailable', 403);
+	if (!run.rankedSession) {
+		const start = await binding
+			.prepare('SELECT user_id,family,variant FROM account_round_activity WHERE run_id=?')
+			.bind(run.id)
+			.first<{ user_id: string; family: string; variant: string | null }>();
+		if (
+			start &&
+			(start.user_id !== userId ||
+				start.family !== run.family ||
+				puzzleVariant(run.family, start.variant ?? undefined)?.id !==
+					puzzleVariant(run.family, run.variant)?.id)
+		)
+			throw new RunError('session', 403);
+	}
 	let scoring = await readScoreConfig(
 		binding,
 		run.family,
-		run.scoreConfigVersion ?? defaultScoreConfig(run.family).version,
-		cache
+		run.scoreConfigVersion ?? defaultScoreConfig(run.family, run.variant).version,
+		cache,
+		run.variant
 	);
 	let seconds = run.elapsedSeconds;
 	let submittedAt = now;
@@ -166,12 +190,20 @@ export async function saveRun(
 			!issued ||
 			issued.seed !== run.seed ||
 			issued.family !== run.family ||
-			issued.engineVersion !== run.engineVersion
+			issued.engineVersion !== run.engineVersion ||
+			puzzleVariant(run.family, issued.variant ?? undefined)?.id !==
+				puzzleVariant(run.family, run.variant)?.id
 		)
 			throw new RunError('session', 403);
 		if (run.scoreConfigVersion && run.scoreConfigVersion !== issued.scoreConfigVersion)
 			throw new RunError('score_version', 409);
-		scoring = await readScoreConfig(binding, run.family, issued.scoreConfigVersion, cache);
+		scoring = await readScoreConfig(
+			binding,
+			run.family,
+			issued.scoreConfigVersion,
+			cache,
+			issued.variant ?? undefined
+		);
 		cardOpeningMs = issued.cardOpeningMs;
 		// The issued snapshot is authoritative, including for a queued legacy client.
 		resolvedTheme = issued.themeSnapshot
@@ -214,14 +246,20 @@ export async function saveRun(
 	let result;
 	const replayStarted = performance.now();
 	try {
-		result = catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values);
+		result = catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values, run.variant);
 		const timing = catalog[run.family].rankedTiming;
 		if (run.rankedSession && timing) {
 			seconds = Math.floor(
-				Math.max(0, rankedWallMs - timing.openingMs(result) - cardOpeningMs) / 1000
+				Math.max(0, rankedWallMs - timing.openingMs(result, run.variant) - cardOpeningMs) / 1000
 			);
-			result = catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values);
-			if (seconds < timing.minimumSeconds(result)) throw new RunError('too_fast');
+			result = catalog[run.family].replay(
+				run.seed,
+				run.moves,
+				seconds,
+				scoring.values,
+				run.variant
+			);
+			if (seconds < timing.minimumSeconds(result, run.variant)) throw new RunError('too_fast');
 		}
 	} catch (error) {
 		// Terminal validation failures release the lock; storage failures retain retry rights.
@@ -291,9 +329,35 @@ export async function accountHistory(binding: D1Database, userId: string) {
 		.where(eq(completedRun.userId, userId))
 		.orderBy(desc(completedRun.createdAt), asc(completedRun.id))
 		.limit(30);
-	const defaultVersion = sql`CASE ${completedRun.family} ${sql.join(
-		Object.values(catalog).map(
-			(manifest) => sql`WHEN ${manifest.id} THEN ${manifest.scoring.version}`
+	const ownVariants = Object.values<PuzzleManifest>(catalog).flatMap((manifest) =>
+		(manifest.variants ?? [])
+			.filter((variant) => variant.scoring)
+			.map((variant) => ({ family: manifest.id, variant }))
+	);
+	const scoreFamily = ownVariants.length
+		? sql`CASE ${sql.join(
+				ownVariants.map(
+					({ family, variant }) =>
+						sql`WHEN ${completedRun.family}=${family} AND ${completedRun.group} IN (${sql.join(
+							variant.leaderboardGroups.map((group) => sql`${group}`),
+							sql`,`
+						)}) THEN ${scoreScope(family, variant.id)}`
+				),
+				sql` `
+			)} ELSE ${completedRun.family} END`
+		: completedRun.family;
+	const defaultVersion = sql`CASE ${sql.join(
+		ownVariants.map(
+			({ family, variant }) =>
+				sql`WHEN ${completedRun.family}=${family} AND ${completedRun.group} IN (${sql.join(
+					variant.leaderboardGroups.map((group) => sql`${group}`),
+					sql`,`
+				)}) THEN ${variant.scoring!.version}`
+		),
+		sql` `
+	)} ${sql.join(
+		Object.values<PuzzleManifest>(catalog).map(
+			(manifest) => sql`WHEN ${completedRun.family}=${manifest.id} THEN ${manifest.scoring.version}`
 		),
 		sql` `
 	)} END`;
@@ -308,7 +372,7 @@ export async function accountHistory(binding: D1Database, userId: string) {
 		.where(
 			and(
 				eq(completedRun.userId, userId),
-				sql`${completedRun.scoreConfigVersion} = COALESCE((SELECT version FROM score_live WHERE family=${completedRun.family}), ${defaultVersion})`
+				sql`${completedRun.scoreConfigVersion} = COALESCE((SELECT version FROM score_live WHERE family=${scoreFamily}), ${defaultVersion})`
 			)
 		)
 		.groupBy(completedRun.family, completedRun.group, completedRun.scoreConfigVersion);
@@ -325,7 +389,7 @@ export async function accountHistory(binding: D1Database, userId: string) {
 	return { history, bests, summary };
 }
 
-export const BOARD_GROUPS = Object.values(catalog).flatMap(
+export const BOARD_GROUPS = Object.values<PuzzleManifest>(catalog).flatMap(
 	(manifest) => manifest.leaderboardGroups
 );
 export async function leaderboard(
@@ -335,12 +399,15 @@ export async function leaderboard(
 	viewer: string | null,
 	cache?: KVNamespace
 ) {
-	const manifest = Object.values(catalog).find((entry) => entry.leaderboardGroups.includes(group));
+	const manifest = Object.values<PuzzleManifest>(catalog).find((entry) =>
+		entry.leaderboardGroups.includes(group)
+	);
 	if (!manifest || !Number.isSafeInteger(offset) || offset < 0 || offset > 9900 || offset % 25)
 		throw new RunError('board');
 	const db = createDatabase(binding);
 	const family = manifest.id;
-	const scoring = await readScoreConfig(binding, family, undefined, cache);
+	const variant = manifest.variants?.find((variant) => variant.leaderboardGroups.includes(group));
+	const scoring = await readScoreConfig(binding, family, undefined, cache, variant?.id);
 	// Each player occupies one place, using their best eligible result.
 	const query = sql`WITH eligible AS (
 		SELECT r.*, p.name, row_number() OVER (PARTITION BY r.user_id ORDER BY r.score DESC,r.created_at,r.id) AS personal

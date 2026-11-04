@@ -146,7 +146,7 @@ test('real Google-session fixture plus TOTP opens the native dashboard and audit
 	await page.goto('/admin/scoring');
 	const memoryEditor = page
 		.locator('section')
-		.filter({ has: page.getByRole('heading', { name: 'Memory', exact: true }) });
+		.filter({ has: page.getByRole('heading', { name: 'Memory · Shared scoring', exact: true }) });
 	await memoryEditor.getByLabel('Points per pair').fill('1250');
 	await memoryEditor.locator('form').first().locator('input[name=reason]').fill('Score test');
 	await memoryEditor.locator('form').first().locator('input[name=confirm]').check();
@@ -157,7 +157,7 @@ test('real Google-session fixture plus TOTP opens the native dashboard and audit
 	await page.goto('/admin/scoring');
 	const restoredEditor = page
 		.locator('section')
-		.filter({ has: page.getByRole('heading', { name: 'Memory', exact: true }) });
+		.filter({ has: page.getByRole('heading', { name: 'Memory · Shared scoring', exact: true }) });
 	await restoredEditor.locator('form').first().locator('input[name=reason]').fill('Restore test');
 	await restoredEditor.locator('form').first().locator('input[name=confirm]').check();
 	await restoredEditor.getByRole('button', { name: 'Restore brief defaults' }).click();
@@ -387,7 +387,7 @@ test('games admin manages availability and restores scoring without losing saved
 
 		const editor = page
 			.locator('section.scoring-card')
-			.filter({ has: page.getByRole('heading', { name: 'Memory', exact: true }) });
+			.filter({ has: page.getByRole('heading', { name: 'Memory · Shared scoring', exact: true }) });
 		const save = editor.locator('form').first();
 		const source = await save.locator('input[name=expected]').inputValue();
 		scoreSource = source;

@@ -2,7 +2,7 @@ import { and, desc, eq } from 'drizzle-orm';
 import { catalog } from '#lib/catalog.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { randomSeed } from '#lib/seeds.js';
-import { defaultScoreConfig } from '#lib/scoring.js';
+import { defaultScoreConfig, puzzleVariant, scoreScope } from '#lib/scoring.js';
 import { CARD_RANKED_OPENING_MS } from '#lib/round-timing.js';
 import { themeProfile } from '#lib/engine/theme/config.js';
 import { drawFreshTheme } from '#lib/engine/theme/freshness.js';
@@ -12,6 +12,7 @@ import { playSession } from './db/schema.js';
 import { readLiveScoreConfig, readScoreConfig } from './scoring.js';
 import { RunError } from './runs.js';
 import { ensureCatalogFamily, readThemeConfig } from './config.js';
+import { variantAvailable } from './games.js';
 import { assertAccountActive } from './user-lifecycle.js';
 
 /** Returns only the authenticated account's original issuance snapshot; never a new seed. */
@@ -24,7 +25,7 @@ export async function resumableRanked(
 	await assertAccountActive(binding, userId, now);
 	const row = await binding
 		.prepare(
-			`SELECT id,family,seed,engine_version AS engineVersion,
+			`SELECT id,family,variant,seed,engine_version AS engineVersion,
 		created_at AS startedAt,expires_at AS expiresAt,theme_snapshot AS themeSnapshot,
 		score_config_version AS scoreVersion,payload_hash IS NOT NULL AS saving
 		FROM play_session active WHERE user_id=? AND abandoned_at IS NULL AND expires_at>?
@@ -35,6 +36,7 @@ export async function resumableRanked(
 		.first<{
 			id: string;
 			family: string;
+			variant: string | null;
 			seed: string;
 			engineVersion: string;
 			startedAt: number;
@@ -55,9 +57,16 @@ export async function resumableRanked(
 	const { themeSnapshot, scoreVersion, saving, ...session } = row;
 	return {
 		...session,
+		variant: puzzleVariant(row.family, row.variant ?? undefined)?.id,
 		saving: Boolean(saving),
 		theme: themeSnapshot ? (JSON.parse(themeSnapshot) as ResolvedTheme) : null,
-		scoring: await readScoreConfig(binding, row.family, scoreVersion, cache)
+		scoring: await readScoreConfig(
+			binding,
+			row.family,
+			scoreVersion,
+			cache,
+			row.variant ?? undefined
+		)
 	};
 }
 
@@ -98,8 +107,16 @@ export async function startRanked(
 	ipHash: string,
 	now = Date.now(),
 	takeoverSession: string | null = null,
-	cache?: KVNamespace
+	cache?: KVNamespace,
+	variant?: string
 ) {
+	let selected;
+	try {
+		selected = puzzleVariant(family, variant);
+	} catch {
+		throw new RunError('variant');
+	}
+	variant = selected?.id;
 	await ensureCatalogFamily(binding, family);
 	const db = createDatabase(binding);
 	const id = crypto.randomUUID();
@@ -117,16 +134,22 @@ export async function startRanked(
 	const seed = theme.seed;
 	// One conditional statement serializes caps and insertion. No read/check/write gap.
 	for (let attempt = 0; attempt < 3; attempt++) {
-		const { config: scoring, liveVersion } = await readLiveScoreConfig(binding, family, cache);
+		const { config: scoring, liveVersion } = await readLiveScoreConfig(
+			binding,
+			family,
+			cache,
+			variant
+		);
 		const issue = binding
 			.prepare(
 				`
-		INSERT INTO play_session (id,user_id,family,seed,engine_version,created_at,expires_at,ip_hash,theme_config_version,theme_generator_version,theme_snapshot,card_opening_ms,score_config_version)
-		SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?
+		INSERT INTO play_session (id,user_id,family,variant,seed,engine_version,created_at,expires_at,ip_hash,theme_config_version,theme_generator_version,theme_snapshot,card_opening_ms,score_config_version)
+		SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?
 		WHERE EXISTS (SELECT 1 FROM player WHERE user_id=?)
 		AND NOT EXISTS (SELECT 1 FROM player_ban WHERE user_id=? AND (expires_at IS NULL OR expires_at>?))
 		AND NOT EXISTS (SELECT 1 FROM user_lifecycle WHERE user_id=?)
 		AND EXISTS (SELECT 1 FROM game_lifecycle WHERE family=? AND state='enabled')
+		AND COALESCE((SELECT state FROM variant_lifecycle WHERE family=? AND variant=?),?)='enabled'
 		AND NOT EXISTS (SELECT 1 FROM play_session active WHERE active.user_id=? AND active.abandoned_at IS NULL AND active.expires_at>?
 			AND NOT EXISTS (SELECT 1 FROM completed_run finished WHERE finished.id=active.id)
 			AND NOT (active.id=COALESCE(?, '') AND active.payload_hash IS NULL))
@@ -144,6 +167,7 @@ export async function startRanked(
 				id,
 				userId,
 				family,
+				variant ?? null,
 				seed,
 				catalog[family].engineVersion,
 				now,
@@ -159,11 +183,14 @@ export async function startRanked(
 				now,
 				userId,
 				family,
+				family,
+				variant ?? null,
+				selected?.enabled === false ? 'disabled' : 'enabled',
 				userId,
 				now,
 				takeoverSession,
-				family,
-				defaultScoreConfig(family).version,
+				scoreScope(family, variant),
+				defaultScoreConfig(family, variant).version,
 				liveVersion,
 				userId,
 				now - 3600000,
@@ -189,16 +216,14 @@ export async function startRanked(
 				.bind(now, takeoverSession, userId, id)
 		]);
 		if (!results[0]!.results.length) {
-			const available = await binding
-				.prepare('SELECT state FROM game_lifecycle WHERE family=?')
-				.bind(family)
-				.first<{ state: string }>();
-			if (available?.state !== 'enabled') throw new RunError('game_disabled', 409);
+			if (!(await variantAvailable(binding, family, variant)))
+				throw new RunError('game_disabled', 409);
 			const current = await binding
 				.prepare('SELECT version FROM score_live WHERE family=?')
-				.bind(family)
+				.bind(scoreScope(family, variant))
 				.first<{ version: string }>();
-			if ((current?.version ?? defaultScoreConfig(family).version) !== liveVersion) continue;
+			if ((current?.version ?? defaultScoreConfig(family, variant).version) !== liveVersion)
+				continue;
 			const active = await activeRanked(binding, userId, now);
 			if (active && (active.id !== takeoverSession || active.saving))
 				throw new RunError('ranked_active', 409);
@@ -209,6 +234,7 @@ export async function startRanked(
 			id,
 			seed,
 			family,
+			...(variant ? { variant } : {}),
 			theme,
 			engineVersion: catalog[family].engineVersion,
 			startedAt: now,

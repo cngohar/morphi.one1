@@ -2523,3 +2523,38 @@ The final verification evidence above is retained; app tests were not repeated
 for this documentation/Git handoff. Local refactor acceptance and the original
 Slice 0 timing-gate waiver still require the owner's explicit written decision.
 No deployment, production changes or post-refactor implementation are authorized.
+
+## v1.3 — Memory variants, local only (2026-11-04)
+
+**Built:** classic compatibility plus no-preview, trios and moving Memory; family-owned variant metadata and weighted selection; checkpoint/pending/ranked identity; authoritative replay and separate groups; same-page registered-cohort/open/imported statistics; audited variant lifecycle; shared pair and independent trio immutable scoring; operator-only/noindex ephemeral Memory test play. Migration `0013_variants.sql` applied locally. Full files/groups/evidence: `docs/V1.3_WORK.md`.
+
+**Skipped:** all Block/Connect variants, Mahjong/new games, knowledge graph, guest tracking, full verify and unrelated test suites, physical-device measurements, commit/push and every release/production/deployment step.
+
+**Known issues / decisions:** equal variant weights; omitted variant remains classic; trios uses `memory-trios-v1` and a board-preserving Home recovery at its cap; no-preview keeps face-down arrival with zero game-opening allowance. Imported completions stay outside reconciled counts under the owner's clarification. No dependency/version upgrade. Browser scoring tests leave new immutable/audited versions while restoring original coefficients; local live version/eligibility advances, saved runs remain unchanged. Initial fixture/locator/type/CSS issues were corrected and affected checks rerun. No known unresolved targeted functional failure; physical-device validation is outstanding.
+
+**Questions for the owner:** review and confirm the local v1.3 implementation or provide corrections. No next phase or release is inferred.
+
+| Acceptance item                                                                                                        | Evidence type / location                                                                                                           | Result                                    |
+| ---------------------------------------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------- |
+| Memory variants, classic legacy compatibility, scoring, manifest/messages and shared plumbing                          | 53 unique unit/theme/checkpoint/progress checks plus manifest projection assertions; `build/v1.3/`, permanent verification summary | Pass                                      |
+| Exact classic/new/moving replay vectors in six runtimes                                                                | `tests/vectors/memory-*`, `vectors-final.log`, permanent summary                                                                   | Pass: 13 identical vectors per runtime    |
+| Memory-only procedural palettes                                                                                        | `docs/evidence/v1.3/palettes.json`                                                                                                 | Pass: 10,000 safe palettes                |
+| Variant persistence/replay/groups, count reconciliation/imports/open, lifecycle/audit/disable races, immutable scoring | 12 unique real local D1 integration checks; `integration.log`, `integration-final.log`                                             | Pass                                      |
+| Public Memory label/no-preview/trios/moving/result/Next/rotation/recovery and cap                                      | Focused Chromium specs; composite scoped logs linked in `docs/V1.3_WORK.md`                                                        | Pass                                      |
+| Existing admin games counts/controls/editors and ephemeral authenticated/noindex test play                             | Focused admin Chromium spec; `browser-admin-final.log`                                                                             | Pass; 9/9 unique browser checks overall   |
+| Type/format/lint/import/purity boundaries                                                                              | `types-complete.log`, lint logs, `boundaries.log`                                                                                  | Pass: zero type errors/warnings           |
+| Owner confirmation / physical-device acceptance                                                                        | Owner review                                                                                                                       | Pending; no acceptance or waiver inferred |
+
+**Measurements:** local Linux x64 / Bun 1.4.2, preloaded Memory generator, no network, 10,000 samples; median 0.711 ms, p95 3.002 ms. Diagnostic goal only. Browser portrait/landscape/desktop viewport checks are emulation, not physical-phone/performance evidence. No new performance gate or waiver.
+
+**Waivers:** none. The imported-completion clarification changes the cohort definition; it does not waive reconciliation.
+
+**Owner responsibilities:** review/confirm locally; provide physical devices if physical evidence is wanted. Source push and release/deployment remain separate instructions.
+
+**CODEMAP:** updated for v1.3 paths, scoped commands and closeout evidence. Stop for owner confirmation.
+
+### v1.3 Git handoff — 2026-11-04
+
+The owner explicitly requested updating the repository and pushing v1.3 to the existing GitHub `origin/main`. This source-only handoff includes implementation, tests, the owner-approved brief, documentation and permanent verification/palette evidence. It supersedes the earlier commit/push prohibition for this requested handoff; it does not infer local functional/device acceptance or authorize deployment, release work or another phase.
+
+Prior targeted verification results remain unchanged. No app checks are repeated for the documentation/Git handoff. Pre-existing local editor MCP configuration, ignored credentials, local databases and build/test output are excluded.

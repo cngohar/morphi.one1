@@ -44,7 +44,8 @@ for (const preset of PRESETS) {
 	)
 		throw new Error(`Unsafe documented preset: ${preset.id}`);
 }
-const directory = 'docs/evidence/slice5-themes';
+const memoryOnly = process.argv.includes('--memory');
+const directory = memoryOnly ? 'docs/evidence/v1.3' : 'docs/evidence/slice5-themes';
 // Freshness is a best-effort diagnostic; the palette safety gate keeps 10,000 seeds.
 const freshnessRounds = 1000;
 const report: Record<string, unknown> = {
@@ -55,7 +56,9 @@ const report: Record<string, unknown> = {
 	colorModel:
 		'Machado 2009 severity 1.0 on linear sRGB; CIE76 D65; 8-bit hex checked after conversion'
 };
-for (const family of ['memory', 'block', 'connect'] as const) {
+for (const family of memoryOnly
+	? (['memory'] as const)
+	: (['memory', 'block', 'connect'] as const)) {
 	const buckets = Array.from({ length: 12 }, (_, i) => ({
 		hue: `${i * 30}–${i * 30 + 29}`,
 		seeds: 0,

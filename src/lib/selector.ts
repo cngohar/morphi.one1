@@ -1,3 +1,4 @@
+import type { PuzzleVariant } from '#lib/engine/contract.js';
 import type { Rng } from '#lib/engine/rng.js';
 
 export type PuzzleFamily = import('#lib/engine/contract.js').PuzzleId;
@@ -13,10 +14,17 @@ export interface PuzzleSelectorState<Family extends string = PuzzleFamily> {
 	queue: Family[];
 	recent: Family[];
 	cyclePosition: number;
+	lastVariants?: Record<string, string>;
 }
 
 export interface PuzzleSelector<Family extends string = PuzzleFamily> {
 	next(): Family;
+	peekVariant(
+		family: Family,
+		variants: readonly PuzzleVariant[] | undefined,
+		enabled: readonly string[]
+	): string | undefined;
+	commitVariant(family: Family, variant?: string): void;
 	peek(): Family;
 	setAvailable(families: readonly Family[]): void;
 	snapshot(): PuzzleSelectorState<Family>;
@@ -56,6 +64,8 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 	let queue: Family[] = [];
 	let cursor = 0;
 	let cyclePosition = 0;
+	let lastVariants: Record<string, string> = {};
+	const pendingVariants = new Map<Family, string>();
 
 	function restore(value: unknown): boolean {
 		if (!value || typeof value !== 'object') return false;
@@ -82,6 +92,21 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 				!(state.queue.length === 0 && state.cyclePosition === 0))
 		)
 			return false;
+		if (
+			state.lastVariants !== undefined &&
+			(!state.lastVariants ||
+				typeof state.lastVariants !== 'object' ||
+				Array.isArray(state.lastVariants) ||
+				Object.entries(state.lastVariants).some(
+					([family, variant]) =>
+						!ids.has(family as Family) ||
+						typeof variant !== 'string' ||
+						!variant.startsWith(`${family}:`) ||
+						variant.length > 100
+				))
+		)
+			return false;
+		lastVariants = { ...(state.lastVariants as Record<string, string> | undefined) };
 		const selected = new Set(state.eligible);
 		const restored = state.queue.slice();
 		if (!repair(restored, state.recent, selected.size)) return false;
@@ -98,7 +123,8 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 			eligible: available.map((entry) => entry.family),
 			queue: queue.slice(cursor),
 			recent: recent.slice(),
-			cyclePosition
+			cyclePosition,
+			...(Object.keys(lastVariants).length ? { lastVariants: { ...lastVariants } } : {})
 		};
 	}
 
@@ -170,6 +196,43 @@ export function createPuzzleSelector<Family extends string = PuzzleFamily>(
 
 	return {
 		snapshot,
+		peekVariant(family, variants, enabled) {
+			if (!variants?.length) return undefined;
+			const candidates = variants.filter(
+				(entry) => entry.enabled !== false && entry.weight > 0 && enabled.includes(entry.id)
+			);
+			const pending = pendingVariants.get(family);
+			if (pending && candidates.some((entry) => entry.id === pending)) return pending;
+			const choices =
+				candidates.length > 1
+					? candidates.filter((entry) => entry.id !== lastVariants[family])
+					: candidates;
+			const total = choices.reduce((sum, entry) => sum + entry.weight, 0);
+			if (!Number.isSafeInteger(total) || total <= 0) throw new Error('variant_unavailable');
+			let draw = options.rng.nextInt(total);
+			for (const entry of choices) {
+				if (
+					!Number.isSafeInteger(entry.weight) ||
+					entry.weight <= 0 ||
+					!entry.id.startsWith(`${family}:`)
+				)
+					throw new Error('variant_invalid');
+				if (draw < entry.weight) {
+					pendingVariants.set(family, entry.id);
+					return entry.id;
+				}
+				draw -= entry.weight;
+			}
+			throw new Error('variant_invalid');
+		},
+		commitVariant(family, variant) {
+			if (variant !== undefined) {
+				if (pendingVariants.get(family) !== variant) throw new Error('variant_invalid');
+				lastVariants[family] = variant;
+				pendingVariants.delete(family);
+				changed();
+			}
+		},
 		peek() {
 			if (ensureQueue()) changed();
 			return queue[cursor]!;

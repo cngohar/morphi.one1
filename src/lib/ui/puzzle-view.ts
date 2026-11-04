@@ -6,6 +6,7 @@ import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 
 /** The shell keeps identity; each lazy view owns its concrete round and result presentation. */
 export interface PuzzleRound {
+	variant?: string;
 	seed: string;
 }
 

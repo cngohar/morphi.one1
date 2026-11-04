@@ -1,31 +1,42 @@
-import { defaultScoreConfig, validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
+import {
+	defaultScoreConfig,
+	scoreScope,
+	validateScoreValues,
+	type ScoreConfig
+} from '#lib/scoring.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { RunError } from './runs.js';
 import { cachedConfigRow } from './config-cache.js';
 
 type ScoreRow = { version: string; parent: string; values_json: string; created_at: number };
 
-function parseScoreRow(family: PuzzleId, row: ScoreRow): ScoreConfig | null {
+function parseScoreRow(family: PuzzleId, row: ScoreRow, variant?: string): ScoreConfig | null {
 	try {
 		return {
 			version: row.version,
-			values: validateScoreValues(family, JSON.parse(row.values_json))
+			values: validateScoreValues(family, JSON.parse(row.values_json), variant)
 		};
 	} catch {
 		return null;
 	}
 }
 
-async function scoreRow(db: D1Database, family: PuzzleId, version: string, cache?: KVNamespace) {
+async function scoreRow(
+	db: D1Database,
+	family: PuzzleId,
+	version: string,
+	cache?: KVNamespace,
+	variant?: string
+) {
 	return cachedConfigRow(
 		cache,
-		`config-v1:score:${family}:${version}`,
+		`config-v1:score:${scoreScope(family, variant)}:${version}`,
 		() =>
 			db
 				.prepare(
 					'SELECT version,parent,values_json,created_at FROM score_config WHERE family=? AND version=?'
 				)
-				.bind(family, version)
+				.bind(scoreScope(family, variant), version)
 				.first<ScoreRow>(),
 		(value) => {
 			if (!value || typeof value !== 'object') return null;
@@ -33,28 +44,33 @@ async function scoreRow(db: D1Database, family: PuzzleId, version: string, cache
 			return row.version === version &&
 				typeof row.parent === 'string' &&
 				typeof row.created_at === 'number' &&
-				parseScoreRow(family, row)
+				parseScoreRow(family, row, variant)
 				? row
 				: null;
 		}
 	);
 }
 
-export async function readLiveScoreConfig(db: D1Database, family: PuzzleId, cache?: KVNamespace) {
-	const defaultVersion = defaultScoreConfig(family).version;
+export async function readLiveScoreConfig(
+	db: D1Database,
+	family: PuzzleId,
+	cache?: KVNamespace,
+	variant?: string
+) {
+	const defaultVersion = defaultScoreConfig(family, variant).version;
 	try {
 		const live = await db
 			.prepare('SELECT version FROM score_live WHERE family=?')
-			.bind(family)
+			.bind(scoreScope(family, variant))
 			.first<{ version: string }>();
 		const liveVersion = live?.version ?? defaultVersion;
 		let version = liveVersion;
 		const seen = new Set<string>();
 		while (version !== defaultVersion && !seen.has(version) && seen.size < 32) {
 			seen.add(version);
-			const row = await scoreRow(db, family, version, cache);
+			const row = await scoreRow(db, family, version, cache, variant);
 			if (!row) break;
-			const config = parseScoreRow(family, row);
+			const config = parseScoreRow(family, row, variant);
 			if (config) {
 				if (version !== liveVersion) console.warn('morphi:score_live_invalid', family);
 				return { liveVersion, config };
@@ -62,10 +78,10 @@ export async function readLiveScoreConfig(db: D1Database, family: PuzzleId, cach
 			version = row.parent;
 		}
 		if (liveVersion !== defaultVersion) console.warn('morphi:score_live_invalid', family);
-		return { liveVersion, config: defaultScoreConfig(family) };
+		return { liveVersion, config: defaultScoreConfig(family, variant) };
 	} catch {
 		console.warn('morphi:score_config_unavailable', family);
-		return { liveVersion: defaultVersion, config: defaultScoreConfig(family) };
+		return { liveVersion: defaultVersion, config: defaultScoreConfig(family, variant) };
 	}
 }
 
@@ -73,27 +89,29 @@ export async function readScoreConfig(
 	db: D1Database,
 	family: PuzzleId,
 	version?: string,
-	cache?: KVNamespace
+	cache?: KVNamespace,
+	variant?: string
 ): Promise<ScoreConfig> {
-	if (!version) return (await readLiveScoreConfig(db, family, cache)).config;
-	if (version === defaultScoreConfig(family).version) return defaultScoreConfig(family);
-	const row = await scoreRow(db, family, version, cache);
-	const config = row && parseScoreRow(family, row);
+	if (!version) return (await readLiveScoreConfig(db, family, cache, variant)).config;
+	if (version === defaultScoreConfig(family, variant).version)
+		return defaultScoreConfig(family, variant);
+	const row = await scoreRow(db, family, version, cache, variant);
+	const config = row && parseScoreRow(family, row, variant);
 	if (!config) throw new RunError('score_version', 409);
 	return config;
 }
 
-export async function listScoreVersions(db: D1Database, family: PuzzleId) {
+export async function listScoreVersions(db: D1Database, family: PuzzleId, variant?: string) {
 	const rows = await db
 		.prepare(
 			'SELECT version,parent,values_json,created_at FROM score_config WHERE family=? ORDER BY created_at DESC, version DESC'
 		)
-		.bind(family)
+		.bind(scoreScope(family, variant))
 		.all<ScoreRow>();
 	return [
-		{ version: defaultScoreConfig(family).version, createdAt: null },
+		{ version: defaultScoreConfig(family, variant).version, createdAt: null },
 		...rows.results
-			.filter((row) => parseScoreRow(family, row))
+			.filter((row) => parseScoreRow(family, row, variant))
 			.map((row) => ({ version: row.version, createdAt: row.created_at }))
 	];
 }
@@ -107,10 +125,11 @@ export async function saveScoreConfig(
 	input: unknown,
 	reason: string,
 	reset = false,
-	rollbackSource?: string
+	rollbackSource?: string,
+	variant?: string
 ) {
-	const values = validateScoreValues(family, input);
-	const { config: before, liveVersion } = await readLiveScoreConfig(db, family);
+	const values = validateScoreValues(family, input, variant);
+	const { config: before, liveVersion } = await readLiveScoreConfig(db, family, undefined, variant);
 	if (liveVersion !== expected) throw new RunError('score_conflict', 409);
 	const version = crypto.randomUUID(),
 		now = Date.now();
@@ -120,12 +139,12 @@ export async function saveScoreConfig(
 				.prepare(
 					'INSERT INTO score_config(version,family,parent,values_json,created_at) VALUES(?,?,?,?,?)'
 				)
-				.bind(version, family, expected, JSON.stringify(values), now),
+				.bind(version, scoreScope(family, variant), expected, JSON.stringify(values), now),
 			db
 				.prepare(
 					'INSERT INTO score_live(family,version) VALUES(?,?) ON CONFLICT(family) DO UPDATE SET version=excluded.version'
 				)
-				.bind(family, version),
+				.bind(scoreScope(family, variant), version),
 			db
 				.prepare(
 					'INSERT INTO admin_audit(id,actor,action,target,reason,before,after,created_at) VALUES(?,?,?,?,?,?,?,?)'
@@ -134,7 +153,7 @@ export async function saveScoreConfig(
 					crypto.randomUUID(),
 					actor,
 					rollbackSource ? 'score-rollback' : reset ? 'score-defaults' : 'score-change',
-					family,
+					scoreScope(family, variant),
 					reason,
 					JSON.stringify(liveVersion === before.version ? before : { ...before, liveVersion }),
 					JSON.stringify(
@@ -158,8 +177,25 @@ export async function rollbackScoreConfig(
 	family: PuzzleId,
 	expected: string,
 	sourceVersion: string,
-	reason: string
+	reason: string,
+	variant?: string
 ) {
-	const source = await readScoreConfig(db, family, sourceVersion || '__invalid__');
-	return saveScoreConfig(db, actor, family, expected, source.values, reason, false, source.version);
+	const source = await readScoreConfig(
+		db,
+		family,
+		sourceVersion || '__invalid__',
+		undefined,
+		variant
+	);
+	return saveScoreConfig(
+		db,
+		actor,
+		family,
+		expected,
+		source.values,
+		reason,
+		false,
+		source.version,
+		variant
+	);
 }

@@ -1,13 +1,16 @@
 <script lang="ts">
 	import { dismissOnBackdrop } from '#lib/ui/dismiss-dialog.js';
 	import { t } from '#lib/i18n/messages.js';
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import PuzzleGuide from '#lib/components/PuzzleGuide.svelte';
 	import { motion } from '#lib/ui/motion.js';
 	let {
 		family,
+		variant,
 		scoring,
 		onpause = () => {}
 	}: {
+		variant?: string;
 		scoring?: import('#lib/engine/scoring.js').ScoreValues;
 		family: import('#lib/engine/contract.js').PuzzleId;
 		onpause?: (paused: boolean) => void;
@@ -57,10 +60,13 @@
 	aria-labelledby="help-title"
 >
 	<header>
+		<p>{familyName(family, variant)}</p>
 		<h2 id="help-title">{t(kind === 'how' ? 'v1.game.how' : 'v1.game.helpScoring')}</h2>
 	</header>
-	<PuzzleGuide {family} {scoring} section={kind === 'scoring' ? 'scoring-tips' : kind} /><button
-		class="btn"
-		onclick={close}>{t('v1.game.back')}</button
-	>
+	<PuzzleGuide
+		{family}
+		{variant}
+		{scoring}
+		section={kind === 'scoring' ? 'scoring-tips' : kind}
+	/><button class="btn" onclick={close}>{t('v1.game.back')}</button>
 </dialog>

@@ -1,9 +1,30 @@
 import { messages } from './messages.js';
-import type { PuzzleManifest } from '#lib/engine/contract.js';
+import type { PuzzleManifest, PuzzlePresentation } from '#lib/engine/contract.js';
 import type { ScoreValues } from '#lib/engine/scoring.js';
-import { scoring } from './scoring.js';
+import { scoring, triosScoring } from './scoring.js';
 import { memoryOpeningMs } from '#lib/round-timing.js';
-import { createMemoryRound, flipCard, resolveMismatch, scoreRound } from './logic.js';
+import {
+	cardsPerMatch,
+	createMemoryRound,
+	flipCard,
+	memoryMoveLimit,
+	memoryVariant,
+	parseMemoryVariant,
+	resolveMismatch,
+	scoreRound
+} from './logic.js';
+
+const pairHelp = {
+	steps: ['v1.game.memory.step1', 'v1.game.memory.step2', 'v1.game.memory.step3'],
+	rows: [
+		{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+		{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+		{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+		{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+	],
+	note: 'v1.game.memory.scoringNote',
+	tips: 'v1.game.memory.tips'
+} satisfies PuzzlePresentation['help'];
 
 export const manifest = {
 	id: 'memory',
@@ -11,25 +32,25 @@ export const manifest = {
 		name: 'v1.game.memory',
 		scoringLabels: {
 			pair: 'scoring.memory.pair',
+			trio: 'scoring.memory.trio',
 			mismatch: 'scoring.memory.mismatch',
 			second: 'scoring.memory.second'
 		},
 		groups: {
 			'memory-1:6': 'leaderboard.memory6',
 			'memory-1:8': 'leaderboard.memory8',
-			'memory-1:10': 'leaderboard.memory10'
+			'memory-1:10': 'leaderboard.memory10',
+			'memory-1:no-preview:6': 'leaderboard.memory.no-preview.6',
+			'memory-1:no-preview:8': 'leaderboard.memory.no-preview.8',
+			'memory-1:no-preview:10': 'leaderboard.memory.no-preview.10',
+			'memory-1:trios:6': 'leaderboard.memory.trios.6',
+			'memory-1:trios:8': 'leaderboard.memory.trios.8',
+			'memory-1:trios:10': 'leaderboard.memory.trios.10',
+			'memory-1:moving:6': 'leaderboard.memory.moving.6',
+			'memory-1:moving:8': 'leaderboard.memory.moving.8',
+			'memory-1:moving:10': 'leaderboard.memory.moving.10'
 		},
-		help: {
-			steps: ['v1.game.memory.step1', 'v1.game.memory.step2', 'v1.game.memory.step3'],
-			rows: [
-				{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
-				{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
-				{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
-				{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
-			],
-			note: 'v1.game.memory.scoringNote',
-			tips: 'v1.game.memory.tips'
-		},
+		help: pairHelp,
 		backdrop: {
 			items: [
 				{ id: 'card', path: 'M17 5H43Q48 5 48 10V50Q48 55 43 55H17Q12 55 12 50V10Q12 5 17 5Z' }
@@ -43,23 +64,103 @@ export const manifest = {
 	orientation: 'any',
 	engineVersion: 'memory-1',
 	scoring,
-	maxMoves: 120,
+	variants: [
+		{
+			id: 'memory:classic',
+			name: 'variant.memory:classic',
+			weight: 1,
+			maxMoves: 120,
+			leaderboardGroups: ['memory-1:6', 'memory-1:8', 'memory-1:10']
+		},
+		{
+			id: 'memory:no-preview',
+			name: 'variant.memory:no-preview',
+			weight: 1,
+			maxMoves: 120,
+			leaderboardGroups: [
+				'memory-1:no-preview:6',
+				'memory-1:no-preview:8',
+				'memory-1:no-preview:10'
+			],
+			help: {
+				...pairHelp,
+				steps: ['v1.game.memory.step1', 'v1.game.memory.step2', 'memory.noPreview.step3'],
+				note: 'memory.noPreview.scoringNote',
+				tips: 'memory.noPreview.tips'
+			}
+		},
+		{
+			id: 'memory:trios',
+			name: 'variant.memory:trios',
+			weight: 1,
+			maxMoves: 180,
+			leaderboardGroups: ['memory-1:trios:6', 'memory-1:trios:8', 'memory-1:trios:10'],
+			scoring: triosScoring,
+			help: {
+				steps: ['memory.trios.step1', 'memory.trios.step2', 'memory.trios.step3'],
+				rows: [
+					{ label: 'memory.trios.row1', field: 'trio', sign: '+' },
+					{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+					{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+					{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+				],
+				note: 'v1.game.memory.scoringNote',
+				tips: 'memory.trios.tips'
+			},
+			ending: {
+				kind: 'completion',
+				headlines: { default: 'ending.memory.trios.headline' },
+				subline: { key: 'ending.memory.trios.subline', values: ['pairs', 'time'] },
+				animation: 'fade-rise',
+				continue: 'auto_500ms',
+				condition: 'All trios have been matched.'
+			}
+		},
+		{
+			id: 'memory:moving',
+			name: 'variant.memory:moving',
+			weight: 1,
+			maxMoves: 120,
+			leaderboardGroups: ['memory-1:moving:6', 'memory-1:moving:8', 'memory-1:moving:10'],
+			help: {
+				...pairHelp,
+				steps: ['v1.game.memory.step1', 'memory.moving.step2', 'v1.game.memory.step3'],
+				tips: 'memory.moving.tips'
+			}
+		}
+	],
+	maxMoves: 180,
 	parseMove(move) {
 		if (Object.keys(move).sort().join(',') !== 'index') throw new RangeError('move');
 		return { index: move.index };
 	},
-	leaderboardGroups: ['memory-1:6', 'memory-1:8', 'memory-1:10'],
+	leaderboardGroups: [
+		'memory-1:6',
+		'memory-1:8',
+		'memory-1:10',
+		'memory-1:no-preview:6',
+		'memory-1:no-preview:8',
+		'memory-1:no-preview:10',
+		'memory-1:trios:6',
+		'memory-1:trios:8',
+		'memory-1:trios:10',
+		'memory-1:moving:6',
+		'memory-1:moving:8',
+		'memory-1:moving:10'
+	],
 	rankedTiming: {
-		openingMs: (result) => memoryOpeningMs(result.pairs!),
-		minimumSeconds: (result) => result.pairs! * 0.4
+		openingMs: (result, variant?: string) =>
+			parseMemoryVariant(variant) === 'memory:no-preview' ? 0 : memoryOpeningMs(result.pairs!),
+		minimumSeconds: (result, variant?: string) =>
+			result.pairs! * (parseMemoryVariant(variant) === 'memory:trios' ? 0.6 : 0.4)
 	},
 	messages,
 	createRound: createMemoryRound,
-	resumeRound(seed, moves) {
-		let round = createMemoryRound(seed);
-		if (moves.length > 12 * round.pairs) throw new RangeError('move_limit');
+	resumeRound(seed, moves, _scoring?: ScoreValues, variant?: string) {
+		let round = createMemoryRound(seed, variant);
+		if (moves.length > memoryMoveLimit(round)) throw new RangeError('move_limit');
 		for (const move of moves) {
-			if (round.revealed.length === 2) round = resolveMismatch(round);
+			if (round.revealed.length === cardsPerMatch(round)) round = resolveMismatch(round);
 			if (Object.keys(move).join(',') !== 'index' || !Number.isInteger(move.index))
 				throw new RangeError('move');
 			const next = flipCard(round, move.index!);
@@ -76,9 +177,9 @@ export const manifest = {
 		continue: 'auto_500ms',
 		condition: 'All pairs have been matched.'
 	},
-	replay(seed, moves, seconds, scoring?: ScoreValues) {
-		let round = createMemoryRound(seed);
-		if (moves.length > 12 * round.pairs) throw new RangeError('move_limit');
+	replay(seed, moves, seconds, scoring?: ScoreValues, variant?: string) {
+		let round = createMemoryRound(seed, variant);
+		if (moves.length > memoryMoveLimit(round)) throw new RangeError('move_limit');
 		for (const move of moves) {
 			if (Object.keys(move).length !== 1 || !Number.isInteger(move.index))
 				throw new RangeError('move');
@@ -89,7 +190,10 @@ export const manifest = {
 		if (round.status !== 'won') throw new RangeError('incomplete');
 		return {
 			score: scoreRound(round, seconds, scoring),
-			group: `memory-1:${round.pairs}`,
+			group:
+				memoryVariant(round) === 'memory:classic'
+					? `memory-1:${round.pairs}`
+					: `memory-1:${memoryVariant(round).slice('memory:'.length)}:${round.pairs}`,
 			pairs: round.pairs,
 			moves: round.moves
 		};

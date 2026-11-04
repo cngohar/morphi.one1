@@ -1,5 +1,10 @@
 <script lang="ts">
-	import { defaultScoreConfig, validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
+	import {
+		defaultScoreConfig,
+		puzzleVariant,
+		validateScoreValues,
+		type ScoreConfig
+	} from '#lib/scoring.js';
 	import { measure } from '#lib/ui/measurement.js';
 	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import {
@@ -154,16 +159,34 @@
 		else stage?.stop();
 		await waitCard(motion.reduced() && !ranked ? 0 : duration);
 	}
+	function reportPresented() {
+		if (roundOwner && !roundActivity)
+			roundActivity = reportAccountRound(
+				'start',
+				roundOwner,
+				roundId,
+				family,
+				rankedSession,
+				variant
+			);
+	}
 	function gameReady() {
 		if (screen !== 'game') return;
 		cardPhase = 'playing';
 		void checkpointRound();
-		if (roundOwner && !roundActivity) {
-			roundActivity = reportAccountRound('start', roundOwner, roundId, family, rankedSession);
-		}
+		reportPresented();
 	}
 	let screen = $state<Screen>('home');
 	let family = $state<PuzzleFamily>(families[0]!);
+	let variant = $state<string | undefined>();
+	let availableVariants: Record<string, string[]> = Object.fromEntries(
+		families.map((id) => [
+			id,
+			puzzleMetadata[id].variants
+				?.filter((entry) => entry.enabled !== false)
+				.map((entry) => entry.id) ?? []
+		])
+	);
 	let round = $state<PuzzleRound | null>(null);
 	let View = $state<Component<PuzzleViewProps> | null>(null);
 	let resolvedTheme = $state<ResolvedTheme | null>(null);
@@ -356,7 +379,8 @@
 						account.ownerKey,
 						resumeChoice.id,
 						resumeChoice.family,
-						'rankedSession' in resumeChoice ? resumeChoice.rankedSession : resumeChoice.id
+						'rankedSession' in resumeChoice ? resumeChoice.rankedSession : resumeChoice.id,
+						resumeChoice.variant
 					);
 			}
 		} else startRound();
@@ -366,9 +390,10 @@
 		const owner = roundOwner,
 			id = roundId,
 			game = family,
+			roundVariant = variant,
 			session = rankedSession;
 		void roundActivity.then((started) => {
-			if (started) void reportAccountRound('abandon', owner, id, game, session);
+			if (started) void reportAccountRound('abandon', owner, id, game, session, roundVariant);
 		});
 	}
 	async function ownCheckpoint(id: string, takeover = false): Promise<boolean> {
@@ -416,6 +441,7 @@
 					id: roundId,
 					owner: roundOwner,
 					family,
+					...(variant ? { variant } : {}),
 					seed: round.seed,
 					engineVersion: puzzleMetadata[family].engineVersion,
 					difficulty: 'band' in round && typeof round.band === 'number' ? round.band : null,
@@ -438,6 +464,17 @@
 		}
 	}
 	function checkpointMove(move: Move): void {
+		if (runMoves.length === 0 && roundOwner) {
+			reportPresented();
+			const owner = roundOwner,
+				id = roundId,
+				game = family,
+				session = rankedSession,
+				roundVariant = variant;
+			void roundActivity?.then((started) => {
+				if (started) void reportAccountRound('play', owner, id, game, session, roundVariant);
+			});
+		}
 		runMoves.push(move);
 		// Capture after the move handler has installed any logical deadlines.
 		queueMicrotask(() => {
@@ -480,11 +517,11 @@
 				if (!active || active.id !== choice.id || active.saving)
 					throw new Error('ranked_resume_unavailable');
 			}
-			await assertGameAvailable(choice.family);
+			if (!puzzleMetadata[choice.family].variants?.length) await assertGameAvailable(choice.family);
 			const module = await loadPuzzleModule(puzzlePools[choice.family], generationLifetime.signal);
 			const checkpoint = 'moves' in choice ? choice : null;
 			const config = choice.scoring;
-			validateScoreValues(choice.family, config.values);
+			validateScoreValues(choice.family, config.values, choice.variant);
 			const theme = 'theme' in choice ? choice.theme : null;
 			if (
 				theme &&
@@ -497,7 +534,12 @@
 			if (moves.length > module.manifest.maxMoves) throw new Error('checkpoint_moves');
 			for (const move of moves) module.manifest.parseMove(move);
 			if (!module.manifest.resumeRound) throw new Error('checkpoint_version');
-			const restored = module.manifest.resumeRound(choice.seed, moves, config.values);
+			const restored = module.manifest.resumeRound(
+				choice.seed,
+				moves,
+				config.values,
+				choice.variant
+			);
 			const view = await loadPuzzleView(puzzleViews[choice.family], generationLifetime.signal);
 			if (generationLifetime.signal.aborted) return;
 			if (screen === 'game') {
@@ -507,11 +549,12 @@
 				await tick();
 			}
 			family = choice.family;
+			variant = puzzleVariant(choice.family, choice.variant)?.id;
 			round = restored;
 			View = view;
 			resolvedTheme = theme;
 			scoring = config;
-			bests = { ...bests, [family]: loadBestScore(family, scoring.version) };
+			bests = { ...bests, [family]: loadBestScore(bestKey(), scoring.version) };
 			roundId = choice.id;
 			roundOwner = account.ownerKey;
 			rankedSession = checkpoint ? checkpoint.rankedSession : choice.id;
@@ -573,7 +616,14 @@
 				JSON.stringify({ event: 'round_abandoned', family: choice.family, reason: 'new_puzzle' })
 			);
 			if (account.ownerKey)
-				void reportAccountRound('abandon', account.ownerKey, choice.id, choice.family, session);
+				void reportAccountRound(
+					'abandon',
+					account.ownerKey,
+					choice.id,
+					choice.family,
+					session,
+					choice.variant
+				);
 			resumeChoice = null;
 			resumeInvalid = false;
 			resumeError = false;
@@ -629,6 +679,7 @@
 	}
 	async function makeCandidate(
 		chosen: PuzzleFamily,
+		nextVariant: string | undefined,
 		rankedGate: Promise<void>,
 		takeoverSession?: string
 	) {
@@ -636,7 +687,7 @@
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 		let seed = randomSeed();
 		let nextTheme: ResolvedTheme | null = null;
-		let nextScoring = defaultScoreConfig(chosen);
+		let nextScoring = defaultScoreConfig(chosen, nextVariant);
 		let nextRunId: string = crypto.randomUUID();
 		const nextOwner = account.ownerKey;
 		let nextSession: string | null = null;
@@ -645,7 +696,7 @@
 			await rankedGate;
 			if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 			try {
-				const issued = await startSession(chosen, nextOwner, takeoverSession);
+				const issued = await startSession(chosen, nextOwner, takeoverSession, nextVariant);
 				seed = issued.seed;
 				nextTheme = issued.theme;
 				nextScoring = issued.scoring;
@@ -675,14 +726,22 @@
 		} else preparation.clear();
 		if (!nextSession && accountsEnabled) {
 			try {
-				const response = await fetch(resolve('/api/play/scoring') + '?family=' + chosen, {
-					signal: AbortSignal.timeout(3000)
-				});
+				const response = await fetch(
+					resolve('/api/play/scoring') +
+						'?' +
+						new URLSearchParams({
+							family: chosen,
+							...(nextVariant ? { variant: nextVariant } : {})
+						}),
+					{
+						signal: AbortSignal.timeout(3000)
+					}
+				);
 				if (!response.ok) throw new Error('scoring_unavailable');
 				const config: ScoreConfig = await response.json();
 				nextScoring = {
 					version: config.version,
-					values: validateScoreValues(chosen, config.values)
+					values: validateScoreValues(chosen, config.values, nextVariant)
 				};
 			} catch {
 				console.warn('morphi:score_defaults_offline');
@@ -691,14 +750,18 @@
 		if (accountsEnabled && !nextTheme) throw new Error('round_theme_missing');
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 		const nextRound =
-			candidate?.round ??
+			(nextVariant === undefined || nextVariant === puzzleMetadata[chosen].variants?.[0]?.id
+				? candidate?.round
+				: null) ??
 			(await loadPuzzleModule(puzzlePools[chosen], generationLifetime.signal)).manifest.createRound(
-				seed
+				seed,
+				nextVariant
 			);
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 
 		return {
 			chosen,
+			nextVariant,
 			nextRound,
 			nextView: view,
 			nextTheme,
@@ -719,6 +782,7 @@
 			if (!response.ok) throw new Error('game_unavailable');
 			const data = selectorAvailability(familyIndex, await response.json());
 			available = data.available;
+			availableVariants = data.variants;
 			for (const entry of familyIndex)
 				weights.set(entry.id, data.weights[entry.id] ?? entry.weight);
 		}
@@ -731,12 +795,23 @@
 			)
 		);
 	}
-	async function assertGameAvailable(chosen: PuzzleFamily): Promise<void> {
+	async function assertGameAvailable(
+		chosen: PuzzleFamily,
+		selectedVariant?: string
+	): Promise<void> {
 		if (!accountsEnabled) return;
-		const response = await fetch(resolve('/api/play/availability') + '?family=' + chosen, {
-			signal: AbortSignal.timeout(3000),
-			cache: 'no-store'
-		});
+		const response = await fetch(
+			resolve('/api/play/availability') +
+				'?' +
+				new URLSearchParams({
+					family: chosen,
+					...(selectedVariant ? { variant: selectedVariant } : {})
+				}),
+			{
+				signal: AbortSignal.timeout(3000),
+				cache: 'no-store'
+			}
+		);
 		if (!response.ok) throw new Error('game_unavailable');
 		const data: unknown = await response.json();
 		if (!data || typeof data !== 'object' || !('available' in data) || data.available !== true)
@@ -752,13 +827,18 @@
 			sound.unlock();
 			await refreshAvailableGames();
 			const chosen = getSelector().peek();
+			const chosenVariant = getSelector().peekVariant(
+				chosen,
+				puzzleMetadata[chosen].variants,
+				availableVariants[chosen] ?? []
+			);
 			startErrorFamily = chosen;
-			await assertGameAvailable(chosen);
+			await assertGameAvailable(chosen, chosenVariant);
 			let ready = false;
 			const rankedGate = new Promise<void>((resolveGate) => {
 				releaseRanked = resolveGate;
 			});
-			const work = makeCandidate(chosen, rankedGate, takeoverSession).then(
+			const work = makeCandidate(chosen, chosenVariant, rankedGate, takeoverSession).then(
 				(value) => {
 					ready = true;
 					return { value };
@@ -791,17 +871,22 @@
 				nextScoring
 			} = prepared.value;
 			if (generationLifetime.signal.aborted) return;
-			if (!nextSession) await assertGameAvailable(chosen);
+			if (!nextSession) await assertGameAvailable(chosen, chosenVariant);
 			await ownCheckpoint(nextRunId);
 			if (generationLifetime.signal.aborted) return;
 			// Commit rotation only after generation succeeds. Retry keeps the same family.
+			getSelector().commitVariant(chosen, chosenVariant);
 			getSelector().next();
 			family = chosen;
+			variant = chosenVariant;
 			round = nextRound;
 			View = nextView;
 			resolvedTheme = nextTheme;
 			scoring = nextScoring;
-			bests = { ...bests, [chosen]: loadBestScore(chosen, scoring.version) };
+			bests = {
+				...bests,
+				[chosen]: loadBestScore(bestKey(chosen, chosenVariant), scoring.version)
+			};
 			roundId = nextRunId;
 			roundOwner = nextOwner;
 			rankedSession = nextSession;
@@ -828,6 +913,7 @@
 			await waitCard(motion.reduced() && !rankedRound ? 0 : CARD_FLIP_MS / 2);
 			if (generationLifetime.signal.aborted) return;
 			revealed = true;
+			reportPresented();
 			await waitCard(motion.reduced() && !rankedRound ? 0 : CARD_FLIP_MS / 2);
 			await cardBeat('unfolding', CARD_UNFOLD_MS);
 			if (generationLifetime.signal.aborted) return;
@@ -855,6 +941,11 @@
 		saveSoundEnabled(soundEnabled);
 	}
 
+	function bestKey(game = family, roundVariant = variant) {
+		return roundVariant && roundVariant !== puzzleMetadata[game].variants?.[0]?.id
+			? roundVariant
+			: game;
+	}
 	function recordResult({
 		score,
 		title,
@@ -872,11 +963,11 @@
 
 		if (isNewBest) {
 			bests = { ...bests, [game]: score };
-			saveBestScore(score, game, scoring.version);
+			saveBestScore(score, bestKey(game), scoring.version);
 		}
 
 		resultAnnouncement = announcement;
-		const endingSpec = puzzleMetadata[game].ending;
+		const endingSpec = puzzleVariant(game, variant)?.ending ?? puzzleMetadata[game].ending;
 		ending = {
 			headline: t(
 				(cap
@@ -931,7 +1022,7 @@
 			stack = [
 				...stack,
 				{
-					family: familyName(game),
+					family: familyName(game, variant),
 					best: Math.max(previousBest, score),
 					color: resolvedTheme?.back ?? 'var(--surface-2)'
 				}
@@ -954,7 +1045,7 @@
 		measure('round_completed', family);
 		markFamilyPlayed(family);
 		played[family] = true;
-		if (score > bests[family]) saveBestScore(score, family, scoring.version);
+		if (score > bests[family]) saveBestScore(score, bestKey(), scoring.version);
 		// The policy-only guest release keeps the existing best/settings behavior;
 		// recording account-importable replays belongs to the later account release.
 		if (!accountsEnabled) {
@@ -967,6 +1058,7 @@
 			version: 1,
 			id: roundId,
 			family,
+			...(variant ? { variant } : {}),
 			engineVersion: puzzleMetadata[family].engineVersion,
 			seed,
 			moves: runMoves.slice(),
@@ -1041,6 +1133,7 @@
 	class="active-round card-session"
 	inert={roundLocked || Boolean(resumeChoice) || resumeError || (starting && screen === 'game')}
 	data-family={family}
+	data-variant={variant}
 	data-card-phase={cardPhase}
 	style={shellStyle}
 >
@@ -1058,14 +1151,14 @@
 		onhome={goHome}
 		gameTitle={revealed &&
 		(!puzzleMetadata[family].titleAfterEntrance || cardReady || screen === 'result')
-			? familyName(family)
+			? familyName(family, variant)
 			: ''}
 		gameMode
 	/>
 	<RoundStage
 		bind:this={stage}
 		phase={cardPhase}
-		title={familyName(family)}
+		title={familyName(family, variant)}
 		best={result?.best ?? bests[family]}
 		ready={cardReady && screen === 'game'}
 		failed={startError}
@@ -1109,6 +1202,7 @@
 			{#if result}
 				<ResultScreen
 					{family}
+					{variant}
 					stats={result.stats}
 					title={result.title}
 					summary={result.summary}
@@ -1140,6 +1234,7 @@
 		<div class="round-panel-inner">
 			{#if revealed}<PuzzleHelp
 					{family}
+					{variant}
 					scoring={scoring.values}
 					onpause={(value) => (helpOpen = value)}
 				/>{/if}

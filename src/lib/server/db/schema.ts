@@ -1,4 +1,11 @@
-import { index, integer, sqliteTable, text, uniqueIndex } from 'drizzle-orm/sqlite-core';
+import {
+	index,
+	integer,
+	primaryKey,
+	sqliteTable,
+	text,
+	uniqueIndex
+} from 'drizzle-orm/sqlite-core';
 
 // Better Auth core fields, including its database-backed rate limiter.
 export const user = sqliteTable('user', {
@@ -92,6 +99,8 @@ export const playSession = sqliteTable(
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
 		family: text('family').notNull(),
+		variant: text('variant'),
+		firstMoveAt: integer('first_move_at'),
 		seed: text('seed').notNull(),
 		engineVersion: text('engine_version').notNull(),
 		scoreConfigVersion: text('score_config_version').notNull().default('brief-v1'),
@@ -178,6 +187,8 @@ export const accountRoundActivity = sqliteTable(
 			.notNull()
 			.references(() => user.id, { onDelete: 'cascade' }),
 		family: text('family').notNull(),
+		variant: text('variant'),
+		firstMoveAt: integer('first_move_at'),
 		startedAt: integer('started_at').notNull(),
 		completedAt: integer('completed_at'),
 		abandonedAt: integer('abandoned_at')
@@ -321,3 +332,14 @@ export const themeDraft = sqliteTable('theme_draft', {
 	valuesJson: text('values_json').notNull(),
 	createdAt: integer('created_at').notNull()
 });
+
+export const variantLifecycle = sqliteTable(
+	'variant_lifecycle',
+	{
+		family: text('family').notNull(),
+		variant: text('variant').notNull(),
+		state: text('state', { enum: ['enabled', 'disabled'] }).notNull(),
+		reason: text('reason').notNull()
+	},
+	(table) => [primaryKey({ columns: [table.family, table.variant] })]
+);

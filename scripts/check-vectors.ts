@@ -8,6 +8,7 @@ import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, firefox, webkit } from '@playwright/test';
 import type { verifyVectors } from '../tests/vectors/runner.js';
 const run = promisify(execFile);
+const memoryOnly = process.argv.includes('--memory');
 const directory = await mkdtemp(join(tmpdir(), 'morphi-vectors-'));
 const server = createServer((_request, response) => {
 	response.setHeader('Content-Type', 'text/html');
@@ -26,7 +27,7 @@ try {
 	] as const) {
 		await run('bun', [
 			'build',
-			`tests/vectors/${entry}.ts`,
+			`tests/vectors/${memoryOnly ? 'memory-' : ''}${entry}.ts`,
 			'--target',
 			target,
 			'--format',

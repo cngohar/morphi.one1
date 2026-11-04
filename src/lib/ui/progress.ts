@@ -1,4 +1,4 @@
-import { validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
+import { puzzleVariant, validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
 import type { CompletedRun, PuzzleId } from '#lib/engine/contract.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { paletteIssues } from '#lib/engine/theme/generator.js';
@@ -100,6 +100,7 @@ export class RankedSessionConflict extends Error {
 	}
 }
 export interface ResumableRankedSession extends ActiveRankedSession {
+	variant?: string;
 	family: PuzzleId;
 	seed: string;
 	engineVersion: string;
@@ -140,7 +141,8 @@ export async function activeSession(
 		typeof value.scoring?.version !== 'string'
 	)
 		throw new Error('ranked_response');
-	validateScoreValues(value.family, value.scoring.values);
+	puzzleVariant(value.family, value.variant);
+	validateScoreValues(value.family, value.scoring.values, value.variant);
 	return value;
 }
 export async function abandonSession(session: string, owner: string): Promise<void> {
@@ -154,13 +156,19 @@ export async function abandonSession(session: string, owner: string): Promise<vo
 	});
 	if (!response.ok) throw new Error('ranked_abandon_unavailable');
 }
-export async function startSession(family: PuzzleId, owner: string, takeoverSession?: string) {
+export async function startSession(
+	family: PuzzleId,
+	owner: string,
+	takeoverSession?: string,
+	variant?: string
+) {
 	const response = await fetch('/api/play/start', {
 		method: 'POST',
 		credentials: 'same-origin',
 		headers: { 'Content-Type': 'application/json' },
 		body: JSON.stringify({
 			family,
+			...(variant ? { variant } : {}),
 			ownerKey: owner,
 			...(takeoverSession ? { takeoverSession } : {})
 		}),
@@ -180,7 +188,11 @@ export async function startSession(family: PuzzleId, owner: string, takeoverSess
 			Number.isSafeInteger(failure.active.expiresAt)
 		)
 			throw new RankedSessionConflict(failure.active);
-		throw new Error(failure?.code === 'game_disabled' ? 'game_disabled' : 'ranked_unavailable');
+		throw new Error(
+			['game_disabled', 'variant_disabled'].includes(failure?.code ?? '')
+				? 'game_disabled'
+				: 'ranked_unavailable'
+		);
 	}
 	const value = (await response.json()) as Record<string, unknown>;
 	if (
@@ -205,8 +217,14 @@ export async function startSession(family: PuzzleId, owner: string, takeoverSess
 		throw new Error('ranked_theme');
 	const scoring = value.scoring as ScoreConfig | undefined;
 	if (!scoring || typeof scoring.version !== 'string') throw new Error('ranked_scoring');
-	validateScoreValues(family, scoring.values);
+	if (
+		puzzleVariant(family, value.variant as string | undefined)?.id !==
+		puzzleVariant(family, variant)?.id
+	)
+		throw new Error('ranked_variant');
+	validateScoreValues(family, scoring.values, variant);
 	return value as {
+		variant?: string;
 		id: string;
 		seed: string;
 		engineVersion: string;

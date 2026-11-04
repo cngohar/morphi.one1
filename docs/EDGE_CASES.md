@@ -482,3 +482,17 @@ Slice 5; the existing generation and selector algorithms remain unchanged.
 Coverage: `tests/slices/slice4-selector-property.test.ts`, existing selector and
 preparation units, and the focused `tests/e2e/selector-reload.spec.ts` refresh test.
 Full browser/account/palette checks are deferred to the authorized later milestone.
+
+## v1.3 Memory variants
+
+- Legacy omitted variant → classic with the same generated deck, payload hashing and replay. Unknown/foreign-family variant, ranked variant substitution and signed-in solo start substitution → reject. Variant survives pending completion, checkpoint and ranked resume.
+- A failed preparation retains the selector's family and pending variant; speculative preparation does not consume a variant draw or ranked reservation. With only one enabled variant, repetition is allowed; with none, remove the family and keep rotation usable.
+- Disable during a round → the issued round can finish; new issuance is blocked by the same conditional statement. Family state remains independent; re-enable has reason/confirmation/audit.
+- Trios: two revealed cards are not an attempt; the third decides match/mismatch. The final allowed attempt may win; an unfinished cap disables flips, preserves the board, exposes Home recovery and never saves a completion. Cap text remains visible in the integrated shell and three emulated viewport sizes.
+- Moving: all currently revealed and matched positions stay pinned. Draw accounting includes RNG rejection draws; mismatch hiding consumes no draws. Replay and partial resume reproduce the same stream.
+- No-preview: no preview/hiding phase or exposed opening faces, including a resumed round; game-opening allowance is zero and help/result labels retain the variant.
+- Statistics: zero flips are ignored, a played unknown exit is open, and an explicit played departure is abandoned. A delayed first-flip report must still classify played after Home. A registered completion supersedes departure; imported guest completions never enter the reconciled cohort and no starts are backfilled.
+- Score edits/rollbacks: pair variants share a config, trios stays separate; conflict checking and immutable history apply. Existing rows/scores/counts remain; live eligibility follows the new live version. Test fixture cleanup must append a rollback, never rewind a live pointer to a parent that already has a child.
+- Admin test play: operator auth before noindex; explicit disabled-variant selection works. Same view/engine/replay, zero ranked/session/completion/activity/leaderboard writes. Public selector and public navigation never expose the test picker.
+
+Evidence: Memory variant/plumbing units, `tests/integration/memory-variants.test.ts`, `tests/e2e/memory-variants{,-admin}.spec.ts`, six-runtime `tests/vectors/memory-*`; final results in `docs/V1.3_WORK.md`.

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { puzzleVariant, scoreDefinition } from '#lib/scoring.js';
 	import { scoreGuideValue } from '#lib/ui/puzzle-presentation.js';
 	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
 	import type { PuzzleId } from '#lib/engine/contract.js';
@@ -6,15 +7,19 @@
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	let {
 		family,
+		variant,
 		scoring,
 		section = 'all'
 	}: {
 		family: PuzzleId;
+		variant?: string;
 		scoring?: ScoreValues;
 		section?: 'all' | 'how' | 'scoring' | 'scoring-tips' | 'right';
 	} = $props();
-	const guide = $derived(puzzleMetadata[family].presentation.help);
-	const values: ScoreValues = $derived(scoring ?? puzzleMetadata[family].scoring.defaults);
+	const guide = $derived(
+		puzzleVariant(family, variant)?.help ?? puzzleMetadata[family].presentation.help
+	);
+	const values: ScoreValues = $derived(scoring ?? scoreDefinition(family, variant).defaults);
 </script>
 
 {#if section === 'all' || section === 'how'}<section class="guide-how">

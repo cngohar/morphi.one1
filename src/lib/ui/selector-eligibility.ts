@@ -1,3 +1,4 @@
+import { puzzleMetadata } from '#lib/puzzle-metadata.js';
 import type { PuzzleFamilyEntry } from '#lib/engine/contract.js';
 
 export function selectorAvailability(index: readonly PuzzleFamilyEntry[], input: unknown) {
@@ -28,7 +29,34 @@ export function selectorAvailability(index: readonly PuzzleFamilyEntry[], input:
 			weights[id] = weight;
 		}
 	}
-	return { available, weights };
+	const variants: Record<string, string[]> = {};
+	const supplied = 'variants' in input ? input.variants : undefined;
+	if (
+		supplied !== undefined &&
+		(!supplied || typeof supplied !== 'object' || Array.isArray(supplied))
+	)
+		throw new Error('game_unavailable');
+	for (const id of available) {
+		const definitions = puzzleMetadata[id]?.variants;
+		if (!definitions?.length) continue;
+		const enabled =
+			supplied === undefined
+				? definitions.filter((entry) => entry.enabled !== false).map((entry) => entry.id)
+				: (supplied as Record<string, unknown>)[id];
+		if (
+			!Array.isArray(enabled) ||
+			enabled.some(
+				(value) => typeof value !== 'string' || !definitions.some((entry) => entry.id === value)
+			)
+		)
+			throw new Error('game_unavailable');
+		variants[id] = enabled;
+	}
+	return {
+		available: available.filter((id) => !variants[id] || variants[id].length > 0),
+		weights,
+		variants
+	};
 }
 
 /** Eligibility is checked between rounds; rotating a device never replaces an active board. */

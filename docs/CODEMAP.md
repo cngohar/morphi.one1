@@ -4,10 +4,10 @@ Read this map before searching. Types and implementation live in code; decisions
 
 ## Current scope
 
-- Engine refactor Slice 6 is owner-confirmed at `77ce70f` ("Harden catalog UI, recovery, performance and SEO"). Slice 7 is the final authorized refactor slice: determinism/contract/generic-boundary audit, focused regressions and final full verification (passed: 212 units, 41 D1/auth, six vector runtimes, 190 browser checks). Written owner confirmation is required before the refactor is accepted complete locally; no post-refactor work or deployment is authorized.
-- Approved brief: `docs/morphi-engine-refactor-brief.md`. Frozen annotated base `v1.2-local-complete` points to `1303c9c4bdb1718bb558886dc43b7b48c597a02a`. Slice 7 adds a retrospective Slice 0 tag-integrity test; the original pre-Slice-1 HEAD check remains outstanding for an explicit owner waiver decision. No reset was performed. Gameplay vectors are frozen at Slice 0; cosmetic fixtures retain the accepted Slice 5 version. See `docs/SLICE7_CONTRACT_AUDIT.md` and the final phase report.
+- v1.3 Memory variants are implemented locally from post-refactor `c7bdb03`, pending owner confirmation. The owner approved the v1.3 brief and the separate registered-start/imported-completion statistics cohorts. The refactor remains closed; no release or next game is authorized. See `docs/V1.3_WORK.md` and `docs/evidence/v1.3/verification.json`.
+- Scope: classic compatibility plus no-preview, trios and moving Memory; generic variant selection/persistence/replay; same-page admin statistics/lifecycle/immutable scoring/test play. The owner subsequently authorized committing and pushing this source handoff; no deployment or next phase is authorized.
 - v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/NEXT_PHASE_REVIEW.md`, `docs/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
-- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved engine brief controls this refactor. No deployment, production provisioning, secrets, DNS or Google changes are authorized.
+- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved `docs/morphi-v1.3-memory-variants-codex-brief.md` controls v1.3, with the owner's registered-start/imported-completion clarification. No deployment, production provisioning, secrets, DNS or Google changes are authorized.
 - The published guest/privacy version remains `b50a7a18-2e85-4406-bd40-77f27c4b3da3` at `https://morphi.one` and `https://morphi-one.electrasincng.workers.dev`. Cloudflare injects its intentional analytics beacon at delivery. Source repository: `https://github.com/cngohar/morphi.one1`; pushing does not authorize deployment.
 
 ## Engine and registration
@@ -167,3 +167,12 @@ Slice 6 additions:
 - `scripts/check-boundaries.ts`: explicit approximate-math negative probes in addition to purity/import checks.
 - `src/lib/ui/checkpoint.ts`, `src/lib/server/config.ts`: package-owned bounded phases and manifest-derived weight/initial enablement; checkpoint/Slice 3 regressions.
 - `docs/evidence/slice7/verification.json`, `build/slice7/`: compact permanent verification evidence and local detailed logs.
+
+## v1.3 Memory variants
+
+- `src/lib/puzzles/memory/{logic,manifest,scoring,messages,Game,View}.ts` (Svelte views use `.svelte`): classic/no-preview/trios/moving, pinned deterministic mismatch shuffle, trio cap and variant presentation; package README describes timing and compatibility.
+- `engine/contract.ts`, `selector.ts`, `scoring.ts`, generated `puzzle-metadata.ts`/`puzzle-messages.ts`, `screens/PlaySession.svelte`, `ui/{checkpoint,progress,account-activity,selector-eligibility}.ts`: family-owned codes, weighted variant selection, default classic, durable round/ranked identity and isolated bests.
+- `server/{activity,games,ranked-session,runs,scoring}.ts`, `server/db/schema.ts`, `migrations/0013_variants.sql`, `routes/api/play/{activity,availability,start,scoring}`: first-flip/activity cohorts, lifecycle/audit, authoritative replay and independent immutable scoring scopes.
+- `routes/admin/[view]/+page.{server.ts,svelte}`, `components/{ScoringEditor,AdminTestPlay}.svelte`: existing games detail variant expansion, shared/trio editors and authenticated ephemeral test play. No new route.
+- `memory/variants.test.ts`, `lib/memory-variants.test.ts`, `tests/integration/memory-variants.test.ts`, `tests/e2e/memory-variants{,-admin}.spec.ts`, `tests/vectors/memory-*`: scoped acceptance checks. `bun scripts/check-vectors.ts --memory` runs only Memory vectors in six runtimes; `bun scripts/check-palettes.ts --memory` checks only Memory palettes.
+- `docs/V1.3_WORK.md`, `docs/evidence/v1.3/`: final report, exact groups, full file inventory, targeted verification and local diagnostic measurements. Full verify and other-family suites were deliberately not run.

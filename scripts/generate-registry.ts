@@ -45,8 +45,34 @@ for (const directory of directories) {
 		)
 	)
 		throw new Error(`Invalid selector metadata: ${directory}`);
-	const { engineVersion, titleAfterEntrance, scoring, ending, presentation }: PuzzleManifest =
-		manifest;
+	const {
+		engineVersion,
+		titleAfterEntrance,
+		scoring,
+		ending,
+		presentation,
+		variants
+	}: PuzzleManifest = manifest;
+	const variantIds = new Set<string>();
+	for (const variant of variants ?? []) {
+		if (
+			!variant.id.startsWith(`${manifest.id}:`) ||
+			variantIds.has(variant.id) ||
+			!manifest.messages[variant.name] ||
+			!Number.isSafeInteger(variant.weight) ||
+			variant.weight <= 0 ||
+			variant.weight > 10000 ||
+			!Number.isSafeInteger(variant.maxMoves) ||
+			variant.maxMoves <= 0 ||
+			variant.maxMoves > manifest.maxMoves ||
+			!variant.leaderboardGroups.length ||
+			variant.leaderboardGroups.some((group) => !manifest.leaderboardGroups.includes(group))
+		)
+			throw new Error(`Invalid variant metadata: ${directory}`);
+		variantIds.add(variant.id);
+		if (variant.ending) validateEnding(manifest.id, variant.ending, manifest.messages);
+	}
+
 	puzzles.push({
 		directory,
 		id: manifest.id,
@@ -55,6 +81,7 @@ for (const directory of directories) {
 			engineVersion,
 			titleAfterEntrance,
 			scoring,
+			variants,
 			ending,
 			presentation,
 			backdropPieces: manifest.backdropPieces

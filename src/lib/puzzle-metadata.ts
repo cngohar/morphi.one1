@@ -215,6 +215,86 @@ const metadata = {
 			fields: ['pair', 'mismatch', 'second'],
 			defaults: { pair: 1000, mismatch: 150, second: 5 }
 		},
+		variants: [
+			{
+				id: 'memory:classic',
+				name: 'variant.memory:classic',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: ['memory-1:6', 'memory-1:8', 'memory-1:10']
+			},
+			{
+				id: 'memory:no-preview',
+				name: 'variant.memory:no-preview',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:no-preview:6',
+					'memory-1:no-preview:8',
+					'memory-1:no-preview:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'v1.game.memory.step2', 'memory.noPreview.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.noPreview.tips'
+				}
+			},
+			{
+				id: 'memory:trios',
+				name: 'variant.memory:trios',
+				weight: 1,
+				maxMoves: 180,
+				leaderboardGroups: ['memory-1:trios:6', 'memory-1:trios:8', 'memory-1:trios:10'],
+				scoring: {
+					version: 'memory-trios-v1',
+					fields: ['trio', 'mismatch', 'second'],
+					defaults: { trio: 1500, mismatch: 150, second: 5 }
+				},
+				help: {
+					steps: ['memory.trios.step1', 'memory.trios.step2', 'memory.trios.step3'],
+					rows: [
+						{ label: 'memory.trios.row1', field: 'trio', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.trios.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'ending.memory.trios.headline' },
+					subline: { key: 'ending.memory.trios.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition: 'All trios have been matched.'
+				}
+			},
+			{
+				id: 'memory:moving',
+				name: 'variant.memory:moving',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: ['memory-1:moving:6', 'memory-1:moving:8', 'memory-1:moving:10'],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.moving.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.moving.tips'
+				}
+			}
+		],
 		ending: {
 			kind: 'completion',
 			headlines: { default: 'ending.memory.headline' },
@@ -227,13 +307,23 @@ const metadata = {
 			name: 'v1.game.memory',
 			scoringLabels: {
 				pair: 'scoring.memory.pair',
+				trio: 'scoring.memory.trio',
 				mismatch: 'scoring.memory.mismatch',
 				second: 'scoring.memory.second'
 			},
 			groups: {
 				'memory-1:6': 'leaderboard.memory6',
 				'memory-1:8': 'leaderboard.memory8',
-				'memory-1:10': 'leaderboard.memory10'
+				'memory-1:10': 'leaderboard.memory10',
+				'memory-1:no-preview:6': 'leaderboard.memory.no-preview.6',
+				'memory-1:no-preview:8': 'leaderboard.memory.no-preview.8',
+				'memory-1:no-preview:10': 'leaderboard.memory.no-preview.10',
+				'memory-1:trios:6': 'leaderboard.memory.trios.6',
+				'memory-1:trios:8': 'leaderboard.memory.trios.8',
+				'memory-1:trios:10': 'leaderboard.memory.trios.10',
+				'memory-1:moving:6': 'leaderboard.memory.moving.6',
+				'memory-1:moving:8': 'leaderboard.memory.moving.8',
+				'memory-1:moving:10': 'leaderboard.memory.moving.10'
 			},
 			help: {
 				steps: ['v1.game.memory.step1', 'v1.game.memory.step2', 'v1.game.memory.step3'],

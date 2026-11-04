@@ -5,6 +5,7 @@
 	import { formatNumber } from '#lib/ui/format.js';
 	let {
 		family,
+		variant,
 		title,
 		summary,
 		score,
@@ -21,6 +22,7 @@
 		stats,
 		onnext
 	}: {
+		variant?: string;
 		family: import('#lib/engine/contract.js').PuzzleId;
 		title: string;
 		summary: string;
@@ -43,7 +45,7 @@
 <main class="result-main result">
 	<section class="result-summary">
 		<p class="eyebrow">
-			{title} · {familyName(family)}
+			{title} · {familyName(family, variant)}
 		</p>
 		<h1>{t('v1.result.title')}</h1>
 		<section class="result-score" aria-label={t('result.score')}>

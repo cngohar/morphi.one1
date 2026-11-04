@@ -1,7 +1,6 @@
 <script lang="ts">
 	import type { CheckpointState } from '#lib/ui/checkpoint.js';
 	import type { ScoreValues } from '#lib/engine/scoring.js';
-	import { scoring as defaultScoring } from './scoring.js';
 	import { onMount, untrack } from 'svelte';
 	import { motion } from '#lib/ui/motion.js';
 	import { memoryEntranceMs, MEMORY_PREVIEW_MS, MEMORY_HIDE_MS } from '#lib/round-timing.js';
@@ -14,6 +13,11 @@
 		resolveMismatch,
 		scoreRound,
 		currentScore,
+		cardsPerMatch,
+		memoryVariant,
+		memoryVariantName,
+		memoryMoveLimit,
+		memoryCapReached,
 		type MemoryRound
 	} from '#lib/puzzles/memory/logic.js';
 	import { SYMBOL_COLORS } from '#lib/puzzles/memory/symbols.js';
@@ -28,7 +32,7 @@
 	import { memoryThemeFromResolved } from '#lib/puzzles/memory/themes.js';
 
 	let {
-		scoring = defaultScoring.defaults,
+		scoring,
 		round,
 		roundNumber,
 		soundEnabled,
@@ -79,12 +83,18 @@
 	let phase = $state<'dealing' | 'preview' | 'hiding' | 'playing'>('dealing');
 	let boardEl: HTMLDivElement;
 	let entrance: ReturnType<typeof motion.deal> | null = null;
-	const entranceDelay = createActiveDelay(() => {
-		entrance?.settle();
-		phase = 'preview';
-		announcement = t('status.memorize');
-		if (!(document.hidden || paused)) startPreviewClock();
-	});
+	const entranceDelay = createActiveDelay(() =>
+		guard(() => {
+			entrance?.settle();
+			if (noPreview) {
+				beginPlay();
+				return;
+			}
+			phase = 'preview';
+			announcement = t(trios ? 'memory.trios.memorize' : 'status.memorize');
+			if (!(document.hidden || paused)) startPreviewClock();
+		})
+	);
 
 	let rankedClockStart: number | null = null;
 	let clockStarted = false;
@@ -105,6 +115,7 @@
 	let waveTimer: ReturnType<typeof setTimeout> | null = null;
 	let burstTimer: ReturnType<typeof setTimeout> | null = null;
 	let finishFailed = $state(false);
+	let failed = $state(false);
 	const finishDelay = createActiveDelay(() => {
 		try {
 			onfinish(scoreRound(game, elapsed, scoring), elapsed, game.moves);
@@ -119,10 +130,21 @@
 	let previewStart: number | null = null;
 	let hideDuration = 250;
 	let layoutMode = $state<'phone' | 'phone-landscape' | 'compact-landscape' | 'wide'>('phone');
-	const hideDelay = createActiveDelay(finishHide);
-	const mismatchDelay = createActiveDelay(() => {
-		game = resolveMismatch(game);
-	});
+	const hideDelay = createActiveDelay(() => guard(finishHide));
+	const mismatchDelay = createActiveDelay(() =>
+		guard(() => {
+			game = resolveMismatch(game);
+		})
+	);
+
+	const variant = $derived(memoryVariant(game));
+	const trios = $derived(variant === 'memory:trios');
+	const noPreview = $derived(variant === 'memory:no-preview');
+	const matchSize = $derived(cardsPerMatch(game));
+	const capped = $derived(memoryCapReached(game));
+	const variantLabel = $derived(
+		t('memory.variantLabel', { variant: t(memoryVariantName(variant)) })
+	);
 
 	const columns = $derived(
 		layoutMode === 'compact-landscape'
@@ -148,10 +170,24 @@
 	);
 	const confettiColors = $derived([...theme.symbols, theme.mark]);
 	const score = $derived(currentScore(game, elapsed, scoring));
-	const showAll = $derived(phase === 'preview' || phase === 'dealing');
+	const showAll = $derived(!noPreview && (phase === 'preview' || phase === 'dealing'));
 	const locked = $derived(
-		phase !== 'playing' || game.revealed.length >= 2 || game.status === 'won'
+		failed ||
+			capped ||
+			phase !== 'playing' ||
+			game.revealed.length >= matchSize ||
+			game.status === 'won'
 	);
+
+	function guard(action: () => void): void {
+		try {
+			action();
+		} catch {
+			failed = true;
+			pauseClock();
+			console.error('morphi:memory_callback_failed');
+		}
+	}
 
 	function clockMs(): number {
 		if (rankedRound)
@@ -177,11 +213,14 @@
 	}
 
 	function startClock(): void {
-		if (clockRunning) {
+		if (clockRunning || capped || failed) {
 			return;
 		}
 
-		rankedClockStart ??= performance.now();
+		rankedClockStart ??=
+			rankedRound && noPreview && rankedStartedAt !== null
+				? performance.now() - Math.max(0, Date.now() - rankedStartedAt)
+				: performance.now();
 		clockStarted = true;
 		clockRunning = true;
 		clockStart = performance.now();
@@ -201,7 +240,7 @@
 	}
 
 	function resumeClock(): void {
-		if (!clockStarted || clockRunning || game.status !== 'playing') {
+		if (!clockStarted || clockRunning || game.status !== 'playing' || capped || failed) {
 			return;
 		}
 
@@ -239,7 +278,7 @@
 		}
 
 		previewStart = performance.now();
-		previewTimer = setTimeout(beginHide, previewRemaining);
+		previewTimer = setTimeout(() => guard(beginHide), previewRemaining);
 	}
 
 	function pausePreview(): void {
@@ -270,6 +309,10 @@
 			return;
 		}
 
+		beginPlay();
+	}
+
+	function beginPlay(): void {
 		phase = 'playing';
 		onready?.();
 		announcement = t('status.go');
@@ -280,6 +323,10 @@
 	}
 
 	function handleVisibility(): void {
+		guard(updateVisibility);
+	}
+
+	function updateVisibility(): void {
 		if (document.hidden || paused) {
 			finishDelay.pause();
 			entrance?.pause();
@@ -288,7 +335,7 @@
 			mismatchDelay.pause();
 			if (phase === 'preview') {
 				pausePreview();
-			} else if (phase === 'playing') {
+			} else if (phase === 'playing' || (noPreview && clockStarted)) {
 				pauseClock();
 			}
 			return;
@@ -301,7 +348,7 @@
 		mismatchDelay.resume();
 		if (phase === 'preview') {
 			startPreviewClock();
-		} else if (phase === 'playing' && game.status === 'playing') {
+		} else if ((phase === 'playing' || (noPreview && clockStarted)) && game.status === 'playing') {
 			if (!clockStarted) {
 				startClock();
 			} else {
@@ -311,6 +358,10 @@
 	}
 
 	function handleFlip(index: number): void {
+		guard(() => acceptFlip(index));
+	}
+
+	function acceptFlip(index: number): void {
 		if (document.hidden || paused || phase !== 'playing' || game.status !== 'playing' || locked) {
 			return;
 		}
@@ -350,9 +401,10 @@
 		if (result.effect === 'mismatch') {
 			matchStreak = 0;
 			sound.play('mismatch');
-			announcement = t('status.mismatch');
+			announcement = t(capped ? 'memory.trios.cap' : 'status.mismatch');
+			if (capped) freezeClock();
 			shake = [...game.revealed];
-			delayedFlip = game.revealed[1] ?? null;
+			delayedFlip = game.revealed[matchSize - 1] ?? null;
 			clearTimer(shakeTimer);
 			shakeTimer = setTimeout(() => {
 				shake = [];
@@ -378,7 +430,7 @@
 
 		matchStreak += 1;
 		sound.play('win');
-		announcement = t('status.won');
+		announcement = t(trios ? 'memory.trios.won' : 'status.won');
 		clearTimer(celebrateTimer);
 		celebrating = [];
 		winWave = false;
@@ -410,41 +462,44 @@
 	let entranceStarted = false;
 	$effect(() => {
 		if (!mounted || !entranceReady || entranceStarted) return;
-		untrack(() => {
-			entranceStarted = true;
-			if (resume && resume.phase !== 'dealing') {
-				if (resume.phase === 'preview') {
-					phase = 'preview';
-					previewRemaining = resume.pending.preview ?? PREVIEW_MS;
-					if (!(document.hidden || paused)) startPreviewClock();
-				} else if (resume.phase === 'hiding') {
-					phase = 'hiding';
-					hideDelay.start(resume.pending.hide ?? MEMORY_HIDE_MS, document.hidden || paused);
-				} else {
-					phase = 'playing';
-					if (game.revealed.length === 2) {
-						if (resume.pending.mismatch === undefined) game = resolveMismatch(game);
-						else mismatchDelay.start(resume.pending.mismatch, document.hidden || paused);
+		untrack(() =>
+			guard(() => {
+				entranceStarted = true;
+				if (resume && resume.phase !== 'dealing') {
+					if (resume.phase === 'preview') {
+						phase = 'preview';
+						previewRemaining = resume.pending.preview ?? PREVIEW_MS;
+						if (!(document.hidden || paused)) startPreviewClock();
+					} else if (resume.phase === 'hiding') {
+						phase = 'hiding';
+						hideDelay.start(resume.pending.hide ?? MEMORY_HIDE_MS, document.hidden || paused);
+					} else {
+						phase = 'playing';
+						if (game.revealed.length === matchSize) {
+							if (resume.pending.mismatch === undefined) game = resolveMismatch(game);
+							else mismatchDelay.start(resume.pending.mismatch, document.hidden || paused);
+						}
+						onready?.();
+						if (game.status === 'won') {
+							oncomplete?.(scoreRound(game, elapsed, scoring), elapsed);
+							finishDelay.start(0, document.hidden || paused);
+						} else if (!(document.hidden || paused)) startClock();
 					}
-					onready?.();
-					if (game.status === 'won') {
-						oncomplete?.(scoreRound(game, elapsed, scoring), elapsed);
-						finishDelay.start(0, document.hidden || paused);
-					} else if (!(document.hidden || paused)) startClock();
+					return;
 				}
-				return;
-			}
-			const duration =
-				resume?.pending.entrance ??
-				(motion.reduced() && !rankedRound ? 0 : memoryEntranceMs(game.pairs));
-			entrance = motion.deal(
-				Array.from(boardEl.querySelectorAll<HTMLElement>('.memory-card')),
-				duration
-			);
-			announcement = t('v1.game.arriving');
-			sound.play('deal');
-			entranceDelay.start(duration, document.hidden || paused);
-		});
+				if (noPreview && !(document.hidden || paused)) startClock();
+				const duration =
+					resume?.pending.entrance ??
+					(motion.reduced() && !rankedRound ? 0 : memoryEntranceMs(game.pairs));
+				entrance = motion.deal(
+					Array.from(boardEl.querySelectorAll<HTMLElement>('.memory-card')),
+					duration
+				);
+				announcement = t('v1.game.arriving');
+				sound.play('deal');
+				entranceDelay.start(duration, document.hidden || paused);
+			})
+		);
 	});
 
 	onMount(() => {
@@ -529,21 +584,29 @@
 </script>
 
 {#if finishFailed}<p role="alert">{t('ending.error')}</p>{/if}
+{#if failed}<p role="alert">{t('memory.error')}</p>{/if}
 
 <div
 	class="game"
+	class:is-capped={capped}
 	style={`--cols:${columns};--rows:${rows};${memoryThemeStyle(theme)};${resolvedTheme ? proceduralStyle(resolvedTheme) : ''}`}
 	data-family="memory"
+	data-variant={variant}
 	data-round={roundNumber}
 	data-theme-version={resolvedTheme?.themeConfigVersion}
 	data-theme-generator={resolvedTheme?.themeGeneratorVersion}
 	data-theme-recipe={resolvedTheme?.recipe}
 	data-phase={phase}
 >
-	<h2 class="sr-only">{t('game.title')}</h2>
+	<h2 class="sr-only">{variantLabel}</h2>
 
 	<header class="hud">
-		<button type="button" class="home-button" aria-label={t('game.home')} onclick={onhome}>
+		<button
+			type="button"
+			class="home-button"
+			aria-label={t('game.home')}
+			onclick={() => guard(onhome)}
+		>
 			<svg viewBox="0 0 24 24" aria-hidden="true" focusable="false">
 				<path
 					d="M4 11 12 4l8 7v9h-5v-6H9v6H4Z"
@@ -565,8 +628,8 @@
 				<strong>{formatDuration(elapsed)}</strong>
 			</div>
 			<div class="stat">
-				<span class="stat-label">{t('v1.game.pairs')}</span><strong
-					>{game.matched.length / 2} / {game.pairs}</strong
+				<span class="stat-label">{t(trios ? 'memory.trios.label' : 'v1.game.pairs')}</span><strong
+					>{game.matched.length / matchSize} / {game.pairs}</strong
 				>
 			</div>
 			<div class="stat">
@@ -581,6 +644,7 @@
 		<SoundToggle enabled={soundEnabled} ontoggle={ontogglesound} />
 
 		<p class="round-meta">
+			<span>{variantLabel}</span>
 			<span>{t('game.round', { number: roundNumber })}</span>
 			{#if matchStreak >= 2}
 				{#key matchStreak}
@@ -589,9 +653,16 @@
 			{/if}
 		</p>
 	</header>
+	{#if capped}<p class="cap" role="status">{t('memory.trios.cap')}</p>{/if}
 
 	<main class="stage">
-		<div class="board" bind:this={boardEl} data-pairs={game.pairs} data-columns={columns}>
+		<div
+			class="board"
+			bind:this={boardEl}
+			data-pairs={game.pairs}
+			data-columns={columns}
+			data-cap={capped}
+		>
 			{#each game.cards as card, index (card.id)}
 				<MemoryCard
 					{card}
@@ -602,7 +673,9 @@
 					faceUp={showAll || isFaceUp(game, index)}
 					matched={game.matched.includes(index)}
 					shaking={shake.includes(index)}
-					selected={phase === 'playing' && game.revealed.length === 1 && game.revealed[0] === index}
+					selected={phase === 'playing' &&
+						game.revealed.length < matchSize &&
+						game.revealed.includes(index)}
 					delayedFlip={delayedFlip === index}
 					celebrating={celebrating.includes(index)}
 					winWave={winWave && game.matched.includes(index)}
@@ -617,7 +690,13 @@
 	</main>
 
 	<footer class="hint">
-		<span>{t('game.hint', { pairs: game.pairs })}</span>
+		<span>{t(trios ? 'memory.trios.hint' : 'game.hint', { pairs: game.pairs })}</span>
+		{#if trios}<span>
+				· {t('memory.trios.flips', {
+					flips: game.moves * 3 + (game.revealed.length < 3 ? game.revealed.length : 0),
+					limit: memoryMoveLimit(game)
+				})}</span
+			>{/if}
 	</footer>
 
 	<p class="sr-only" aria-live="polite" aria-atomic="true">{announcement}</p>
@@ -640,6 +719,10 @@
 			calc(10px + var(--safe-bottom)) calc(14px + var(--safe-left));
 		background: var(--memory-bg);
 		overflow: hidden;
+	}
+
+	.game.is-capped {
+		grid-template-rows: auto auto minmax(0, 1fr) auto;
 	}
 
 	.hud {
@@ -743,6 +826,13 @@
 		white-space: nowrap;
 	}
 
+	.cap {
+		grid-column: 1 / -1;
+		margin: 0;
+		text-align: center;
+		font-size: var(--text-13);
+	}
+
 	.streak {
 		color: var(--primary-strong);
 		animation: streak-pop 180ms var(--ease-out);
@@ -785,6 +875,9 @@
 	}
 
 	@media (orientation: landscape) and (max-height: 560px) {
+		:global(.design-public .active-round) .game.is-capped {
+			grid-template-rows: minmax(0, 1fr) auto;
+		}
 		.board {
 			width: min(
 				calc(100vw - 216px),
@@ -804,7 +897,6 @@
 		.home-button {
 			transition: none;
 		}
-
 		.stat strong.is-dropping,
 		.streak {
 			animation: none;

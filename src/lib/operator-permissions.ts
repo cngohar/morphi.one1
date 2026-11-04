@@ -1,6 +1,8 @@
 export const permissions = {
 	admin: [
 		'games',
+		'variant-enable',
+		'variant-disable',
 		'game-enable',
 		'game-disable',
 		'game-delete',

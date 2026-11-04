@@ -1198,3 +1198,14 @@ the palette stage changed timing fields only. Keep final evidence under
   modifying its contents. Detailed audit: `docs/SLICE7_CONTRACT_AUDIT.md`.
 - Written owner confirmation is still required for local refactor acceptance;
   no deployment or post-refactor work is authorized.
+
+## 2026-11-04 — v1.3 Memory variants, local only
+
+- Owner-approved brief from `c7bdb03`; refactor closed. Only classic compatibility, no-preview, trios and moving Memory, shared variant plumbing and existing-games-page admin controls/test play are in scope. Stop for owner confirmation; no commit/push/deploy/release.
+- Variant code is a generic string validated against its family manifest. All four Memory weights are 1; avoid the last served variant when another is enabled. Missing Memory variant means classic and preserves legacy serialized payload hashes/decks/replay.
+- Preserve classic/no-preview/moving `brief-v1` pair scoring. Trios owns `memory-trios-v1` with fields `trio=1500`, `mismatch=150`, `second=5`. Reuse immutable `score_config`/`score_live`, with scope `memory` shared and `memory:trios` separate; rollbacks append a version and never rewrite saved runs.
+- Owner clarification: reconciled Finished requires a registered start; completions with neither account activity nor ranked start are separate imported guest completions. Never infer/backfill starts or change import behavior. A late first-flip report can follow an explicit departure without losing the played classification.
+- Variant lifecycle is independent of family lifecycle. Reject new disabled-variant starts atomically at issuance, retain in-progress completion/history, and remove Memory availability when no variant is enabled.
+- No-preview has a face-down arrival and zero game-opening allowance; the existing separately issued Card allowance remains. Trios caps at 18 flips/group, keeps its board and Home recovery, and emits no completion at an unfinished cap. Moving continues the same seeded stream and pins revealed/matched positions.
+- Test play is inline on the existing protected/noindex admin games page. The component uses generic family metadata; only Memory is allowed in v1.3. No player persistence/statistics APIs are called.
+- No dependency upgrades; TypeScript remains `~6.0.3` (installed 6.0.3). Existing D1 batch/conditional-write patterns retained; current Cloudflare D1 batch and local Wrangler migration documentation checked. See `docs/V1.3_WORK.md` for evidence and local scoring-test version effects.

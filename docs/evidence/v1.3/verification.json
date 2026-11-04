@@ -1,0 +1,77 @@
+{
+	"scope": "v1.3 Memory variants only, local",
+	"base": "c7bdb03",
+	"date": "2026-11-04",
+	"status": "local implementation complete; owner confirmation pending",
+	"summary": {
+		"unitAndThemeTestsUniquePassed": 53,
+		"d1IntegrationTestsUniquePassed": 12,
+		"browserTestsUniquePassed": 9,
+		"browserWorkers": 1,
+		"vectorCountPerRuntime": 13,
+		"vectorRuntimes": ["Node", "Bun", "Chromium", "Firefox", "WebKit", "workerd"],
+		"vectorFingerprint": "278b9df0763a061e2b3405d9013bbde5ed7fb5c0337f2213fd7eaf3e51a1106b",
+		"memoryPalettesPassed": 10000,
+		"typeErrors": 0,
+		"typeWarnings": 0
+	},
+	"evidence": {
+		"types": "build/v1.3/types-complete.log",
+		"formatLint": [
+			"build/v1.3/lint-final.log",
+			"build/v1.3/lint-complete.log",
+			"build/v1.3/admin-spec-prettier.log",
+			"build/v1.3/admin-spec-eslint.log"
+		],
+		"boundaries": "build/v1.3/boundaries.log",
+		"units": ["build/v1.3/units.log", "build/v1.3/units-final.log", "build/v1.3/memory-themes.log"],
+		"manifestMessages": "build/v1.3/memory-manifest.log",
+		"integration": ["build/v1.3/integration.log", "build/v1.3/integration-final.log"],
+		"vectors": "build/v1.3/vectors-final.log",
+		"palettes": "docs/evidence/v1.3/palettes.json",
+		"browserComposite": {
+			"publicSeven": "build/v1.3/browser-final.log",
+			"triosCap": "build/v1.3/browser-complete2.log",
+			"adminFinal": "build/v1.3/browser-admin-final.log"
+		},
+		"localMigration": "build/v1.3/migrations.log"
+	},
+	"compositeEvidenceNote": "Earlier failed attempts remain in logs. Corrected failing cases passed in affected-only reruns; browser summary is seven public cases plus corrected cap plus final admin case, not one full nine-pass run. Units similarly retain 46 initial passes plus the corrected plumbing suite, with 47 unique checks in that scope.",
+	"emulatedViewports": [
+		[390, 844],
+		[844, 390],
+		[1280, 800]
+	],
+	"physicalDevicesTested": false,
+	"notRun": [
+		"full bun run verify",
+		"full unit/accounts/browser suites",
+		"Block/Connect/Mahjong gameplay suites",
+		"users/moderation admin suites",
+		"other-family theme/palette/scoring suites",
+		"full built-Worker smoke",
+		"release artifact/build checks",
+		"physical-device/performance tests"
+	],
+	"notDone": [
+		"other game/Memory variants",
+		"knowledge graph",
+		"guest counting/tracking",
+		"commit",
+		"push",
+		"deploy",
+		"release",
+		"production provisioning",
+		"secrets/DNS/Google changes"
+	],
+	"choices": {
+		"memoryVariantWeight": 1,
+		"pairScoreScope": "memory",
+		"triosScoreScope": "memory:trios",
+		"triosDefaultVersion": "memory-trios-v1",
+		"unfinishedTriosCap": "board preserved, Home recovery, no completion",
+		"importedCompletionCohort": "no registered activity or ranked start; excluded from reconciled counts",
+		"localScoringTestCleanup": "new audited rollback versions restore coefficient values; no live-pointer rewind or saved-run rewrite"
+	},
+	"report": "docs/V1.3_WORK.md"
+}

@@ -2,6 +2,8 @@
 	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import { onMount, untrack } from 'svelte';
 	import ThemeEditor from '#lib/components/ThemeEditor.svelte';
+	import { puzzleVariant } from '#lib/scoring.js';
+	import AdminTestPlay from '#lib/components/AdminTestPlay.svelte';
 	import ScoringEditor from '#lib/components/ScoringEditor.svelte';
 	import Brand from '#lib/components/Brand.svelte';
 	import { resolve } from '$app/paths';
@@ -873,7 +875,9 @@
 							>{familyName(game.family)}</a
 						>{/each}
 				</nav>
-				<p>{t('v1.admin.games.stats')}</p>
+				<p>
+					{t(data.gameStats.variants.length ? 'admin.variants.totals' : 'v1.admin.games.stats')}
+				</p>
 				{#if !data.selectedGame}
 					<div class="game-grid">
 						{#each data.games as game (game.family)}<a
@@ -967,7 +971,7 @@
 									{t('v1.admin.games.completed')}: {game.completed} · {t('v1.admin.games.ranked')}: {game.ranked}
 									· {t('v1.admin.games.solo')}: {game.completed - game.ranked}
 								</p>
-								<p>{t('v1.admin.games.unavailable')}</p>
+								{#if !data.gameStats.variants.length}<p>{t('v1.admin.games.unavailable')}</p>{/if}
 								<div class="table-wrap game-stats-table">
 									<table>
 										<thead
@@ -997,7 +1001,108 @@
 								{#if data.gameStats.more}<p>{t('v1.admin.games.limited')}</p>{/if}
 							{/if}
 						</section>
-						{#if data.subview === 'settings' && (game.state === 'enabled' || game.state === 'disabled')}{#each data.scoring as config (`${config.family}:${config.version}`)}<ScoringEditor
+						{#if data.gameStats.variants.length}
+							<section class="admin-card variant-section">
+								<h2>{t('admin.variants.title')}</h2>
+								<p>{t('admin.variants.registered')}</p>
+								<p>{t('admin.variants.reconcile')}</p>
+								{#each data.gameStats.variants as variant (variant.id)}
+									<details class="variant-row" data-variant={variant.id}>
+										<summary
+											>{t(puzzleVariant(game.family, variant.id)!.name as MessageKey)} · {t(
+												`v1.admin.games.${variant.state}` as MessageKey
+											)}</summary
+										>
+										<dl class="variant-counts">
+											{#each ['shown', 'ignored', 'played', 'abandoned', 'finished', 'open'] as metric (metric)}
+												<div>
+													<dt>{t(`admin.variants.${metric}` as MessageKey)}</dt>
+													<dd>
+														{variant[
+															metric as
+																'shown' | 'ignored' | 'played' | 'abandoned' | 'finished' | 'open'
+														]}
+													</dd>
+												</div>
+											{/each}
+										</dl>
+										<p>{t('admin.variants.imported')}: <strong>{variant.imported}</strong></p>
+										<p>{t('admin.variants.importedNote')}</p>
+										<p>
+											{t('admin.variants.completedTotal', {
+												total: variant.totalCompleted,
+												finished: variant.finished,
+												imported: variant.imported
+											})}
+										</p>
+										<div class="table-wrap game-stats-table">
+											<table>
+												<thead
+													><tr
+														>{#each ['rulesGroup', 'version', 'completed', 'ranked', 'solo', 'best', 'average', 'duration'] as heading (heading)}<th
+																>{t(`v1.admin.games.${heading}` as MessageKey)}</th
+															>{/each}</tr
+													></thead
+												>
+												<tbody
+													>{#each variant.rows as row (`${row.rules_group}:${row.score_config_version}`)}<tr
+															><td>{row.rules_group}</td><td>{row.score_config_version}</td><td
+																>{row.completed}</td
+															><td>{row.ranked}</td><td>{row.completed - row.ranked}</td><td
+																>{row.bestScore}</td
+															><td>{row.averageScore.toFixed(1)}</td><td
+																>{row.averageSeconds.toFixed(1)}</td
+															></tr
+														>{:else}<tr><td colspan="8">{t('v1.admin.empty')}</td></tr
+														>{/each}</tbody
+												>
+											</table>
+										</div>
+										{#if variant.more}<p>{t('v1.admin.games.limited')}</p>{/if}
+										{#if can(data.actor.role, variant.state === 'enabled' ? 'variant-disable' : 'variant-enable')}
+											<AccountForm
+												>{#snippet children(pending)}
+													<input type="hidden" name="target" value={game.family} />
+													<input type="hidden" name="variant" value={variant.id} />
+													<input
+														type="hidden"
+														name="action"
+														value={variant.state === 'enabled'
+															? 'variant-disable'
+															: 'variant-enable'}
+													/>
+													<label
+														>{t('v1.operator.reason')}<input
+															name="reason"
+															required
+															minlength="3"
+															maxlength="240"
+														/></label
+													>
+													<label class="confirm"
+														><input type="checkbox" name="confirm" value="yes" required />{t(
+															'admin.variants.confirm'
+														)}</label
+													>
+													<button class="btn" disabled={pending}
+														>{t(
+															variant.state === 'enabled'
+																? 'admin.variants.disable'
+																: 'admin.variants.enable'
+														)}</button
+													>
+												{/snippet}</AccountForm
+											>
+										{/if}
+									</details>
+								{/each}
+							</section>
+						{/if}
+						{#if data.testPlayFamilies.some((family) => family === game.family)}<AdminTestPlay
+								family={game.family}
+								scoring={data.scoring}
+							/>{/if}
+						{#if data.subview === 'settings' && (game.state === 'enabled' || game.state === 'disabled')}{#each data.scoring as config (`${config.family}:${config.variant ?? ''}:${config.version}`)}<ScoringEditor
 									{config}
 								/>{/each}{/if}
 					{/each}
@@ -1008,7 +1113,7 @@
 					</p>{/if}
 				<ThemeEditor config={data.themes} />
 			{:else if data.view === 'scoring'}
-				{#each data.scoring as config (`${config.family}:${config.version}`)}<ScoringEditor
+				{#each data.scoring as config (`${config.family}:${config.variant ?? ''}:${config.version}`)}<ScoringEditor
 						{config}
 					/>{/each}
 			{:else if data.view === 'privacy'}
@@ -1088,6 +1193,25 @@
 	>{/snippet}
 
 <style>
+	.variant-row {
+		padding: 16px 0;
+		border-top: 1px solid var(--border);
+	}
+	.variant-row summary {
+		cursor: pointer;
+		font-weight: 800;
+	}
+	.variant-counts {
+		display: grid;
+		grid-template-columns: repeat(auto-fit, minmax(130px, 1fr));
+		gap: 12px;
+	}
+	.variant-counts dd {
+		margin: 4px 0 0;
+		font-size: 24px;
+		font-weight: 800;
+	}
+
 	.section-tabs {
 		display: flex;
 		flex-wrap: wrap;

@@ -7,7 +7,7 @@ import {
 	publishThemeDraft,
 	rollbackThemeConfig
 } from '#lib/server/theme-admin.js';
-import { gameOverview, gameStatistics, changeGame } from '#lib/server/games.js';
+import { gameOverview, gameStatistics, changeGame, changeVariant } from '#lib/server/games.js';
 import { readAudit, exportAuditYear } from '#lib/server/audit.js';
 import { softDeleteUser, restoreDeletedUser } from '#lib/server/user-lifecycle.js';
 import { userDirectory, userDetail, userOverview } from '#lib/server/admin-users.js';
@@ -18,6 +18,7 @@ import {
 	saveScoreConfig
 } from '#lib/server/scoring.js';
 import { catalog } from '#lib/catalog.js';
+import { defaultScoreConfig, puzzleVariant } from '#lib/scoring.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { error, fail, redirect } from '@sveltejs/kit';
 import { env } from 'cloudflare:workers';
@@ -95,6 +96,8 @@ export const load: PageServerLoad = async (event) => {
 	let auditMore = false;
 	let scoring: (Awaited<ReturnType<typeof readLiveScoreConfig>>['config'] & {
 		family: PuzzleId;
+		variant?: string;
+		sharedVariants?: string[];
 		liveVersion: string;
 		versions: Awaited<ReturnType<typeof listScoreVersions>>;
 	})[] = [];
@@ -104,7 +107,11 @@ export const load: PageServerLoad = async (event) => {
 		versions: Awaited<ReturnType<typeof listThemeVersions>>;
 	} | null = null;
 	let games: Awaited<ReturnType<typeof gameOverview>> = [];
-	let gameStats: Awaited<ReturnType<typeof gameStatistics>> = { rows: [], more: false };
+	let gameStats: Awaited<ReturnType<typeof gameStatistics>> = {
+		rows: [],
+		more: false,
+		variants: []
+	};
 	let metrics: Record<string, number> = {},
 		daily: { day: string; total: number }[] = [],
 		split: { family: string; total: number }[] = [],
@@ -149,15 +156,33 @@ export const load: PageServerLoad = async (event) => {
 		}
 		if (event.params.view === 'scoring' || selectedGame)
 			scoring = await Promise.all(
-				(selectedGame ? [selectedGame] : Object.keys(catalog)).map(async (family) => {
-					const { config, liveVersion } = await readLiveScoreConfig(env.DB, family);
-					return {
-						family,
-						...config,
-						liveVersion,
-						versions: await listScoreVersions(env.DB, family)
-					};
-				})
+				(selectedGame ? [selectedGame] : Object.keys(catalog)).flatMap((family) =>
+					[
+						undefined,
+						...(catalog[family].variants ?? [])
+							.filter((variant) => variant.scoring)
+							.map((variant) => variant.id)
+					].map(async (variant) => {
+						const { config, liveVersion } = await readLiveScoreConfig(
+							env.DB,
+							family,
+							undefined,
+							variant
+						);
+						return {
+							family,
+							variant,
+							sharedVariants: variant
+								? undefined
+								: catalog[family].variants
+										?.filter((entry) => !entry.scoring)
+										.map((entry) => entry.name),
+							...config,
+							liveVersion,
+							versions: await listScoreVersions(env.DB, family, variant)
+						};
+					})
+				)
 			);
 		if (event.params.view === 'dashboard') {
 			const rows = await env.DB.prepare(
@@ -253,6 +278,7 @@ export const load: PageServerLoad = async (event) => {
 			filters,
 			subview,
 			selectedGame,
+			testPlayFamilies: [],
 			gameStats,
 			detailTab,
 			userSearch,
@@ -281,6 +307,7 @@ export const load: PageServerLoad = async (event) => {
 		filters,
 		subview,
 		selectedGame,
+		testPlayFamilies: ['memory'],
 		gameStats,
 		detailTab,
 		userSearch,
@@ -325,7 +352,8 @@ export const actions: Actions = {
 							'duration',
 							'year',
 							'cursor',
-							'sourceVersion'
+							'sourceVersion',
+							'variant'
 						].includes(key)
 				)
 			)
@@ -339,6 +367,8 @@ export const actions: Actions = {
 					'theme-rollback',
 					'score-change',
 					'score-rollback',
+					'variant-enable',
+					'variant-disable',
 					'game-enable',
 					'game-disable',
 					'game-delete',
@@ -423,6 +453,19 @@ export const actions: Actions = {
 				}
 				return { success: true };
 			}
+			if (action.startsWith('variant-')) {
+				if (event.params.view !== 'games' || !Object.hasOwn(catalog, target))
+					return fail(400, { code: 'input' });
+				await changeVariant(
+					env.DB,
+					actor.id,
+					target,
+					String(body.get('variant') ?? ''),
+					action as 'variant-enable' | 'variant-disable',
+					reason
+				);
+				return { success: true };
+			}
 			if (action.startsWith('game-')) {
 				if (!Object.hasOwn(catalog, target)) return fail(400, { code: 'input' });
 				const days = action === 'game-delete' ? Number(body.get('duration')) : 7;
@@ -458,6 +501,12 @@ export const actions: Actions = {
 			if (action.startsWith('score-')) {
 				if (!Object.hasOwn(catalog, target)) return fail(400, { code: 'input' });
 				const family = target as PuzzleId;
+				const variant = body.has('variant') ? String(body.get('variant')) : undefined;
+				try {
+					puzzleVariant(family, variant);
+				} catch {
+					return fail(400, { code: 'input' });
+				}
 				if (action === 'score-rollback') {
 					await rollbackScoreConfig(
 						env.DB,
@@ -465,7 +514,8 @@ export const actions: Actions = {
 						family,
 						String(body.get('expected') ?? ''),
 						String(body.get('sourceVersion') ?? ''),
-						reason
+						reason,
+						variant
 					);
 					return { success: true };
 				}
@@ -473,7 +523,7 @@ export const actions: Actions = {
 				try {
 					values =
 						action === 'score-defaults'
-							? catalog[family].scoring.defaults
+							? defaultScoreConfig(family, variant).values
 							: JSON.parse(String(body.get('values')));
 				} catch {
 					return fail(400, { code: 'input' });
@@ -486,7 +536,9 @@ export const actions: Actions = {
 						String(body.get('expected')),
 						values,
 						reason,
-						action === 'score-defaults'
+						action === 'score-defaults',
+						undefined,
+						variant
 					);
 				} catch (e) {
 					if (e instanceof RangeError) return fail(400, { code: 'input' });

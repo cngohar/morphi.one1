@@ -1,3 +1,4 @@
+import { puzzleVariant } from '#lib/scoring.js';
 import type { Move } from '#lib/engine/contract.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import type { ScoreConfig } from '#lib/engine/scoring.js';
@@ -13,6 +14,7 @@ export interface RoundCheckpoint {
 	id: string;
 	owner: string | null;
 	family: string;
+	variant?: string;
 	seed: string;
 	engineVersion: string;
 	difficulty: number | null;
@@ -39,6 +41,11 @@ export function validCheckpoint(
 ): value is RoundCheckpoint {
 	if (!value || typeof value !== 'object') return false;
 	const v = value as RoundCheckpoint;
+	try {
+		puzzleVariant(v.family, v.variant);
+	} catch {
+		return false;
+	}
 	return (
 		v.version === 1 &&
 		v.status === 'active' &&

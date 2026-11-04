@@ -1,0 +1,298 @@
+import { expect, test, type Locator } from '@playwright/test';
+import { createCipheriv, createHash, randomBytes } from 'node:crypto';
+import { betterAuth } from 'better-auth';
+import { testUtils } from 'better-auth/plugins';
+import { getPlatformProxy } from 'wrangler';
+import { createAuth } from '../../src/lib/server/auth.js';
+import { totp } from '../../src/lib/server/admin-totp.js';
+
+test.use({ baseURL: 'http://localhost:5173' });
+
+async function apply(form: Locator, button: string, reason: string) {
+	await form.locator('input[name=reason]').fill(reason);
+	await form.locator('input[name=confirm]').check();
+	await Promise.all([
+		form
+			.page()
+			.waitForResponse(
+				(response) =>
+					response.request().method() === 'POST' && response.url().includes('/admin/games')
+			),
+		form.getByRole('button', { name: button, exact: true }).click()
+	]);
+	await expect(form).toHaveAttribute('aria-busy', 'false');
+}
+
+test('Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds', async ({
+	browser
+}) => {
+	test.setTimeout(180_000);
+	const proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc' });
+	const db = proxy.env.DB;
+	const context = await browser.newContext({
+		baseURL: 'http://localhost:5173',
+		reducedMotion: 'reduce'
+	});
+	let userId: string | undefined;
+	const originalLifecycle = (
+		await db
+			.prepare("SELECT variant,state,reason FROM variant_lifecycle WHERE family='memory'")
+			.all<{ variant: string; state: string; reason: string }>()
+	).results;
+	const originalScores: { scope: string; variant?: string; version: string }[] = [];
+	try {
+		const helpers = (
+			await betterAuth({
+				...createAuth(db, {
+					baseURL: 'http://localhost:5173',
+					secret: proxy.env.BETTER_AUTH_SECRET,
+					googleClientId: '',
+					googleClientSecret: ''
+				}).options,
+				plugins: [testUtils()]
+			}).$context
+		).test;
+		const user = await helpers.saveUser(
+			helpers.createUser({
+				email: `${crypto.randomUUID()}@example.test`,
+				name: 'Memory variant operator fixture'
+			})
+		);
+		userId = user.id;
+		const login = await helpers.login({ userId });
+		expect(
+			(await context.request.get('/admin/games?game=memory', { maxRedirects: 0 })).status()
+		).toBe(303);
+		await context.addCookies(login.cookies);
+		expect(
+			(await context.request.get('/admin/games?game=memory', { maxRedirects: 0 })).status()
+		).toBe(403);
+		const secret = new Uint8Array(20).fill(19),
+			iv = randomBytes(12);
+		const cipher = createCipheriv(
+			'aes-256-gcm',
+			createHash('sha256').update(`operator-v1:${proxy.env.BETTER_AUTH_SECRET}`).digest(),
+			iv
+		);
+		const data = Buffer.concat([cipher.update(secret), cipher.final(), cipher.getAuthTag()]);
+		await db.batch([
+			db.prepare("INSERT INTO admin_actor(id,role) VALUES(?,'admin')").bind(userId),
+			db
+				.prepare('INSERT INTO admin_web_operator(user_id,secret_cipher) VALUES(?,?)')
+				.bind(userId, JSON.stringify({ iv: Array.from(iv), data: Array.from(data) }))
+		]);
+		const page = await context.newPage();
+		await page.goto('/admin/sign-in');
+		await page.getByRole('textbox').fill(totp(secret, Date.now()));
+		await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
+		await expect(page).toHaveURL(/\/admin\/dashboard$/);
+		await page.goto('/admin/games?game=memory&subview=settings');
+		await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
+		await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', 'noindex');
+		await expect(
+			page.getByText('Registered users only; guest solo starts are not counted.', { exact: true })
+		).toBeVisible();
+		await expect(page.locator('.variant-row')).toHaveCount(4);
+		const moving = page.locator('.variant-row[data-variant="memory:moving"]');
+		await moving.locator('summary').click();
+		for (const label of [
+			'Shown',
+			'Ignored (zero flips)',
+			'Played',
+			'Abandoned',
+			'Finished',
+			'Still open / unknown exit'
+		])
+			await expect(moving.getByText(label, { exact: true })).toBeVisible();
+		await expect(moving).toContainText('Imported guest completions');
+		const movingState = await moving.locator('input[name=action]').inputValue();
+		if (movingState === 'variant-enable')
+			await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-ENABLE');
+		await apply(moving.locator('form'), 'Disable variant', 'CASE-VARIANT-DISABLE');
+		await expect(moving.locator('summary')).toContainText('Disabled');
+		await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-REENABLE');
+		await expect(moving.locator('summary')).toContainText('Enabled');
+		await apply(moving.locator('form'), 'Disable variant', 'CASE-VARIANT-DISABLE-AGAIN');
+		for (const id of ['memory:classic', 'memory:no-preview', 'memory:trios']) {
+			const row = page.locator(`.variant-row[data-variant="${id}"]`);
+			await row.locator('summary').click();
+			if ((await row.locator('input[name=action]').inputValue()) === 'variant-disable')
+				await apply(row.locator('form'), 'Disable variant', 'CASE-ALL-VARIANTS-DISABLED');
+		}
+		expect(
+			(await (await context.request.get('/api/play/availability')).json()).available
+		).not.toContain('memory');
+		expect(
+			(await (await context.request.get('/api/play/availability?family=memory')).json()).available
+		).toBe(false);
+		for (const id of ['memory:classic', 'memory:no-preview', 'memory:trios']) {
+			const row = page.locator(`.variant-row[data-variant="${id}"]`);
+			await apply(row.locator('form'), 'Enable variant', 'CASE-RESTORE-VARIANT');
+		}
+		expect(
+			await db
+				.prepare(
+					"SELECT id FROM admin_audit WHERE actor=? AND action='variant-enable' AND target='memory:moving' AND reason='CASE-VARIANT-REENABLE'"
+				)
+				.bind(userId)
+				.first()
+		).toBeTruthy();
+
+		expect(
+			await db
+				.prepare(
+					"SELECT id FROM admin_audit WHERE actor=? AND action='variant-disable' AND target='memory:moving' AND reason='CASE-VARIANT-DISABLE'"
+				)
+				.bind(userId)
+				.first()
+		).toBeTruthy();
+		const beforeScores = (
+			await db
+				.prepare(
+					"SELECT id,score,score_config_version FROM completed_run WHERE family='memory' ORDER BY id"
+				)
+				.all()
+		).results;
+		const editors = page.locator('.scoring-card');
+		await expect(editors).toHaveCount(2);
+		await expect(editors.first()).toContainText(
+			'Edits affect Classic, No preview, Moving cards in future rounds.'
+		);
+		for (const [index, variant, field, scope] of [
+			[0, undefined, 'Points per pair', 'memory'],
+			[1, 'memory:trios', 'Points per trio', 'memory:trios']
+		] as const) {
+			const editor = editors.nth(index),
+				save = editor.locator('form').first();
+			const source = await save.locator('input[name=expected]').inputValue();
+			originalScores.push({ scope, variant, version: source });
+			const initial = Number(await save.getByLabel(field).inputValue());
+			await save.getByLabel(field).fill(String(initial === 10000 ? 9999 : initial + 1));
+			await apply(save, 'Save scoring', `CASE-VARIANT-SCORE-${index}`);
+			const live = await editor.locator('input[name=expected]').first().inputValue();
+			expect(live).not.toBe(source);
+			const conflict = await context.request.post('/admin/games?game=memory', {
+				headers: { Origin: 'http://localhost:5173' },
+				form: {
+					action: 'score-defaults',
+					target: 'memory',
+					...(variant ? { variant } : {}),
+					expected: source,
+					reason: 'CASE-VARIANT-CONFLICT',
+					confirm: 'yes'
+				}
+			});
+			expect(conflict.status()).toBe(409);
+			const rollback = editor.locator('form').nth(1);
+			await rollback.getByLabel('Previous scoring version').selectOption(source);
+			await apply(rollback, 'Restore selected version', `CASE-VARIANT-ROLLBACK-${index}`);
+			await expect(editor.getByLabel(field)).toHaveValue(String(initial));
+			const restored = await editor.locator('input[name=expected]').first().inputValue();
+			expect(restored).not.toBe(source);
+			expect(restored).not.toBe(live);
+		}
+		expect(
+			(
+				await db
+					.prepare(
+						"SELECT id,score,score_config_version FROM completed_run WHERE family='memory' ORDER BY id"
+					)
+					.all()
+			).results
+		).toEqual(beforeScores);
+		const counts = async () =>
+			await db
+				.prepare(
+					"SELECT (SELECT count(*) FROM completed_run WHERE family='memory') completed,(SELECT count(*) FROM play_session WHERE family='memory') sessions,(SELECT count(*) FROM account_round_activity WHERE family='memory') activity"
+				)
+				.first();
+		const beforeCounts = await counts();
+		const testPlay = page.locator('.admin-test');
+		const playerWrites: string[] = [];
+		page.on('request', (request) => {
+			if (request.method() === 'POST' && /\/api\/(play|progress)/.test(request.url()))
+				playerWrites.push(request.url());
+		});
+		for (const variant of [
+			'memory:classic',
+			'memory:no-preview',
+			'memory:trios',
+			'memory:moving'
+		]) {
+			await testPlay.getByRole('combobox', { name: 'Variant', exact: true }).selectOption(variant);
+			await testPlay.getByRole('button', { name: /^(Start test round|Next test round)$/ }).click();
+			await expect(testPlay.locator('.game')).toHaveAttribute('data-phase', 'playing', {
+				timeout: 12000
+			});
+			await expect(testPlay.locator('.test-banner')).toContainText('Admin test · Memory');
+			const groups = await testPlay.locator('.memory-card').evaluateAll((cards) => {
+				const matches = new Map<string, number[]>();
+				cards.forEach((card, index) => {
+					const symbol = card.querySelector('.card-front')!.innerHTML;
+					matches.set(symbol, [...(matches.get(symbol) ?? []), index]);
+				});
+				return [...matches.values()];
+			});
+			expect(groups.every((group) => group.length === (variant === 'memory:trios' ? 3 : 2))).toBe(
+				true
+			);
+			for (const group of groups)
+				for (const index of group) await testPlay.locator('.memory-card').nth(index).click();
+			await expect(testPlay.getByText(/^Test score:/)).toBeVisible({ timeout: 12000 });
+			await expect(testPlay.getByRole('alert')).toHaveCount(0);
+		}
+		expect(playerWrites).toEqual([]);
+		expect(await counts()).toEqual(beforeCounts);
+		await page.reload();
+		await expect(moving.locator('summary')).toContainText('Disabled');
+		for (const viewport of [
+			{ width: 390, height: 844 },
+			{ width: 844, height: 390 },
+			{ width: 1280, height: 800 }
+		]) {
+			await page.setViewportSize(viewport);
+			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
+				false
+			);
+		}
+	} finally {
+		for (const score of originalScores) {
+			const live = await db
+				.prepare('SELECT version FROM score_live WHERE family=?')
+				.bind(score.scope)
+				.first<{ version: string }>();
+			if (live && live.version !== score.version && userId) {
+				const response = await context.request.post('/admin/games?game=memory', {
+					headers: { Origin: 'http://localhost:5173' },
+					timeout: 10_000,
+					form: {
+						action: 'score-rollback',
+						target: 'memory',
+						expected: live.version,
+						sourceVersion: score.version,
+						reason: 'CASE-VARIANT-CLEANUP',
+						confirm: 'yes',
+						...(score.variant ? { variant: score.variant } : {})
+					}
+				});
+				expect(response.ok()).toBe(true);
+			}
+		}
+		await db.prepare("DELETE FROM variant_lifecycle WHERE family='memory'").run();
+		for (const row of originalLifecycle)
+			await db
+				.prepare(
+					"INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('memory',?,?,?)"
+				)
+				.bind(row.variant, row.state, row.reason)
+				.run();
+		if (userId)
+			await db.batch([
+				db.prepare('DELETE FROM admin_web_operator WHERE user_id=?').bind(userId),
+				db.prepare('DELETE FROM admin_actor WHERE id=?').bind(userId),
+				db.prepare('DELETE FROM user WHERE id=?').bind(userId)
+			]);
+		await context.close();
+		await proxy.dispose();
+	}
+});
