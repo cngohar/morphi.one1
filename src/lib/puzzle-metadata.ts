@@ -17,6 +17,58 @@ const metadata = {
 			condition:
 				'Cap when placements reach BLOCK_MOVE_CAP; otherwise no-fit when the tray is empty or no tray piece fits.'
 		},
+		presentation: {
+			name: 'v1.game.block',
+			scoringLabels: {
+				line: 'scoring.block.line',
+				extraLine: 'scoring.block.extraLine',
+				combo: 'scoring.block.combo'
+			},
+			groups: { 'block-placement-1': 'leaderboard.block' },
+			help: {
+				steps: ['v1.game.block.step1', 'v1.game.block.step2', 'v1.game.block.step3'],
+				rows: [
+					{ label: 'v1.game.block.row1', field: 'line', sign: '+' },
+					{ label: 'v1.game.block.row2', field: 'extraLine', sign: '+' },
+					{ label: 'v1.game.block.row3', field: 'combo', sign: '+' },
+					{ label: 'v1.game.block.row4', value: 'v1.game.block.value4' }
+				],
+				note: 'v1.game.block.scoringNote',
+				tips: 'v1.game.block.tips'
+			},
+			backdrop: {
+				items: [
+					{ id: 'single', path: 'M7 7h44v44h-44Z' },
+					{ id: 'domino', path: 'M7 7h21v21h-21ZM7 30h21v21h-21Z' },
+					{
+						id: 'bar3',
+						path: 'M7 7h13.333333333333334v13.333333333333334h-13.333333333333334ZM7 22.333333333333336h13.333333333333334v13.333333333333334h-13.333333333333334ZM7 37.66666666666667h13.333333333333334v13.333333333333334h-13.333333333333334Z'
+					},
+					{ id: 'l3', path: 'M7 7h21v21h-21ZM7 30h21v21h-21ZM30 30h21v21h-21Z' },
+					{
+						id: 'bar4',
+						path: 'M7 7h9.5v9.5h-9.5ZM7 18.5h9.5v9.5h-9.5ZM7 30h9.5v9.5h-9.5ZM7 41.5h9.5v9.5h-9.5Z'
+					},
+					{
+						id: 'square',
+						path: 'M7 7h21v21h-21ZM30 7h21v21h-21ZM7 30h21v21h-21ZM30 30h21v21h-21Z'
+					},
+					{
+						id: 'l4',
+						path: 'M7 7h13.333333333333334v13.333333333333334h-13.333333333333334ZM7 22.333333333333336h13.333333333333334v13.333333333333334h-13.333333333333334ZM7 37.66666666666667h13.333333333333334v13.333333333333334h-13.333333333333334ZM22.333333333333336 37.66666666666667h13.333333333333334v13.333333333333334h-13.333333333333334Z'
+					},
+					{
+						id: 't4',
+						path: 'M7 7h13.333333333333334v13.333333333333334h-13.333333333333334ZM22.333333333333336 7h13.333333333333334v13.333333333333334h-13.333333333333334ZM37.66666666666667 7h13.333333333333334v13.333333333333334h-13.333333333333334ZM22.333333333333336 22.333333333333336h13.333333333333334v13.333333333333334h-13.333333333333334Z'
+					},
+					{
+						id: 's4',
+						path: 'M22.333333333333336 7h13.333333333333334v13.333333333333334h-13.333333333333334ZM37.66666666666667 7h13.333333333333334v13.333333333333334h-13.333333333333334ZM7 22.333333333333336h13.333333333333334v13.333333333333334h-13.333333333333334ZM22.333333333333336 22.333333333333336h13.333333333333334v13.333333333333334h-13.333333333333334Z'
+					}
+				],
+				fill: 'solid'
+			}
+		},
 		backdropPieces: [
 			{ id: 'single', cells: [{ x: 0, y: 0 }], width: 1, height: 1 },
 			{
@@ -120,6 +172,40 @@ const metadata = {
 			animation: 'fade-rise',
 			continue: 'auto_500ms',
 			condition: 'Every pair is connected; filling every cell is not required.'
+		},
+		presentation: {
+			name: 'v1.game.connect',
+			scoringLabels: {
+				pair: 'scoring.connect.pair',
+				grid: 'scoring.connect.grid',
+				second: 'scoring.connect.second',
+				redraw: 'scoring.connect.redraw'
+			},
+			groups: {
+				'connect-1:1': 'leaderboard.connect1',
+				'connect-1:2': 'leaderboard.connect2',
+				'connect-1:3': 'leaderboard.connect3'
+			},
+			help: {
+				steps: ['v1.game.connect.step1', 'v1.game.connect.step2', 'v1.game.connect.step3'],
+				rows: [
+					{ label: 'v1.game.connect.row1', field: 'pair', sign: '+' },
+					{ label: 'v1.game.connect.row2', field: 'grid', sign: '+' },
+					{ label: 'v1.game.connect.row3', field: 'second', sign: '+' },
+					{ label: 'v1.game.connect.row4', field: 'redraw', sign: '−' }
+				],
+				note: 'v1.game.connect.scoringNote',
+				tips: 'v1.game.connect.tips'
+			},
+			backdrop: {
+				items: [
+					{
+						id: 'dot-path',
+						path: 'M8 12a5 5 0 1 0 10 0a5 5 0 1 0-10 0M13 17v27h34V17M42 12a5 5 0 1 0 10 0a5 5 0 1 0-10 0'
+					}
+				],
+				fill: 'outline'
+			}
 		}
 	},
 	['memory']: {
@@ -136,6 +222,38 @@ const metadata = {
 			animation: 'fade-rise',
 			continue: 'auto_500ms',
 			condition: 'All pairs have been matched.'
+		},
+		presentation: {
+			name: 'v1.game.memory',
+			scoringLabels: {
+				pair: 'scoring.memory.pair',
+				mismatch: 'scoring.memory.mismatch',
+				second: 'scoring.memory.second'
+			},
+			groups: {
+				'memory-1:6': 'leaderboard.memory6',
+				'memory-1:8': 'leaderboard.memory8',
+				'memory-1:10': 'leaderboard.memory10'
+			},
+			help: {
+				steps: ['v1.game.memory.step1', 'v1.game.memory.step2', 'v1.game.memory.step3'],
+				rows: [
+					{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+					{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+					{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+					{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+				],
+				note: 'v1.game.memory.scoringNote',
+				tips: 'v1.game.memory.tips'
+			},
+			backdrop: {
+				items: [
+					{ id: 'card', path: 'M17 5H43Q48 5 48 10V50Q48 55 43 55H17Q12 55 12 50V10Q12 5 17 5Z' }
+				],
+				fill: 'solid',
+				symbol: true
+			},
+			profileIcon: { color: 'var(--accent)', rotation: 8 }
 		}
 	}
 } as const;

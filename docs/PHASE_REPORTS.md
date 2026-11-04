@@ -2225,3 +2225,210 @@ evidence is retained; app tests are not repeated for this Git handoff. This
 instruction authorizes source publication only: Slice 6 still requires written
 confirmation, and no deployment or production change is authorized. The Slice 0
 base-tag test remains deferred and outstanding.
+
+## Engine refactor Slice 6 — UI, admin, recovery, performance and SEO (2026-11-04)
+
+**Status:** complete locally, awaiting owner review. All required checks are
+covered by one full milestone invocation plus the affected fixture rerun described
+below. Slice 5 is owner-confirmed and closed.
+This slice starts from `58113561d9c85737a599149967f69e25c5adfabf`,
+“Refactor theme admin, freshness and palette caching.” Slice 7 has not started
+and requires the owner's written confirmation after this report.
+
+**Built:** family presentation is required manifest data: names, help rows,
+result/scoring labels, leaderboard groups, profile icons and allowed backdrop
+objects. The generated browser projection drives the generic shell, help,
+results, profiles, leaderboards and admin views without literal-family dispatch.
+Each puzzle retains its own view and message bundle. The game service was
+already catalog-driven at the supplied commit; its audited SQL was retained and
+exercised with a synthetic family rather than replaced with equivalent code.
+
+Home idle-loads the peeked eligible puzzle view/pool and the play route, without
+consuming a selector draw or issuing ranked sessions. Save-Data and slow-2G/2G
+skip speculation. The existing Worker generation and one-candidate Instant Next
+preparation remain intact, including preserved results on failure and Retry.
+
+`/play` offers Resume or Abandon + New for a saved solo round or active ranked
+issuance. IndexedDB checkpoints save accepted moves and hidden-page boundaries,
+resolved appearance/scoring, versions, active elapsed time and pending logical
+delays. Family adapters replay the existing reducers. Account/guest scoping,
+Web Locks ownership, IndexedDB fencing and explicit takeover prevent displaced
+tabs overwriting the replacement round. Acquisition after navigation releases
+its late lock. Final accepted moves survive failures of the completed-run queue.
+The authenticated active-session endpoint returns the original ranked issuance;
+incompatible/saving locks expose only abandonment/conflict information. Hidden
+ranked activity reports abandonment separately from `goHome()` and keeps the
+original lock resumable; explicit Abandon releases it. Ranked wall time, TTL,
+authoritative replay and server scoring remain in force.
+
+Runtime HTML and personal/ranked/API responses are private/no-store, preserving
+existing `Vary` fields when adding Cookie. Hashed assets retain the adapter's
+one-year public immutable policy; audio and OG assets are public for one week.
+The guest artifact copies the adapter's actual headers. Six public content
+routes remain prerendered with correct canonical/OG metadata and one Home h1.
+Play, admin, auth, API and reserved seed-share paths are noindex; the sitemap
+contains only Home, Privacy, Terms, How it works, About and FAQ. Public family
+doors remain withdrawn. Local privacy copy now discloses device checkpoints;
+the deployed policy has not changed.
+
+**Admin audit:** `src/lib/server/games.ts` uses catalog ids for lifecycle reads,
+writes and statistics, including the novel-family regression. The requested
+`src/lib/server/moderation.ts`, `user-lifecycle.ts`, `players.ts`, and
+`src/lib/operator-permissions.ts` remain **family-agnostic**; no missed family
+branch was found. Existing operator authentication/TOTP and sensitive-action
+re-authentication guards remain mandatory, with transactional audit records for
+configuration, game, scoring, user and moderation changes. The audit view is
+generic over recorded scopes; scoring/game labels use the catalog projection.
+
+**Skipped:** Slice 7; deployment and production provisioning; app secrets, DNS
+and Google changes; physical-device/field performance; public launch approval;
+commits/pushes. No puzzle rules, generation, validation, scoring logic, normal
+gameplay, endings or sounds were changed. Recovery restores existing state and
+timers rather than introducing different game rules. No per-type indexable page,
+game door or share-link feature was introduced. **The Slice 0 base-tag test
+remains deferred and outstanding**; no base-tag reset/test was performed.
+
+**Known issues/limits:** the transfer and Play-to-playable goals below were
+missed. The latter includes the accepted Card/game entrances and Memory preview;
+those were preserved. Different Mix families were selected across samples, so
+preloaded-versus-cold totals do not prove a controlled speedup. INP is a short
+Event Timing lab proxy, not field INP. No physical phone, real mobile network,
+production compression or public-launch performance pass is claimed.
+
+Resume is device-local and uses the last successful checkpoint. Storage/locking
+unavailability has visible fallback limits; in-memory fallback cannot survive a
+closed tab. Only compatible checkpoints younger than 24 hours are offered;
+older browser copies may remain until replaced or cleared, as disclosed. Ranked
+expiry and server clocks still apply. Cross-device move synchronisation is not
+implemented.
+
+**Decisions:** no dependencies or pinned versions changed. Manifest presentation,
+bounded recovery and cache/SEO choices are recorded in `docs/DECISIONS.md`.
+The owner selected “Record emulation; physical phone outstanding.” Preserve
+per-run logs and sample checkpoints through the milestone, resume unfinished
+checks after interruptions, then remove temporary saves after final evidence is
+archived. One full milestone was invoked; after its fixture correction, only
+the affected browser case and file checks were repeated. No shared app code changed.
+
+**Questions for the owner:** confirm Slice 6 in writing or provide corrections
+before Slice 7 may start.
+
+### Evidence
+
+Permanent result summary: [Slice 6 verification](evidence/slice6/verification.json).
+Source tests remain the repeatable specification. Final measurements and result
+summaries are permanent; temporary restart saves are removed after all checks pass.
+
+| Acceptance item                                                                                      | Evidence type and location                                                                                                                                      | Result                                                                              |
+| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------- |
+| Generic names/help/results/backdrops and no family dispatch in shared UI or `server/games.ts`        | Manifest/projection units, `tests/slices/slice6-performance-seo.test.ts`, synthetic catalog family in `slice3-catalog-server-validation.test.ts`, source review | Pass; manifest, source and milestone checks                                         |
+| Generic game/scoring/users/audit views; TOTP, re-auth and audited changes                            | Four-file family-agnostic audit above; isolated D1 lifecycle/scoring/security tests; `tests/e2e/operator.spec.ts`                                               | Pass; 5/5 operator browser checks plus D1 tests                                     |
+| Lazy chunks, idle preload and Instant Next failure/kill-switch behavior                              | `tests/e2e/lazy-registry.spec.ts`, `preparation.spec.ts`, `selector-reload.spec.ts`; lazy-bundle graph check                                                    | Pass; 3 independent Game views and browser preparation/retry checks                 |
+| Resume, explicit Abandon, hidden abandonment and original ranked issuance                            | `tests/e2e/resume.spec.ts`, Slice 6 ranked-isolation cases and built-Worker recovery smoke                                                                      | Pass; recovery browsers and built-Worker original-issuance checks                   |
+| Solo checkpoint refresh, pending delays, storage failure, final move, takeover and late-lock cleanup | `src/lib/ui/checkpoint.test.ts`, `active-delay.test.ts`, `tests/e2e/resume.spec.ts`                                                                             | Pass, including two-tab Abandon + New ownership regression                          |
+| Cache policy and no publicly cached personalised HTML                                                | Slice 6 response-policy cases, actual local Worker header probe, explicit guest-artifact header assertions                                                      | Pass; units, guest headers and 45-check built-Worker smoke                          |
+| Prerendering, sitemap, canonical/OG, one Home h1, noindex and public-door withdrawal                 | Slice 6 SEO cases, `tests/e2e/explainers.spec.ts`, actual guest crawl                                                                                           | Pass; milestone SEO checks and explicit guest crawl                                 |
+| Named desktop/phone-emulation cold/preloaded p50/p95, at least five runs                             | `scripts/measure-performance.ts`; [raw evidence](evidence/slice6/performance.json), [readable report](evidence/slice6/performance.md)                           | Measurement protocol pass, 20/20; numeric goals below include misses                |
+| Explicit checks outside verify                                                                       | `bun run test:public-privacy` and `bun run test:demo`; permanent verification summary                                                                           | Pass: 8 guest assertion groups; demo 366 checks, zero browser errors/uploads        |
+| Fast lint, zero-warning types, boundaries, units, Slice 6 cases and relevant browsers                | Development passes and permanent milestone result summary                                                                                                       | Pass; lint, 0 errors/warnings, boundaries, 205 units and combined 190 browser cases |
+| One full end-of-slice `bun run verify`                                                               | Permanent verification summary                                                                                                                                  | One invocation; all stages covered after fixture-only targeted rerun                |
+| Slice 0 base-tag test                                                                                | Owner's recorded deferral                                                                                                                                       | **Deferred and outstanding**, neither passed nor waived                             |
+
+The single `bun run verify` invocation passed lint, type-check (0 errors and
+0 warnings), boundaries, 30,000 palettes, 34 unit files / 205 tests, 6 integration
+files / 41 tests, all six vector runtimes (9 logic and 6 theme vectors each),
+45 built-Worker checks and the 3-view lazy-bundle analysis. Its browser stage
+finished **189 passed / 1 failed in 41.0 minutes**, so the command exited 1.
+The sole failure was a stale test expectation: after leaving an in-progress
+round, the measurement-consent fixture expected Home's Play button instead of
+Resume. The fixture now explicitly chooses Resume → Abandon + New to start a
+fresh consented round; every consent, bounded-payload and withdrawal assertion
+is retained. The affected Chromium case passed **1/1** on its targeted rerun;
+its file-format and ESLint checks also passed. The full command was not repeated.
+Combined browser coverage is **190/190**: Chromium 114, Firefox 38, WebKit 38.
+No application code changed after the full invocation or performance run.
+
+The palette stage regenerated only timing fields in the initially clean Slice 5
+measurement artifact. The original accepted artifact was restored; all 30,000
+current palette-safety results are recorded in the milestone summary. This does
+not reopen Slice 5 acceptance.
+
+### Measurements
+
+Built local Worker on loopback, Chromium **156.0.8078.4**, sequential samples.
+Desktop: **HP EliteDesk 705 G2 MT**, AMD PRO A8-8650B R7, Linux
+7.0.0-38-generic, 1280×800, CPU 1×, 20 ms latency, 40/10 Mbps down/up.
+Phone: **Google Pixel 7a reference emulation**, Pixel 7 viewport/touch profile,
+412×915, CPU 4× on the same desktop, 150 ms latency, 1.6/0.75 Mbps down/up.
+This is the owner's approved emulation evidence, not a physical Pixel 7a test.
+
+Every state has **five runs** in fresh contexts with browser cache cleared before
+navigation. Cold disables HTTP caching and clicks when Play hydrates; none of
+these cold runs reached the preload-ready mark first. Preloaded waits for that
+mark, confirmed in all ten preloaded runs. Server caches were not reset between
+samples. Median is p50; p95 is nearest rank (the maximum with five samples).
+Raw per-run family, resources, bytes, interaction timing and preload marks are
+retained in the linked JSON. No deployment or edge compression is assumed.
+
+All targets in this table are **local diagnostic goals**, not passed physical
+phone or public-launch gates. LCP goal: ≤2,500 ms; INP lab proxy: ≤200 ms;
+CLS: ≤0.1; critical Home transfer: about 150 KB (150,000 decimal bytes);
+Play-to-playable after preload: about 300 ms. Each cell is **p50 / p95**.
+
+| Device/state (n=5 each)    | Home LCP ms | INP lab proxy ms |      Home CLS | CLS through Play |    Critical bytes | Play-to-playable ms |
+| -------------------------- | ----------: | ---------------: | ------------: | ---------------: | ----------------: | ------------------: |
+| HP desktop, cold           |   216 / 284 |          64 / 72 | 0.001 / 0.001 |    0.033 / 0.058 | 152,894 / 152,894 |       5,385 / 8,639 |
+| HP desktop, preloaded      |   204 / 224 |          72 / 72 | 0.001 / 0.001 |    0.053 / 0.061 | 152,894 / 153,440 |      8,572 / 10,596 |
+| Pixel reference, cold      |   684 / 712 |        104 / 104 | 0.000 / 0.000 |    0.088 / 0.091 | 152,894 / 152,894 |      5,790 / 11,291 |
+| Pixel reference, preloaded |   696 / 708 |          96 / 96 | 0.000 / 0.000 |    0.088 / 0.093 | 152,894 / 152,894 |       6,073 / 9,190 |
+
+LCP, INP proxy and CLS goals are met in these profiles. The critical-transfer
+goal is missed by roughly 2%; playable timing misses the 300 ms goal. Playable
+means the actual playing stage with game input enabled, after the normal
+approved entrances/Memory preview; the report does not substitute early DOM
+appearance for readiness. Cold and preloaded samples contain different family
+mixes, including more Memory samples in desktop preloaded runs.
+
+A separate [Next diagnostic](evidence/slice6/next-diagnostic.json) retains five
+Nov 3 development-server measurements: desktop Chromium 1280×720, unthrottled
+localhost, preloaded solo transitions, fresh session per run, reduced motion;
+p50 **705.9 ms**, p95 **908.8 ms**. This measures activation to next-round DOM,
+excluding each game's subsequent entrance/preview, and is not next-game
+playability or phone evidence. Functional Next preparation/retry checks remain;
+the historical physical-phone Next feedback/preparation/playability goals are
+not closed by this diagnostic.
+
+**Kill switches and defaults:** lifecycle enablement/zero weights govern family
+availability; the global ranked flag is enforced on issuance and replay. Play,
+Resume and Next recheck eligibility. An availability error serves no fallback
+family. Unknown families are rejected; missing weights use 1; invalid versioned
+config uses valid typed defaults or a previous valid theme parent. Existing
+local catalog/ranked defaults remain enabled under auth, caps, TTL and replay;
+this is not production flag setup. The guest publication has no account backend;
+optional anonymous measurement remains off until consent.
+
+**Waivers:** no new numeric-goal waiver. The owner explicitly approved recording
+emulation while physical-phone validation remains outstanding. This does not
+waive field/production performance or physical-device recovery checks. The
+Slice 0 base-tag test remains deferred and outstanding, not waived. Its missing
+historical-baseline evidence is not supplied by current-head milestone checks.
+
+**Owner responsibilities:** review the local Resume/Abandon/UI changes and this
+evidence; provide written Slice 6 confirmation before Slice 7. Physical phone
+validation (including local HTTPS for Web Locks), field/production measurements,
+public-release acceptance and any deployment/provisioning remain separate owner
+actions. No production approval is inferred.
+
+**CODEMAP:** updated for Slice 6 presentation, recovery, delivery, harness,
+regressions, final milestone results and permanent evidence.
+
+Temporary restart evidence cleanup: complete.
+
+### Slice 6 Git handoff — 2026-11-04
+
+The owner requested updating the Git repository and pushing to GitHub. This
+handoff commits and pushes the completed Slice 6 source, tests, documentation
+and permanent evidence to the existing `origin/main`. Existing verification
+results and outstanding Slice 0, physical-phone and performance-goal limitations
+above remain unchanged. This source-only handoff does not infer Slice 6
+acceptance, Slice 7 authorization or deployment approval.

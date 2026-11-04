@@ -1,15 +1,17 @@
 <script lang="ts">
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import { onMount } from 'svelte';
+	import { familyIndex } from '#lib/family-index.js';
 	import { workerTheme } from '#lib/ui/solo-theme.js';
 	import { themeProfile } from '#lib/engine/theme/config.js';
 	import type { ThemeConfig } from '#lib/engine/theme/config.js';
 	import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 	import { themeStyle } from '#lib/engine/theme/style.js';
-	import { t, type MessageKey } from '#lib/i18n/messages.js';
+	import { t } from '#lib/i18n/messages.js';
 	let { config }: { config: ThemeConfig } = $props();
 	let themes = $state<ResolvedTheme[]>([]);
 	let failed = $state(false);
-	const families = ['memory', 'block', 'connect'];
+	const families = familyIndex.map(({ id }) => id);
 	onMount(() => {
 		const controller = new AbortController();
 		void (async () => {
@@ -48,7 +50,7 @@
 			data-family={theme.family}
 			style={`background:${theme.background};${themeStyle(theme)}`}
 		>
-			<h2>{t(`v1.game.${theme.family}` as MessageKey)}</h2>
+			<h2>{familyName(theme.family)}</h2>
 			<div class="preview-items">
 				{#each theme.symbols as symbol, i (symbol.path)}
 					<div

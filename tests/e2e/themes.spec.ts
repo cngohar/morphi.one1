@@ -1,7 +1,14 @@
 import { expect, test } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
 import { generateTheme } from '../../src/lib/engine/theme/generator.js';
-import { THEME_CONFIG_VERSION } from '../../src/lib/engine/theme/config.js';
+import {
+	THEME_CONFIG,
+	THEME_CONFIG_VERSION,
+	validateThemeConfig
+} from '../../src/lib/engine/theme/config.js';
+import { selectorSeedFor } from './entropy.js';
+
+const defaultThemeConfig = validateThemeConfig(THEME_CONFIG, THEME_CONFIG_VERSION);
 
 for (const family of ['memory', 'block'] as const)
 	for (const [width, height] of [
@@ -38,7 +45,16 @@ for (const family of ['memory', 'block'] as const)
 						return original(array);
 					};
 				},
-				{ value: seed, selectorSeed: family === 'memory' ? 0 : 7 }
+				{ value: seed, selectorSeed: selectorSeedFor(family) }
+			);
+			await page.route('**/api/play/theme', (route) =>
+				route.fulfill({
+					json: {
+						version: THEME_CONFIG_VERSION,
+						liveVersion: THEME_CONFIG_VERSION,
+						values: defaultThemeConfig
+					}
+				})
 			);
 			const errors: string[] = [];
 			page.on('pageerror', (error) => errors.push(error.message));

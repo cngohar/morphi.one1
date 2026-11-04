@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import { onMount, untrack } from 'svelte';
 	import ThemeEditor from '#lib/components/ThemeEditor.svelte';
 	import ScoringEditor from '#lib/components/ScoringEditor.svelte';
@@ -132,8 +133,7 @@
 					<section class="admin-card">
 						<h2>{t('v1.admin.dashboard.split')}</h2>
 						{#each data.split as game (game.family)}<p class="summary-row">
-								<span>{t(`v1.game.${game.family}` as MessageKey)}</span><strong>{game.total}</strong
-								>
+								<span>{familyName(game.family)}</span><strong>{game.total}</strong>
 							</p>{/each}
 						<p>
 							<a href="https://dash.cloudflare.com" rel="external noreferrer"
@@ -239,7 +239,7 @@
 										></thead
 									><tbody
 										>{#each data.detail.stats as stat (`${stat.family}:${stat.rules_group}:${stat.score_config_version}`)}<tr
-												><td>{stat.family}</td><td>{stat.rules_group}</td><td
+												><td>{familyName(stat.family)}</td><td>{stat.rules_group}</td><td
 													>{stat.score_config_version}</td
 												><td>{stat.completions}</td><td>{stat.best}</td><td
 													>{stat.average.toFixed(1)}</td
@@ -278,9 +278,9 @@
 										></thead
 									><tbody
 										>{#each data.detail.tracked as row (row.family)}<tr
-												><td>{row.family}</td><td>{row.starts}</td><td>{row.completed}</td><td
-													>{row.abandoned}</td
-												></tr
+												><td>{familyName(row.family)}</td><td>{row.starts}</td><td
+													>{row.completed}</td
+												><td>{row.abandoned}</td></tr
 											>{:else}<tr><td colspan="4">{t('v1.admin.users.notRecorded')}</td></tr
 											>{/each}</tbody
 									>
@@ -326,7 +326,7 @@
 							<h2>{t('v1.admin.users.rounds')}</h2>
 							{#each data.detail.rounds as round (round.id)}<details>
 									<summary
-										>{round.family} · {round.score} · {round.id} · {t(
+										>{familyName(round.family)} · {round.score} · {round.id} · {t(
 											round.hidden ? 'v1.operator.hidden' : 'v1.operator.eligible'
 										)}</summary
 									><AccountForm
@@ -870,7 +870,7 @@
 							class:active={data.selectedGame === game.family}
 							aria-current={data.selectedGame === game.family ? 'page' : undefined}
 							href="{resolve('/admin/[view]', { view: 'games' })}?game={game.family}"
-							>{t(`v1.game.${game.family}` as MessageKey)}</a
+							>{familyName(game.family)}</a
 						>{/each}
 				</nav>
 				<p>{t('v1.admin.games.stats')}</p>
@@ -880,9 +880,7 @@
 								class="admin-card game-card"
 								href="{resolve('/admin/[view]', { view: 'games' })}?game={game.family}"
 								><h2>
-									{t(`v1.game.${game.family}` as MessageKey)} · {t(
-										`v1.admin.games.${game.state}` as MessageKey
-									)}
+									{familyName(game.family)} · {t(`v1.admin.games.${game.state}` as MessageKey)}
 								</h2>
 								<p>{t('v1.admin.games.completed')}: {game.completed}</p>
 								<p>
@@ -908,9 +906,7 @@
 						</nav>
 						<section class="admin-card">
 							<h2>
-								{t(`v1.game.${game.family}` as MessageKey)} · {t(
-									`v1.admin.games.${game.state}` as MessageKey
-								)}
+								{familyName(game.family)} · {t(`v1.admin.games.${game.state}` as MessageKey)}
 							</h2>
 							{#if data.subview === 'settings'}
 								{#if game.restoreUntil}<p>

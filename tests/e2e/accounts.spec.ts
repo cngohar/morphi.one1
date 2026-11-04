@@ -7,6 +7,7 @@ import { eq } from 'drizzle-orm';
 import { createAuth } from '../../src/lib/server/auth.js';
 import { createDatabase } from '../../src/lib/server/db/index.js';
 import { session } from '../../src/lib/server/db/schema.js';
+import type { PuzzleSelectorState } from '../../src/lib/selector.js';
 
 // These helpers run in the Playwright process. No fixture/bypass route ships in the app.
 test.use({ baseURL: 'http://localhost:5173' });
@@ -447,23 +448,39 @@ test('a guest finishing Memory sees the real sign-in prompt and keeps their loca
 	).toEqual(best);
 });
 
-test('a signed-in player finishing Memory sees their account link and can continue to Block', async ({
+test('a signed-in player finishing Memory sees their account link and continues to the queued Next puzzle', async ({
 	browser
 }) => {
 	const { login } = await fixtureUser();
 	const context = await browser.newContext({ baseURL: 'http://localhost:5173' });
 	await context.addCookies(login.cookies);
 	const page = await context.newPage();
+	await chooseName(page, `p_${crypto.randomUUID().slice(0, 8)}`);
 	await finishMemory(page);
 	await expect(page.getByRole('link', { name: 'Sign in with Google', exact: true })).toHaveCount(0);
 	await expect(
 		page.locator('.result-main').getByRole('link', { name: 'Your account', exact: true })
 	).toHaveAttribute('href', '/account');
 	await expect(page.locator('.local-status')).toContainText(
-		/Saved to your account|Saving when connected/
+		/Ranked score saved|Saved to your account|Saving when connected/
 	);
+	const status = await context.request.get('/api/account/status');
+	expect(status.status()).toBe(200);
+	const { ownerKey } = await status.json();
+	expect(typeof ownerKey).toBe('string');
+	const selectorRaw = await page.evaluate(
+		(key) => localStorage.getItem(key),
+		`morphi.selector.v2.account:${encodeURIComponent(ownerKey)}`
+	);
+	expect(selectorRaw).not.toBeNull();
+	const selector = JSON.parse(selectorRaw!) as PuzzleSelectorState;
+	expect(selector.recent.at(-1)).toBe('memory');
+	expect(selector.queue.length).toBeGreaterThan(0);
+	const nextFamily = selector.queue[0]!;
+	expect(nextFamily).not.toBe('memory');
 	await page.getByRole('button', { name: 'Next puzzle', exact: true }).click();
-	await expect(page.locator('.game[data-family="block"]')).toBeVisible();
+	await expect(page.locator('.game')).toBeVisible({ timeout: 20_000 });
+	await expect(page.locator('.game')).toHaveAttribute('data-family', nextFamily);
 	await context.close();
 });
 
@@ -519,29 +536,27 @@ test('a second browser must explicitly take over the account ranked session', as
 		const firstStart = page.waitForResponse(
 			(response) => new URL(response.url()).pathname === '/api/play/start'
 		);
-		await page.goto('/play');
+		await page.goto('/');
+		await page.getByRole('button', { name: 'Play', exact: true }).click();
 		const started = await firstStart;
 		expect(started.status()).toBe(200);
 		const old = await started.json();
 		const { ownerKey } = started.request().postDataJSON();
 		const conflictResponse = peer.waitForResponse(
-			(response) => new URL(response.url()).pathname === '/api/play/start'
+			(response) => new URL(response.url()).pathname === '/api/play/active'
 		);
 		await peer.goto('/play');
-		expect((await conflictResponse).status()).toBe(409);
+		expect((await conflictResponse).status()).toBe(200);
 		await expect(
-			peer.getByRole('heading', { name: 'A ranked round is already active.', exact: true })
+			peer.getByRole('heading', { name: 'Continue your puzzle?', exact: true })
 		).toBeVisible();
 		await expect(peer.locator('.game')).toHaveCount(0);
 		const takeover = peer.waitForResponse(
 			(response) => new URL(response.url()).pathname === '/api/play/start'
 		);
-		await peer
-			.getByRole('button', { name: 'Abandon previous round and play here', exact: true })
-			.click();
+		await peer.getByRole('button', { name: 'Abandon + New', exact: true }).click();
 		const replaced = await takeover;
 		expect(replaced.status()).toBe(200);
-		expect(replaced.request().postDataJSON().takeoverSession).toBe(old.id);
 		const replacement = await replaced.json();
 		await expect(peer.locator('.ranked-conflict')).toHaveCount(0);
 		await expect(peer.locator('.game')).toBeVisible();

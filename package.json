@@ -31,6 +31,7 @@
 		"test:vectors": "bun scripts/check-vectors.ts",
 		"test:worker": "bun run build && bun scripts/check-worker.ts",
 		"measure:replay": "bun scripts/measure-replay.ts",
+		"measure:performance": "bun scripts/measure-performance.ts",
 		"check:boundaries": "bun scripts/check-boundaries.ts",
 		"check:lazy-bundle": "bun scripts/check-lazy-bundle.ts",
 		"test:palettes": "bun scripts/check-palettes.ts",

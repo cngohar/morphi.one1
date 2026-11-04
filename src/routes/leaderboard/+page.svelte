@@ -1,19 +1,15 @@
 <script lang="ts">
+	import { familyIndex } from '#lib/family-index.js';
+	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
 	import { resolve } from '$app/paths';
 	import AccountShell from '#lib/components/account/AccountShell.svelte';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	import { formatNumber } from '#lib/ui/format.js';
 	import type { PageProps } from './$types';
 	let { data }: PageProps = $props();
-	const groups: [string, MessageKey][] = [
-		['block-placement-1', 'leaderboard.block'],
-		['memory-1:6', 'leaderboard.memory6'],
-		['memory-1:8', 'leaderboard.memory8'],
-		['memory-1:10', 'leaderboard.memory10'],
-		['connect-1:1', 'leaderboard.connect1'],
-		['connect-1:2', 'leaderboard.connect2'],
-		['connect-1:3', 'leaderboard.connect3']
-	];
+	const groups = familyIndex.flatMap(({ id }) =>
+		Object.entries(puzzleMetadata[id].presentation?.groups ?? {})
+	);
 </script>
 
 <svelte:head><title>{t('leaderboard.pageTitle')}</title></svelte:head>
@@ -24,7 +20,8 @@
 		<form method="GET" action={resolve('/leaderboard')}>
 			<label for="board-group">{t('leaderboard.group')}</label>
 			<select id="board-group" name="group" value={data.group}>
-				{#each groups as [value, label] (value)}<option {value}>{t(label)}</option>{/each}
+				{#each groups as [value, label] (value)}<option {value}>{t(label as MessageKey)}</option
+					>{/each}
 			</select>
 			<button type="submit" class="account-button">{t('leaderboard.show')}</button>
 		</form>

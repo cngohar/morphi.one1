@@ -1,20 +1,23 @@
 import { expect, test, type Page } from '@playwright/test';
-import { fixSelectorSeed } from './entropy.js';
+import { fixSelectorSeed, selectorSeedFor } from './entropy.js';
 async function fixedPuzzleSeed(page: Page, pairs: number) {
 	const seed = pairs === 6 ? 3 : pairs === 8 ? 0 : 1;
-	await page.addInitScript((value) => {
-		const original = crypto.getRandomValues.bind(crypto);
-		let first = true;
-		crypto.getRandomValues = (array) => {
-			if (array instanceof Uint32Array && array.length === 2) {
-				array[0] = 0;
-				array[1] = first ? 0 : value;
-				first = false;
-				return array;
-			}
-			return original(array);
-		};
-	}, seed);
+	await page.addInitScript(
+		({ value, selectorSeed }) => {
+			const original = crypto.getRandomValues.bind(crypto);
+			let first = true;
+			crypto.getRandomValues = (array) => {
+				if (array instanceof Uint32Array && array.length === 2) {
+					array[0] = 0;
+					array[1] = first ? selectorSeed : value;
+					first = false;
+					return array;
+				}
+				return original(array);
+			};
+		},
+		{ value: seed, selectorSeed: selectorSeedFor('memory') }
+	);
 }
 for (const pairs of [6, 8, 10])
 	test(`Memory ${pairs} pairs settles before a full free preview and timer start`, async ({
@@ -88,7 +91,7 @@ test('hidden entrance pauses and reduced-motion changes reveal safely without sk
 	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'playing', { timeout: 2500 });
 });
 test('Block entrance locks placement, then supports real selection', async ({ page }) => {
-	await fixSelectorSeed(page, 7);
+	await fixSelectorSeed(page, selectorSeedFor('block'));
 	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'dealing');
@@ -114,7 +117,8 @@ test('measurement is opt-in, bounded and can be withdrawn', async ({ page }) => 
 	await expect(toggle).not.toBeChecked();
 	await toggle.check();
 	await page.goto('/', { waitUntil: 'networkidle' });
-	await page.getByRole('button', { name: 'Play', exact: true }).click();
+	await page.getByRole('button', { name: 'Resume', exact: true }).click();
+	await page.getByRole('button', { name: 'Abandon + New', exact: true }).click();
 	await expect(page.locator('.game')).toBeVisible();
 	await expect.poll(() => sent.length).toBeGreaterThanOrEqual(2);
 	for (const body of sent) {
@@ -143,7 +147,7 @@ test('every operator view denies guests without exposing records', async ({ requ
 test('failed cosmetic entropy keeps Memory visible and playable after its preview', async ({
 	page
 }) => {
-	await fixSelectorSeed(page, 0);
+	await fixSelectorSeed(page, selectorSeedFor('memory'));
 	await page.addInitScript(() => {
 		const original = crypto.getRandomValues.bind(crypto);
 		crypto.getRandomValues = (array) => {

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { CheckpointState } from '#lib/ui/checkpoint.js';
 	import type { ScoreValues } from '#lib/engine/scoring.js';
 	import { scoring as defaultScoring } from './scoring.js';
 	import { onMount, untrack } from 'svelte';
@@ -38,8 +39,12 @@
 		traySide = 'right',
 		entranceReady = true,
 		onready,
-		resolvedTheme = null
+		resolvedTheme = null,
+		resume,
+		registerCheckpoint
 	}: {
+		resume?: CheckpointState;
+		registerCheckpoint?: (read: () => CheckpointState) => void;
 		round: BlockRound;
 		roundNumber: number;
 		best: number;
@@ -875,6 +880,16 @@
 		if (!mounted || !entranceReady || entranceStarted) return;
 		untrack(() => {
 			entranceStarted = true;
+			if (resume?.phase === 'playing') {
+				entering = false;
+				busy = false;
+				onready?.();
+				if (game.status === 'ended') {
+					oncomplete?.(game.score);
+					finishDelay.start(0, document.hidden);
+				}
+				return;
+			}
 			const duration = motion.reduced() ? 0 : BLOCK_ENTRANCE_MS;
 			entrance = motion.deal(
 				[
@@ -889,6 +904,12 @@
 	});
 
 	onMount(() => {
+		registerCheckpoint?.(() => ({
+			phase: entering ? 'arrival' : 'playing',
+			elapsedMs: 0,
+			clockStarted: false,
+			pending: {}
+		}));
 		const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
 		const preferenceChanged = () => {
 			if (entranceStarted && motionQuery.matches && entering)

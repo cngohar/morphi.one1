@@ -40,27 +40,21 @@
 			data-band={item.band}
 			style={`--item-x:${item.x};--item-y:${item.y}%;transform:translate(-50%,-50%) rotate(${item.rotate}deg);color:${backdrop.color}`}
 		>
-			{#if theme.family === 'memory'}
-				<rect x="12" y="5" width="36" height="50" rx="5" fill="currentColor" />
-				<path
+			<path
+				d={item.path}
+				fill={backdrop.fill === 'solid' ? 'currentColor' : 'none'}
+				stroke={backdrop.fill === 'outline' ? 'currentColor' : undefined}
+				stroke-width={backdrop.fill === 'outline' ? 4 : undefined}
+				stroke-linecap="round"
+				stroke-linejoin="round"
+			/>
+			{#if backdrop.symbol}<path
 					d={item.glyph}
 					transform="translate(18 18) scale(.5)"
 					fill="none"
 					stroke={theme.background}
 					stroke-width="2"
-				/>
-			{:else if theme.family === 'connect'}
-				<path
-					d={item.path}
-					fill="none"
-					stroke="currentColor"
-					stroke-width="4"
-					stroke-linecap="round"
-					stroke-linejoin="round"
-				/>
-			{:else}
-				<path d={item.path} fill="currentColor" />
-			{/if}
+				/>{/if}
 		</svg>
 	{/each}
 </div>

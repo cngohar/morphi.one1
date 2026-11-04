@@ -1,7 +1,7 @@
 <script lang="ts">
 	import { measure } from '#lib/ui/measurement.js';
 	import { onMount } from 'svelte';
-	import { goto } from '$app/navigation';
+	import { goto, preloadCode } from '$app/navigation';
 	import { resolve } from '$app/paths';
 	import SiteHeader from '#lib/components/SiteHeader.svelte';
 	import SiteFooter from '#lib/components/SiteFooter.svelte';
@@ -13,6 +13,7 @@
 	let ready = $state(false);
 	let starting = $state(false),
 		enabled = $state(true);
+	let resumable = $state(false);
 	const colors = [
 		'var(--success)',
 		'var(--accent)',
@@ -74,8 +75,51 @@
 		sound.setEnabled(enabled);
 		dealScatter();
 		const stop = motion.orbit(root);
+		const preloading = new AbortController();
+		void (async () => {
+			const { loadCheckpoint } = await import('#lib/ui/checkpoint.js');
+			let owner: string | null = null;
+			if (import.meta.env.MODE !== 'public-guest') {
+				const response = await fetch(resolve('/api/account/status'), {
+					signal: preloading.signal,
+					cache: 'no-store'
+				});
+				if (!response.ok) return;
+				const status = (await response.json()) as { ownerKey?: string | null };
+				if (typeof status.ownerKey !== 'string' && status.ownerKey !== null) return;
+				owner = status.ownerKey;
+			}
+			resumable = Boolean(await loadCheckpoint(owner));
+		})().catch(() => {
+			if (!preloading.signal.aborted) console.warn('morphi:home_resume_unavailable');
+		});
+		const connection = (
+			navigator as Navigator & { connection?: { saveData?: boolean; effectiveType?: string } }
+		).connection;
+		const preload = () => {
+			if (
+				preloading.signal.aborted ||
+				document.hidden ||
+				connection?.saveData ||
+				['slow-2g', '2g'].includes(connection?.effectiveType ?? '')
+			)
+				return;
+			void Promise.all([
+				preloadCode('/play'),
+				import('#lib/ui/idle-preload.js').then(({ preloadFirstPuzzle }) =>
+					preloadFirstPuzzle(preloading.signal)
+				)
+			]).catch(() => {
+				if (!preloading.signal.aborted) console.warn('morphi:first_preload_unavailable');
+			});
+		};
+		const idle = typeof requestIdleCallback === 'function';
+		const pending = idle ? requestIdleCallback(preload) : window.setTimeout(preload, 1000);
 		window.addEventListener('resize', dealScatter);
 		return () => {
+			preloading.abort();
+			if (idle) cancelIdleCallback(pending);
+			else clearTimeout(pending);
 			stop();
 			window.removeEventListener('resize', dealScatter);
 		};
@@ -141,7 +185,7 @@
 					class="play-circle"
 					onclick={play}
 					disabled={starting || !ready}
-					aria-busy={starting}>{t('home.play')}</button
+					aria-busy={starting}>{t(resumable ? 'resume.action' : 'home.play')}</button
 				>
 			</div>
 			<div class="mystery-tiles" aria-hidden="true" data-safe><i>?</i><i>?</i><i>?</i></div>

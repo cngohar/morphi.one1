@@ -179,6 +179,17 @@ try {
 		);
 	}
 	check((await fetch(origin + '/api/progress')).status === 401, 'anonymous history refused');
+	for (const path of [
+		'/play',
+		'/account/sign-in',
+		'/admin/sign-in',
+		'/api/progress',
+		'/api/play/active'
+	]) {
+		const response = await fetch(origin + path, { redirect: 'manual' });
+		check(response.headers.get('x-robots-tag') === 'noindex', `built ${path} noindex`);
+		check(response.headers.get('cache-control')?.includes('no-store'), `built ${path} no-store`);
+	}
 	const headers = new Headers(login.headers);
 	headers.set('origin', origin);
 	headers.set('content-type', 'application/json');
@@ -201,7 +212,25 @@ try {
 	if (start.status !== 200)
 		throw new Error('built ranked start: ' + start.status + ' ' + (await start.text()));
 	check(true, 'built ranked start');
+	check(
+		start.headers.get('cache-control') === 'private, no-store',
+		'ranked issuance is never cached'
+	);
 	const issued = (await start.json()) as { id: string; seed: string; engineVersion: string };
+	const resumed = await fetch(`${origin}/api/play/active?ownerKey=${ownerKey}`, { headers });
+	const active = (await resumed.json()) as { id?: string; seed?: string };
+	check(
+		resumed.status === 200 && active.id === issued.id && active.seed === issued.seed,
+		'built recovery returns the original issuance'
+	);
+	check(
+		resumed.headers.get('cache-control') === 'private, no-store',
+		'ranked recovery is never cached'
+	);
+	check(
+		(await fetch(`${origin}/api/play/active?ownerKey=other`, { headers })).status === 409,
+		'built recovery rejects a mismatched account key'
+	);
 	const round = catalog.memory.createRound(issued.seed);
 	const moves = [...new Set(round.cards.map((card) => card.symbol))].flatMap((symbol) =>
 		round.cards.flatMap((card, index) => (card.symbol === symbol ? [{ index }] : []))

@@ -42,7 +42,7 @@ await writeFile(
 );
 await writeFile(
 	join(assets, '_headers'),
-	'/*\n  X-Content-Type-Options: nosniff\n  Referrer-Policy: strict-origin-when-cross-origin\n'
+	await readFile('.svelte-kit/cloudflare/_headers', 'utf8')
 );
 const policy = await readFile(join(assets, 'privacy.html'), 'utf8');
 const home = await readFile(join(assets, 'index.html'), 'utf8');

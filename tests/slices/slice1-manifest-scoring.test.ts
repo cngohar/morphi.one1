@@ -13,6 +13,18 @@ const puzzlesPath = resolve('src/lib/puzzles');
 const syntheticId: PuzzleId = 'slice1-synthetic';
 const synthetic: PuzzleManifest = {
 	id: syntheticId,
+	presentation: {
+		name: 'synthetic.headline',
+		scoringLabels: { novel: 'synthetic.headline' },
+		groups: { 'synthetic-engine-1': 'synthetic.headline' },
+		help: {
+			steps: ['synthetic.headline'],
+			rows: [{ label: 'synthetic.headline', field: 'novel', sign: '+' }],
+			note: 'synthetic.headline',
+			tips: 'synthetic.headline'
+		},
+		backdrop: { items: [{ id: 'synthetic', path: 'M1 1h10v10Z' }], fill: 'solid' }
+	},
 	engineVersion: 'synthetic-engine-1',
 	maxMoves: 1,
 	parseMove: (move) => ({ novel: move.novel }),
@@ -84,7 +96,8 @@ it('accepts a novel family and fields without extending the engine', () => {
 	puzzleMetadata[syntheticId] = {
 		engineVersion: synthetic.engineVersion,
 		scoring: synthetic.scoring,
-		ending: synthetic.ending
+		ending: synthetic.ending,
+		presentation: synthetic.presentation
 	};
 	try {
 		expect(defaultScoreConfig(syntheticId)).toEqual({
@@ -138,7 +151,8 @@ it('generates and type-checks a catalog with an extra manifest and its messages 
 			metadata: {
 				engineVersion: synthetic.engineVersion,
 				scoring: synthetic.scoring,
-				ending: synthetic.ending
+				ending: synthetic.ending,
+				presentation: synthetic.presentation
 			},
 			family: { id: syntheticId, weight: 1, enabled: true, orientation: 'any' }
 		});

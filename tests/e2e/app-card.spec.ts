@@ -1,22 +1,23 @@
 import { expect, test } from '@playwright/test';
 import { mkdir, writeFile } from 'node:fs/promises';
+import { selectorSeedFor } from './entropy.js';
 
 test('Memory resize uses the new layout without restarting the round', async ({ page }) => {
 	await page.emulateMedia({ reducedMotion: 'reduce' });
 	await page.setViewportSize({ width: 390, height: 844 });
-	await page.addInitScript(() => {
+	await page.addInitScript((selectorSeed) => {
 		const original = crypto.getRandomValues.bind(crypto);
 		let first = true;
 		crypto.getRandomValues = (array) => {
 			if (array instanceof Uint32Array && array.length === 2) {
 				array[0] = 0;
-				array[1] = first ? 0 : 1;
+				array[1] = first ? selectorSeed : 1;
 				first = false;
 				return array;
 			}
 			return original(array);
 		};
-	});
+	}, selectorSeedFor('memory'));
 	await page.goto('/play');
 	const game = page.locator('.game[data-family="memory"]');
 	await expect(game).toHaveAttribute('data-phase', 'playing', { timeout: 16000 });
@@ -43,50 +44,53 @@ for (const [width, height] of [
 ])
 	test(`actual Card lifecycle and result at ${width}×${height}`, async ({ page }, info) => {
 		await page.setViewportSize({ width, height });
-		await page.addInitScript(() => {
-			const original = crypto.getRandomValues.bind(crypto);
-			let first = true;
-			crypto.getRandomValues = (array) => {
-				if (array instanceof Uint32Array && array.length === 2) {
-					array[0] = 0;
-					array[1] = first ? 0 : 3;
-					first = false;
-					return array;
-				}
-				return original(array);
-			};
-			const frames: {
-				phase: string;
-				x: number;
-				y: number;
-				width: number;
-				count: number;
-				resultOpacity: number;
-			}[] = [];
-			Object.defineProperty(window, '__appCardFrames', { value: frames });
-			let originalFrame: Element | null = null;
-			const sample = () => {
-				const root = document.querySelector<HTMLElement>('.round-stage');
-				const frame = root?.querySelector('.round-frame');
-				if (root && frame) {
-					originalFrame ??= frame;
-					const r = frame.getBoundingClientRect();
-					if (originalFrame !== frame) throw new Error('Card frame replaced');
-					frames.push({
-						phase: root.dataset.cardPhase ?? '',
-						x: r.x + r.width / 2,
-						y: r.y + r.height / 2,
-						width: r.width,
-						count: document.querySelectorAll('.round-frame').length,
-						resultOpacity: Number(
-							getComputedStyle(root.querySelector('.result-main') ?? root).opacity
-						)
-					});
-				}
-				if (frames.length < 1600) requestAnimationFrame(sample);
-			};
-			requestAnimationFrame(sample);
-		});
+		await page.addInitScript(
+			(selectorSeed) => {
+				const original = crypto.getRandomValues.bind(crypto);
+				let first = true;
+				crypto.getRandomValues = (array) => {
+					if (array instanceof Uint32Array && array.length === 2) {
+						array[0] = 0;
+						array[1] = first ? selectorSeed : 3;
+						first = false;
+						return array;
+					}
+					return original(array);
+				};
+				const frames: {
+					phase: string;
+					x: number;
+					y: number;
+					width: number;
+					count: number;
+					resultOpacity: number;
+				}[] = [];
+				Object.defineProperty(window, '__appCardFrames', { value: frames });
+				let originalFrame: Element | null = null;
+				const sample = () => {
+					const root = document.querySelector<HTMLElement>('.round-stage');
+					const frame = root?.querySelector('.round-frame');
+					if (root && frame) {
+						originalFrame ??= frame;
+						const r = frame.getBoundingClientRect();
+						if (originalFrame !== frame) throw new Error('Card frame replaced');
+						frames.push({
+							phase: root.dataset.cardPhase ?? '',
+							x: r.x + r.width / 2,
+							y: r.y + r.height / 2,
+							width: r.width,
+							count: document.querySelectorAll('.round-frame').length,
+							resultOpacity: Number(
+								getComputedStyle(root.querySelector('.result-main') ?? root).opacity
+							)
+						});
+					}
+					if (frames.length < 1600) requestAnimationFrame(sample);
+				};
+				requestAnimationFrame(sample);
+			},
+			selectorSeedFor('memory', 'block')
+		);
 		const errors: string[] = [];
 		page.on('pageerror', (error) => errors.push(error.message));
 		await page.goto('/play');

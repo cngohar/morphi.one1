@@ -1,4 +1,7 @@
 <script lang="ts">
+	import { familyIndex } from '#lib/family-index.js';
+	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import type { Snippet } from 'svelte';
 	import { resolve } from '$app/paths';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
@@ -26,14 +29,6 @@
 	let tab = $state('overview'),
 		detail = $state<string | null>(null);
 	const tabs = ['overview', 'games', 'activity', 'settings'];
-	const familyName = (family: string) =>
-		t(
-			family === 'block'
-				? 'v1.game.block'
-				: family === 'connect'
-					? 'v1.game.connect'
-					: 'v1.game.memory'
-		);
 	const high = (family: string) =>
 		Math.max(0, ...bests.filter((row) => row.family === family).map((row) => row.score));
 	const date = (timestamp: number) =>
@@ -107,14 +102,15 @@
 							>{t('v1.profile.rounds')}</span
 						><span>{t('v1.profile.last')}</span>
 					</div>
-					{#each ['block', 'memory', 'connect'] as family (family)}<button
+					{#each familyIndex as { id: family } (family)}<button
 							class="family-row"
 							onclick={() => (detail = detail === family ? null : family)}
 							aria-expanded={detail === family}
 							><span class="family-name"
-								><i class:memory={family === 'memory'} aria-hidden="true"></i>{familyName(
-									family
-								)}</span
+								><i
+									style={`background:${puzzleMetadata[family].presentation?.profileIcon?.color ?? 'var(--primary)'};transform:rotate(${puzzleMetadata[family].presentation?.profileIcon?.rotation ?? 0}deg)`}
+									aria-hidden="true"
+								></i>{familyName(family)}</span
 							><strong
 								>{bests.some((row) => row.family === family)
 									? formatNumber(high(family))
@@ -127,8 +123,10 @@
 						>{/each}{#if detail}<ul class="recent-activity history-list">
 							{#each history.filter((row) => row.family === detail) as row (row.id)}<li>
 									<span
-										>{date(row.createdAt)} · {row.group.startsWith('memory-1:')
-											? row.group.split(':')[1]
+										>{date(row.createdAt)} · {puzzleMetadata[row.family]?.presentation?.groups[
+											row.group
+										]
+											? t(puzzleMetadata[row.family].presentation!.groups[row.group] as MessageKey)
 											: familyName(row.family)}</span
 									><strong>{formatNumber(row.score)}</strong>
 								</li>{/each}
@@ -335,10 +333,7 @@
 		border-radius: 6px;
 		background: var(--primary);
 	}
-	.family-name .memory {
-		background: var(--accent);
-		transform: rotate(8deg);
-	}
+
 	.recent-activity {
 		list-style: none;
 		padding: 0;

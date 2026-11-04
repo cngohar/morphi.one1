@@ -1,4 +1,5 @@
 import type { Component } from 'svelte';
+import type { CheckpointState } from './checkpoint.js';
 import type { Move } from '#lib/engine/contract.js';
 import type { ScoreValues } from '#lib/engine/scoring.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
@@ -20,6 +21,9 @@ export interface PuzzleResult {
 
 export interface PuzzleViewProps {
 	round: PuzzleRound;
+	resume?: CheckpointState;
+	rankedStartedAt?: number | null;
+	registerCheckpoint?: (read: () => CheckpointState) => void;
 	roundNumber: number;
 	best: number;
 	scoring: ScoreValues;

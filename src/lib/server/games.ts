@@ -3,6 +3,7 @@ import type { PuzzleId } from '#lib/engine/contract.js';
 import { RunError } from './runs.js';
 import { ensureCatalogFamily } from './config.js';
 
+// Catalog ids drive reads and audited lifecycle writes; no family-specific dispatch.
 type GameAction =
 	'game-enable' | 'game-disable' | 'game-delete' | 'game-restore' | 'game-hard-delete';
 

@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import { resolve } from '$app/paths';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	import { formatNumber } from '#lib/ui/format.js';
@@ -42,7 +43,7 @@
 <main class="result-main result">
 	<section class="result-summary">
 		<p class="eyebrow">
-			{title} · {t(`v1.game.${family}` as MessageKey)}
+			{title} · {familyName(family)}
 		</p>
 		<h1>{t('v1.result.title')}</h1>
 		<section class="result-score" aria-label={t('result.score')}>

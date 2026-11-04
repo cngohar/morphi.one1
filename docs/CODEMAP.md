@@ -4,7 +4,7 @@ Read this map before searching. Types and implementation live in code; decisions
 
 ## Current scope
 
-- Engine refactor Slice 3 is owner-confirmed at `4cffb4e` ("Refactor catalog validation, config and ranked sessions"). Slice 4 is owner-accepted locally (2026-11-02): linear weighted selector with bounded gap repair, generated small family index/lazy procedural pools, viewport/orientation and config eligibility, discovery boost and browser/account selector continuity. Fast checks passed: lint, zero-warning types, boundaries, all 158 units covered across the suite plus isolated timeout recovery, 15 Slice 4 acceptance cases and one Chromium refresh case. Evidence: `build/slice4/`, `docs/PHASE_REPORTS.md`. This fast-only result is provisional until the full milestone after Slice 6. The owner authorized committing and pushing Slice 4. Slice 5 is complete locally for owner review (2026-11-03), from owner-confirmed push `2cbaf49`: versioned theme/style/token administration, scored freshness, palette caching and Worker-only normal generation. Fast checks cover all 173 unit cases (including two isolated timeout recoveries), 4 Slice 5 D1 cases, 30,000 palettes and one three-viewport Chromium publish/fallback/rollback workflow. See `docs/PHASE_REPORTS.md` and `build/slice5/`. The owner authorized committing/pushing the completed Slice 5 source and documentation. Slice 6 has not started and needs written owner confirmation; the Git handoff does not authorize deployment.
+- Engine refactor Slice 5 is owner-confirmed at `5811356` ("Refactor theme admin, freshness and palette caching"). Slice 6 is complete locally (2026-11-04), awaiting owner confirmation: one full milestone invocation plus one corrected-fixture browser rerun covers all required checks; 20 cold/preloaded performance samples are archived. Scope: manifest-driven presentation/admin audit, idle preloading, cache/SEO hardening and device-local checkpoint recovery. Phone evidence is owner-approved emulation; physical validation is outstanding. Every verification pass is saved temporarily to resume interruptions; temporary saves are deleted only when the slice fully passes. Slice 7 requires written owner confirmation. No deployment is authorized.
 - Approved brief: `docs/morphi-engine-refactor-brief.md`. Frozen base tag `v1.2-local-complete` points to `1303c9c4bdb1718bb558886dc43b7b48c597a02a`. The Slice 0 base-tag test remains deferred and outstanding; no reset was performed. Owner edits to the brief are preserved.
 - v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/NEXT_PHASE_REVIEW.md`, `docs/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
 - Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved engine brief controls this refactor. No deployment, production provisioning, secrets, DNS or Google changes are authorized.
@@ -71,13 +71,32 @@ Slice 5 additions:
 - `docs/SLICE5_CSS_AUDIT.md`, `docs/evidence/slice5-themes/`, `build/slice5/`:
   four-file audit, palette measurements/contact sheet and fast-check/browser evidence.
 
+Slice 6 additions:
+
+- `src/lib/engine/contract.ts`, each manifest and generated `puzzle-metadata.ts`:
+  required family presentation data and family-owned partial-round replay adapters.
+- `src/lib/ui/puzzle-presentation.ts`, generic help/result/profile/leaderboard/admin
+  views: explicit manifest names, scoring labels, group labels and backdrop objects.
+- `src/lib/ui/{checkpoint,idle-preload}.ts`: account-scoped local round snapshots,
+  fresh/version validation, active timer restoration, fencing and first-family speculation.
+- `src/lib/server/response-policy.ts`, root `_headers`: private runtime HTML/API
+  policy, noindex route policy and public media caching; guest artifact reuses adapter headers.
+- `tests/slices/slice6-performance-seo.test.ts`, `slice6-performance-metrics.test.ts`,
+  checkpoint/presentation units and `tests/e2e/resume.spec.ts`: Slice 6 regressions.
+- `scripts/{measure-performance,performance-metrics}.ts`: repeatable built-Worker
+  desktop/phone-emulation cold/preloaded p50/p95 diagnostic, with temporary sample checkpoints.
+- `scripts/performance-checkpoint.ts`, `tests/slices/slice6-performance-checkpoint.test.ts`:
+  atomic per-sample persistence and source/build/profile identity checks on resumption.
+- `docs/evidence/slice6/`: permanent measurements and compact verification results;
+  `docs/PHASE_REPORTS.md` records goal misses, admin audit and remaining owner gates.
+
 ## App shell and public pages
 
 | Path                                                                                            | Purpose                                                                                                                     |
 | ----------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------- |
 | `src/routes/play/`, `src/lib/screens/PlaySession.svelte`                                        | Selector-only Mix loop; one generic round/view, id-derived names/bests/played flags, Card orchestration and durable results |
 | `src/lib/components/RoundStage.svelte`                                                          | Persistent Card, entrances, played stack, ending overlay and result stage                                                   |
-| `src/lib/screens/{HomeScreen,ResultScreen}.svelte`                                              | Approved landing/result views, actual account/save controls and Next                                                        |
+| `src/lib/screens/{HomeScreen,ResultScreen}.svelte`                                              | Approved landing/result views, Home idle-preload/Resume entry, real account/save controls and Next                          |
 | `src/routes/+page.svelte`, `+page.ts`, `+layout.svelte`                                         | Prerendered Home and global styles/fonts; account status refresh stays private                                              |
 | `src/app.css`, `src/lib/ui/{v1,game-shell,card-shell}.css`                                      | Design tokens, accepted presentation and viewport-based game sizing                                                         |
 | `src/lib/components/{SiteHeader,SiteFooter,SoundToggle,PuzzleHelp,PuzzleGuide}.svelte`          | Viewport chrome, policy link, sound and catalog-backed help/scoring copy                                                    |
@@ -95,9 +114,9 @@ Slice 5 additions:
 | `src/lib/server/auth.ts`, `players.ts`, `request-body.ts`                                                                          | Better Auth/Drizzle factory, Google-only sessions, public names, CSRF/origin/rate guards and bounded input                                                     |
 | `src/lib/server/db/`, `migrations/`, `drizzle.config.ts`                                                                           | Plain-text family keys; local D1 auth/runs/operators; migration 0011 preserves legacy rows/claims and adds config snapshots and ranked abandonment             |
 | `src/routes/account/`, `src/lib/components/account/`, `src/lib/ui/account.css`                                                     | Real account lifecycle/profile layouts; AccountShell readiness is the house hydration pattern                                                                  |
-| `src/lib/ui/progress.ts`                                                                                                           | IndexedDB pending replays, ownership, guest import, retries and memory fallback                                                                                |
+| `src/lib/ui/progress.ts`, `checkpoint.ts`                                                                                          | IndexedDB completed-run retries plus fresh in-progress checkpoints, resolved look/timers, Web Locks ownership/fencing, guest import and storage fallback       |
 | `src/lib/server/runs.ts`, `play-http.ts`, `src/routes/api/play/`                                                                   | Catalog-driven envelope/move validation, canonical replay/hash, manifest timing/groups, history/boards and guarded play HTTP; no family dispatch branches      |
-| `src/lib/server/ranked-session.ts`, `src/routes/api/play/{start,abandon}/`                                                         | Atomic account-wide ranked lock, exact-id takeover/abandon, two-hour TTL, caps, claimed retry protection and visible conflict                                  |
+| `src/lib/server/ranked-session.ts`, `src/routes/api/play/{start,active,abandon}/`                                                  | Atomic account-wide ranked lock, original-issuance recovery, exact-id takeover/abandon, two-hour TTL, caps and saving conflict                                 |
 | `src/lib/server/{config,config-cache,scoring}.ts`                                                                                  | Catalog lifecycle and typed config readers; invalid themes follow previous valid parents; immutable snapshots cached in KV; live pointers/enforcement stay D1  |
 | `src/routes/api/progress/`, `src/routes/leaderboard/`                                                                              | Saved history and server-computed rankings                                                                                                                     |
 | `src/lib/server/operator*.ts`, `admin-totp.ts`, `src/routes/admin/`, `scripts/admin-local.ts`                                      | Protected local operator workspace, role/TOTP/freshness guards, owner enrollment and audit; operator shell exposes readiness for browser input synchronization |
@@ -132,7 +151,7 @@ Slice 5 additions:
 
 - Install: `bun install`; local setup: `bun run accounts:setup`, `bun run cf:types`, `bun run db:migrate:local`.
 - Dev: `bun run dev --host 0.0.0.0`; type-check: `bun run check`; format/lint: `bun run lint`.
-- Slice 5 uses fast lint/types/boundaries/units, palettes, theme sheet and only the focused theme preview/rollback browser workflow; no full verify or full accounts/browser suite. Next full milestone is after Slice 6 and the final full run after Slice 7.
+- Slice 6 uses fast lint/types/boundaries/units, focused recovery/admin/SEO browsers and explicit `test:public-privacy` / `test:demo`, then one full milestone `bun run verify`. Final full verification remains after owner-authorized Slice 7. Never overlap verify with its components.
 - Full gate: `bun run verify`; targeted commands: `test:unit -- --run`, `test:accounts`, `test:vectors`, `test:worker`, `test:e2e`, `check:boundaries`, `check:lazy-bundle`.
 - Generate registry: `bun run registry:generate`; palette diagnostics: `bun run test:palettes`; contact sheet: `bun run theme:sheet`.
 - Build/local Worker: `bun run build`, `bun run preview:worker`. Deployment and even a remote preview still require explicit owner approval.

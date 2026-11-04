@@ -1,5 +1,27 @@
 # Retention inventory — inspected 2026-10-24
 
+## Local Slice 6 checkpoint addendum — 2026-11-03
+
+The unpublished Slice 6 candidate adds device-local active-round snapshots in
+`morphi-checkpoint` IndexedDB, scoped to guest or the existing account-scope hash.
+They contain round identity/seed, moves, scoring and resolved appearance,
+pending deadlines, active time and a save timestamp; an owner fencing token
+prevents displaced tabs from overwriting newer progress. No account identity or
+new upload endpoint is added by this store. Ranked recovery reads the original
+issuance through an authenticated, no-store endpoint.
+
+Only checkpoints younger than 24 hours are offered for Resume. Expired or invalid
+records are ignored and replaced by the next saved round, rather than being
+deleted during a read that could race another tab's write. Explicit abandonment
+and a durable completed-run write clear the matching active checkpoint. If the
+completed queue fails, the active checkpoint stays available for recovery.
+Browser data clearing removes this store; account deletion cannot wipe another
+device's browser storage. In-memory fallback cannot survive closing the tab.
+
+The local privacy candidate discloses this behavior, dated 2026-11-03. This
+addendum does not alter the historical deployment evidence below or publish
+the candidate; no production storage, policy deployment or retention job ran.
+
 Scope: current local Step 6 implementation and the existing public guest release. This records behavior, not a promise of provider-wide erasure. The initial inventory was read-only; the owner subsequently authorized publishing the prepared guest/privacy assets-only update. No account data, provider analytics settings, DNS or OAuth credentials were modified. The owner-approved general-audience direction is unchanged.
 
 ## Deployment evidence

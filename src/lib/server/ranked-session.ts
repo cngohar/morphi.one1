@@ -9,9 +9,57 @@ import { drawFreshTheme } from '#lib/engine/theme/freshness.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { createDatabase } from './db/index.js';
 import { playSession } from './db/schema.js';
-import { readLiveScoreConfig } from './scoring.js';
+import { readLiveScoreConfig, readScoreConfig } from './scoring.js';
 import { RunError } from './runs.js';
 import { ensureCatalogFamily, readThemeConfig } from './config.js';
+import { assertAccountActive } from './user-lifecycle.js';
+
+/** Returns only the authenticated account's original issuance snapshot; never a new seed. */
+export async function resumableRanked(
+	binding: D1Database,
+	userId: string,
+	now = Date.now(),
+	cache?: KVNamespace
+) {
+	await assertAccountActive(binding, userId, now);
+	const row = await binding
+		.prepare(
+			`SELECT id,family,seed,engine_version AS engineVersion,
+		created_at AS startedAt,expires_at AS expiresAt,theme_snapshot AS themeSnapshot,
+		score_config_version AS scoreVersion,payload_hash IS NOT NULL AS saving
+		FROM play_session active WHERE user_id=? AND abandoned_at IS NULL AND expires_at>?
+		AND NOT EXISTS (SELECT 1 FROM completed_run finished WHERE finished.id=active.id)
+		ORDER BY (payload_hash IS NOT NULL) DESC,sequence DESC LIMIT 1`
+		)
+		.bind(userId, now)
+		.first<{
+			id: string;
+			family: string;
+			seed: string;
+			engineVersion: string;
+			startedAt: number;
+			expiresAt: number;
+			themeSnapshot: string | null;
+			scoreVersion: string;
+			saving: number;
+		}>();
+	if (!row) return null;
+	if (row.saving) return { id: row.id, expiresAt: row.expiresAt, saving: true };
+	if (
+		!Object.hasOwn(catalog, row.family) ||
+		row.engineVersion !== catalog[row.family].engineVersion
+	) {
+		console.warn(JSON.stringify({ event: 'ranked_resume_incompatible', family: row.family }));
+		return { id: row.id, expiresAt: row.expiresAt, saving: false };
+	}
+	const { themeSnapshot, scoreVersion, saving, ...session } = row;
+	return {
+		...session,
+		saving: Boolean(saving),
+		theme: themeSnapshot ? (JSON.parse(themeSnapshot) as ResolvedTheme) : null,
+		scoring: await readScoreConfig(binding, row.family, scoreVersion, cache)
+	};
+}
 
 export async function activeRanked(binding: D1Database, userId: string, now = Date.now()) {
 	const row = await binding

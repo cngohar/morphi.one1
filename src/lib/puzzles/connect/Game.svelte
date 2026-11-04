@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { CheckpointState } from '#lib/ui/checkpoint.js';
 	import type { ScoreValues } from '#lib/engine/scoring.js';
 	import { scoring as defaultScoring } from './scoring.js';
 	import { onMount, tick, untrack } from 'svelte';
@@ -31,8 +32,14 @@
 		onmove = () => {},
 		oncomplete = () => {},
 		onfinish,
-		onhome
+		onhome,
+		resume,
+		rankedStartedAt = null,
+		registerCheckpoint
 	}: {
+		resume?: CheckpointState;
+		rankedStartedAt?: number | null;
+		registerCheckpoint?: (read: () => CheckpointState) => void;
 		round: ConnectRound;
 		roundNumber: number;
 		scoring?: ScoreValues;
@@ -292,15 +299,40 @@
 		if (!mounted || !entranceReady || entered) return;
 		untrack(() => {
 			entered = true;
+			if (resume?.phase === 'playing' || resume?.phase === 'finished') {
+				phase = game.status === 'won' ? 'finished' : 'playing';
+				onready();
+				if (game.status === 'won') {
+					oncomplete(connectScore(game, elapsed, scoring), elapsed);
+					finishDelay.start(0, document.hidden || paused);
+				} else if (resume.clockStarted && !(document.hidden || paused)) startClock();
+				return;
+			}
 			entranceMotion = motion.connectEnter(board);
 			sound.play('connect-appear');
 			entranceDelay.start(
-				motion.reduced() && !rankedRound ? 0 : CONNECT_ENTRANCE_MS,
+				resume?.pending.entrance ?? (motion.reduced() && !rankedRound ? 0 : CONNECT_ENTRANCE_MS),
 				document.hidden || paused
 			);
 		});
 	});
 	onMount(() => {
+		if (resume) {
+			clockBase = resume.elapsedMs;
+			elapsed = Math.floor(clockBase / 1000);
+			if (resume.clockStarted)
+				rankedStart =
+					performance.now() -
+					(rankedRound && rankedStartedAt !== null
+						? Math.max(resume.elapsedMs, Date.now() - rankedStartedAt)
+						: 0);
+		}
+		registerCheckpoint?.((): CheckpointState => ({
+			phase,
+			elapsedMs: clockMs(),
+			clockStarted: rankedStart !== null,
+			pending: entranceDelay.remaining() === null ? {} : { entrance: entranceDelay.remaining()! }
+		}));
 		mounted = true;
 		document.addEventListener('visibilitychange', syncVisibility);
 		window.addEventListener('blur', cancelStroke);

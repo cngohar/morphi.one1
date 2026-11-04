@@ -9,6 +9,7 @@ import { sveltekitCookies, svelteKitHandler } from 'better-auth/svelte-kit';
 import type { Handle } from '@sveltejs/kit/hooks';
 import { boundAccountRequest } from '#lib/server/request-body.js';
 import { createAuth, googleIsConfigured } from '#lib/server/auth.js';
+import { responsePolicy } from '#lib/server/response-policy.js';
 
 export const handle: Handle = async ({ event, resolve }) => {
 	event.locals.auth = null;
@@ -33,7 +34,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 		if (!bounded)
 			return Response.json(
 				{ code: 'BODY_TOO_LARGE', retryable: false },
-				{ status: 413, headers: { 'Cache-Control': 'no-store' } }
+				{
+					status: 413,
+					headers: { 'Cache-Control': 'private, no-store', 'X-Robots-Tag': 'noindex' }
+				}
 			);
 		event = { ...event, request: bounded };
 	}
@@ -95,25 +99,11 @@ export const handle: Handle = async ({ event, resolve }) => {
 		console.error(JSON.stringify({ event: 'auth_request_failed' }));
 		response = Response.json({ code: 'AUTH_UNAVAILABLE', retryable: true }, { status: 503 });
 	}
-	if (
-		authPath ||
-		accountPath ||
-		adminPath ||
-		event.url.pathname.startsWith('/api/') ||
-		event.locals.user
-	) {
-		response.headers.set('Cache-Control', 'private, no-store');
-		response.headers.set('Vary', 'Cookie');
-	}
-	if (
-		adminPath ||
-		accountPath ||
-		authPath ||
-		event.url.pathname.startsWith('/api/') ||
-		event.url.pathname === '/play' ||
-		event.url.pathname === '/leaderboard'
-	)
-		response.headers.set('X-Robots-Tag', 'noindex');
+	responsePolicy(
+		response,
+		event.url.pathname,
+		Boolean(event.locals.user) || response.headers.has('Set-Cookie')
+	);
 	if (adminPath) {
 		response.headers.set('Content-Security-Policy', "frame-ancestors 'none'");
 		response.headers.set('X-Frame-Options', 'DENY');

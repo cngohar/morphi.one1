@@ -1,9 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
-import { fixSelectorSeed } from './entropy.js';
+import { fixSelectorSeed, selectorSeedFor } from './entropy.js';
 
 test.beforeEach(async ({ page }) => {
-	// With three Mix families, seed 7 deals Block then Memory for this two-board layout check.
-	await fixSelectorSeed(page, 7);
+	await fixSelectorSeed(page, selectorSeedFor('block', 'memory'));
 });
 
 type Slot = { index: number; cells: Array<{ x: number; y: number }> };

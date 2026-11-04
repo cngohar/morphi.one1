@@ -14,8 +14,10 @@ describe('active UI deadlines', () => {
 		const delay = createActiveDelay(callback);
 		delay.start(500);
 		vi.advanceTimersByTime(200);
+		expect(delay.remaining()).toBe(300);
 		delay.pause();
 		vi.advanceTimersByTime(60_000);
+		expect(delay.remaining()).toBe(300);
 		expect(callback).not.toHaveBeenCalled();
 		delay.resume();
 		delay.resume(); // Duplicate visibility events must not create another timer.

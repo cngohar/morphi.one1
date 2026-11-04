@@ -2,8 +2,8 @@ import type { MessageKey } from '#lib/i18n/messages.js';
 
 /** Reviewed publication candidate. Publication/deployment status lives in PRIVACY_REVIEW.md. */
 export const privacyPolicy = {
-	version: '2026-10-26-v1',
-	updatedOn: '2026-10-26',
+	version: '2026-11-03-slice6',
+	updatedOn: '2026-11-03',
 	operatorName: 'Ali Gohar',
 	contactEmail: 'cngohar@gmail.com',
 	audience: 'general',
@@ -28,7 +28,12 @@ export const privacyPolicy = {
 		{
 			id: 'device',
 			heading: 'privacy.device.title',
-			paragraphs: ['privacy.device.cookies', 'privacy.device.storage', 'privacy.device.guest']
+			paragraphs: [
+				'privacy.device.cookies',
+				'privacy.device.storage',
+				'privacy.device.checkpoint',
+				'privacy.device.guest'
+			]
 		},
 		{
 			id: 'providers',

@@ -1,8 +1,8 @@
 import { expect, test, type Page } from '@playwright/test';
-import { fixSelectorSeed } from './entropy.js';
+import { fixSelectorSeed, selectorSeedFor } from './entropy.js';
 
 test.beforeEach(async ({ page }) => {
-	await fixSelectorSeed(page, 7);
+	await fixSelectorSeed(page, selectorSeedFor('block'));
 });
 
 async function startBlock(page: Page): Promise<void> {
@@ -129,7 +129,7 @@ test('held Enter does not select and immediately place a piece', async ({ page }
 });
 
 test('Memory preserves the mismatch hold while hidden', async ({ page }) => {
-	await fixSelectorSeed(page, 0);
+	await fixSelectorSeed(page, selectorSeedFor('memory'));
 	await page.goto('/', { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	const cards = page.locator('.memory-card');

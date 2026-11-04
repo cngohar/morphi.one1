@@ -1,6 +1,18 @@
 <script lang="ts">
 	import { defaultScoreConfig, validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
 	import { measure } from '#lib/ui/measurement.js';
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
+	import {
+		loadCheckpoint,
+		saveCheckpoint,
+		clearCheckpoint,
+		claimCheckpoint,
+		checkpointDurable,
+		type RoundCheckpoint,
+		type CheckpointState,
+		type CheckpointLease
+	} from '#lib/ui/checkpoint.js';
+	import { paletteIssues } from '#lib/engine/theme/generator.js';
 	import { reportAccountRound } from '#lib/ui/account-activity.js';
 	import SiteHeader from '#lib/components/SiteHeader.svelte';
 	import ThemeBackdrop from '#lib/components/ThemeBackdrop.svelte';
@@ -61,6 +73,8 @@
 		enqueue,
 		syncProgress,
 		startSession,
+		activeSession,
+		type ResumableRankedSession,
 		abandonSession,
 		RankedSessionConflict,
 		type ActiveRankedSession,
@@ -143,6 +157,7 @@
 	function gameReady() {
 		if (screen !== 'game') return;
 		cardPhase = 'playing';
+		void checkpointRound();
 		if (roundOwner && !roundActivity) {
 			roundActivity = reportAccountRound('start', roundOwner, roundId, family, rankedSession);
 		}
@@ -151,7 +166,6 @@
 	let family = $state<PuzzleFamily>(families[0]!);
 	let round = $state<PuzzleRound | null>(null);
 	let View = $state<Component<PuzzleViewProps> | null>(null);
-	const familyName = (value: PuzzleFamily) => t(`v1.game.${value}` as MessageKey);
 	let resolvedTheme = $state<ResolvedTheme | null>(null);
 	const generationLifetime = new AbortController();
 	const preparation = createPreparationSlot(async (chosen, signal) => {
@@ -188,6 +202,18 @@
 	let soundEnabled = $state(true);
 	let startError = $state(false);
 	let rankedConflict = $state<ActiveRankedSession | null>(null);
+	let resumeChoice = $state<RoundCheckpoint | ResumableRankedSession | null>(null);
+	let resumeInvalid = $state(false);
+	let resumeError = $state(false);
+	let roundLocked = $state(false);
+	let storageNotice = $state(false);
+	let lockNotice = $state(false);
+	let resumeState = $state<CheckpointState | undefined>();
+	let checkpointReader: (() => CheckpointState) | null = null;
+	let checkpointLease: CheckpointLease | null = null;
+	let restoring = false;
+	let rankedStartedAt = $state<number | null>(null);
+
 	let startErrorFamily = $state<PuzzleFamily>(families[0]!);
 	let resultAnnouncement = $state('');
 	let roundNumber = $state(0);
@@ -233,10 +259,18 @@
 		played = Object.fromEntries(families.map((id) => [id, loadFamilyPlayed(id)]));
 		soundEnabled = loadSoundEnabled();
 		sound.setEnabled(soundEnabled);
-		startRound();
+		lockNotice = !navigator.locks;
+		void restoreChoice().catch(() => {
+			resumeError = true;
+			console.warn('morphi:checkpoint_load_failed');
+		});
 		retrySync();
 		window.addEventListener('online', retrySync);
 		const cardVisibility = () => {
+			if (document.hidden) {
+				void checkpointRound();
+				if (rankedSession) reportAbandon();
+			}
 			for (const delay of cardWaits.keys()) {
 				if (document.hidden) delay.pause();
 				else delay.resume();
@@ -245,6 +279,8 @@
 		document.addEventListener('visibilitychange', cardVisibility);
 		const retry = setInterval(retrySync, 15000);
 		return () => {
+			const lease = checkpointLease;
+			void checkpointRound().finally(() => lease?.release());
 			generationLifetime.abort();
 			stopCardWaits();
 			document.removeEventListener('visibilitychange', cardVisibility);
@@ -253,6 +289,324 @@
 			window.removeEventListener('online', retrySync);
 		};
 	});
+
+	async function restoreChoice(): Promise<void> {
+		if (accountsEnabled) {
+			try {
+				const response = await fetch(resolve('/api/account/status'), {
+					cache: 'no-store',
+					signal: AbortSignal.timeout(3000)
+				});
+				if (!response.ok) throw new Error('account_status');
+				const current: unknown = await response.json();
+				if (
+					!current ||
+					typeof current !== 'object' ||
+					!('signedIn' in current) ||
+					typeof current.signedIn !== 'boolean' ||
+					!('ownerKey' in current) ||
+					(current.ownerKey !== null && typeof current.ownerKey !== 'string')
+				)
+					throw new Error('account_status');
+				account = { signedIn: current.signedIn, ownerKey: current.ownerKey };
+			} catch {
+				console.warn('morphi:account_status_unavailable');
+			}
+		}
+		const checkpoint = await loadCheckpoint(account.ownerKey);
+		storageNotice = !checkpointDurable;
+		let active: ActiveRankedSession | ResumableRankedSession | null = null;
+		if (account.ownerKey) {
+			try {
+				active = await activeSession(account.ownerKey);
+			} catch {
+				resumeChoice = checkpoint;
+				resumeError = true;
+				console.warn('morphi:ranked_resume_unavailable');
+				return;
+			}
+		}
+		if (generationLifetime.signal.aborted) return;
+		if (active && (active.saving || !('family' in active))) {
+			rankedConflict = active;
+			return;
+		}
+		if (active && 'family' in active) {
+			resumeChoice = checkpoint?.rankedSession === active.id ? checkpoint : active;
+		} else if (checkpoint) {
+			// A released/expired ranked checkpoint may still continue locally, without a ranked claim.
+			resumeChoice = { ...checkpoint, rankedSession: null, rankedStartedAt: null };
+		}
+		if (resumeChoice) {
+			resumeInvalid =
+				!Object.hasOwn(puzzleMetadata, resumeChoice.family) ||
+				resumeChoice.engineVersion !== puzzleMetadata[resumeChoice.family].engineVersion;
+			if (resumeInvalid) {
+				console.info(
+					JSON.stringify({
+						event: 'round_abandoned',
+						family: resumeChoice.family,
+						reason: 'engine_version'
+					})
+				);
+				console.warn('morphi:checkpoint_version_mismatch');
+				if (account.ownerKey)
+					void reportAccountRound(
+						'abandon',
+						account.ownerKey,
+						resumeChoice.id,
+						resumeChoice.family,
+						'rankedSession' in resumeChoice ? resumeChoice.rankedSession : resumeChoice.id
+					);
+			}
+		} else startRound();
+	}
+	function reportAbandon(): void {
+		if (screen !== 'game' || completedQueuedId === roundId || !roundOwner || !roundActivity) return;
+		const owner = roundOwner,
+			id = roundId,
+			game = family,
+			session = rankedSession;
+		void roundActivity.then((started) => {
+			if (started) void reportAccountRound('abandon', owner, id, game, session);
+		});
+	}
+	async function ownCheckpoint(id: string, takeover = false): Promise<boolean> {
+		// The live-tab lock belongs to the owner, so Next keeps its existing lease.
+		if (!takeover && checkpointLease?.owns()) {
+			roundLocked = false;
+			return true;
+		}
+		checkpointLease?.release();
+		checkpointLease = await claimCheckpoint(
+			id,
+			account.ownerKey,
+			() => {
+				roundLocked = true;
+				console.warn('morphi:checkpoint_ownership_lost');
+			},
+			takeover
+		);
+		if (generationLifetime.signal.aborted) {
+			checkpointLease?.release();
+			checkpointLease = null;
+			return false;
+		}
+		roundLocked = !checkpointLease;
+		return Boolean(checkpointLease);
+	}
+	async function checkpointRound(): Promise<void> {
+		if (
+			screen !== 'game' ||
+			restoring ||
+			Boolean(resumeChoice) ||
+			resumeError ||
+			!round ||
+			!checkpointReader ||
+			!checkpointLease ||
+			completedQueuedId === roundId ||
+			roundLocked
+		)
+			return;
+		try {
+			const state = checkpointReader();
+			await saveCheckpoint(
+				{
+					version: 1,
+					id: roundId,
+					owner: roundOwner,
+					family,
+					seed: round.seed,
+					engineVersion: puzzleMetadata[family].engineVersion,
+					difficulty: 'band' in round && typeof round.band === 'number' ? round.band : null,
+					modifiers: {},
+					theme: resolvedTheme,
+					scoring,
+					moves: runMoves.slice(),
+					state,
+					status: 'active',
+					savedAt: Date.now(),
+					rankedSession,
+					rankedStartedAt
+				},
+				checkpointLease
+			);
+			storageNotice = !checkpointDurable;
+		} catch {
+			console.warn('morphi:checkpoint_save_failed');
+			storageNotice = true;
+		}
+	}
+	function checkpointMove(move: Move): void {
+		runMoves.push(move);
+		// Capture after the move handler has installed any logical deadlines.
+		queueMicrotask(() => {
+			void checkpointRound();
+		});
+	}
+	async function resumeRound(takeover = false): Promise<void> {
+		let choice = resumeChoice;
+		if (!choice || starting || resumeInvalid) return;
+		starting = true;
+		restoring = true;
+		resumeError = false;
+		try {
+			if (!(await ownCheckpoint(choice.id, takeover))) return;
+			const latest = await loadCheckpoint(account.ownerKey, true);
+			if (latest && latest.id !== choice.id) {
+				resumeChoice = latest;
+				resumeInvalid =
+					!Object.hasOwn(puzzleMetadata, latest.family) ||
+					latest.engineVersion !== puzzleMetadata[latest.family].engineVersion;
+				checkpointLease?.release();
+				return;
+			}
+			if (latest?.id === choice.id) choice = latest;
+			else if ('moves' in choice) {
+				resumeInvalid = true;
+				checkpointLease?.release();
+				return;
+			}
+			if (
+				!Object.hasOwn(puzzleMetadata, choice.family) ||
+				choice.engineVersion !== puzzleMetadata[choice.family].engineVersion
+			) {
+				resumeInvalid = true;
+				checkpointLease?.release();
+				return;
+			}
+			if (account.ownerKey && ('rankedSession' in choice ? choice.rankedSession : choice.id)) {
+				const active = await activeSession(account.ownerKey);
+				if (!active || active.id !== choice.id || active.saving)
+					throw new Error('ranked_resume_unavailable');
+			}
+			await assertGameAvailable(choice.family);
+			const module = await loadPuzzleModule(puzzlePools[choice.family], generationLifetime.signal);
+			const checkpoint = 'moves' in choice ? choice : null;
+			const config = choice.scoring;
+			validateScoreValues(choice.family, config.values);
+			const theme = 'theme' in choice ? choice.theme : null;
+			if (
+				theme &&
+				(theme.family !== choice.family ||
+					theme.seed !== choice.seed ||
+					paletteIssues(theme).length)
+			)
+				throw new Error('checkpoint_theme');
+			const moves = checkpoint?.moves ?? [];
+			if (moves.length > module.manifest.maxMoves) throw new Error('checkpoint_moves');
+			for (const move of moves) module.manifest.parseMove(move);
+			if (!module.manifest.resumeRound) throw new Error('checkpoint_version');
+			const restored = module.manifest.resumeRound(choice.seed, moves, config.values);
+			const view = await loadPuzzleView(puzzleViews[choice.family], generationLifetime.signal);
+			if (generationLifetime.signal.aborted) return;
+			if (screen === 'game') {
+				round = null;
+				View = null;
+				checkpointReader = null;
+				await tick();
+			}
+			family = choice.family;
+			round = restored;
+			View = view;
+			resolvedTheme = theme;
+			scoring = config;
+			bests = { ...bests, [family]: loadBestScore(family, scoring.version) };
+			roundId = choice.id;
+			roundOwner = account.ownerKey;
+			rankedSession = checkpoint ? checkpoint.rankedSession : choice.id;
+			rankedStartedAt = checkpoint
+				? rankedSession && checkpoint.state.clockStarted
+					? Math.floor(checkpoint.savedAt - checkpoint.state.elapsedMs)
+					: checkpoint.rankedStartedAt
+				: 'startedAt' in choice
+					? choice.startedAt
+					: null;
+			rankedRound = Boolean(rankedSession);
+			runMoves = moves.slice();
+			resumeState = checkpoint?.state ?? {
+				phase: 'playing',
+				elapsedMs: 0,
+				clockStarted: true,
+				pending: {}
+			};
+			roundNumber++;
+			result = null;
+			ending = null;
+			screen = 'game';
+			revealed = true;
+			cardPhase = 'arriving';
+			cardReady = true;
+			resumeChoice = null;
+			startError = false;
+			void preparation.warm(getSelector().peek());
+			await tick();
+			restoring = false;
+			await checkpointRound();
+		} catch (error) {
+			console.warn('morphi:checkpoint_resume_failed');
+			resumeError = true;
+			// Bad local replay data must not trap the player in a retry loop.
+			if (
+				error instanceof RangeError ||
+				error instanceof TypeError ||
+				(error instanceof Error &&
+					['checkpoint_theme', 'checkpoint_version', 'checkpoint_moves'].includes(error.message))
+			)
+				resumeInvalid = true;
+			checkpointLease?.release();
+		} finally {
+			restoring = false;
+			starting = false;
+		}
+	}
+	async function abandonAndNew(): Promise<void> {
+		const choice = resumeChoice;
+		if (!choice || starting) return;
+		starting = true;
+		try {
+			const session = 'moves' in choice ? choice.rankedSession : choice.id;
+			if (session && account.ownerKey) await abandonSession(session, account.ownerKey);
+			if (!(await ownCheckpoint(choice.id, true))) return;
+			await clearCheckpoint(account.ownerKey, choice.id);
+			console.info(
+				JSON.stringify({ event: 'round_abandoned', family: choice.family, reason: 'new_puzzle' })
+			);
+			if (account.ownerKey)
+				void reportAccountRound('abandon', account.ownerKey, choice.id, choice.family, session);
+			resumeChoice = null;
+			resumeInvalid = false;
+			resumeError = false;
+			roundLocked = false;
+		} catch {
+			resumeError = true;
+		} finally {
+			starting = false;
+		}
+		if (!resumeChoice) startRound();
+	}
+	function takeOverRound(): void {
+		if (resumeChoice) {
+			void resumeRound(true);
+			return;
+		}
+		void loadCheckpoint(account.ownerKey, true)
+			.then((checkpoint) => {
+				if (!checkpoint) {
+					resumeError = true;
+					return;
+				}
+				resumeChoice = checkpoint;
+				if (checkpoint.id !== roundId) {
+					roundLocked = false;
+					return;
+				}
+				return resumeRound(true);
+			})
+			.catch(() => {
+				resumeError = true;
+			});
+	}
 
 	function getSelector(): PuzzleSelector {
 		selector ??= createPuzzleSelector({
@@ -286,6 +640,7 @@
 		let nextRunId: string = crypto.randomUUID();
 		const nextOwner = account.ownerKey;
 		let nextSession: string | null = null;
+		let nextStartedAt: number | null = null;
 		if (nextOwner) {
 			await rankedGate;
 			if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
@@ -296,6 +651,7 @@
 				nextScoring = issued.scoring;
 				nextRunId = issued.id;
 				nextSession = issued.id;
+				nextStartedAt = issued.startedAt;
 			} catch (error) {
 				if (
 					takeoverSession ||
@@ -348,6 +704,7 @@
 			nextTheme,
 			nextOwner,
 			nextSession,
+			nextStartedAt,
 			nextRunId,
 			nextScoring
 		};
@@ -423,10 +780,20 @@
 			if (!ready) cardPhase = 'waiting';
 			const prepared = await work;
 			if (!prepared.value) throw prepared.error;
-			const { nextRound, nextView, nextTheme, nextOwner, nextSession, nextRunId, nextScoring } =
-				prepared.value;
+			const {
+				nextRound,
+				nextView,
+				nextTheme,
+				nextOwner,
+				nextSession,
+				nextStartedAt,
+				nextRunId,
+				nextScoring
+			} = prepared.value;
 			if (generationLifetime.signal.aborted) return;
 			if (!nextSession) await assertGameAvailable(chosen);
+			await ownCheckpoint(nextRunId);
+			if (generationLifetime.signal.aborted) return;
 			// Commit rotation only after generation succeeds. Retry keeps the same family.
 			getSelector().next();
 			family = chosen;
@@ -438,6 +805,9 @@
 			roundId = nextRunId;
 			roundOwner = nextOwner;
 			rankedSession = nextSession;
+			rankedStartedAt = nextStartedAt;
+			resumeState = undefined;
+			checkpointReader = null;
 			roundActivity = null;
 			rankedRound = Boolean(nextSession);
 			runMoves = [];
@@ -578,6 +948,8 @@
 
 	function persistRound(elapsedSeconds: number, score: number) {
 		if (completedQueuedId === roundId) return;
+		// Keep the final accepted move recoverable while the completed-run queue commits.
+		const checkpointed = checkpointRound();
 		completedQueuedId = roundId;
 		measure('round_completed', family);
 		markFamilyPlayed(family);
@@ -585,7 +957,10 @@
 		if (score > bests[family]) saveBestScore(score, family, scoring.version);
 		// The policy-only guest release keeps the existing best/settings behavior;
 		// recording account-importable replays belongs to the later account release.
-		if (!accountsEnabled) return;
+		if (!accountsEnabled) {
+			void clearCheckpoint(roundOwner, roundId);
+			return;
+		}
 		const seed = round!.seed;
 		const run: CompletedRun = {
 			scoreConfigVersion: scoring.version,
@@ -608,15 +983,19 @@
 		};
 		syncStatus = roundOwner ? 'progress.pending' : '';
 		const owner = roundOwner;
-		completionQueued = enqueue({
-			id: run.id,
-			owner,
-			run,
-			attempts: 0,
-			retryAt: 0,
-			...(resolvedTheme ? { resolvedTheme } : {})
-		})
-			.then(() => {
+		completionQueued = checkpointed
+			.then(() =>
+				enqueue({
+					id: run.id,
+					owner,
+					run,
+					attempts: 0,
+					retryAt: 0,
+					...(resolvedTheme ? { resolvedTheme } : {})
+				})
+			)
+			.then(async (durable) => {
+				if (durable) await clearCheckpoint(owner, run.id);
 				if (!durableStorage && run.id === roundId) syncStatus = 'progress.storage';
 				if (owner)
 					void syncProgress(owner, onSaved, false, (message) => {
@@ -638,15 +1017,12 @@
 				console.warn('morphi:ranked_abandon_failed')
 			);
 		}
-		if (screen === 'game' && completedQueuedId !== roundId && roundOwner && roundActivity) {
-			const owner = roundOwner,
-				id = roundId,
-				game = family,
-				session = rankedSession;
-			void roundActivity.then((started) => {
-				if (started) void reportAccountRound('abandon', owner, id, game, session);
-			});
+		reportAbandon();
+		if (screen === 'game' && completedQueuedId !== roundId) {
+			console.info(JSON.stringify({ event: 'round_abandoned', family, reason: 'home' }));
+			void clearCheckpoint(roundOwner, roundId);
 		}
+		checkpointLease?.release();
 		generationLifetime.abort();
 		stopCardWaits();
 		stage?.stop();
@@ -663,6 +1039,7 @@
 
 <div
 	class="active-round card-session"
+	inert={roundLocked || Boolean(resumeChoice) || resumeError || (starting && screen === 'game')}
 	data-family={family}
 	data-card-phase={cardPhase}
 	style={shellStyle}
@@ -704,13 +1081,24 @@
 					scoring={scoring.values}
 					{roundNumber}
 					best={bests[family]}
-					paused={helpOpen || !cardReady}
+					paused={helpOpen ||
+						!cardReady ||
+						roundLocked ||
+						starting ||
+						Boolean(resumeChoice) ||
+						resumeError}
 					{soundEnabled}
 					{rankedRound}
 					ontogglesound={toggleSound}
 					onfinish={recordResult}
 					onhome={goHome}
-					onmove={(move) => runMoves.push(move)}
+					resume={resumeState}
+					{rankedStartedAt}
+					registerCheckpoint={(read) => {
+						checkpointReader = read;
+						if (!resumeState) void checkpointRound();
+					}}
+					onmove={checkpointMove}
 					oncomplete={(score, seconds) => persistRound(seconds, score)}
 					entranceReady={cardReady}
 					onready={gameReady}
@@ -765,6 +1153,38 @@
 		</div>
 	</footer>
 </div>
+{#if resumeChoice || roundLocked || resumeError}
+	<aside class="ranked-conflict" aria-live="polite" aria-labelledby="resume-title">
+		<h2 id="resume-title">{t(roundLocked ? 'resume.locked' : 'resume.title')}</h2>
+		{#if resumeInvalid}<p>{t('resume.unavailable')}</p>{/if}
+		{#if resumeError}<p role="alert">{t('resume.failed')}</p>{/if}
+		{#if roundLocked}<button type="button" disabled={starting} onclick={takeOverRound}
+				>{t('resume.takeover')}</button
+			>
+		{:else if resumeChoice && !resumeInvalid}<button
+				type="button"
+				disabled={starting}
+				onclick={() => void resumeRound()}>{t('resume.action')}</button
+			>{/if}
+		{#if resumeChoice}<button type="button" disabled={starting} onclick={() => void abandonAndNew()}
+				>{t('resume.new')}</button
+			>
+		{:else if resumeError}<button
+				type="button"
+				disabled={starting}
+				onclick={() => {
+					resumeError = false;
+					void restoreChoice().catch(() => {
+						resumeError = true;
+					});
+				}}>{t('ranked.retry')}</button
+			>{/if}
+		<button type="button" onclick={goHome}>{t('ranked.keepCurrent')}</button>
+	</aside>
+{/if}
+{#if storageNotice || lockNotice}<p class="storage-notice" role="status">
+		{t(storageNotice ? 'resume.storage' : 'resume.lockUnavailable')}
+	</p>{/if}
 {#if rankedConflict}
 	<aside class="ranked-conflict" aria-live="polite" aria-labelledby="ranked-conflict-title">
 		<h2 id="ranked-conflict-title">{t('ranked.activeTitle')}</h2>
@@ -811,6 +1231,18 @@
 		width: 100%;
 		min-height: 44px;
 		margin-top: 8px;
+	}
+
+	.storage-notice {
+		position: fixed;
+		bottom: 72px;
+		left: 16px;
+		right: 16px;
+		z-index: 45;
+		text-align: center;
+		background: var(--surface);
+		color: var(--ink);
+		padding: 12px;
 	}
 
 	.ending {

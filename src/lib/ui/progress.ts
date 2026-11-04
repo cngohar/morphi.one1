@@ -2,7 +2,7 @@ import { validateScoreValues, type ScoreConfig } from '#lib/scoring.js';
 import type { CompletedRun, PuzzleId } from '#lib/engine/contract.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { paletteIssues } from '#lib/engine/theme/generator.js';
-import { THEME_CONFIG_VERSION, THEME_GENERATOR_VERSION } from '#lib/engine/theme/config.js';
+import { THEME_GENERATOR_VERSION } from '#lib/engine/theme/config.js';
 export interface PendingRun {
 	id: string;
 	owner: string | null;
@@ -53,16 +53,18 @@ async function store<T>(
 		};
 	});
 }
-export async function enqueue(entry: PendingRun): Promise<void> {
+export async function enqueue(entry: PendingRun): Promise<boolean> {
 	const plain = JSON.parse(JSON.stringify(entry)) as PendingRun;
 	fallback.set(entry.id, plain);
 	try {
 		await store('readwrite', (store) => store.put(plain));
 		shadow.delete(entry.id);
+		return true;
 	} catch {
 		durableStorage = false;
 		shadow.add(entry.id);
 		console.warn(JSON.stringify({ event: 'progress_storage_failed' }));
+		return false;
 	}
 }
 export async function pendingRuns(): Promise<PendingRun[]> {
@@ -96,6 +98,50 @@ export class RankedSessionConflict extends Error {
 	constructor(public active: ActiveRankedSession) {
 		super('ranked_active');
 	}
+}
+export interface ResumableRankedSession extends ActiveRankedSession {
+	family: PuzzleId;
+	seed: string;
+	engineVersion: string;
+	startedAt: number;
+	theme: ResolvedTheme;
+	scoring: ScoreConfig;
+}
+export async function activeSession(
+	owner: string
+): Promise<ActiveRankedSession | ResumableRankedSession | null> {
+	const response = await fetch(`/api/play/active?ownerKey=${encodeURIComponent(owner)}`, {
+		credentials: 'same-origin',
+		cache: 'no-store',
+		signal: AbortSignal.timeout(8000)
+	});
+	if (!response.ok) throw new Error('ranked_resume_unavailable');
+	const value = (await response.json()) as ResumableRankedSession | null;
+	if (value === null) return null;
+	if (
+		typeof value.id !== 'string' ||
+		!Number.isSafeInteger(value.expiresAt) ||
+		typeof value.saving !== 'boolean'
+	)
+		throw new Error('ranked_response');
+	if (value.saving || !('family' in value)) return value;
+	if (
+		typeof value.family !== 'string' ||
+		typeof value.seed !== 'string' ||
+		typeof value.engineVersion !== 'string' ||
+		!Number.isSafeInteger(value.startedAt) ||
+		!value.theme ||
+		value.theme.family !== value.family ||
+		value.theme.seed !== value.seed ||
+		typeof value.theme.themeConfigVersion !== 'string' ||
+		!/^[a-zA-Z0-9-]{1,80}$/.test(value.theme.themeConfigVersion) ||
+		value.theme.themeGeneratorVersion !== THEME_GENERATOR_VERSION ||
+		paletteIssues(value.theme).length ||
+		typeof value.scoring?.version !== 'string'
+	)
+		throw new Error('ranked_response');
+	validateScoreValues(value.family, value.scoring.values);
+	return value;
 }
 export async function abandonSession(session: string, owner: string): Promise<void> {
 	const response = await fetch('/api/play/abandon', {
@@ -151,7 +197,8 @@ export async function startSession(family: PuzzleId, owner: string, takeoverSess
 		!theme ||
 		theme.seed !== value.seed ||
 		theme.family !== family ||
-		theme.themeConfigVersion !== THEME_CONFIG_VERSION ||
+		typeof theme.themeConfigVersion !== 'string' ||
+		!/^[a-zA-Z0-9-]{1,80}$/.test(theme.themeConfigVersion) ||
 		theme.themeGeneratorVersion !== THEME_GENERATOR_VERSION ||
 		paletteIssues(theme).length
 	)

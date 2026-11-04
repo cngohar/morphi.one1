@@ -33,7 +33,7 @@ export interface PuzzleFamilyEntry {
 }
 export type PuzzleMetadata = Pick<
 	PuzzleManifest,
-	'engineVersion' | 'titleAfterEntrance' | 'scoring' | 'ending'
+	'engineVersion' | 'titleAfterEntrance' | 'scoring' | 'ending' | 'presentation'
 > & {
 	backdropPieces?: readonly {
 		id: string;
@@ -42,8 +42,26 @@ export type PuzzleMetadata = Pick<
 		cells: readonly { x: number; y: number }[];
 	}[];
 };
+export interface PuzzlePresentation {
+	name: string;
+	scoringLabels: Readonly<Record<string, string>>;
+	groups: Readonly<Record<string, string>>;
+	help: {
+		steps: readonly string[];
+		rows: readonly { label: string; field?: string; sign?: '+' | '−'; value?: string }[];
+		note: string;
+		tips: string;
+	};
+	backdrop: {
+		items: readonly { id: string; path: string }[];
+		fill: 'solid' | 'outline';
+		symbol?: boolean;
+	};
+	profileIcon?: { color: string; rotation: number };
+}
 export interface PuzzleManifest {
 	id: PuzzleId;
+	presentation: PuzzlePresentation;
 	selectionOrder?: number;
 	weight?: number;
 	enabled?: boolean;
@@ -64,6 +82,11 @@ export interface PuzzleManifest {
 	scoring: import('./scoring.js').ScoreDefinition;
 	messages: Readonly<Record<string, string>>;
 	createRound(seed: string): { seed: string };
+	resumeRound?(
+		seed: string,
+		moves: readonly Move[],
+		scoring?: import('./scoring.js').ScoreValues
+	): { seed: string };
 	ending: {
 		kind: 'completion' | 'run_over';
 		headlines: { default: string; cap?: string };

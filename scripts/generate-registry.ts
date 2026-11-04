@@ -45,7 +45,8 @@ for (const directory of directories) {
 		)
 	)
 		throw new Error(`Invalid selector metadata: ${directory}`);
-	const { engineVersion, titleAfterEntrance, scoring, ending }: PuzzleManifest = manifest;
+	const { engineVersion, titleAfterEntrance, scoring, ending, presentation }: PuzzleManifest =
+		manifest;
 	puzzles.push({
 		directory,
 		id: manifest.id,
@@ -55,6 +56,7 @@ for (const directory of directories) {
 			titleAfterEntrance,
 			scoring,
 			ending,
+			presentation,
 			backdropPieces: manifest.backdropPieces
 		},
 		messages: manifest.messages

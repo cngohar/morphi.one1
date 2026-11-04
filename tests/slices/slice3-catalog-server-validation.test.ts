@@ -17,6 +17,18 @@ const now = 1_800_000_000_000;
 const themeValues = (version: string) => ({ ...THEME_CONFIG, version });
 const manifest: PuzzleManifest = {
 	id: family,
+	presentation: {
+		name: 'slice3.finished',
+		scoringLabels: { perStep: 'slice3.finished' },
+		groups: { 'slice3-numeric-1:custom': 'slice3.finished' },
+		help: {
+			steps: ['slice3.finished'],
+			rows: [{ label: 'slice3.finished', field: 'perStep', sign: '+' }],
+			note: 'slice3.finished',
+			tips: 'slice3.finished'
+		},
+		backdrop: { items: [{ id: 'synthetic', path: 'M1 1h10v10Z' }], fill: 'solid' }
+	},
 	engineVersion: 'slice3-numeric-1',
 	maxMoves: 2,
 	parseMove(move) {
@@ -179,7 +191,8 @@ beforeAll(async () => {
 	puzzleMetadata[family] = {
 		engineVersion: manifest.engineVersion,
 		scoring: manifest.scoring,
-		ending: manifest.ending
+		ending: manifest.ending,
+		presentation: manifest.presentation
 	};
 }, 30_000);
 
@@ -612,4 +625,43 @@ it('uses safe defaults for invalid and unreachable config', async () => {
 		liveVersion: manifest.scoring.version,
 		config: { version: manifest.scoring.version, values: manifest.scoring.defaults }
 	});
+}, 30_000);
+
+it('lists and audits lifecycle changes for a novel catalog family without a server family list', async () => {
+	const { gameOverview, gameStatistics, gameAvailable, changeGame } =
+		await import('../../src/lib/server/games.js');
+	const actor = crypto.randomUUID();
+	await db().prepare("INSERT INTO admin_actor(id,role) VALUES(?,'admin')").bind(actor).run();
+	const player = await createPlayer();
+	await saveRun(
+		db(),
+		player,
+		run(crypto.randomUUID(), '42', [{ steps: 2, charge: 3 }], false),
+		now
+	);
+	const overview = (await gameOverview(db())).find((entry) => entry.family === family);
+	expect(overview).toMatchObject({ family, state: 'enabled', restoreUntil: null });
+	expect(overview!.completed).toBeGreaterThan(0);
+	expect((await gameStatistics(db(), family)).rows.some((row) => row.rules_group === group)).toBe(
+		true
+	);
+	await changeGame(db(), actor, family, 'game-disable', 'Novel family maintenance', 7, now);
+	expect(await gameAvailable(db(), family)).toBe(false);
+	await changeGame(db(), actor, family, 'game-enable', 'Novel family restored', 7, now + 1);
+	expect(await gameAvailable(db(), family)).toBe(true);
+	const audits = await db()
+		.prepare('SELECT action,target,before,after FROM admin_audit WHERE actor=? ORDER BY created_at')
+		.bind(actor)
+		.all<{ action: string; target: string; before: string; after: string }>();
+	expect(
+		audits.results.map((row) => [
+			row.action,
+			row.target,
+			JSON.parse(row.before).state,
+			JSON.parse(row.after).state
+		])
+	).toEqual([
+		['game-disable', family, 'enabled', 'disabled'],
+		['game-enable', family, 'disabled', 'enabled']
+	]);
 }, 30_000);

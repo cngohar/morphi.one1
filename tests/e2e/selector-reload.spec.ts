@@ -4,7 +4,9 @@ import { createPuzzleSelector, type PuzzleSelectorState } from '../../src/lib/se
 
 const guestKey = 'morphi.selector.v2.guest';
 
-test('guest selector resumes its queued cycle after refreshing /play', async ({ page }) => {
+test('guest resume preserves the selector, and Abandon + New continues its queued cycle', async ({
+	page
+}) => {
 	const scores = {
 		block: { line: 100, extraLine: 50, combo: 50 },
 		memory: { pair: 1000, mismatch: 150, second: 5 },
@@ -99,6 +101,14 @@ test('guest selector resumes its queued cycle after refreshing /play', async ({ 
 	expect(expectedFamily).toBe(before.queue[0]);
 
 	await page.reload({ waitUntil: 'domcontentloaded' });
+	await page.getByRole('button', { name: 'Resume', exact: true }).click();
+	await expect(game).toBeVisible({ timeout: 30_000 });
+	await expect(game).toHaveAttribute('data-family', currentFamily!);
+	expect(JSON.parse((await page.evaluate((key) => localStorage.getItem(key), guestKey))!)).toEqual(
+		before
+	);
+	await page.reload({ waitUntil: 'domcontentloaded' });
+	await page.getByRole('button', { name: 'Abandon + New', exact: true }).click();
 	await expect(game).toBeVisible({ timeout: 30_000 });
 	await expect(game).toHaveAttribute('data-family', expectedFamily);
 	await page.waitForFunction(

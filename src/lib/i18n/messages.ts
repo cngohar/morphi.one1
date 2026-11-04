@@ -2,6 +2,16 @@ import { puzzleMessages } from '../puzzle-messages.js';
 
 export const messages = {
 	...puzzleMessages,
+	'resume.title': 'Continue your puzzle?',
+	'resume.action': 'Resume',
+	'resume.new': 'Abandon + New',
+	'resume.unavailable': 'This saved puzzle can no longer be resumed. Choose a new puzzle.',
+	'resume.locked': 'This puzzle is open in another tab.',
+	'resume.takeover': 'Take over',
+	'resume.lockUnavailable':
+		'This browser cannot keep this puzzle exclusive to one tab. Use one play tab.',
+	'resume.storage': 'Progress is kept in this tab only. Closing it will lose the active puzzle.',
+	'resume.failed': 'Unable to resume right now. Your saved puzzle is still here. Try again.',
 
 	'ending.continue': 'Continue to results',
 	'ending.error': 'Round complete. Unable to display the result. Return home to continue.',
@@ -601,6 +611,8 @@ export const messages = {
 		'Morphi.One uses cookies needed for sign-in, session security, and the Google return flow. Blocking these cookies can prevent account features from working. Guest games do not require signing in.',
 	'privacy.device.storage':
 		'Your browser stores settings such as sound and local best scores. When account features are available, it also keeps newly completed rounds waiting to be saved. A pending round records its moves, timing, puzzle information, and an account-scope identifier when it belongs to a signed-in account. Device storage can be cleared by you or your browser.',
+	'privacy.device.checkpoint':
+		'Your current puzzle is also kept on this device for Resume, including its moves, timing, appearance and puzzle information, and an account-scope identifier when signed in. Resume is available for up to 24 hours. Older browser copies can remain until replaced or cleared. This does not provide cross-device resume.',
 	'privacy.device.guest':
 		'New guest rounds are sent to an account only when you choose to save them after signing in. They remain unranked. Old browser best-score numbers are not uploaded as verified ranked results. Clearing device data can remove unsaved rounds; it does not delete data already saved to your account.',
 	'privacy.providers.title': 'Service providers and sharing',

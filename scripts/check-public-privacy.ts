@@ -6,7 +6,7 @@ import { createHash } from 'node:crypto';
 import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, type Page } from '@playwright/test';
-import { fixSelectorSeed } from '../tests/e2e/entropy.js';
+import { fixSelectorSeed, selectorSeedFor } from '../tests/e2e/entropy.js';
 
 const directory = 'build/public-privacy';
 const live = process.argv.includes('--live');
@@ -123,6 +123,22 @@ try {
 		const routes = ['/', '/privacy', '/terms', '/how-it-works', '/about', '/faq'];
 		const slugs = ['block', 'memory', 'connect', 'block-puzzle'];
 		const sitemap = await (await fetch(origin + '/sitemap.xml')).text();
+		const immutable = manifest.files.find((file) => /^_app\/immutable\/.*\.js$/.test(file.path));
+		assert(immutable, 'Hashed client assets exist');
+		const assetHeaders = (await fetch(`${origin}/${immutable.path}`)).headers;
+		assert.match(assetHeaders.get('cache-control') ?? '', /public.*immutable.*max-age=31536000/);
+		for (const prefix of ['audio/', 'og/']) {
+			const media = manifest.files.find((file) => file.path.startsWith(prefix));
+			assert(media, `Static ${prefix} assets exist`);
+			assert.equal(
+				(await fetch(`${origin}/${media.path}`)).headers.get('cache-control'),
+				'public, max-age=604800'
+			);
+		}
+		assert.equal((await fetch(origin + '/play')).headers.get('x-robots-tag'), 'noindex');
+		checks.push(
+			'hashed assets immutable for one year; static media public for one week; /play noindex'
+		);
 		assert.deepEqual(
 			[...sitemap.matchAll(/<loc>https:\/\/morphi\.one([^<]*)<\/loc>/g)].map((item) => item[1]),
 			routes
@@ -165,10 +181,15 @@ try {
 		await policyPage.getByRole('link', { name: 'cngohar@gmail.com' }).getAttribute('href'),
 		'mailto:cngohar@gmail.com'
 	);
-	assert((await policyPage.locator('article').innerText()).includes('Updated: 2026-10-26'));
+	assert((await policyPage.locator('article').innerText()).includes('Updated: 2026-11-03'));
+	assert(
+		(await policyPage.locator('article').innerText()).includes(
+			'This does not provide cross-device resume.'
+		)
+	);
 	await noJS.close();
 	checks.push('no-JavaScript policy/contact/date/title/canonical');
-	const page = await browser.newPage();
+	let page = await browser.newPage();
 	const errors: string[] = [];
 	const requests: string[] = [];
 	page.on('pageerror', (error) => errors.push(error.message));
@@ -201,8 +222,13 @@ try {
 		});
 	}
 	checks.push('home/privacy links and document layouts at three approved viewports');
+	// Home preload persists the first selector queue; gameplay needs fresh storage before seeding.
+	await page.close();
+	page = await browser.newPage({ viewport: { width: 1280, height: 800 } });
+	page.on('pageerror', (error) => errors.push(error.message));
+	page.on('request', (request) => requests.push(request.url()));
 	// The current Mix selector may deal either other family after Block.
-	await fixSelectorSeed(page, live ? 2 : 7);
+	await fixSelectorSeed(page, live ? 2 : selectorSeedFor('block'));
 	await page.goto(origin, { waitUntil: 'networkidle' });
 	await page.getByRole('button', { name: 'Play', exact: true }).click();
 	await page.locator('.game[data-family="block"]').waitFor();

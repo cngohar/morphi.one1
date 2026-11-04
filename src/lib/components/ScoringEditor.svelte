@@ -1,4 +1,5 @@
 <script lang="ts">
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import { untrack } from 'svelte';
 	import AccountForm from './account/AccountForm.svelte';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
@@ -20,7 +21,7 @@
 <section class="scoring-card">
 	<header class="scoring-heading">
 		<div>
-			<h2>{t(`v1.game.${config.family}` as MessageKey)}</h2>
+			<h2>{familyName(config.family)}</h2>
 			<p>{t('scoring.version')} <code>{config.version}</code></p>
 			{#if config.liveVersion !== config.version}<p role="status">
 					{t('scoring.liveInvalid')}
@@ -33,9 +34,13 @@
 			<input type="hidden" name="expected" value={config.liveVersion} />
 			<input type="hidden" name="values" value={JSON.stringify(draft)} />
 			<div class="scoring-fields">
-				{#each Object.keys(config.values) as field (field)}
+				{#each puzzleMetadata[config.family].scoring.fields as field (field)}
 					<label>
-						<span>{t(`scoring.${config.family}.${field}` as MessageKey)}</span>
+						<span
+							>{t(
+								puzzleMetadata[config.family].presentation.scoringLabels[field] as MessageKey
+							)}</span
+						>
 						<input
 							type="number"
 							min="0"

@@ -27,7 +27,8 @@ test('privacy policy is readable without JavaScript or sign-in and contains the 
 	await expect(
 		page.getByRole('heading', { name: 'Children and families', exact: true })
 	).toBeVisible();
-	await expect(page.locator('article')).toContainText('Updated: 2026-10-26');
+	await expect(page.locator('article')).toContainText('Updated: 2026-11-03');
+	await expect(page.locator('article')).toContainText('This does not provide cross-device resume.');
 	await expect(page.locator('article')).not.toContainText('local preview');
 	await expect(page.locator('article')).not.toContainText('under review');
 	await expect(page.locator('a[href*="localhost"], a[href*="127.0.0.1"]')).toHaveCount(0);

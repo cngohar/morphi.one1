@@ -11,6 +11,7 @@ export async function reportAccountRound(
 	try {
 		const response = await fetch('/api/play/activity', {
 			method: 'POST',
+			keepalive: action === 'abandon',
 			credentials: 'same-origin',
 			headers: { 'Content-Type': 'application/json' },
 			body: JSON.stringify({ action, ownerKey, runId, family, rankedSession }),

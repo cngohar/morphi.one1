@@ -1,4 +1,5 @@
 <script lang="ts">
+	import type { CheckpointState } from '#lib/ui/checkpoint.js';
 	import type { ScoreValues } from '#lib/engine/scoring.js';
 	import { scoring as defaultScoring } from './scoring.js';
 	import { onMount, untrack } from 'svelte';
@@ -40,8 +41,14 @@
 		rankedRound = false,
 		entranceReady = true,
 		onready,
-		resolvedTheme = null
+		resolvedTheme = null,
+		resume,
+		rankedStartedAt = null,
+		registerCheckpoint
 	}: {
+		resume?: CheckpointState;
+		rankedStartedAt?: number | null;
+		registerCheckpoint?: (read: () => CheckpointState) => void;
 		round: MemoryRound;
 		roundNumber: number;
 		soundEnabled: boolean;
@@ -405,7 +412,31 @@
 		if (!mounted || !entranceReady || entranceStarted) return;
 		untrack(() => {
 			entranceStarted = true;
-			const duration = motion.reduced() && !rankedRound ? 0 : memoryEntranceMs(game.pairs);
+			if (resume && resume.phase !== 'dealing') {
+				if (resume.phase === 'preview') {
+					phase = 'preview';
+					previewRemaining = resume.pending.preview ?? PREVIEW_MS;
+					if (!(document.hidden || paused)) startPreviewClock();
+				} else if (resume.phase === 'hiding') {
+					phase = 'hiding';
+					hideDelay.start(resume.pending.hide ?? MEMORY_HIDE_MS, document.hidden || paused);
+				} else {
+					phase = 'playing';
+					if (game.revealed.length === 2) {
+						if (resume.pending.mismatch === undefined) game = resolveMismatch(game);
+						else mismatchDelay.start(resume.pending.mismatch, document.hidden || paused);
+					}
+					onready?.();
+					if (game.status === 'won') {
+						oncomplete?.(scoreRound(game, elapsed, scoring), elapsed);
+						finishDelay.start(0, document.hidden || paused);
+					} else if (!(document.hidden || paused)) startClock();
+				}
+				return;
+			}
+			const duration =
+				resume?.pending.entrance ??
+				(motion.reduced() && !rankedRound ? 0 : memoryEntranceMs(game.pairs));
 			entrance = motion.deal(
 				Array.from(boardEl.querySelectorAll<HTMLElement>('.memory-card')),
 				duration
@@ -417,6 +448,34 @@
 	});
 
 	onMount(() => {
+		if (resume) {
+			clockBase = resume.elapsedMs;
+			elapsed = Math.floor(clockBase / 1000);
+			clockStarted = resume.clockStarted;
+			rankedClockStart =
+				rankedRound && rankedStartedAt !== null && clockStarted
+					? performance.now() - Math.max(resume.elapsedMs, Date.now() - rankedStartedAt)
+					: null;
+		}
+		registerCheckpoint?.(() => ({
+			phase,
+			elapsedMs: clockMs(),
+			clockStarted,
+			pending: Object.fromEntries(
+				Object.entries({
+					entrance: entranceDelay.remaining(),
+					preview:
+						phase === 'preview'
+							? Math.max(
+									0,
+									previewRemaining - (previewStart === null ? 0 : performance.now() - previewStart)
+								)
+							: null,
+					hide: hideDelay.remaining(),
+					mismatch: mismatchDelay.remaining()
+				}).filter((entry): entry is [string, number] => entry[1] !== null)
+			)
+		}));
 		document.addEventListener('visibilitychange', handleVisibility);
 		const wideQuery = window.matchMedia('(min-width: 1024px)');
 		const shortLandscapeQuery = window.matchMedia(

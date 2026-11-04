@@ -1,6 +1,6 @@
 import { expect, test, type Page } from '@playwright/test';
 import { captureGameReview } from './review-capture.js';
-import { fixSelectorSeed } from './entropy.js';
+import { fixSelectorSeed, selectorSeedFor } from './entropy.js';
 declare global {
 	interface Window {
 		endingPhases: { phase: string; at: number }[];
@@ -73,7 +73,7 @@ async function phaseTimes(page: Page) {
 test('Memory ending holds over the completed board and its queued result survives early Next', async ({
 	page
 }) => {
-	await fixSelectorSeed(page, 0);
+	await fixSelectorSeed(page, selectorSeedFor('memory'));
 	await trackPhases(page);
 	await page.goto('/play');
 	const pairs = await finishMemory(page);
@@ -132,7 +132,7 @@ test('Memory ending holds over the completed board and its queued result survive
 test('Block ending shows its score and piece count, then advances automatically with reduced motion', async ({
 	page
 }) => {
-	await fixSelectorSeed(page, 7);
+	await fixSelectorSeed(page, selectorSeedFor('block'));
 	await trackPhases(page);
 	await page.emulateMedia({ reducedMotion: 'reduce' });
 	await page.goto('/play');

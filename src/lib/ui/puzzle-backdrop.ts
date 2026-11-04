@@ -5,11 +5,9 @@ import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 
 /** Presentation only: keep approved palette snapshots and game RNG unchanged. */
 export function puzzleBackdrop(theme: ResolvedTheme) {
-	const families = { memory: true, block: true, connect: true } satisfies Record<
-		ResolvedTheme['family'],
-		boolean
-	>;
-	if (!Object.hasOwn(families, theme.family)) throw new RangeError('backdrop_family');
+	if (!Object.hasOwn(puzzleMetadata, theme.family)) throw new RangeError('backdrop_family');
+	const definition = puzzleMetadata[theme.family].presentation?.backdrop;
+	if (!definition?.items.length) throw new RangeError('backdrop_family');
 	let scatterSeed = normalizeSeed(theme.seed) ^ 0x73636174746572n;
 	// Published backdrop choices must affect the rendered layout as well as its label.
 	for (const character of theme.backdrop.kind)
@@ -29,8 +27,7 @@ export function puzzleBackdrop(theme: ResolvedTheme) {
 	const rightCount = 1 + rng.nextInt(5);
 	const items = Array.from({ length: leftCount + rightCount }, (_, i) => {
 		const band = i < leftCount ? 'left' : 'right';
-		const piece =
-			puzzleMetadata.block.backdropPieces[rng.nextInt(puzzleMetadata.block.backdropPieces.length)];
+		const piece = definition.items[rng.nextInt(definition.items.length)];
 		const glyph = theme.symbols[rng.nextInt(theme.symbols.length)];
 		return {
 			band,
@@ -38,22 +35,16 @@ export function puzzleBackdrop(theme: ResolvedTheme) {
 			x: 0.08 + fraction() * 0.84,
 			y: 8 + fraction() * 84,
 			rotate: Math.round(fraction() * 60 - 30),
-			kind: theme.family === 'memory' ? 'card' : theme.family === 'connect' ? 'dot-path' : piece.id,
-			path:
-				theme.family === 'connect'
-					? 'M8 12a5 5 0 1 0 10 0a5 5 0 1 0-10 0M13 17v27h34V17M42 12a5 5 0 1 0 10 0a5 5 0 1 0-10 0'
-					: theme.family === 'memory'
-						? `M12 5H48V55H12Z`
-						: piece.cells
-								.map(({ x, y }) => {
-									const size = 46 / Math.max(piece.width, piece.height);
-									const left = 7 + x * size;
-									const top = 7 + y * size;
-									return `M${left} ${top}h${size - 2}v${size - 2}h${2 - size}Z`;
-								})
-								.join(''),
+			kind: piece.id,
+			path: piece.path,
 			glyph: glyph.path
 		};
 	});
-	return { color, kind: theme.backdrop.kind === 'none' ? 'arc' : theme.backdrop.kind, items };
+	return {
+		color,
+		fill: definition.fill,
+		symbol: definition.symbol,
+		kind: theme.backdrop.kind === 'none' ? 'arc' : theme.backdrop.kind,
+		items
+	};
 }

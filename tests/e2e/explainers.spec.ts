@@ -1,5 +1,8 @@
 import { expect, test } from '@playwright/test';
 import { mkdir } from 'node:fs/promises';
+import { createRng } from '../../src/lib/engine/rng.js';
+import { familyIndex } from '../../src/lib/family-index.js';
+import { createPuzzleSelector } from '../../src/lib/selector.js';
 import { fixSelectorSeed } from './entropy.js';
 
 const families = ['block', 'memory', 'connect'];
@@ -19,21 +22,56 @@ test('family slugs redirect Home and play paths cannot choose a family', async (
 });
 
 for (const requested of families) {
-	test(`play parameters cannot request ${requested} ahead of the selector`, async ({ page }) => {
-		await page.emulateMedia({ reducedMotion: 'reduce' });
-		const expected = requested === 'memory' ? 'block' : 'memory';
-		await fixSelectorSeed(page, expected === 'block' ? 7 : 0);
+	test(`play parameters cannot request ${requested} ahead of the selector`, async ({
+		browser,
+		baseURL
+	}) => {
+		const fixture = Array.from({ length: 32 }, (_, seed) => ({
+			seed,
+			expected: createPuzzleSelector({
+				families: familyIndex.map((entry) => ({ family: entry.id, weight: entry.weight })),
+				weight: (entry) => entry.weight * 2,
+				rng: createRng(String(seed))
+			}).next()
+		})).find(({ expected }) => expected !== requested);
+		expect(fixture).toBeDefined();
+		const { seed, expected } = fixture!;
 		for (const choice of [
 			`?game=${requested}`,
 			`?family=${requested}&mode=stay`,
 			`?puzzle=${requested}&seed=1&stay=1`,
 			`#${requested}`
 		]) {
-			await page.goto(`/play${choice}`);
-			await expect(page.locator('.game')).toHaveAttribute('data-family', expected, {
-				timeout: 15000
-			});
-			await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+			expect(expected).not.toBe(requested);
+			const context = await browser.newContext({ baseURL, reducedMotion: 'reduce' });
+			try {
+				const page = await context.newPage();
+				await fixSelectorSeed(page, seed);
+				await page.route('**/api/play/availability**', async (route) => {
+					const family = new URL(route.request().url()).searchParams.get('family');
+					await route.fulfill({
+						status: 200,
+						contentType: 'application/json',
+						body: JSON.stringify(
+							family
+								? { available: true }
+								: {
+										available: familyIndex.map((entry) => entry.id),
+										weights: Object.fromEntries(
+											familyIndex.map((entry) => [entry.id, entry.weight])
+										)
+									}
+						)
+					});
+				});
+				await page.goto(`/play${choice}`);
+				await expect(page.locator('.game')).toHaveAttribute('data-family', expected, {
+					timeout: 15000
+				});
+				await expect(page.locator('meta[name="robots"]')).toHaveAttribute('content', 'noindex');
+			} finally {
+				await context.close();
+			}
 		}
 	});
 }

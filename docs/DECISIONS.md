@@ -1090,3 +1090,92 @@ Owner-confirmed base: `2cbaf49` (Slice 4). Slice 5 only; no Slice 6 work or depl
 D1 transaction behavior was checked against the current
 [Cloudflare D1 batch documentation](https://developers.cloudflare.com/d1/worker-api/d1-database/).
 Real local D1 concurrency, fallback and rollback tests corroborate this flow.
+
+## Engine refactor Slice 6 — presentation, recovery and delivery (2026-11-03)
+
+- Continue from owner-confirmed `5811356`; Slice 5 is closed. Slice 6 ends at
+  local review and requires written confirmation before Slice 7. The Slice 0
+  base-tag test remains deferred and outstanding. No dependencies or pinned
+  versions change in this slice.
+- Require manifest presentation data for family names, help and scoring labels,
+  leaderboard groups, profile icons and permitted backdrop objects. Generate the
+  browser projection; keep family logic and views lazy. The already catalog-driven
+  game lifecycle service retains its audited SQL behavior, with a novel-family
+  regression instead of a redundant rewrite. Moderation, user lifecycle, player
+  names and operator permissions remain family-agnostic.
+- Persist in-progress rounds separately from the completed-run retry queue in
+  local IndexedDB, scoped to the account/guest. Replay accepted moves with each
+  family's existing reducers; retain resolved theme/scoring snapshots, active
+  time and pending logical delays. Checkpoints expire after 24 hours. Changed
+  engine versions require a new round; changed theme config keeps the saved look.
+  Web Locks owns a live round and an IndexedDB fence guards writes. Unsupported
+  storage/locking has explicit user-visible limits. Recovery stays on this device.
+- Read the original active ranked issuance through an authenticated no-store
+  endpoint. Visibility loss records account abandonment activity without releasing
+  the resumable ranked lock; explicit Abandon releases it. Ranked time continues.
+  Recovery never requests a new seed or accepts a client-computed ranked score.
+- Home idle-preloads only the eligible peeked first puzzle (or saved round) and
+  the play route; it neither consumes a selector draw nor starts a ranked session.
+  Save-Data and slow-2G/2G skip speculation. The existing one-candidate Instant Next
+  preparation and failure-preserved selector/result remain in use.
+- Runtime HTML and personal/ranked/API responses are private/no-store. Preserve
+  existing `Vary` fields when adding Cookie. Prerendered public documents contain
+  no personal state; the adapter emits year-long immutable caching for hashed
+  assets. Unhashed audio/OG media use a one-week public max-age. Copy the adapter's
+  actual headers into the guest artifact so both delivery paths agree.
+- Retain exactly Home, Privacy, Terms, How it works, About and FAQ in the sitemap.
+  Play, admin, auth, APIs and reserved seed-share paths are noindex. No per-family
+  public page, game picker, door or share-link feature is introduced.
+- Measure five cold and five idle-preloaded samples per desktop/phone-emulation
+  profile, serially, against a built local Worker. Report median and p95 for Home
+  LCP, CLS, transferred bytes and a clearly labeled Event Timing INP lab proxy.
+  Normal approved entrances remain enabled. The owner explicitly selected
+  emulation on 2026-11-03; physical mid-range-phone evidence stays outstanding.
+  Local goals do not close public-launch performance gates or establish field INP.
+
+Current API/delivery references:
+[SvelteKit preloading](https://svelte.dev/docs/kit/$app-navigation),
+[Cloudflare static headers](https://developers.cloudflare.com/workers/static-assets/headers/),
+[HTTP cache policy](https://developer.mozilla.org/en-US/docs/Web/HTTP/Reference/Headers/Cache-Control),
+[idle callbacks](https://developer.mozilla.org/en-US/docs/Web/API/Window/requestIdleCallback).
+
+Slice 6 measurement closeout (2026-11-04): five cold and five confirmed
+idle-preloaded runs on HP EliteDesk 705 G2 MT (AMD PRO A8-8650B, Linux,
+Chromium 156.0.8078.4), plus the named Pixel 7a reference emulation on that
+host. The phone profile uses Pixel 7 touch/viewport emulation, CPU 4× and
+150 ms / 1.6 Mbps down / 0.75 Mbps up; it is not calibrated physical hardware.
+The owner explicitly chose “Record emulation; physical phone outstanding.”
+LCP, the short-interaction INP lab proxy and CLS met the local goals. Critical
+Home transfer p95 was 152,894–153,440 bytes against the decimal 150,000-byte
+goal. Play-to-playable p95 was 8.639–11.291 seconds with the approved entrances
+and Memory preview included; the 300 ms goal was missed. Preserve these results
+and the accepted motion/gameplay instead of redefining playable or hiding the
+miss. Mix samples selected different families, so the two states do not establish
+a controlled preload speedup. All figures are local diagnostics; field INP,
+physical-device validation and production edge compression remain outstanding.
+See `docs/evidence/slice6/performance.{json,md}` for raw samples and protocol.
+
+Keep the existing kill-switch defaults explicit: invalid availability fails
+closed, unknown families are rejected, valid typed defaults/previous theme
+parents are used when configuration is missing or invalid, and missing family
+weights default to 1. Local catalog games and ranked mode default enabled;
+ranked issuance still requires auth, caps, TTL and authoritative replay. The
+public guest artifact has no account backend, and anonymous measurement remains
+off until consent. No production flag configuration is authorized here.
+
+Verification logs and successful sample checkpoints are temporary restart
+evidence, saved immediately per owner instruction. Retain them through the
+entire local Slice 6 milestone; archive final measurements and a compact result
+summary, then delete the temporary saves. An interruption resumes unfinished
+checks rather than rerunning saved passes. The end-of-slice full milestone is
+authorized once; follow-up fixes rerun affected suites unless shared code changes.
+
+Slice 6 milestone closeout: one full `bun run verify` invocation covered all
+stages, ending with 189/190 browser passes and a stale measurement-consent fixture
+expecting Play instead of Resume. The fixture now explicitly abandons the saved
+round and starts a fresh consented one; all assertions stay intact. Only that
+Chromium case and the changed test file's formatting/lint were rerun, passing.
+Combined browser coverage is 190/190; no app/shared code changed, and no second
+full verify was run. The accepted Slice 5 palette artifact was restored after
+the palette stage changed timing fields only. Keep final evidence under
+`docs/evidence/slice6/`; remove temporary restart saves after final doc checks.

@@ -1,0 +1,29 @@
+/*
+  X-Content-Type-Options: nosniff
+  Referrer-Policy: strict-origin-when-cross-origin
+/audio/*
+  Cache-Control: public, max-age=604800
+/og/*
+  Cache-Control: public, max-age=604800
+/play
+  X-Robots-Tag: noindex
+/play/*
+  X-Robots-Tag: noindex
+/admin
+  X-Robots-Tag: noindex
+/admin/*
+  X-Robots-Tag: noindex
+/account
+  X-Robots-Tag: noindex
+/account/*
+  X-Robots-Tag: noindex
+/auth/*
+  X-Robots-Tag: noindex
+/api/*
+  X-Robots-Tag: noindex
+/share/*
+  X-Robots-Tag: noindex
+/seed/*
+  X-Robots-Tag: noindex
+/s/*
+  X-Robots-Tag: noindex

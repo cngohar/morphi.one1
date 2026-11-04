@@ -1,12 +1,9 @@
 import { expect, test } from '@playwright/test';
-import { fixSelectorSeed } from './entropy.js';
+import { fixSelectorSeed, selectorSeedFor } from './entropy.js';
 
-for (const [seed, family] of [
-	[0, 'memory'],
-	[7, 'block']
-] as const) {
+for (const family of ['memory', 'block'] as const) {
 	test(`the selector RNG can deal ${family} as the first game`, async ({ page }) => {
-		await fixSelectorSeed(page, seed);
+		await fixSelectorSeed(page, selectorSeedFor(family));
 		await page.goto('/', { waitUntil: 'networkidle' });
 		await page.getByRole('button', { name: 'Play', exact: true }).click();
 		await expect(page.locator(`.game[data-family="${family}"]`)).toBeVisible({ timeout: 15000 });

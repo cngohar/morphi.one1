@@ -35,6 +35,11 @@ export function createActiveDelay(callback: () => void) {
 			remaining = duration;
 			if (!paused) resume();
 		},
+		remaining(): number | null {
+			return remaining === null
+				? null
+				: Math.max(0, remaining - (startedAt === null ? 0 : performance.now() - startedAt));
+		},
 		pause,
 		resume,
 		cancel

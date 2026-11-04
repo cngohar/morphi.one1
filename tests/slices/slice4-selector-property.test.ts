@@ -202,6 +202,7 @@ describe('Slice 4 family index and availability', () => {
 					: { titleAfterEntrance: manifest.titleAfterEntrance }),
 				scoring: manifest.scoring,
 				ending: manifest.ending,
+				...(manifest.presentation === undefined ? {} : { presentation: manifest.presentation }),
 				...(manifest.backdropPieces === undefined
 					? {}
 					: { backdropPieces: manifest.backdropPieces })

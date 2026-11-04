@@ -1,0 +1,122 @@
+{
+	"slice": 6,
+	"baseCommit": "58113561d9c85737a599149967f69e25c5adfabf",
+	"status": "complete locally; written owner confirmation required before Slice 7",
+	"ownerScope": "Slice 6 only; stop before Slice 7 for written confirmation",
+	"phoneEvidence": "Owner: Record emulation; physical phone outstanding",
+	"slice0BaseTagTest": "deferred and outstanding; no reset performed",
+	"performance": {
+		"status": "pass: required measurement protocol completed",
+		"runs": 20,
+		"runsPerProfileState": 5,
+		"fingerprint": "6208d2a29d86541390d57465d5ea306e6dada85ea5fc55190e9c234adef7aac7",
+		"evidence": "performance.json",
+		"goals": "LCP, INP lab proxy, CLS met; critical transfer and Play-to-playable goals missed"
+	},
+	"explicitChecks": [
+		{
+			"command": "bun run prepare:public-privacy",
+			"result": "pass",
+			"detail": "137 local static files; no upload"
+		},
+		{
+			"command": "bun run test:public-privacy",
+			"result": "pass",
+			"detail": "8 assertion groups; SEO, headers, privacy and real round/Next; fresh isolated gameplay context"
+		},
+		{
+			"command": "bun run test:demo",
+			"result": "pass",
+			"detail": "366 checks; zero browser errors; zero uploads; unaffected pass retained"
+		}
+	],
+	"focusedDevelopmentChecks": "Completed; stable-source milestone coverage and targeted fixture rerun recorded below.",
+	"milestone": {
+		"command": "bun run verify",
+		"invocations": 1,
+		"fullCommandExitCode": 1,
+		"fullCommandResult": "All prior stages passed; browser stage 189 passed, one stale fixture failed (41.0 minutes).",
+		"result": "All required checks covered after fixture-only targeted browser rerun; no app/shared code change and no full rerun.",
+		"stages": [
+			{
+				"name": "lint",
+				"result": "pass"
+			},
+			{
+				"name": "type-check",
+				"result": "pass",
+				"errors": 0,
+				"warnings": 0
+			},
+			{
+				"name": "boundaries",
+				"result": "pass"
+			},
+			{
+				"name": "palette safety",
+				"result": "pass",
+				"palettes": 30000
+			},
+			{
+				"name": "unit",
+				"result": "pass",
+				"files": 34,
+				"tests": 205
+			},
+			{
+				"name": "D1/auth integration",
+				"result": "pass",
+				"files": 6,
+				"tests": 41
+			},
+			{
+				"name": "vectors",
+				"result": "pass",
+				"runtimes": ["Node", "Bun", "Chromium", "Firefox", "WebKit", "workerd"],
+				"logicVectorsPerRuntime": 9,
+				"themeVectorsPerRuntime": 6
+			},
+			{
+				"name": "built Worker",
+				"result": "pass",
+				"checks": 45,
+				"privateNoindexNoStoreAssertions": 10
+			},
+			{
+				"name": "lazy bundle",
+				"result": "pass",
+				"independentGameViews": 3
+			},
+			{
+				"name": "browser",
+				"initialPassed": 189,
+				"initialFailed": 1,
+				"result": "pass after affected fixture rerun",
+				"combinedCases": 190,
+				"passedByProject": {
+					"chromium": 114,
+					"firefox-themes": 38,
+					"webkit-themes": 38
+				}
+			}
+		],
+		"affectedRerun": {
+			"command": "bunx playwright test --project=chromium --workers=1 tests/e2e/entrance.spec.ts --grep 'measurement is opt-in, bounded and can be withdrawn'",
+			"case": "measurement is opt-in, bounded and can be withdrawn",
+			"result": "pass",
+			"tests": 1,
+			"durationSeconds": 43.6,
+			"cause": "Fixture expected exact Play after an in-progress round; UI correctly showed Resume.",
+			"fix": "Second Home visit explicitly selects Resume then Abandon + New; all original consent/payload/withdrawal assertions retained.",
+			"fileChecks": {
+				"prettier": "pass",
+				"eslint": "pass"
+			},
+			"applicationCodeChanged": false
+		}
+	},
+	"temporaryEvidence": "Every completed check and performance sample was saved for restart recovery; final results and measurements are archived here. Temporary saves are removed only after all local checks and final documentation checks pass.",
+	"production": "No deploy, remote provisioning, app secret, DNS or Google change",
+	"finalDocumentationCheck": "pass",
+	"temporaryEvidenceCleanup": "complete"
+}
