@@ -94,6 +94,7 @@
 				summary={data.summary}
 			>
 				{#snippet settings()}<div class="account-actions">
+						<a class="account-link" href={resolve('/account/support')}>{t('support.title')}</a>
 						<a class="account-link" href={resolve('/leaderboard')}>{t('leaderboard.title')}</a>
 						<button class="account-link" type="button" disabled={syncing} onclick={retryProgress}
 							>{t('progress.retry')}</button

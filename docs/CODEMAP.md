@@ -1,15 +1,23 @@
 # CODEMAP.md
 
-- **v1.3.1 local implementation (2026-11-05):** Block variants, admin Games/cache/switch and three new per-action sounds are implemented. Targeted automated checks pass; S5 owner audition and owner local review remain pending. The owner subsequently authorized a source-only commit/push; the three unauditioned MP3s stay local. No deployment or next phase is inferred. See `docs/V1.3.1_WORK.md` and `docs/evidence/v1.3.1/verification.json`.
+- **Source handoff (2026-11-05):** Owner requested updating and pushing the current source to existing GitHub `origin/main`, including accepted v1.3.2, local v1.3.3 and documentation organization. Full verification remains deferred and owner v1.3.3 review pending. Local editor settings, ignored credentials/runtime artifacts, unauditioned audio and pre-existing palette timing changes are excluded; no deployment is authorized.
+
+- **v1.3.3 Member Support (2026-11-05):** Implemented locally on accepted v1.3.2; 7 focused D1 and 4 unique Chromium cases pass, with zero type errors/warnings and scoped lint passing. Owner explicitly deferred full `bun run verify` to later stages; no full pass or waiver is inferred. Local owner review remains pending. See [approved plan](planning/V1.3.3_MEMBER_SUPPORT.md), [work record](work/V1.3.3_WORK.md) and [evidence](evidence/v1.3.3/verification.json). No source push or deployment is authorized.
+
+- **v1.3.2 accepted locally (2026-11-05):** Owner acceptance covers the existing Connect variants, per-game admin scoring tabs, audit pagination and profile summary/activity changes. Automated verification evidence and device/browser details were not supplied; no test pass or waiver is inferred. No commit/push, deployment or next phase is authorized. See `docs/briefs/morphi-v1.3.2-codex-brief.md` and `docs/PHASE_REPORTS.md`.
+
+- **Documentation directory:** see [README.md](README.md) for grouped briefs, planning, work records, reviews, operations, privacy, and imported references. Imported documents do not authorize implementation.
+
+- **v1.3.1 local implementation (2026-11-05):** Block variants, admin Games/cache/switch and three new per-action sounds are implemented. Targeted automated checks pass; S5 owner audition and owner local review remain pending. The owner subsequently authorized a source-only commit/push; the three unauditioned MP3s stay local. No deployment or next phase is inferred. See `docs/work/V1.3.1_WORK.md` and `docs/evidence/v1.3.1/verification.json`.
 
 Read this map before searching. Types and implementation live in code; decisions and historical evidence live in the linked docs.
 
 ## Current scope
 
-- v1.3.1 is implemented locally from the v1.3 source baseline `f053fc39e5bb9e3daa3cba747761cf9e81c5c914`. Targeted automated checks pass; S5 sound audition and owner local review remain pending. The refactor stays closed; this does not infer v1.3 functional acceptance. The owner subsequently authorized a source-only GitHub handoff; unauditioned MP3s remain excluded, with no deployment or next phase authorized. See `docs/V1.3.1_WORK.md` and `docs/evidence/v1.3.1/verification.json`.
-- Current scope: classic-compatible Block board-10, rows-only and rush-60; cached reconciled admin Games statistics, header switch/dialog, audited reason-free family/variant enable and catalog test play; offline per-action sounds and the two Memory sound hooks. Preserve the existing v1.3 Memory implementation and evidence without reopening that phase. The three new MP3s remain uncommitted pending owner audition.
-- v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/NEXT_PHASE_REVIEW.md`, `docs/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
-- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved `docs/morphi-v1.3.1-codex-brief.md` controls this local scope, retaining the registered-start/imported-completion cohorts. The owner authorized committing/pushing the source handoff on 2026-11-05, while the three new MP3s remain local pending audition. No deployment, production provisioning, secret installation, DNS/Google changes or next phase is authorized.
+- v1.3.1 is implemented locally from the v1.3 source baseline `f053fc39e5bb9e3daa3cba747761cf9e81c5c914`. Targeted automated checks pass; S5 sound audition and owner local review remain pending. The refactor stays closed; this does not infer v1.3 functional acceptance. The owner subsequently authorized a source-only GitHub handoff; unauditioned MP3s remain excluded, with no deployment or next phase authorized. See `docs/work/V1.3.1_WORK.md` and `docs/evidence/v1.3.1/verification.json`.
+- Current scope: v1.3.3 Member Support only, on the owner-accepted local v1.3.2 working tree. Preserve earlier game, admin and sound changes and their acceptance/evidence boundaries. The three new v1.3.1 MP3s remain uncommitted pending owner audition.
+- v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/reviews/NEXT_PHASE_REVIEW.md`, `docs/work/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
+- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved `docs/planning/V1.3.3_MEMBER_SUPPORT.md` controls this local scope, retaining the registered-start/imported-completion cohorts. The owner authorized committing/pushing the source handoff on 2026-11-05, while the three new MP3s remain local pending audition. No deployment, production provisioning, secret installation, DNS/Google changes or next phase is authorized.
 - The published guest/privacy version remains `b50a7a18-2e85-4406-bd40-77f27c4b3da3` at `https://morphi.one` and `https://morphi-one.electrasincng.workers.dev`. Cloudflare injects its intentional analytics beacon at delivery. Source repository: `https://github.com/cngohar/morphi.one1`; pushing does not authorize deployment.
 
 ## Engine and registration
@@ -70,7 +78,7 @@ Slice 5 additions:
 - `tests/slices/slice5-theme-admin-rollback.test.ts`: isolated real D1/KV safety,
   conflicting edits, fallback and rollback; `tests/e2e/theme-admin-preview.spec.ts`
   proves three responsive sizes, publishing and invalid-live recovery via actual HTTP.
-- `docs/SLICE5_CSS_AUDIT.md`, `docs/evidence/slice5-themes/`, `build/slice5/`:
+- `docs/reviews/SLICE5_CSS_AUDIT.md`, `docs/evidence/slice5-themes/`, `build/slice5/`:
   four-file audit, palette measurements/contact sheet and fast-check/browser evidence.
 
 Slice 6 additions:
@@ -124,30 +132,30 @@ Slice 6 additions:
 | `src/lib/server/operator*.ts`, `admin-totp.ts`, `src/routes/admin/`, `scripts/admin-local.ts`                                      | Protected local operator workspace, role/TOTP/freshness guards, owner enrollment and audit; operator shell exposes readiness for browser input synchronization |
 | `src/lib/server/{user-lifecycle,activity,admin-users,audit,moderation,games}.ts`                                                   | User controls, prospective activity, append-only audit, game lifecycle/statistics and scoring rollback                                                         |
 | `src/lib/ui/account-activity.ts`, `src/routes/api/play/activity/`                                                                  | Existing account round-start/abandon reports                                                                                                                   |
-| `src/lib/server/retention.ts`, `docs/PRIVACY_RETENTION.md`, `PRIVACY_REQUESTS.md`                                                  | Local cleanup/request deletion and documented retention/operator limits                                                                                        |
+| `src/lib/server/retention.ts`, `docs/privacy/PRIVACY_RETENTION.md`, `PRIVACY_REQUESTS.md`                                          | Local cleanup/request deletion and documented retention/operator limits                                                                                        |
 | `src/lib/server/measurement.ts`, `src/lib/ui/measurement.ts`, `src/routes/api/measurement/`, `components/MeasurementChoice.svelte` | Default-off coarse measurement, consent/DNT/GPC and withdrawal; families validate against catalog                                                              |
 | `src/env.ts`, `src/lib/server/elevenlabs.ts`                                                                                       | Optional key schema and unused server stub; offline sound generation remains manual                                                                            |
 
 ## Build, verification and evidence
 
-| Path                                                                                                 | Purpose                                                                                                                                                         |
-| ---------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| `vite.config.ts`, `scripts/check-lazy-bundle.ts`                                                     | Client chunk membership/static/dynamic graph in ignored `build/slice2/client-chunks.json`; rejects eager/transitive Game imports and cross-family view closures |
-| `package.json`, `vitest.config.ts`                                                                   | Bun commands and headless units, including Slice acceptance tests; verify runs bundle analysis after Worker build                                               |
-| `tests/integration/`, `vitest.accounts.config.ts`                                                    | Isolated real D1/auth, scoring, lifecycle, audit and activity integration tests (full accounts suite skipped for Slice 5)                                       |
-| `tests/vectors/`, `scripts/check-vectors.ts`, `measure-replay.ts`                                    | Unchanged known vectors in Node/Bun/Chromium/Firefox/WebKit/workerd and local replay-cost diagnostics                                                           |
-| `scripts/check-worker.ts`, `finish-build.ts`                                                         | Isolated built-Worker smoke and removal of demo assets from release output                                                                                      |
-| `playwright.config.ts`, `tests/e2e/`                                                                 | One browser worker; account, Card, game, recovery, operator, policy, selector and layout regressions across configured browsers                                 |
-| `tests/e2e/lazy-registry.spec.ts`, `selector-reload.spec.ts`                                         | Selected-view-only requests, failed import retry/retained result, and actual page-refresh selector continuity                                                   |
-| `static/demo/`, `scripts/{card-proof,build-card-proof,check-v1-app,check-v1-demo}.ts`                | Reference demos and isolated visual checks; never production game logic                                                                                         |
-| `wrangler.jsonc`, `wrangler.public-privacy.jsonc`                                                    | Local-account Worker configuration versus published assets-only guest/privacy configuration; never deploy without specific approval                             |
-| `scripts/{prepare-public-privacy,check-public-privacy,setup-accounts}.ts`                            | Guest artifact validation and ignored local credential setup                                                                                                    |
-| `docs/PHASE_REPORTS.md`, `docs/DECISIONS.md`, `docs/EDGE_CASES.md`                                   | Acceptance evidence, locked choices and required failure behavior                                                                                               |
-| `docs/ADMIN_LOCAL.md`, `GOOGLE_AUTH_SETUP.md`, `GOOGLE_OAUTH_PUBLIC.md`, `CLOUDFLARE_AGENT_SETUP.md` | Owner-only local enrollment, Google setup/release gates and project-local Cloudflare tooling                                                                    |
-| `docs/{STEP6_WORK,STEP6_REVIEW,STEP6_MEASUREMENTS,V1_WORK,V1.1_WORK,NEXT_PHASE_REVIEW}.md`           | Historical accepted local implementation/review and remaining production boundaries                                                                             |
-| `docs/puzzles/`, `docs/morphi-v1.1-handoff-2026-10-26/`                                              | Approved per-game briefs, templates and historical v1.1 handoff                                                                                                 |
-| `docs/NEXT_PHASE_VISUAL_REVIEW.md`, `build/combined-review/`                                         | Earlier combined visual comparison and verification evidence                                                                                                    |
-| `build/slice1/`, `build/slice2/`, `build/slice3/`, `build/slice4/`                                   | Ignored refactor logs/measurements; Slice 3 milestone evidence retained; Slice 4 fast checks, timing and focused reload evidence                                |
+| Path                                                                                                            | Purpose                                                                                                                                                         |
+| --------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `vite.config.ts`, `scripts/check-lazy-bundle.ts`                                                                | Client chunk membership/static/dynamic graph in ignored `build/slice2/client-chunks.json`; rejects eager/transitive Game imports and cross-family view closures |
+| `package.json`, `vitest.config.ts`                                                                              | Bun commands and headless units, including Slice acceptance tests; verify runs bundle analysis after Worker build                                               |
+| `tests/integration/`, `vitest.accounts.config.ts`                                                               | Isolated real D1/auth, scoring, lifecycle, audit and activity integration tests (full accounts suite skipped for Slice 5)                                       |
+| `tests/vectors/`, `scripts/check-vectors.ts`, `measure-replay.ts`                                               | Unchanged known vectors in Node/Bun/Chromium/Firefox/WebKit/workerd and local replay-cost diagnostics                                                           |
+| `scripts/check-worker.ts`, `finish-build.ts`                                                                    | Isolated built-Worker smoke and removal of demo assets from release output                                                                                      |
+| `playwright.config.ts`, `tests/e2e/`                                                                            | One browser worker; account, Card, game, recovery, operator, policy, selector and layout regressions across configured browsers                                 |
+| `tests/e2e/lazy-registry.spec.ts`, `selector-reload.spec.ts`                                                    | Selected-view-only requests, failed import retry/retained result, and actual page-refresh selector continuity                                                   |
+| `static/demo/`, `scripts/{card-proof,build-card-proof,check-v1-app,check-v1-demo}.ts`                           | Reference demos and isolated visual checks; never production game logic                                                                                         |
+| `wrangler.jsonc`, `wrangler.public-privacy.jsonc`                                                               | Local-account Worker configuration versus published assets-only guest/privacy configuration; never deploy without specific approval                             |
+| `scripts/{prepare-public-privacy,check-public-privacy,setup-accounts}.ts`                                       | Guest artifact validation and ignored local credential setup                                                                                                    |
+| `docs/PHASE_REPORTS.md`, `docs/DECISIONS.md`, `docs/EDGE_CASES.md`                                              | Acceptance evidence, locked choices and required failure behavior                                                                                               |
+| `docs/operations/ADMIN_LOCAL.md`, `GOOGLE_AUTH_SETUP.md`, `GOOGLE_OAUTH_PUBLIC.md`, `CLOUDFLARE_AGENT_SETUP.md` | Owner-only local enrollment, Google setup/release gates and project-local Cloudflare tooling                                                                    |
+| `docs/{STEP6_WORK,STEP6_REVIEW,STEP6_MEASUREMENTS,V1_WORK,V1.1_WORK,NEXT_PHASE_REVIEW}.md`                      | Historical accepted local implementation/review and remaining production boundaries                                                                             |
+| `docs/puzzles/`, `docs/morphi-v1.1-handoff-2026-10-26/`                                                         | Approved per-game briefs, templates and historical v1.1 handoff                                                                                                 |
+| `docs/reviews/NEXT_PHASE_VISUAL_REVIEW.md`, `build/combined-review/`                                            | Earlier combined visual comparison and verification evidence                                                                                                    |
+| `build/slice1/`, `build/slice2/`, `build/slice3/`, `build/slice4/`                                              | Ignored refactor logs/measurements; Slice 3 milestone evidence retained; Slice 4 fast checks, timing and focused reload evidence                                |
 
 ## Commands and conventions
 
@@ -163,7 +171,7 @@ Slice 6 additions:
 
 ## Slice 7 final audit
 
-- `docs/SLICE7_CONTRACT_AUDIT.md`: per-family determinism classes, canonical replay/hash/scoring audit, generic boundaries and the recorded Slice 5 cosmetic-vector exception.
+- `docs/reviews/SLICE7_CONTRACT_AUDIT.md`: per-family determinism classes, canonical replay/hash/scoring audit, generic boundaries and the recorded Slice 5 cosmetic-vector exception.
 - `tests/slices/slice7-determinism-six-runtimes.test.ts`: frozen fixtures, rejection sampling/Fisher–Yates, cosmetic RNG isolation and actual existing six-runtime harness execution.
 - `tests/slices/slice0-base-tag.test.ts`: retrospective annotated-tag target and ancestry integrity; does not assert the original timed gate ran.
 - `scripts/check-boundaries.ts`: explicit approximate-math negative probes in addition to purity/import checks.
@@ -177,7 +185,7 @@ Slice 6 additions:
 - `server/{activity,games,ranked-session,runs,scoring}.ts`, `server/db/schema.ts`, `migrations/0013_variants.sql`, `routes/api/play/{activity,availability,start,scoring}`: first-flip/activity cohorts, lifecycle/audit, authoritative replay and independent immutable scoring scopes.
 - `routes/admin/[view]/+page.{server.ts,svelte}`, `components/{ScoringEditor,AdminTestPlay}.svelte`: existing games detail variant expansion, shared/trio editors and authenticated ephemeral test play. No new route.
 - `memory/variants.test.ts`, `lib/memory-variants.test.ts`, `tests/integration/memory-variants.test.ts`, `tests/e2e/memory-variants{,-admin}.spec.ts`, `tests/vectors/memory-*`: scoped acceptance checks. `bun scripts/check-vectors.ts --memory` runs only Memory vectors in six runtimes; `bun scripts/check-palettes.ts --memory` checks only Memory palettes.
-- `docs/V1.3_WORK.md`, `docs/evidence/v1.3/`: final report, exact groups, full file inventory, targeted verification and local diagnostic measurements. Full verify and other-family suites were deliberately not run.
+- `docs/work/V1.3_WORK.md`, `docs/evidence/v1.3/`: final report, exact groups, full file inventory, targeted verification and local diagnostic measurements. Full verify and other-family suites were deliberately not run.
 
 ## v1.3.1 Block variants, admin and sounds
 
@@ -187,4 +195,13 @@ Slice 6 additions:
 - `scripts/generate-sounds.ts`, `static/audio/manifest.json`, `static/audio/{trio-match,reshuffle,timer-tick}.mp3`, `ui/sound.ts`, `puzzles/memory/Game.svelte`: staged offline generation, preserved old provenance, new action assets and runtime hooks. New MP3 owner audition remains pending.
 - `scripts/{generate-registry,check-vectors}.ts`, generated `puzzle-{metadata,messages}.ts`, `tests/vectors/block-*`: maxSeconds projection, `bun scripts/check-vectors.ts --block`, three-seed vectors per new variant plus preserved classic vectors in six runtimes.
 - `puzzles/block-placement/variants.test.ts`, `src/lib/block-variants.test.ts`, `tests/integration/block-variants.test.ts`, filtered `tests/integration/memory-variants.test.ts`, `tests/slices/v1.3.1-sounds.test.ts`, `tests/e2e/{block-variants,variant-sounds,memory-variants-admin,operator}.spec.ts`: targeted logic, compatibility, ceiling, statistics/cache/lifecycle, action sounds and admin evidence.
-- `docs/V1.3.1_WORK.md`, `docs/evidence/v1.3.1/{verification,audio-quality}.json`: complete inventory, B/S/A results, known risks and pending S5 gate. No full verify/global lint/type checks or physical-device claim.
+- `docs/work/V1.3.1_WORK.md`, `docs/evidence/v1.3.1/{verification,audio-quality}.json`: complete inventory, B/S/A results, known risks and pending S5 gate. No full verify/global lint/type checks or physical-device claim.
+
+## v1.3.3 Member Support
+
+- `migrations/0014_member_support.sql`, `server/db/schema.ts`: taxonomy, account-owned tickets/messages, per-ticket read marker, retry receipts and rolling successful-write limiter events.
+- `server/support.ts`, `operator-permissions.ts`, `server/retention.ts`: explicit admin/moderator support permissions, ban-tolerant member guard, conditional atomic writes/audits, quota/idempotency, protected defaults/reassignment, account cascades and expired-limit maintenance.
+- `server/support-http.ts`, `routes/api/support/`, `routes/admin/support/data/`: bounded same-origin JSON with owner binding, guarded staff sessions/freshness and private/no-store/noindex replies. Staff endpoints retain the existing `/admin` cookie scope.
+- `components/SupportDesk.svelte`, `routes/account/support/`, `routes/account/+page.svelte`, `routes/admin/[view]/`: member support and staff inbox/taxonomy in existing shells; paginated plain text, unread replies and memory-only drafts/ambiguous retry ids.
+- `content/privacy.ts`, `i18n/messages.ts`, `docs/privacy/{PRIVACY_RETENTION,PRIVACY_REQUESTS}.md`: approved local conversation retention/deletion policy; no publication.
+- `tests/integration/support.test.ts`, `tests/e2e/support.spec.ts`, `tests/e2e/privacy.spec.ts`: focused service/access/race/deletion and UI/privacy coverage. Targeted results and the explicit full-verification deferral are recorded in `docs/work/V1.3.3_WORK.md`, `docs/evidence/v1.3.3/verification.json` and the latest phase report.

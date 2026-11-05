@@ -1,5 +1,7 @@
 export const permissions = {
 	admin: [
+		'support-tickets',
+		'support-taxonomy',
 		'games',
 		'variant-enable',
 		'variant-disable',
@@ -33,6 +35,7 @@ export const permissions = {
 		'delete'
 	],
 	moderator: [
+		'support-tickets',
 		'moderation',
 		'queue',
 		'hide',

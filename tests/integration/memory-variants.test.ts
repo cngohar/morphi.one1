@@ -405,11 +405,11 @@ it('caches reconciled overview totals, includes families without variants, and i
 	expect(statements).toBe(5);
 	statements = 0;
 	await gameStatistics(countedDb, 'connect', selected[0]);
-	expect(statements).toBe(2);
+	expect(statements).toBe(6);
 	expect(first.games.find((game) => game.family === 'connect')).toMatchObject({
 		played: 1,
 		open: 1,
-		variantCount: 0
+		variantCount: 4
 	});
 	await recordRoundAbandon(db, userId, round, now + 2);
 	await saveRun(db, userId, completion('memory:moving'), now + 2);

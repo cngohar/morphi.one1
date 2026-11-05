@@ -9,7 +9,7 @@
 	import { motion } from '#lib/ui/motion.js';
 	import { createActiveDelay } from '#lib/ui/active-delay.js';
 	import { sound } from '#lib/ui/sound.js';
-	import { formatNumber } from '#lib/ui/format.js';
+	import { formatDuration, formatNumber } from '#lib/ui/format.js';
 	import { CONNECT_ENTRANCE_MS } from '#lib/round-timing.js';
 	import {
 		applyConnectMove,
@@ -64,6 +64,10 @@
 	let activePointer: number | null = null;
 	let lastInvalidAt = -Infinity;
 	let elapsed = $state(0);
+	const CONNECT_RUSH_SECONDS = 60;
+	const rush = $derived(game.variant === 'connect:rush-60');
+	let remaining = $state(CONNECT_RUSH_SECONDS);
+	let lastTick = -1;
 	let announcement = $state('');
 	let ticker: ReturnType<typeof setInterval> | null = null;
 	let clockBase = 0;
@@ -133,7 +137,23 @@
 		rankedStart ??= performance.now();
 		if (clockStart === null) clockStart = performance.now();
 		ticker ??= setInterval(() => {
-			elapsed = Math.floor(clockMs() / 1000);
+			const ms = clockMs();
+			elapsed = Math.floor(ms / 1000);
+			if (rush) {
+				remaining = Math.max(0, Math.ceil((CONNECT_RUSH_SECONDS * 1000 - ms) / 1000));
+				if (remaining > 0 && remaining <= 10 && remaining !== lastTick) sound.play('timer-tick');
+				lastTick = remaining;
+				if (remaining === 0 && phase === 'playing') {
+					phase = 'finished';
+					activePair = -1;
+					pauseClock();
+					sound.play('connect-invalid');
+					const score = connectScore(game, CONNECT_RUSH_SECONDS, scoring);
+					oncomplete(score, CONNECT_RUSH_SECONDS);
+					announcement = t('ending.connect.timeUp');
+					finishDelay.start(motion.reduced() ? 0 : 1000, document.hidden || paused);
+				}
+			}
 		}, 250);
 	}
 	function pauseClock() {
@@ -388,6 +408,13 @@
 					>{Math.round((filledCount(game) * 100) / total)}%</strong
 				>
 			</div>
+			{#if rush}
+				<div class="stat" data-countdown={remaining}>
+					<span class="stat-label">{t('connect.timeLeft')}</span><strong
+						>{formatDuration(remaining)}</strong
+					>
+				</div>
+			{/if}
 		</div>
 		<p class="round-meta">{t('game.round', { number: roundNumber })}</p>
 	</header>

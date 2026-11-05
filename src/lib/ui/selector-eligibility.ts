@@ -39,10 +39,12 @@ export function selectorAvailability(index: readonly PuzzleFamilyEntry[], input:
 	for (const id of available) {
 		const definitions = puzzleMetadata[id]?.variants;
 		if (!definitions?.length) continue;
+		const suppliedFamily =
+			supplied === undefined ? undefined : (supplied as Record<string, unknown>)[id];
 		const enabled =
-			supplied === undefined
+			suppliedFamily === undefined
 				? definitions.filter((entry) => entry.enabled !== false).map((entry) => entry.id)
-				: (supplied as Record<string, unknown>)[id];
+				: suppliedFamily;
 		if (
 			!Array.isArray(enabled) ||
 			enabled.some(

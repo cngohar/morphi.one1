@@ -1,0 +1,80 @@
+{
+	"version": "v1.3.3",
+	"scope": "Member Support, local only",
+	"baseline": "Owner-accepted v1.3.2 working tree",
+	"ownerReview": "pending",
+	"checks": [
+		{
+			"command": "bunx vitest run --config vitest.accounts.config.ts tests/integration/support.test.ts",
+			"result": "pass",
+			"tests": 7,
+			"seconds": 38.08,
+			"log": "build/v1.3.3/integration-final.log"
+		},
+		{
+			"command": "bun run check",
+			"result": "pass",
+			"errors": 0,
+			"warnings": 0,
+			"log": "build/v1.3.3/check-final.log"
+		},
+		{
+			"command": "targeted ESLint of support and connected integration files",
+			"result": "pass",
+			"log": "build/v1.3.3/targeted-eslint.log"
+		},
+		{
+			"command": "bun run db:migrate:local",
+			"result": "pass",
+			"migration": "0014_member_support.sql",
+			"log": "build/v1.3.3/migrate-final.log"
+		},
+		{
+			"command": "bunx playwright test tests/e2e/support.spec.ts --project=chromium --workers=1",
+			"result": "pass",
+			"tests": 2,
+			"log": "build/v1.3.3/browser-final.log"
+		},
+		{
+			"command": "Chromium privacy.spec.ts in preceding combined run",
+			"result": "pass",
+			"tests": 2,
+			"log": "build/v1.3.3/browser-second-failure.log"
+		},
+		{
+			"command": "bun run verify",
+			"result": "deferred by explicit owner decision",
+			"completed": "Prettier passed; global ESLint interrupted by SIGTERM; later stages did not run",
+			"log": "build/v1.3.3/verify.log"
+		}
+	],
+	"corrections": [
+		"Initial JSON/D1 typing errors fixed",
+		"SvelteMap/SvelteSet lint fixes",
+		"Browser test message locator, Settings navigation and account hydration waits corrected"
+	],
+	"priorLogs": [
+		"build/v1.3.3/check.log",
+		"build/v1.3.3/verify-first-failure.log",
+		"build/v1.3.3/browser-first-failure.log",
+		"build/v1.3.3/browser-second-failure.log",
+		"build/v1.3.3/browser-third-failure.log"
+	],
+	"screenshots": [
+		"build/v1.3.3/support-390x844.png",
+		"build/v1.3.3/support-844x390.png",
+		"build/v1.3.3/support-1280x800.png",
+		"build/v1.3.3/support-staff-390x844.png",
+		"build/v1.3.3/support-staff-844x390.png",
+		"build/v1.3.3/support-staff-1280x800.png"
+	],
+	"paletteEvidence": "Pre-existing dirty palette evidence restored byte-for-byte; palette gate did not start",
+	"notClaimed": [
+		"full verification pass",
+		"physical-device review",
+		"owner acceptance",
+		"performance gate",
+		"deployment",
+		"source commit or push"
+	]
+}

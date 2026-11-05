@@ -1,4 +1,5 @@
 import { expect, test } from '@playwright/test';
+import { privacyPolicy } from '../../src/lib/content/privacy.js';
 
 test('privacy policy is readable without JavaScript or sign-in and contains the reviewed publication copy', async ({
 	browser
@@ -27,8 +28,14 @@ test('privacy policy is readable without JavaScript or sign-in and contains the 
 	await expect(
 		page.getByRole('heading', { name: 'Children and families', exact: true })
 	).toBeVisible();
-	await expect(page.locator('article')).toContainText('Updated: 2026-11-03');
+	await expect(page.locator('article')).toContainText(`Updated: ${privacyPolicy.updatedOn}`);
 	await expect(page.locator('article')).toContainText('This does not provide cross-device resume.');
+	await expect(page.locator('article')).toContainText(
+		'Support tickets and all messages are kept while your account exists'
+	);
+	await expect(page.locator('article')).toContainText(
+		'Account deletion removes your tickets and all messages in them.'
+	);
 	await expect(page.locator('article')).not.toContainText('local preview');
 	await expect(page.locator('article')).not.toContainText('under review');
 	await expect(page.locator('a[href*="localhost"], a[href*="127.0.0.1"]')).toHaveCount(0);

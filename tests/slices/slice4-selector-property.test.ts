@@ -202,6 +202,7 @@ describe('Slice 4 family index and availability', () => {
 					: { titleAfterEntrance: manifest.titleAfterEntrance }),
 				scoring: manifest.scoring,
 				ending: manifest.ending,
+				...(manifest.variants === undefined ? {} : { variants: manifest.variants }),
 				...(manifest.presentation === undefined ? {} : { presentation: manifest.presentation }),
 				...(manifest.backdropPieces === undefined
 					? {}
@@ -268,7 +269,7 @@ describe('Slice 4 family index and availability', () => {
 			{ id: 'block', weight: 1, enabled: true, orientation: 'any' },
 			{ id: 'memory', weight: 1, enabled: true, orientation: 'any' }
 		];
-		expect(selectorAvailability(index, { available: ['block'] })).toEqual({
+		expect(selectorAvailability(index, { available: ['block'] })).toMatchObject({
 			available: ['block'],
 			weights: {}
 		});

@@ -28,6 +28,7 @@ export async function pruneExpiredRecords(binding: D1Database, actor: string, no
 		rankedAddressBefore: now - RANKED_LIMIT_WINDOW_MS
 	};
 	const results = await binding.batch([
+		binding.prepare('DELETE FROM support_limit WHERE expires_at <= ?').bind(now),
 		binding.prepare('DELETE FROM anonymous_event WHERE created_at < ?').bind(now - 7 * 86_400_000),
 		binding.prepare('DELETE FROM admin_web_limit WHERE expires_at <= ?').bind(now),
 		binding

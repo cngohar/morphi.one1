@@ -96,4 +96,4 @@ refinements remove repeated headings and centered desktop gaps, strengthen the
 quick drawer, preserve readable table columns with contained horizontal scroll,
 and bring the audit log nearer the top with compact filter/export panels.
 
-Visual findings and retained designs: `docs/NEXT_PHASE_VISUAL_REVIEW.md`.
+Visual findings and retained designs: `docs/reviews/NEXT_PHASE_VISUAL_REVIEW.md`.

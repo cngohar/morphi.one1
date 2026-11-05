@@ -1,0 +1,1157 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Connect Puzzle Variants</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f2f4f5;
+        --surface: #fcfdfd;
+        --surface-2: #e7edef;
+        --ink: #15222e;
+        --muted: #596873;
+        --line: #d2dce1;
+        --accent: #0f62b4;
+        --accent-ink: #0a4c8c;
+        --accent-soft: #dbeafa;
+        --ok: #146c43;
+        --ok-bg: #dff1e6;
+        --warn: #7d5200;
+        --warn-bg: #faf0cb;
+        --teal: #0b6e6e;
+        --teal-bg: #dcf0ef;
+        --p1: #e4572e;
+        --p2: #2e9e6b;
+        --p3: #3d7bd6;
+        --p4: #efa00b;
+        --p5: #d64570;
+        --p6: #159a9c;
+        --cell-empty: #e2e8eb;
+        --shadow: 0 1px 2px rgba(21, 34, 46, 0.06), 0 8px 24px -18px rgba(21, 34, 46, 0.35);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #0f161d;
+          --surface: #1a242e;
+          --surface-2: #232f3a;
+          --ink: #eaf1f6;
+          --muted: #9db0bd;
+          --line: #33424f;
+          --accent: #5ea8ec;
+          --accent-ink: #93c6f7;
+          --accent-soft: #17334d;
+          --ok: #63d69b;
+          --ok-bg: #173527;
+          --warn: #eec25e;
+          --warn-bg: #3a3010;
+          --teal: #6fd3d3;
+          --teal-bg: #123434;
+          --cell-empty: #2a3742;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -18px rgba(0, 0, 0, 0.8);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Archivo", system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px 72px; }
+      a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+      a:hover { color: var(--accent); }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+      /* ---------- Hero ---------- */
+      .hero { padding: 44px 0 8px; }
+      .hero-eyebrow {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent-ink);
+        margin: 0 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .hero-eyebrow::before {
+        content: "";
+        width: 11px; height: 11px;
+        border-radius: 50%;
+        background: var(--accent);
+        flex: none;
+      }
+      h1 {
+        font-size: clamp(34px, 6vw, 54px);
+        line-height: 1.04;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0 0 14px;
+      }
+      .lede { font-size: 17.5px; color: var(--muted); max-width: 72ch; margin: 0; }
+      .lede strong { color: var(--ink); font-weight: 600; }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin: 30px 0 6px;
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 14px 14px 12px;
+        box-shadow: var(--shadow);
+      }
+      .stat .num {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 30px;
+        font-weight: 600;
+        line-height: 1;
+        display: block;
+      }
+      .stat .lbl { font-size: 12.5px; color: var(--muted); display: block; margin-top: 7px; line-height: 1.35; }
+      .stat.hot .num { color: var(--accent-ink); }
+
+      /* ---------- Sections ---------- */
+      section { margin-top: 52px; }
+      h2 {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.015em;
+        margin: 0 0 6px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+      h2::before { content: ""; width: 13px; height: 13px; border-radius: 50%; background: var(--accent); flex: none; }
+      .section-intro { color: var(--muted); max-width: 76ch; margin: 0 0 20px; }
+      h3 { font-size: 17px; font-weight: 700; margin: 0; }
+
+      /* ---------- Base card ---------- */
+      .base-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        overflow: hidden;
+      }
+      .base-text { padding: 22px 24px; }
+      .base-text h3 { margin-bottom: 10px; }
+      .base-rules { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+      .base-rules li { display: flex; gap: 9px; align-items: baseline; font-size: 15px; }
+      .base-rules li::before { content: ""; width: 8px; height: 8px; border-radius: 50%; background: var(--p3); flex: none; transform: translateY(-1px); }
+      .base-rules li:nth-child(2)::before { background: var(--p1); }
+      .base-rules li:nth-child(3)::before { background: var(--p2); }
+      .base-rules li:nth-child(4)::before { background: var(--p4); }
+      .base-rules li:nth-child(5)::before { background: var(--p5); }
+      .base-viz {
+        background: var(--surface-2);
+        border-left: 1px solid var(--line);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+      }
+      .board { display: grid; gap: 3px; }
+      .board .cell {
+        width: 30px; height: 30px;
+        border-radius: 5px;
+        background: var(--cell-empty);
+        position: relative;
+      }
+      .board .cell .dot {
+        position: absolute;
+        inset: 0;
+        margin: auto;
+        width: 15px; height: 15px;
+        border-radius: 50%;
+        background: rgba(0, 0, 0, 0.32);
+        border: 2px solid rgba(255, 255, 255, 0.6);
+      }
+      .viz-cap { font-size: 12px; color: var(--muted); text-align: center; margin: 0; max-width: 30ch; }
+
+      .callout {
+        border: 1px solid var(--warn);
+        background: var(--warn-bg);
+        border-radius: 6px;
+        padding: 16px 18px;
+        margin-top: 14px;
+        font-size: 15px;
+      }
+      .callout strong { font-weight: 700; }
+      .callout p { margin: 0; }
+      .callout p + p { margin-top: 8px; }
+
+      .convention {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 18px 20px;
+        margin-top: 14px;
+        font-size: 15px;
+      }
+      .convention h3 { margin-bottom: 8px; font-size: 15.5px; }
+      .convention p { margin: 0; color: var(--muted); }
+      .convention p strong { color: var(--ink); }
+
+      /* ---------- Catalogue ---------- */
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 18px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .filter-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+      .filter-group .fg-label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-right: 2px;
+      }
+      .chip {
+        font: inherit;
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 6px 13px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+      }
+      .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+      .chip:focus-visible, .vchip:focus-visible, button:focus-visible, input:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .search-box { flex: 1 1 220px; min-width: 200px; }
+      .search-box input {
+        width: 100%;
+        font: inherit;
+        font-size: 15px;
+        padding: 9px 13px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+      }
+      .showing { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); margin: 4px 0 16px; }
+
+      .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .card.flagged { border-style: dashed; }
+      .card-top { display: flex; align-items: center; gap: 6px; flex-wrap: wrap; }
+      .card-num {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--muted);
+        margin-right: auto;
+      }
+      .badge {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+      }
+      .badge.verified { background: var(--ok-bg); color: var(--ok); }
+      .badge.flagged { background: var(--warn-bg); color: var(--warn); }
+      .badge.data { background: var(--teal-bg); color: var(--teal); }
+      .badge.mech { background: var(--accent-soft); color: var(--accent-ink); }
+      .badge.role { background: var(--surface-2); color: var(--muted); }
+      .card h3 { font-size: 16.5px; line-height: 1.3; }
+      .card .change { font-size: 14.5px; margin: 0; color: var(--ink); }
+      .card .note { font-size: 13.5px; margin: 0; color: var(--muted); }
+      .card .sources { margin-top: auto; padding-top: 6px; border-top: 1px solid var(--line); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+      .card .sources .src-label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        width: 100%;
+      }
+      .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: var(--muted);
+        padding: 36px 16px;
+        border: 1px dashed var(--line);
+        border-radius: 6px;
+      }
+
+      /* ---------- Dimensions ---------- */
+      .dims { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+      .dim {
+        display: grid;
+        grid-template-columns: 210px 1fr;
+        gap: 6px 22px;
+        padding: 15px 20px;
+      }
+      .dim + .dim { border-top: 1px solid var(--line); }
+      .dim dt { font-weight: 700; font-size: 15px; }
+      .dim dd { margin: 0; font-size: 14.5px; color: var(--muted); }
+      .dim dd strong { color: var(--ink); font-weight: 600; }
+
+      /* ---------- Core systems ---------- */
+      .core-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; counter-reset: core; }
+      .core-item {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 13px 16px 13px 52px;
+        position: relative;
+        font-size: 15px;
+        box-shadow: var(--shadow);
+      }
+      .core-item::before {
+        counter-increment: core;
+        content: counter(core);
+        position: absolute;
+        left: 14px;
+        top: 12px;
+        font-family: "IBM Plex Mono", monospace;
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--accent-ink);
+        background: var(--accent-soft);
+        width: 26px; height: 26px;
+        border-radius: 50%;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .core-item.meta::before { content: "M"; background: var(--surface-2); color: var(--muted); }
+      .core-item .rows { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+      /* ---------- Calculator ---------- */
+      .calc {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        padding: 22px;
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 26px;
+      }
+      .calc-dim { padding: 12px 0; }
+      .calc-dim + .calc-dim { border-top: 1px solid var(--line); }
+      .calc-dim-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+      .calc-dim-head .name { font-weight: 700; font-size: 15px; }
+      .calc-dim-head .n { font-family: "IBM Plex Mono", monospace; font-size: 13.5px; color: var(--accent-ink); font-weight: 600; }
+      .vchips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .vchip {
+        font: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 5px 11px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .vchip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+      .calc-side { display: flex; flex-direction: column; gap: 14px; }
+      .calc-result {
+        background: var(--surface-2);
+        border-radius: 6px;
+        padding: 18px;
+        text-align: left;
+      }
+      .calc-result .big {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 44px;
+        font-weight: 600;
+        line-height: 1;
+        display: block;
+      }
+      .calc-result .cap { font-size: 13.5px; color: var(--muted); display: block; margin-top: 8px; }
+      .chain { font-family: "IBM Plex Mono", monospace; font-size: 13.5px; line-height: 1.9; word-break: break-word; }
+      .chain .step { display: block; }
+      .versus-row { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+      .versus-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex: none; }
+      .reset-btn {
+        font: inherit;
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+        align-self: flex-start;
+      }
+      .reset-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+      .calc-note { font-size: 13.5px; color: var(--muted); margin: 14px 0 0; max-width: 90ch; }
+
+      /* ---------- Boundary / split / gaps ---------- */
+      .boundary-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .boundary-item {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 14px 16px;
+        font-size: 14.5px;
+        box-shadow: var(--shadow);
+      }
+      .boundary-item strong { display: block; font-size: 15px; margin-bottom: 3px; }
+      .boundary-item span { color: var(--muted); }
+      .boundary-item .bsrc { display: block; margin-top: 6px; font-size: 13px; }
+      .plain-list { margin: 0; padding-left: 20px; display: grid; gap: 9px; font-size: 15px; }
+      .plain-list li::marker { color: var(--accent); }
+      .plain-list strong { font-weight: 700; }
+      .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+      .two-col h3 { margin-bottom: 10px; display: flex; align-items: center; gap: 9px; }
+      .two-col h3::before { content: ""; width: 9px; height: 9px; border-radius: 50%; background: var(--p3); flex: none; }
+      .two-col.split h3::before { background: var(--p2); }
+      .two-col.split > div:last-child h3::before { background: var(--p1); }
+
+      footer {
+        margin-top: 56px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+        font-size: 13.5px;
+        color: var(--muted);
+        display: grid;
+        gap: 6px;
+      }
+
+      @media (max-width: 860px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        .stat:last-child { grid-column: 1 / -1; }
+        .base-card { grid-template-columns: 1fr; }
+        .base-viz { border-left: none; border-top: 1px solid var(--line); }
+        .cards, .core-grid, .boundary-list, .two-col { grid-template-columns: 1fr; }
+        .calc { grid-template-columns: 1fr; }
+        .dim { grid-template-columns: 1fr; gap: 2px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        * { transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <p class="hero-eyebrow">Global research · Morphi planning library</p>
+        <h1>Connect Puzzle Variants</h1>
+        <p class="lede">
+          A catalogue of named, published pair-connecting path games and modes — the Flow Free / Numberlink
+          family — that change a rule compared with Morphi's Connect base: connect every pair to win, filling
+          the grid only a bonus, and crossing a foreign path cuts it. <strong>26 entries are listed:
+          18 verified and 8 flagged.</strong> Collapsing same-dimension duplicates leaves
+          <strong>13 distinct path-rule systems</strong>, plus one meta ending system. Research only — no
+          variant pick or build is made here.
+        </p>
+        <div class="stats" role="list" aria-label="Headline counts">
+          <div class="stat" role="listitem"><span class="num">26</span><span class="lbl">Named entries listed (rows 1–26)</span></div>
+          <div class="stat" role="listitem"><span class="num">18</span><span class="lbl">Verified against a solid source</span></div>
+          <div class="stat" role="listitem"><span class="num">8</span><span class="lbl">Flagged — blurb-only, contradictory, or a single weak page</span></div>
+          <div class="stat" role="listitem"><span class="num">13</span><span class="lbl">Core path-rule systems (+1 meta ending system = 14 in total)</span></div>
+          <div class="stat hot" role="listitem"><span class="num">2,592</span><span class="lbl">Rule combinations from verified dimensions — <em>not</em> published games</span></div>
+        </div>
+      </header>
+
+      <main>
+        <!-- ================= BASE ================= -->
+        <section id="base" aria-labelledby="base-h">
+          <h2 id="base-h">The base every variant is measured against</h2>
+          <p class="section-intro">
+            The comparison base is Morphi's Connect game as stipulated for this research. Every rule change in
+            the catalogue is stated relative to it — connect-all win, fill as bonus, cut-on-cross, square grid,
+            two endpoints per pair, no walls or holes.
+          </p>
+          <div class="base-card">
+            <div class="base-text">
+              <h3>The base game</h3>
+              <ul class="base-rules">
+                <li>Connect matching pairs of endpoints with paths on a square grid; paths cannot share cells.</li>
+                <li>A path cannot cross a foreign path — crossing one <em>cuts</em> it.</li>
+                <li>Win: every pair connected. Filling every cell is <em>not</em> required — it is an optional score bonus.</li>
+                <li>Bands: 5×5 with 5 pairs · 6×6 with 6 pairs · 7×7 with 8 pairs — each round timed.</li>
+                <li>Score rewards connected pairs and the full-grid bonus, rewards beating par time, and penalises redraws.</li>
+              </ul>
+            </div>
+            <div class="base-viz" aria-hidden="true">
+              <div class="board" id="baseBoard"></div>
+              <p class="viz-cap">A solved 5×5 Flow-style board: five pairs joined, every cell covered. Under Morphi's base rules the full cover is a score bonus — the win is the five connections.</p>
+            </div>
+          </div>
+
+          <div class="callout" role="note">
+            <p>
+              <strong>The central discrepancy — Flow Free's own win rule is unsettled in the sources.</strong>
+              Three readings coexist. (i) The publisher's slogan — “Pair all colors, and cover the entire board
+              to solve each puzzle” — makes fill-all the win. (ii) Fan-wiki tips, repeated across pack pages,
+              say a level is not complete without full fill, and locked packs will not unlock the next level.
+              (iii) The fan wiki's mechanics page describes three endings — creating all flows without filling
+              all squares, filling all squares over the minimum moves, or finishing with a star — implying
+              connect-only <em>does</em> finish a level (a checkmark), while full fill in fewest moves earns
+              the star.
+            </p>
+            <p>
+              The most consistent reconciliation: connect-only = level marked complete but not “perfect”, while
+              the store slogan collapses complete and perfect into “solve”. This was <strong>not</strong>
+              resolved by a live app check — the research was signed-out and index-based — so Morphi's stated
+              rule (connect-all = win, fill = bonus) is treated as matching reading (iii), not reading (i).
+              Any comparison that says “Flow Free requires fill-all” without this caveat overstates the case.
+            </p>
+          </div>
+
+          <div class="convention">
+            <h3>Counting convention</h3>
+            <p>
+              A named published game or mode is counted <strong>once</strong>, and only if it <strong>changes a
+              rule</strong> versus the base — never for art, theme, colour scheme, soundtrack, board size alone,
+              or pair count alone. Same-dimension duplicates stay in the full list of 26 but are collapsed in the
+              core count of 13. <strong>Combinations are not published games.</strong> Status:
+              <strong>Verified</strong> = a solid source (publisher, Wikipedia, a paper or thesis, a reputable
+              puzzle site, or — for its own game — the developer's own detailed site);
+              <strong>Flagged</strong> = the rule rests on a store blurb, a forum post or single wiki line, or a
+              contradictory blurb. All sources were read on 2026-11-04.
+            </p>
+          </div>
+        </section>
+
+        <!-- ================= CATALOGUE ================= -->
+        <section id="catalogue" aria-labelledby="cat-h">
+          <h2 id="cat-h">The catalogue — 26 named variants</h2>
+          <p class="section-intro">
+            Each entry states its exact rule change versus the base, its evidence status, how it counts toward
+            the core, and whether — relative to Morphi's base — it would be <strong>data-only</strong> (a
+            parameter in the existing generator) or needs <strong>new mechanics</strong> code. Flagged entries
+            are excluded from the core count of 13.
+          </p>
+
+          <div class="toolbar" role="group" aria-label="Catalogue filters">
+            <div class="filter-group" aria-label="Filter by status">
+              <span class="fg-label">Status</span>
+              <button class="chip" data-filter-status="all" aria-pressed="true">All</button>
+              <button class="chip" data-filter-status="verified" aria-pressed="false">Verified</button>
+              <button class="chip" data-filter-status="flagged" aria-pressed="false">Flagged</button>
+            </div>
+            <div class="filter-group" aria-label="Filter by how the entry counts">
+              <span class="fg-label">Counts as</span>
+              <button class="chip" data-filter-role="all" aria-pressed="true">All</button>
+              <button class="chip" data-filter-role="core" aria-pressed="false">Core system</button>
+              <button class="chip" data-filter-role="duplicate" aria-pressed="false">Duplicate</button>
+              <button class="chip" data-filter-role="combination" aria-pressed="false">Combination</button>
+              <button class="chip" data-filter-role="meta" aria-pressed="false">Meta ending</button>
+              <button class="chip" data-filter-role="candidate" aria-pressed="false">Candidate</button>
+            </div>
+            <div class="filter-group" aria-label="Filter by build class">
+              <span class="fg-label">Class</span>
+              <button class="chip" data-filter-class="all" aria-pressed="true">All</button>
+              <button class="chip" data-filter-class="data" aria-pressed="false">Data-only</button>
+              <button class="chip" data-filter-class="mech" aria-pressed="false">New mechanics</button>
+            </div>
+            <div class="search-box">
+              <input type="search" id="catSearch" placeholder="Search names and rule changes…" aria-label="Search the catalogue" />
+            </div>
+          </div>
+          <p class="showing" id="showingCount" aria-live="polite"></p>
+
+          <div class="cards" id="cards"></div>
+        </section>
+
+        <!-- ================= DIMENSIONS ================= -->
+        <section id="dimensions" aria-labelledby="dim-h">
+          <h2 id="dim-h">Rule dimensions — what actually varies</h2>
+          <p class="section-intro">
+            Ten dimensions were checked across the catalogue, plus further dimensions the research found along
+            the way. Values are given verified first; values marked † appear in wish-lists and briefs but were
+            <strong>not found as a published Flow-family rule</strong> in this research.
+          </p>
+          <dl class="dims">
+            <div class="dim">
+              <dt>Grid geometry / adjacency</dt>
+              <dd><strong>Square, 4-neighbour</strong> (base) · <strong>hexagonal, 6-neighbour</strong> (entry 3) · <strong>triangular, 3-neighbour</strong> (entry 13) · <strong>mixed cell shapes + round edges</strong> (entry 5) · <strong>irregular outline via absent cells</strong> (entry 7). † A torus is really entry 4's topology, not a cell shape. † Diagonal movement: not found.</dd>
+            </div>
+            <div class="dim">
+              <dt>Win condition</dt>
+              <dd><strong>Connect all pairs only</strong> (entry 9's connect-only reading; the Morphi base) · <strong>fill all playable cells</strong> (entries 1, 3–5, 20–22) · <strong>fill-all + fewest moves</strong> = a “perfect” star, vs a plain checkmark for completion (entries 1, 8). † Fill a target percentage (e.g. 80%) as a win: not found — Morphi's fill-as-bonus is a scoring variant of this idea, not a published win rule found here.</dd>
+            </div>
+            <div class="dim">
+              <dt>Crossing rule</dt>
+              <dd><strong>Forbidden</strong> — and the interaction on conflict differs by implementation: Morphi <em>cuts</em> the foreign path, while Flow's fan-wiki mechanics describe drawing over a filled square as <em>truncating / overwriting</em> that flow at that point · <strong>allowed at bridge cells</strong> (entry 2) · <strong>avoided via teleport</strong> instead of crossing (entries 4, 21). † Free crossing anywhere: not found.</dd>
+            </div>
+            <div class="dim">
+              <dt>Topology / wrap</dt>
+              <dd><strong>None</strong> (planar board) · <strong>edge-to-opposite-edge wrap</strong> (entry 4) · <strong>interior paired portals</strong> (entry 21). † Klein-bottle or other topologies: not found.</dd>
+            </div>
+            <div class="dim">
+              <dt>Obstacles</dt>
+              <dd><strong>None</strong> · <strong>edge-walls</strong> blocking adjacency (entry 6) · <strong>absent / unfillable cells</strong> (entry 7). † Moving blockers: not found — Dot Knot Chain's “moving nails” (entry 19) is a flagged, contradictory blurb, and describes pins in a rope game, not verified Flow obstacles.</dd>
+            </div>
+            <div class="dim">
+              <dt>Path constraints</dt>
+              <dd><strong>None beyond no-share / no-cross</strong> — zig-zags allowed (entries 1, 12) · <strong>minimum-turns / no-U-turn</strong> (entry 11) · <strong>one-way / directed edges</strong> (entry 20) · <strong>must-visit waypoints</strong> (entry 22). † Single-stroke-per-colour as a <em>rule</em> (rather than an input method): not found. † No-backtracking: not found as a distinct rule. † Length limits: not found. † A no-touching / adjacency ban between different colours: not found — different colours routinely sit adjacent in Flow solutions.</dd>
+            </div>
+            <div class="dim">
+              <dt>Endpoint rules</dt>
+              <dd><strong>Exactly 2 per colour</strong> in the base and every verified game — colour <em>is</em> the pair identity. † More than 2 per colour: only the flagged Triple Dots (entry 17). † Endpoints that move: not found. † Endpoints visited in a required order: not found — Circuit Trace's checkpoints state no order (entry 22). † Two pairs sharing one colour: not found.</dd>
+            </div>
+            <div class="dim">
+              <dt>Branching</dt>
+              <dd><strong>Forbidden everywhere in verified games</strong> — a path is a simple path: endpoints have degree 1, interior cells degree 2. A triple-endpoint “path” that branches would be a tree, not a path — which is why entry 17, if verified, is a genuinely new topology, not a parameter.</dd>
+            </div>
+            <div class="dim">
+              <dt>Helpers / assists</dt>
+              <dd><strong>Hints</strong> — Flow: limited, buyable or ad-watched; Dot Knot: a hint shows one colour's full path; Circuit Trace: a hint shows the full next line of the last-touched colour · <strong>undo</strong> — Flow's undo button, and tapping a dot clears that flow · <strong>restart</strong> to retry for a perfect star. A “check” mistake-checker: not found as a named feature — the checkmark is a completion mark, not a checker. Shuffle: not found — shuffling endpoints would change the puzzle, not assist solving it.</dd>
+            </div>
+            <div class="dim">
+              <dt>Ending / scoring / delivery</dt>
+              <dd><strong>Free-play level packs</strong> (sequential, some locked) · <strong>Time Trial</strong> — most boards in a fixed time (entry 8) · <strong>Circuit Trace's 60-second Time Trial and Endless procedural chaining</strong> · Daily / Weekly puzzles with streaks (delivery, not a rule) · <strong>star (perfect, fewest moves) vs checkmark (completed)</strong> (entry 1). Morphi-style par-time + redraw-penalty scoring is a Morphi choice, not a published Flow rule found here — Flow's perfect is fewest <em>moves</em>, not fewest redraws or a par time.</dd>
+            </div>
+            <div class="dim">
+              <dt>Also found</dt>
+              <dd><strong>Interaction semantics on conflict</strong> — cut vs truncate / overwrite (see crossing) · <strong>solution uniqueness</strong> — Numberlink's “well-designed” criterion; a design rule for which boards count, not a play rule · <strong>board generation</strong> — handcrafted vs procedural / endless (Circuit Trace) vs daily-seeded · <strong>endpoint marking</strong> — colour vs number vs letter vs animal icon is presentation, not a rule (entries 9, 10 collapse on it) · <strong>folk heuristics that are not rules</strong> — e.g. the fan wiki's “2×2 pools are not intended, so pretend they are illegal” is a solving tip, not a published rule, and is not counted.</dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- ================= CORE SYSTEMS ================= -->
+        <section id="core" aria-labelledby="core-h">
+          <h2 id="core-h">The conservative core — 13 path-rule systems</h2>
+          <p class="section-intro">
+            Collapsing same-dimension duplicates and dropping all eight flagged entries leaves 13 distinct
+            path-rule systems. Time Trial (entry 8) is a 14th system of a different kind — a meta ending that
+            layers over any path system. Sensitivity note: if Shapes (entry 5) is held to subsume pure
+            triangular boards, the core falls to 12; the 13-count keeps them separate because Shapes is
+            documented as mixed shapes and round edges, not a pure triangular grid. Of the flagged entries,
+            Triple Dots (entry 17) is the only one that would add a 14th path system if independently verified.
+          </p>
+          <div class="core-grid" id="coreGrid"></div>
+        </section>
+
+        <!-- ================= CALCULATOR ================= -->
+        <section id="calculator" aria-labelledby="calc-h">
+          <h2 id="calc-h">Combinations calculator</h2>
+          <p class="section-intro">
+            The combinatorial total multiplies <strong>verified values only</strong> across eight dimensions.
+            Triple endpoints, free crossing, moving endpoints or blockers, target-percentage wins, length
+            limits and no-touching are all excluded — flagged or unattested. Toggle values off to see how the
+            space shrinks. <strong>These are combinations, not published games</strong>: only a handful are
+            actually published — the 13 core systems, mostly varying one dimension at a time — and many
+            combinations may be unplayable (minimum-turns + interior portals + absent cells, say, may admit no
+            boards, or no generator).
+          </p>
+          <div class="calc">
+            <div id="calcDims"></div>
+            <div class="calc-side">
+              <div class="calc-result">
+                <span class="big" id="calcTotal">2,592</span>
+                <span class="cap">possible combinations of verified rule values</span>
+              </div>
+              <div class="chain" id="calcChain" aria-live="polite"></div>
+              <label class="versus-row">
+                <input type="checkbox" id="sizeToggle" />
+                <span>Also parameterise <strong>board size (×11)</strong> — Flow's published square range alone runs 5×5 to 15×15. Illustrative; not part of the 2,592.</span>
+              </label>
+              <label class="versus-row">
+                <input type="checkbox" id="timerToggle" />
+                <span>Also parameterise <strong>timer / par settings (×4)</strong>. Illustrative; not part of the 2,592.</span>
+              </label>
+              <button class="reset-btn" id="calcReset" type="button">Reset to the research's verified set</button>
+            </div>
+          </div>
+          <p class="calc-note">
+            Even after size and timer, pair count is further constrained by board size — Flow runs from
+            3 colours at 5×5 up to 16 at 15×15 (Wikipedia) — and artwork and themes (Rainbow, Dark Matter,
+            animal icons) are unbounded multipliers that change nothing about play. Helpers such as hint on/off
+            or undo on/off would multiply the total again if counted, which is why the strict convention
+            excludes them from the core.
+          </p>
+        </section>
+
+        <!-- ================= DATA vs MECHANICS ================= -->
+        <section id="split" aria-labelledby="split-h">
+          <h2 id="split-h">Data-only vs new mechanics</h2>
+          <p class="section-intro">
+            Relative to the Morphi base, and assuming the generator is graph-based — cells as nodes, steps as
+            edges, as Flow solvers treat boards (see the
+            <a href="https://torvaney.github.io/projects/flow-solver.html" target="_blank" rel="noopener">Flow solver model</a>) —
+            these variants split into parameters the existing generator could in principle express, and rules
+            that would need new mechanics code.
+          </p>
+          <div class="two-col split">
+            <div>
+              <h3>Data-only — parameters, no new path mechanics</h3>
+              <ul class="plain-list">
+                <li><strong>Grid shape</strong> among square / hex / triangular / mixed boards, <em>if</em> the generator already stores an adjacency graph — the board is then a different node/edge list plus cell-shape artwork. Rendering new shapes is asset work, not a path rule.</li>
+                <li><strong>Win flag:</strong> connect-all vs fill-all — a boolean win predicate over the same paths. Fill-as-bonus is already Morphi's scoring.</li>
+                <li><strong>Obstacle map:</strong> edge-walls are deleted edges; absent cells are deleted nodes — Worm, Inkblot and Scattered boards are just a subset of nodes.</li>
+                <li><strong>Plain parameters:</strong> board size, pair count, endpoint placement, timer / par values, star thresholds, hint availability, undo on/off, and level-pack vs endless vs daily delivery.</li>
+                <li><strong>Minimum-turns as a score</strong> (counting turns) — but enforcing it as a win rule belongs in the other column.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>New mechanics — code, not data</h3>
+              <ul class="plain-list">
+                <li><strong>Bridges (entry 2):</strong> a cell must hold two paths at once — one over, one under — with a layer/order state. The one-path-per-cell invariant the base relies on must break at bridge cells only, and crossing be legal only there.</li>
+                <li><strong>Edge-warps (entry 4):</strong> adjacency wrapping across edges is cheap as data, but path rendering and input that continue across the edge are UI / mechanics work, not a board file.</li>
+                <li><strong>Interior portals (entry 21):</strong> paired teleport nodes with a pairing table; a path is no longer a contiguous chain of adjacent cells.</li>
+                <li><strong>One-way diodes (entry 20):</strong> directed edges plus a direction check on every step, including forbidding entry from the wrong side — path validation becomes directed.</li>
+                <li><strong>Must-visit stars / checkpoints (entry 22):</strong> an extra win predicate — every waypoint visited by the correct colour's path (in order, if ordered) — plus generation that guarantees a waypoint lies on its colour's path.</li>
+                <li><strong>Triple endpoints (entry 17, flagged):</strong> a colour's solution becomes a path through a middle terminal, or a branching tree; endpoint-degree and win checks change.</li>
+                <li><strong>Minimum-turns as a win rule (entry 11):</strong> the published rule is “fewest turns given the other paths” — enforcing it means comparing against alternative routes around those paths, not just counting turns, and the source itself notes no formal definition was found.</li>
+                <li><strong>Moving endpoints, moving blockers, ordered endpoints:</strong> a time-stepped board state with re-validation after every move — and no verified published example was found to copy.</li>
+                <li><strong>Interaction semantics:</strong> Morphi already implements cut-on-cross; Flow's truncate-on-overdraw is a different undo / overwrite behaviour — input-handling code, not board data.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= BOUNDARY ================= -->
+        <section id="boundary" aria-labelledby="bound-h">
+          <h2 id="bound-h">Boundary games — close relatives, not variants</h2>
+          <p class="section-intro">
+            These sit next to the family — pipes, loops, dots, circuits — but are not pair-connecting path
+            variants under the strict rule, and are not counted.
+          </p>
+          <div class="boundary-list" id="boundaryList"></div>
+        </section>
+
+        <!-- ================= UNCERTAINTIES ================= -->
+        <section id="gaps" aria-labelledby="gaps-h">
+          <h2 id="gaps-h">Uncertainties, gaps &amp; what was not counted</h2>
+          <div class="two-col">
+            <div>
+              <h3>Discrepancies &amp; open questions</h3>
+              <ul class="plain-list">
+                <li><strong>Flow Free's win rule:</strong> the three-way discrepancy set out at the top of this page — publisher slogan vs fan-wiki tips vs fan-wiki mechanics. Unresolved by any live app check; Morphi's rule is treated as matching the connect-only-with-checkmark reading.</li>
+                <li><strong>Bridges orientation:</strong> sources agree crossing is allowed only at bridges, but one review's description is garbled (“one line must pass through the bridge vertically, while another needs to go through it vertically”) — the one-vertical, one-horizontal reading is inferred, not quoted. Fan-wiki level data shows 1–3 bridges per level; whether every level has exactly the bridges it needs, vs optional bridges, is not stated.</li>
+                <li><strong>Warps vs portals:</strong> Wikipedia and the fan wiki describe Warps as edge-to-edge only; Circuit Trace's portals are interior paired cells. Different mechanics sharing the word “warp / portal” in secondary coverage — entries 4 and 21 must not be merged.</li>
+                <li><strong>Shapes “3D” claim:</strong> secondary solver / SEO pages claim “three-dimensional puzzle elements” and “skyscraper” packs for Shapes; the publisher and Wikipedia say only multiple cell shapes and round edges. The 3D element is treated as unverified embellishment and is not counted.</li>
+                <li><strong>Numberlink's own fill rule:</strong> Wikipedia calls unique + filled the “well-designed” standard while noting some designers do not stipulate it; the academic paper footnotes that the coverage constraint is absent from Nikoli's own Numberlink page, possibly by omission. Even the paper game's rule is ambiguous — the connect-only vs fill-all split here reflects the sources, not a settled ruling.</li>
+                <li><strong>Minimum-turns definition:</strong> the academic source's authors state they have not seen a formal definition, and interpret it as fewest turns within the path's homotopy class. Any use of entry 11 would implement an interpretation, not a canonical rule.</li>
+                <li><strong>Circuit Trace is single-source:</strong> entries 20–22 rest entirely on the developer's own site — detailed and internally consistent (modes, counts, editor, hints), but no independent review or store page confirming the diode / portal / star rules in play was found. Verified-primary, not independently corroborated.</li>
+                <li><strong>Stars vs checkpoints:</strong> Circuit Trace lists both words but never defines whether a star is collected by any colour, must sit on a specific colour's path, or must be visited in order. Collapsing them into one must-visit system is the conservative choice; they could be two systems.</li>
+                <li><strong>Dot Knot Chain (entry 19):</strong> its own page simultaneously claims bridges and intersecting lines and a no-intersects win condition, plus timed / limited-move / rope-sorting language that reads like a different game pasted in. Nothing about it should be relied on.</li>
+                <li><strong>Size → colour mappings conflict:</strong> Wikipedia gives Flow's range as 5×5 (3 colours) to 15×15 (up to 16); fan-wiki pack pages give different colour counts for the same sizes. Sizes and counts are parameters, so the core is unaffected — but no single size-to-colour mapping should be quoted as canonical.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Not counted, and what was not found</h3>
+              <ul class="plain-list">
+                <li><strong>Parameters, delivery and art only:</strong> Mania packs (board size only); Jumbo / Mega Mania / Jumbo Rectangle / Tower (large or rectangular sizes only); Rainbow / Pink / Purple / Dark Matter packs (colour and theme only); Regular / Bonus / Extreme packs (difficulty and size only); the Bridges / Hexes / Warps / Shapes sampler packs inside the original Flow app (the same systems as entries 2–5, ported as packs); Daily / Weekly puzzles (a delivery schedule plus streaks, no rule change); colour labels for colour-blind play (accessibility marking, not a rule); and the hundreds of other Flow clones that state only entry 1's rule set.</li>
+                <li><strong>Folk heuristics are not rules:</strong> fan-wiki tips such as “2×2 pools are not intended, so pretend they are illegal” are solver heuristics, not published rules, and were not counted as variants.</li>
+                <li><strong>Not found — despite targeted searching:</strong> no verified published Flow-family game with moving endpoints, endpoints that must be visited in a prescribed order, moving blockers, a maximum path length, a no-touching rule, or a fill-target-percentage win. Absence here means “not found in this research”, not “does not exist” — these remain plausible invented dimensions, and the combinations total deliberately excludes them.</li>
+                <li><strong>No booster-only entries:</strong> no entry in the catalogue is a mere power-up that changes no rule; entry 19's bridge claim is the closest, and it is flagged for exactly that reason.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Sources are linked on every catalogue entry. All sources were read on 2026-11-04; the Flow Free Wikipedia article and the Circuit Trace developer site were opened directly, the rest via web index.</span>
+        <span>Research catalogue only — compiled for Morphi's long-term planning. No variant selection, plan, or build is implied by anything on this page.</span>
+      </footer>
+    </div>
+
+    <script>
+      /* ================= Mini board diagram ================= */
+      (function () {
+        var colors = { A: "var(--p1)", B: "var(--p2)", C: "var(--p3)", D: "var(--p4)", E: "var(--p5)" };
+        var pattern = [
+          "ABBCC",
+          "ABCCD",
+          "AAADD",
+          "EEADD",
+          "EEEDD"
+        ];
+        var endpoints = { "0,0": 1, "3,2": 1, "0,2": 1, "1,1": 1, "0,3": 1, "1,2": 1, "1,4": 1, "3,4": 1, "3,0": 1, "4,2": 1 };
+        var board = document.getElementById("baseBoard");
+        board.style.gridTemplateColumns = "repeat(5, 30px)";
+        pattern.forEach(function (row, r) {
+          row.split("").forEach(function (ch, c) {
+            var cell = document.createElement("span");
+            cell.className = "cell";
+            cell.style.background = colors[ch];
+            if (endpoints[r + "," + c]) {
+              var dot = document.createElement("span");
+              dot.className = "dot";
+              cell.appendChild(dot);
+            }
+            board.appendChild(cell);
+          });
+        });
+      })();
+
+      /* ================= Catalogue data ================= */
+      var ROLE_LABELS = {
+        core: "Core system",
+        duplicate: "Duplicate system",
+        combination: "Combination",
+        meta: "Meta ending",
+        candidate: "Candidate if verified"
+      };
+      var ENTRIES = [
+        { n: 1, name: "Flow Free (original, Big Duck Games, 2012)", status: "verified", role: "core", cls: "data",
+          change: "Win changes: filling the whole board becomes the win — the publisher's slogan is “Pair all colors, and cover the entire board” — not a bonus. Otherwise the base: square grid, no intersecting, crossing breaks the pipe. Some grids have walls to navigate around; a checkmark marks a solved board, a star a fewest-moves perfect.",
+          note: "Core system (i). The win change itself is a data-only win flag — but read the discrepancy at the top of this page: the fan wiki also describes connect-only finishes earning a checkmark.",
+          sources: [["Wikipedia", "https://en.wikipedia.org/wiki/Flow_Free"], ["Big Duck Games", "https://www.bigduckgames.com/"]] },
+        { n: 2, name: "Flow Free: Bridges (2012)", status: "verified", role: "core", cls: "mech",
+          change: "Crossing changes: at pre-made bridge cells, two different-colour pipes may cross — one over, one under. Everywhere else, crossing still breaks the pipe. The fill-all win is retained.",
+          note: "Core system (iv). New mechanics: a bridge cell must hold two paths at once, breaking the one-path-per-cell invariant at those cells only.",
+          sources: [["Wikipedia", "https://en.wikipedia.org/wiki/Flow_Free"], ["Common Sense Media", "https://www.commonsensemedia.org/app-reviews/flow-free-bridges"]] },
+        { n: 3, name: "Flow Free: Hexes (2016)", status: "verified", role: "core", cls: "data",
+          change: "Geometry changes: hexagonal cells with 6-neighbour movement instead of 4. Fill-all win and no-crossing are retained.",
+          note: "Core system (v). Data-only if the generator stores an adjacency graph — the new cell shapes are artwork, not a path rule.",
+          sources: [["Wikipedia", "https://en.wikipedia.org/wiki/Flow_Free"], ["Flow Free Wiki", "https://flowfree.fandom.com/wiki/Flow_Free:_Hexes"]] },
+        { n: 4, name: "Flow Free: Warps (2017)", status: "verified", role: "core", cls: "mech",
+          change: "Topology changes: a path leaving one board edge re-enters at the opposite edge — an edge-wrap teleport. It is not a crossing. The fill-all win is retained.",
+          note: "Core system (vi). Not the same mechanic as interior portals (entry 21), despite the shared vocabulary. The wrapped adjacency is cheap as data; drawing and input continuing across the edge are mechanics work.",
+          sources: [["Wikipedia", "https://en.wikipedia.org/wiki/Flow_Free"], ["Big Duck Games", "https://www.bigduckgames.com/warps?pid=230107&c=FlowWeb"], ["Level Winner", "https://www.levelwinner.com/flow-free-warps-tips-cheats-tricks-solve-puzzles/"]] },
+        { n: 5, name: "Flow Free: Shapes (2024)", status: "verified", role: "core", cls: "data",
+          change: "Geometry changes: boards use multiple cell shapes and round edges instead of uniform squares. The pair-connect, fill-all, no-cross core is unchanged.",
+          note: "Core system (vii). A “3D packs” claim appears on secondary sites only and is not counted — see the uncertainties.",
+          sources: [["Wikipedia", "https://en.wikipedia.org/wiki/Flow_Free"]] },
+        { n: 6, name: "Flow Free — Walls packs: Courtyard, Courtyard Spin, Pathway, Star Field, Pockets, Cataclysm", status: "verified", role: "core", cls: "data",
+          change: "Obstacle changes: fixed walls sit on cell edges and block adjacency — a path may not step across a wall; it must go around, or through a wall-gap / pathway. The six pack names differ only in wall pattern (courtyard, U-shaped pockets, paired-wall pathways, star walls), so they count as one system.",
+          note: "Core system (ix). Verified via the fan wiki plus store-changelog corroboration (“Courtyard Pack with walls”). Data-only: a wall is a deleted edge in the adjacency graph.",
+          sources: [["Flow Free Wiki", "https://flowfree.fandom.com/wiki/Flow_Free"], ["Pathway Pack", "https://flowfree.fandom.com/wiki/Pathway_Pack_(Flow)"], ["Pockets Pack", "https://flowfree.fandom.com/wiki/Pockets_Pack_(Flow)"], ["Star Field Pack", "https://flowfree.fandom.com/wiki/Star_Field_Pack"], ["Apptopia changelog", "https://apptopia.com/ios/app/526641427/about"]] },
+        { n: 7, name: "Flow Free — Holed / non-rectangular boards: Worm, Amoeba, Inkblot, Scattered, Party packs", status: "verified", role: "core", cls: "data",
+          change: "Playable-set changes: some cells are absent and unfillable — worm-shaped holes, scattered bordered holes, inkblot and party outlines. Fill-all applies to playable cells only, and paths cannot enter absent cells. Outline shape vs interior holes is arrangement, not a second rule, so the packs count as one system.",
+          note: "Core system (x). Verified via the fan wiki. Data-only: an absent cell is a deleted node.",
+          sources: [["Worm Pack", "https://flowfree.fandom.com/wiki/Worm_Pack_(Flow)"], ["Inkblot Pack", "https://flowfree.fandom.com/wiki/Inkblot_Pack_(Flow)"], ["Scattered Pack", "https://flowfree.fandom.com/wiki/Scattered_Pack_(Bridges)"]] },
+        { n: 8, name: "Flow Free: Time Trial", status: "verified", role: "meta", cls: "data",
+          change: "Ending / scoring changes only — the path rules are unchanged: solve as many boards as possible in a set time (30 s / 1 min / 2 min / 4 min in fan-wiki-derived descriptions). There is no per-board par in Morphi's sense.",
+          note: "A meta ending system that layers over any path system — counted separately from the 13 path systems.",
+          sources: [["Wikipedia", "https://en.wikipedia.org/wiki/Flow_Free"], ["Flow Free Wiki — Strategies", "https://flowfree.fandom.com/wiki/Flow_Free_Strategies"]] },
+        { n: 9, name: "Numberlink / Nanbarinku (Nikoli, paper)", status: "verified", role: "core", cls: "data",
+          change: "Endpoint marking changes (numbers instead of colours) and the win is ambiguous: pairs must be joined, lines cannot branch or cross, and numbers must be line ends — but filling the board is a “well-designed puzzle” quality criterion, and some designers do not stipulate it. Relative to Morphi, the paper game is the family's ancestor.",
+          note: "Core system (ii) — the connect-all-only reading. Morphi's connect-all-plus-bonus matches this connect-only reading, not the well-designed (fill-all) reading.",
+          sources: [["Wikipedia — Numberlink", "https://en.wikipedia.org/wiki/Numberlink"]] },
+        { n: 10, name: "Arukone / Alphabet Connection (Nikoli)", status: "verified", role: "duplicate", cls: "data",
+          change: "No rule change vs entry 9: letter pairs instead of number pairs — the same device as Dudeney's letters.",
+          note: "Verified as a named game, but a duplicate system: it collapses into entry 9 and adds nothing to the core count.",
+          sources: [["Wikipedia — Numberlink", "https://en.wikipedia.org/wiki/Numberlink"]] },
+        { n: 11, name: "Classic / minimum-turns Numberlink", status: "verified", role: "core", cls: "mech",
+          change: "Path-constraint changes: each path must use the fewest turns possible given the other paths — equivalently, in some formulations, no U-turns (two 90° turns in immediate succession), since a U-turn could be shortened. Fill-all is retained.",
+          note: "Core system (iii). Counting turns for a score is data-only; enforcing fewest-turns as a win rule is new mechanics — it needs comparison against alternative routes, and the source notes no formal definition exists.",
+          sources: [["Wikipedia — Numberlink", "https://en.wikipedia.org/wiki/Numberlink"], ["arXiv — Zig-Zag Numberlink", "https://arxiv.org/pdf/1410.5845"]] },
+        { n: 12, name: "Zig-Zag Numberlink (academic name)", status: "verified", role: "duplicate", cls: "data",
+          change: "No rule change vs entry 1: fill-all, U-turns and zig-zags allowed, no branching or crossing. This is the formal academic name for the Flow Free rule set, not a separate game.",
+          note: "Duplicate system — collapses into entry 1.",
+          sources: [["arXiv — Zig-Zag Numberlink", "https://arxiv.org/pdf/1410.5845"]] },
+        { n: 13, name: "Triangular Numberlink (Logic Masters)", status: "verified", role: "core", cls: "data",
+          change: "Geometry changes: triangular cells with 3-neighbour movement — lines run through cell centres, perpendicular to a side. No crossing, no branching, no passing through numbered cells.",
+          note: "Core system (viii). Kept separate from Shapes (entry 5): Shapes is documented as mixed shapes and round edges, not a pure triangular grid. If Shapes were held to subsume it, the core would fall to 12.",
+          sources: [["Logic Masters", "https://logic-masters.de/Raetselportal/Raetsel/zeigen.php?chlang=en&id=0003KQ"]] },
+        { n: 14, name: "Hexagonal Numberlink (paper / solver variant)", status: "verified", role: "duplicate", cls: "data",
+          change: "No new system vs entry 3: hexagonal cells change the encoding and adjacency exactly as Hexes does. Listed because it is a named paper variant (Leiden thesis).",
+          note: "Duplicate system — collapses into entry 3.",
+          sources: [["Leiden thesis (PDF)", "https://thesis.liacs.nl/pdf/2025-2026-LelipalyJJoshua.pdf"]] },
+        { n: 15, name: "Wire Storm (app)", status: "flagged", role: "candidate", cls: "data",
+          change: "Claimed as a Numberlink / Flow app version; no distinct rule is stated anywhere found beyond the name — colours-for-numbers at most.",
+          note: "Flagged — it rests on a single line in Wikipedia's Numberlink article listing app versions; its rule is unverified.",
+          sources: [["Wikipedia — Numberlink", "https://en.wikipedia.org/wiki/Numberlink"]] },
+        { n: 16, name: "Dudeney's 1897 “puzzle for motorists” / Puzzled Neighbours (precursor)", status: "flagged", role: "candidate", cls: "data",
+          change: "Historical precursor: pairs of houses / letters to connect in a park-like layout.",
+          note: "Flagged — the exact path and cell rules as printed in 1917 (Amusements in Mathematics no. 252) were not verified from a primary page in this research; do not treat its rule as established.",
+          sources: [["Wikipedia — Numberlink", "https://en.wikipedia.org/wiki/Numberlink"]] },
+        { n: 17, name: "Color Link — Triple Dots mode (Cool Publisher)", status: "flagged", role: "candidate", cls: "mech",
+          change: "Endpoint rule changes: one colour's path must visit three same-colour dots — not a pair — in a single path, still with no crossing and a fill-all win. Its “Two Dots” mode duplicates entry 1 and is not separately counted.",
+          note: "Flagged — store blurb only. If independently verified, this would add a 14th path system: a branching or through-terminal topology, not a parameter.",
+          sources: [["APKFab store listing", "https://apkfab.com/color-connect-color-matching-app/appspartan.freeflow"]] },
+        { n: 18, name: "Dot Knot — Line & Color Puzzle (Tiledom)", status: "flagged", role: "duplicate", cls: "data",
+          change: "No rule change vs entry 1: connect pairs, no crossing, fill every tile; its hint shows one colour's full path.",
+          note: "Flagged — store-blurb sources only. The rule itself is clear, but the source class is blurb; an independent clone and a duplicate system.",
+          sources: [["iosgames.net", "https://www.iosgames.net/Dot-Knot-Line-and-Color-Puzzle/index.html"], ["Google Play", "https://play.google.com/store/apps/details?id=com.water.fruitline.game"]] },
+        { n: 19, name: "Dot Knot Chain & Color Puzzle", status: "flagged", role: "candidate", cls: "mech",
+          change: "Claims bridges and intersecting lines, timed play and limited moves, plus “moving nails” — but its own stated win conditions also say no intersects and fill the board, contradicting the bridge claim.",
+          note: "Flagged — contradictory store blurb, unverified. The bridge element, if real, would duplicate entry 2 anyway; the “moving nails” language reads like a rope-sorting game pasted in.",
+          sources: [["APKPure", "https://apkpure.net/chain-connect-puzzle-art/com.tcga.chain.connect.puzzle"]] },
+        { n: 20, name: "Circuit Trace — Diodes mode", status: "verified", role: "core", cls: "mech",
+          change: "Path-constraint changes: one-way diode cells force a path to traverse in a specified direction — directed edges; traversing against the arrow is forbidden. The fill-all win is retained.",
+          note: "Core system (xi). Verified from the developer's own detailed site — primary, but single-source; no independent corroboration was found.",
+          sources: [["Circuit Trace (developer site)", "https://circuittrace.app/"]] },
+        { n: 21, name: "Circuit Trace — Portals mode", status: "verified", role: "core", cls: "mech",
+          change: "Topology changes, distinct from entry 4: paired portal cells inside the board teleport a path from one portal to its mate elsewhere on the board — not edge-to-edge.",
+          note: "Core system (xii). Single-source (the developer's site), as entries 20 and 22.",
+          sources: [["Circuit Trace (developer site)", "https://circuittrace.app/"]] },
+        { n: 22, name: "Circuit Trace — Stars / checkpoints (campaign + Arcade)", status: "verified", role: "core", cls: "mech",
+          change: "Endpoint / waypoint rule changes: a path must also pass through designated star / checkpoint cells — must-visit intermediate cells — in addition to joining its pair.",
+          note: "Core system (xiii). Whether stars and checkpoints differ (collect vs ordered visit) is not specified on the source, so they are collapsed to one must-visit system. Single-source.",
+          sources: [["Circuit Trace (developer site)", "https://circuittrace.app/"]] },
+        { n: 23, name: "Circuit Trace — Arcade mode", status: "verified", role: "combination", cls: "mech",
+          change: "A combination, not a new rule: Arcade stacks stars, diodes and checkpoints (entries 20–22) in one gauntlet.",
+          note: "Counted as a named mode, but excluded from the core — it adds no rule system of its own.",
+          sources: [["Circuit Trace (developer site)", "https://circuittrace.app/"]] },
+        { n: 24, name: "Flow Mania (Zarium web game)", status: "flagged", role: "duplicate", cls: "data",
+          change: "No rule change vs entry 1: connect pairs, fill the whole board, no overlap.",
+          note: "Flagged — a single web-game page; a duplicate system.",
+          sources: [["Zarium", "https://zarium.com/en/g/flow-mania"]] },
+        { n: 25, name: "NumberLink 2000+ (iOS)", status: "flagged", role: "duplicate", cls: "data",
+          change: "No rule change vs entry 1: connect same-colour circles, fill the whole board, no crossing. Its star rating per level and per-step hints are scoring and assists, not path rules.",
+          note: "Flagged — store listing only; a duplicate system.",
+          sources: [["Soft112 listing", "https://numberlink-2000-ios.soft112.com"]] },
+        { n: 26, name: "Hexic Flow (ThinkCube clone series)", status: "flagged", role: "duplicate", cls: "data",
+          change: "No distinct rule stated: a Flow / Bridges clone sued for copying graphics and design. It is named here only because the lawsuit source names it; it adds no verified rule.",
+          note: "Flagged — a lawsuit article with no rule detail; a duplicate clone.",
+          sources: [["S. McArthur Law — lawsuit article", "https://smcarthurlaw.com/makers-of-iconic-flow-free-mobile-game-sue-cloner-for-copyright-and-trademark-infringement/"]] }
+      ];
+
+      var cardsEl = document.getElementById("cards");
+      var showingEl = document.getElementById("showingCount");
+      var state = { status: "all", role: "all", cls: "all", q: "" };
+
+      function statusBadge(status) {
+        return status === "verified"
+          ? '<span class="badge verified">Verified</span>'
+          : '<span class="badge flagged">Flagged</span>';
+      }
+      function roleBadge(role) {
+        return '<span class="badge role">' + ROLE_LABELS[role] + "</span>";
+      }
+      function classBadge(cls) {
+        return cls === "data"
+          ? '<span class="badge data">Data-only</span>'
+          : '<span class="badge mech">New mechanics</span>';
+      }
+      function renderCards() {
+        var visible = ENTRIES.filter(function (e) {
+          if (state.status !== "all" && e.status !== state.status) return false;
+          if (state.role !== "all" && e.role !== state.role) return false;
+          if (state.cls !== "all" && e.cls !== state.cls) return false;
+          if (state.q) {
+            var hay = (e.name + " " + e.change + " " + e.note).toLowerCase();
+            if (hay.indexOf(state.q) === -1) return false;
+          }
+          return true;
+        });
+        cardsEl.innerHTML = "";
+        if (!visible.length) {
+          var empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.textContent = "No catalogue entries match these filters.";
+          cardsEl.appendChild(empty);
+        }
+        visible.forEach(function (e) {
+          var card = document.createElement("article");
+          card.className = "card" + (e.status === "flagged" ? " flagged" : "");
+          var srcs = e.sources.map(function (s) {
+            return '<a href="' + s[1] + '" target="_blank" rel="noopener">' + s[0] + "</a>";
+          }).join("");
+          card.innerHTML =
+            '<div class="card-top"><span class="card-num">No. ' + e.n + "</span>" +
+            statusBadge(e.status) + roleBadge(e.role) + classBadge(e.cls) + "</div>" +
+            "<h3>" + e.name + "</h3>" +
+            '<p class="change">' + e.change + "</p>" +
+            '<p class="note">' + e.note + "</p>" +
+            '<div class="sources"><span class="src-label">Source</span>' + srcs + "</div>";
+          cardsEl.appendChild(card);
+        });
+        var filtered = state.status !== "all" || state.role !== "all" || state.cls !== "all" || state.q;
+        showingEl.textContent = "Showing " + visible.length + " of 26 entries" + (filtered ? " (filtered)" : "");
+      }
+      function wireFilter(attr, key) {
+        var btns = document.querySelectorAll("[data-filter-" + attr + "]");
+        btns.forEach(function (b) {
+          b.addEventListener("click", function () {
+            btns.forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+            b.setAttribute("aria-pressed", "true");
+            state[key] = b.getAttribute("data-filter-" + attr);
+            renderCards();
+          });
+        });
+      }
+      wireFilter("status", "status");
+      wireFilter("role", "role");
+      wireFilter("class", "cls");
+      document.getElementById("catSearch").addEventListener("input", function (ev) {
+        state.q = ev.target.value.trim().toLowerCase();
+        renderCards();
+      });
+      renderCards();
+
+      /* ================= Core systems ================= */
+      var CORE = [
+        ["Square grid, fill-all win, no-cross / cut", "Entries 1, 12 — Zig-Zag is this system's formal name", false],
+        ["Square grid, connect-all-only win", "Entry 9, the connect-only reading of Numberlink", false],
+        ["Minimum-turns / no-U-turn paths", "Entry 11", false],
+        ["Bridges — crossing allowed at bridge cells", "Entry 2", false],
+        ["Hexagonal geometry", "Entries 3, 14, collapsed", false],
+        ["Edge-warps — paths wrap across board edges", "Entry 4", false],
+        ["Mixed / round cell shapes", "Entry 5", false],
+        ["Triangular geometry", "Entry 13", false],
+        ["Edge-walls blocking adjacency", "Entry 6 — six packs, one system", false],
+        ["Absent-cell / non-rectangular boards", "Entry 7 — five packs, one system", false],
+        ["One-way diodes — directed paths", "Entry 20", false],
+        ["Interior portals — paired teleport cells", "Entry 21", false],
+        ["Must-visit stars / checkpoints", "Entry 22", false],
+        ["Time Trial — most boards in a fixed time", "Entry 8 — a meta ending system: it layers over any path system and changes no path rule", true]
+      ];
+      var coreGrid = document.getElementById("coreGrid");
+      CORE.forEach(function (c) {
+        var d = document.createElement("div");
+        d.className = "core-item" + (c[2] ? " meta" : "");
+        d.innerHTML = c[0] + '<span class="rows">' + c[1] + "</span>";
+        coreGrid.appendChild(d);
+      });
+
+      /* ================= Boundary games ================= */
+      var BOUNDARY = [
+        ["Pipe Dream / Pipe Mania (1989)",
+         "No fixed pairs at all. The player places queued pipe tiles — cannot rotate them, cannot skip the order — to grow one pipeline from a start piece to a minimum length before the timed “flooz” flows. Win = length, not pair matching. Later variants add an end piece, wrap openings and one-way sections — Pipe Mania features, not Flow-family pair rules.",
+         ["Wikipedia — Pipe Mania", "https://en.wikipedia.org/w/index.php?title=Pipe_Mania&useparsoid=0"]],
+        ["Pipe-rotation / plumber games (generic “Pipe Connect”, “Water Connect”)",
+         "Tiles are rotated in place to connect a single source to a single drain (or a network); there are no colour-matched endpoint pairs to join with drawn paths, and the move is rotation, not path drawing. Excluded even though the theme is pipes — the exclusion rests on the mechanic definition, the same distinction as Pipe Mania's tile placement.",
+         null],
+        ["Slitherlink (Nikoli, “Fences”)",
+         "No pairs: draw one closed loop on cell edges so each numbered cell has exactly that many loop edges around it. The numbers are edge-count clues, not endpoints.",
+         ["MDPI — Slitherlink vs Numberlink", "https://www.mdpi.com/1999-4893/5/2/176/"]],
+        ["Masyu",
+         "No pairs: one closed loop through black and white circles, with turn / straight rules at each circle. The loop-family neighbour of Slitherlink; the same exclusion reason.",
+         null],
+        ["Hashiwokakero (“Bridges”, Nikoli) — name-collision warning",
+         "Not Flow Free: Bridges. Numbered islands must be joined by one or two bridges each so bridge counts match the island numbers and all islands connect. The “bridges” are counted connections between islands, not crossing points for pair-paths — do not conflate with entry 2.",
+         null],
+        ["Connect the Dots / Dot-to-Dot",
+         "One ordered chain (1→2→3…) revealing a picture, drawn as straight segments; endpoints are not pairs, there is no grid-cell filling, and order is the puzzle. A grid variant that also requires visiting every cell once is a Hamiltonian-path puzzle, not a pair-connecting puzzle.",
+         ["Puzzles Wiki — Connect The Dots", "https://www.puzzles.wiki/wiki/Connect_The_Dots"]],
+        ["Two Dots / Dots-style match games",
+         "The player draws a line through any same-colour dots in a row or rectangle to clear them; dots are not fixed pairs, the board refills, and the goal is clearing and scoring, not joining every pair. Excluded despite the “connect dots” wording.",
+         null],
+        ["One-line / single-stroke drawing games (1Line, “One Touch Drawing”, nine-dot puzzles)",
+         "One continuous stroke must cover all points or lines; there are no colour-matched pairs and no per-pair paths. The stroke constraint is a different puzzle type.",
+         null],
+        ["Circuit / wiring games (Circuit Scramble-style, wire-routing)",
+         "Typically one network from power to components, with rotation, switching and component requirements; colour pairs are not the win condition. Numberlink / Flow is used as a model for VLSI routing in the literature — that analogy does not make a wiring game a pair-connecting variant. Circuit Trace (entries 20–22) is the exception that proves the rule: it is a pair-connecting game with circuit theming, so it sits in the catalogue, not here.",
+         null],
+        ["2248 Hexa and other “number link” merge games",
+         "Numbers are slid and connected to merge into multiples of two for score; “link” means merging, not joining fixed pairs with non-crossing paths. Excluded despite the name.",
+         null]
+      ];
+      var boundaryList = document.getElementById("boundaryList");
+      BOUNDARY.forEach(function (b) {
+        var d = document.createElement("div");
+        d.className = "boundary-item";
+        var html = "<strong>" + b[0] + "</strong><span>" + b[1] + "</span>";
+        if (b[2]) html += '<span class="bsrc">Source: <a href="' + b[2][1] + '" target="_blank" rel="noopener">' + b[2][0] + "</a></span>";
+        d.innerHTML = html;
+        boundaryList.appendChild(d);
+      });
+
+      /* ================= Calculator ================= */
+      var CALC_DIMS = [
+        { name: "Grid geometry", values: ["Square", "Hexagonal", "Triangular", "Mixed / round shapes"] },
+        { name: "Win condition", values: ["Connect-all only", "Fill-all"] },
+        { name: "Crossing rule", values: ["Forbidden / cut", "Bridge-allowed"] },
+        { name: "Topology / wrap", values: ["None", "Edge-wrap", "Interior portals"] },
+        { name: "Obstacles", values: ["None", "Edge-walls", "Absent cells"] },
+        { name: "Path constraint", values: ["None (zig-zag allowed)", "Minimum-turns", "One-way diodes"] },
+        { name: "Endpoint rule", values: ["Pairs only", "Must-visit waypoints"] },
+        { name: "Ending", values: ["Free-play packs", "Time trial", "Endless"] }
+      ];
+      var calcState = CALC_DIMS.map(function (d) { return d.values.map(function () { return true; }); });
+      var calcDimsEl = document.getElementById("calcDims");
+      var totalEl = document.getElementById("calcTotal");
+      var chainEl = document.getElementById("calcChain");
+      var sizeEl = document.getElementById("sizeToggle");
+      var timerEl = document.getElementById("timerToggle");
+
+      function fmt(n) { return n.toLocaleString("en-US"); }
+
+      function renderCalc() {
+        calcDimsEl.innerHTML = "";
+        CALC_DIMS.forEach(function (dim, di) {
+          var on = calcState[di].filter(Boolean).length;
+          var block = document.createElement("div");
+          block.className = "calc-dim";
+          var head = document.createElement("div");
+          head.className = "calc-dim-head";
+          head.innerHTML = '<span class="name">' + dim.name + '</span><span class="n">n = ' + on + "</span>";
+          block.appendChild(head);
+          var chips = document.createElement("div");
+          chips.className = "vchips";
+          dim.values.forEach(function (v, vi) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "vchip";
+            b.textContent = v;
+            b.setAttribute("aria-pressed", calcState[di][vi] ? "true" : "false");
+            b.addEventListener("click", function () {
+              var count = calcState[di].filter(Boolean).length;
+              if (calcState[di][vi] && count === 1) return; /* keep at least one value per dimension */
+              calcState[di][vi] = !calcState[di][vi];
+              renderCalc();
+            });
+            chips.appendChild(b);
+          });
+          block.appendChild(chips);
+          calcDimsEl.appendChild(block);
+        });
+        var counts = CALC_DIMS.map(function (d, di) { return calcState[di].filter(Boolean).length; });
+        var steps = [];
+        var running = counts[0];
+        steps.push(counts[0] + " × " + counts[1] + " = " + fmt(running * counts[1]));
+        running = running * counts[1];
+        for (var i = 2; i < counts.length; i++) {
+          steps.push(fmt(running) + " × " + counts[i] + " = " + fmt(running * counts[i]));
+          running = running * counts[i];
+        }
+        var total = running;
+        if (sizeEl.checked) {
+          steps.push(fmt(total) + " × 11 (board sizes, parameter) = " + fmt(total * 11));
+          total = total * 11;
+        }
+        if (timerEl.checked) {
+          steps.push(fmt(total) + " × 4 (timer settings, parameter) = " + fmt(total * 4));
+          total = total * 4;
+        }
+        chainEl.innerHTML = steps.map(function (s) { return '<span class="step">' + s + "</span>"; }).join("");
+        totalEl.textContent = fmt(total);
+      }
+      sizeEl.addEventListener("change", renderCalc);
+      timerEl.addEventListener("change", renderCalc);
+      document.getElementById("calcReset").addEventListener("click", function () {
+        calcState = CALC_DIMS.map(function (d) { return d.values.map(function () { return true; }); });
+        sizeEl.checked = false;
+        timerEl.checked = false;
+        renderCalc();
+      });
+      renderCalc();
+    </script>
+  </body>
+</html>

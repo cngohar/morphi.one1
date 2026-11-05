@@ -73,5 +73,5 @@
 		"importedCompletionCohort": "no registered activity or ranked start; excluded from reconciled counts",
 		"localScoringTestCleanup": "new audited rollback versions restore coefficient values; no live-pointer rewind or saved-run rewrite"
 	},
-	"report": "docs/V1.3_WORK.md"
+	"report": "docs/work/V1.3_WORK.md"
 }

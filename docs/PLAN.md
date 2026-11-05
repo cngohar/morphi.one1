@@ -4,7 +4,7 @@ Handoff document for a coding agent (Claude Code, Codex, etc.). Before writing c
 
 ## 1. Product summary
 
-**Name:** Morphi, at the domain morphi.one. All puzzles live on one site (not one site per puzzle), which is a deliberate difference from sites that list puzzles across separate domains. The name is confirmed by the owner; the trademark and store check is on `docs/LAUNCH_CHECKLIST.md`.
+**Name:** Morphi, at the domain morphi.one. All puzzles live on one site (not one site per puzzle), which is a deliberate difference from sites that list puzzles across separate domains. The name is confirmed by the owner; the trademark and store check is on `docs/planning/LAUNCH_CHECKLIST.md`.
 
 A web platform where a visitor (a guest or a signed-in user) clicks one **Play** button and receives a randomly chosen, procedurally generated puzzle (memory, word, sliding, etc.). Each puzzle is generated from a seed plus difficulty and modifiers, so repeat puzzle types still feel new (different items, rules, themes, backgrounds, timers). Players get scores, leaderboards, and a small profile. Payments and multiplayer come later.
 
@@ -230,7 +230,7 @@ Part A ships v0 first: two puzzles, no accounts, no database. Part B builds the 
 Tasks, Part A (public v0):
 
 1. **Accounts and first deploy.** Create the GitHub repository (push the code and make the CI workflow run on a real pull request) and the Cloudflare account, with two-factor on both. Deploy an unlisted, `noindex` preview to staging. This is the first time anything leaves the local machine.
-2. **Replay test on the preview.** Run the A/B replay test (`docs/REPLAY_TEST.md`) with 5 to 10 non-owner testers on the preview. This is a qualitative usability and replay pilot, not statistical proof: it can reveal confusion and obvious replay differences, and it confirms or overturns the provisional first-impression puzzle only when the signal is clear.
+2. **Replay test on the preview.** Run the A/B replay test (`docs/operations/REPLAY_TEST.md`) with 5 to 10 non-owner testers on the preview. This is a qualitative usability and replay pilot, not statistical proof: it can reveal confusion and obvious replay differences, and it confirms or overturns the provisional first-impression puzzle only when the signal is clear.
 3. **Deploy** the solo-play build to morphi.one with `@sveltejs/adapter-cloudflare` (SvelteKit on a Worker with static assets, no accounts, no database), on staging first and then production (section 12.2), with HTTPS and the security headers from section 9.1.
 4. **SEO basics** (section 11.3): server-rendered Home with title, meta description, and `<h1>`; prerendered per-type landing pages; `sitemap.xml`; `robots.txt`; canonical URLs; `noindex` rules; Open Graph tags; and Lighthouse results recorded.
 5. **Analytics** (section 11.6): GA4 with Consent Mode and the event schema, key events, 14-month retention, the opt-out toggle, the server-set first-party anonymous-id cookie, a verified Search Console property with the sitemap submitted, and a documented replay-rate report in GA4.
@@ -241,7 +241,7 @@ Tasks, Part B (third puzzle, behind a flag): 8. Implement the third puzzle via t
 
 Acceptance:
 
-- **Replay test (A/B):** 5 to 10 people who are not the owner play with no instructions, about half starting with Memory and half with block-placement. Record, per person and per puzzle: did they finish the first puzzle, did they click Next/Play again after the first, and after the third. Write the results in `docs/REPLAY_TEST.md`. Target to aim for (not a hard gate): most testers start a second round, and a clear share reach a fifth. If almost nobody replays, stop and rework the result screen and puzzle before building more
+- **Replay test (A/B):** 5 to 10 people who are not the owner play with no instructions, about half starting with Memory and half with block-placement. Record, per person and per puzzle: did they finish the first puzzle, did they click Next/Play again after the first, and after the third. Write the results in `docs/operations/REPLAY_TEST.md`. Target to aim for (not a hard gate): most testers start a second round, and a clear share reach a fifth. If almost nobody replays, stop and rework the result screen and puzzle before building more
 - Three separate gates: **2a** private preview and replay pilot, **2b** public launch, **2c** continue or stop after the public data
 - v0 is live on morphi.one with SEO and analytics verified: sitemap and robots work, landing pages render without JavaScript, seed share pages are `noindex`, GA4 events arrive only after consent where required, contain no personal data, and respect the opt-out toggle, the replay-rate and funnel reports work, and Search Console shows the sitemap as processed
 - Lighthouse and Core Web Vitals meet the targets in section 11.3, or the gaps are written down
@@ -264,7 +264,7 @@ Phase 3 starts only after the Phase 2 gate. Assume the Workers Paid plan from he
 7. Rate limiting and enforcement: per-user enforcement (token supersession, abandoned-start accounting, daily eligibility, and ban checks) lives in a Durable Object per user or guest, with counters persisted to DO storage. The Workers Rate Limiting binding and Cloudflare rate-limiting rules are only coarse abuse brakes; KV is never used for counters or revocation. Kill switches propagate through KV within a documented delay (target about 60 seconds), while security-critical revocations are checked against the authoritative store.
 8. **Environments and limits** (section 12.2): staging and preview environments, secrets per environment, the Drizzle migration flow in CI, and confirming billing and alerts for Workers Paid (already decided). Run a load test with 100, 500, and 2,000 simulated players against staging (section 12.3) and record request rate, p95 latency, D1 query time, and errors. Start Phase 3 with a spike on local bindings (D1, Better Auth, and the per-user Durable Object in `vite dev`, with `vite preview` or `wrangler dev` as the fallback). Run this spike before task 7. It also decides and records the Durable Object export approach (a separate Worker that exports the class and is bound from the app, the default, or a community exporter plugin; section 12.2), because the enforcement Durable Object cannot be built without it. Record the results in `docs/DECISIONS.md`.
 
-**3B: hardening and data** 9. Local-to-account import endpoint (see 8.6): validate each run by replaying it, flag as imported, dedupe, cap size and count. 10. **Ranked failure handling** (section 11.4): `pending` queue with backoff, idempotent submit, structured error responses, and kill-switch config flags. 11. **Account lifecycle and moderation basics** (see `docs/LAUNCH_CHECKLIST.md`): username rules (length, allowed characters, uniqueness, profanity filter), account and data deletion that keeps leaderboards consistent (delete or anonymize scores, decided with the owner), and the Stage 0 **admin CLI** from section 11.10 (set config, toggle kill switches, hide or restore a score, ban or unban a user, all audit-logged). The admin web panel comes later (Phase 7). 12. **Theme analytics pipeline** (section 11.6): write theme feature events through a first-party endpoint to Workers Analytics Engine and build the daily `theme_stats` rollup. 13. **Observability endpoints** (section 11.4): a rate-limited client error-report endpoint (no personal data), a health endpoint, and Workers logs with correlation ids.
+**3B: hardening and data** 9. Local-to-account import endpoint (see 8.6): validate each run by replaying it, flag as imported, dedupe, cap size and count. 10. **Ranked failure handling** (section 11.4): `pending` queue with backoff, idempotent submit, structured error responses, and kill-switch config flags. 11. **Account lifecycle and moderation basics** (see `docs/planning/LAUNCH_CHECKLIST.md`): username rules (length, allowed characters, uniqueness, profanity filter), account and data deletion that keeps leaderboards consistent (delete or anonymize scores, decided with the owner), and the Stage 0 **admin CLI** from section 11.10 (set config, toggle kill switches, hide or restore a score, ban or unban a user, all audit-logged). The admin web panel comes later (Phase 7). 12. **Theme analytics pipeline** (section 11.6): write theme feature events through a first-party endpoint to Workers Analytics Engine and build the daily `theme_stats` rollup. 13. **Observability endpoints** (section 11.4): a rate-limited client error-report endpoint (no personal data), a health endpoint, and Workers logs with correlation ids.
 
 Acceptance 3A (identity and ranked core):
 
@@ -664,7 +664,7 @@ The owner prototypes on AI web builders (Google AI Studio, z.ai, arena.ai) befor
 - Do not copy their stack, architecture, plans, or "confirmed decisions". These tools substitute their own environment (for example React and Express), which conflicts with section 2.
 - Use them for UI reference (layout, spacing, components) and gameplay feel and rules (scoring, piece distributions, timings, animations).
 - Any gameplay taken from a prototype must be re-implemented behind the engine contract (`generate`, `validate`, `score`) and pass the engine tests and test vectors. Never import prototype game logic directly.
-- Record findings in `docs/PROTOTYPE_NOTES.md`: which prototype, what to keep, what to discard (including tuning numbers), with screenshots or links.
+- Record findings in `docs/planning/PROTOTYPE_NOTES.md`: which prototype, what to keep, what to discard (including tuning numbers), with screenshots or links.
 - Timebox prototyping so it does not replace building.
 
 ### 11.6 Analytics (learn what players actually want)
@@ -870,8 +870,8 @@ Candidates, not commitments. Orientation: P portrait, L landscape, B both. Effor
 - **Multiple tabs:** only one tab owns the active round, enforced with an atomic lock (the Web Locks API, with a fencing check on every save; a `BroadcastChannel` message alone is not a lock; verify browser support). A second tab shows "This puzzle is open in another tab" with a Take over action. When only the in-memory storage fallback is available, closing the tab cannot preserve the round, and the app says so.
 - **Resume tests:** close the tab with one card open, during the mismatch delay, immediately after the final move, and while a result is being written; each must resume or finish consistently.
 - **Abandonment** is neutral, but two non-success outcomes in a row (failures, abandonments, or a mix) step the difficulty band down.
-- **Scope (v1):** a round resumes only on the device that holds its checkpoint. Cross-device resume of an active round is not in v1, because it would need an account-backed checkpoint with frequent writes (parked in `docs/IDEAS.md`). The cross-device paths in v1 are the share link (solo, unranked) and finished-run history.
-- **Retry after a failed round** is a pending owner decision (`docs/IDEAS.md`).
+- **Scope (v1):** a round resumes only on the device that holds its checkpoint. Cross-device resume of an active round is not in v1, because it would need an account-backed checkpoint with frequent writes (parked in `docs/planning/IDEAS.md`). The cross-device paths in v1 are the share link (solo, unranked) and finished-run history.
+- **Retry after a failed round** is a pending owner decision (`docs/planning/IDEAS.md`).
 
 **Edge cases.** `docs/EDGE_CASES.md` is the catalog: page lifecycle, time, input, storage, network, engine, rendering and accessibility, server and auth, payments, multiplayer, anti-cheat, analytics, SEO, internationalization, operations, and gameplay. Every case has an expected behavior and a test (unit, property, Playwright, or a manual drill). Each phase's acceptance names the categories it must cover. The engine gets property tests and fuzzing with random and invalid move sequences and extreme seeds. Add every real bug found in play to the catalog with a regression test.
 
@@ -892,7 +892,7 @@ The first local run exposed a gap: Next served another Memory round with new col
 5. **First round:** a brand-new player gets the configured first-impression family (a repo value until Phase 3, then config).
 6. Pick the variant inside the family by weight, avoiding the last variant, and the difficulty band from that family's own progression.
 7. Draw the seed, with up to 8 candidates for theme freshness (section 11.2).
-8. A failed round does not change the rotation. Try again (same seed) is a separate action (see `docs/IDEAS.md`).
+8. A failed round does not change the rotation. Try again (same seed) is a separate action (see `docs/planning/IDEAS.md`).
 
 With 2 families and no immediate repeats the sequence strictly alternates, which is acceptable; the seed decides only which family starts. With 50 families a player sees each family once per cycle of 50 rounds, with the weights shaping the order.
 

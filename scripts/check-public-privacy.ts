@@ -7,6 +7,7 @@ import { spawn } from 'node:child_process';
 import { setTimeout as delay } from 'node:timers/promises';
 import { chromium, type Page } from '@playwright/test';
 import { fixSelectorSeed, selectorSeedFor } from '../tests/e2e/entropy.js';
+import { privacyPolicy } from '../src/lib/content/privacy.js';
 
 const directory = 'build/public-privacy';
 const live = process.argv.includes('--live');
@@ -181,7 +182,11 @@ try {
 		await policyPage.getByRole('link', { name: 'cngohar@gmail.com' }).getAttribute('href'),
 		'mailto:cngohar@gmail.com'
 	);
-	assert((await policyPage.locator('article').innerText()).includes('Updated: 2026-11-03'));
+	assert(
+		(await policyPage.locator('article').innerText()).includes(
+			`Updated: ${privacyPolicy.updatedOn}`
+		)
+	);
 	assert(
 		(await policyPage.locator('article').innerText()).includes(
 			'This does not provide cross-device resume.'

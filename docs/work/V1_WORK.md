@@ -13,8 +13,8 @@ achievements are future fixtures and must not ship as real v1 data. Production
 resources, credentials, D5 eligibility and every deployment remain separate.
 
 Owner: Ali Gohar. Started 2026-10-24 from the consolidated v2 handoff in
-[V1_RELEASE_CHECKLIST.md](V1_RELEASE_CHECKLIST.md). The earlier
-[V1_RELEASE_PLAN.md](V1_RELEASE_PLAN.md) is historical. This file records work;
+[V1_RELEASE_CHECKLIST.md](../planning/V1_RELEASE_CHECKLIST.md). The earlier
+[V1_RELEASE_PLAN.md](../planning/V1_RELEASE_PLAN.md) is historical. This file records work;
 it does not authorize remote changes or mark release gates passed.
 
 ## Integrated local app — 2026-10-26
@@ -108,7 +108,7 @@ This update stops at the demo: layouts/copy still need owner review before
 integration. D5 remains open; the existing 18+ text is still only a proposal
 shown in the demo. No deployment approval is inferred.
 
-- Interactive demo: [static/demo/v1.html](../static/demo/v1.html).
+- Interactive demo: [static/demo/v1.html](../../static/demo/v1.html).
   Run `bun run dev --host 0.0.0.0` and open
   `http://localhost:5173/demo/v1.html`, or open the HTML file directly.
   During this review, an independent static server runs at

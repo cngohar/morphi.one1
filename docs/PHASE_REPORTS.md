@@ -17,9 +17,136 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.3 — Member Support local handoff (2026-11-05)
+
+**Built:** Member Support at `/account/support`, staff inbox at `/admin/support`,
+admin-only category/priority management, protected General/Normal defaults,
+paginated plain-text conversations and unread staff replies. Atomic D1 writes
+provide ownership/lifecycle/role guards, idempotency, success-only rolling quotas,
+reply-and-close, taxonomy reassignment and content-free write audits. Banned
+members retain support; gameplay checks remain unchanged. Account cascades and
+explicit limiter maintenance are integrated. Local privacy copy, retention/request
+instructions, plan/version, decisions and CODEMAP are updated. Inventory and
+logs: `docs/work/V1.3.3_WORK.md`; permanent summary:
+`docs/evidence/v1.3.3/verification.json`.
+
+**Explicit owner verification decision:** During this handoff the owner instructed
+leaving full `bun run verify` for later stages and recording that decision. The
+active process was stopped during global ESLint, after Prettier passed. Full
+verification and all unrun stages are **deferred, not passed or waived**. No further
+verification expansion is authorized at this stage. The targeted results below
+remain the evidence for this local implementation.
+
+**Skipped:** Attachments, rich text, reopening, staff notes, assignment, departments,
+email notifications, automatic ban reversal, leaderboard/game work, dependency
+upgrades, physical-device/performance measurements, source commit/push, production
+resources/secrets/DNS/Google changes and deployment. Full verification is deferred
+by the explicit owner decision above.
+
+**Known issues:** No unresolved support failure was found in the targeted checks.
+The full regression/build/runtime gate is unverified. Owner working-build review
+is pending. Conversations open oldest first in twenty-message pages; a newly
+saved reply can be on a later page. Failed drafts survive only in the current page,
+so leaving/reloading/closing discards them. Earlier test-only locator/navigation/
+hydration mistakes and initial type/lint failures were corrected and retained in
+logs. Existing v1.3.1 sound-audition status is unchanged.
+
+**Decisions and pinned versions:** Owner corrected Member Support from v1.3.4 to
+v1.3.3 and confirmed accepted v1.3.2 as baseline. Approved defaults, limits and
+retention are implemented without dependency/version upgrades. Text counts trimmed
+UTF-16 units; JSON is bounded to 32,768 bytes. Staff JSON remains under `/admin`
+for existing operator cookie scope and retains fresh-auth requirements. Tickets
+persist until account deletion, including closed tickets; audits contain no
+conversation content. See `docs/DECISIONS.md` and the approved plan.
+
+| Acceptance item                                                             | Evidence type and location                                                                                          | Result                                                        |
+| --------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Member create/read/reply/close and unread replies                           | Real local D1 `tests/integration/support.test.ts`; final Chromium `tests/e2e/support.spec.ts`; `build/v1.3.3/` logs | Pass                                                          |
+| Guest, guessed id, other member and unauthorized staff denied               | Focused D1 and Chromium service/direct-request assertions                                                           | Pass                                                          |
+| Banned member support; gameplay ban retained; pending/deleted denied        | Focused D1 ownership, ban and lifecycle cases                                                                       | Pass                                                          |
+| Moderator handling, admin taxonomy, existing support-role denial            | Focused D1 plus real operator/TOTP Chromium flows                                                                   | Pass                                                          |
+| Protected defaults, rename, closed/open reassignment and create/delete race | Focused real D1 taxonomy test and Chromium admin controls                                                           | Pass                                                          |
+| Boundary lengths, escaped text, bounded body and concurrent quotas          | D1 UTF-16/NUL/concurrency cases; Chromium escaped text/body/origin assertions                                       | Pass                                                          |
+| Duplicate retry, close/reply race and draft recovery                        | D1 idempotency/race cases; Chromium lost-response and signed-out retry                                              | Pass                                                          |
+| Self-service, privacy/lifecycle cascades and expired limiter cleanup        | Actual browser self-service deletion plus D1 privacy/lifecycle/maintenance tests; content-free audits asserted      | Pass                                                          |
+| Phone portrait/landscape and desktop member/staff flows                     | Six `build/v1.3.3/support[-staff]-*.png` captures, no-overflow/labels/keyboard checks and root visual inspection    | Pass for emulation; physical devices and owner review pending |
+| Focused D1 / Chromium suites                                                | `integration-final.log` (7/7); `browser-final.log` (2 support); retained combined run (2 privacy)                   | Pass: 7 D1 and 4 unique browser cases                         |
+| Type check and scoped lint                                                  | `check-final.log` (0 errors/0 warnings); `targeted-eslint.log`                                                      | Pass                                                          |
+| Local migration                                                             | `migrate-final.log`, migration 0014                                                                                 | Pass; local only                                              |
+| Full repository verification / broad account and game regression            | `verify.log`: Prettier passed, global ESLint stopped by owner-directed SIGTERM; later stages unrun                  | Deferred by explicit owner decision; no full pass or waiver   |
+| Owner working-build acceptance                                              | Required local owner review of member/staff flows                                                                   | Pending                                                       |
+
+**Measurements:** Local Linux workstation, unshaped local network/browser
+emulation. The final seven-case D1 command took 38.08 seconds; this is tooling
+duration, not a performance gate. No new page performance target was introduced.
+Device class/network/cold-versus-preloaded runs/median/p95 for page performance
+were not collected; no gate is claimed passed on that basis.
+
+**Waivers:** The owner waived a separate pre-build support-screen review because
+existing shells/patterns are reused; working local review remains necessary.
+Full verification is deferred, not waived. No other acceptance waiver is inferred.
+
+**Questions for the owner / owner responsibilities:** Review member and staff
+support locally and accept or supply corrections. Direct the later full
+verification stage. Physical devices, any future source handoff and every
+production/deployment action remain separate owner responsibilities/authorizations.
+
+**CODEMAP updated:** yes, with support storage/service/routes/UI/privacy/test paths.
+Stop at this local review handoff; no next feature is authorized.
+
+### v1.3.3 source handoff authorization — 2026-11-05
+
+The owner explicitly requested updating the Git repository and pushing to the
+existing GitHub `origin/main`. This authorizes the source handoff, including the
+accepted v1.3.2 working-tree changes, v1.3.3 Member Support, tests, permanent
+verification summary and documentation reorganization. It supersedes earlier
+commit/push restrictions only for this handoff. It does not record v1.3.3 owner
+acceptance, resume full verification, or authorize deployment or production
+changes. Full `bun run verify` remains explicitly deferred to later stages.
+
+Local editor MCP configuration, ignored credentials/databases/build output,
+three unauditioned v1.3.1 MP3s and pre-existing palette timing changes are excluded.
+No application tests are repeated for this source-only handoff.
+
+## v1.3.2 — Owner local acceptance (2026-11-05)
+
+**Built / scope:** Existing local Connect classic/full-grid/board-8/rush-60
+variants, per-game admin scoring tabs, numbered audit pagination and compact
+profile recent-round summary. Scope: `docs/briefs/morphi-v1.3.2-codex-brief.md`;
+implementation remains in the working tree.
+
+**Owner acceptance:** The owner explicitly instructed: “now mark this as a
+accepted”. This closes the local owner-review status for v1.3.2 and supersedes
+the brief's pending-review label. No specific test results, devices or browsers
+were reported in this acceptance.
+
+**Evidence:** Connect variants, admin scoring/navigation, audit pagination,
+profile summary/activity and Connect admin test play are accepted by owner
+instruction in this conversation on 2026-11-05. Section 7 automated checks,
+six-runtime vectors and registry generation have no recorded v1.3.2 run evidence;
+they are unverified, not marked passed or waived.
+
+**Skipped:** This acceptance-record update makes no application changes and
+runs no application checks. No commit, push, deployment, production change or
+next implementation was requested or authorized.
+
+**Known issues:** Technical verification remains unconfirmed; owner acceptance
+does not establish regression-free behavior or physical-device coverage.
+The separate v1.3.1 sound-audition gate is unchanged.
+
+**Decisions and pinned versions:** Record local v1.3.2 owner acceptance only;
+no implementation decision or dependency version changed.
+
+**Measurements:** None supplied or collected; device/network profiles, run
+counts, medians and p95 are unavailable. No performance gate is marked passed.
+
+**Waivers:** None recorded. **Questions for the owner:** None for recording
+acceptance. **Owner responsibilities:** Authorize any subsequent implementation,
+source handoff or deployment separately. **CODEMAP updated:** yes.
+
 ## v1.3.1 — Block variants, admin games and sounds (2026-11-05)
 
-**Built:** classic-compatible Block board-10/rows-only/rush-60 with isolated groups/shared `brief-v1`; exact ranked rush ceiling; cached reconciled Games overview and selected-family detail reads; accessible header switch/dialog and audited reason-free enable; catalog-derived protected ephemeral test play; staged offline sound generation and three new static action assets. Full 42-path inventory and results: `docs/V1.3.1_WORK.md`.
+**Built:** classic-compatible Block board-10/rows-only/rush-60 with isolated groups/shared `brief-v1`; exact ranked rush ceiling; cached reconciled Games overview and selected-family detail reads; accessible header switch/dialog and audited reason-free enable; catalog-derived protected ephemeral test play; staged offline sound generation and three new static action assets. Full 42-path inventory and results: `docs/work/V1.3.1_WORK.md`.
 
 **Skipped:** D6/sidebar/pagination changes, Connect variants/Mahjong/new families, guest tracking, new routes/dependencies/migrations, full verify/global lint/type checks and unrelated suites, physical-device/performance/production measurements, commit/push and release/deployment work.
 
@@ -43,7 +170,7 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 The owner explicitly requested updating the repository and pushing the v1.3.1 source handoff to the existing GitHub `origin/main`. This supersedes the earlier commit/push stop instruction for this handoff only; no local acceptance, deployment, release or next phase is inferred. Include implementation/tests, regenerated outputs, the approved brief, provenance manifest and report/evidence. The three new MP3s remain local and uncommitted until the owner approves their audition; a fresh checkout therefore lacks those assets even though their hooks/provenance are included. Prior local verification used the local files, and S5 remains NOT PASSED.
 
-The existing verification results are retained without repeating app checks. Pre-existing editor configuration, ignored credentials, databases and build output stay excluded. See the Git handoff note in `docs/V1.3.1_WORK.md`; execution status is reported separately after the source commit/push.
+The existing verification results are retained without repeating app checks. Pre-existing editor configuration, ignored credentials, databases and build output stay excluded. See the Git handoff note in `docs/work/V1.3.1_WORK.md`; execution status is reported separately after the source commit/push.
 
 ## v1.1 Work 3: Connect local integration — 2026-10-29
 
@@ -839,16 +966,16 @@ bundle). These are local evidence, not owner acceptance or launch authorization.
 
 Changed files for this task:
 
-| Area                                                           | Files                                                                                                                                                                         |
-| -------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
-| Public policy                                                  | `src/lib/content/privacy.ts`, `src/lib/i18n/messages.ts`, `src/routes/privacy/+page.svelte`                                                                                   |
-| Guest publication mode (account prompts/replay queue disabled) | `src/routes/+page.ts` (new), `src/routes/+page.svelte`, `src/lib/screens/HomeScreen.svelte`, `src/lib/screens/ResultScreen.svelte`                                            |
-| Local operator controls                                        | `src/lib/server/retention.ts` (new), `scripts/admin-local.ts`                                                                                                                 |
-| Publication preparation/checks                                 | `scripts/prepare-public-privacy.ts`, `scripts/check-public-privacy.ts` (both new)                                                                                             |
-| Existing verification                                          | `tests/integration/accounts.test.ts`, `tests/e2e/privacy.spec.ts`, `scripts/check-vectors.ts`                                                                                 |
-| Configuration                                                  | `package.json`, `wrangler.jsonc`, `wrangler.public-privacy.jsonc` (new)                                                                                                       |
-| Operational docs                                               | `docs/PRIVACY_RETENTION.md`, `PRIVACY_REQUESTS.md`, `PUBLIC_PRIVACY_RELEASE.md`, `STEP6_REVIEW.md` (new)                                                                      |
-| Project records                                                | `AGENTS.md`, `morphi-plan-simple.md`, `docs/PRIVACY_REVIEW.md`, `GOOGLE_OAUTH_PUBLIC.md`, `ADMIN_LOCAL.md`, `STEP6_WORK.md`, `DECISIONS.md`, `CODEMAP.md`, `PHASE_REPORTS.md` |
+| Area                                                           | Files                                                                                                                                                                                 |
+| -------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Public policy                                                  | `src/lib/content/privacy.ts`, `src/lib/i18n/messages.ts`, `src/routes/privacy/+page.svelte`                                                                                           |
+| Guest publication mode (account prompts/replay queue disabled) | `src/routes/+page.ts` (new), `src/routes/+page.svelte`, `src/lib/screens/HomeScreen.svelte`, `src/lib/screens/ResultScreen.svelte`                                                    |
+| Local operator controls                                        | `src/lib/server/retention.ts` (new), `scripts/admin-local.ts`                                                                                                                         |
+| Publication preparation/checks                                 | `scripts/prepare-public-privacy.ts`, `scripts/check-public-privacy.ts` (both new)                                                                                                     |
+| Existing verification                                          | `tests/integration/accounts.test.ts`, `tests/e2e/privacy.spec.ts`, `scripts/check-vectors.ts`                                                                                         |
+| Configuration                                                  | `package.json`, `wrangler.jsonc`, `wrangler.public-privacy.jsonc` (new)                                                                                                               |
+| Operational docs                                               | `docs/privacy/PRIVACY_RETENTION.md`, `PRIVACY_REQUESTS.md`, `PUBLIC_PRIVACY_RELEASE.md`, `STEP6_REVIEW.md` (new)                                                                      |
+| Project records                                                | `AGENTS.md`, `morphi-plan-simple.md`, `docs/privacy/PRIVACY_REVIEW.md`, `GOOGLE_OAUTH_PUBLIC.md`, `ADMIN_LOCAL.md`, `STEP6_WORK.md`, `DECISIONS.md`, `CODEMAP.md`, `PHASE_REPORTS.md` |
 
 - **Final verification:** `bun run verify` passes in `/tmp/morphi-readiness-verify-complete.log`: format/lint, 0-error/0-warning type check, boundary self-checks, 95 unit tests, 17 D1/auth integration tests, six runtime vectors (unchanged fingerprint `a8be9d5fdacc1818c3d078be2fa014cb279c349d6ba7313029f9a363b40b0ac4`), production build, 15 isolated built-Worker checks and all 24 Chromium account/privacy/recovery/layout/input cases. Initial failures and their fixes are described above; `/tmp/morphi-readiness-layout-hmr.zip` retains the interrupted-run evidence. A final factual mail-disclosure addition was checked separately with `bun run check` (0 errors/warnings) and the rebuilt artifact checks. Final `prepare:public-privacy`, `test:public-privacy` and `wrangler deploy --config wrangler.public-privacy.jsonc --dry-run` all pass (`/tmp/morphi-readiness-public-build-final.log`, `/tmp/morphi-readiness-public-test-final.log`, `/tmp/morphi-readiness-public-dry.log`). Dry run reports no bindings and exits without upload; its 47 filesystem entries correspond to 41 asset files plus directories, not a claim about total uploaded asset bytes. Manifest SHA-256: `15c32fd3562c607d43d676e09041f4ccda498e9457f06a18c553e43ce600efce`. After the dry run, all asset names/hashes still match. Final phone rendering inspected at `build/public-privacy/checks/privacy-390.png`; three approved sizes captured. The final scan of 30 changed source/config/doc files and all 41 asset files found no configured credential-value matches; baseline diff is `/tmp/morphi-privacy-readiness.diff` (no Git metadata in this workspace).
 - **Measurements:** Local Linux development desktop and Chromium; localhost serving; policy layouts 390×844, 844×390 and 1280×800 in the artifact check, plus the normal 320×480 policy case. These are functional/layout checks, not new latency/performance claims. No median/p95 series was introduced; prior replay measurements and their limits remain in `STEP6_MEASUREMENTS.md`.
@@ -866,7 +993,7 @@ Changed files for this task:
 
 - **Built:** `/privacy` with the owner-supplied operator Ali Gohar and public contact cngohar@gmail.com, current Google/account/history/leaderboard/device-storage/security disclosures, provider links, deletion/retention limits, and children's/families wording. Prerendered HTML with client JavaScript disabled, readable without sign-in, title/description/canonical, accessible headings, and a visible draft/noindex state. Home and account/content footers link to it; gameplay has no footer overlay. Content is separate from the route layout and all copy uses the message catalog. Fixed the server hook's build guard so prerendering never reads unavailable Worker bindings. Added static-document/account-navigation and layout checks, plus `/privacy` in the isolated built-Worker smoke.
 - **Skipped (and why):** No publication, Google submission, DNS/credentials/backend provisioning, or deployment. No admin editor/CMS, terms/blog/other new pages, analytics, age screen, or parental-consent flow. The owner selected under-13 guest games with child accounts deferred; this task records that decision and exposes the unimplemented safeguards instead of inventing an account flow. Later editable static pages belong to long-plan section 11.10 Stage 5.
-- **Known issues:** This is deliberately a local draft, not a publication-ready policy or a legal-compliance determination. The under-13 guest-only/account-eligibility and data-collection safeguards must be designed, implemented, and reviewed before public accounts. Security/moderation/provider-log/backup retention periods and request handling still need owner review. Google's requirements and children's privacy considerations apply to actual behavior; a page alone does not establish those protections. `docs/PRIVACY_REVIEW.md` records the scope and blockers. Step 6 owner/physical-device acceptance remains open.
+- **Known issues:** This is deliberately a local draft, not a publication-ready policy or a legal-compliance determination. The under-13 guest-only/account-eligibility and data-collection safeguards must be designed, implemented, and reviewed before public accounts. Security/moderation/provider-log/backup retention periods and request handling still need owner review. Google's requirements and children's privacy considerations apply to actual behavior; a page alone does not establish those protections. `docs/privacy/PRIVACY_REVIEW.md` records the scope and blockers. Step 6 owner/physical-device acceptance remains open.
 - **Decisions and pinned versions:** Owner chooses public OAuth verification before the full v1 launch, with final home/privacy information published first through a separately authorized, reviewed change. The local accounts configuration is not a policy-only deploy artifact. Keep Google-only sign-in, guest play, and existing dependency pins. Use the approved scrolling content template; no CMS schema or Markdown/HTML interpreter is added. Current SvelteKit prerender/CSR and Google/FTC primary sources are linked in `PRIVACY_REVIEW.md`; no dependencies changed.
 - **Questions for the owner:** Review the local policy and the recorded under-13 guest-only direction. A separate safeguards/retention design review is needed before this policy can be finalized for Google submission. Admin editing and other static pages remain future scoped work.
 - **Evidence table:**
@@ -883,7 +1010,7 @@ Changed files for this task:
 | Production build including prerender                                                  | Framework build                                 | `bun run test:worker`; `/tmp/morphi-privacy-worker.log`                          | pass after moving build guard before Worker binding reads               |
 | Built Worker still serves public pages and validates/revokes real sessions            | Isolated temporary local D1 smoke               | `scripts/check-worker.ts`, `/tmp/morphi-privacy-worker.log`                      | 15 checks pass, including guest `/privacy`                              |
 | Readable layout review                                                                | Local Chromium screenshots                      | `/tmp/morphi-privacy-390.png`, `-844.png`, `-1280.png`                           | inspected portrait and desktop; all sizes captured                      |
-| Public publication / Google verification / children's safeguards / retention approval | Owner review and future implementation          | `docs/PRIVACY_REVIEW.md`                                                         | pending; no waiver or public-ready claim                                |
+| Public publication / Google verification / children's safeguards / retention approval | Owner review and future implementation          | `docs/privacy/PRIVACY_REVIEW.md`                                                 | pending; no waiver or public-ready claim                                |
 | CODEMAP and decision records                                                          | Documentation                                   | `docs/CODEMAP.md`, `docs/DECISIONS.md`, simple plan                              | updated                                                                 |
 
 - **Measurements:** Layout checks use local desktop Chromium with the four viewport sizes above and normal scrolling for the policy; Home retains its no-scroll fit. No new timing/load-performance claim or median/p95 series was introduced. Existing Step 6 replay measurements remain unchanged.
@@ -915,7 +1042,7 @@ Status: implementation and automated local verification delivered. Owner accepta
 | Finished result survives reload and interruption                                 | Logical-completion-before-animation and lost-response tests | account browser suite; `src/lib/ui/progress.ts`                                                | pass                                                                |
 | Blocked storage remains playable with honest warning                             | Real browser API failure injection                          | account browser suite                                                                          | pass; persistence unavailable is explicitly disclosed               |
 | Comparable groups, one best result/player, hidden/banned/deleted entries removed | Real D1 queries and browser/built-Worker deletion           | `runs.test.ts`, account browser suite, `check-worker.ts`                                       | pass                                                                |
-| Necessary moderation permissions, second factor, and audits                      | D1 role/audit tests; RFC 6238 vector                        | `runs.test.ts`, `admin-totp.test.ts`, `docs/ADMIN_LOCAL.md`                                    | pass; owner enrollment not performed                                |
+| Necessary moderation permissions, second factor, and audits                      | D1 role/audit tests; RFC 6238 vector                        | `runs.test.ts`, `admin-totp.test.ts`, `docs/operations/ADMIN_LOCAL.md`                         | pass; owner enrollment not performed                                |
 | Lint/format and zero-error/zero-warning type check                               | Full verification command                                   | `bun run verify`                                                                               | pass                                                                |
 | Unit and account/ranked integration regressions                                  | Vitest                                                      | full verification: 95 unit and 15 integration tests                                            | pass                                                                |
 | Browser account, recovery, input, and approved layouts                           | Chromium                                                    | full verification: 21 cases including 390×844, 844×390, 1280×800, smaller portraits            | pass                                                                |
@@ -984,7 +1111,7 @@ Newest first.
 
 - **Measurements:** Virtual Chromium viewports listed above, local dev server plus one built-Worker run at 390x844, no throttling. Actual completed rounds were used; results were not injected. Screenshot artifacts are in `/tmp/morphi-result-review-20261023/` (including the built Worker Memory result). Initial browser run took 2.9 minutes and the seven-case environment retry took 24.6 seconds; these are test durations, not user latency measurements. No median/p95 or real-device performance claim.
 - **Waivers:** None. Failed cases were rerun successfully after restoring the local server.
-- **Owner responsibilities:** Review `http://localhost:5173/` through Play and a completed round. `morphi.one` remains the prior owner-approved deployment; no deployment was performed. Follow `docs/GOOGLE_AUTH_SETUP.md` to enable real Google login when ready.
+- **Owner responsibilities:** Review `http://localhost:5173/` through Play and a completed round. `morphi.one` remains the prior owner-approved deployment; no deployment was performed. Follow `docs/operations/GOOGLE_AUTH_SETUP.md` to enable real Google login when ready.
 - **CODEMAP updated:** yes.
 
 ## Step 6: local accounts foundation — 2026-10-23
@@ -993,7 +1120,7 @@ Newest first.
 - **Skipped (and why):** Real Google login/callback verification is pending the owner’s OAuth client; the owner confirmed it does not exist yet. No remote database, Google project, deployment, web admin panel, new game, or gameplay/scoring change. Saved-round synchronization and validated ranked leaderboards are the next slices and are not claimed complete; the account page truthfully shows empty progress instead of mock scores. The standalone demo remains a reference artifact.
 - **Known issues:** No real Google OAuth callback has been exercised. Account creation via Google, cancellation/denied consent, and provider credential errors need a real test once credentials exist. Local cookie/session tests use privileged helpers only in the test processes; no fixture endpoint or test-login path ships in the app. Real-device review of the implemented screens, Firefox/WebKit account verification, account-scale load measurements, and full Step 6 release hardening remain outstanding. The D1 ID and canonical base URL are explicitly local and must be replaced/reviewed before any production release. The browser tests use the same local D1 file as the dev app, so they create and remove reserved test accounts; fixture proxies are closed before browser requests to avoid competing local SQLite writers.
 - **Decisions and pinned versions:** `better-auth@1.7.12`, `@better-auth/drizzle-adapter@1.7.12`, `drizzle-orm@0.45.4`, `drizzle-kit@0.31.11`. Kept TypeScript `~6.0.3`, adapter-cloudflare 8.0.1, Wrangler 4.151.3, runtime date 2026-10-22, and `nodejs_als`. Seven-day sessions, daily update age, five-minute freshness for deletion, encrypted provider tokens, disabled password registration/account linking, explicit origin/CSRF checks, and database-backed auth rate limiting. Public names use 3–20 ASCII letters/numbers/underscores with official names reserved; Google profile fields are not used publicly. Secrets are read from `cloudflare:workers`, including the pinned adapter’s Vite emulation of `.dev.vars`. See `docs/DECISIONS.md` for generated-types and SvelteKit 3 API details.
-- **Questions for the owner:** No further screen/scope approval needed. Create the Google OAuth web client using `docs/GOOGLE_AUTH_SETUP.md` and enter its credentials only in ignored `.dev.vars`; then the real provider flow can be tested. This is an external setup dependency, not a request to reapprove implementation.
+- **Questions for the owner:** No further screen/scope approval needed. Create the Google OAuth web client using `docs/operations/GOOGLE_AUTH_SETUP.md` and enter its credentials only in ignored `.dev.vars`; then the real provider flow can be tested. This is an external setup dependency, not a request to reapprove implementation.
 - **Evidence table:**
 
 | Acceptance item for this slice                                                                         | Evidence type                                  | Where                                                                                                                                | Result                                                                                                                               |
@@ -1010,16 +1137,16 @@ Newest first.
 | Built Worker with real D1/session operations                                                           | Isolated local Wrangler + Chromium             | `/tmp/morphi-account-worker-smoke.ts`; `/tmp/morphi-accounts-worker-result.json`; screenshots `/tmp/morphi-accounts-worker-screens/` | pass; profile at all 3 sizes, private cache headers, name edit, fresh deletion, revoked-session redirect, guest game; no page errors |
 | Local secret values excluded from browser output                                                       | Byte scan, no values printed                   | `.svelte-kit/output/client/` (37 files) against the local auth secret                                                                | no matches                                                                                                                           |
 | Real Google authorization completion                                                                   | Real provider/browser test                     | Owner OAuth client not yet created                                                                                                   | pending; not waived                                                                                                                  |
-| Saved game history, ranked scoring, leaderboard and release gates                                      | Later Step 6 slices                            | `docs/STEP6.md`                                                                                                                      | outstanding; no Step 6 completion claimed                                                                                            |
+| Saved game history, ranked scoring, leaderboard and release gates                                      | Later Step 6 slices                            | `docs/planning/STEP6.md`                                                                                                             | outstanding; no Step 6 completion claimed                                                                                            |
 
 - **Measurements:** Automated Chromium uses virtual 390x844, 844x390, and 1280x800 viewports. The built Worker smoke uses a separate temporary local D1 state directory, the same configured runtime flags, canonical localhost origin overridden to port 8787, no network throttling, and one profile capture per viewport. No horizontal overflow or page errors. Full browser-suite duration is 3.3 minutes; it is not a user latency measurement. No median/p95, real-device, load-capacity, or ranked-replay CPU/memory claim. Temporary logs/scripts/screenshots are session artifacts; outcomes are recorded durably here.
 - **Waivers:** None added. The Step 5 replay-evidence waiver remains historical; real Google testing and Step 6 release checks are still required.
-- **Owner responsibilities:** Follow `docs/GOOGLE_AUTH_SETUP.md`; do not send secrets in chat. Use `http://localhost:5173/account/sign-in` on the development machine for the exact configured callback. Report real-device issues. Remote D1 provisioning, production Google settings/secrets, and any deployment remain separate authorized operations.
+- **Owner responsibilities:** Follow `docs/operations/GOOGLE_AUTH_SETUP.md`; do not send secrets in chat. Use `http://localhost:5173/account/sign-in` on the development machine for the exact configured callback. Report real-device issues. Remote D1 provisioning, production Google settings/secrets, and any deployment remain separate authorized operations.
 - **CODEMAP updated:** yes.
 
 ## Step 6 Google choice and account-screen preview — 2026-10-23
 
-- **Built:** Recorded the owner’s Google-only sign-in choice with guest play retained. Added an isolated local HTML review harness (`static/demo/accounts.html`) and five responsive proposed screens: Sign in, Choose player name, Your account, After a round, and Leaderboard. Included normal/cancelled/failed/offline connection samples, an in-memory sign-in/name flow, public-name validation samples, edit/sign-out, deletion confirmation, and game/Memory-size filters. Reused the existing self-hosted Nunito subset and palette tokens; prototype copy lives in its own message catalog. Documented the database and administration sequence in `docs/STEP6.md`.
+- **Built:** Recorded the owner’s Google-only sign-in choice with guest play retained. Added an isolated local HTML review harness (`static/demo/accounts.html`) and five responsive proposed screens: Sign in, Choose player name, Your account, After a round, and Leaderboard. Included normal/cancelled/failed/offline connection samples, an in-memory sign-in/name flow, public-name validation samples, edit/sign-out, deletion confirmation, and game/Memory-size filters. Reused the existing self-hosted Nunito subset and palette tokens; prototype copy lives in its own message catalog. Documented the database and administration sequence in `docs/planning/STEP6.md`.
 - **Skipped (and why):** Production UI/authentication, migrations/database creation, real Google access, new dependencies, admin panel, gameplay changes, and deployment. The owner requested a demo to review before accepting screens. Sample actions do not persist or perform real sign-in, saving, deletion, or scoring.
 - **Known issues:** New-screen approval is pending. Profile history scrolls at phone sizes and short landscape; the landscape leaderboard also scrolls. Preview Play/Next shows a notice instead of starting the games. Public-name rules, deletion policy, leaderboard windows, and saved-progress scope remain design proposals. Real-phone review and real Google/D1 integration are not established by this preview.
 - **Decisions:** Google sign-in selected by the owner. Start account storage with local D1 using the locked Better Auth stack; no resource was created. A full admin web panel is not a prerequisite: the full plan’s Stage 0 audit-logged command tool precedes it. Current Better Auth Google/database and Cloudflare D1 local-development documentation checked 2026-10-23. No pinned dependency versions changed.
@@ -1045,7 +1172,7 @@ Newest first.
 
 ## Step 5 owner acceptance and Step 6 planning — 2026-10-23
 
-- **Built:** Recorded the owner's acceptance of the public-test result and prepared `docs/STEP6.md` with a proposed sequence for accounts, completed-progress sync, server-validated scores, and leaderboards. Updated the active status in the simple plan, agent instructions, decisions, and CODEMAP.
+- **Built:** Recorded the owner's acceptance of the public-test result and prepared `docs/planning/STEP6.md` with a proposed sequence for accounts, completed-progress sync, server-validated scores, and leaderboards. Updated the active status in the simple plan, agent instructions, decisions, and CODEMAP.
 - **Skipped (and why):** No runtime changes, dependency installation, authentication implementation, new games, remote resource creation, or deployment. The owner requested the next-step approach; authentication and new-screen choices remain unresolved.
 - **Known issues:** Replay counts and the predetermined threshold are still unavailable. The acceptance is owner judgment, not a measured retention or replay claim. Existing browser bests cannot be replay-validated because they contain no move logs.
 - **Decisions:** Step 5 is accepted. Google-only sign-in with guest play is recommended but not selected. Step 6 planning draws only relevant requirements from the full plan.
@@ -1056,7 +1183,7 @@ Newest first.
 | -------------------------------------------------- | ----------------------------- | ---------------------------------------------------------------- | ---------------------------------------------------- |
 | Owner accepts the public-test result               | Explicit owner instruction    | Conversation, 2026-10-23: "i ill maccept the public test result" | accepted by owner judgment                           |
 | Second-round share against predetermined threshold | No measured evidence supplied | Prior public-test feedback report                                | waived by owner acceptance; no measured pass claimed |
-| Proposed Step 6 sequence and unresolved choices    | Documentation                 | `docs/STEP6.md`                                                  | prepared; implementation not begun                   |
+| Proposed Step 6 sequence and unresolved choices    | Documentation                 | `docs/planning/STEP6.md`                                         | prepared; implementation not begun                   |
 
 - **Measurements:** No new performance measurements; documentation-only change.
 - **Waivers:** The owner accepts proceeding from Step 5 without the missing replay counts and predetermined threshold. Risk: positive sentiment may not predict repeat play.
@@ -1096,7 +1223,7 @@ Newest first.
 - **Built:** Installed 19 Cloudflare skills in `.agents/skills`, generated `skills-lock.json`, and registered the enabled Cloudflare MCP server in `.codex/config.toml`. Completed browser OAuth with read-only account/Worker diagnostic scopes plus offline access.
 - **Skipped:** Global installation/configuration, the optional `cf` CLI, deployment, and infrastructure changes. The current conversation needs a reload before it can invoke newly registered MCP tools.
 - **Known issues:** MCP API/tool access has not been exercised after login; authentication success does not establish that every API operation is available with the selected scopes. No gameplay changes.
-- **Decisions:** Project-only configuration; Wrangler remains the deployment tool. Codex manages OAuth credentials outside the repository. Installation paths and scopes are recorded in `docs/CLOUDFLARE_AGENT_SETUP.md`.
+- **Decisions:** Project-only configuration; Wrangler remains the deployment tool. Codex manages OAuth credentials outside the repository. Installation paths and scopes are recorded in `docs/operations/CLOUDFLARE_AGENT_SETUP.md`.
 - **Questions for the owner:** None.
 - **Evidence table:**
 
@@ -1122,17 +1249,17 @@ Newest first.
 - **Questions for the owner:** None required to review the code. Browser/device verification is needed before considering deployment. Cloudflare activation needs writable project config directories and subsequent browser OAuth authorization.
 - **Evidence table:**
 
-| Acceptance item                                    | Evidence type                              | Location                          | Result                                                                  |
-| -------------------------------------------------- | ------------------------------------------ | --------------------------------- | ----------------------------------------------------------------------- |
-| Storage corruption and failed-write fallback       | Unit regressions                           | `src/lib/ui/storage.test.ts`      | pass; earlier comparison against original code reproduced four failures |
-| Visible-time UI deadlines and cancellation         | Fake-clock unit tests                      | `src/lib/ui/active-delay.test.ts` | pass                                                                    |
-| Existing rule, RNG, selector, and palette tests    | Node/Vitest                                | `bun run test:unit -- --run`      | 92 tests pass across 8 files                                            |
-| Types, including new browser cases and test config | Svelte/TypeScript                          | `bun run check`                   | 0 errors, 0 warnings                                                    |
-| Formatting and lint                                | Prettier/ESLint                            | `bun run lint`                    | pass                                                                    |
-| Production bundle                                  | Local build                                | `bun run build`                   | pass with Cloudflare adapter; no upload                                 |
-| Browser regression discovery                       | Playwright listing                         | `bun run test:e2e -- --list`      | 11 cases discovered in 2 files                                          |
-| Retry, drag, keyboard, visibility integration      | Browser tests                              | `tests/e2e/reliability.spec.ts`   | blocked by local listener/browser sandbox; no browser pass claimed      |
-| Project-local Cloudflare agent setup               | Read-only inspection/current official docs | `docs/CLOUDFLARE_AGENT_SETUP.md`  | blocked; no MCP registration, OAuth, or new skill installation          |
+| Acceptance item                                    | Evidence type                              | Location                                    | Result                                                                  |
+| -------------------------------------------------- | ------------------------------------------ | ------------------------------------------- | ----------------------------------------------------------------------- |
+| Storage corruption and failed-write fallback       | Unit regressions                           | `src/lib/ui/storage.test.ts`                | pass; earlier comparison against original code reproduced four failures |
+| Visible-time UI deadlines and cancellation         | Fake-clock unit tests                      | `src/lib/ui/active-delay.test.ts`           | pass                                                                    |
+| Existing rule, RNG, selector, and palette tests    | Node/Vitest                                | `bun run test:unit -- --run`                | 92 tests pass across 8 files                                            |
+| Types, including new browser cases and test config | Svelte/TypeScript                          | `bun run check`                             | 0 errors, 0 warnings                                                    |
+| Formatting and lint                                | Prettier/ESLint                            | `bun run lint`                              | pass                                                                    |
+| Production bundle                                  | Local build                                | `bun run build`                             | pass with Cloudflare adapter; no upload                                 |
+| Browser regression discovery                       | Playwright listing                         | `bun run test:e2e -- --list`                | 11 cases discovered in 2 files                                          |
+| Retry, drag, keyboard, visibility integration      | Browser tests                              | `tests/e2e/reliability.spec.ts`             | blocked by local listener/browser sandbox; no browser pass claimed      |
+| Project-local Cloudflare agent setup               | Read-only inspection/current official docs | `docs/operations/CLOUDFLARE_AGENT_SETUP.md` | blocked; no MCP registration, OAuth, or new skill installation          |
 
 - **Measurements:** No new latency/load performance measurements; device/network profile, cold/preloaded runs, median, and p95 are not available. Fake-clock tests establish deadline behavior, not device performance.
 - **Waivers:** None. Browser verification is blocked, not waived.
@@ -1369,7 +1496,7 @@ public-test acceptance and deployment remain separate.
 **Measurements:** No new performance gate specified for this step; production
 resource evidence remains a separate release gate. **Waivers:** None.
 **Owner responsibilities:** Direct the next handoff item, Work 5. No deployment was authorized.
-**CODEMAP:** Updated. Final `bun run verify` passed all stages: 30,000 palettes, unit and D1/auth integration, six-runtime vectors, built Worker and 156/156 browser checks. Local review/acceptance applies to the owner PC only; public-test acceptance was not claimed. See `docs/V1.1_WORK.md`.
+**CODEMAP:** Updated. Final `bun run verify` passed all stages: 30,000 palettes, unit and D1/auth integration, six-runtime vectors, built Worker and 156/156 browser checks. Local review/acceptance applies to the owner PC only; public-test acceptance was not claimed. See `docs/work/V1.1_WORK.md`.
 
 ## v1.1 Work 5 — family-door withdrawal and static explainers (2026-10-31)
 
@@ -1438,18 +1565,18 @@ deployment action is authorized by this local work.
 ## Next phase assessment — local only (2026-10-31)
 
 **Built:** Gap assessment with code evidence, current behavior, undo matrix,
-proposed order and owner decisions in `docs/NEXT_PHASE_ASSESSMENT.md`.
+proposed order and owner decisions in `docs/reviews/NEXT_PHASE_ASSESSMENT.md`.
 **Skipped:** Implementation, test execution, deployment and remote operations;
 this slice was assessment only. **Known issues:** Single web-operator enrollment,
 audit integrity limitations and incomplete statistics are detailed in the report.
 **Decisions:** None; no dependency changes. **Questions for the owner:** See the
 report's ten decision questions; approve a slice and order before implementation.
 
-| Acceptance item                                                     | Evidence type and location                                   | Result                            |
-| ------------------------------------------------------------------- | ------------------------------------------------------------ | --------------------------------- |
-| Six requested gaps and current local implementation                 | Code/schema/test inspection, `docs/NEXT_PHASE_ASSESSMENT.md` | Assessed; owner decisions pending |
-| Existing features, undo limits, proposed order and decision context | Code inspection, same report                                 | Documented                        |
-| Local-only and behavior unchanged                                   | Working-tree inspection; report-only documentation changes   | Pass                              |
+| Acceptance item                                                     | Evidence type and location                                           | Result                            |
+| ------------------------------------------------------------------- | -------------------------------------------------------------------- | --------------------------------- |
+| Six requested gaps and current local implementation                 | Code/schema/test inspection, `docs/reviews/NEXT_PHASE_ASSESSMENT.md` | Assessed; owner decisions pending |
+| Existing features, undo limits, proposed order and decision context | Code inspection, same report                                         | Documented                        |
+| Local-only and behavior unchanged                                   | Working-tree inspection; report-only documentation changes           | Pass                              |
 
 **Measurements:** None requested or collected. **Waivers:** None.
 **Owner responsibilities:** Review the report, decide the open questions and
@@ -1566,7 +1693,7 @@ user-detail polish; no earlier screenshot is fabricated.
 review and supplied visual corrections. None of that constitutes final
 acceptance. See `docs/DECISIONS.md`. No dependency versions changed.
 
-**Questions for the owner:** Review `docs/NEXT_PHASE_REVIEW.md` and the local
+**Questions for the owner:** Review `docs/reviews/NEXT_PHASE_REVIEW.md` and the local
 before/after gallery, then accept or request corrections. Closing the work waits
 for that acceptance; no production/deployment action follows automatically.
 
@@ -1596,7 +1723,7 @@ import-boundary self-checks, 30,000 palettes, 126 unit tests, 37 account integra
 tests, vectors in Node/Bun/Chromium/Firefox/WebKit/workerd, 32 built-Worker smoke
 checks, and 174/174 browser checks (one worker, 35.8 minutes). Full persistent log:
 `build/combined-review/verify-final.log`. Final capture evidence has 63 matched
-before/after pairs; `docs/NEXT_PHASE_VISUAL_REVIEW.md` records findings.
+before/after pairs; `docs/reviews/NEXT_PHASE_VISUAL_REVIEW.md` records findings.
 
 All implementation and automated checks are complete locally. All three slices
 and owner quick-review changes remain **pending combined owner acceptance**.
@@ -1638,7 +1765,7 @@ Decide any future work and separately authorize production actions or deployment
 `1303c9c4bdb1718bb558886dc43b7b48c597a02a`, "Record combined local
 acceptance", the post-acceptance v1.2 base. Local annotated tag
 `v1.2-local-complete` freezes that commit. The approved single brief is supplied
-as `docs/morphi-engine-refactor-brief.md`.
+as `docs/briefs/morphi-engine-refactor-brief.md`.
 
 v1.2 is complete locally: the owner accepted all three slices and quick-review
 changes after reviewing on their own PC and checking mobile layouts through
@@ -2071,7 +2198,7 @@ unmeasured. No unresolved Slice 4 failure remains in the authorized checks.
 radix passes and bounded repair, supported by deterministic work counters and
 adversarial timing. Existing procedural pools are reused without new variant
 selection or puzzle parameters. See `docs/DECISIONS.md`, `docs/EDGE_CASES.md` and
-`docs/PRIVACY_RETENTION.md`.
+`docs/privacy/PRIVACY_RETENTION.md`.
 
 **Verification method:** Fast checks only. Lint, zero-warning type-check and
 boundaries passed. The broad unit rerun passed 157/158; one existing Connect seed
@@ -2203,7 +2330,7 @@ before Slice 6 may begin.
 | Weighted best-of-N, family/version isolation, distinct symbol subsets and palette reuse                              | `src/lib/engine/theme/theme.test.ts`, `src/lib/ui/theme-history.test.ts`; `docs/evidence/slice5-themes/palettes.json`                                                 | Pass; all 66 possible 10-of-12 subsets reached per family in the diagnostic                                 |
 | Palette safety, gamut reduction and Machado separation                                                               | `build/slice5/palettes-pass.log`; `docs/evidence/slice5-themes/palettes.json`; negative publishing tests                                                              | Pass, 30,000 palettes; every hue bucket below the existing 5% fallback gate                                 |
 | Worker normal path and explicit failure recovery                                                                     | Worker config/failure unit tests; preview observes real `theme-worker` instances                                                                                      | Pass; no synchronous solver fallback                                                                        |
-| Four-file legacy CSS audit and editable safe tokens/shapes                                                           | `docs/SLICE5_CSS_AUDIT.md`; site-token/schema/shape tests; responsive previews                                                                                        | Pass; structural layout retained                                                                            |
+| Four-file legacy CSS audit and editable safe tokens/shapes                                                           | `docs/reviews/SLICE5_CSS_AUDIT.md`; site-token/schema/shape tests; responsive previews                                                                                | Pass; structural layout retained                                                                            |
 | Theme sheet and scattered backdrop coordinates                                                                       | `docs/evidence/slice5-themes/contact-sheet.html` and `contact-sheet.png`; engine scatter and existing family-isolation tests                                          | Pass; 60 samples across all three families; sheet inspected                                                 |
 | Fast lint, zero-warning types and boundaries                                                                         | `build/slice5/lint-pass.log`, `check-pass.log`, `boundaries-final.log`; final fixture/document closeout logs in the same directory                                    | Pass; 0 type errors, 0 warnings                                                                             |
 | Units                                                                                                                | `build/slice5/units-final.log`, `timeouts-connect.log`, `timeouts-backdrop.log`, `backdrop-final.log`                                                                 | All 173 cases covered: 170 in combined run, 2 isolated timeout recoveries and the final backdrop regression |
@@ -2472,7 +2599,7 @@ confirmation before accepting the refactor complete locally. Slice 6 is not reop
 `memory-1`, Connect `connect-1`); there are no physics-class games. Preserved
 SplitMix64, unsigned 64-bit decimal seeds, unbiased shuffle, separate cosmetic
 streams, canonical replay, authoritative scoring and immutable scoring versions.
-The detailed audit is `docs/SLICE7_CONTRACT_AUDIT.md`. Added the required Slice 7
+The detailed audit is `docs/reviews/SLICE7_CONTRACT_AUDIT.md`. Added the required Slice 7
 six-runtime test using the unchanged harness, frozen-fixture comparisons, RNG
 rejection/shuffle and cosmetic isolation regressions, and approximate-math
 boundary probes. Added a retrospective Slice 0 base-tag integrity test.
@@ -2506,17 +2633,17 @@ separate gameplay determinism fingerprint. See DECISIONS and the audit.
 outstanding original Slice 0 timed-gate waiver, then confirm local refactor
 acceptance in writing or supply corrections. No next work is inferred.
 
-| Acceptance item                                                     | Evidence type and location                                                                              | Result                                                                                                                        |
-| ------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
-| Per-family integer-only contract, seeds/RNG, replay, score versions | Static frozen-base audit in `docs/SLICE7_CONTRACT_AUDIT.md`; existing puzzle/scoring units and D1 tests | Pass: audit and final verification                                                                                            |
-| All six runtimes reproduce exact results                            | `tests/slices/slice7-determinism-six-runtimes.test.ts`, existing vector harness; `build/slice7/`        | Pass: Node, Bun, Chromium, Firefox, WebKit, workerd; 9 gameplay and 6 cosmetic vectors each                                   |
-| Gameplay fixtures unchanged; cosmetic exception explicit            | Slice 7 byte comparisons to frozen base and accepted Slice 5 commit                                     | Pass with recorded cosmetic baseline; no new fixture changes                                                                  |
-| Generic registry/catalog/server/themes/selector/checkpoint/admin    | Audit plus synthetic-family Slice 1–4/presentation regressions, new checkpoint/default tests            | Pass; no active family dispatch required for new packages                                                                     |
-| Core integer-only/import boundaries                                 | Lint and strengthened `scripts/check-boundaries.ts`                                                     | Pass                                                                                                                          |
-| Development fast checks                                             | `docs/evidence/slice7/verification.json`, `build/slice7/`                                               | Pass: lint, zero-error/zero-warning types, boundaries, 36 unit files / 212 cases, six-runtime vectors                         |
-| Retrospective Slice 0 base-tag integrity                            | `tests/slices/slice0-base-tag.test.ts`                                                                  | Pass: annotated target and ancestry; does not prove original timed check                                                      |
-| Original pre-Slice-1 HEAD/base gate                                 | Original deferral; retrospective audit cannot reconstruct execution                                     | **Deferred and outstanding**; owner waiver decision required, not passed or waived                                            |
-| Single final full `bun run verify`                                  | `build/slice7/verify-final.log`, permanent verification summary                                         | Pass: 212 units, 41 D1/auth, six runtimes, 45 built-Worker checks, bundle isolation, 190/190 browsers (one worker); 45m 40.8s |
+| Acceptance item                                                     | Evidence type and location                                                                                      | Result                                                                                                                        |
+| ------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- |
+| Per-family integer-only contract, seeds/RNG, replay, score versions | Static frozen-base audit in `docs/reviews/SLICE7_CONTRACT_AUDIT.md`; existing puzzle/scoring units and D1 tests | Pass: audit and final verification                                                                                            |
+| All six runtimes reproduce exact results                            | `tests/slices/slice7-determinism-six-runtimes.test.ts`, existing vector harness; `build/slice7/`                | Pass: Node, Bun, Chromium, Firefox, WebKit, workerd; 9 gameplay and 6 cosmetic vectors each                                   |
+| Gameplay fixtures unchanged; cosmetic exception explicit            | Slice 7 byte comparisons to frozen base and accepted Slice 5 commit                                             | Pass with recorded cosmetic baseline; no new fixture changes                                                                  |
+| Generic registry/catalog/server/themes/selector/checkpoint/admin    | Audit plus synthetic-family Slice 1–4/presentation regressions, new checkpoint/default tests                    | Pass; no active family dispatch required for new packages                                                                     |
+| Core integer-only/import boundaries                                 | Lint and strengthened `scripts/check-boundaries.ts`                                                             | Pass                                                                                                                          |
+| Development fast checks                                             | `docs/evidence/slice7/verification.json`, `build/slice7/`                                                       | Pass: lint, zero-error/zero-warning types, boundaries, 36 unit files / 212 cases, six-runtime vectors                         |
+| Retrospective Slice 0 base-tag integrity                            | `tests/slices/slice0-base-tag.test.ts`                                                                          | Pass: annotated target and ancestry; does not prove original timed check                                                      |
+| Original pre-Slice-1 HEAD/base gate                                 | Original deferral; retrospective audit cannot reconstruct execution                                             | **Deferred and outstanding**; owner waiver decision required, not passed or waived                                            |
+| Single final full `bun run verify`                                  | `build/slice7/verify-final.log`, permanent verification summary                                                 | Pass: 212 units, 41 D1/auth, six runtimes, 45 built-Worker checks, bundle isolation, 190/190 browsers (one worker); 45m 40.8s |
 
 **Measurements:** local workstation checks only, with no network shaping or
 phone-performance claim. Command durations are in the permanent summary. No new
@@ -2554,7 +2681,7 @@ No deployment, production changes or post-refactor implementation are authorized
 
 ## v1.3 — Memory variants, local only (2026-11-04)
 
-**Built:** classic compatibility plus no-preview, trios and moving Memory; family-owned variant metadata and weighted selection; checkpoint/pending/ranked identity; authoritative replay and separate groups; same-page registered-cohort/open/imported statistics; audited variant lifecycle; shared pair and independent trio immutable scoring; operator-only/noindex ephemeral Memory test play. Migration `0013_variants.sql` applied locally. Full files/groups/evidence: `docs/V1.3_WORK.md`.
+**Built:** classic compatibility plus no-preview, trios and moving Memory; family-owned variant metadata and weighted selection; checkpoint/pending/ranked identity; authoritative replay and separate groups; same-page registered-cohort/open/imported statistics; audited variant lifecycle; shared pair and independent trio immutable scoring; operator-only/noindex ephemeral Memory test play. Migration `0013_variants.sql` applied locally. Full files/groups/evidence: `docs/work/V1.3_WORK.md`.
 
 **Skipped:** all Block/Connect variants, Mahjong/new games, knowledge graph, guest tracking, full verify and unrelated test suites, physical-device measurements, commit/push and every release/production/deployment step.
 
@@ -2568,7 +2695,7 @@ No deployment, production changes or post-refactor implementation are authorized
 | Exact classic/new/moving replay vectors in six runtimes                                                                | `tests/vectors/memory-*`, `vectors-final.log`, permanent summary                                                                   | Pass: 13 identical vectors per runtime    |
 | Memory-only procedural palettes                                                                                        | `docs/evidence/v1.3/palettes.json`                                                                                                 | Pass: 10,000 safe palettes                |
 | Variant persistence/replay/groups, count reconciliation/imports/open, lifecycle/audit/disable races, immutable scoring | 12 unique real local D1 integration checks; `integration.log`, `integration-final.log`                                             | Pass                                      |
-| Public Memory label/no-preview/trios/moving/result/Next/rotation/recovery and cap                                      | Focused Chromium specs; composite scoped logs linked in `docs/V1.3_WORK.md`                                                        | Pass                                      |
+| Public Memory label/no-preview/trios/moving/result/Next/rotation/recovery and cap                                      | Focused Chromium specs; composite scoped logs linked in `docs/work/V1.3_WORK.md`                                                   | Pass                                      |
 | Existing admin games counts/controls/editors and ephemeral authenticated/noindex test play                             | Focused admin Chromium spec; `browser-admin-final.log`                                                                             | Pass; 9/9 unique browser checks overall   |
 | Type/format/lint/import/purity boundaries                                                                              | `types-complete.log`, lint logs, `boundaries.log`                                                                                  | Pass: zero type errors/warnings           |
 | Owner confirmation / physical-device acceptance                                                                        | Owner review                                                                                                                       | Pending; no acceptance or waiver inferred |
@@ -2586,3 +2713,13 @@ No deployment, production changes or post-refactor implementation are authorized
 The owner explicitly requested updating the repository and pushing v1.3 to the existing GitHub `origin/main`. This source-only handoff includes implementation, tests, the owner-approved brief, documentation and permanent verification/palette evidence. It supersedes the earlier commit/push prohibition for this requested handoff; it does not infer local functional/device acceptance or authorize deployment, release work or another phase.
 
 Prior targeted verification results remain unchanged. No app checks are repeated for the documentation/Git handoff. Pre-existing local editor MCP configuration, ignored credentials, local databases and build/test output are excluded.
+
+## 2026-11-05 — Documentation organization
+
+- **Built:** moved seven owner-supplied Downloads files into `docs/references/`; grouped 30 existing supporting documents into briefs, planning, work, reviews, operations and privacy folders; updated project path references and added `docs/README.md` as the directory index. Core guidance paths remain stable.
+- **Skipped:** implementation of imported briefs, deployment, and app changes; this request authorizes file organization only.
+- **Known issues / decisions:** the imported engine-refactor brief differs from the maintained project copy; both are preserved without merging. Imported originals remain unchanged. No dependency or version changes.
+- **Evidence:** seven destination files were byte-checked during the move and their Downloads sources confirmed absent; existing document destinations and references were checked locally.
+- **Measurements / waivers:** not applicable to document organization.
+- **Owner responsibilities / questions:** none required for this organization; future implementation needs its own authorization.
+- **CODEMAP:** updated with the documentation index and relocated paths.

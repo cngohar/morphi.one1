@@ -33,24 +33,36 @@ For testing and verification:
 
 ## Current phase
 
+**Source-only GitHub handoff authorized (2026-11-05).** The owner explicitly requested committing the current source handoff and pushing to the existing `origin/main`. Include accepted v1.3.2 changes, local v1.3.3 support and reorganized documentation. This supersedes the commit/push restrictions below only for this handoff. Preserve full-verification deferral, pending v1.3.3 owner acceptance and the unauditioned-audio exclusion; no deployment or production change is authorized.
+
+**v1.3.3 Member Support implemented locally (2026-11-05); owner review pending.** The owner corrected the version from v1.3.4 to v1.3.3 and confirmed accepted v1.3.2 as the baseline. Approved defaults, limits, retention and behavior are implemented; targeted D1, Chromium, types and scoped lint checks pass. The owner explicitly deferred full `bun run verify` to later stages; the active run was stopped during global ESLint after Prettier passed. This is a recorded deferral, not a full verification pass or waiver. See `docs/planning/V1.3.3_MEMBER_SUPPORT.md`, `docs/work/V1.3.3_WORK.md` and the latest phase report. No commit, push, deployment, production change or next feature is authorized.
+
+**v1.3.2 accepted locally (2026-11-05).** The owner explicitly directed marking
+the existing Connect variants, admin scoring/pagination and profile polish
+accepted. This supersedes the v1.3.2 brief's pending-review status. Automated
+verification evidence and device/browser details were not supplied; no test pass
+or waiver is inferred. No commit, push, deployment, production change or next
+implementation is authorized. See `docs/briefs/morphi-v1.3.2-codex-brief.md`
+and `docs/PHASE_REPORTS.md`. Earlier v1.3.1 sound-audition status is unchanged.
+
 **Combined next-phase local work closed (2026-11-01).** The owner accepted all
 three slices and quick-review changes, reporting all checks passed after review on
 their own local PC and mobile layout checks using browser responsive emulation
 with no corrections noted. Browser/device models were not supplied; physical
 mobile review was not reported. This supersedes earlier pending-review and next-
 phase notes below. No deployment, production release or next implementation is
-authorized. See `docs/NEXT_PHASE_REVIEW.md` and `docs/PHASE_REPORTS.md`.
+authorized. See `docs/reviews/NEXT_PHASE_REVIEW.md` and `docs/PHASE_REPORTS.md`.
 
-**Simple plan: Step 6 accepted locally; active v1 integration review.** Step 5 was accepted by owner judgment on 2026-10-23, with the measured replay-rate criterion waived. The owner selected Google-only sign-in with guest play retained, then approved all five account/demo screens and the proposed Step 6 scope and authorized implementation. The first slice implements local D1, Better Auth sessions, public names, sign-out, and deletion. The owner subsequently authorized completing Step 6 locally and the small per-puzzle structural cleanup. Local saved history, ranked replay, leaderboards, and moderation controls are implemented; do not claim Step 6 accepted before its release checks and owner real-device review pass. The owner confirms local Google OAuth works. On 2026-10-24 the owner completed `docs/STEP6_REVIEW.md`, reported all functional checks working on PC/mobile, and explicitly accepted the local functional build. This supersedes pending owner-review notes; specific device/browser models were not supplied. Production resource measurements/operations remain unresolved, with no waiver or deployment/global-launch approval inferred. See `docs/STEP6_WORK.md` and the newest phase report for current evidence. Owner setup and Testing/branding guidance are documented in `docs/GOOGLE_AUTH_SETUP.md`. No additional games or full admin web panel implementation are authorized. After local Step 6 review, the owner wants global-release planning including an admin panel proposal; do not bring that implementation into this local task. Production provisioning and deployment still need their applicable explicit authorization. See `docs/STEP6.md` and `docs/PHASE_REPORTS.md`.
+**Simple plan: Step 6 accepted locally; active v1 integration review.** Step 5 was accepted by owner judgment on 2026-10-23, with the measured replay-rate criterion waived. The owner selected Google-only sign-in with guest play retained, then approved all five account/demo screens and the proposed Step 6 scope and authorized implementation. The first slice implements local D1, Better Auth sessions, public names, sign-out, and deletion. The owner subsequently authorized completing Step 6 locally and the small per-puzzle structural cleanup. Local saved history, ranked replay, leaderboards, and moderation controls are implemented; do not claim Step 6 accepted before its release checks and owner real-device review pass. The owner confirms local Google OAuth works. On 2026-10-24 the owner completed `docs/reviews/STEP6_REVIEW.md`, reported all functional checks working on PC/mobile, and explicitly accepted the local functional build. This supersedes pending owner-review notes; specific device/browser models were not supplied. Production resource measurements/operations remain unresolved, with no waiver or deployment/global-launch approval inferred. See `docs/work/STEP6_WORK.md` and the newest phase report for current evidence. Owner setup and Testing/branding guidance are documented in `docs/operations/GOOGLE_AUTH_SETUP.md`. No additional games or full admin web panel implementation are authorized. After local Step 6 review, the owner wants global-release planning including an admin panel proposal; do not bring that implementation into this local task. Production provisioning and deployment still need their applicable explicit authorization. See `docs/planning/STEP6.md` and `docs/PHASE_REPORTS.md`.
 
-Owner-authorized local privacy preparation (2026-10-23): build `/privacy` for review before public Google verification and the later v1 launch, with future static-page admin editing scoped separately. Public operator/contact: Ali Gohar, cngohar@gmail.com. On 2026-10-24 the owner clarified that Morphi is a general-audience puzzle site with no child-focused content, design, or marketing; children being able to visit as guests was not an intention to target them. Child accounts remain deferred; no separate kids site is planned. The owner approved the general-audience wording and then authorized finishing local privacy readiness and preparing a guest-only publication artifact (2026-10-24). The public candidate has no internal draft notes; retention inventory, a monitored contact/request procedure, and tested local admin maintenance/privacy deletion are implemented. Public account eligibility, production operator/maintenance/audit rules, production resource evidence, deployment authorization, and Google setup/submission remain separate gates. Local functional Step 6 acceptance is separately recorded in the owner review. See `docs/PRIVACY_REVIEW.md` and `docs/PUBLIC_PRIVACY_RELEASE.md`. No age/consent flow, CMS, or web admin implementation is authorized by this task. The owner subsequently authorized publication and then explicitly requested the live Cloudflare Web Analytics disclosure update/recheck. Current public version is `b50a7a18-2e85-4406-bd40-77f27c4b3da3`; Cloudflare’s automatic analytics beacon is intentional and absent from build assets by design. Domain ownership is owner-confirmed complete; Google project setup/submission remains owner-run. These scoped deployments do not authorize future deployments or the account backend.
+Owner-authorized local privacy preparation (2026-10-23): build `/privacy` for review before public Google verification and the later v1 launch, with future static-page admin editing scoped separately. Public operator/contact: Ali Gohar, cngohar@gmail.com. On 2026-10-24 the owner clarified that Morphi is a general-audience puzzle site with no child-focused content, design, or marketing; children being able to visit as guests was not an intention to target them. Child accounts remain deferred; no separate kids site is planned. The owner approved the general-audience wording and then authorized finishing local privacy readiness and preparing a guest-only publication artifact (2026-10-24). The public candidate has no internal draft notes; retention inventory, a monitored contact/request procedure, and tested local admin maintenance/privacy deletion are implemented. Public account eligibility, production operator/maintenance/audit rules, production resource evidence, deployment authorization, and Google setup/submission remain separate gates. Local functional Step 6 acceptance is separately recorded in the owner review. See `docs/privacy/PRIVACY_REVIEW.md` and `docs/privacy/PUBLIC_PRIVACY_RELEASE.md`. No age/consent flow, CMS, or web admin implementation is authorized by this task. The owner subsequently authorized publication and then explicitly requested the live Cloudflare Web Analytics disclosure update/recheck. Current public version is `b50a7a18-2e85-4406-bd40-77f27c4b3da3`; Cloudflare’s automatic analytics beacon is intentional and absent from build assets by design. Domain ownership is owner-confirmed complete; Google project setup/submission remains owner-run. These scoped deployments do not authorize future deployments or the account backend.
 
-Owner-authorized maintenance (2026-10-23): review and improve engineering reliability in the existing two-game build while player surveys continue. This does not advance the product step. Cloudflare agent setup is project-local and OAuth-authenticated; see `docs/CLOUDFLARE_AGENT_SETUP.md` for installation, requested read-only scopes, and tool activation status.
+Owner-authorized maintenance (2026-10-23): review and improve engineering reliability in the existing two-game build while player surveys continue. This does not advance the product step. Cloudflare agent setup is project-local and OAuth-authenticated; see `docs/operations/CLOUDFLARE_AGENT_SETUP.md` for installation, requested read-only scopes, and tool activation status.
 
 ## Owner-authorized v1 follow-up — 2026-10-24
 
 The owner supplied the consolidated v2 checklist and authorized local v1 coding.
-`docs/V1_RELEASE_CHECKLIST.md` now records the active handoff and explicit owner
+`docs/planning/V1_RELEASE_CHECKLIST.md` now records the active handoff and explicit owner
 updates, superseding the earlier v1 planning-only/admin prohibition for this
 scope. The owner approved dashboard plus anonymous gameplay events, Terms
 preparation, and curated themes for v1. Proposed 18+ account wording is approved
@@ -83,7 +95,7 @@ two-game-only, and public-door restrictions from v1 are superseded for this
 local work. Theme contact-sheet and visual acceptance remain owner gates.
 Share links and `/admin/games/<name>` remain excluded. No deployment,
 production provisioning, secrets, DNS or Google changes are authorized.
-See `docs/V1.1_WORK.md` for the current slice and pending work.
+See `docs/work/V1.1_WORK.md` for the current slice and pending work.
 During the slice the owner supplied the 1920×923 small-board screenshot,
 requested the already-planned viewport-sizing fix and directed continuation.
 That bounded Work 2 shell/sizing follow-up is included while theme/Card/overall
@@ -164,7 +176,7 @@ static explainer pages, sitemap/robots updates and guest artifact changes are
 implemented. Full local verification passed, including 166/166 browser checks;
 the guest artifact was prepared and checked without `--live`. No deployment or
 production change is authorized. Owner visual acceptance was pending at this
-point and is recorded in the later acceptance entry below. See `docs/V1.1_WORK.md` and the latest entry in
+point and is recorded in the later acceptance entry below. See `docs/work/V1.1_WORK.md` and the latest entry in
 `docs/PHASE_REPORTS.md`.
 
 ## Owner acceptance of Work 5 — 2026-10-31
@@ -172,7 +184,7 @@ point and is recorded in the later acceptance entry below. See `docs/V1.1_WORK.m
 The owner reviewed and accepted Work 5 locally. This closes only the family-door
 withdrawal and static explainer work; it is not physical-device acceptance or
 deployment approval. At that point the separate Work 2 integrated visual/device
-review was still open; see the later acceptance below. See `docs/V1.1_WORK.md`.
+review was still open; see the later acceptance below. See `docs/work/V1.1_WORK.md`.
 
 ## Owner acceptance of Work 2 visual/device review — 2026-10-31
 
@@ -187,7 +199,7 @@ a best-effort diagnostic; no numeric target was supplied.
 ## Rules
 
 1. **One phase at a time.** Stop when the acceptance criteria are met, write the report (format below), and wait for the owner.
-2. **No scope additions.** Non-goals (section 3) and the parked list (end of section 7) are off limits. Ask first. Do not act on `docs/IDEAS.md` or `docs/LAUNCH_CHECKLIST.md` unless the owner promotes an item into the plan.
+2. **No scope additions.** Non-goals (section 3) and the parked list (end of section 7) are off limits. Ask first. Do not act on `docs/planning/IDEAS.md` or `docs/planning/LAUNCH_CHECKLIST.md` unless the owner promotes an item into the plan.
 3. **Smallest implementation that meets the acceptance criteria.** No speculative abstractions or extra config systems.
 4. **Locked decisions stay locked** (section 2 and `docs/DECISIONS.md`). Do not swap them without asking.
 5. **Check current docs before using any API** (Cloudflare, adapter-cloudflare, TypeScript 6.x as the canonical compiler, pinned explicitly as `typescript@~6.0.3` because npm's default tag is now TypeScript 7 (TypeScript 7 only side by side, after the Phase 0 compatibility test), Better Auth, Rapier, NOWPayments, GA4). Record pinned versions and non-obvious choices in `docs/DECISIONS.md`.

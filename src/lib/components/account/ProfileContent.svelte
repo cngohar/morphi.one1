@@ -135,7 +135,32 @@
 								{t('v1.profile.empty')}
 							</p>{/if}{/if}
 				</section>{/if}
-			{#if tab === 'overview' || tab === 'activity'}<section class="foundation-card">
+			{#if tab === 'overview'}
+				<section class="foundation-card">
+					<h2>{t('account.profile.history')}</h2>
+					<ul class="recent-activity history-list">
+						{#each history.slice(0, 4) as row (row.id)}<li>
+								<span
+									><strong>{familyName(row.family)}</strong><small
+										>{date(row.createdAt)} · {t(
+											row.ranked ? 'progress.rankedLabel' : 'progress.unrankedLabel'
+										)}</small
+									></span
+								><strong>{formatNumber(row.score)}</strong>
+							</li>{/each}
+					</ul>
+					{#if !history.length}<p>{t('v1.profile.empty')}</p>{/if}
+					{#if history.length > 4}
+						<div class="overview-more">
+							<button class="text-button" type="button" onclick={() => (tab = 'activity')}>
+								{t('v1.profile.viewAll')}
+							</button>
+						</div>
+					{/if}
+				</section>
+			{/if}
+			{#if tab === 'activity'}
+				<section class="foundation-card">
 					<h2>{t('account.profile.history')}</h2>
 					<ul class="recent-activity history-list">
 						{#each history as row (row.id)}<li>
@@ -149,7 +174,8 @@
 							</li>{/each}
 					</ul>
 					{#if !history.length}<p>{t('v1.profile.empty')}</p>{/if}
-				</section>{/if}
+				</section>
+			{/if}
 			{#if tab === 'settings'}<section class="foundation-card">
 					<h2>{t('v1.profile.settings')}</h2>
 					{@render settings()}
@@ -230,6 +256,11 @@
 		cursor: pointer;
 		padding: 10px 14px;
 		font-weight: 800;
+	}
+	.overview-more {
+		margin-top: 14px;
+		display: flex;
+		justify-content: flex-end;
 	}
 	.profile-tabs {
 		display: flex;

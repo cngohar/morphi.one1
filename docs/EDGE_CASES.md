@@ -231,7 +231,7 @@ Privacy-page regressions (2026-10-23): `/privacy` is public, prerendered, and re
 - "So close" threshold → defined numerically per puzzle in its spec.
 - Score ties, negative scores, and absurdly fast finishes → defined, clamped, and flagged.
 - Difficulty progression bounds (minimum and maximum band) → never out of range; abandonment rules as in section 11.13 of the plan.
-- Failed round → Try again versus Next (pending owner decision in `docs/IDEAS.md`).
+- Failed round → Try again versus Next (pending owner decision in `docs/planning/IDEAS.md`).
 - Daily puzzle played twice → only the first attempt counts for ranking.
 - Block placement: no tray piece fits after the opening turns → the run ends as `ended` and is scored. During the opening turns every refill includes at least one fitting piece (plan section 7, Phase 1B rules).
 - Block placement: a clear completes a row and a column together → the union of both lines clears once, both count toward `lines`, and the combo increments once.
@@ -495,7 +495,7 @@ Full browser/account/palette checks are deferred to the authorized later milesto
 - Score edits/rollbacks: pair variants share a config, trios stays separate; conflict checking and immutable history apply. Existing rows/scores/counts remain; live eligibility follows the new live version. Test fixture cleanup must append a rollback, never rewind a live pointer to a parent that already has a child.
 - Admin test play: operator auth before noindex; explicit disabled-variant selection works. Same view/engine/replay, zero ranked/session/completion/activity/leaderboard writes. Public selector and public navigation never expose the test picker.
 
-Evidence: Memory variant/plumbing units, `tests/integration/memory-variants.test.ts`, `tests/e2e/memory-variants{,-admin}.spec.ts`, six-runtime `tests/vectors/memory-*`; final results in `docs/V1.3_WORK.md`.
+Evidence: Memory variant/plumbing units, `tests/integration/memory-variants.test.ts`, `tests/e2e/memory-variants{,-admin}.spec.ts`, six-runtime `tests/vectors/memory-*`; final results in `docs/work/V1.3_WORK.md`.
 
 ## v1.3.1 Block variants, admin and sounds
 
@@ -508,4 +508,15 @@ Evidence: Memory variant/plumbing units, `tests/integration/memory-variants.test
 - Admin test play rejects guests/nonoperators for both families, is noindex and creates no player POST/completion/session/activity/leaderboard/variant-count changes. Persistence checks isolate the authenticated fixture so concurrent owner play cannot masquerade as a test write; old score snapshots remain unchanged while unrelated new rows may appear. Unknown historical fixture groups are not deleted/reassigned to satisfy tests.
 - Sound generation failure leaves prior manifest/assets complete and publishes no partial new files. Existing files/provenance are never regenerated. New decoded files must meet duration, peak and size limits before publication. Trio matches retain shared streak pitch; moving emits one reshuffle after its active mismatch hold, including repeated resume events. Runtime requests stay same-origin. Owner audition is separate and remains pending for all three new files.
 
-Evidence: `src/lib/puzzles/block-placement/{logic,variants}.test.ts`, `src/lib/block-variants.test.ts`, `tests/integration/block-variants.test.ts`, filtered admin cases in `tests/integration/memory-variants.test.ts`, `tests/slices/v1.3.1-sounds.test.ts`, the four scoped browser specs and six-runtime Block vectors. Results/limitations: `docs/V1.3.1_WORK.md`, `docs/evidence/v1.3.1/verification.json`.
+Evidence: `src/lib/puzzles/block-placement/{logic,variants}.test.ts`, `src/lib/block-variants.test.ts`, `tests/integration/block-variants.test.ts`, filtered admin cases in `tests/integration/memory-variants.test.ts`, `tests/slices/v1.3.1-sounds.test.ts`, the four scoped browser specs and six-runtime Block vectors. Results/limitations: `docs/work/V1.3.1_WORK.md`, `docs/evidence/v1.3.1/verification.json`.
+
+## v1.3.3 Member Support
+
+- Guest, guessed ticket id, other member, existing support-role operator or missing/expired operator grant: deny before content is returned. A gameplay ban still permits the member's own support; pending deletion denies it.
+- Concurrent creates and replies enforce rolling server limits and the five-open cap in the same transaction as successful writes. Rejected writes consume no successful-write quota. Repeating a request id cannot duplicate a message or ticket.
+- Concurrent close/reply: the losing reply remains in page memory with a useful conflict; staff reply-and-close commits together. Closed tickets are readable with no reopening.
+- Taxonomy rename preserves stable ids; deletion reassigns open and closed tickets to protected defaults atomically with its audit. A stale choice fails recoverably rather than losing the draft or silently creating taxonomy.
+- Mark member read only upon opening the conversation; list polling never clears unread replies. Messages paginate in a stable chronological order.
+- Length checks use the same documented trimmed-string count on client and server; oversized streamed bodies are rejected. HTML/Markdown/URLs remain escaped plain text with line breaks.
+- Network failure, duplicate submit and expired session retain drafts only in the current page. Leaving/reloading/closing discards drafts; no conversation content enters browser persistence, audit metadata, analytics or URLs.
+- Account deletion removes owned conversations and every staff/member message in them; lifecycle restoration timing and audit retention remain unchanged. Explicit maintenance prunes expired limiter state, without implying a scheduler.

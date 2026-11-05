@@ -7,7 +7,7 @@ Inbox for things the owner remembers mid-project. Agents do **not** read or act 
 1. When you remember something, add one line below with the date. Do not edit the plan right away.
 2. At each phase boundary, triage every new item:
    - **Blocks the current or next phase** -> promote into `docs/PLAN.md`.
-   - **Needed before launch** -> add to `docs/LAUNCH_CHECKLIST.md`.
+   - **Needed before launch** -> add to `docs/planning/LAUNCH_CHECKLIST.md`.
    - **Everything else** -> move to the parked list in `docs/PLAN.md` (section 7).
 3. Delete items from this inbox once triaged.
 

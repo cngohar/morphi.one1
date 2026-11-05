@@ -67,8 +67,16 @@ export async function readAudit(db: D1Database, actor: string, filters: AuditFil
 			.bind(...values, page * 25)
 			.all<AuditRow>()
 	).results;
+	const countRow = await db
+		.prepare(
+			`SELECT count(*) total FROM admin_audit ${where.length ? `WHERE ${where.join(' AND ')}` : ''}`
+		)
+		.bind(...values)
+		.first<{ total: number }>();
+	const total = countRow?.total ?? 0;
+	const totalPages = Math.max(1, Math.ceil(total / 25));
 	await auditOperatorRead(db, actor, 'audit:read', `page-${page}`);
-	return { rows: rows.slice(0, 25), more: rows.length > 25, page };
+	return { rows: rows.slice(0, 25), more: rows.length > 25, page, total, totalPages };
 }
 /** Each cursor freezes the last rowid, so a whole year can be archived without omitted or duplicated rows. */
 export async function exportAuditYear(

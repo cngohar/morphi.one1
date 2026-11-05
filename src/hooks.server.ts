@@ -30,7 +30,10 @@ export const handle: Handle = async ({ event, resolve }) => {
 	const adminPath =
 		event.url.pathname.startsWith('/admin') || event.url.pathname.startsWith('/api/admin');
 	if ((authPath || accountPath || adminPath) && !['GET', 'HEAD'].includes(event.request.method)) {
-		const bounded = await boundAccountRequest(event.request);
+		const supportPath = /^(?:\/api\/support|\/admin\/support\/data)(?:\/|$)/.test(
+			event.url.pathname
+		);
+		const bounded = await boundAccountRequest(event.request, supportPath ? 32768 : 16384);
 		if (!bounded)
 			return Response.json(
 				{ code: 'BODY_TOO_LARGE', retryable: false },

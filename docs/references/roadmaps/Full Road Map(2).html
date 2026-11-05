@@ -1,0 +1,911 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<meta name="color-scheme" content="light dark">
+<link rel="icon" href="data:,">
+<title>Morphi.One — Full Puzzle Roadmap A–Z</title>
+<style>
+:root{
+  --bg:#f7f3ec; --panel:#fffdf8; --ink:#1c1a17; --muted:#6b655c; --line:#e3ddd1;
+  --coral:#e85d3d; --coral-soft:#fde9e2; --teal:#0f766e; --teal-soft:#e0f2ef;
+  --amber:#b45309; --amber-soft:#fef3c7; --blue:#1d4ed8; --blue-soft:#dbeafe;
+  --grey-soft:#ece8e0; --dark:#292524;
+  --radius:14px;
+  color-scheme: light dark;
+}
+@media (prefers-color-scheme: dark){
+  :root{ --bg:#161412; --panel:#201d1a; --ink:#f3efe8; --muted:#a8a29e; --line:#3a3531;
+  --coral-soft:#3d241d; --teal-soft:#12302d; --amber-soft:#3a2e10; --blue-soft:#1e2a4a; --grey-soft:#2c2825; }
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family: system-ui,-apple-system,"Segoe UI",Roboto,Helvetica,Arial,sans-serif;line-height:1.55}
+a{color:var(--teal)}
+h1,h2,h3{font-family: Georgia,"Times New Roman",serif;line-height:1.15;margin:0}
+.wrap{max-width:1140px;margin:0 auto;padding:20px 18px 64px}
+.eyebrow{font-size:12px;letter-spacing:.14em;text-transform:uppercase;color:var(--coral);font-weight:700}
+h1{font-size:clamp(30px,6vw,52px);margin:8px 0 10px;max-width:16ch}
+.lede{font-size:17px;color:var(--muted);max-width:68ch}
+.meta{font-size:13px;color:var(--muted);margin-top:10px}
+.stats{display:grid;grid-template-columns:repeat(4,1fr);gap:12px;margin:22px 0}
+.stat{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px}
+.stat b{display:block;font-size:22px;line-height:1.1}
+.stat span{font-size:13px;color:var(--muted);display:block;margin-top:4px}
+.src{font-size:11px;color:var(--muted);margin-top:6px;display:block}
+section{margin-top:34px}
+h2{font-size:26px;margin-bottom:6px}
+.sub{color:var(--muted);font-size:14px;max-width:72ch}
+.panel{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:16px}
+table{width:100%;border-collapse:collapse;font-size:14px}
+th,td{text-align:left;padding:9px 8px;border-bottom:1px solid var(--line);vertical-align:top}
+th{font-size:12px;letter-spacing:.06em;text-transform:uppercase;color:var(--muted)}
+.controls{position:sticky;top:0;background:var(--bg);padding:12px 0;z-index:5;border-bottom:1px solid var(--line)}
+.controls input,.controls select{width:100%;padding:11px 12px;border-radius:10px;border:1px solid var(--line);background:var(--panel);color:var(--ink);font-size:15px}
+.cgrid{display:grid;grid-template-columns:2fr 1fr 1fr 1fr;gap:10px}
+.pills{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px}
+.pill{border:1px solid var(--line);background:var(--panel);color:var(--ink);padding:7px 12px;border-radius:999px;cursor:pointer;font-size:13px;font-weight:600}
+.pill.on{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+.count{font-size:13px;color:var(--muted);margin:10px 0}
+.grid{display:grid;grid-template-columns:repeat(3,1fr);gap:12px}
+.card{background:var(--panel);border:1px solid var(--line);border-radius:var(--radius);padding:14px;display:flex;flex-direction:column;gap:6px}
+.card h3{font-size:17px;font-family:inherit;font-weight:700}
+.card p{margin:0;font-size:13.5px;color:var(--muted)}
+.badges{display:flex;flex-wrap:wrap;gap:6px}
+.b{font-size:11px;font-weight:700;padding:3px 8px;border-radius:999px}
+.bA{background:var(--coral-soft);color:var(--coral)} .bB{background:var(--teal-soft);color:var(--teal)}
+.bC{background:var(--amber-soft);color:var(--amber)} .bD{background:var(--grey-soft);color:var(--muted)}
+.bLive{background:var(--ink);color:var(--bg)} .bProto{background:var(--blue-soft);color:var(--blue)}
+.bHigh{background:#fee2e2;color:#991b1b} .bMed{background:var(--teal-soft);color:var(--teal)}
+.bLow{background:var(--grey-soft);color:var(--muted)} .bLater{background:var(--grey-soft);color:var(--muted)}
+.bNobody{background:#ede9fe;color:#5b21b6}
+.bBoth{background:var(--teal-soft);color:var(--teal)} .bRace{background:#d9f0e1;color:#14532d} .bVersus{background:var(--blue-soft);color:var(--blue)}
+.bMulti{background:var(--coral-soft);color:var(--coral)} .bSoloOnly{background:var(--grey-soft);color:var(--muted)}
+@media (prefers-color-scheme: dark){ .bHigh{background:#3f1d1d;color:#fca5a5} .bNobody{background:#2e1065;color:#c4b5fd} .bRace{background:#123524;color:#86efac} }
+.num{font-size:11px;color:var(--muted)}
+.tiers{display:grid;grid-template-columns:repeat(2,1fr);gap:12px}
+.bands{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin-top:12px}
+.bandcard{border:1px solid var(--line);border-radius:10px;padding:12px;background:var(--bg)}
+.bandcard h4{margin:8px 0 4px;font-size:15px;line-height:1.25}
+.bandcard p{margin:0;font-size:13px;color:var(--muted)}
+.bandcard .examples{margin-top:6px;font-size:12.5px}
+.famgrid{display:grid;grid-template-columns:repeat(3,1fr);gap:10px;margin-top:12px}
+@media(max-width:820px){ .famgrid{grid-template-columns:1fr} }
+.note{font-size:13px;color:var(--muted)}
+footer{margin-top:40px;font-size:12.5px;color:var(--muted);border-top:1px solid var(--line);padding-top:16px}
+footer a{word-break:break-all}
+@media(max-width:820px){
+  .stats{grid-template-columns:1fr 1fr} .grid{grid-template-columns:1fr} .tiers{grid-template-columns:1fr} .bands{grid-template-columns:1fr 1fr}
+  .cgrid{grid-template-columns:1fr}
+  table,thead,tbody,tr,th,td{display:block;width:100%}
+  thead{display:none} tr{border-bottom:2px solid var(--line);padding:6px 0} td{border:none;padding:4px 8px}
+}
+@media(max-width:520px){ .bands{grid-template-columns:1fr} }
+.chart{margin-top:12px}
+.bars{display:flex;flex-direction:column;gap:10px;margin-top:10px}
+.barrow{display:grid;grid-template-columns:170px 1fr 118px;gap:10px;align-items:center;font-size:13px;text-align:left;width:100%;background:none;border:none;color:var(--ink);padding:0;font-family:inherit}
+button.barrow{cursor:pointer}
+.barrow .blabel{font-weight:600}
+.barrow .bval{color:var(--muted);font-size:12.5px}
+.track{background:var(--grey-soft);border-radius:999px;height:18px;position:relative;min-width:60px}
+.fill{height:100%;border-radius:999px;background:var(--coral)}
+.fill.teal{background:var(--teal)} .fill.amber{background:var(--amber)} .fill.blue{background:var(--blue)} .fill.grey{background:var(--muted)}
+.rangefill{position:absolute;top:0;height:100%;border-radius:999px;background:var(--teal)}
+.point{position:absolute;top:50%;width:14px;height:14px;border-radius:50%;background:var(--coral);transform:translate(-50%,-50%);border:2px solid var(--panel)}
+.axis{font-size:11.5px;color:var(--muted);margin-top:6px}
+.timeline{border-left:2px solid var(--line);margin:14px 0 0 8px;padding-left:20px;display:flex;flex-direction:column;gap:14px}
+.titem{position:relative}
+.titem::before{content:"";position:absolute;left:-27px;top:4px;width:10px;height:10px;border-radius:50%;background:var(--coral);border:2px solid var(--panel)}
+.titem .when{font-size:12px;font-weight:700;letter-spacing:.05em;text-transform:uppercase;color:var(--coral)}
+.titem h4{margin:2px 0 2px;font-size:15px}
+.titem p{margin:0;font-size:13px;color:var(--muted)}
+button.titem{background:none;border:none;border-top:none;text-align:left;font-family:inherit;color:var(--ink);cursor:pointer;padding:0 0 0 0;width:100%}
+button.titem h4{text-decoration:underline;text-underline-offset:3px}
+@media(max-width:640px){ .barrow{grid-template-columns:1fr;gap:4px} .track{height:16px} }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <p class="eyebrow">Morphi.One · Roadmap</p>
+  <h1>Every puzzle family, A to Z — most-played to nobody-plays-it… yet</h1>
+  <p class="lede">A filterable roadmap of <strong><span class="totalFam">182</span> puzzle families — that means <span class="totalFam">182</span> puzzle <em>types</em>, not <span class="totalFam">182</span> games</strong> (see “Family vs Game” directly below). Built from global research (2023–2025 published data, report dated 25 Oct 2026). Because Morphi deals a puzzle the player never chose, even an obscure family earns its place — it arrives as a surprise for one round. Priorities below follow the evidence, not fashion: mass-market first, loyal niches as the retention library, and the forgotten ones revived only with their original problem fixed.</p>
+  <p class="meta">Morphi today — <strong>only 3 of the <span class="totalFam">182</span> families are in progress as Morphi games, the other <span class="otherFam">179</span> are roadmap entries only, not built and not playable:</strong> <strong>Block</strong> (block-fit family) and <strong>Memory</strong> (memory pairs family) are live in v1 · <strong>Connect</strong> (Flow family) is a built prototype awaiting acceptance. No build or integration notes here — this page is only about what to build, in what order, and why players stay or leave.</p>
+
+  <div class="stats">
+    <div class="stat"><b>&gt;$10B</b><span>Mobile puzzle IAP in 2025, +14% YoY · 9.7B downloads in 2025 — 2nd-highest-grossing genre</span><span class="src">[P] Sensor Tower via Naavik, 2025 digest</span></div>
+    <div class="stat"><b>66% on mobile · 60% on PC</b><span>Puzzle is the top genre on mobile — played by 66% of US mobile players — and it also leads on PC at 60%</span><span class="src">[P] ESA Essential Facts 2026</span></div>
+    <div class="stat"><b>368M downloads</b><span>Block Blast! in 2025 — world's most-downloaded mobile game that year. Maker claims 70M DAU / 300M MAU (vendor claim, not audited)</span><span class="src">[E] AppMagic via Mobilegamer.biz · [P-claim] Hungry Studio</span></div>
+    <div class="stat"><b>11.1B plays</b><span>NYT Games in 2024: Wordle 5.3B, Connections 3.3B, Strands 1.3B</span><span class="src">[P] NYT spokesperson via The Verge, June 2025</span></div>
+  </div>
+
+  <div class="panel">
+    <h3 style="font-family:inherit">How to read the labels</h3>
+    <p class="note"><strong>[P]</strong> Published figure · <strong>[E]</strong> Third-party estimate (Sensor Tower / AppMagic / AppBrain modelled installs — AppBrain figures are Google-Play-only, read Oct 2026) · <strong>[R]</strong> Reasoned estimate from board size / move count · <strong>[ABSENT]</strong> No play data found — for Band D (“no data found”), absence of data <em>is</em> the finding; it is <em>not</em> proof that nobody plays them. Priorities: <span class="b bHigh">High Priority</span> <span class="b bMed">Medium</span> <span class="b bLow">Low Priority</span> <span class="b bLater">Later</span> <span class="b bNobody">Nobody Plays It… Yet</span></p>
+    <p class="note" style="margin-top:8px"><strong>Band is not Priority.</strong> <strong>Band</strong> = how widely a puzzle is played in the real world today (see the full explanation directly below). <strong>Priority</strong> = Morphi's recommended build order. They are different: a Band D puzzle can still be worth building later, and a Band A puzzle is not automatically next.</p>
+  </div>
+
+  <div class="panel" style="margin-top:12px;border:2px solid var(--ink)" id="family-vs-game">
+    <h3 style="font-family:inherit;font-size:20px">Family vs Game — what is actually counted here?</h3>
+    <p class="note" style="margin-top:6px;font-size:14px;color:var(--ink)"><strong>Short answer: nobody built <span class="totalFam">182</span> games.</strong> This roadmap is a catalogue of <strong><span class="totalFam">182</span> families</strong> — the original solo-puzzle research plus the multiplayer-puzzle families added from the companion multiplayer research (report dated 26 Oct 2026). Only 3 of them exist in Morphi so far (2 live, 1 prototype) — the other <span class="otherFam">179</span> are names on a list, to be built one at a time later.</p>
+    <div class="famgrid">
+      <div class="bandcard">
+        <span class="b bA">Family = a type</span>
+        <h4>1 family = 1 set of rules</h4>
+        <p>A <strong>family</strong> is a puzzle <em>type</em> — one set of rules for how a round works.</p>
+        <p class="examples"><strong>Examples of families:</strong> Sudoku, Match-3, Water Sort, Block-fit, Flow.</p>
+        <p class="examples">The A–Z index at the bottom of this page lists <strong><span class="totalFam">182</span> families</strong> — <em>not</em> <span class="totalFam">182</span> separate commercial games, and <em>not</em> <span class="totalFam">182</span> built / playable games.</p>
+      </div>
+      <div class="bandcard">
+        <span class="b bB">Game = a specific title</span>
+        <h4>Many games can share one family</h4>
+        <p>A <strong>game</strong> (in the commercial sense) is one specific, named title made by someone, sitting <em>inside</em> a family.</p>
+        <p class="examples"><strong>Example:</strong> <em>Royal Match</em> and <em>Candy Crush</em> are two different commercial games — both are <strong>example games in the Match-3 family</strong>. That is still only <strong>one</strong> family in this roadmap.</p>
+        <p class="examples">Wherever a commercial title appears on this page — Block Blast!, Royal Match, Wordle, Flow Free and so on — read it as <strong>“example game(s) in this family”</strong>. It is there only as evidence for how popular its family is, not as a separate roadmap entry and not as a Morphi game.</p>
+      </div>
+      <div class="bandcard">
+        <span class="b bLive">In Morphi</span>
+        <h4>1 family = 1 future Morphi game</h4>
+        <p>In Morphi terms, <strong>one family becomes one Morphi game</strong> — and inside that one game there are unlimited seeded instances / rounds, each dealt fresh from a seed. A family is never just one single puzzle.</p>
+        <p class="examples"><strong>Morphi today — only 3 families in progress:</strong><br>• <strong>Block</strong> — block-fit family — <strong>Live</strong><br>• <strong>Memory</strong> — memory pairs family — <strong>Live</strong><br>• <strong>Connect</strong> — Flow family — <strong>Prototype</strong></p>
+        <p class="examples">The other <strong><span class="otherFam">179</span> families are roadmap entries only — not built</strong>.</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px"><strong>Worked example, so it can't be misread:</strong> Family = <strong>Block-fit</strong> (the type: drag blocks, clear lines). Example commercial game in this family = <strong>Block Blast!</strong> (someone else's title, used here as popularity evidence). Morphi game in this family = <strong>Block</strong> (Morphi's own version, live). Three different things — type, their game, our game — for one single family.</p>
+  </div>
+
+  <div class="panel" style="margin-top:12px;border:2px solid var(--teal)" id="multiplayer">
+    <h3 style="font-family:inherit;font-size:20px">Solo, Multiplayer or Both — now from research, not guesses</h3>
+    <p class="note" style="margin-top:6px;font-size:14px;color:var(--ink)"><strong>An honest correction first:</strong> an earlier version of this page tagged families by <em>potential</em> — what multiplayer form a family <em>could</em> take (same-seed races, turn-based versus and so on). Those tags were educated guesses, and they have been <strong>replaced</strong>. Every family now carries exactly one research-based label — <strong>Solo</strong>, <strong>Multiplayer</strong> or <strong>Both</strong> — meaning how that family is <em>actually played in the real world</em>, from the companion multiplayer research (84 multiplayer families in seven forms, report dated 26 Oct 2026), using the same [P] / [E] / [R] / [ABSENT] evidence discipline as the solo research.</p>
+    <div class="bands" style="margin-top:12px">
+      <div class="bandcard"><span class="b bSoloOnly">Solo</span><h4>Played solo in the real world</h4><p>No played multiplayer form was found — no official mode, no championship, no versus or co-op app with real players [ABSENT]. A multiplayer version may be <em>theoretically</em> possible, but nobody plays it that way, so it does not count. <strong>Examples:</strong> Flow / Connect, Water Sort, Block-fit and the sort puzzles are all Solo only by this evidence.</p></div>
+      <div class="bandcard"><span class="b bMulti">Multiplayer</span><h4>Played with or against other people</h4><p>The family's real, played form is multiplayer — versus, co-op, party, async turns or team play. Some of these families were born multiplayer and were missing from a solo-only roadmap entirely; they are now in the A–Z list. <strong>Examples:</strong> Kahoot!, Words With Friends, Keep Talking and Nobody Explodes, 4-player Mahjong.</p></div>
+      <div class="bandcard"><span class="b bBoth">Both</span><h4>Played solo <em>and</em> multiplayer</h4><p>Both forms genuinely exist and are played. The multiplayer form is often a <em>race on the same puzzle</em> (a championship, a race app, a shared daily score) rather than head-to-head interaction. <strong>Examples:</strong> Sudoku, Nonogram, Crosswords, Jigsaw, Minesweeper, Japanese logic — and Memory pairs, whose multiplayer form is its <em>original</em> form.</p></div>
+      <div class="bandcard"><span class="b bD">Band D — No data found</span><h4>Dead multiplayer is labelled, not hidden</h4><p>Several multiplayer families in the list are dead — Draw Something (collapsed as a mass game), QuizUp (servers off 24 Mar 2021), HQ Trivia (ceased 14 Feb 2020), Tetris Battle / Friends (closed 31 May 2019), Minesweeper Flags (delisted 2024). Their cards keep their peak figures and their death dates, because <em>why</em> they died is roadmap evidence.</p></div>
+    </div>
+    <div class="bands" id="playModeSummary" style="margin-top:12px"></div>
+    <p class="axis" style="margin-top:8px">Counts are generated from the same dataset as the A–Z cards below, so they always match the list.</p>
+    <p class="note" style="margin-top:10px"><strong>This label is an attribute, not a priority.</strong> It does <em>not</em> change any family's Band or Priority. Morphi today is still solo, and multiplayer remains a parked / later feature in the owner's plans (with a future slot already reserved in the profile design) — this section simply stops the roadmap pretending multiplayer puzzles don't exist. Two near-identical names must never be merged: <strong>Mahjong Solitaire is Solo only</strong>, while <strong>4-player Mahjong is Multiplayer</strong> — different families. And one honest limit on the label <strong>Both</strong> for Merge: it is weak — only the 2048 / Suika branch has played versus forms; progression-merge games (Merge Mansion type) are Solo only.</p>
+  </div>
+
+  <div class="panel" style="margin-top:12px" id="what-is-a-band">
+    <h3 style="font-family:inherit;font-size:20px">What is a “Band”? — Band A, B, C and D explained</h3>
+    <p class="note" style="margin-top:6px"><strong>Band = popularity band.</strong> Every family in the A–Z list is placed in one band based on the research evidence for how many people actually play it today — downloads, active players, plays, revenue and chart presence in 2023–2025. For Band D the “evidence” is the opposite: no such data was found at all (see its card below). It is <em>not</em> a difficulty rating, not a quality rating, and not Morphi's build order.</p>
+    <div class="bands">
+      <div class="bandcard">
+        <span class="b bA">Band A — Mass</span>
+        <h4>Most-played</h4>
+        <p>Huge global audience. Hundreds of millions of downloads, billions of plays, or top-of-chart revenue.</p>
+        <p class="examples"><strong>Examples:</strong> Block-fit, Match-3, Wordle, Connections, Tetris.</p>
+        <p class="examples"><strong><span class="bcA">18</span> families</strong> start in Band A (including A/B borderline cases).</p>
+      </div>
+      <div class="bandcard">
+        <span class="b bB">Band B — Medium</span>
+        <h4>Medium-played</h4>
+        <p>Proven mainstream audience, but smaller than Band A. Typically tens of millions of installs, or a strong, visible app / web presence.</p>
+        <p class="examples"><strong>Examples:</strong> Water Sort, Mahjong Solitaire, Nonogram, Word Search, Jigsaw, Triple Tile's neighbours like Ball Sort.</p>
+        <p class="examples"><strong><span class="bcB">64</span> families</strong> start in Band B (including B/C and B/D borderline cases).</p>
+      </div>
+      <div class="bandcard">
+        <span class="b bC">Band C — Niche-but-loyal</span>
+        <h4>Less-played · loyal</h4>
+        <p>Small audience, but devoted and long-lived. Often no mass chart numbers — loyalty shows up in syndication, championships, books and decades of repeat play instead.</p>
+        <p class="examples"><strong>Examples:</strong> Slitherlink, Kakuro, KenKen, Minesweeper, Sokoban, Tangram.</p>
+        <p class="examples"><strong><span class="bcC">102</span> families</strong> start in Band C (including C/D borderline cases).</p>
+      </div>
+      <div class="bandcard">
+        <span class="b bD">Band D — No data found</span>
+        <h4>No data found</h4>
+        <p>The research found <strong>no modern downloads, users or retention data</strong> for these families anywhere — labelled <strong>[ABSENT]</strong>. That is <em>not</em> proof nobody plays them: no data is not the same as no players, and a small audience may simply be unmeasured. Most of these families <em>also</em> faded for a documented reason: too hard to teach, too slow, needed paper or special pieces, language-locked, or boring once solved.</p>
+        <p class="examples"><strong>Examples:</strong> Yajisan-Kazusan, Diagramless Crossword, Lights Out, Burr puzzle, Sator Square.</p>
+        <p class="examples"><strong><span class="bcD">58</span> families</strong> are Band D.</p>
+      </div>
+    </div>
+    <p class="note" style="margin-top:12px"><strong>What about labels like A/B, B/C or C/D?</strong> The puzzle sits <em>between</em> two bands. For example, <strong>A/B</strong> means mass in one measure or market but medium in another; <strong>B/C</strong> means medium overall with a niche, loyal core; <strong>C/D</strong> means niche overall, shading into no-data-found, with only a small loyal remnant. One special case is labelled <strong>B/D</strong> — Arrowword: Band B in much of Europe, Band D in the US. On each card below, the badge now spells the band out in full — for example “Band A — Mass” — so you don't need to memorise the letters.</p>
+  </div>
+
+  <section id="charts">
+    <h2>Charts — tap to explore</h2>
+    <p class="sub">Every number below is taken from the research already on this page, with its label kept: <strong>[P]</strong> published · <strong>[E]</strong> third-party estimate · <strong>[R]</strong> reasoned estimate · <strong>[ABSENT]</strong> no data found. Nothing is mixed across units: downloads, money and plays each get their own view.</p>
+
+    <div class="panel chart">
+      <h3 style="font-family:inherit">1 · How the <span class="totalFam">182</span> families split by Band</h3>
+      <p class="note">Counted from the A–Z list itself, by each family's first band letter — so borderline labels count with their first band (A/B with A, B/C and B/D with B, C/D with C). <strong>Tap a bar to filter the A–Z list to that band.</strong></p>
+      <div class="bars" id="bandChart"></div>
+      <p class="axis" id="bandAxis"></p>
+    </div>
+
+    <div class="panel chart">
+      <h3 style="font-family:inherit">2 · Biggest families — by downloads, by money, by plays (via example games)</h3>
+      <p class="note">Three separate units, never on one axis. Use the toggle — each view has its own scale and each bar keeps its own year and source label, because the report stitches incompatible datasets. <strong>Every bar names an example commercial game in a family</strong> (e.g. Block Blast! for block-fit, Royal Match for match-3) — the bar measures that <em>family's</em> popularity through its best-known game; the game itself is not a roadmap entry.</p>
+      <div class="pills" id="popPills">
+        <button class="pill on" data-pop="downloads">Downloads / installs</button>
+        <button class="pill" data-pop="revenue">Revenue</button>
+        <button class="pill" data-pop="plays">Plays (NYT, 2024)</button>
+      </div>
+      <div class="bars" id="popChart"></div>
+      <p class="axis" id="popAxis"></p>
+    </div>
+
+    <div class="panel chart">
+      <h3 style="font-family:inherit">3 · Retention — who comes back?</h3>
+      <p class="note">Bars are % of players still playing. Scale is the % itself (0–100%), so a D30 bar of 5.35% is honestly small next to a D1 bar of 31.85%.</p>
+      <div class="bars">
+        <div class="barrow"><span class="blabel">Puzzle (general) — D1 [P]</span><span class="track"><span class="fill" style="display:block;width:31.85%"></span></span><span class="bval">31.85% · AppsFlyer Q3 2022</span></div>
+        <div class="barrow"><span class="blabel">Puzzle (general) — D30 [P]</span><span class="track"><span class="fill grey" style="display:block;width:5.35%"></span></span><span class="bval">5.35% · AppsFlyer Q3 2022</span></div>
+        <div class="barrow"><span class="blabel">Match — D1 [P]</span><span class="track"><span class="fill teal" style="display:block;width:32.65%"></span></span><span class="bval">32.65% · AppsFlyer Q3 2022</span></div>
+        <div class="barrow"><span class="blabel">Match — D30 [P]</span><span class="track"><span class="fill teal" style="display:block;width:7.15%;opacity:.55"></span></span><span class="bval">7.15% · AppsFlyer Q3 2022</span></div>
+        <div class="barrow"><span class="blabel">Hyper-casual — D1 [P]</span><span class="track"><span class="fill amber" style="display:block;width:29.31%"></span></span><span class="bval">29.31% · AppsFlyer Q3 2022</span></div>
+        <div class="barrow"><span class="blabel">Hyper-casual — D30 [P]</span><span class="track"><span class="fill amber" style="display:block;width:1.38%;opacity:.55"></span></span><span class="bval">1.38% · AppsFlyer Q3 2022</span></div>
+        <div class="barrow"><span class="blabel">All genres, median — D1 [P]</span><span class="track"><span class="fill blue" style="display:block;width:22.91%"></span></span><span class="bval">22.91% · GameAnalytics Q1 2024</span></div>
+        <div class="barrow"><span class="blabel">All genres, median — D7 [P]</span><span class="track"><span class="fill blue" style="display:block;width:4.2%;opacity:.7"></span></span><span class="bval">4.20% · GameAnalytics Q1 2024</span></div>
+        <div class="barrow"><span class="blabel">All genres, median — D28 [P]</span><span class="track"><span class="fill blue" style="display:block;width:0.85%;opacity:.45"></span></span><span class="bval">0.85% · GameAnalytics Q1 2024</span></div>
+      </div>
+      <p class="note" style="margin-top:10px"><strong>Multiplayer retention — the headline is an absence:</strong> <em>no publisher has published a multiplayer-vs-solo retention, session-length or sessions-per-day split for any puzzle game</em> [ABSENT]. Any claim that “multiplayer improves puzzle retention by X%” would be invented, so none is made here. The negative evidence is real, though: Draw Something's DAU collapsed within weeks despite being purely social, and QuizUp died unprofitable despite a company-claimed 40 minutes/day per user (May 2014, self-reported and unaudited [P-claim]). Budget multiplayer retention as an unproven hypothesis, not a benchmarked uplift.</p>
+    <p class="note" style="margin-top:10px"><strong>Caveat — read before quoting:</strong> there is <em>no</em> clean published puzzle-specific D1/D7/D30 triplet for 2023–25. The puzzle and match figures above are the last public genre split (AppsFlyer Q3 2022) and have <em>no D7 figure</em> — D7 for puzzle is [ABSENT], which is why no puzzle D7 bar exists. The all-genre median is the only series here with D1, D7 <em>and</em> a late point (D28, not D30 — the two are not the same day and are labelled separately above).</p>
+    </div>
+
+    <div class="panel chart">
+      <h3 style="font-family:inherit">3b · Multiplayer families — biggest published figures</h3>
+      <p class="note">From the multiplayer research (26 Oct 2026). Three separate units, never on one axis — cumulative participants, downloads / installs and units / copies measure different things, and figures from different eras are labelled per bar, exactly as in Chart 2. <strong>Storefront and Steam-chart figures in the report are web-index snapshots, not live-verified.</strong></p>
+      <div class="pills" id="mpPills">
+        <button class="pill on" data-mp="participants">Participants / users</button>
+        <button class="pill" data-mp="downloads">Downloads / installs</button>
+        <button class="pill" data-mp="units">Units / copies sold</button>
+      </div>
+      <div class="bars" id="mpChart"></div>
+      <p class="axis" id="mpAxis"></p>
+    </div>
+
+    <div class="panel chart">
+      <h3 style="font-family:inherit">4 · How long is one round?</h3>
+      <p class="note">Ranges from the round-time table below, on a 0–20 minute scale. A dot means a single typical time, not a range. <strong>[R]</strong> = reasoned from board size / move count; <strong>[P]</strong> = published.</p>
+      <div class="bars">
+        <div class="barrow"><span class="blabel">Flow board</span><span class="track"><span class="rangefill" style="left:2.5%;width:22.5%"></span></span><span class="bval">0.5–5 min [R]</span></div>
+        <div class="barrow"><span class="blabel">Match-3 level</span><span class="track"><span class="rangefill" style="left:5%;width:10%"></span></span><span class="bval">1–3 min [R]</span></div>
+        <div class="barrow"><span class="blabel">Water / Ball Sort</span><span class="track"><span class="rangefill" style="left:5%;width:10%"></span></span><span class="bval">1–3 min [R]</span></div>
+        <div class="barrow"><span class="blabel">Memory pairs</span><span class="track"><span class="rangefill" style="left:5%;width:10%"></span></span><span class="bval">1–3 min [R]</span></div>
+        <div class="barrow"><span class="blabel">Block-fit run</span><span class="track"><span class="rangefill" style="left:10%;width:15%"></span></span><span class="bval">2–5 min [R]</span></div>
+        <div class="barrow"><span class="blabel">Triple Tile</span><span class="track"><span class="rangefill" style="left:10%;width:10%"></span></span><span class="bval">2–4 min [R]</span></div>
+        <div class="barrow"><span class="blabel">Wordle</span><span class="track"><span class="point" style="left:15%"></span></span><span class="bval">~3 min [P]</span></div>
+        <div class="barrow"><span class="blabel">Nonogram 10×10</span><span class="track"><span class="rangefill" style="left:15%;width:10%"></span></span><span class="bval">3–5 min [R]</span></div>
+        <div class="barrow"><span class="blabel">Sudoku — Easy</span><span class="track"><span class="rangefill" style="left:25%;width:25%"></span></span><span class="bval">5–10 min [P-range]</span></div>
+        <div class="barrow"><span class="blabel">Mahjong Solitaire</span><span class="track"><span class="rangefill" style="left:25%;width:50%"></span></span><span class="bval">5–15 min [R]</span></div>
+        <div class="barrow"><span class="blabel">2048 / Suika run</span><span class="track"><span class="rangefill" style="left:25%;width:50%"></span></span><span class="bval">5–15 min [P-secondary / R]</span></div>
+        <div class="barrow"><span class="blabel">Minesweeper</span><span class="track"><span class="rangefill" style="left:5%;width:45%"></span></span><span class="bval">1–10 min [R]</span></div>
+        <div class="barrow"><span class="blabel">Jigsaw — 100 pieces</span><span class="track"><span class="rangefill" style="left:50%;width:50%"></span></span><span class="bval">10–20 min [R]</span></div>
+      </div>
+      <p class="axis">Scale 0–20 min. Longer forms from the same table are not plotted: Sudoku Hard 20–40 min [P-range], Nonogram 25×25 25–60 min [R], Jigsaw 1000 pieces 120+ min [R] — all past Morphi's 1–3 minute sweet spot, which is why the roadmap caps sizes.</p>
+    </div>
+  </section>
+
+  <section id="timeline">
+    <h2>Timeline</h2>
+    <p class="sub">Two views: how these puzzles lived and died in the real world, and where Morphi's roadmap goes next. In the Morphi view, tap a phase to filter the A–Z list to the games in that phase.</p>
+    <div class="pills" id="tlPills">
+      <button class="pill on" data-tl="history">Puzzle history</button>
+      <button class="pill" data-tl="morphi">Morphi roadmap phases</button>
+    </div>
+
+    <div class="timeline" id="tlHistory">
+      <div class="titem"><span class="when">Before AD 62</span><h4>Sator Square — Pompeii</h4><p>The famous word square survives from Pompeii as an artefact / charm, not as a living game [P]. Band D today.</p></div>
+      <div class="titem"><span class="when">1880</span><h4>The 15-Puzzle fad</h4><p>Sliding tiles sweep the world — then fade. Half of all random 15-Puzzle setups are mathematically unsolvable [P], one reason the faithful form sits in Band D today.</p></div>
+      <div class="titem"><span class="when">1924</span><h4>Diagramless crossword — by accident</h4><p>The grid-less crossword begins as a 1924 accident [P]: the solver must rebuild the black squares too. Too slow and hard to teach — Band D today.</p></div>
+      <div class="titem"><span class="when">1978</span><h4>Simon</h4><p>The light-and-tone sequence toy becomes a hardware icon. No modern chart or MAU data exists for Simon-type play [ABSENT].</p></div>
+      <div class="titem"><span class="when">1992–2009</span><h4>Minesweeper, bundled with Windows</h4><p>Free on almost every PC [P] — then unbundled in Windows 8, and its mass audience goes with the distribution, not the game.</p></div>
+      <div class="titem"><span class="when">1995</span><h4>Lights Out</h4><p>A dedicated electronic toy. It collapses once the “chase the lights” trick is known [P] — a lesson in solved-once puzzles.</p></div>
+      <div class="titem"><span class="when">2012 → today</span><h4>Flow Free — the long tail</h4><p>Flow-type play proves durable: 230M Play installs and 2,500+ free levels [E/P]. Morphi's Connect prototype is this family's form.</p></div>
+      <div class="titem"><span class="when">2023</span><h4>NYT kills Digits after ~4 months</h4><p>Even the New York Times retires a numbers daily quickly when it doesn't hold — distribution alone doesn't save a puzzle.</p></div>
+      <div class="titem"><span class="when">29 Aug 2024</span><h4>NYT Vertex discontinued [P]</h4><p>Another NYT experiment ends — the daily-games catalogue is ruthlessly pruned, which is why Morphi's suspense model (no catalogue to prune) is different.</p></div>
+      <div class="titem"><span class="when">18 Aug 2025</span><h4>NYT launches Pips</h4><p>Domino logic redesigned to be taught visually — the modern template for reviving a Band D idea: fix the teach cost, keep the logic.</p></div>
+      <div class="titem"><span class="when">c. 1800 · 1817–18</span><h4>Tangram — the first global multiplayer puzzle fad</h4><p>Invented / popularised in China c. 1800 [E]; the 1817–18 craze sweeps Europe and America as parlour play with informal races [E]. Tangram races are still a played form today.</p></div>
+      <div class="titem"><span class="when">1978</span><h4>American Crossword Puzzle Tournament founded</h4><p>Will Shortz founds the ACPT in Stamford with 149 contestants [E] — crossword solving becomes an organised race. It grows to 926 contestants in the 2025 report and 915 in-person + 319 virtual in the 2026 official history [E/P], including an official Pairs division.</p></div>
+      <div class="titem"><span class="when">1990</span><h4>Nintendo World Championships — Tetris on a national tour</h4><p>The tour visits 29 US cities; finals combine Mario, Rad Racer and a Tetris score leg [E]. Competitive Tetris is mass entertainment a decade before online versus.</p></div>
+      <div class="titem"><span class="when">1991</span><h4>Puyo Puyo launches</h4><p>Versus chain-puzzling becomes a Japanese institution [E] — still running: JESU-certified pro licences, a Sega Grand Prix circuit, and selection as an Asian Games 2026 esports title [P, Sega, 2 Apr 2026]. No global sales / MAU figure has ever been published [ABSENT].</p></div>
+      <div class="titem"><span class="when">1993</span><h4>Tetris Battle Gaiden — character versus is born</h4><p>Japan-only Super Famicom release [E]: clear lines, spend orbs on character attacks. With Puyo Puyo (1991), Panel de Pon (1995) and Super Puzzle Fighter II Turbo (1996), the 1990s codify garbage-battle design.</p></div>
+      <div class="titem"><span class="when">Jul 2009</span><h4>Words With Friends launches</h4><p>Async turn-based becomes mobile's default social puzzle [P/E] — turns over days, many games in parallel, notifications bringing players back.</p></div>
+      <div class="titem"><span class="when">Feb–Mar 2012</span><h4>Draw Something — the spike and the collapse</h4><p>50M downloads in 50 days [P, Zynga]; DAU then falls from ~14.6M peak to 10.4M within about a month [E, AppData] and the studio is closed in June 2013. Social virality demonstrably did not retain it.</p></div>
+      <div class="titem"><span class="when">20 May 2014</span><h4>Nintendo Wi-Fi Connection shuts down</h4><p>Online play for Tetris DS, Dr. Mario and every DS / Wii puzzle title ends at a stroke [P, Nintendo] — a platform-shutdown death, not a popularity death.</p></div>
+      <div class="titem"><span class="when">13 Feb 2019</span><h4>Tetris 99 — 99-player battle-royale Tetris</h4><p>Launches free for Nintendo Switch Online members [P, Nintendo]. Its total player count has never been published [ABSENT].</p></div>
+      <div class="titem"><span class="when">31 May 2019</span><h4>Tetris Online, Inc. ceases operations</h4><p>Tetris Friends and Tetris Battle (once 16M MAU [E]) close the same day [P/E]; the community migrates to unofficial TETR.IO and Jstris.</p></div>
+      <div class="titem"><span class="when">14 Feb 2020</span><h4>HQ Trivia ceases operations</h4><p>The appointment live-trivia show — record 2.38M concurrent players on 28 Mar 2018 [E] — ends when investors stop funding it [E]. The format decayed as prizes split among too many winners shrank to cents.</p></div>
+      <div class="titem"><span class="when">24 Mar 2021</span><h4>QuizUp servers taken offline</h4><p>Death by monetisation failure despite scale [P/E]: 20M users and over 1 billion matches by 2014, ~$55M+ raised, sold on for $7.5M in 2016, then discontinued.</p></div>
+      <div class="titem"><span class="when">2026</span><h4>Puyo Puyo at the Asian Games</h4><p>A 1991 versus puzzler is selected as an Asian Games 2026 esports title [P, Sega] — the longest-lived multiplayer puzzle form on this page reaches multi-sport-event status.</p></div>
+    </div>
+
+    <div class="timeline" id="tlMorphi" style="display:none">
+      <button class="titem" data-phase="Live in Morphi"><span class="when">Now · Live</span><h4>Live in Morphi — Block + Memory</h4><p>Two families live in v1: Block (block-fit, Band A) and Memory (memory pairs, Band B/C). Tap to see them.</p></button>
+      <button class="titem" data-phase="Prototype"><span class="when">Next · Prototype built</span><h4>Prototype — Connect (Flow)</h4><p>Built and awaiting acceptance: connect the pairs, fill the grid. Tap to see it.</p></button>
+      <button class="titem" data-phase="High Priority"><span class="when">Wave 1 · High Priority</span><h4>High Priority — the proven mass + medium wave</h4><p>Sort, Triple Tile, classic Sudoku, Flow-type and daily-word forms: teach in ≤10 seconds, rounds of 30 sec–5 min. Tap to filter the list.</p></button>
+      <button class="titem" data-phase="Medium"><span class="when">Wave 2 · Medium</span><h4>Medium — the second wave</h4><p>Nonogram, Word Search, Mahjong Solitaire, Jigsaw (phone-sized) and friends — search traffic and repeat visits. Tap to filter the list.</p></button>
+      <button class="titem" data-phase="Low Priority"><span class="when">Wave 3 · Low Priority</span><h4>Low Priority — the loyal-niche retention library</h4><p>Mostly Band C logic and classics: judged by returning players, not new-player volume. Tap to filter the list.</p></button>
+      <button class="titem" data-phase="Later"><span class="when">Later</span><h4>Later — good puzzles, wrong moment</h4><p>Kept on the map, deliberately not scheduled: regional or slow forms like Arrowword, Acrostic and Tapa. Tap to filter the list.</p></button>
+      <button class="titem" data-phase="Nobody Plays It… Yet"><span class="when">Final wave · Revivals</span><h4>Nobody Plays It… Yet — revive by fixing the cause of death</h4><p>Band D families, never ported faithfully: shorten the teach, cut the round, remove the special pieces — then let Morphi's suspense deal them as a surprise. Tap to filter the list.</p></button>
+    </div>
+  </section>
+
+  <section>
+    <h2>Most-played families right now — the evidence</h2>
+    <p class="sub">Composite ranking of <strong>families</strong> (downloads + active users + revenue + plays + chart longevity). No single vendor publishes a clean cross-platform ranking of puzzle types — this stitches incompatible datasets, exactly as the research report warns. <strong>In the table, any commercial title after a dash — Block Blast!, Royal Match, Candy Crush Saga and so on — is an “example game in this family”, shown only as evidence for that family. It is not a separate family and not a Morphi game.</strong></p>
+    <div class="panel" style="margin-top:12px;overflow:hidden">
+    <table>
+      <thead><tr><th>#</th><th>Family (type) — example game(s) in this family</th><th>Evidence (for the family, via its example games)</th><th>Source</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><strong>Block-fit 8×8 / 10×10</strong> — Block Blast!</td><td>368M downloads in 2025 [E]; 367M cumulative to Dec 2024 [E]; Indonesia 73M, US 36M downloads in 2025 [E]</td><td>AppMagic via Mobilegamer.biz; Sensor Tower</td></tr>
+        <tr><td>2</td><td><strong>Match-3 + meta</strong> — Royal Match</td><td>$1.4B IAP in 2025, #1 puzzle revenue [E]; lifetime &gt;$6B gross, 351M downloads [E, May 2025]; US = 54.5% of gross revenue [E]</td><td>Sensor Tower via Naavik; AppMagic</td></tr>
+        <tr><td>3</td><td><strong>Match-3 saga</strong> — Candy Crush Saga</td><td>~$1.09B in 2024 [E]; $20B lifetime to Sep 2023 [P]; ~180M MAU franchise [E, 2024]</td><td>AppMagic / BOA round-up; King via Reuters</td></tr>
+        <tr><td>4–5</td><td><strong>Daily word</strong> — Wordle · Connections</td><td>Wordle 5.3B plays in 2024 (4.8B in 2023); Connections 3.3B plays in 2024 [P]</td><td>NYT via The Verge</td></tr>
+        <tr><td>6</td><td><strong>Match-3 decorate</strong> — Gardenscapes / Homescapes</td><td>Gardenscapes &gt;$500M in 2025 [E]; lifetime 672M downloads / ~$4B (Gardenscapes), 619M / ~$3.4B (Homescapes) [E, Jan 2025]</td><td>Sensor Tower; AppMagic</td></tr>
+        <tr><td>7</td><td><strong>Tricky brain-test</strong> — Brain Test</td><td>390M Google Play installs [E]; Brain Test 1+2 &gt;300M combined at Huawei launch [P, 2021]</td><td>AppBrain; Unico / Huawei</td></tr>
+        <tr><td>8</td><td><strong>Triple-tile match</strong></td><td>Tile Explorer 280M, Tile Club 230M, Triple Tile 75M installs [E, Play only]</td><td>AppBrain</td></tr>
+        <tr><td>10</td><td><strong>Classic Sudoku</strong></td><td>100M+ Play installs for the lead app [E]; print syndication in hundreds of newspapers [P]</td><td>AppBrain / AppStoreSpy; Conceptis</td></tr>
+        <tr><td>14</td><td><strong>Tetris (all versions)</strong></td><td>520M copies sold to Dec 2024 — best-selling game ever [P]. Modern mobile MAU: [ABSENT]</td><td>Tetris Co. via Wikipedia</td></tr>
+        <tr><td>18–20</td><td><strong>Flow Free · Nonogram · Water Sort</strong></td><td>Flow 230M Play installs, 2,500+ free levels [E/P]; Nonogram.com 73M [E]; Water/Ball Sort lead apps 28M + 40M + 70M each [E]</td><td>AppBrain; Big Duck listing</td></tr>
+        <tr><td>24</td><td><strong>Fruit-merge (Suika-like)</strong></td><td>Suika: 11M downloads to Oct 2024; #1 Switch eShop download in Japan in 2023 <em>and</em> 2024 [P]</td><td>Aladdin X via Wikipedia</td></tr>
+      </tbody>
+    </table>
+    </div>
+    <p class="note" style="margin-top:8px">Full top-40 ranking, medium band and niche band are in the research report; the A–Z index below carries all <span class="totalFam">182</span> families with their band.</p>
+  </section>
+
+  <section>
+    <h2>Retention &amp; session benchmarks — read the caveats</h2>
+    <div class="panel" style="margin-top:12px">
+    <table>
+      <thead><tr><th>Metric</th><th>Figure</th><th>Label / source</th></tr></thead>
+      <tbody>
+        <tr><td>Puzzle (general) D1 / D30</td><td><strong>31.85% / 5.35%</strong></td><td>[P] AppsFlyer Q3 2022 via Mistplay — the most recent public genre split. Do <em>not</em> present as 2025.</td></tr>
+        <tr><td>Match D1 / D30</td><td><strong>32.65% / 7.15%</strong></td><td>[P] AppsFlyer Q3 2022, as above</td></tr>
+        <tr><td>Hyper-casual D1 / D30 (contrast)</td><td>29.31% / <strong>1.38%</strong></td><td>[P] AppsFlyer Q3 2022 — shows short-loop collapse</td></tr>
+        <tr><td>All-genre median D1 / D7 / D28</td><td><strong>22.91% / 4.20% / 0.85%</strong></td><td>[P] GameAnalytics Q1 2024, &gt;10K games</td></tr>
+        <tr><td>All-genre median D1 (2025)</td><td>~22%; top quartile 25–27% Android, 31–33% iOS</td><td>[P] GameAnalytics Benchmarks 2025, 11,600 games, 1.48B MAU — no open genre split</td></tr>
+        <tr><td>Median session length</td><td><strong>4 min 45 sec</strong> (Q1 2024); 2025 median-tier 5–6 min, top-tier 8–9 min</td><td>[P] GameAnalytics Q1 2024 &amp; 2025</td></tr>
+        <tr><td>Multiplayer vs solo retention / session split</td><td><strong>[ABSENT] — never published for any puzzle game</strong></td><td>Multiplayer research, 26 Oct 2026: no Zynga, etermax, Chess.com, King or Nintendo disclosure found. Adjacent-genre studies exist but cannot be transferred numerically to puzzles.</td></tr>
+        <tr><td>Sessions / day · daily playtime</td><td>~4 sessions/day, ~22 min/day median (all genres)</td><td>[P-secondary] AppAgent summary of GameAnalytics</td></tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-top:10px"><strong>Honest gap:</strong> there is <em>no</em> clean published puzzle-specific D1/D7/D30 triplet for 2023–25. Anything quoting “puzzle D30 = 18%” or a “13-minute puzzle session” without a primary source was excluded by the research as unverified. Best long-tail retention: daily puzzles (a calendar habit + a streak to lose), classic word/board, Sudoku/Nonogram at a chosen difficulty, match-3 with live events. Worst: hyper-casual one-mechanic sorts, tricky-puzzle clones, fruit-merge spikes. Note for Morphi as a <em>website</em> (no install): the honest equivalents are “returned next calendar day” and streak continuation — NYT publishes plays, not retention [ABSENT].</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Round time, likes &amp; dislikes</h2>
+    <p class="sub">Round times are [R] reasoned estimates from board size / move count unless marked [P].</p>
+    <div class="panel" style="margin-top:12px">
+    <table>
+      <thead><tr><th>Type</th><th>One round</th><th>Players love</th><th>Players complain about</th></tr></thead>
+      <tbody>
+        <tr><td>Block-fit run</td><td>2–5 min [R]</td><td>Instant to learn, relaxing, offline, no timer</td><td>Pieces “feel rigged” late-run, ads between runs, no undo</td></tr>
+        <tr><td>Match-3 level</td><td>1–3 min [R]</td><td>Satisfying clears/cascades, polish, endless levels</td><td>Difficulty spikes / “rigged” near-misses, pay-for-5-moves, lives/energy</td></tr>
+        <tr><td>Wordle</td><td>~3 min [P — creator intent]</td><td>One-a-day scarcity, shareable grid, no ads in core</td><td>The same one-a-day scarcity, streak anxiety, obscure-word rows</td></tr>
+        <tr><td>Sudoku Easy / Med / Hard</td><td>5–10 / 10–20 / 20–40 min [P-range]</td><td>Unique solution, notes/undo, offline, no timer</td><td>Tiny number pad on phone, mistake-limit stress, ads mid-solve</td></tr>
+        <tr><td>Nonogram 10×10 / 15×15 / 25×25</td><td>3–5 / 8–15 / 25–60 min [R]</td><td>Picture reveal, pure logic</td><td>Colour-only or tiny cells at large sizes, guessing-required bad puzzles</td></tr>
+        <tr><td>Flow board</td><td>30 sec (5×5) – 5 min (10×10+) [R]</td><td>Clean, satisfying connection, huge free catalogue</td><td>Paid packs, colour-only coding (colour-blind failure), ads</td></tr>
+        <tr><td>Water / Ball Sort</td><td>1–3 min [R]</td><td>ASMR pour, relaxing, short</td><td>Hidden-colour levels feel unsolvable, extra tube sold via ad, similar colours hard to tell apart</td></tr>
+        <tr><td>Triple Tile</td><td>2–4 min [R]</td><td>Calming, large tiles</td><td>7-slot tray death feels forced, shuffle/undo sold as boosters</td></tr>
+        <tr><td>Mahjong Solitaire</td><td>5–15 min [R]</td><td>Relaxing, familiar tiles</td><td>Dead board with no warning, tiny tiles, reshuffle paywall</td></tr>
+        <tr><td>Jigsaw 100 / 300 / 1000 pc</td><td>10–20 / 30–60 / 120+ min [R]</td><td>Calm, beautiful images, own-photo puzzles</td><td>Pieces too small on phone, lost progress, pack paywalls</td></tr>
+        <tr><td>2048 / Suika run</td><td>5–15 min [P-secondary / R]</td><td>Zero friction, clear goal, physics chaos</td><td>Solved corner strategy makes 2048 routine; random fruit order feels unfair</td></tr>
+        <tr><td>Memory pairs · Simon</td><td>1–3 min · 1–4 min [R]</td><td>Universal; pure memory test, nostalgia</td><td>No depth once a layout is memorised; sound/colour-only coding, one mistake = restart</td></tr>
+        <tr><td>Minesweeper</td><td>1–10 min [R]</td><td>Pure deduction, speedrunning</td><td>Forced 50/50 guesses — the classic “unsolvable-feeling” complaint</td></tr>
+        <tr><td>Versus garbage-battle (Tetris / Puyo)</td><td>Round ~2 min [P/E]; a first-to-5/10 set 5–15 min [R]</td><td>Instant rematch, readable rival progress, skill expression</td><td>Garbage frustration; matchmaking imbalance; dead lobbies in niche titles</td></tr>
+        <tr><td>Same-puzzle race (Puzzle Rush, championships)</td><td>Puzzle Rush run 3 or 5 min [P]; championship rounds vary</td><td>Fairness — identical puzzle, no interaction luck; personal-best chasing</td><td>No interaction — can feel like parallel solo; elite fields are tiny</td></tr>
+        <tr><td>Async turn-based (WWF, Trivia Crack)</td><td>One turn 1–3 min [R]; one game runs days–weeks across turns [R]</td><td>Fits gaps in the day; many friends in parallel; notifications bring you back</td><td>Waiting for opponents — the genre's signature complaint; nag-notification fatigue; solver-app cheating in word games</td></tr>
+        <tr><td>Co-operative (Keep Talking, escape rooms)</td><td>Escape room 45–60 min [E]; Keep Talking ~5 min per bomb [R]</td><td>Communication joy is the product — shared triumph, mishearing, shouting</td><td>Needs the same friends online at the same time; one weak / quiet partner ruins it; no solo fallback in two-player-only titles</td></tr>
+        <tr><td>Party / quiz / social (Kahoot!, Jackbox, HQ)</td><td>HQ show ~15 min [E]; Jackbox game 10–20 min [R]; Kahoot! quiz 10–30 min [R]</td><td>Lowest barrier in gaming — phone-as-controller, one host copy, humour is social</td><td>Appointment-only play (HQ); format repetition; endless fresh questions needed (QuizUp)</td></tr>
+        <tr><td>Unblock / Sokoban</td><td>1–10 min [R]</td><td>Compact spatial logic</td><td>Deadlock discovered late, no undo in bad versions</td></tr>
+      </tbody>
+    </table>
+    <p class="note" style="margin-top:10px">Rules the research implies for every Morphi round: no colour-only coding (always pair colour with pattern/letter/shape), undo is a retention feature not a booster, never sell the extra tube/shuffle the level design made necessary, no interruption inside a &gt;5-minute solve, and label hard levels “Hard” honestly — difficulty spikes are the #1 complaint in the #1 genre.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>Who plays, and where</h2>
+    <div class="panel" style="margin-top:12px">
+      <p class="note" style="margin:0">Puzzle players are <strong>majority women over 35</strong> — US 75% women for matching + word/brain/board, UK 74%, Japan 66%, Korea 73% [P, Udonis multi-market report]. A rewarded-panel study found 81% female, 84% play for relaxation, 54% for escapism [P-panel, Mistplay 2024 — panel skew, not a universe figure]. Players hold 2–3 games, prefer short sessions and solo play, and mostly do not identify as “gamers”. <strong>No vendor publishes a clean gender split by subgenre for 2023–25 [ABSENT]</strong> — directional only: match-3 / merge / jigsaw / word skew strongest female 35–64; block-fit and tricky puzzles are broader/younger; Sudoku / logic / speedcubing are more balanced or male-skewing in competition scenes.</p>
+      <p class="note">Downloads map ≠ revenue map. India is the #1 mobile-games download market (~17% of global game downloads, Oct 2024 [E, Sensor Tower]), then US ~8%, Brazil ~7.5%. Block Blast downloads: Indonesia #1, then US, Vietnam, Brazil, India [E, AppMagic]. Revenue is a US / Japan / Germany / UK story (Royal Match US = 54.5% of gross [E, AppMagic]). A web, SEO-led model follows the download map; a subscription model follows the revenue map.</p>
+      <p class="note">Earlier cut, different measure — ESA 2025: 59% of <em>all</em> US players play puzzle, and Boomer / Silent-generation players prefer puzzle at 73% [P, ESA 2025]. The ESA 2026 figures at the top of this page are mobile- and PC-specific cuts, so the two editions are not directly comparable.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>The roadmap in tiers</h2>
+    <p class="sub">Every tier below is computed from the same priority labels as the A–Z list — the family names and the count in each heading come straight from the list itself, so this section always matches the cards.</p>
+    <div class="tiers" id="tiersGrid" style="margin-top:12px">
+      <!-- Tier panels are generated by the script at the bottom of this page, from the same F dataset as the A–Z list. -->
+      <div class="panel"><h3 style="font-family:inherit">Why Band D died — the pattern</h3><p class="note">Too hard to teach in &lt;30 seconds (Tentai Show, Shakashaka) · too slow for a phone session (diagramless, acrostic, barred cryptic) · needs paper or special pieces (burr, puzzle boxes, Simon hardware) · language-locked (Sator square, crossnumber) · solved once the trick is known (Lights Out “chase the lights”, 15-Puzzle parity — half of all random 15-Puzzle setups are mathematically unsolvable [P]) · or lost distribution (Minesweeper unbundled in Windows 8; NYT Digits killed after ~4 months; NYT Vertex discontinued 29 Aug 2024 [P]).</p></div>
+    </div>
+  </section>
+
+  <section id="az">
+    <h2>A–Z Index — <span class="totalFam">182</span> Families (puzzle types, not commercial games)</h2>
+    <p class="sub">Each card below is <strong>one family = one puzzle type = one future Morphi game</strong> — not a commercial game you can buy, and (except Block, Memory and Connect) not built yet. Search by family name or by what the player does. Filter by popularity band, priority label, or the research-based Solo / Multiplayer / Both label. Morphi's own families are pinned at the top of the list. <a href="#family-vs-game">Family vs Game explained</a> · <a href="#what-is-a-band">What does Band A / B / C / D mean?</a></p>
+    <div class="controls">
+      <div class="cgrid">
+        <input id="q" type="search" placeholder="Search families… e.g. sort, loop, shade, word, versus, co-op" aria-label="Search families">
+        <select id="bandSel" aria-label="Filter by band"><option value="">All bands</option><option value="A">Band A — Mass</option><option value="B">Band B — Medium</option><option value="C">Band C — Niche-but-loyal</option><option value="D">Band D — No data found</option></select>
+        <select id="priSel" aria-label="Filter by priority"><option value="">All priorities</option><option>High Priority</option><option>Medium</option><option>Low Priority</option><option>Later</option><option>Nobody Plays It… Yet</option><option>Live in Morphi</option><option>Prototype</option></select>
+        <select id="modeSel" aria-label="Filter by Solo / Multiplayer / Both"><option value="">Solo / Multiplayer / Both — all</option><option>Solo</option><option>Multiplayer</option><option>Both</option></select>
+      </div>
+      <div class="pills" id="quickPills">
+        <button class="pill on" data-f="">Everything</button>
+        <button class="pill" data-f="morphi">Morphi families now (3)</button>
+        <button class="pill" data-f="A">Band A · Most-played</button>
+        <button class="pill" data-f="B">Band B · Medium-played</button>
+        <button class="pill" data-f="C">Band C · Less-played · loyal</button>
+        <button class="pill" data-f="D">Band D · No data found</button>
+      </div>
+    </div>
+    <p class="count" id="count"></p>
+    <div class="grid" id="grid"></div>
+    <p class="note" id="empty" style="display:none">No family matches that search + filter. Try a shorter word — “sort”, “loop”, “word”, “shade”.</p>
+  </section>
+
+  <section>
+    <h2>Open questions — what the research could not verify</h2>
+    <div class="panel" style="margin-top:12px">
+      <p class="note" style="margin:0">No published puzzle-genre D1/D7/D30 triplet for 2023–25 (last: AppsFlyer Q3 2022) · no NYT per-game retention, and no <em>settled</em> per-game plays split beyond Wordle / Connections / Strands — see the disputed Mini Crossword figure below · no modern MAU for Tetris, Minesweeper, 2048, Simon-type, or any Band C/D family · no gender-by-subgenre split · no per-type web-portal plays split (Poki / CrazyGames / Microsoft). Candy Crush and Royal Match lifetime figures differ by vendor (gross vs net, store-only vs all revenue) — never add them together. Several circulating statistics (“puzzle D30 18%”, “13-min puzzle session”, “$21B puzzle revenue 2024”) could not be traced to a primary publisher and were excluded.</p>
+      <p class="note" style="margin-top:10px"><strong>Multiplayer research — could not verify / [ABSENT]:</strong> Tetris 99 total players / downloads [ABSENT — Nintendo has not published a figure] · Tetris Effect: Connected lifetime sales [ABSENT] · Jackbox franchise sales [ABSENT — no publisher total found; do not invent one] · Chess.com Puzzle Rush / Battle user totals [ABSENT — tournament scale only: a 16-player Puzzle Battle World Championship field, $25,000 pool in 2022] · Keep Talking and Nobody Explodes lifetime sales [ABSENT beyond &gt;200,000 copies by Mar 2016 [P]] · Mahjong Soul global MAU [ABSENT] · Puyo Puyo series sales / MAU [ABSENT] · Portal 2 co-op-specific players [ABSENT] · any multiplayer-vs-solo retention split for any puzzle game [ABSENT]. Physical escape-room market size: two 2025 estimates conflict by ~9× ($1.08bn vs $9.32bn) — neither is quoted as settled. Exact shutdown dates for Scramble With Friends, Hanging With Friends and Trivia Royale were [ABSENT] in quality sources.</p>
+      <p class="note" style="margin-top:10px"><strong>Disputed, not settled — QuizUp's peak:</strong> secondary sources conflict — 20M users and over 1 billion matches by Mar–May 2014 [P/E], while later reports put the cumulative base at 70–80M [E]. Both figures are shown; no single “peak” is quoted as settled.</p>
+      <p class="note" style="margin-top:10px"><strong>Disputed, not settled — NYT Mini Crossword “2.1B plays”:</strong> a figure of 2.1B plays for the Mini Crossword in 2024 <em>was</em> published, in reporting of NYT's announcement (via TODAY). But it conflicts with NYT's own other reported figures: Wordle 5.3B + Connections 3.3B + Strands 1.3B + Mini 2.1B = <strong>12.0B plays</strong> — more than NYT's own reported total of <strong>11.1B plays across all its games</strong>. The two NYT-sourced reports cannot both be right, so the Mini figure is treated here as <strong>disputed</strong> until NYT reconciles them — it is deliberately <em>not</em> shown as a bar in the Plays chart above.</p>
+    </div>
+  </section>
+
+  <footer>
+    <p><strong>Sources (verbatim from the research report):</strong>
+    Sensor Tower / Naavik — naavik.co/digest/what-leading-match-3-and-merge-games-do-differently/ ·
+    Mobilegamer / AppMagic — mobilegamer.biz/the-top-mobile-game-downloads-of-2025/ ·
+    AppMagic / Royal Match — gaming.news/news/2025-05-20/user-spending-in-mobile-puzzle-game-royal-match-surpasses-6-billion/ ·
+    NYT Games — en.wikipedia.org/wiki/NYT_Games ·
+    NYT Vertex — thenewyorktimeshelpcenter.helpjuice.com/28624146433300-Vertex ·
+    GameAnalytics Q1 2024 — investgame.net/news/pdf/mobile-gaming-benchmarks-for-q1-2024/ ·
+    Udonis — blog.udonis.co/mobile-marketing/mobile-games/puzzle-games-report ·
+    Mistplay — business.mistplay.com/resources/puzzle-game-trends ·
+    ESA — theesa.com ·
+    Nikoli types — en.wikipedia.org/wiki/List_of_Nikoli_puzzle_types ·
+    Conceptis — conceptispuzzles.com ·
+    Puzzle Baron — puzzlebaron.com/puzzles/ ·
+    Atlas Obscura / Yajilin — atlasobscura.com/articles/puzzle-monday-yajilin ·
+    15 Puzzle — entertainment.howstuffworks.com/puzzles/sliding-puzzles1.htm ·
+    Lights Out — cut-the-knot.org/Curriculum/Games/Merlin5x5.shtml ·
+    Diagramless — puzzles.wiki/wiki/Diagramless_Crossword ·
+    Sator — en.wikipedia.org/wiki/Sator_Square ·
+    Burr — en.wikipedia.org/wiki/Burr_puzzle ·
+    Tetris — en.wikipedia.org/wiki/Tetris_(video_game) ·
+    Suika — en.wikipedia.org/wiki/Suika_Game ·
+    Simon — en.wikipedia.org/wiki/Simon_(game) ·
+    Sort puzzles — deconstructoroffun.com/blog/2026/2/6/sort-puzzles-how-a-new-subgenre-is-born ·
+    Microsoft Solitaire — azerion.com/azerion-to-distribute-classic-microsoft-casual-games/
+    AppBrain install totals are Google-Play-only modelled estimates, cited as [E]. Research window 2023–2025 unless a date is given; report dated 2026-10-25.</p>
+    <p><strong>Multiplayer sources (companion research, 26 Oct 2026):</strong> Kahoot! press, 9 Nov 2023 — kahoot.com/press/2023/11/09/kahoot-reaches-10-billion-participants-before-exciting-new-chapter/ · etermax / Trivia Crack via Games Press · Zynga / Guinness World Records, 13 Aug 2012 (Words With Friends) · Pressman / Goliath via Wikipedia (Rummikub) · Wikipedia / Polygon / TechCrunch (QuizUp, HQ Trivia, Puzzle Fighter shutdowns) · Nintendo support (Wi-Fi Connection shutdown, 20 May 2014) · World Cube Association — worldcubeassociation.org/speedcubing-history · Sega, 2 Apr 2026 (Puyo Puyo, Asian Games) · MIT The Tech, 22 Jan 2026 (Mystery Hunt 2026). All multiplayer figures carry their [P] / [E] / [R] / [ABSENT] label at the point of use.</p>
+    <p>Morphi.One roadmap · Priorities are a planning label only — under Morphi's suspense design no family is wasted, because the player never picks it.</p>
+  </footer>
+</div>
+<script>
+var F=[
+[11,"Block-fit 8×8 (Block Blast)","A","Drag blocks, complete lines, survive","Live in Morphi","Morphi: Block — live in v1. World's most-downloaded type in 2025."],
+[48,"Memory pairs / Concentration","B/C","Flip cards, remember matching pairs","Live in Morphi","Morphi: Memory — live in v1. Universal, unowned — no standalone chart app [ABSENT]. Labelled Both: Concentration is a traditional 2+-player turn-taking game — multiplayer is its original form [multiplayer research]."],
+[34,"Flow Free / Numberlink","A/B","Connect colour pairs, fill grid","Prototype","Morphi: Connect — prototype built, awaiting acceptance. Flow: 230M Play installs [E]."],
+[1,"Match-3 swap","A","Swap adjacent gems, match three","High Priority",""],
+[2,"Match-3 link / chain","A","Trace connected matching tiles","High Priority",""],
+[3,"Bubble Shooter","A","Aim, shoot bubbles, match colours","High Priority",""],
+[4,"Triple Tile Match","A","Collect three identical layered tiles","High Priority","Tile Explorer 280M, Tile Club 230M installs [E, AppBrain]."],
+[5,"Match-3D / Match Factory","B","Pick matching 3D objects from pile","Medium",""],
+[6,"Collapse / click-group (SameGame)","C","Tap groups of same colour","Low Priority",""],
+[7,"Bejeweled Blitz / timed match-3","C","Match fast against countdown timer","Low Priority",""],
+[8,"Tile pair connect (Onet)","B","Connect identical pairs, clear board","Medium",""],
+[9,"Mahjong Solitaire","B","Remove free matching tile pairs","Medium","Medium, older skew; no clean global total [ABSENT]. Solo only: no played multiplayer form found [ABSENT] — do not confuse with 4-player Mahjong (#168), a different, Multiplayer family [multiplayer research]."],
+[10,"Shanghai / Mahjong Titans","C","Remove pairs from stacked layout","Low Priority",""],
+[12,"Block-fit 10×10 (1010!)","B","Place pieces, clear rows columns","Medium",""],
+[13,"Blockudoku / Woodoku","B","Place blocks, clear lines and boxes","Medium","Blockudoku 120M installs [E, AppBrain]."],
+[14,"Tetris / falling tetromino","A","Rotate falling pieces, clear lines","High Priority","520M copies sold to Dec 2024 [P]; modern mobile MAU [ABSENT]."],
+[15,"Columns / gem falling","C","Rotate falling trios, match colours","Low Priority",""],
+[16,"Puyo Puyo blob falling","C","Chain falling blobs, send garbage","Low Priority",""],
+[17,"Dr. Mario / virus match","D","Drop capsules, match virus colours","Nobody Plays It… Yet",""],
+[18,"Klax / conveyor match","D","Catch, stack coloured tiles in rows","Nobody Plays It… Yet",""],
+[19,"Lumines / block timing","D","Rotate squares over sweeping timeline","Nobody Plays It… Yet",""],
+[20,"Hexic / rotating hex match","D","Rotate hex clusters, match colours","Nobody Plays It… Yet",""],
+[21,"2048 sliding merge","A/B","Slide tiles, merge equal numbers","High Priority","No 2023–25 download/MAU series [ABSENT]; evergreen by ubiquity. Merge is labelled Both (weak) only for this 2048 / Suika branch — versus modes exist and are played, figures [ABSENT] [multiplayer research]."],
+[22,"Threes! sliding merge","C","Slide numbered cards, combine pairs","Low Priority",""],
+[23,"Suika / fruit drop merge","B","Drop fruits, merge into larger","Medium","Suika 11M downloads to Oct 2024 [P]."],
+[24,"Merge-2 board (Merge Mansion type)","A","Merge items twice, fulfil orders","High Priority","Gossip Harbor ~$650M in 2025 [E, Sensor Tower]."],
+[25,"Merge-3 board (Merge Dragons type)","B","Merge three objects, evolve forms","Medium",""],
+[26,"Idle / merge evolution","C","Combine creatures, automate production","Low Priority",""],
+[27,"Water Sort","B","Pour coloured water, sort tubes","High Priority","Lead apps 28M / 40M / 70M installs each [E, AppBrain] — demand is mass, no single title is. Promoted: Morphi's next-family candidate."],
+[28,"Ball Sort","B","Move balls, sort by colour","Medium",""],
+[29,"Hexa Sort / stack sort","B","Stack hex tiles, merge colours","Medium","Hexa Sort IAP peaked $4M/month [E, Deconstructor of Fun]."],
+[30,"Goods / shelf sort","B","Sort products onto matching shelves","Medium",""],
+[31,"Screw / nuts-and-bolts sort","B","Unscrew, sort coloured hardware pieces","Medium",""],
+[32,"Block Jam / colour jam escape","B","Slide coloured blocks to exits","Medium","Block Jam 3D proved sort could support IAP in 2023 [E]."],
+[33,"Bus / car jam escape","B","Move vehicles, free the bus","Medium","Trend-driven; repeatedly top-5 by single markets, never global top-10 [E]."],
+[35,"Pipe rotation (Plumber)","C","Rotate pipes, connect source drain","Low Priority",""],
+[36,"Pipe connect (no rotation)","C","Draw pipes between matching endpoints","Low Priority",""],
+[37,"One-line / one-stroke drawing","B","Draw shape without lifting pen","Medium","Line Drawing app 44M installs in one AppBrain market cut [E]."],
+[38,"Draw one part (DOP)","B","Draw missing part of picture","Medium","Tier 4 novelty in the report — expect spike-and-decay."],
+[39,"Unblock / sliding block escape","C","Slide blocks, free red block","Low Priority","No 2023–25 series [ABSENT]; persistent portal presence."],
+[40,"Rush Hour traffic","C","Slide cars, exit the red car","Low Priority",""],
+[41,"Sokoban box-push","C","Push crates onto target squares","Low Priority","Level-design community; solvers exist."],
+[42,"Chips / warehouse push variants","D","Push objects, avoid deadlocks","Nobody Plays It… Yet",""],
+[43,"Sliding picture puzzle (15-puzzle digital)","C","Slide tiles, restore picture order","Low Priority","Physical 1880 form is Band D — half of random setups are unsolvable [P]."],
+[44,"Tower of Hanoi","C","Move stacked disks, obey size rule","Low Priority","Education staple."],
+[45,"Peg solitaire","D","Jump pegs, leave one peg","Nobody Plays It… Yet","Central-game solution is memorised — solved."],
+[46,"Lights Out","D","Toggle lights, turn all off","Nobody Plays It… Yet","Needed 1995 hardware; collapses once 'chase the lights' is known [P]."],
+[47,"Simon / sequence memory","C/D","Repeat growing light-tone sequence","Later","1978 hardware icon; no modern chart/MAU data [ABSENT]."],
+[49,"Jigsaw (digital)","B","Assemble interlocking pieces into picture","Medium","Magic Jigsaw 110M Play installs [E]; publisher claims 50M solves/month [P-claim, undated]."],
+[50,"Jigsaw solitaire / Jigsort","B","Sort jigsaw pieces by edge","Medium",""],
+[51,"Tangram","C","Arrange seven pieces into silhouette","Low Priority","School + senior market."],
+[52,"Pattern block / pentomino fit","C","Tile shape with given pieces","Low Priority",""],
+[53,"Pentomino packing","D","Pack twelve pentominoes into rectangle","Nobody Plays It… Yet",""],
+[54,"Rubik's Cube 3×3","C","Twist faces, restore colour faces","Low Priority","Speedcubing championships; no 2023–25 app MAU [ABSENT]."],
+[55,"Twisty variants (2×2, 4×4, Pyraminx, Mirror)","C","Twist puzzle, restore solved state","Low Priority",""],
+[56,"Physics balance / drop","C","Place objects, keep structure stable","Low Priority","No puzzle-genre series 2023–25 [ABSENT]."],
+[57,"Physics cut / slice","C","Cut shapes, guide object home","Low Priority",""],
+[58,"Angry-Birds-style trajectory (adjacent)","C","Launch, topple targets with physics","Low Priority","Angry Birds 2 Europe WAU ~860K Q4 2024 [E, Sensor Tower]."],
+[59,"Brain Test / tricky lateral","B","Tap, drag unexpectedly, solve joke","Medium","390M Google Play installs [E, AppBrain] — mass downloads, clone-decay risk."],
+[60,"Spot the difference","B","Find differences between two pictures","Medium","Spot-difference apps 30–40M installs in AppBrain cuts [E]."],
+[61,"Hidden object scene","B","Find listed objects in scene","Medium","June's Journey: Europe WAU ~580–640K, high revenue per player [E, Sensor Tower]."],
+[62,"Hidden object (word-list / silhouette)","C","Find objects matching clues shown","Low Priority",""],
+[63,"Seek-and-find crowd (Where's Wally type)","C","Locate character in crowded picture","Low Priority",""],
+[64,"Colour by number / Pixel art fill","B","Fill cells matching number colours","Medium",""],
+[65,"Wordle / daily word guess","A","Guess five-letter word in six","High Priority","5.3B plays in 2024 [P, NYT]. Language-dependent — note Morphi's language-free strength."],
+[66,"Quordle / Dordle / multi-Wordle","C","Solve multiple Wordles simultaneously","Low Priority",""],
+[67,"Connections grouping","A","Sort sixteen words into fours","High Priority","3.3B plays in 2024 [P, NYT]."],
+[68,"Strands themed word search","A/B","Find themed words, reveal spangram","High Priority","1.3B plays in 2024 [P, NYT]."],
+[69,"Spelling Bee anagram","A/B","Make words from seven letters","High Priority","Inside NYT total; plays not split [ABSENT split]."],
+[70,"Letter Boxed","C","Build words around square sides","Low Priority",""],
+[71,"Tiles (NYT pattern match)","C","Pair tiles, clear overlapping sequences","Low Priority",""],
+[72,"Crossword full (US)","B","Fill grid from across-down clues","Medium","Standalone plays not split out by NYT [ABSENT split]."],
+[73,"Mini crossword","B","Solve small five-by-five crossword","Medium","NYT Mini paywalled Aug 2025 — documented backlash. A published 2.1B plays figure for 2024 conflicts with NYT's own 11.1B all-games total — disputed, see Open questions."],
+[74,"Cryptic crossword","C","Solve definition-plus-wordplay clues","Low Priority","Months-long learning curve; UK/IN/AU loyal."],
+[75,"Barred cryptic","D","Solve cryptic, bars separate answers","Nobody Plays It… Yet",""],
+[76,"Diagramless crossword","D","Reconstruct grid while solving clues","Nobody Plays It… Yet","No grid given — solver rebuilds black squares too. 1924 origin was an accident [P]."],
+[77,"Arrowword / Scandinavian crossword","B/D","Fill answers from in-grid clues","Later","Band B in Europe, D in the US — 'most popular word puzzle in many European countries' [P], near-invisible in US/UK charts."],
+[78,"Fill-In / Kriss Kross","C","Fit listed words into grid","Low Priority",""],
+[79,"Word search","B","Find hidden words in letters","Medium","Lead app US WAU ~0.6–0.9M Q2–Q3 2025 [E, Sensor Tower]. Labelled Both (niche): real-time multiplayer word-search race apps exist and are played; scale [ABSENT] [multiplayer research]."],
+[80,"Word connect / swipe anagram","B","Swipe letters, fill crossword slots","Medium","Wordscapes 130M installs [E]; US WAU ~5M Q3 2025 [E]."],
+[81,"Wordscapes-style anagram crossword","B","Anagram letters, complete crossword grid","Medium",""],
+[82,"Words of Wonders-style travel crossword","B","Guess words, reveal wonder landmark","Medium","~460K WAU in a single small market (PL) Q3 2025 [E]."],
+[83,"4 Pics 1 Word","B/C","Guess word linking four pictures","Low Priority","74M Play installs [E] but only ~80K in last 30 days — ageing curve."],
+[84,"Anagram (jumbled word)","C","Unscramble letters into real word","Low Priority",""],
+[85,"Word ladder","C","Change one letter per step","Low Priority",""],
+[86,"Word square / Sator","D","Arrange words reading across down","Nobody Plays It… Yet","One famous Pompeii artefact (pre-AD 62); survived as a charm, not a game [P]."],
+[87,"Acrostic","C/D","Answer clues, transfer letters, reveal quote","Later","30–90 min, language-locked."],
+[88,"Double acrostic","D","Transfer letters both directions, reveal quote","Nobody Plays It… Yet",""],
+[89,"Cryptogram / cipher quote","C","Substitute letters, decode hidden quote","Low Priority",""],
+[90,"Codeword / Codebreaker crossword","C","Deduce letter-number codes, fill grid","Low Priority",""],
+[91,"Hangman / wheel word guess","C","Guess letters, reveal hidden phrase","Low Priority",""],
+[92,"Boggle / letter-grid word hunt","C","Trace adjacent letters, form words","Low Priority",""],
+[93,"Scrabble-style crossword board","B","Place letter tiles, score words","Medium",""],
+[94,"Bananagrams / speed anagram tiles","D","Race building personal crossword grid","Nobody Plays It… Yet",""],
+[95,"Rebus / pictogram word puzzle","C","Read pictures as sounds, phrases","Low Priority",""],
+[96,"Puns / Dingbats","C","Decode visual wordplay into phrase","Low Priority",""],
+[97,"Sudoku classic","A/B","Place digits one-nine without repeats","High Priority","Lead app 100M+ Play installs [E]. Labelled Both: World Sudoku Championship races since 2006, plus race / co-op apps [multiplayer research]."],
+[98,"Mini / 6×6 Sudoku","B","Place digits in smaller grid","Medium","Phone-friendly band."],
+[99,"Killer Sudoku","C","Add cage sums, obey Sudoku","Low Priority","Syndicated daily [P]; no chart data [ABSENT]."],
+[100,"Jigsaw / irregular Sudoku","C","Fill irregular regions with digits","Low Priority",""],
+[101,"Diagonal Sudoku X","C","Obey diagonals plus Sudoku rules","Low Priority",""],
+[102,"Windoku / Hyper Sudoku","C","Obey extra shaded window regions","Low Priority",""],
+[103,"Thermo Sudoku","C","Digits increase along thermometer shapes","Low Priority",""],
+[104,"Arrow Sudoku","C","Circled digits equal arrow sums","Low Priority",""],
+[105,"Kropki Sudoku","C","Obey dot ratio-difference clues","Low Priority",""],
+[106,"Sandwich Sudoku","D","Use sums outside grid clues","Nobody Plays It… Yet",""],
+[107,"Anti-Knight / Anti-King Sudoku","D","Digits separated by chess moves","Nobody Plays It… Yet",""],
+[108,"XV / Greater-Than Sudoku","D","Obey pair sums, inequality marks","Nobody Plays It… Yet",""],
+[109,"Samurai / multi-grid Sudoku","D","Solve overlapping linked Sudoku grids","Nobody Plays It… Yet",""],
+[110,"Stradoku / Str8ts","C","Fill compartments, avoid number repeats","Low Priority",""],
+[111,"KenKen / Calcudoku","C","Fill grid, satisfy cage arithmetic","Low Priority",""],
+[112,"Kakuro","C","Fill sums without repeating digits","Low Priority",""],
+[113,"Futoshiki","C","Place digits obeying inequality signs","Low Priority",""],
+[114,"Binairo / Takuzu / Tic-Tac-Logic","C","Balance zeros ones, avoid triples","Low Priority",""],
+[115,"Skyscrapers","C","Place heights matching visibility clues","Low Priority",""],
+[116,"Battleships solitaire","C","Locate hidden fleet from counts","Low Priority",""],
+[117,"Minesweeper","C","Deduce mines from number clues","Low Priority","Bundled 1992–2009, removed in Windows 8 [P]; no modern MAU [ABSENT]. Revive only with no-guess boards. Labelled Both: Minesweeper Flags was a real shipped multiplayer race (2003 / 2009, now dead) [multiplayer research]."],
+[118,"Nonogram / Picross / Pic-a-Pix","B","Fill cells, reveal pixel picture","Medium","Nonogram.com 73M Play installs [E]. Expert sizes collapse to Band C. Labelled Both (niche): World Puzzle Championship race sets and Picross S 2-player modes [multiplayer research]."],
+[119,"Colour nonogram","B","Fill coloured cells, reveal picture","Medium",""],
+[120,"Fill-a-Pix","C","Paint around clues, reveal picture","Low Priority",""],
+[121,"Link-a-Pix","C","Link number pairs, reveal picture","Low Priority",""],
+[122,"Sym-a-Pix / Tentai Show","D","Draw symmetric regions around dots","Nobody Plays It… Yet","Rotational symmetry is invisible to novices — teach failure [P catalogue; ABSENT play data]."],
+[123,"Cross-a-Pix","D","Shade groups matching row clues","Nobody Plays It… Yet",""],
+[124,"Maze-a-Pix / picture maze","D","Solve maze, reveal hidden picture","Nobody Plays It… Yet",""],
+[125,"Dot-a-Pix / dot-to-dot","D","Connect numbered dots in order","Nobody Plays It… Yet",""],
+[126,"Block-a-Pix","D","Tile rectangles around number clues","Nobody Plays It… Yet",""],
+[127,"Slitherlink","C","Draw loop matching edge counts","Low Priority","Nikoli / championship staple; no mass app data [ABSENT]. Japanese logic types are labelled Both (championship-race only) via World Puzzle Championship sets [multiplayer research]."],
+[128,"Masyu","C","Loop through circles obeying turns","Low Priority",""],
+[129,"Yajilin","C","Shade cells, loop remaining cells","Low Priority","The successful remix of Yajisan-Kazusan (see #130)."],
+[130,"Yajisan-Kazusan","D","Shade cells, distrust lying clues","Nobody Plays It… Yet","Nikoli's president: it 'never caught on', appealed only to 'maniacs' [P, Atlas Obscura]."],
+[131,"Hashiwokakero / Bridges","C","Connect islands with limited bridges","Low Priority",""],
+[132,"Numberlink (pure logic form)","C","Connect pairs, fill every cell","Low Priority","Logic form of Flow (#34)."],
+[133,"Shikaku","C","Divide grid into numbered rectangles","Low Priority",""],
+[134,"Fillomino","C","Divide grid into numbered polyominoes","Low Priority",""],
+[135,"Nurikabe","C","Paint sea, keep numbered islands","Low Priority",""],
+[136,"Heyawake","C","Shade rooms obeying wall counts","Low Priority",""],
+[137,"Hitori","C","Shade duplicates, keep cells connected","Low Priority",""],
+[138,"Kuromasu / Kurodoko","C/D","Shade cells matching visibility counts","Later","Diagonal/visibility counting is slow on phone."],
+[139,"Akari / Light Up","C","Place bulbs illuminating all cells","Low Priority",""],
+[140,"LITS / Nuruomino","C/D","Place tetrominoes in each region","Later",""],
+[141,"Tapa","C/D","Paint wall around clue cells","Later",""],
+[142,"Ripple Effect","D","Place numbers, respect distance rules","Nobody Plays It… Yet",""],
+[143,"Gokigen Naname / Slant","D","Draw diagonals matching point counts","Nobody Plays It… Yet","Diagonal input is miserable on a phone."],
+[144,"Shakashaka","D","Place triangles, form white rectangles","Nobody Plays It… Yet",""],
+[145,"Bag / Corral","D","Draw loop enclosing clue numbers","Nobody Plays It… Yet",""],
+[146,"Country Road","D","Loop once through every region","Nobody Plays It… Yet",""],
+[147,"Hotaru Beam","D","Draw beams from numbered bulbs","Nobody Plays It… Yet",""],
+[148,"Reflect Link","D","Loop reflecting off mirror cells","Nobody Plays It… Yet",""],
+[149,"Mochikoro","D","Shade rectangles around number clues","Nobody Plays It… Yet",""],
+[150,"Tatamibari","D","Divide grid, obey tatami rule","Nobody Plays It… Yet",""],
+[151,"Toichika","D","Pair arrows, avoid matching neighbours","Nobody Plays It… Yet",""],
+[152,"Suguru / Tectonics","C","Fill regions, avoid adjacent repeats","Low Priority",""],
+[153,"Star Battle","C","Place stars per row region","Low Priority",""],
+[154,"Logic grid / Zebra puzzle","C","Match categories using written clues","Low Priority","Puzzle Baron catalogue + books only [ABSENT chart data]."],
+[155,"Crossnumber","D","Fill grid with number answers","Nobody Plays It… Yet","UK tradition; needs written arithmetic, locale-locked [P]."],
+[156,"Alphametic / Cryptarithm","D","Replace letters with correct digits","Nobody Plays It… Yet","SEND+MORE=MONEY — solved once and remembered."],
+[157,"Numbrix / Hidato number path","C","Connect consecutive numbers in path","Low Priority",""],
+[158,"Kakurasu / index sums","D","Shade cells matching index sums","Nobody Plays It… Yet",""],
+[159,"Lasergrid / mirrors","D","Place mirrors directing laser beams","Nobody Plays It… Yet","Book-only form."],
+[160,"Campsite / Tents and Trees","D","Place tents beside matching trees","Nobody Plays It… Yet","Book-only form."],
+[161,"Trivia quiz (general)","B","Answer questions, beat the clock","Medium",""],
+[162,"Trivia Crack / wheel quiz","B","Answer category questions, collect characters","Medium","Trivia Crack 270M installs [E, AppBrain]."],
+[163,"Geo / flag / logo quiz","B","Identify place flag or logo","Medium",""],
+[164,"Daily quiz (Kahoot-style, classroom)","B","Answer fast, top the leaderboard","Medium","Education-led; not comparable MAU."],
+[165,"Chess puzzles / mate-in-N","C","Find forced checkmate move sequence","Low Priority",""],
+[166,"Domino placement / domino search","D","Place domino set into grid","Nobody Plays It… Yet",""],
+[167,"Card solitaire puzzles (FreeCell etc.)","B","Stack cards, clear all suits","Medium","Microsoft Solitaire Collection: 35M players/month, 100M hands/day [P, Jan 2021 — pre-window, no newer split]."],
+[168,"Mahjong (4-player, not solitaire)","B","Draw discard tiles, complete hand","Medium","Asia band B. Multiplayer only — not a solo puzzle; included to prevent conflation with Mahjong Solitaire (#9), which is Solo only. Mahjong Soul Steam peak 39,075 concurrent (Chinese client, 17 Apr 2024) [E]; global MAU [ABSENT] [multiplayer research]."],
+[169,"Rummikub / tile rummy puzzles","C","Form sets runs from tiles","Low Priority",""],
+[170,"Dice / Yahtzee scoring puzzles","D","Assign rolls to scoring categories","Nobody Plays It… Yet",""],
+[171,"Maze (print / hand-drawn)","C","Trace path from start exit","Low Priority",""],
+[172,"Labyrinth / rolling-ball maze","C","Tilt board, guide ball out","Low Priority",""],
+[173,"Tilt / balance maze apps","D","Tilt phone, avoid holes traps","Nobody Plays It… Yet",""],
+[174,"Escape-room / point-and-click puzzle","B","Find items, combine, escape room","Medium",""],
+[175,"Puzzle hunt / meta-puzzle","D","Solve feeder puzzles, extract final answer","Nobody Plays It… Yet","Thousands watch, dozens finish — not a daily phone loop."],
+[176,"ARG / cryptographic hunt","D","Decode layered clues across media","Nobody Plays It… Yet",""],
+[177,"Burr puzzle (physical)","D","Disassemble interlocking wooden pieces apart","Nobody Plays It… Yet","Once the move is known it is 'trite and uninteresting' [P]. Cannot be phone-first without becoming a different puzzle."],
+[178,"Disentanglement puzzle (physical)","D","Separate rings ropes metal pieces","Nobody Plays It… Yet","Physical only."],
+[179,"Puzzle box / secret opening","D","Find hidden sequence, open box","Nobody Plays It… Yet","Physical only."],
+[180,"Packing puzzle (physical)","D","Fit irregular pieces into tray","Nobody Plays It… Yet",""],
+[181,"Dissection puzzle (Stomachion type)","D","Rearrange cut pieces into shapes","Nobody Plays It… Yet",""],
+[182,"Pips domino logic (NYT, 2025)","B","Place dominoes satisfying region conditions","Medium","NYT's first original logic daily, launched 18 Aug 2025. Band unproven — no plays split [ABSENT]. Watchlist."],
+[183,"Tetris 99 — 99-player battle royale","B","Battle-royale Tetris, target attackers, collect KO badges","Medium","Launched 13 Feb 2019, free with Nintendo Switch Online [P]. Total players / downloads [ABSENT] — Nintendo has not published a figure."],
+[184,"TETR.IO / Jstris ranked versus","B/C","Race ranked 1v1 Tetris and lobbies at extreme speed","Low Priority","TETR.IO: 25.26M registered by May 2026 [E]. The community home of versus Tetris after Tetris Friends closed."],
+[185,"Tetris Battle / Tetris Friends (dead 2019)","D","Async ghost battles and live versus Arena on Facebook / web","Nobody Plays It… Yet","Peak: Tetris Battle 16M MAU, >4M DAU [E]; Tetris Friends >1M registered [P/E]. DIED 31 May 2019 — Tetris Online, Inc. ceased operations."],
+[186,"Panel de Pon / Tetris Attack / Puzzle League","C","Swap panels, send rising garbage blocks","Low Priority","Versus falling-block family [multiplayer research]."],
+[187,"Super Puzzle Fighter II Turbo","C","Crash gems, drop counter-gems on rival","Low Priority","Versus gem-battle classic [multiplayer research]."],
+[188,"Puzzle Fighter mobile (dead 2018)","D","Gem-battle with gacha roster and health bars","Nobody Plays It… Yet","DIED 31 Jul 2018, ~5 months after launch — publisher refocus after a monetisation-damaged launch [P/E]."],
+[189,"Magical Drop versus","C","Pull and shoot orbs, bury rival with drops","Low Priority","Versus orb family; online lobbies are a dead-lobby risk [multiplayer research]."],
+[190,"Bust-a-Move / Puzzle Bobble versus","C","Aim bubble shots, drop bubbles onto rival","Low Priority","Versus form of the bubble-shooter family [multiplayer research]."],
+[191,"Tetris Battle Gaiden character versus (1993)","D","Clear lines, spend orbs on character attacks","Nobody Plays It… Yet","Japan-only 1993 origin of character versus Tetris [E] — historical."],
+[192,"Tetris Effect: Connected","B/C","Zone-battle head-to-head; 3 players merge boards vs AI bosses","Medium","Lifetime sales [ABSENT]; a third-party Steam-revenue estimate (~$10.6M gross) is modelled, not sales [E-low]."],
+[193,"Classic Tetris score race (CTWC)","C","Same-start NES Tetris side-by-side, chase-out scoring","Low Priority","Classic Tetris World Championship founded 2010, modelled on Nintendo World Championships 1990 [E]."],
+[194,"Chess Puzzle Rush","B/C","Solve escalating tactics in 3 or 5 minutes","Medium","Formats [P, Chess.com]. Total Puzzle Rush players [ABSENT] — never published."],
+[195,"Chess Puzzle Battle","C","Solve same tactics head-to-head, strikes punish errors","Low Priority","Puzzle Battle World Championship: 16-player field, $10,000 pool (2019), $25,000 (2022) [P, Chess.com]. User totals [ABSENT]."],
+[196,"Minesweeper Flags (dead)","D","Race to find and flag mines first","Nobody Plays It… Yet","Real shipped multiplayer: MSN Messenger 2003, Xbox Live Arcade 2009 — delisted with the Xbox 360 store closure 2024 [E]."],
+[197,"Same-seed solve races","C","Start same seed simultaneously, first finish wins","Low Priority","Community races (Tetris / Sudoku / cube seeds, Discord races) [multiplayer research]."],
+[198,"Speedrun puzzle races","C","Race identical puzzle game route, live","Low Priority","Portal / The Witness race events [multiplayer research]."],
+[199,"Words With Friends","A","Play Scrabble-like turns over days, many games in parallel","Medium",">250M installs by Nov 2017 [P, Zynga]; 15M monthly players Aug 2012, a record at the time [P/E, Guinness]. Launched Jul 2009."],
+[200,"Wordfeud","B/C","Play Scrabble-like turns, custom boards, chat","Low Priority","Async word-board family [multiplayer research]."],
+[201,"Aworded / Word Crack","B","Play Spanish-origin Scrabble-like async matches","Low Priority","etermax async word family [multiplayer research]."],
+[202,"Ruzzle","A/B","Best-of-three 2-minute Boggle rounds, asynchronously","Medium","50M downloads in under 2 years from Mar 2012 launch; 1M in 3 weeks [P, MAG Interactive]."],
+[203,"Draw Something (dead as a mass game)","D","Draw a word, partner guesses from the replay","Nobody Plays It… Yet","50M downloads in 50 days [P, Zynga, Apr 2012]; DAU ~14.6M peak Mar 2012, then fell 14.3M → 10.4M in ~one month [E, AppData]; 100M downloads by 2013. Fad collapse — the app lingered, the mass game died."],
+[204,"Letterpress","C","Claim board letters by forming words, territory-style","Low Priority","Async word-territory family [multiplayer research]."],
+[205,"Crosswords With Friends","B/C","Race / complete daily crossword turns with friends","Low Priority","Co-op and race crossword app play [multiplayer research]."],
+[206,"Hanging With Friends (dead)","D","Guess words hangman-style, async versus","Nobody Plays It… Yet","Zynga With Friends era — faded / discontinued; exact shutdown date [ABSENT] in quality sources."],
+[207,"WordBrain async challenges","C","Beat friends' scores on same word grids","Low Priority","Async challenge form of word-grid play [multiplayer research]."],
+[208,"QuizClash / Duel Quiz async duels","B/C","Answer same question sets in turns","Low Priority","Async quiz-duel app family [multiplayer research]."],
+[209,"Keep Talking and Nobody Explodes","C","Defuser describes bomb, experts talk from manual","Medium",">200,000 copies by Mar 2016 [P, developer at GDC 2016]; lifetime total [ABSENT] — never updated publicly. Multiplayer only, by design."],
+[210,"Portal 2 co-op","A/B","Two robots solve linked portal chambers together","Medium","3M copies sold by June 2011, all modes [P]; co-op-specific players [ABSENT]. Separate solo campaign exists."],
+[211,"We Were Here series","B","Describe asymmetric rooms over walkie-talkie only","Low Priority",">25M players across the franchise [P, Total Mayhem Games, 26 Feb 2026] — the free first game inflates the figure. Multiplayer only."],
+[212,"Tick Tock: A Tale for Two","C","Each holds half the clues, voice-only coordination","Later","Asymmetric co-op; multiplayer only, no solo fallback [multiplayer research]."],
+[213,"The Past Within","B/C","One plays Past, one Future, exchange observations","Later","~1M sales across PC + mobile by its Switch launch [E]. Multiplayer only."],
+[214,"Operation: Tango","C","Agent acts, hacker describes unseen information","Later","Asymmetric spy-hacker co-op; multiplayer only [multiplayer research]."],
+[215,"Bokura two-view co-op","C","See different worlds, reconcile both views aloud","Later","Two-view co-op puzzler; multiplayer only [multiplayer research]."],
+[216,"Snipperclips","C","Cut each other's paper bodies to fit shapes","Low Priority",">350,000 downloads by Apr 2017 [P, Nintendo investor briefing]."],
+[217,"PICO PARK","B/C","Stack, key-carry, coordinate 2–8 bodies simultaneously","Low Priority",">1M units, series reporting, 2021-era [E]. Solo is impractical."],
+[218,"Escape Simulator","B","Search same virtual room, hand over clues and objects","Medium","1M copies by May 2022 [P, Pine Studio]; >3M units by Oct 2025 [P, Pine Studio]."],
+[219,"Online co-op jigsaw (Puzzle Together type)","C","Place pieces on one shared virtual jigsaw","Low Priority","Real, if small, app category [multiplayer research]."],
+[220,"Co-op ability puzzlers (Unravel Two type)","C","Combine two characters' abilities to progress","Later","Degrees of Separation / Unravel Two-style co-op [multiplayer research]."],
+[221,"Jackbox Party Packs","B","Invent answers / drawings on phones, group votes funniest","Medium","Franchise unit sales [ABSENT] — no publisher total found; do not invent one. Annual packs since 2014; audiences up to 10,000 in Pack 7 marketing [P]."],
+[222,"You Don't Know Jack","B/C","Answer irreverent trivia together, screw rivals","Low Priority","Party trivia family [multiplayer research]."],
+[223,"QuizUp (dead 2021)","D","Duel strangers / friends on niche topic trivia","Nobody Plays It… Yet","20M users & >1 billion matches by Mar–May 2014 [P/E]; later cumulative claims 70–80M conflict — disputed, see Open questions. Claimed 40 min/day per user, May 2014 [P-claim]. DIED 24 Mar 2021 — servers off; monetisation failure despite scale."],
+[224,"HQ Trivia (dead 2020)","D","Answer live hosted show together, split cash prize","Nobody Plays It… Yet","Record 2.38M concurrent players, 28 Mar 2018 [E]; >15M installs [E]. DIED 14 Feb 2020 — ceased operations; brief later revivals did not restore it."],
+[225,"Trivia Royale (dead)","D","1,000-player head-to-head trivia elimination","Nobody Plays It… Yet","Launched 2020, shut soon after; exact closure [ABSENT] in quality sources."],
+[226,"Trivial Pursuit","B","Answer category trivia, collect wedges, race the board","Low Priority","Console / board / live forms [multiplayer research]."],
+[227,"Heads Up! phone charades","B","Hold phone to forehead, friends shout clues","Low Priority","Party charades app family [multiplayer research]."],
+[228,"Psych! bluff-answer party","B/C","Invent fake answers, vote for the real one","Low Priority","Bluff-answer party app family [multiplayer research]."],
+[229,"SongPop music quiz races","B/C","Identify song clips faster than rival","Low Priority","Music-quiz race family [multiplayer research]."],
+[230,"Dominoes (Mexican Train / Block)","B","Match tile ends, shed hand before rivals","Low Priority","Tabletop-born tile family — distinct from domino placement puzzles (#166) [multiplayer research]."],
+[231,"SET card game","C","Spot matching triples first from shared layout","Low Priority","Shared-layout race card game [multiplayer research]."],
+[232,"Dobble / Spot It!","B","Spot matching symbol first, grab the card","Low Priority","Speed-spotting card family [multiplayer research]."],
+[233,"Blokus / Qwirkle tile placement","B/C","Place shapes / tiles, block rivals' space","Low Priority","Abstract tile placement family [multiplayer research]."],
+[234,"Parlour Anagrams / word-stealing","C","Steal and rebuild words from shared letter pool","Later","19th-century parlour tradition; historical multiplayer word play [multiplayer research]."],
+[235,"Charades / Pictionary parlour tradition","A","Act or draw a prompt, team guesses aloud","Later","A as a social tradition — unquantifiable; no reliable participation figures exist [ABSENT]."],
+[236,"Perplexus-style dexterity races","C","Race ball through same 3D maze fastest","Low Priority","Race is an informal variant — the product is solo [multiplayer research]."],
+[237,"Rubik's Race sliding-tile race","C","Slide tiles to match pattern card first","Low Priority","Two-player race board form of sliding tiles [multiplayer research]."],
+[238,"Puzzled Pint","C","Bar teams solve four puzzles plus metapuzzle, monthly","Later","Monthly, 50+ cities and >3,000 global attendance in organiser descriptions [E]."],
+[239,"Corporate puzzle hunts (Microsoft type)","C","Employee teams solve ~60 puzzles over a weekend","Later","Team puzzlehunt form [multiplayer research]."],
+[240,"DASH team hunts (dormant)","C/D","Teams walk city solving same hunt simultaneously worldwide","Later","Editions irregular — dormant [multiplayer research]."],
+[241,"Escape-room team championships (ER Champ)","C","Teams race identical escape-room / box puzzles competitively","Later","Competitive team escape form [multiplayer research]."],
+[242,"Treasure hunts — Masquerade / Forrest Fenn (historical)","D","Public races clues to buried / hidden real treasure","Nobody Plays It… Yet","Masquerade launched the modern form in 1979; Fenn treasure found 2020 — ended when found [multiplayer research]. Historical."]
+
+];
+/* Solo / Multiplayer / Both — RESEARCH-BASED label (multiplayer research, 26 Oct 2026):
+   how each family is actually played in the real world. "Both" requires a multiplayer form
+   that exists and is played (official mode, championship, or an app with real users);
+   "Solo" is the default — no played multiplayer form found [ABSENT].
+   This replaces the earlier potential-based Play Mode guesses. Keyed by family number. */
+var SMB_BOTH=[14,15,16,17,19,21,23,48,49,50,51,54,55,65,66,67,68,69,72,73,74,76,79,83,91,92,93,97,98,99,100,101,102,103,104,105,106,107,108,109,111,112,113,114,115,116,117,118,119,120,121,122,123,127,128,129,130,131,133,134,135,136,137,138,139,140,141,142,143,144,145,146,147,148,149,150,151,152,153,161,162,163,165,170,174,184,186,187,189,190,192,193,194,198,205,207,210,216,218,219,220,222,226,231,236,242];
+var SMB_MULTI=[94,164,202,168,169,175,176,183,185,188,191,195,196,197,199,200,201,203,204,206,208,209,211,212,213,214,215,217,221,223,224,225,227,228,229,230,232,233,234,235,237,238,239,240,241];
+var SMB={}; for(var _b=0;_b<SMB_BOTH.length;_b++) SMB[SMB_BOTH[_b]]='Both'; for(var _m=0;_m<SMB_MULTI.length;_m++) SMB[SMB_MULTI[_m]]='Multiplayer';
+function playMode(f){ return SMB[f[0]]||'Solo'; }
+function modeClass(m){ if(m==='Both')return 'bBoth'; if(m==='Multiplayer')return 'bMulti'; return 'bSoloOnly'; }
+function modeLabel(f){ if(f[0]===168) return 'Multiplayer — not a solo puzzle'; if(f[0]===48) return 'Both — multiplayer is its original form'; return playMode(f); }
+var grid=document.getElementById('grid'),countEl=document.getElementById('count'),emptyEl=document.getElementById('empty');
+var q=document.getElementById('q'),bandSel=document.getElementById('bandSel'),priSel=document.getElementById('priSel'),modeSel=document.getElementById('modeSel');
+var quick='';
+function bandClass(b){ if(b.indexOf('A')===0) return 'bA'; if(b.indexOf('B')===0) return 'bB'; if(b.indexOf('C')===0) return 'bC'; return 'bD'; }
+function bandShort(letter){ return letter==='A'?'Mass':letter==='B'?'Medium':letter==='C'?'Niche-but-loyal':'No data found'; }
+function bandLabel(b){ var parts=b.split('/'); var words=[]; for(var i=0;i<parts.length;i++) words.push(bandShort(parts[i])); return 'Band '+b+' — '+words.join(' / '); }
+function priClass(p){ if(p==='High Priority')return 'bHigh'; if(p==='Medium')return 'bMed'; if(p==='Low Priority')return 'bLow'; if(p==='Later')return 'bLater'; if(p==='Live in Morphi')return 'bLive'; if(p==='Prototype')return 'bProto'; return 'bNobody'; }
+function bandMatch(band,filter){ if(!filter)return true; if(filter==='morphi')return false; return band.charAt(0)===filter || band.indexOf('/'+filter)>-1 || band===filter; }
+function render(){
+  var term=q.value.trim().toLowerCase(), bf=bandSel.value, pf=priSel.value, mf=modeSel.value;
+  var shown=0, html='';
+  for(var i=0;i<F.length;i++){
+    var f=F[i], isMorphi=(f[4]==='Live in Morphi'||f[4]==='Prototype');
+    if(quick==='morphi' && !isMorphi) continue;
+    if(quick && quick!=='morphi' && !bandMatch(f[2],quick)) continue;
+    if(bf && !bandMatch(f[2],bf)) continue;
+    if(pf && f[4]!==pf) continue;
+    if(mf && playMode(f)!==mf) continue;
+    if(term && (f[1]+' '+f[3]+' '+f[5]+' '+playMode(f)).toLowerCase().indexOf(term)===-1) continue;
+    shown++;
+    html+='<article class="card"><span class="num">#'+f[0]+' · '+bandLabel(f[2])+'</span><h3>'+f[1]+'</h3><p>'+f[3]+'.</p>'
+      +(f[5]?'<p>'+f[5]+'</p>':'')
+      +'<div class="badges"><span class="b '+bandClass(f[2])+'" title="Popularity band — see “What is a Band?” above">'+bandLabel(f[2])+'</span><span class="b '+priClass(f[4])+'">'+f[4]+'</span><span class="b '+modeClass(playMode(f))+'" title="Solo / Multiplayer / Both — research-based, see the multiplayer panel above">'+modeLabel(f)+'</span></div></article>';
+  }
+  grid.innerHTML=html;
+  countEl.textContent='Showing '+shown+' of '+F.length+' families'+(quick==='morphi'?' — Morphi now':quick?' — Band '+quick:'')+(bf?' · Band '+bf:'')+(pf?' · '+pf:'')+(mf?' · '+mf:'')+(term?' · “'+q.value.trim()+'”':'');
+  emptyEl.style.display=shown?'none':'block';
+}
+q.addEventListener('input',render); bandSel.addEventListener('change',render); priSel.addEventListener('change',render); modeSel.addEventListener('change',render);
+var pills=document.querySelectorAll('#quickPills .pill');
+for(var j=0;j<pills.length;j++){ pills[j].addEventListener('click',function(){ for(var k=0;k<pills.length;k++)pills[k].classList.remove('on'); this.classList.add('on'); quick=this.getAttribute('data-f'); render(); }); }
+function goToList(){ document.getElementById('az').scrollIntoView({behavior:'smooth',block:'start'}); }
+function setBandFilter(letter){
+  quick=''; for(var k=0;k<pills.length;k++)pills[k].classList.remove('on'); pills[0].classList.add('on');
+  bandSel.value=letter; priSel.value=''; modeSel.value=''; render(); goToList();
+}
+function setPhaseFilter(phase){
+  quick=''; for(var k=0;k<pills.length;k++)pills[k].classList.remove('on'); pills[0].classList.add('on');
+  bandSel.value=''; priSel.value=phase; modeSel.value=''; render(); goToList();
+}
+/* Band distribution — counted live from F so the chart can never disagree with the list */
+(function(){
+  var counts={A:0,B:0,C:0,D:0}, max=0, L;
+  for(var i=0;i<F.length;i++){ var c=F[i][2].charAt(0); counts[c]++; if(counts[c]>max)max=counts[c]; }
+  var names={A:'Band A — Mass · Most-played',B:'Band B — Medium · Medium-played',C:'Band C — Niche-but-loyal · Less-played',D:'Band D — No data found'};
+  var cls={A:'',B:'teal',C:'amber',D:'grey'}, html='';
+  for(var b in counts){ html+='<button class="barrow bandbar" data-band="'+b+'" aria-label="Filter list to Band '+b+'"><span class="blabel">'+names[b]+'</span><span class="track"><span class="fill '+cls[b]+'" style="display:block;width:'+Math.round(counts[b]/max*100)+'%"></span></span><span class="bval">'+counts[b]+' families · '+Math.round(counts[b]/F.length*100)+'% of all families — tap to filter</span></button>'; }
+  document.getElementById('bandChart').innerHTML=html;
+  var ba=document.getElementById('bandAxis'); if(ba) ba.textContent='A '+counts.A+' · B '+counts.B+' · C '+counts.C+' · D '+counts.D+' = '+F.length+' families, counted live from the list by each family\'s first band letter. The long tail is the point: most puzzle families ever made are niche (C) or have no play data found anywhere (D). When you tap a bar, the filter is inclusive — a borderline family (A/B, B/C, C/D, B/D) appears in both its bands, so a filtered count can be higher than the bar\'s primary count above.';
+  var bc={A:'.bcA',B:'.bcB',C:'.bcC',D:'.bcD'}; for(var bl in bc){ var be=document.querySelectorAll(bc[bl]); for(var bi=0;bi<be.length;bi++) be[bi].textContent=counts[bl]; }
+  var tf=document.querySelectorAll('.totalFam'); for(var ti=0;ti<tf.length;ti++) tf[ti].textContent=F.length;
+  var of=document.querySelectorAll('.otherFam'); for(var oi=0;oi<of.length;oi++) of[oi].textContent=F.length-3;
+  var bars=document.querySelectorAll('.bandbar');
+  for(var j=0;j<bars.length;j++){ bars[j].addEventListener('click',function(){ setBandFilter(this.getAttribute('data-band')); }); }
+})();
+/* Popularity — three separate units, one view at a time */
+var POP={
+  downloads:{axis:'Unit: millions of downloads / installs. Bars are not one single ranking — each keeps its own period from the report (a 2025 download total and a lifetime install total are different measures, both labelled).',max:390,cls:'',items:[
+    ['Brain Test — Google Play installs',390,'390M [E] · AppBrain'],
+    ['Block Blast! — downloads in 2025',368,'368M in 2025 [E] · AppMagic'],
+    ['Royal Match — downloads, lifetime to May 2025',351,'351M [E] · AppMagic'],
+    ['Tile Explorer — installs, Play only',280,'280M [E] · AppBrain'],
+    ['Flow Free — Play installs',230,'230M [E] · AppBrain'],
+    ['Wordscapes — installs',130,'130M [E] · AppBrain'],
+    ['Classic Sudoku — lead app, Play installs',100,'100M+ [E] · AppBrain']
+  ]},
+  revenue:{axis:'Unit: US$ millions. Royal Match and Gardenscapes / Gossip Harbor are 2025 IAP [E]; Candy Crush is the 2024 figure [E] — years are labelled per bar, not blended.',max:1400,cls:'teal',items:[
+    ['Royal Match — IAP, 2025',1400,'$1.4B in 2025 [E] · Sensor Tower'],
+    ['Candy Crush Saga — 2024',1090,'~$1.09B in 2024 [E] · AppMagic'],
+    ['Gossip Harbor (merge-2) — 2025',650,'~$650M in 2025 [E] · Sensor Tower'],
+    ['Gardenscapes — 2025',500,'>$500M in 2025 [E] · Sensor Tower']
+  ]},
+  plays:{axis:'Unit: billions of plays in 2024, NYT Games [P]. NYT total across all its games was 11.1B plays in 2024; Wordle, Connections and Strands have the settled published per-game split. A 2.1B plays figure for the Mini Crossword was also published in reporting of NYT’s announcement, but it conflicts with that 11.1B total — treated as disputed (see Open questions) and deliberately not charted here.',max:5.3,cls:'amber',items:[
+    ['Wordle — plays, 2024',5.3,'5.3B plays [P] · NYT'],
+    ['Connections — plays, 2024',3.3,'3.3B plays [P] · NYT'],
+    ['Strands — plays, 2024',1.3,'1.3B plays [P] · NYT']
+  ]}
+};
+function renderPop(key){
+  var d=POP[key], html='';
+  for(var i=0;i<d.items.length;i++){ var it=d.items[i]; html+='<div class="barrow"><span class="blabel">'+it[0]+'</span><span class="track"><span class="fill '+d.cls+'" style="display:block;width:'+Math.max(2,Math.round(it[1]/d.max*100))+'%"></span></span><span class="bval">'+it[2]+'</span></div>'; }
+  document.getElementById('popChart').innerHTML=html;
+  document.getElementById('popAxis').textContent=d.axis;
+}
+var popPills=document.querySelectorAll('#popPills .pill');
+for(var p=0;p<popPills.length;p++){ popPills[p].addEventListener('click',function(){ for(var k=0;k<popPills.length;k++)popPills[k].classList.remove('on'); this.classList.add('on'); renderPop(this.getAttribute('data-pop')); }); }
+renderPop('downloads');
+/* Multiplayer popularity — three separate units, one view at a time (multiplayer research, 26 Oct 2026) */
+var MPOP={
+  participants:{axis:'Unit: people reached, as labelled per bar — cumulative non-unique participants, annual active users and a single-show concurrent record are different measures and are never added together.',max:10000,cls:'',items:[
+    ['Kahoot! — cumulative participants (non-unique) since 2013',10000,'10B by Nov 2023 [P] · Kahoot! press — 14B claimed in a Sep 2026 release'],
+    ['Trivia Crack — active users per year',150,'150M / year [P] · etermax'],
+    ['MIT Mystery Hunt 2026 — participants',5,'>5,000 participants, ~280 teams [P/E] · MIT The Tech, Jan 2026'],
+    ['HQ Trivia — record concurrent players, 28 Mar 2018',2.38,'2.38M concurrent [E] — a single-show record, not a total']
+  ]},
+  downloads:{axis:'Unit: millions of downloads / installs, period labelled per bar. Draw Something is the cautionary tale: the fastest launch on this chart, then collapse.',max:600,cls:'teal',items:[
+    ['Trivia Crack — downloads',600,'>600M downloads [P] · etermax'],
+    ['Words With Friends — installs by Nov 2017',250,'>250M installs [P] · Zynga'],
+    ['Draw Something — downloads by 2013',100,'100M by 2013; 50M in its first 50 days [P] · Zynga'],
+    ['Ruzzle — downloads in under 2 years',50,'50M [P] · MAG Interactive'],
+    ['Scrabble GO — Google Play installs',45,'45M [E] · AppBrain, Oct 2026']
+  ]},
+  units:{axis:'Unit: millions of units / copies sold, as labelled per bar. Portal 2 is all modes — its co-op-only share is [ABSENT].',max:50,cls:'amber',items:[
+    ['Rummikub — units sold worldwide',50,'>50M units [P] · Pressman / Goliath (some listings say 55M)'],
+    ['Bananagrams — copies by 2026',13,'>13M copies, 30+ countries [E] · 2026 reporting (>7M by 2016 [P])'],
+    ['Escape Simulator — units by Oct 2025',3,'>3M units [P] · Pine Studio'],
+    ['Portal 2 — copies by June 2011 (all modes)',3,'3M copies [P] · Valve'],
+    ['Snipperclips — downloads by Apr 2017',0.35,'>350,000 [P] · Nintendo']
+  ]}
+};
+function renderMp(key){
+  var d=MPOP[key], html='';
+  for(var i=0;i<d.items.length;i++){ var it=d.items[i]; html+='<div class="barrow"><span class="blabel">'+it[0]+'</span><span class="track"><span class="fill '+d.cls+'" style="display:block;width:'+Math.max(2,Math.round(it[1]/d.max*100))+'%"></span></span><span class="bval">'+it[2]+'</span></div>'; }
+  document.getElementById('mpChart').innerHTML=html;
+  document.getElementById('mpAxis').textContent=d.axis;
+}
+var mpPills=document.querySelectorAll('#mpPills .pill');
+for(var mp=0;mp<mpPills.length;mp++){ mpPills[mp].addEventListener('click',function(){ for(var k=0;k<mpPills.length;k++)mpPills[k].classList.remove('on'); this.classList.add('on'); renderMp(this.getAttribute('data-mp')); }); }
+renderMp('participants');
+/* Timeline toggle + Morphi phase filtering */
+var tlPills=document.querySelectorAll('#tlPills .pill');
+for(var t=0;t<tlPills.length;t++){ tlPills[t].addEventListener('click',function(){ for(var k=0;k<tlPills.length;k++)tlPills[k].classList.remove('on'); this.classList.add('on'); var v=this.getAttribute('data-tl'); document.getElementById('tlHistory').style.display=(v==='history')?'flex':'none'; document.getElementById('tlMorphi').style.display=(v==='morphi')?'flex':'none'; }); }
+var phaseBtns=document.querySelectorAll('#tlMorphi .titem');
+for(var s=0;s<phaseBtns.length;s++){ phaseBtns[s].addEventListener('click',function(){ setPhaseFilter(this.getAttribute('data-phase')); }); }
+/* Roadmap tiers — generated from the same F dataset and priority labels as the A–Z list,
+   so the counts and family names here can never disagree with the cards */
+(function(){
+  var tg=document.getElementById('tiersGrid'); if(!tg) return;
+  var defs=[
+    {key:'__now',title:'Now — In Morphi',guide:'The only families that exist as Morphi games today. Everything else on this page is roadmap only — not built, not playable.'},
+    {key:'High Priority',title:'Tier 1 — High Priority · proven mass + medium',guide:'Build first. Teach in ≤10 seconds, rounds of 30 sec–5 min.'},
+    {key:'Medium',title:'Tier 2 — Medium · proven, cheaper to win',guide:'Second wave / daily rotation — carries search traffic and repeat visits without an ads arms-race.'},
+    {key:'Low Priority',title:'Tier 3 — Low Priority · the loyal-niche retention library',guide:'Small audiences, decades-long loyalty. Judge by share of returning players, not by new-player volume.'},
+    {key:'Later',title:'Tier 4 — Later · good puzzles, wrong moment',guide:'Kept on the map, deliberately not scheduled — regional, slow, or hard-to-teach forms.'},
+    {key:'Nobody Plays It… Yet',title:'Tier 5 — Nobody Plays It… Yet · revivals',guide:'Never port faithfully. Revive only by removing the cause of death: Yajilin is Yajisan-Kazusan with the lying clues removed; Wordle is a paper word game with the teach cost cut to one sentence; NYT Pips (launched 18 Aug 2025) is domino logic redesigned to be taught visually. No baseline exists [ABSENT] — success is finishing the one-screen tutorial, not downloads.'}
+  ];
+  var html='';
+  for(var d=0;d<defs.length;d++){
+    var names=[];
+    for(var i=0;i<F.length;i++){
+      if(defs[d].key==='__now'){
+        if(F[i][4]==='Live in Morphi') names.push(F[i][1]+' (Live)');
+        else if(F[i][4]==='Prototype') names.push(F[i][1]+' (Prototype)');
+      } else if(F[i][4]===defs[d].key){ names.push(F[i][1]); }
+    }
+    html+='<div class="panel"><h3 style="font-family:inherit">'+defs[d].title+' — '+names.length+(names.length===1?' family':' families')+'</h3><p class="note">'+defs[d].guide+'</p><p class="note" style="margin-top:6px">'+names.join(' · ')+'</p></div>';
+  }
+  tg.insertAdjacentHTML('afterbegin',html);
+})();
+/* Solo / Multiplayer / Both summary — generated from the same F dataset and SMB labels
+   as the A-Z cards, so the counts here can never disagree with the list */
+(function(){
+  var el=document.getElementById('playModeSummary'); if(!el) return;
+  var order=['Solo','Multiplayer','Both'];
+  var defs={
+    'Solo':'Played solo in the real world — no played multiplayer form found [ABSENT], however theoretically possible one might be.',
+    'Multiplayer':'The real, played form is multiplayer — versus, co-op, party, async turns or team play. Includes the dead giants (Draw Something, QuizUp, HQ Trivia), labelled with their death dates on their cards.',
+    'Both':'Both forms genuinely exist and are played — the multiplayer form is often a race on the same puzzle (championships, race apps, shared daily scores). Merge counts as Both only weakly, via the 2048 / Suika branch.'
+  };
+  var counts={'Solo':0,'Multiplayer':0,'Both':0};
+  for(var i=0;i<F.length;i++) counts[playMode(F[i])]++;
+  var html='';
+  for(var k=0;k<order.length;k++){ var m=order[k]; html+='<div class="bandcard"><span class="b '+modeClass(m)+'">'+m+'</span><h4>'+counts[m]+' families · '+Math.round(counts[m]/F.length*100)+'%</h4><p>'+defs[m]+'</p></div>'; }
+  html+='<div class="bandcard"><span class="b bLive">Total</span><h4>'+F.length+' families</h4><p>Solo-research families plus the multiplayer families added from the companion research — deduplicated where a family was already in the list (Tetris versus, Trivia Crack, 4-player Mahjong, puzzle hunts, escape rooms, Rubik\'s / WCA, Bananagrams, Rummikub).</p></div>';
+  el.innerHTML=html;
+})();
+render();
+</script>
+</div>
+</body>
+</html>

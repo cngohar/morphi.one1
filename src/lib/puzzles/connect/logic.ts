@@ -10,6 +10,20 @@ export const CONNECT_BANDS = [
 	{ size: 7, pairs: 8, par: 165 }
 ] as const;
 
+export const CONNECT_VARIANTS = [
+	'connect:classic',
+	'connect:full-grid',
+	'connect:board-8',
+	'connect:rush-60'
+] as const;
+export type ConnectVariant = (typeof CONNECT_VARIANTS)[number];
+
+export function parseConnectVariant(variant?: string): ConnectVariant {
+	if (variant === undefined) return 'connect:classic';
+	if (!CONNECT_VARIANTS.includes(variant as ConnectVariant)) throw new RangeError('variant');
+	return variant as ConnectVariant;
+}
+
 export interface ConnectPair {
 	a: number;
 	b: number;
@@ -22,6 +36,7 @@ export interface ConnectMove extends Move {
 }
 export interface ConnectRound {
 	seed: string;
+	variant?: ConnectVariant;
 	band: number;
 	size: number;
 	par: number;
@@ -51,10 +66,26 @@ function adjacent(a: number, b: number, size: number): boolean {
 	return neighbors(a, size).includes(b);
 }
 
-export function createConnectRound(seed: string): ConnectRound {
+export function createConnectRound(seed: string, variant?: string): ConnectRound {
+	const selectedVariant = parseConnectVariant(variant);
 	const rng = createRng(seed);
-	const band = rng.nextInt(CONNECT_BANDS.length);
-	const { size, pairs, par } = CONNECT_BANDS[band]!;
+	let band: number;
+	let size: number;
+	let pairs: number;
+	let par: number;
+	if (selectedVariant === 'connect:board-8') {
+		band = 4;
+		size = 8;
+		pairs = 8;
+		par = 210;
+	} else {
+		const bandIndex = rng.nextInt(CONNECT_BANDS.length);
+		const bandConfig = CONNECT_BANDS[bandIndex]!;
+		band = bandIndex + 1;
+		size = bandConfig.size;
+		pairs = bandConfig.pairs;
+		par = bandConfig.par;
+	}
 	const total = size * size;
 	let path: number[] = [];
 	for (let row = 0; row < size; row++) {
@@ -75,9 +106,10 @@ export function createConnectRound(seed: string): ConnectRound {
 	if (rng.nextInt(2)) path.reverse();
 	const lengths = Array<number>(pairs).fill(3);
 	let rest = total - 3 * pairs;
+	const maxLength = selectedVariant === 'connect:board-8' ? 16 : 12;
 	while (rest > 0) {
 		const at = rng.nextInt(pairs);
-		if (lengths[at]! < 12) {
+		if (lengths[at]! < maxLength) {
 			lengths[at]!++;
 			rest--;
 		}
@@ -91,7 +123,8 @@ export function createConnectRound(seed: string): ConnectRound {
 	const order = shuffle(rng, segments);
 	return {
 		seed,
-		band: band + 1,
+		...(selectedVariant === 'connect:classic' ? {} : { variant: selectedVariant }),
+		band,
 		size,
 		par,
 		pairs: order.map((cells) => ({ a: cells[0]!, b: cells[cells.length - 1]! })),
@@ -201,6 +234,11 @@ export function applyConnectMove(round: ConnectRound, move: ConnectMove): Connec
 		everConnected: round.everConnected.slice()
 	};
 	for (let i = 0; i < paths.length; i++) if (connected(next, i)) next.everConnected[i] = true;
-	if (connectedCount(next) === next.pairs.length) next.status = 'won';
+	const allPairsConnected = connectedCount(next) === next.pairs.length;
+	if (round.variant === 'connect:full-grid') {
+		if (allPairsConnected && filledCount(next) === next.size * next.size) next.status = 'won';
+	} else {
+		if (allPairsConnected) next.status = 'won';
+	}
 	return next;
 }

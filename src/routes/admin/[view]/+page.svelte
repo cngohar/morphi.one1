@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import { onMount, untrack } from 'svelte';
+	import { SvelteSet } from 'svelte/reactivity';
+	import SupportDesk from '#lib/components/SupportDesk.svelte';
 	import ThemeEditor from '#lib/components/ThemeEditor.svelte';
 	import { puzzleVariant } from '#lib/scoring.js';
 	import AdminTestPlay from '#lib/components/AdminTestPlay.svelte';
@@ -18,6 +20,7 @@
 		ready = true;
 	});
 	const views = [
+		'support',
 		'dashboard',
 		'users',
 		'games',
@@ -26,9 +29,28 @@
 		'queue',
 		'audit',
 		'privacy',
-		'scoring',
 		'themes'
 	];
+	function auditPages(current: number, totalPages: number): (number | 'ellipsis')[] {
+		if (totalPages <= 7) {
+			return Array.from({ length: totalPages }, (_, i) => i);
+		}
+		const pages = new SvelteSet<number>();
+		pages.add(0);
+		pages.add(totalPages - 1);
+		for (let i = Math.max(0, current - 1); i <= Math.min(totalPages - 1, current + 1); i++) {
+			pages.add(i);
+		}
+		const sorted = Array.from(pages).sort((a, b) => a - b);
+		const result: (number | 'ellipsis')[] = [];
+		for (let i = 0; i < sorted.length; i++) {
+			if (i > 0 && sorted[i]! - sorted[i - 1]! > 1) {
+				result.push('ellipsis');
+			}
+			result.push(sorted[i]!);
+		}
+		return result;
+	}
 	const activityMetrics = ['shown', 'ignored', 'played', 'abandoned', 'finished', 'open'] as const;
 	let ref = $state('');
 	const key = (suffix: string) => `v1.admin.${suffix}` as MessageKey;
@@ -52,7 +74,7 @@
 		<a class="brand" href={resolve('/')}><Brand /></a>
 		<p class="eyebrow">{t('v1.admin.workspace')}</p>
 		<nav>
-			{#each views.filter((view) => can(data.actor.role, view)) as view (view)}
+			{#each views.filter( (view) => can(data.actor.role, view === 'support' ? 'support-tickets' : view) ) as view (view)}
 				{#if view === 'users' || view === 'audit'}
 					<details class="sidebar-group" open={data.view === view}>
 						<summary class:active={data.view === view}>{t(key(`nav.${view}`))}</summary>
@@ -108,7 +130,13 @@
 				</p>{:else if form && 'success' in form}<p class="notice success" role="status">
 					{t('v1.operator.saved')}
 				</p>{/if}
-			{#if data.view === 'dashboard'}
+			{#if data.view === 'support'}
+				<SupportDesk
+					staff
+					manageTaxonomy={can(data.actor.role, 'support-taxonomy')}
+					ownerKey={data.account.ownerKey ?? ''}
+				/>
+			{:else if data.view === 'dashboard'}
 				<div class="metric-grid">
 					{#each ['accounts', 'runs', 'entries', 'starts', 'claims', 'hidden', 'bans', 'deletions'] as metric (metric)}<article
 							class="metric"
@@ -957,9 +985,15 @@
 						</header>
 						<nav class="section-tabs" aria-label={t('v1.admin.games.detailSections')}>
 							<a
-								class:active={data.subview !== 'settings'}
+								class:active={!data.subview ||
+									(data.subview !== 'scoring' && data.subview !== 'settings')}
 								href="{resolve('/admin/[view]', { view: 'games' })}?game={game.family}"
 								>{t('v1.admin.games.statistics')}</a
+							><a
+								class:active={data.subview === 'scoring'}
+								href="{resolve('/admin/[view]', {
+									view: 'games'
+								})}?game={game.family}&subview=scoring">{t('v1.admin.nav.scoring')}</a
 							><a
 								class:active={data.subview === 'settings'}
 								href="{resolve('/admin/[view]', {
@@ -1161,7 +1195,7 @@
 								family={game.family}
 								scoring={data.scoring}
 							/>{/if}
-						{#if data.subview === 'settings' && (game.state === 'enabled' || game.state === 'disabled')}{#each data.scoring as config (`${config.family}:${config.variant ?? ''}:${config.version}`)}<ScoringEditor
+						{#if data.subview === 'scoring' && (game.state === 'enabled' || game.state === 'disabled')}{#each data.scoring as config (`${config.family}:${config.variant ?? ''}:${config.version}`)}<ScoringEditor
 									{config}
 								/>{/each}{/if}
 					{/each}
@@ -1205,15 +1239,41 @@
 						>{/if}
 				</section>
 			{/if}
-			{#if (data.view === 'audit' && data.subview === 'viewer') || data.view === 'queue'}<nav
-					class="pagination"
-				>
+			{#if data.view === 'audit' && data.subview === 'viewer'}
+				<nav class="pagination audit-pagination" aria-label={t('v1.admin.audit.section')}>
+					<form method="GET" class="pagination-form">
+						<input type="hidden" name="subview" value="viewer" />
+						{#each Object.entries(data.filters) as [key, value] (key)}
+							{#if value}<input type="hidden" name={key} {value} />{/if}
+						{/each}
+						<button class="btn" name="page" value={data.page - 1} disabled={data.page === 0}
+							>{t('leaderboard.previous')}</button
+						>
+						{#each auditPages(data.page, data.auditTotalPages) as item, i (typeof item === 'number' ? `page-${item}` : `ellipsis-${i}`)}
+							{#if item === 'ellipsis'}
+								<span class="pagination-ellipsis" aria-hidden="true">…</span>
+							{:else}
+								<button
+									class="btn page-btn"
+									class:primary={item === data.page}
+									aria-current={item === data.page ? 'page' : undefined}
+									name="page"
+									value={item}>{item + 1}</button
+								>
+							{/if}
+						{/each}
+						<button
+							class="btn"
+							name="page"
+							value={data.page + 1}
+							disabled={data.page >= data.auditTotalPages - 1}>{t('leaderboard.next')}</button
+						>
+					</form>
+				</nav>
+			{:else if data.view === 'queue'}
+				<nav class="pagination">
 					{#if data.page > 0}<form method="GET">
-							{#if data.view === 'audit'}<input
-									type="hidden"
-									name="subview"
-									value="viewer"
-								/>{/if}{#each Object.entries(data.filters) as [key, value] (key)}{#if value}<input
+							{#each Object.entries(data.filters) as [key, value] (key)}{#if value}<input
 										type="hidden"
 										name={key}
 										{value}
@@ -1222,18 +1282,15 @@
 								>{t('leaderboard.previous')}</button
 							>
 						</form>{/if}{#if data.more}<form method="GET">
-							{#if data.view === 'audit'}<input
-									type="hidden"
-									name="subview"
-									value="viewer"
-								/>{/if}{#each Object.entries(data.filters) as [key, value] (key)}{#if value}<input
+							{#each Object.entries(data.filters) as [key, value] (key)}{#if value}<input
 										type="hidden"
 										name={key}
 										{value}
 									/>{/if}{/each}
 							<button class="btn" name="page" value={data.page + 1}>{t('leaderboard.next')}</button>
 						</form>{/if}
-				</nav>{/if}
+				</nav>
+			{/if}
 		</main>
 	</div>
 </div>
@@ -1856,6 +1913,22 @@
 	.pagination {
 		display: flex;
 		gap: 24px;
+	}
+	.pagination-form {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+	}
+	.page-btn {
+		min-width: 36px;
+		padding: 6px 10px;
+		text-align: center;
+	}
+	.pagination-ellipsis {
+		padding: 0 4px;
+		color: var(--muted);
+		user-select: none;
 	}
 	a {
 		color: var(--ink-2);

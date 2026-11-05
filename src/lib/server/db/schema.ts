@@ -343,3 +343,91 @@ export const variantLifecycle = sqliteTable(
 	},
 	(table) => [primaryKey({ columns: [table.family, table.variant] })]
 );
+
+export const supportCategory = sqliteTable('support_category', {
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	normalizedName: text('normalized_name').notNull().unique(),
+	isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false)
+});
+export const supportPriority = sqliteTable('support_priority', {
+	id: text('id').primaryKey(),
+	name: text('name').notNull(),
+	normalizedName: text('normalized_name').notNull().unique(),
+	isDefault: integer('is_default', { mode: 'boolean' }).notNull().default(false)
+});
+export const supportTicket = sqliteTable(
+	'support_ticket',
+	{
+		id: text('id').primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		subject: text('subject').notNull(),
+		categoryId: text('category_id')
+			.notNull()
+			.references(() => supportCategory.id, { onDelete: 'restrict' }),
+		priorityId: text('priority_id')
+			.notNull()
+			.references(() => supportPriority.id, { onDelete: 'restrict' }),
+		state: text('state', { enum: ['open', 'closed'] })
+			.notNull()
+			.default('open'),
+		createdAt: integer('created_at').notNull(),
+		updatedAt: integer('updated_at').notNull(),
+		memberReadSequence: integer('member_read_sequence').notNull().default(0),
+		lastStaffSequence: integer('last_staff_sequence').notNull().default(0)
+	},
+	(table) => [
+		index('support_ticket_owner').on(table.userId, table.updatedAt, table.id),
+		index('support_ticket_inbox').on(table.updatedAt, table.id),
+		index('support_ticket_open').on(table.userId, table.state),
+		index('support_ticket_category').on(table.categoryId),
+		index('support_ticket_priority').on(table.priorityId)
+	]
+);
+export const supportMessage = sqliteTable(
+	'support_message',
+	{
+		sequence: integer('sequence').primaryKey({ autoIncrement: true }),
+		id: text('id').notNull().unique(),
+		ticketId: text('ticket_id')
+			.notNull()
+			.references(() => supportTicket.id, { onDelete: 'cascade' }),
+		authorKind: text('author_kind', { enum: ['member', 'staff'] }).notNull(),
+		body: text('body').notNull(),
+		createdAt: integer('created_at').notNull()
+	},
+	(table) => [index('support_message_conversation').on(table.ticketId, table.sequence)]
+);
+export const supportReceipt = sqliteTable(
+	'support_receipt',
+	{
+		nonce: text('nonce').primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		requestId: text('request_id').notNull(),
+		payloadHash: text('payload_hash').notNull(),
+		ticketId: text('ticket_id').references(() => supportTicket.id, { onDelete: 'cascade' }),
+		resultId: text('result_id').notNull(),
+		createdAt: integer('created_at').notNull()
+	},
+	(table) => [uniqueIndex('support_receipt_request').on(table.userId, table.requestId)]
+);
+export const supportLimit = sqliteTable(
+	'support_limit',
+	{
+		nonce: text('nonce').primaryKey(),
+		userId: text('user_id')
+			.notNull()
+			.references(() => user.id, { onDelete: 'cascade' }),
+		kind: text('kind').notNull(),
+		createdAt: integer('created_at').notNull(),
+		expiresAt: integer('expires_at').notNull()
+	},
+	(table) => [
+		index('support_limit_window').on(table.userId, table.kind, table.createdAt),
+		index('support_limit_expiry').on(table.expiresAt)
+	]
+);

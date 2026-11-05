@@ -1,0 +1,717 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Memory Puzzle Variants — Global Research for Morphi</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700;12..96,800&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet" />
+    <style>
+      :root {
+        --bg: #f2efe6;
+        --bg-raise: #faf8f1;
+        --card: #fffdf6;
+        --ink: #1d2420;
+        --ink-soft: #4a554e;
+        --ink-faint: #77817a;
+        --line: #d8d2c0;
+        --line-strong: #b9b198;
+        --felt: #17573f;
+        --felt-deep: #0f4230;
+        --felt-ink: #eaf3ec;
+        --amber: #b06f14;
+        --amber-soft: #f3e3c2;
+        --red: #a83a28;
+        --red-soft: #f2d9d2;
+        --chip-bg: #e9e4d2;
+        --shadow: 0 1px 2px rgba(29, 36, 32, .07), 0 8px 24px rgba(29, 36, 32, .06);
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #101511;
+          --bg-raise: #171d18;
+          --card: #1b221c;
+          --ink: #ece8da;
+          --ink-soft: #b3baae;
+          --ink-faint: #828c80;
+          --line: #333b33;
+          --line-strong: #4a554a;
+          --felt: #1d6a4c;
+          --felt-deep: #0d2c20;
+          --felt-ink: #e6f2ea;
+          --amber: #e0a458;
+          --amber-soft: #3a2f1c;
+          --red: #e08a76;
+          --red-soft: #3d2620;
+          --chip-bg: #262e27;
+          --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 8px 24px rgba(0, 0, 0, .3);
+          color-scheme: dark;
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-size: 16.5px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
+      h1, h2, h3 { font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif; line-height: 1.12; margin: 0; }
+      h2 { font-size: clamp(1.55rem, 3.4vw, 2.15rem); font-weight: 800; letter-spacing: -.01em; }
+      h3 { font-size: 1.12rem; font-weight: 700; }
+      p { margin: 0; }
+      a { color: var(--felt); text-underline-offset: 3px; }
+      @media (prefers-color-scheme: dark) { a { color: #7cc7a4; } }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+      section { padding: 56px 0 8px; }
+      .sec-head { max-width: 46rem; margin-bottom: 26px; }
+      .sec-head p { color: var(--ink-soft); margin-top: 10px; }
+      .sec-tag {
+        font-family: "IBM Plex Mono", monospace; font-size: .78rem; font-weight: 600;
+        letter-spacing: .14em; text-transform: uppercase; color: var(--amber); margin-bottom: 10px;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero { padding: 52px 0 10px; }
+      .hero-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 36px; align-items: center; }
+      .hero h1 { font-size: clamp(2.1rem, 5.4vw, 3.5rem); font-weight: 800; letter-spacing: -.015em; }
+      .hero h1 em { font-style: normal; color: var(--felt); }
+      @media (prefers-color-scheme: dark) { .hero h1 em { color: #7cc7a4; } }
+      .hero .lede { margin-top: 18px; font-size: 1.08rem; color: var(--ink-soft); max-width: 34rem; }
+      .hero .meta { margin-top: 20px; font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--ink-faint); }
+      .deck { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 340px; margin-left: auto; }
+      .mini {
+        aspect-ratio: 3 / 4; border-radius: 9px; position: relative;
+        display: flex; align-items: center; justify-content: center;
+        font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 700;
+      }
+      .mini.down {
+        background:
+          repeating-linear-gradient(45deg, rgba(255,255,255,.09) 0 6px, transparent 6px 12px),
+          linear-gradient(150deg, var(--felt), var(--felt-deep));
+        border: 1px solid var(--felt-deep);
+        box-shadow: inset 0 0 0 4px rgba(255,255,255,.14), var(--shadow);
+      }
+      .mini.down::after {
+        content: ""; width: 34%; height: 34%; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,.45);
+      }
+      .mini.up { background: var(--card); border: 1px solid var(--line-strong); box-shadow: var(--shadow); color: var(--ink); }
+      .mini.up.red { color: var(--red); }
+      .mini.up .sub { position: absolute; bottom: 7px; right: 9px; font-size: .62rem; font-family: "IBM Plex Mono", monospace; color: var(--ink-faint); font-weight: 500; }
+      @media (max-width: 760px) {
+        .hero-grid { grid-template-columns: 1fr; }
+        .deck { margin: 4px auto 0 0; max-width: 300px; }
+      }
+
+      /* ---------- Stat band ---------- */
+      .stats {
+        margin-top: 44px; display: grid; grid-template-columns: repeat(5, 1fr);
+        border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card);
+        box-shadow: var(--shadow);
+      }
+      .stat { padding: 18px 18px 14px; border-left: 1px solid var(--line); }
+      .stat:first-child { border-left: none; }
+      .stat .n { font-family: "IBM Plex Mono", monospace; font-size: clamp(1.35rem, 2.6vw, 1.9rem); font-weight: 600; line-height: 1.1; }
+      .stat .l { font-size: .82rem; color: var(--ink-soft); margin-top: 6px; line-height: 1.45; }
+      @media (max-width: 860px) { .stats { grid-template-columns: repeat(2, 1fr); } .stat { border-top: 1px solid var(--line); } .stat:nth-child(-n+2) { border-top: none; } .stat:nth-child(odd) { border-left: none; } .stat:last-child { grid-column: 1 / -1; } }
+      .answer {
+        margin-top: 22px; background: var(--felt-deep); color: var(--felt-ink);
+        border-radius: 14px; padding: 24px 26px; font-size: 1.05rem; line-height: 1.65;
+      }
+      .answer strong { color: #ffd98a; }
+      @media (prefers-color-scheme: dark) { .answer strong { color: #f0bd72; } }
+
+      /* ---------- Classic baseline ---------- */
+      .baseline {
+        margin-top: 26px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      }
+      .base-step { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+      .base-step .k { font-family: "IBM Plex Mono", monospace; font-size: .75rem; color: var(--amber); font-weight: 600; letter-spacing: .1em; }
+      .base-step p { font-size: .92rem; color: var(--ink-soft); margin-top: 6px; }
+      @media (max-width: 860px) { .baseline { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 480px) { .baseline { grid-template-columns: 1fr; } }
+
+      /* ---------- Counts / doesn't count ---------- */
+      .split2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      @media (max-width: 760px) { .split2 { grid-template-columns: 1fr; } }
+      .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
+      .panel h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+      .badge { font-family: "IBM Plex Mono", monospace; font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; letter-spacing: .06em; }
+      .badge.yes { background: var(--felt); color: #fff; }
+      .badge.no { background: var(--red-soft); color: var(--red); }
+      .panel ul { margin: 10px 0 0; padding: 0; list-style: none; }
+      .panel li { padding: 10px 0; border-top: 1px solid var(--line); font-size: .95rem; }
+      .panel li:first-child { border-top: none; }
+      .panel li b { display: block; font-weight: 600; }
+      .panel li span { color: var(--ink-soft); font-size: .9rem; }
+
+      /* ---------- Variant explorer ---------- */
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+      .chip {
+        font-family: "IBM Plex Sans", sans-serif; font-size: .86rem; font-weight: 500;
+        padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line-strong);
+        background: var(--bg-raise); color: var(--ink); cursor: pointer;
+      }
+      .chip:hover { border-color: var(--felt); }
+      .chip[aria-pressed="true"] { background: var(--felt); border-color: var(--felt); color: #fff; }
+      .chip .cnt { font-family: "IBM Plex Mono", monospace; font-size: .76rem; opacity: .75; margin-left: 4px; }
+      .vcount { font-family: "IBM Plex Mono", monospace; font-size: .82rem; color: var(--ink-faint); margin: 10px 0 16px; }
+      .vgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 760px) { .vgrid { grid-template-columns: 1fr; } }
+      .vcard { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); }
+      .vcard .top { display: flex; align-items: baseline; gap: 10px; }
+      .vcard .num { font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--ink-faint); font-weight: 600; }
+      .vcard h3 { font-size: 1.02rem; flex: 1; }
+      .dim { font-family: "IBM Plex Mono", monospace; font-size: .68rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--amber); white-space: nowrap; }
+      .vcard .rule { font-size: .93rem; color: var(--ink-soft); margin-top: 7px; }
+      .vcard .src { margin-top: 10px; font-size: .8rem; }
+      .vcard .src a { color: var(--ink-faint); }
+      .vcard .flag { margin-top: 8px; font-size: .8rem; background: var(--amber-soft); color: var(--ink); border-radius: 8px; padding: 7px 10px; }
+      .vcard[hidden] { display: none; }
+
+      /* ---------- Dimensions grid ---------- */
+      .dims { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      @media (max-width: 860px) { .dims { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 520px) { .dims { grid-template-columns: 1fr; } }
+      .dimcard { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+      .dimcard .n { font-family: "IBM Plex Mono", monospace; font-size: 1.5rem; font-weight: 600; color: var(--felt); }
+      @media (prefers-color-scheme: dark) { .dimcard .n { color: #7cc7a4; } }
+      .dimcard h3 { font-size: .98rem; margin-top: 2px; }
+      .dimcard p { font-size: .86rem; color: var(--ink-soft); margin-top: 4px; }
+
+      /* ---------- Ladder ---------- */
+      .ladder { display: flex; flex-direction: column; gap: 0; }
+      .rung { display: grid; grid-template-columns: 190px 1fr; gap: 18px; padding: 18px 0; border-top: 1px solid var(--line); align-items: baseline; }
+      .rung:first-child { border-top: none; }
+      .rung .big { font-family: "IBM Plex Mono", monospace; font-size: clamp(1.5rem, 3.4vw, 2.2rem); font-weight: 600; line-height: 1; }
+      .rung .what b { display: block; font-weight: 600; }
+      .rung .what span { color: var(--ink-soft); font-size: .93rem; }
+      .rung .mult { font-family: "IBM Plex Mono", monospace; color: var(--amber); font-weight: 600; }
+      @media (max-width: 620px) { .rung { grid-template-columns: 1fr; gap: 6px; } }
+      .inf-note { margin-top: 8px; background: var(--amber-soft); border-radius: 12px; padding: 18px 20px; font-size: .97rem; }
+      table.opts { width: 100%; border-collapse: collapse; margin-top: 26px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+      table.opts th, table.opts td { text-align: left; padding: 11px 16px; font-size: .93rem; vertical-align: top; }
+      table.opts th { font-family: "IBM Plex Mono", monospace; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); border-bottom: 1px solid var(--line-strong); }
+      table.opts td { border-top: 1px solid var(--line); color: var(--ink-soft); }
+      table.opts td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+      table.opts td.c { font-family: "IBM Plex Mono", monospace; color: var(--amber); font-weight: 600; white-space: nowrap; }
+      @media (max-width: 620px) {
+        table.opts, table.opts tbody, table.opts tr, table.opts td { display: block; }
+        table.opts thead { display: none; }
+        table.opts td { border-top: none; padding: 3px 16px; }
+        table.opts td:first-child { padding-top: 14px; }
+        table.opts td:last-child { padding-bottom: 14px; }
+        table.opts tr { border-top: 1px solid var(--line); }
+        table.opts tr:first-child { border-top: none; }
+      }
+
+      /* ---------- Tests / degenerate ---------- */
+      .tests { counter-reset: t; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 760px) { .tests { grid-template-columns: 1fr; } }
+      .test { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); display: flex; gap: 14px; }
+      .test .tn { counter-increment: t; font-family: "IBM Plex Mono", monospace; font-weight: 600; color: var(--felt); font-size: 1.15rem; line-height: 1.3; }
+      @media (prefers-color-scheme: dark) { .test .tn { color: #7cc7a4; } }
+      .test .tn::before { content: counter(t, decimal-leading-zero); }
+      .test p { font-size: .93rem; color: var(--ink-soft); }
+      .test p b { color: var(--ink); display: block; font-size: .98rem; }
+      .warn { margin-top: 16px; border: 1px solid var(--red); border-radius: 12px; padding: 18px 20px; background: var(--red-soft); font-size: .95rem; }
+      .warn b { color: var(--red); }
+
+      /* ---------- Data-only vs mechanics ---------- */
+      .mech-list { margin: 8px 0 0; padding: 0; list-style: none; }
+      .mech-list li { padding: 9px 0; border-top: 1px solid var(--line); font-size: .93rem; }
+      .mech-list li:first-child { border-top: none; }
+      .mech-list b { font-weight: 600; }
+      .mech-list span { color: var(--ink-soft); }
+      .mech-list code { font-family: "IBM Plex Mono", monospace; font-size: .82em; background: var(--chip-bg); padding: 1px 6px; border-radius: 5px; }
+      .implication { margin-top: 16px; background: var(--felt-deep); color: var(--felt-ink); border-radius: 12px; padding: 18px 20px; font-size: .97rem; }
+
+      /* ---------- Boundary ---------- */
+      .brow { display: grid; grid-template-columns: 200px 1fr 1fr; gap: 16px; padding: 15px 0; border-top: 1px solid var(--line); }
+      .brow:first-of-type { border-top: none; }
+      .brow h3 { font-size: 1rem; }
+      .brow p { font-size: .92rem; color: var(--ink-soft); }
+      .brow p b { color: var(--ink); font-weight: 600; display: block; font-size: .78rem; font-family: "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 2px; }
+      @media (max-width: 760px) { .brow { grid-template-columns: 1fr; gap: 6px; } }
+
+      /* ---------- Calculator ---------- */
+      .calc { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; box-shadow: var(--shadow); }
+      .calc-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 26px; align-items: end; }
+      @media (max-width: 760px) { .calc-grid { grid-template-columns: 1fr; gap: 18px; } }
+      .calc label { display: block; font-weight: 600; font-size: .95rem; margin-bottom: 8px; }
+      .calc label output { font-family: "IBM Plex Mono", monospace; color: var(--felt); font-weight: 600; }
+      @media (prefers-color-scheme: dark) { .calc label output { color: #7cc7a4; } }
+      .calc input[type="range"] { width: 100%; accent-color: var(--felt); }
+      .calc .total { text-align: right; }
+      .calc .total .n { font-family: "IBM Plex Mono", monospace; font-size: clamp(2rem, 5vw, 3rem); font-weight: 600; line-height: 1; color: var(--felt); }
+      @media (prefers-color-scheme: dark) { .calc .total .n { color: #7cc7a4; } }
+      .calc .total .l { font-size: .85rem; color: var(--ink-soft); margin-top: 6px; }
+      @media (max-width: 760px) { .calc .total { text-align: left; } }
+      .calc-note { margin-top: 18px; font-size: .92rem; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 14px; }
+
+      /* ---------- Open questions / sources ---------- */
+      .openq { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
+      .openq ul { margin: 6px 0 0; padding-left: 20px; }
+      .openq li { font-size: .95rem; color: var(--ink-soft); padding: 4px 0; }
+      .openq li b { color: var(--ink); }
+      footer { padding: 54px 0 60px; margin-top: 56px; border-top: 1px solid var(--line); }
+      footer h2 { font-size: 1.3rem; margin-bottom: 14px; }
+      .srcs { columns: 2; column-gap: 34px; font-size: .84rem; }
+      @media (max-width: 700px) { .srcs { columns: 1; } }
+      .srcs p { padding: 5px 0; break-inside: avoid; color: var(--ink-soft); }
+      .srcs a { word-break: break-all; }
+      .foot-note { margin-top: 22px; font-size: .84rem; color: var(--ink-faint); max-width: 44rem; }
+    </style>
+  </head>
+  <body>
+    <main class="wrap">
+
+      <!-- ============ HERO ============ -->
+      <div class="hero">
+        <div class="hero-grid">
+          <div>
+            <p class="sec-tag">Global research · Memory / Concentration · For Morphi</p>
+            <h1>How many Memory variants are there? <em>More than anyone can finish.</em></h1>
+            <p class="lede">There is no official catalogue of Memory variants — no registry, no standard, no publisher list. So this research set its own strict counting rule, sourced every named mode it could, and then counted what the rules themselves allow. The published floor is small. The space above it is not.</p>
+            <p class="meta">Research completed 4 November 2026 · Sources cited throughout · Counting rule stated openly below</p>
+          </div>
+          <div class="deck" aria-hidden="true">
+            <div class="mini down"></div>
+            <div class="mini up">A<span class="sub">♠</span></div>
+            <div class="mini down"></div>
+            <div class="mini down"></div>
+            <div class="mini down"></div>
+            <div class="mini down"></div>
+            <div class="mini up red">K<span class="sub">♥</span></div>
+            <div class="mini down"></div>
+            <div class="mini down"></div>
+            <div class="mini up">7<span class="sub">♣</span></div>
+            <div class="mini down"></div>
+            <div class="mini down"></div>
+          </div>
+        </div>
+
+        <div class="stats">
+          <div class="stat"><div class="n">30</div><div class="l">named, published modes listed below — 24+ verified outright, the rest flagged in place</div></div>
+          <div class="stat"><div class="n">24+</div><div class="l">hold up even after the weakest entries are removed</div></div>
+          <div class="stat"><div class="n">15–18</div><div class="l">genuinely different rule systems, once near-duplicates are collapsed</div></div>
+          <div class="stat"><div class="n">103,680</div><div class="l">rule combinations from conservative option counts alone</div></div>
+          <div class="stat"><div class="n">∞</div><div class="l">once board size, timers, deck content and artwork count as parameters</div></div>
+        </div>
+
+        <div class="answer">
+          <strong>The short answer:</strong> Memory alone can support a large, growing catalogue without repeating the same game — your “unlimited puzzles” idea works for this family — <strong>provided a “new variant” means a new combination of rule dimensions, not a new picture set.</strong> The ceiling is not combinatorics; it is design quality. Most random combinations are trivial tweaks, unplayable, or confusing, so the catalogue has to grow along the rule dimensions, one deliberate step at a time.
+        </div>
+      </div>
+
+      <!-- ============ CLASSIC BASELINE ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">The baseline</p>
+          <h2>Classic Memory, in four moves</h2>
+          <p>Every variant below is measured against this game: Concentration, also published as Memory, Pelmanism, Pexeso and Shinkei-suijaku — those are synonyms for the same game, not variants.</p>
+        </div>
+        <div class="baseline">
+          <div class="base-step"><p class="k">01 · LAYOUT</p><p>Cards are dealt face down in a layout. Nothing is visible.</p></div>
+          <div class="base-step"><p class="k">02 · FLIP TWO</p><p>On a turn, a player flips two cards. Identical cards — or same rank and colour — are kept, and that player goes again.</p></div>
+          <div class="base-step"><p class="k">03 · MISS</p><p>Non-matching cards turn back face down, in the same places. Remembering where they were is the whole game.</p></div>
+          <div class="base-step"><p class="k">04 · WIN</p><p>Most pairs wins. Solo, the aim is to clear the board in the fewest non-matching turns.</p></div>
+        </div>
+        <p style="margin-top:14px; font-size:.85rem; color:var(--ink-faint);">Baseline source: <a href="https://en.wikipedia.org/wiki/Concentration_(card_game)">Wikipedia — Concentration (card game)</a></p>
+      </section>
+
+      <!-- ============ COUNTING RULE ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">The counting rule</p>
+          <h2>What counts as a variant — and what doesn't</h2>
+          <p>A mode is counted once, and only if it changes a rule: what counts as a match, what information you get, what a move does to the board, how turns work, or how you win. Anything less is the same game wearing a different coat. Any source claiming “exactly N variants” without stating its counting rule is marketing, not fact — so the rule is stated here instead.</p>
+        </div>
+        <div class="split2">
+          <div class="panel">
+            <h3><span class="badge yes">COUNTS</span> A real rule change</h3>
+            <ul>
+              <li><b>A different match</b><span>Same rank any colour, opposite colour only, three cards instead of two, or cards related by a rule rather than identical.</span></li>
+              <li><b>A different board</b><span>Misses move to new spots, cards swap mid-game, a card gets blocked by a token.</span></li>
+              <li><b>Different turns</b><span>No extra turn for a match, one card at a time across two boards, or everyone flipping at once.</span></li>
+              <li><b>A different way to win or lose</b><span>Beat the countdown, run out of moves or lives, solve the puzzle the matches reveal, finish a race.</span></li>
+              <li><b>Different information</b><span>Study the board before it hides, different card backs that narrow the search, mismatches that stay face up.</span></li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3><span class="badge no">DOESN'T COUNT</span> Same game, new coat</h3>
+            <ul>
+              <li><b>Reskins and themes</b><span>Ravensburger sells Memory in Mario, Frozen, animal and vehicle editions — the rules text is identical in every listing.</span></li>
+              <li><b>Difficulty = pair count only</b><span>8 vs 12 vs 16 pairs, 4×4 vs 4×8 grids. One guide states it plainly: “Difficulty only changes the number of cards. The rules, the flip-back pause and the scoring are the same at every size.”</span></li>
+              <li><b>Layout shape alone</b><span>Wikipedia's Fancy (circle, triangle, diamond layouts) and Spaghetti (strewn cards) change where cards sit, not how a match is made.</span></li>
+              <li><b>A timer or score value alone</b><span>60 s vs 120 s is tuning. Adding a countdown where none existed is a new rule — shortening one is not.</span></li>
+              <li><b>Synonyms, daily boards, photo decks</b><span>New names, a seeded daily board, achievements, or a “My Photos” deck change distribution or content, not play.</span></li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <!-- ============ VARIANT EXPLORER ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">The catalogue</p>
+          <h2>30 named variants, each with its exact rule change</h2>
+          <p>Every entry below is a published or traditional mode with a source; 24+ hold up under the strictest reading, and the entries the research flagged as weaker are marked honestly rather than quietly promoted. The filters file each variant under the one dimension it changes most. Some variants also touch a second dimension — the anatomy counts further down credit every dimension a variant touches, which is why those totals run higher and add up to more than 30.</p>
+        </div>
+        <div class="chips" id="chips" role="group" aria-label="Filter variants by rule dimension"></div>
+        <p class="vcount" id="vcount"></p>
+        <div class="vgrid" id="vgrid"></div>
+      </section>
+
+      <!-- ============ DIMENSIONS ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">The anatomy</p>
+          <h2>Nine rule dimensions do all the work</h2>
+          <p>Grouped by what they change, the 30 variants concentrate in a few dimensions. These counts credit a variant to every dimension it touches (the filters above use primary dimension only), so they sum to more than 30. Match relation is the richest seam; match size is nearly untouched — no named published four-card variant was found anywhere.</p>
+        </div>
+        <div class="dims">
+          <div class="dimcard"><div class="n">8</div><h3>Match relation</h3><p>What makes two cards a match: rank only, opposite colour, identical suit, related pairs, sound, a pip sum.</p></div>
+          <div class="dimcard"><div class="n">6</div><h3>Time &amp; scoring</h3><p>Countdowns, move limits, lives, combo multipliers, per-move and per-second penalties, fewest-turns solo.</p></div>
+          <div class="dimcard"><div class="n">5</div><h3>Player mode</h3><p>Solo, hotseat for 2–4, teams, a computer opponent, or simultaneous play with no turns at all.</p></div>
+          <div class="dimcard"><div class="n">4</div><h3>Board dynamics</h3><p>Misses relocate, cards swap in marked exchanges, a token blocks a card from being flipped.</p></div>
+          <div class="dimcard"><div class="n">4</div><h3>Flip &amp; turn rules</h3><p>One Flip, alternating single flips across split boards, simultaneous flipping, preview instead of discovery.</p></div>
+          <div class="dimcard"><div class="n">4</div><h3>Obstacles &amp; helpers</h3><p>Wild cards, Take/Forfeit steals, token blocks, and the Hint / Peek / Shuffle / Bomb helper family.</p></div>
+          <div class="dimcard"><div class="n">4</div><h3>Win condition</h3><p>Most pairs, solving the revealed rebus, the last car matched in the bonus round, tower and pawn races.</p></div>
+          <div class="dimcard"><div class="n">3</div><h3>Visibility &amp; information</h3><p>Checkerboard backs that leak position clues, a full preview before hiding, cards that stay face up.</p></div>
+          <div class="dimcard"><div class="n">1</div><h3>Match size</h3><p>Trios are the only published step beyond pairs. Sets of four are the obvious extension — unpublished, so far.</p></div>
+        </div>
+        <p style="margin-top:14px; font-size:.9rem; color:var(--ink-soft);">One collapse worth knowing: word–picture, question–answer, equation–answer, capital–small letter, number–Roman numeral and “one more / one less” are <b>one</b> dimension with many contents — all replace “identical” with “related by a stated rule”. That single collapse is most of why the honest core count is 15–18, not 30.</p>
+      </section>
+
+      <!-- ============ COMBINATORICS ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">The multiplication</p>
+          <h2>From 30 named modes to six figures</h2>
+          <p>The published catalogue is only the floor. Wikipedia itself notes the traditional variations “may be played in combination with one another”, and digital games already stack a timer on a move limit on helpers. The dimensions are independent — so they multiply.</p>
+        </div>
+        <div class="ladder">
+          <div class="rung">
+            <div class="big">2,880</div>
+            <div class="what"><b>Six core dimensions only</b><span><span class="mult">3</span> match sizes × <span class="mult">6</span> match relations × <span class="mult">2</span> turn rules (extra turn vs One Flip) × <span class="mult">4</span> board dynamics × <span class="mult">5</span> time/scoring modes × <span class="mult">4</span> player modes.</span></div>
+          </div>
+          <div class="rung">
+            <div class="big">11,520</div>
+            <div class="what"><b>Add helpers</b><span><span class="mult">× 4</span> — none, hint, wild card, bomb.</span></div>
+          </div>
+          <div class="rung">
+            <div class="big">34,560</div>
+            <div class="what"><b>Add visibility</b><span><span class="mult">× 3</span> — classic face-down, Blind preview, Scramble-style cards staying up.</span></div>
+          </div>
+          <div class="rung">
+            <div class="big">103,680</div>
+            <div class="what"><b>Add layout</b><span><span class="mult">× 3</span> — grid, scattered, split boards. Most of these combinations have never been published by anyone.</span></div>
+          </div>
+        </div>
+        <div class="inf-note"><b>And then it stops being countable.</b> That total still treats board size, timer length, penalty values, deck content and artwork as fixed. Each of those is a dial with effectively endless settings — so a generator that picks a size, a relation, a timer, a helper set and a deck per level never repeats an exact configuration. Apps already claim this scale: FlipSpark advertises 5,000 levels; Pixmory and similar apps claim hundreds. The honest caveat travels with the number: many generated levels will <i>feel</i> similar even when no two are identical.</div>
+
+        <table class="opts">
+          <thead><tr><th>Dimension</th><th>Plausible options</th><th>Count</th></tr></thead>
+          <tbody>
+            <tr><td>Match size</td><td>Pairs, trios, quads</td><td class="c">3</td></tr>
+            <tr><td>Match relation</td><td>Identical; rank any colour; rank + colour; opposite colour; identical rank + suit; associated (word–picture, Q–A, equation–answer, sound); category; sum-to-N</td><td class="c">6–8</td></tr>
+            <tr><td>Flips per turn</td><td>2 (classic), 3 (trios), 1-per-player alternating (Duel)</td><td class="c">3</td></tr>
+            <tr><td>Turn rule</td><td>Match = extra turn; One Flip; simultaneous</td><td class="c">3</td></tr>
+            <tr><td>Board dynamics</td><td>Static; misses relocate; periodic shuffle; marked swaps (Chaos); gravity/shift after removal*</td><td class="c">5</td></tr>
+            <tr><td>Visibility</td><td>Face-down except flips; preview then hide; mismatches stay up; short vs long peek</td><td class="c">4</td></tr>
+            <tr><td>Time / scoring</td><td>Untimed; countdown; move limit; lives; combo multiplier; move + time penalty</td><td class="c">6</td></tr>
+            <tr><td>Helpers / obstacles</td><td>None; hint; peek; shuffle; wild card; bomb; take/forfeit; token-block</td><td class="c">8</td></tr>
+            <tr><td>Player mode</td><td>Solo; hotseat 2–4; team; vs AI; simultaneous</td><td class="c">5</td></tr>
+            <tr><td>Win condition</td><td>Most pairs; clear the board; first to solve the revealed puzzle; race to finish</td><td class="c">4</td></tr>
+            <tr><td>Layout / information</td><td>Grid; scattered; split boards; checkerboard backs</td><td class="c">4</td></tr>
+          </tbody>
+        </table>
+        <p style="margin-top:12px; font-size:.9rem; color:var(--ink-soft);">Why doesn't this table multiply to 103,680? Because the ladder above deliberately uses <b>conservative subsets</b> of these options — 4 of the 8 helpers, 3 of the 4 visibility modes, 3 of the 4 layouts, and only six of the eleven dimensions at all. Multiply every count in this fuller table instead and the product is roughly <b>12–17 million</b>, depending on whether match relation is counted at 6 or 8. Both figures are honest; the ladder is the floor, this table is the fuller space.</p>
+        <p style="margin-top:10px; font-size:.84rem; color:var(--ink-faint);">* Gravity/shift is borrowed from tile games — plausible as a procedural option, but no published Memory rule uses it. It is counted in the option list, not in the verified catalogue.</p>
+      </section>
+
+      <!-- ============ DIFFERENT VS TWEAK ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">Quality control</p>
+          <h2>Five tests separate a new game from a tweak</h2>
+          <p>A combination earns its place in the catalogue if it changes at least one of these five things. If it changes none, it is tuning — sometimes tuning that matters, like a 0.8 s vs 5 s peek, but not a new game.</p>
+        </div>
+        <div class="tests">
+          <div class="test"><div class="tn"></div><p><b>What counts as a match</b>Relation or size changes which cards you are hunting for.</p></div>
+          <div class="test"><div class="tn"></div><p><b>What information is available</b>Visibility, card backs, previews, cards staying up — changes what your memory is <i>of</i>.</p></div>
+          <div class="test"><div class="tn"></div><p><b>What a move does to the board</b>Relocation, shuffles, swaps, blocks, wilds and bombs decide whether remembered positions stay true.</p></div>
+          <div class="test"><div class="tn"></div><p><b>How turns are allocated</b>Extra turn, One Flip, simultaneous, split-board — changes strategy and how much you leak to opponents. Under One Flip, revealing a known card to deny rivals information becomes the correct play.</p></div>
+          <div class="test"><div class="tn"></div><p><b>How you win or lose</b>Most pairs, beat the clock, survive on lives, solve the puzzle, win the race — changes what “good play” even means.</p></div>
+        </div>
+        <div class="warn"><b>Degenerate combinations exist and must be filtered.</b> A wild card plus opposite-colour-only matching can leave some cards unmatchable. Blind preview plus unmarked Chaos swaps is unfair. Simultaneous play plus a token-block can deadlock. A generator needs solvability and matchability checks, not just multiplication — the same lesson Mahjong Solitaire design stresses about winnable shuffles.</div>
+      </section>
+
+      <!-- ============ DATA-ONLY VS MECHANICS ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">What this means for building Morphi</p>
+          <h2>Two-thirds of the catalogue is data. One-third is engineering.</h2>
+          <p>Data-only means the same flip-and-match view and code path, with different parameters in the level definition. New mechanics means new interaction, state, animation or opponent logic. This is exactly the split the refactored engine was built for: variants as manifest data first, features second.</p>
+        </div>
+        <div class="split2">
+          <div class="panel">
+            <h3><span class="badge yes">DATA-ONLY</span> Same view, new parameters</h3>
+            <ul class="mech-list">
+              <li><b>Pair count &amp; grid</b> <span>—</span> <code>pairs</code>, <code>rows</code>, <code>cols</code></li>
+              <li><b>Theme &amp; deck content</b> <span>— the card face asset list</span></li>
+              <li><b>Match relation</b> <span>— identical, rank-only, rank + colour, opposite colour, identical suit, via a</span> <code>matchKey</code> <span>function / pair-group id</span></li>
+              <li><b>Associated pairs</b> <span>— a pair-group id shared by two non-identical faces; optional two-array dealing</span></li>
+              <li><b>Trios</b> <span>—</span> <code>cardsPerTurn = 3</code> <span>with groups of three, if the flip loop accepts N</span></li>
+              <li><b>Timed, move-limited, survival</b> <span>—</span> <code>timeLimit</code>, <code>moveLimit</code>, <code>lives</code> <span>plus lose conditions</span></li>
+              <li><b>Combo &amp; penalty scoring</b> <span>— scoring formula constants and star thresholds</span></li>
+              <li><b>One Flip</b> <span>— one flag:</span> <code>extraTurnOnMatch</code></li>
+              <li><b>Hotseat 2–4</b> <span>— a</span> <code>players[]</code> <span>array, a turn pointer, per-player scores</span></li>
+              <li><b>Daily / seeded board</b> <span>— a random seed</span></li>
+              <li><b>Flip-back delay</b> <span>—</span> <code>peekMs</code><span>; difficulty tuning, not a new rule</span></li>
+              <li><b>Sound pairs</b> <span>— faces are audio clips instead of images; match logic unchanged</span></li>
+            </ul>
+          </div>
+          <div class="panel">
+            <h3><span class="badge no">NEW MECHANICS</span> New code, state or interaction</h3>
+            <ul class="mech-list">
+              <li><b>Moving misses, Chaos swaps, mid-game shuffle</b> <span>— positions must re-animate, the player's mental map is invalidated, swaps need a marker layer</span></li>
+              <li><b>Token-blocked / frozen cards</b> <span>— per-card blocked state, an expiry rule, a distinct visual state, flip validation</span></li>
+              <li><b>Wild, Take/Forfeit, Bomb cards</b> <span>— cards with actions instead of faces; Take/Forfeit mutate opponents' piles; Bomb can change solvability</span></li>
+              <li><b>Hint / Peek / Shuffle / Undo / +Time helpers</b> <span>— buttons, costs and cooldowns; Undo needs a full move history</span></li>
+              <li><b>Sequence playback inside Memory</b> <span>— a playback phase and order validation; Simon's mechanic grafted on, no longer pure flip-and-match</span></li>
+              <li><b>Simultaneous multiplayer</b> <span>— concurrency, card ownership and blocking; there is no turn loop at all</span></li>
+              <li><b>Versus AI</b> <span>— an opponent memory model, from fallible to perfect recall, plus turn timing</span></li>
+              <li><b>Split-board Duel</b> <span>— two independent boards, cross-board pair validation, alternating single flips</span></li>
+              <li><b>Rebus-reveal / tower-building wins</b> <span>— a second puzzle layer whose state advances on matches and decides the winner</span></li>
+              <li><b>Gravity / rotating board</b> <span>— a layout engine that collapses remaining cards, or positions remapped as the board turns</span></li>
+            </ul>
+          </div>
+        </div>
+        <div class="implication"><b>The practical implication:</b> one engine can ship roughly two-thirds of the verified catalogue as level and mode parameters. The remaining third — movement, action cards, simultaneous play, AI, second-layer wins — needs one feature each, and stacking them all at once is where scope explodes. That argues for exactly your plan: grow the catalogue progressively, data-only variants first.</div>
+      </section>
+
+      <!-- ============ BOUNDARY ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">The boundary</p>
+          <h2>Often confused with Memory — but different families</h2>
+          <p>The test: does the core loop stay “flip hidden cards from a fixed layout, remember positions, remove matched sets”? If a different loop replaces it, it is a different family — however much it also “matches” or “tests memory”. Rule of thumb: if removing the memory element still leaves a playable game, it was never a Memory variant.</p>
+        </div>
+        <div>
+          <div class="brow"><h3>Simon</h3><p><b>Looks like Memory because</b>It is called a memory game and tests recall.</p><p><b>Why it isn't</b>No hidden board and no pairs: the device shows a growing light-and-sound sequence and you repeat it in order. Sequence recall vs spatial pair recall.</p></div>
+          <div class="brow"><h3>Mahjong Solitaire</h3><p><b>Looks like Memory because</b>Match identical pairs to clear a board.</p><p><b>Why it isn't</b>Tiles are face up throughout; only “free” tiles — open side, nothing on top — can be taken. The skill is spatial unblocking in a 3D stack, not remembering hidden positions.</p></div>
+          <div class="brow"><h3>Match-3 (Bejeweled, Candy Crush)</h3><p><b>Looks like Memory because</b>Match identical items to clear them.</p><p><b>Why it isn't</b>You swap adjacent tiles to <i>create</i> lines of 3+. Matches don't pre-exist as hidden pairs, and nothing is remembered face-down.</p></div>
+          <div class="brow"><h3>Onet / Connect-2</h3><p><b>Looks like Memory because</b>Find identical pairs to clear a board, timed, with hint and shuffle boosters.</p><p><b>Why it isn't</b>Tiles are face up, and a pair is legal only if a path of at most 2 turns connects them unblocked. Path planning replaces position memory.</p></div>
+          <div class="brow"><h3>Go Fish</h3><p><b>Looks like Memory because</b>Collect matching sets, partly by remembering who holds what.</p><p><b>Why it isn't</b>Cards live in hands and are won by asking opponents. Bluffing and asking replace flipping a shared face-down layout.</p></div>
+          <div class="brow"><h3>Kim's Game</h3><p><b>Looks like Memory because</b>A classic visual-memory test, sometimes sold as a memory game.</p><p><b>Why it isn't</b>One study phase, then recall from memory — list the objects, or spot the removed one. No flip-pair loop, no layout to clear.</p></div>
+          <div class="brow"><h3>Spot It! / Dobble</h3><p><b>Looks like Memory because</b>Fast matching of symbols.</p><p><b>Why it isn't</b>Every card is face up; the race is to spot the one shared symbol between two cards. No hidden information at all — perceptual speed, not memory.</p></div>
+          <div class="brow"><h3>Trio / Nana</h3><p><b>Looks like Memory because</b>Collect trios of the same rank; a team version exists.</p><p><b>Why it isn't</b>Cards are dealt to hands plus a face-down centre, and trios are found by revealing from hands — not by flipping a shared grid. Its “set of 3” doesn't make Memory-trios the same game.</p></div>
+          <div class="brow"><h3>Concentration (TV show)</h3><p><b>Looks like Memory because</b>It is directly based on Memory / Pelmanism.</p><p><b>Why it isn't (quite)</b>A hybrid: pair matching is retained, but matches reveal a rebus and the rebus solve decides the winner. Its special cards — Wild, Take, Forfeit — are counted as variants above; the show as a whole is Memory plus puzzle-solving.</p></div>
+          <div class="brow"><h3>Domino Concentration</h3><p><b>Looks like Memory because</b>It is explicitly “an adaptation of Concentration”.</p><p><b>Why it's borderline</b>It keeps the flip-pair loop but replaces fixed pairs with a sum-to-12 relation, so it is counted in the catalogue with a caveat. Under a strict fixed-pairs definition it moves to this table and the headline count drops by one.</p></div>
+        </div>
+      </section>
+
+      <!-- ============ MORPHI SCALE ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">Scaled to Morphi</p>
+          <h2>The “never-ending” catalogue, in your numbers</h2>
+          <p>Your roadmap holds 224 puzzle families, to be built progressively — not all at once. Memory is one family, and this research shows a single family honestly supporting 15–18 distinct rule systems, 24–30 named modes, and five figures of combinations. Drag the sliders to see what the same pattern does across the whole roadmap.</p>
+        </div>
+        <div class="calc">
+          <div class="calc-grid">
+            <div>
+              <label for="fam">Puzzle families · <output id="famOut">224</output></label>
+              <input type="range" id="fam" min="1" max="300" value="224" />
+            </div>
+            <div>
+              <label for="var">Versions per family (original + variants) · <output id="varOut">5</output></label>
+              <input type="range" id="var" min="1" max="20" value="5" />
+            </div>
+            <div class="total"><div class="n" id="totalOut">1,120</div><div class="l">distinct games on the roadmap</div></div>
+          </div>
+          <p class="calc-note">Reference points from your own maths: 224 families × 3 versions = <b>672</b> games; × 5 = <b>1,120</b>. And that is before procedural parameters — board sizes, timers, deck content — which is where the count stops being a count at all. The research verdict for Memory applies as the pattern for the other families: growth is real only while each new version changes a rule dimension. A family padded with reskins inflates the number and empties the promise.</p>
+        </div>
+      </section>
+
+      <!-- ============ OPEN QUESTIONS ============ -->
+      <section>
+        <div class="sec-head">
+          <p class="sec-tag">Honest gaps</p>
+          <h2>What the research could not verify</h2>
+        </div>
+        <div class="openq">
+          <ul>
+            <li><b>No published four-card (quad), rotating-board, or gravity/collapse Memory variant exists</b> in the sources found. They appear only as plausible procedural options in the combinatorics — not in the verified catalogue.</li>
+            <li><b>“Randomly moving cards”</b> in computer Memory rests on a single Wikipedia sentence with no title, version or rule detail; whether cards drift continuously or swap discretely could not be verified.</li>
+            <li><b>Bomb and Skip helpers</b> are documented for Memory mainly in app-store descriptions and one code tutorial, not a formal rulebook; their exact costs and effects vary by app.</li>
+            <li><b>No single source enumerates all Memory variants.</b> The counts on this page are the research's stated counting convention applied to the sources found — not a quoted industry total.</li>
+            <li><b>Team Memory</b> is attested in educational use (teams taking turns), but no distinct published team rule beyond shared turn-taking was found.</li>
+          </ul>
+        </div>
+      </section>
+
+      <!-- ============ SOURCES ============ -->
+      <footer>
+        <h2>Sources</h2>
+        <div class="srcs">
+          <p>Wikipedia — Concentration (card game): baseline rules, solitaire scoring, named variations, Pexeso. <a href="https://en.wikipedia.org/wiki/Concentration_(card_game)">en.wikipedia.org/wiki/Concentration_(card_game)</a></p>
+          <p>GameRules — Concentration: One Flip, Two Decks, Zebra, Spaghetti, Fancy. <a href="https://gamerules.com/rules/concentration/">gamerules.com/rules/concentration</a></p>
+          <p>MPL Games — How to Play Concentration: Moving Concentration, Two Decks Duel. <a href="https://www.mplgames.com/blog/how-to-play-concentration-card-game/">mplgames.com</a></p>
+          <p>Pagat — Domino Concentration: sum-to-12 pairing. <a href="https://www.pagat.com/domino/misc/concentration.html">pagat.com/domino/misc/concentration</a></p>
+          <p>Illustrative Mathematics — Crossing the Decade Concentration: associated pairs. <a href="https://tasks.illustrativemathematics.org/content-standards/1/NBT/A/1/tasks/405">tasks.illustrativemathematics.org</a></p>
+          <p>Susan Fitzell — Three Card Match: word / picture / definition trios. <a href="https://susanfitzell.com/a-study-method-and-review-strategy-three-card-match/">susanfitzell.com</a></p>
+          <p>Flip Trio: flip-3, 10 trios. <a href="https://www.fliptrio.com/">fliptrio.com</a></p>
+          <p>Metacritic — Trunky Memory Game details: associated-pair mode list. <a href="https://www.metacritic.com/game/trunky-memory-game/details/">metacritic.com</a></p>
+          <p>Memory (Android listing): Couples, Couples with sounds, Trios, Countdown. <a href="https://apkgk.com/com.tekxudus.games.memory">apkgk.com</a></p>
+          <p>Pixmory (Google Play): Classic, Timed, Multiplayer, Limited Moves, Survival, Chaos, Blind, combos, hint. <a href="https://play.google.com/store/apps/details?id=com.cydu.memorygame&hl=en&gl=bd">play.google.com</a></p>
+          <p>FlipSpark: Time Attack, Moves Limit, Daily Challenge, Hint / Peek / Shuffle power-ups. <a href="https://flipspark-chi.vercel.app/">flipspark-chi.vercel.app</a></p>
+          <p>DailyGames — Memo guide: −10 per move, −2 per second scoring, star thresholds. <a href="https://dailygames.cc/blog/how-to-play-memo-memory-matching-guide">dailygames.cc</a></p>
+          <p>Upit — Memory Match code example: Bomb / Hint / Clock / Skip power-ups (tutorial, not a rulebook). <a href="https://upit.com/@bunnymummy/play/IhkoPLbecA/history?page=184">upit.com</a></p>
+          <p>MIT 6.031 — Memory Scramble: simultaneous play, control and blocking. <a href="http://web.mit.edu/6.031/www/fa21/psets/ps4/">web.mit.edu/6.031</a></p>
+          <p>Ravensburger mobile Memory: Arcade, Adventure, Duel, My Photos modes. <a href="http://mobile.chimera-entertainment.de/prod_mem.html">mobile.chimera-entertainment.de</a></p>
+          <p>Ravensburger My First Memory (retailer): identical classic rules across themes. <a href="https://www.kidsplaytoys.com.au/products/ravensburgermyfirstmemory">kidsplaytoys.com.au</a></p>
+          <p>PlayVersusAI — Memory guide: difficulty = card count only; solo efficiency scoring. <a href="https://www.playversusai.com/guide-memory.html">playversusai.com</a></p>
+          <p>Classic Concentration (Fandom): Wild, Take, Forfeit, rebus, bonus car round. <a href="https://markgoodson.fandom.com/wiki/Concentration">markgoodson.fandom.com</a></p>
+          <p>A Secret Area — Classic Concentration adaptation review: Wild / Take mechanics, vs computer. <a href="https://asecretarea.com/2018/05/15/concentration-game-show-windows/">asecretarea.com</a></p>
+          <p>BoardGameGeek — “Het kan vriezen, het kan dooien”: token-block plus pawn race. <a href="https://boardgamegeek.com/boardgame/132526/het-kan-vriezen-het-kan-dooien">boardgamegeek.com</a></p>
+          <p>Rarewaves — Ravensburger Memory Dimension: tower-stacking win. <a href="https://www.rarewaves.com/products/4005556224678-ravensburger-memory-game-dimension-22467">rarewaves.com</a></p>
+          <p>Play Classic Mahjong — free-tile rule (boundary). <a href="https://www.playclassicmahjong.com/">playclassicmahjong.com</a></p>
+          <p>Onet Connect Classic — ≤2-turn path rule (boundary). <a href="https://www.playfiddlebops.com/onet-connect-classic/">playfiddlebops.com</a></p>
+          <p>Wikipedia — Tile-matching video game: match-3 swap definition (boundary). <a href="https://en.wikipedia.org/wiki/Tile-matching_video_game">en.wikipedia.org/wiki/Tile-matching_video_game</a></p>
+          <p>KeyToStudy — Best memory board games: Simon, Memory, Sequence, Spot It! as distinct games. <a href="https://www.keytostudy.com/best-memory-board-games/">keytostudy.com</a></p>
+          <p>Visual memory activities — Kim's Game tray study-and-recall. <a href="https://jeffqulih.jimdofree.com/2018/01/12/visual-memory-activities/">jeffqulih.jimdofree.com</a></p>
+        </div>
+        <p class="foot-note">Compiled from global web research, 4 November 2026. Counts follow the counting rule stated at the top of this page: a named published mode counts once, and only when it changes a rule — never for artwork, theme or pair count alone. This page is a planning document for Morphi's variant roadmap; nothing here is a build schedule.</p>
+      </footer>
+    </main>
+
+    <script>
+      var DIMS = {
+        all: "All variants",
+        relation: "Match relation",
+        scoring: "Time & scoring",
+        player: "Player mode",
+        dynamics: "Board dynamics",
+        turn: "Flip & turn rules",
+        helpers: "Obstacles & helpers",
+        win: "Win condition",
+        visibility: "Visibility",
+        size: "Match size"
+      };
+
+      var VARIANTS = [
+        { n: "Any Color", d: "relation", rule: "A match is the same rank only — colour is ignored. Jokers count double.", src: "Wikipedia", url: "https://en.wikipedia.org/wiki/Concentration_(card_game)" },
+        { n: "One Flip", d: "turn", rule: "A match wins the cards but gives no extra turn. Denying opponents information becomes a real strategy.", src: "Wikipedia · GameRules", url: "https://gamerules.com/rules/concentration/" },
+        { n: "Zebra", d: "relation", rule: "A match is the same rank but the opposite colour only.", src: "Wikipedia", url: "https://en.wikipedia.org/wiki/Concentration_(card_game)" },
+        { n: "Two Decks", d: "relation", rule: "Two 52-card decks shuffled together; a match must be identical in rank and suit. A longer, harder game — the deck change counts because it tightens the relation.", src: "Wikipedia", url: "https://en.wikipedia.org/wiki/Concentration_(card_game)" },
+        { n: "Two Decks Duel", d: "turn", rule: "Two players, each with their own 52-card layout. Players alternate flipping one card from their own side; a cross-board identical pair is removed.", src: "Wikipedia · MPL Games", url: "https://www.mplgames.com/blog/how-to-play-concentration-card-game/" },
+        { n: "Double Decker Checkerboard", d: "visibility", rule: "Two decks with different backs, dealt in a checkerboard pattern. The backs give positional information that narrows the possible matches.", src: "Wikipedia", url: "https://en.wikipedia.org/wiki/Concentration_(card_game)" },
+        { n: "Moving Concentration", d: "dynamics", rule: "Non-matching cards are returned to new spots in the layout instead of their original spots — remembered positions stop being reliable.", src: "MPL Games", url: "https://www.mplgames.com/blog/how-to-play-concentration-card-game/" },
+        { n: "Randomly moving cards (computer versions)", d: "dynamics", rule: "Cards move during play in some computer versions of the game.", src: "Wikipedia", url: "https://en.wikipedia.org/wiki/Concentration_(card_game)", flag: "Weakest entry in the catalogue: a single Wikipedia sentence, no named title, and the exact mechanism — drift vs discrete swaps — could not be verified." },
+        { n: "Trios / Three Card Match", d: "size", rule: "Flip three cards per turn; a set is three identical pictures — or, in study use, a word + picture + definition trio.", src: "Flip Trio · Susan Fitzell", url: "https://www.fliptrio.com/" },
+        { n: "Associated pairs — educational", d: "relation", rule: "The two cards are not identical but related by a rule: word↔picture, question↔answer, “one more / one less” (39↔40). Often dealt in two separate arrays, one card taken from each.", src: "Illustrative Mathematics", url: "https://tasks.illustrativemathematics.org/content-standards/1/NBT/A/1/tasks/405" },
+        { n: "Associated pairs — number & equation", d: "relation", rule: "The same associated-pair rule with different content: number↔Roman numeral, written word or picture, equation↔answer, capital↔small letter.", src: "Metacritic — Trunky Memory Game", url: "https://www.metacritic.com/game/trunky-memory-game/details/", flag: "Counted separately here as a named product mode; in the conservative core count it collapses into the educational entry above — one dimension, different content." },
+        { n: "Sound pairs", d: "relation", rule: "A match is an identical sound rather than an identical picture; cards are listened to, not just seen.", src: "Memory (Android listing)", url: "https://apkgk.com/com.tekxudus.games.memory" },
+        { n: "Domino Concentration (sum-to-12)", d: "relation", rule: "Domino tiles face down; a pair is any two tiles whose four pips sum to 12 — a many-to-many relation, not fixed pairs. First to 50 or 100 points in series play.", src: "Pagat", url: "https://www.pagat.com/domino/misc/concentration.html", flag: "Borderline: it keeps the flip-pair loop but replaces fixed pairs with a sum relation. Under a strict fixed-pairs definition it leaves the catalogue and the headline count drops by one." },
+        { n: "Solitaire fewest-turns scoring", d: "scoring", rule: "The same flips, but the win condition changes from most pairs against opponents to clearing the board in the fewest non-matching turns — the lowest score wins.", src: "Wikipedia", url: "https://en.wikipedia.org/wiki/Concentration_(card_game)" },
+        { n: "Timed / Countdown / Time Attack", d: "scoring", rule: "Clear the board before a countdown expires. Failure is time-out, not just a worse score.", src: "Pixmory (Google Play) · FlipSpark", url: "https://play.google.com/store/apps/details?id=com.cydu.memorygame&hl=en&gl=bd" },
+        { n: "Limited Moves", d: "scoring", rule: "A fixed number of flips or moves to clear the board; running out is game over.", src: "Pixmory (Google Play) · FlipSpark", url: "https://flipspark-chi.vercel.app/" },
+        { n: "Survival (lives)", d: "scoring", rule: "A small number of lives, lost only on genuine memory slips — in Pixmory's wording, not on every miss. Survive as far as possible.", src: "Pixmory (Google Play)", url: "https://play.google.com/store/apps/details?id=com.cydu.memorygame&hl=en&gl=bd" },
+        { n: "Chaos (marked swaps)", d: "dynamics", rule: "Cards swap places during play, and the exchanges are marked so memory can track them — distinct from Moving Concentration's unmarked relocation of misses.", src: "Pixmory (Google Play)", url: "https://play.google.com/store/apps/details?id=com.cydu.memorygame&hl=en&gl=bd" },
+        { n: "Blind Memory (preview-then-hide)", d: "visibility", rule: "Study the whole face-up board first, then match from memory — the usual flip-to-discover loop is replaced by pure recall.", src: "Pixmory (Google Play)", url: "https://play.google.com/store/apps/details?id=com.cydu.memorygame&hl=en&gl=bd" },
+        { n: "Combo / streak scoring", d: "scoring", rule: "Consecutive matches without a miss multiply the score; a miss breaks the chain. A scoring rule only — board play is unchanged.", src: "Pixmory (Google Play) · FlipSpark", url: "https://flipspark-chi.vercel.app/" },
+        { n: "Move + time penalty scoring (Memo)", d: "scoring", rule: "Base 1,000 points, −10 per move and −2 per second, with star thresholds (3 stars at 30 seconds or under). A scoring variant, not a flip-rule variant.", src: "DailyGames — Memo guide", url: "https://dailygames.cc/blog/how-to-play-memo-memory-matching-guide" },
+        { n: "Wild Card (TV show)", d: "helpers", rule: "From Classic Concentration: a Wild square is an automatic match with any prize card.", src: "Classic Concentration (Fandom)", url: "https://markgoodson.fandom.com/wiki/Concentration", flag: "Fan-wiki source, but the Wild / Take / Forfeit mechanics are corroborated across two Fandom wikis and a contemporary game adaptation review." },
+        { n: "Take / Forfeit gifts (TV show)", d: "helpers", rule: "Matching special squares steals an opponent's prize (Take) or forfeits one of your own (Forfeit) — a transfer penalty, not just a missed pair.", src: "Classic Concentration (Fandom)", url: "https://markgoodson.fandom.com/wiki/Concentration" },
+        { n: "Rebus-reveal win (TV show)", d: "win", rule: "Matches reveal pieces of a hidden rebus puzzle; the first player to solve it wins the prizes, which can override most-pairs. Bonus round: 15 squares, 7 car pairs plus 1 unpaired car, timed — the last car matched is the car won.", src: "Classic Concentration (Fandom)", url: "https://markgoodson.fandom.com/wiki/Concentration" },
+        { n: "Memory Scramble (simultaneous multiplayer)", d: "player", rule: "No turns: players flip concurrently. A player controls a face-up card and others block on it; revealed cards stay face up until that player's next move.", src: "MIT 6.031 course problem set", url: "http://web.mit.edu/6.031/www/fa21/psets/ps4/" },
+        { n: "Duel / hotseat multiplayer (2–4)", d: "player", rule: "Turn-taking on one device and one board, match means go again — the standard multiplayer form, and the structural opposite of Scramble's simultaneous play.", src: "Pixmory (Google Play) · Ravensburger", url: "http://mobile.chimera-entertainment.de/prod_mem.html" },
+        { n: "Token-block + race (Dutch board game)", d: "dynamics", rule: "After a pair of flips, a token is placed on one card, which cannot be turned again until the token is removed. Matching pairs advance a pawn — reaching the finish wins, not most pairs.", src: "BoardGameGeek — “Het kan vriezen, het kan dooien”", url: "https://boardgamegeek.com/boardgame/132526/het-kan-vriezen-het-kan-dooien" },
+        { n: "Memory Dimension (tower stacking)", d: "win", rule: "Matched monster pairs — same colour and number of eyes — are stacked floor-by-floor into 3D towers. First to complete a tower wins: a construction win layered on classic matching.", src: "Ravensburger (via Rarewaves)", url: "https://www.rarewaves.com/products/4005556224678-ravensburger-memory-game-dimension-22467" },
+        { n: "Power-up assisted play", d: "helpers", rule: "A named mode family of spendable helpers: Hint reveals a pair, Peek reveals one pair briefly, Shuffle rearranges unmatched cards, Bomb deletes random non-matched cards, Skip passes a level. Each changes information or board state, not just score.", src: "FlipSpark · Upit code example", url: "https://flipspark-chi.vercel.app/", flag: "Counted as one family. The Bomb and Skip helpers are documented in a code tutorial rather than a shipped rulebook, and counting every helper separately would add about five more modes." },
+        { n: "Versus AI / computer opponent", d: "player", rule: "The same board, but the opponent is an AI with its own memory model; in the TV-show adaptation the solo player faces a computer player. Turn structure unchanged — the opponent type changes.", src: "A Secret Area · PlayVersusAI", url: "https://asecretarea.com/2018/05/15/concentration-game-show-windows/" }
+      ];
+
+      var grid = document.getElementById("vgrid");
+      var chipsEl = document.getElementById("chips");
+      var vcount = document.getElementById("vcount");
+
+      VARIANTS.forEach(function (v, i) {
+        var card = document.createElement("article");
+        card.className = "vcard";
+        card.setAttribute("data-dim", v.d);
+        var html = '<div class="top"><span class="num">' + String(i + 1).padStart(2, "0") + '</span><h3></h3><span class="dim">' + DIMS[v.d] + '</span></div>' +
+          '<p class="rule"></p>' +
+          '<p class="src">Source: <a target="_blank" rel="noopener"></a></p>';
+        card.innerHTML = html;
+        card.querySelector("h3").textContent = v.n;
+        card.querySelector(".rule").textContent = v.rule;
+        var a = card.querySelector(".src a");
+        a.href = v.url;
+        a.textContent = v.src;
+        if (v.flag) {
+          var f = document.createElement("p");
+          f.className = "flag";
+          f.textContent = "Caveat: " + v.flag;
+          card.appendChild(f);
+        }
+        grid.appendChild(card);
+      });
+
+      var counts = { all: VARIANTS.length };
+      VARIANTS.forEach(function (v) { counts[v.d] = (counts[v.d] || 0) + 1; });
+
+      Object.keys(DIMS).forEach(function (key) {
+        var b = document.createElement("button");
+        b.type = "button";
+        b.className = "chip";
+        b.setAttribute("aria-pressed", key === "all" ? "true" : "false");
+        b.setAttribute("data-filter", key);
+        b.innerHTML = DIMS[key] + '<span class="cnt">' + (counts[key] || 0) + '</span>';
+        b.addEventListener("click", function () { applyFilter(key); });
+        chipsEl.appendChild(b);
+      });
+
+      function applyFilter(key) {
+        var chips = chipsEl.querySelectorAll(".chip");
+        chips.forEach(function (c) { c.setAttribute("aria-pressed", c.getAttribute("data-filter") === key ? "true" : "false"); });
+        var shown = 0;
+        grid.querySelectorAll(".vcard").forEach(function (card) {
+          var show = key === "all" || card.getAttribute("data-dim") === key;
+          card.hidden = !show;
+          if (show) shown++;
+        });
+        vcount.textContent = key === "all"
+          ? "Showing all " + shown + " listed variants — 24+ verified outright, weaker entries flagged in place"
+          : "Showing " + shown + " of " + VARIANTS.length + " — filed under " + DIMS[key] + " (primary dimension)";
+      }
+      applyFilter("all");
+
+      /* ---------- Morphi scale calculator ---------- */
+      var fam = document.getElementById("fam"), varr = document.getElementById("var");
+      var famOut = document.getElementById("famOut"), varOut = document.getElementById("varOut"), totalOut = document.getElementById("totalOut");
+      function fmt(n) { return n.toLocaleString("en-US"); }
+      function calc() {
+        famOut.textContent = fam.value;
+        varOut.textContent = varr.value;
+        totalOut.textContent = fmt(Number(fam.value) * Number(varr.value));
+      }
+      fam.addEventListener("input", calc);
+      varr.addEventListener("input", calc);
+      calc();
+    </script>
+  </body>
+</html>

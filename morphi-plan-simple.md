@@ -1,5 +1,30 @@
 # Morphi: Simple Plan
 
+## Active local work — v1.3.3 Member Support (2026-11-05)
+
+The owner authorized Member Support on the accepted local v1.3.2 baseline and
+corrected its planned version from v1.3.4 to v1.3.3. All proposed defaults, limits,
+retention and behavior are approved in
+[the Member Support plan](docs/planning/V1.3.3_MEMBER_SUPPORT.md). Implement
+locally, verify, write the report and stop for owner review. This supersedes the
+previous next-implementation restriction only for this scope. No commit/push,
+production provisioning, secrets, DNS/Google changes or deployment is authorized.
+Status and evidence: [V1.3.3_WORK.md](docs/work/V1.3.3_WORK.md).
+The implementation and targeted checks are complete locally; owner review is
+pending. The owner explicitly deferred full `bun run verify` to later stages.
+The active run was stopped during global ESLint after Prettier passed; no full
+pass or verification waiver is inferred.
+
+## Current local status — 2026-11-05
+
+The owner explicitly accepted the existing local v1.3.2 Connect variants,
+admin scoring/pagination and profile polish. This supersedes the brief's
+pending-review status. Automated verification results and device/browser
+details were not supplied; no test-pass claim or verification waiver is made.
+No commit, push, deployment, production change or next implementation is
+authorized. See [the v1.3.2 brief](docs/briefs/morphi-v1.3.2-codex-brief.md)
+and `docs/PHASE_REPORTS.md`. The separate v1.3.1 sound-audition gate is unchanged.
+
 ## Current local status — 2026-11-01
 
 The owner accepted all three next-phase slices and quick-review changes, closing
@@ -8,7 +33,7 @@ and checking mobile layouts in browser responsive emulation without noting
 corrections. Browser/device models were not supplied; physical mobile review was
 not reported. This supersedes earlier pending-review and next-phase notes below.
 No deployment, production release or further implementation is authorized. See
-[the combined review](docs/NEXT_PHASE_REVIEW.md) and `docs/PHASE_REPORTS.md`.
+[the combined review](docs/reviews/NEXT_PHASE_REVIEW.md) and `docs/PHASE_REPORTS.md`.
 
 ## Owner-authorized v1.1 — 2026-10-26
 
@@ -18,7 +43,7 @@ Connect → operator scoring configuration → public-door withdrawal/explainers
 This supersedes the v1 curated-only theme, two-game and door decisions within
 that scope. Stop for the required theme taste/visual review; do not infer
 deployment or production-operation approval. Share links and admin game-test
-routes remain excluded. Status and evidence: [V1.1_WORK.md](docs/V1.1_WORK.md).
+routes remain excluded. Status and evidence: [V1.1_WORK.md](docs/work/V1.1_WORK.md).
 
 During this slice the owner supplied the 1920×923 small-board screenshot and
 explicitly requested the planned viewport-sizing fix, then directed continuation.
@@ -71,11 +96,11 @@ resources, credentials, D5 eligibility and every deployment remain separate.
 
 This is the short plan. It replaces the long plan for day-to-day work. The long plan (`docs/PLAN.md`) stays as reference. If a step below needs something from it, pull only that part in.
 
-Current status (2026-10-24): Step 4 accepted; Step 5 accepted by the owner based on the public-test result (45+ players, over 60% positive feedback). The owner accepts proceeding without the missing replay counts and predetermined threshold; the measured replay-rate criterion is waived, not recorded as a pass. Step 6 implementation is authorized: Google sign-in and all five account-screen designs are approved. The owner subsequently confirmed local Google OAuth works and authorized completing Step 6 locally, including the small per-puzzle structural cleanup. Local progress/ranked/leaderboard implementation and verification are tracked in `docs/STEP6_WORK.md`. The owner completed the PC/mobile functional review and explicitly accepted the local Step 6 build on 2026-10-24 (`docs/STEP6_REVIEW.md`); production resource/operating evidence remains open. Global-release planning, including an admin panel proposal, follows local acceptance. See `docs/STEP6.md`. Acceptance and feedback are recorded in `docs/PHASE_REPORTS.md`.
+Current status (2026-10-24): Step 4 accepted; Step 5 accepted by the owner based on the public-test result (45+ players, over 60% positive feedback). The owner accepts proceeding without the missing replay counts and predetermined threshold; the measured replay-rate criterion is waived, not recorded as a pass. Step 6 implementation is authorized: Google sign-in and all five account-screen designs are approved. The owner subsequently confirmed local Google OAuth works and authorized completing Step 6 locally, including the small per-puzzle structural cleanup. Local progress/ranked/leaderboard implementation and verification are tracked in `docs/work/STEP6_WORK.md`. The owner completed the PC/mobile functional review and explicitly accepted the local Step 6 build on 2026-10-24 (`docs/reviews/STEP6_REVIEW.md`); production resource/operating evidence remains open. Global-release planning, including an admin panel proposal, follows local acceptance. See `docs/planning/STEP6.md`. Acceptance and feedback are recorded in `docs/PHASE_REPORTS.md`.
 
 ## Owner-authorized local privacy preparation (2026-10-23)
 
-The owner requested a privacy page before public Google OAuth verification and the later v1 launch. Implement the page locally using the long plan's content-page template; admin editing of privacy/terms/other static pages remains the later Stage 5 content-management scope. Operator/contact: Ali Gohar, cngohar@gmail.com. On 2026-10-24 the owner clarified a general-audience puzzle site, with no child-focused content, design, or marketing and no separate kids site planned. This supersedes the earlier audience-includes-under-13s interpretation. Child accounts remain deferred. The owner approved the wording and authorized finishing practical readiness on 2026-10-24. Retention inventory, the owner-monitored contact/request procedure, and protected local cleanup/privacy deletion are prepared; the public copy has no internal draft notes. A separate assets-only guest publication candidate is prepared for review and deployment authorization. Public account eligibility and production operator/retention operations remain v1 gates. See `docs/PRIVACY_REVIEW.md`. Privacy preparation did not itself close Step 6 acceptance; the subsequent owner-completed review records local functional acceptance separately. Neither authorizes public provisioning, publication, or deployment.
+The owner requested a privacy page before public Google OAuth verification and the later v1 launch. Implement the page locally using the long plan's content-page template; admin editing of privacy/terms/other static pages remains the later Stage 5 content-management scope. Operator/contact: Ali Gohar, cngohar@gmail.com. On 2026-10-24 the owner clarified a general-audience puzzle site, with no child-focused content, design, or marketing and no separate kids site planned. This supersedes the earlier audience-includes-under-13s interpretation. Child accounts remain deferred. The owner approved the wording and authorized finishing practical readiness on 2026-10-24. Retention inventory, the owner-monitored contact/request procedure, and protected local cleanup/privacy deletion are prepared; the public copy has no internal draft notes. A separate assets-only guest publication candidate is prepared for review and deployment authorization. Public account eligibility and production operator/retention operations remain v1 gates. See `docs/privacy/PRIVACY_REVIEW.md`. Privacy preparation did not itself close Step 6 acceptance; the subsequent owner-completed review records local functional acceptance separately. Neither authorizes public provisioning, publication, or deployment.
 
 ## Owner-authorized publication follow-up (2026-10-24)
 
@@ -83,12 +108,12 @@ The owner explicitly approved publishing the prepared guest homepage/privacy upd
 
 ## Owner-requested v1 release planning (2026-10-24)
 
-The owner requested the v1 plan after local Step 6 acceptance and guest/privacy publication. [docs/V1_RELEASE_PLAN.md](docs/V1_RELEASE_PLAN.md) proposes the production account rollout, operating/resource checks, a small Stage 1 admin panel and an optional repository-managed terms page. This simple plan remains authoritative; the proposal does not promote the parked features into implementation. The owner reports production Google setup complete and supplied a private credential-file location; credential validation, actual branding/audience state and live OAuth behavior are not verified by the planning task. No credential is installed and no backend is deployed. Next is agreement on the release contract/local preparation; admin/terms implementation, provisioning and every deployment still require their applicable approval.
+The owner requested the v1 plan after local Step 6 acceptance and guest/privacy publication. [docs/planning/V1_RELEASE_PLAN.md](docs/planning/V1_RELEASE_PLAN.md) proposes the production account rollout, operating/resource checks, a small Stage 1 admin panel and an optional repository-managed terms page. This simple plan remains authoritative; the proposal does not promote the parked features into implementation. The owner reports production Google setup complete and supplied a private credential-file location; credential validation, actual branding/audience state and live OAuth behavior are not verified by the planning task. No credential is installed and no backend is deployed. Next is agreement on the release contract/local preparation; admin/terms implementation, provisioning and every deployment still require their applicable approval.
 
 ## Owner-authorized v1 implementation and visual review (2026-10-24)
 
 The owner supplied the consolidated v2 checklist and authorized starting local
-v1 implementation. [docs/V1_RELEASE_CHECKLIST.md](docs/V1_RELEASE_CHECKLIST.md)
+v1 implementation. [docs/planning/V1_RELEASE_CHECKLIST.md](docs/planning/V1_RELEASE_CHECKLIST.md)
 records the active handoff and subsequent decisions; the old v1 proposal is
 historical. Stage 1 admin, SEO search-entry pages and removal of Block-first
 are promoted into v1. Dashboard plus anonymous gameplay events, Terms
@@ -174,7 +199,7 @@ Done when a clear share of the people who started a round also started a second 
 
 Only now: sign-in, progress across devices, and a leaderboard. Scores must be checked on the server, because local scores can be edited. The anti-cheat section of the long plan starts to matter here, and not before.
 
-The owner accepted Step 5 on 2026-10-23. The proposed Step 6 sequence and decisions needed before implementation are in `docs/STEP6.md`; the full platform phase is not added wholesale to this step.
+The owner accepted Step 5 on 2026-10-23. The proposed Step 6 sequence and decisions needed before implementation are in `docs/planning/STEP6.md`; the full platform phase is not added wholesale to this step.
 
 ## Look and feel
 

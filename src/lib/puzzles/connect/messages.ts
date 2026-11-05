@@ -1,17 +1,23 @@
 export const messages = {
 	'ending.connect.headline': 'All pairs connected!',
+	'ending.connect.timeUp': "Time's up!",
 	'ending.connect.subline': '{filled}% filled',
 	'scoring.connect.pair': 'Points per connected pair',
 	'scoring.connect.grid': 'Full-grid bonus',
 	'scoring.connect.second': 'Bonus per second under par',
 	'scoring.connect.redraw': 'Penalty per redraw',
 	'v1.game.connect': 'Connect',
+	'variant.connect:classic': 'Classic',
+	'variant.connect:full-grid': 'Full grid',
+	'variant.connect:board-8': '8 × 8 board',
+	'variant.connect:rush-60': '60-second rush',
 	'leaderboard.connect1': 'Connect · 5 × 5',
 	'leaderboard.connect2': 'Connect · 6 × 6',
 	'leaderboard.connect3': 'Connect · 7 × 7',
 	'connect.board': 'Connect puzzle grid',
 	'connect.filled': 'Filled',
 	'connect.strokes': 'Strokes',
+	'connect.timeLeft': 'Time left',
 	'connect.won': 'All pairs connected.',
 	'connect.error': 'This puzzle stopped responding. Return Home to start a fresh one.',
 	'connect.pairConnected': 'Pair {pair} connected.',
@@ -35,5 +41,13 @@ export const messages = {
 	'v1.game.connect.value4': '−50',
 	'v1.game.connect.scoringNote': 'Scores never go below 0. Ranked time is checked by the server.',
 	'v1.game.connect.tips':
-		'Start at the edges and leave a route to each dot. For the grid bonus, plan paths that sweep every cell.'
+		'Start at the edges and leave a route to each dot. For the grid bonus, plan paths that sweep every cell.',
+	'connect.fullGrid.step3': 'Connect every pair and fill every cell on the grid to finish.',
+	'connect.fullGrid.scoringNote':
+		'Every single cell must be covered by a path to complete the puzzle.',
+	'connect.help.boardSize': 'Board size',
+	'connect.board8.size': '8 × 8 grid, 8 pairs',
+	'connect.rush.scoringNote': 'Connect all pairs before the 60-second clock runs out.',
+	'connect.rush.tips':
+		'Speed is key. Route paths decisively to connect all pairs before time expires.'
 } as const;

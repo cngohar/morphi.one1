@@ -67,4 +67,34 @@ describe('Connect generation and replay', () => {
 		round = applyConnectMove(round, { pair: 0, cell: 0, stroke: 2, at: 200 });
 		expect(round.penalties).toBe(50);
 	});
+	it('requires full-grid coverage to win in connect:full-grid variant', () => {
+		let round = createConnectRound('1', 'connect:full-grid');
+		expect(round.variant).toBe('connect:full-grid');
+		// Connect all pairs but with a shortcut that leaves empty cells
+		for (const [pair, path] of round.solution.entries()) {
+			const cells = pair === 2 ? [path[0]!, path[1]!, path[2]!, path.at(-1)!] : path;
+			for (const [at, cell] of cells.entries())
+				round = applyConnectMove(round, { pair, cell, stroke: pair, at: pair * 100 + at });
+		}
+		expect(connectedCount(round)).toBe(round.pairs.length);
+		expect(filledCount(round)).toBeLessThan(round.size * round.size);
+		expect(round.status).toBe('playing');
+
+		// Recreate and solve with full grid
+		let fullRound = createConnectRound('1', 'connect:full-grid');
+		for (const [pair, path] of fullRound.solution.entries()) {
+			for (const [at, cell] of path.entries())
+				fullRound = applyConnectMove(fullRound, { pair, cell, stroke: pair, at: pair * 100 + at });
+		}
+		expect(fullRound.status).toBe('won');
+		expect(filledCount(fullRound)).toBe(fullRound.size * fullRound.size);
+	});
+	it('generates an 8x8 board with 8 pairs for connect:board-8', () => {
+		const round = createConnectRound('42', 'connect:board-8');
+		expect(round.variant).toBe('connect:board-8');
+		expect(round.size).toBe(8);
+		expect(round.pairs.length).toBe(8);
+		expect(round.solution.flat().length).toBe(64);
+		expect(round.par).toBe(210);
+	});
 });

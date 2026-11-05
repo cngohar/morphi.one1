@@ -21,12 +21,15 @@ Nothing else. No Block, Connect, or Mahjong change. No new family. No public rel
 Classic (`memory:classic`) is unchanged: 6/8/10 pairs, preview then hide, flip two, identical symbols match, score 1,000 per pair − 150 per mismatch − 5 per second, scoring version `brief-v1`, groups `memory-1:6`, `memory-1:8`, `memory-1:10`, max 120 flips (12 per pair). Classic rounds made before v1.3 must still replay as classic.
 
 ### V1 — `memory:no-preview`
+
 No opening preview at all; cards start face down, play begins immediately. Everything else is classic. Preview/opening allowance is 0 for this variant; ranked opening time follows the variant, not the family. Help text and the memorise phase are variant-aware. Scoring stays `brief-v1`, same values. Groups: `memory-1:no-preview:6`, `memory-1:no-preview:8`, `memory-1:no-preview:10`.
 
 ### V2 — `memory:trios` (Match-3)
+
 Flip three cards per attempt; three identical symbols stay face up, any non-matching set flips back. Move cap is re-derived, not copied: 18 flips per trio (6 attempts per trio). New scoring version required: 1,500 points per trio − 150 per mismatch − 5 per second (500 per card, same per-card rate as classic). Messages, help, and result summary say trios, not pairs. Groups: `memory-1:trios:6`, `memory-1:trios:8`, `memory-1:trios:10`, where the number is the count of trios.
 
 ### V3 — `memory:moving` (Moving cards on mismatch)
+
 After a mismatch, the still face-down, unmatched cards are reshuffled to new positions, deterministically from the same seeded RNG stream. Matched and currently revealed cards never move. Scoring stays `brief-v1`, same values. Groups: `memory-1:moving:6`, `memory-1:moving:8`, `memory-1:moving:10`.
 
 Each variant gets its own leaderboard groups. Scores are never mixed across variants.
@@ -52,6 +55,7 @@ For each variant, from registered-user activity only:
 - **Finished:** won and saved (`completed_run` for that variant's `rules_group`).
 
 Rules:
+
 - Shown = ignored + played, and played = abandoned + finished + still open. "Still open / unknown exit" is its own bucket — unknown exits are NOT silently called abandons.
 - **Registered users only in v1.3.** Guest solo starts are NOT counted, because solo guest rounds are not server-recorded until saved and counting every guest start would add a per-round write on the hottest path. Label the page plainly, for example "Registered users only; guest solo starts are not counted". Guest counting is a later, separately scoped step. Finished guest runs that are later saved appear under Finished only.
 - Finished also keeps the existing split: ranked vs solo, best, average, duration, per variant group, and best/average per scoring version (see below).

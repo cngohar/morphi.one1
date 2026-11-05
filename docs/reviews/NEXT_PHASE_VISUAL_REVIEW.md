@@ -42,4 +42,4 @@ required stages; see `docs/PHASE_REPORTS.md` and
 `build/combined-review/verify-final.log`.
 
 Independent audit retention, best-effort activity limits and the unchanged static
-public guest release are explained in `docs/NEXT_PHASE_REVIEW.md`.
+public guest release are explained in `docs/reviews/NEXT_PHASE_REVIEW.md`.

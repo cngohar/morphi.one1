@@ -1,5 +1,26 @@
 # Retention inventory — inspected 2026-10-24
 
+## Local v1.3.3 Member Support policy — 2026-11-05
+
+The owner approved retaining support tickets and every message in them while the
+owning account exists. Closed tickets stay readable and do not expire. Banned
+members retain support access; pending-deletion accounts cannot read or mutate
+support. Self-service deletion, operator privacy deletion and lifecycle purge
+remove owned tickets and all their messages through account/ticket cascades.
+Staff messages in another member's ticket remain part of that ticket after the
+staff author's account is deleted. Messages record only member/staff authorship;
+no private Google name, email or staff identity is copied into conversations.
+
+Subjects, category/priority choices and escaped plain-text messages are stored
+only for support. Failed drafts stay in page memory, never browser persistence,
+audit records or analytics. Minimal staff access/write audits contain operation
+ids and content-free metadata under the existing audit policy. Taxonomy deletion
+reassigns tickets, including closed ones, to protected General/Normal defaults.
+Successful-write limiter records expire from enforcement after their rolling
+window; explicit operator maintenance prunes expired rows. No scheduled cleanup
+or exact physical-erasure deadline is promised. The local privacy candidate is
+updated; the public guest policy and deployed version are unchanged.
+
 ## Local Slice 6 checkpoint addendum — 2026-11-03
 
 The unpublished Slice 6 candidate adds device-local active-round snapshots in

@@ -13,7 +13,7 @@ bun.lockb
 
 # Owner-supplied design references; preserve the package byte for byte.
 /docs/morphi-v1.1-handoff-2026-10-26/
-/docs/morphi-engine-refactor-brief.md
+/docs/briefs/morphi-engine-refactor-brief.md
 /docs/evidence/v1.1-themes/contact-sheet.html
 
 /docs/evidence/slice5-themes/contact-sheet.html
@@ -21,3 +21,6 @@ bun.lockb
 # Workspace-local editor connection settings.
 /.cursor/
 /.vscode/mcp.json
+
+# Imported owner references; preserve original bytes.
+/docs/references/

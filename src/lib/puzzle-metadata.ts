@@ -237,13 +237,79 @@ const metadata = {
 			fields: ['pair', 'grid', 'second', 'redraw'],
 			defaults: { pair: 200, grid: 1000, second: 10, redraw: 50 }
 		},
+		variants: [
+			{
+				id: 'connect:classic',
+				name: 'variant.connect:classic',
+				weight: 1,
+				maxMoves: 1000,
+				leaderboardGroups: ['connect-1:1', 'connect-1:2', 'connect-1:3']
+			},
+			{
+				id: 'connect:full-grid',
+				name: 'variant.connect:full-grid',
+				weight: 1,
+				maxMoves: 1000,
+				leaderboardGroups: ['connect-1:full-grid'],
+				help: {
+					steps: ['v1.game.connect.step1', 'v1.game.connect.step2', 'connect.fullGrid.step3'],
+					rows: [
+						{ label: 'v1.game.connect.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.connect.row2', field: 'grid', sign: '+' },
+						{ label: 'v1.game.connect.row3', field: 'second', sign: '+' },
+						{ label: 'v1.game.connect.row4', field: 'redraw', sign: '−' }
+					],
+					note: 'connect.fullGrid.scoringNote',
+					tips: 'v1.game.connect.tips'
+				}
+			},
+			{
+				id: 'connect:board-8',
+				name: 'variant.connect:board-8',
+				weight: 1,
+				maxMoves: 1000,
+				leaderboardGroups: ['connect-1:board-8'],
+				help: {
+					steps: ['v1.game.connect.step1', 'v1.game.connect.step2', 'v1.game.connect.step3'],
+					rows: [
+						{ label: 'v1.game.connect.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.connect.row2', field: 'grid', sign: '+' },
+						{ label: 'v1.game.connect.row3', field: 'second', sign: '+' },
+						{ label: 'v1.game.connect.row4', field: 'redraw', sign: '−' },
+						{ label: 'connect.help.boardSize', value: 'connect.board8.size' }
+					],
+					note: 'v1.game.connect.scoringNote',
+					tips: 'v1.game.connect.tips'
+				}
+			},
+			{
+				id: 'connect:rush-60',
+				name: 'variant.connect:rush-60',
+				weight: 1,
+				maxMoves: 1000,
+				maxSeconds: 60,
+				leaderboardGroups: ['connect-1:rush-60'],
+				help: {
+					steps: ['v1.game.connect.step1', 'v1.game.connect.step2', 'v1.game.connect.step3'],
+					rows: [
+						{ label: 'v1.game.connect.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.connect.row2', field: 'grid', sign: '+' },
+						{ label: 'v1.game.connect.row3', field: 'second', sign: '+' },
+						{ label: 'v1.game.connect.row4', field: 'redraw', sign: '−' },
+						{ label: 'block.help.clock', value: 'block.rush.clock' }
+					],
+					note: 'connect.rush.scoringNote',
+					tips: 'connect.rush.tips'
+				}
+			}
+		],
 		ending: {
 			kind: 'completion',
 			headlines: { default: 'ending.connect.headline' },
 			subline: { key: 'ending.connect.subline', values: ['filled'] },
 			animation: 'fade-rise',
 			continue: 'auto_500ms',
-			condition: 'Every pair is connected; filling every cell is not required.'
+			condition: 'Every pair is connected; filling every cell is not required except in full-grid.'
 		},
 		presentation: {
 			name: 'v1.game.connect',
@@ -256,7 +322,10 @@ const metadata = {
 			groups: {
 				'connect-1:1': 'leaderboard.connect1',
 				'connect-1:2': 'leaderboard.connect2',
-				'connect-1:3': 'leaderboard.connect3'
+				'connect-1:3': 'leaderboard.connect3',
+				'connect-1:full-grid': 'variant.connect:full-grid',
+				'connect-1:board-8': 'variant.connect:board-8',
+				'connect-1:rush-60': 'variant.connect:rush-60'
 			},
 			help: {
 				steps: ['v1.game.connect.step1', 'v1.game.connect.step2', 'v1.game.connect.step3'],

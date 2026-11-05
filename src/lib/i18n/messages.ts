@@ -2,6 +2,71 @@ import { puzzleMessages } from '../puzzle-messages.js';
 
 export const messages = {
 	...puzzleMessages,
+	'privacy.information.support':
+		'If you contact member support, we store your ticket subject, category, priority and messages so our administrators and moderators can respond. Support is also available to banned members.',
+	'privacy.retention.support':
+		'Support tickets and all messages are kept while your account exists, including closed tickets. Account deletion removes your tickets and all messages in them. Minimal staff audit records do not contain conversation content. Failed drafts remain only in the current page memory until you leave or close it.',
+	'v1.admin.nav.support': 'Member support',
+	'v1.admin.support.title': 'Member support',
+	'support.title': 'Support',
+	'support.intro':
+		'Ask for help or clarification, including an appeal. Administrators and moderators can read and respond to your tickets.',
+	'support.privacy':
+		'Plain text only. No attachments. Drafts stay in this page only; leaving or reloading loses them. No email notifications are sent.',
+	'support.loading': 'Loading support…',
+	'support.empty': 'No support tickets yet.',
+	'support.create': 'Create ticket',
+	'support.subject': 'Subject',
+	'support.category': 'Category',
+	'support.priority': 'Priority',
+	'support.message': 'Message',
+	'support.send': 'Send reply',
+	'support.sendClose': 'Reply and close',
+	'support.close': 'Close ticket',
+	'support.closedHint': 'This ticket is closed. You can still read the conversation.',
+	'support.open': 'Open',
+	'support.closed': 'Closed',
+	'support.all': 'All tickets',
+	'support.unread': 'Unread staff reply',
+	'support.member': 'Member',
+	'support.staff': 'Staff',
+	'support.previous': 'Previous',
+	'support.next': 'Next',
+	'support.page': 'Page {page}',
+	'support.back': 'Back to tickets',
+	'support.refresh': 'Refresh',
+	'support.saved': 'Saved.',
+	'support.error': 'Support is unavailable right now. Your draft is still here. Try again.',
+	'support.expired':
+		'Your session expired. Sign in in another tab, then retry here to keep your draft.',
+	'support.denied': 'Support access is unavailable for this account.',
+	'support.conflict':
+		'This ticket changed or closed before your reply was saved. Your draft is still here. Refresh the conversation to review it.',
+	'support.stale':
+		'That category or priority is no longer available. Refresh and choose again; your draft is still here.',
+	'support.invalid': 'Check the fields and limits. Your draft is still here.',
+	'support.limit':
+		'The support limit was reached. Retry in {seconds} seconds. Your draft is still here.',
+	'support.limits':
+		'Subject: 1–120 characters. Message: 1–4,000 characters. Length uses JavaScript UTF-16 code units after trimming. Up to 3 new tickets per hour and 5 open tickets; up to 10 replies per 10 minutes.',
+	'support.staffLimits':
+		'Messages use 1–4,000 JavaScript UTF-16 code units after trimming. Up to 30 staff replies per minute.',
+	'support.taxonomy': 'Categories and priorities',
+	'support.categories': 'Categories',
+	'support.priorities': 'Priorities',
+	'support.name': 'Name',
+	'support.add': 'Add',
+	'support.save': 'Save',
+	'support.delete': 'Delete and reassign',
+	'support.default': 'Protected default',
+	'support.openLimit':
+		'You already have five open tickets. Close one before creating another. Your draft is still here.',
+	'support.duplicate': 'That name already exists. Choose a different name.',
+	'support.protected': 'The protected default cannot be changed.',
+	'support.staffSignin': 'Verify operator sign-in (new tab)',
+	'support.deleteHint':
+		'Deleting reassigns all tickets to the protected default. Names must be unique and use 1–60 characters after trimming.',
+
 	'resume.title': 'Continue your puzzle?',
 	'resume.action': 'Resume',
 	'resume.new': 'Abandon + New',
@@ -618,6 +683,7 @@ export const messages = {
 	'v1.profile.last': 'Last played',
 	'v1.profile.account': 'Account',
 	'v1.profile.empty': 'Finish a round to see it here.',
+	'v1.profile.viewAll': 'View all in Activity →',
 	'privacy.link': 'Privacy policy',
 	'privacy.pageTitle': 'Privacy policy · Morphi.One',
 	'privacy.title': 'Privacy policy',

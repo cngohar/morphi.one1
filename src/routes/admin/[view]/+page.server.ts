@@ -43,6 +43,7 @@ import { deleteAccountForPrivacy } from '#lib/server/retention.js';
 import { RunError } from '#lib/server/runs.js';
 import type { Actions, PageServerLoad } from './$types';
 const views = [
+	'support',
 	'dashboard',
 	'users',
 	'status',
@@ -67,7 +68,10 @@ export const load: PageServerLoad = async (event) => {
 	if (!views.includes(event.params.view as (typeof views)[number])) error(404, 'Not found');
 	let actor;
 	try {
-		actor = await operatorRequest(event, event.params.view);
+		actor = await operatorRequest(
+			event,
+			event.params.view === 'support' ? 'support-tickets' : event.params.view
+		);
 	} catch (e) {
 		if (e instanceof RunError && e.status === 401) redirect(303, '/admin/sign-in');
 		if (e instanceof RunError) error(e.status, 'Access unavailable');
@@ -101,6 +105,8 @@ export const load: PageServerLoad = async (event) => {
 		? requestedTab
 		: 'stats';
 	let auditMore = false;
+	let auditTotal = 0;
+	let auditTotalPages = 1;
 	let scoring: (Awaited<ReturnType<typeof readLiveScoreConfig>>['config'] & {
 		family: PuzzleId;
 		variant?: string;
@@ -280,6 +286,8 @@ export const load: PageServerLoad = async (event) => {
 			const result = await readAudit(env.DB, actor.id, filter);
 			audit = result.rows;
 			auditMore = result.more;
+			auditTotal = result.total;
+			auditTotalPages = result.totalPages;
 		}
 		await auditOperatorRead(
 			env.DB,
@@ -319,6 +327,8 @@ export const load: PageServerLoad = async (event) => {
 			lookup: [],
 			cases: [],
 			audit: [],
+			auditTotal: 0,
+			auditTotalPages: 1,
 			page,
 			unavailable: true
 		};
@@ -350,6 +360,8 @@ export const load: PageServerLoad = async (event) => {
 		lookup,
 		cases: cases.slice(0, 25),
 		audit: audit.slice(0, 25),
+		auditTotal,
+		auditTotalPages,
 		more: cases.length > 25 || auditMore,
 		page,
 		unavailable: false
@@ -419,7 +431,9 @@ export const actions: Actions = {
 				return fail(400, { code: 'input' });
 			const permission =
 				action === 'logout'
-					? event.params.view
+					? event.params.view === 'support'
+						? 'support-tickets'
+						: event.params.view
 					: action.startsWith('theme-')
 						? 'themes'
 						: action.startsWith('game-')

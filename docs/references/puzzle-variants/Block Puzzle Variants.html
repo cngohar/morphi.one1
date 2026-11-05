@@ -1,0 +1,1073 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Block Puzzle Variants</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;500;600;700;800&family=IBM+Plex+Mono:wght@400;500;600&display=swap"
+      rel="stylesheet"
+    />
+    <style>
+      :root {
+        --bg: #f5f3ef;
+        --surface: #fffdf9;
+        --surface-2: #edeae2;
+        --ink: #211a13;
+        --muted: #6d6355;
+        --line: #ddd5c5;
+        --accent: #c8500a;
+        --accent-ink: #9e3e04;
+        --accent-soft: #fbe7d3;
+        --ok: #146c43;
+        --ok-bg: #dff1e6;
+        --warn: #7d5200;
+        --warn-bg: #faf0cb;
+        --teal: #0b6e6e;
+        --teal-bg: #dcf0ef;
+        --p1: #e4572e;
+        --p2: #2e9e6b;
+        --p3: #3d7bd6;
+        --p4: #efa00b;
+        --p5: #d64570;
+        --p6: #159a9c;
+        --cell-empty: #e9e4d8;
+        --shadow: 0 1px 2px rgba(33, 26, 19, 0.06), 0 8px 24px -18px rgba(33, 26, 19, 0.35);
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #16120e;
+          --surface: #221c15;
+          --surface-2: #2b241a;
+          --ink: #f2ecdf;
+          --muted: #ada08d;
+          --line: #3e362a;
+          --accent: #f08a3c;
+          --accent-ink: #f5a55f;
+          --accent-soft: #3a2712;
+          --ok: #63d69b;
+          --ok-bg: #173527;
+          --warn: #eec25e;
+          --warn-bg: #3a3010;
+          --teal: #6fd3d3;
+          --teal-bg: #123434;
+          --cell-empty: #332b20;
+          --shadow: 0 1px 2px rgba(0, 0, 0, 0.4), 0 8px 24px -18px rgba(0, 0, 0, 0.8);
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Archivo", system-ui, sans-serif;
+        font-size: 16px;
+        line-height: 1.55;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 1120px; margin: 0 auto; padding: 0 20px 72px; }
+      a { color: var(--accent-ink); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+      a:hover { color: var(--accent); }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+
+      /* ---------- Hero ---------- */
+      .hero { padding: 44px 0 8px; }
+      .hero-eyebrow {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12.5px;
+        letter-spacing: 0.14em;
+        text-transform: uppercase;
+        color: var(--accent-ink);
+        margin: 0 0 10px;
+        display: flex;
+        align-items: center;
+        gap: 9px;
+      }
+      .hero-eyebrow::before {
+        content: "";
+        width: 11px; height: 11px;
+        background: var(--accent);
+        flex: none;
+      }
+      h1 {
+        font-size: clamp(34px, 6vw, 54px);
+        line-height: 1.04;
+        font-weight: 800;
+        letter-spacing: -0.02em;
+        margin: 0 0 14px;
+      }
+      .lede { font-size: 17.5px; color: var(--muted); max-width: 72ch; margin: 0; }
+      .lede strong { color: var(--ink); font-weight: 600; }
+
+      .stats {
+        display: grid;
+        grid-template-columns: repeat(5, 1fr);
+        gap: 10px;
+        margin: 30px 0 6px;
+      }
+      .stat {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 14px 14px 12px;
+        box-shadow: var(--shadow);
+      }
+      .stat .num {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 30px;
+        font-weight: 600;
+        line-height: 1;
+        display: block;
+      }
+      .stat .lbl { font-size: 12.5px; color: var(--muted); display: block; margin-top: 7px; line-height: 1.35; }
+      .stat.hot .num { color: var(--accent-ink); }
+
+      /* ---------- Sections ---------- */
+      section { margin-top: 52px; }
+      h2 {
+        font-size: 26px;
+        font-weight: 800;
+        letter-spacing: -0.015em;
+        margin: 0 0 6px;
+        display: flex;
+        align-items: center;
+        gap: 11px;
+      }
+      h2::before { content: ""; width: 13px; height: 13px; background: var(--accent); flex: none; }
+      .section-intro { color: var(--muted); max-width: 76ch; margin: 0 0 20px; }
+      h3 { font-size: 17px; font-weight: 700; margin: 0; }
+
+      /* ---------- Base card ---------- */
+      .base-card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        display: grid;
+        grid-template-columns: 1.5fr 1fr;
+        overflow: hidden;
+      }
+      .base-text { padding: 22px 24px; }
+      .base-text h3 { margin-bottom: 10px; }
+      .base-rules { margin: 0; padding: 0; list-style: none; display: grid; gap: 7px; }
+      .base-rules li { display: flex; gap: 9px; align-items: baseline; font-size: 15px; }
+      .base-rules li::before { content: ""; width: 8px; height: 8px; background: var(--p4); flex: none; transform: translateY(-1px); }
+      .base-rules li:nth-child(2)::before { background: var(--p2); }
+      .base-rules li:nth-child(3)::before { background: var(--p3); }
+      .base-rules li:nth-child(4)::before { background: var(--p1); }
+      .base-rules li:nth-child(5)::before { background: var(--p5); }
+      .base-viz {
+        background: var(--surface-2);
+        border-left: 1px solid var(--line);
+        padding: 20px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 14px;
+      }
+      .board { display: grid; gap: 3px; }
+      .board .cell { width: 19px; height: 19px; border-radius: 3px; background: var(--cell-empty); }
+      .board .cell.clearing { outline: 2px solid var(--accent); outline-offset: 1px; }
+      .tray { display: flex; gap: 16px; align-items: flex-start; }
+      .piece { display: grid; gap: 2.5px; }
+      .piece .cell { width: 13px; height: 13px; border-radius: 2.5px; }
+      .piece .cell.ghost { background: transparent; }
+      .viz-cap { font-size: 12px; color: var(--muted); text-align: center; margin: 0; max-width: 26ch; }
+
+      .callout {
+        border: 1px solid var(--warn);
+        background: var(--warn-bg);
+        border-radius: 6px;
+        padding: 16px 18px;
+        margin-top: 14px;
+        font-size: 15px;
+      }
+      .callout strong { font-weight: 700; }
+      .callout p { margin: 0; }
+      .callout p + p { margin-top: 8px; }
+
+      .convention {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 18px 20px;
+        margin-top: 14px;
+        font-size: 15px;
+      }
+      .convention h3 { margin-bottom: 8px; font-size: 15.5px; }
+      .convention p { margin: 0; color: var(--muted); }
+      .convention p strong { color: var(--ink); }
+
+      /* ---------- Catalogue ---------- */
+      .toolbar {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px 18px;
+        align-items: center;
+        margin-bottom: 8px;
+      }
+      .filter-group { display: flex; gap: 6px; flex-wrap: wrap; align-items: center; }
+      .filter-group .fg-label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11.5px;
+        letter-spacing: 0.1em;
+        text-transform: uppercase;
+        color: var(--muted);
+        margin-right: 2px;
+      }
+      .chip {
+        font: inherit;
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 6px 13px;
+        border-radius: 999px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+      }
+      .chip[aria-pressed="true"] { background: var(--ink); color: var(--bg); border-color: var(--ink); }
+      .chip:focus-visible, .vchip:focus-visible, button:focus-visible, input:focus-visible {
+        outline: 2px solid var(--accent);
+        outline-offset: 2px;
+      }
+      .search-box { flex: 1 1 220px; min-width: 200px; }
+      .search-box input {
+        width: 100%;
+        font: inherit;
+        font-size: 15px;
+        padding: 9px 13px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+      }
+      .showing { font-family: "IBM Plex Mono", monospace; font-size: 13px; color: var(--muted); margin: 4px 0 16px; }
+
+      .ref-card {
+        border: 1px dashed var(--line);
+        border-radius: 6px;
+        padding: 16px 18px;
+        margin-bottom: 14px;
+        background: var(--surface-2);
+        font-size: 15px;
+      }
+      .ref-card h3 { font-size: 15.5px; margin-bottom: 4px; }
+      .ref-card p { margin: 0; color: var(--muted); }
+      .ref-card p strong { color: var(--ink); }
+
+      .cards { display: grid; grid-template-columns: 1fr 1fr; gap: 14px; }
+      .card {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        padding: 18px;
+        display: flex;
+        flex-direction: column;
+        gap: 9px;
+      }
+      .card.flagged { border-style: dashed; }
+      .card-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+      .card-num {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 12.5px;
+        font-weight: 600;
+        color: var(--muted);
+        margin-right: auto;
+      }
+      .badge {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        font-weight: 600;
+        letter-spacing: 0.06em;
+        text-transform: uppercase;
+        padding: 3px 8px;
+        border-radius: 4px;
+        white-space: nowrap;
+      }
+      .badge.verified { background: var(--ok-bg); color: var(--ok); }
+      .badge.flagged { background: var(--warn-bg); color: var(--warn); }
+      .badge.data { background: var(--teal-bg); color: var(--teal); }
+      .badge.mech { background: var(--accent-soft); color: var(--accent-ink); }
+      .card h3 { font-size: 16.5px; line-height: 1.3; }
+      .card .change { font-size: 14.5px; margin: 0; color: var(--ink); }
+      .card .note { font-size: 13.5px; margin: 0; color: var(--muted); }
+      .card .note em { font-style: italic; }
+      .card .sources { margin-top: auto; padding-top: 6px; border-top: 1px solid var(--line); font-size: 13px; display: flex; flex-wrap: wrap; gap: 4px 14px; }
+      .card .sources .src-label {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 11px;
+        letter-spacing: 0.08em;
+        text-transform: uppercase;
+        color: var(--muted);
+        width: 100%;
+      }
+      .empty-state {
+        grid-column: 1 / -1;
+        text-align: center;
+        color: var(--muted);
+        padding: 36px 16px;
+        border: 1px dashed var(--line);
+        border-radius: 6px;
+      }
+
+      /* ---------- Dimensions ---------- */
+      .dims { border: 1px solid var(--line); border-radius: 6px; overflow: hidden; background: var(--surface); box-shadow: var(--shadow); }
+      .dim {
+        display: grid;
+        grid-template-columns: 210px 1fr;
+        gap: 6px 22px;
+        padding: 15px 20px;
+      }
+      .dim + .dim { border-top: 1px solid var(--line); }
+      .dim dt { font-weight: 700; font-size: 15px; }
+      .dim dd { margin: 0; font-size: 14.5px; color: var(--muted); }
+      .dim dd strong { color: var(--ink); font-weight: 600; }
+
+      /* ---------- Core systems ---------- */
+      .core-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; counter-reset: core; }
+      .core-item {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 13px 16px 13px 52px;
+        position: relative;
+        font-size: 15px;
+        box-shadow: var(--shadow);
+      }
+      .core-item::before {
+        counter-increment: core;
+        content: counter(core);
+        position: absolute;
+        left: 14px;
+        top: 12px;
+        font-family: "IBM Plex Mono", monospace;
+        font-weight: 600;
+        font-size: 15px;
+        color: var(--accent-ink);
+        background: var(--accent-soft);
+        width: 26px; height: 26px;
+        border-radius: 4px;
+        display: flex; align-items: center; justify-content: center;
+      }
+      .core-item .rows { display: block; font-size: 13px; color: var(--muted); margin-top: 2px; }
+
+      /* ---------- Calculator ---------- */
+      .calc {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        box-shadow: var(--shadow);
+        padding: 22px;
+        display: grid;
+        grid-template-columns: 1.6fr 1fr;
+        gap: 26px;
+      }
+      .calc-dim { padding: 12px 0; }
+      .calc-dim + .calc-dim { border-top: 1px solid var(--line); }
+      .calc-dim-head { display: flex; justify-content: space-between; align-items: baseline; margin-bottom: 8px; }
+      .calc-dim-head .name { font-weight: 700; font-size: 15px; }
+      .calc-dim-head .n { font-family: "IBM Plex Mono", monospace; font-size: 13.5px; color: var(--accent-ink); font-weight: 600; }
+      .vchips { display: flex; flex-wrap: wrap; gap: 6px; }
+      .vchip {
+        font: inherit;
+        font-size: 13px;
+        font-weight: 500;
+        padding: 5px 11px;
+        border-radius: 4px;
+        border: 1px solid var(--line);
+        background: var(--bg);
+        color: var(--muted);
+        cursor: pointer;
+      }
+      .vchip[aria-pressed="true"] { background: var(--accent-soft); border-color: var(--accent); color: var(--accent-ink); font-weight: 600; }
+      .calc-side { display: flex; flex-direction: column; gap: 14px; }
+      .calc-result {
+        background: var(--surface-2);
+        border-radius: 6px;
+        padding: 18px;
+        text-align: left;
+      }
+      .calc-result .big {
+        font-family: "IBM Plex Mono", monospace;
+        font-size: 44px;
+        font-weight: 600;
+        line-height: 1;
+        display: block;
+      }
+      .calc-result .cap { font-size: 13.5px; color: var(--muted); display: block; margin-top: 8px; }
+      .chain { font-family: "IBM Plex Mono", monospace; font-size: 13.5px; line-height: 1.9; word-break: break-word; }
+      .chain .step { display: block; }
+      .versus-row { display: flex; gap: 10px; align-items: flex-start; font-size: 14px; }
+      .versus-row input { width: 18px; height: 18px; margin-top: 2px; accent-color: var(--accent); flex: none; }
+      .reset-btn {
+        font: inherit;
+        font-size: 13.5px;
+        font-weight: 600;
+        padding: 8px 14px;
+        border-radius: 6px;
+        border: 1px solid var(--line);
+        background: var(--surface);
+        color: var(--ink);
+        cursor: pointer;
+        align-self: flex-start;
+      }
+      .reset-btn:hover { border-color: var(--accent); color: var(--accent-ink); }
+
+      /* ---------- Boundary / gaps ---------- */
+      .boundary-list { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
+      .boundary-item {
+        background: var(--surface);
+        border: 1px solid var(--line);
+        border-radius: 6px;
+        padding: 14px 16px;
+        font-size: 14.5px;
+        box-shadow: var(--shadow);
+      }
+      .boundary-item strong { display: block; font-size: 15px; margin-bottom: 3px; }
+      .boundary-item span { color: var(--muted); }
+      .plain-list { margin: 0; padding-left: 20px; display: grid; gap: 9px; font-size: 15px; }
+      .plain-list li::marker { color: var(--accent); }
+      .plain-list strong { font-weight: 700; }
+      .two-col { display: grid; grid-template-columns: 1fr 1fr; gap: 26px; }
+      .two-col h3 { margin-bottom: 10px; display: flex; align-items: center; gap: 9px; }
+      .two-col h3::before { content: ""; width: 9px; height: 9px; background: var(--p3); flex: none; }
+
+      footer {
+        margin-top: 56px;
+        border-top: 1px solid var(--line);
+        padding-top: 18px;
+        font-size: 13.5px;
+        color: var(--muted);
+        display: grid;
+        gap: 6px;
+      }
+
+      @media (max-width: 860px) {
+        .stats { grid-template-columns: repeat(2, 1fr); }
+        .stat:last-child { grid-column: 1 / -1; }
+        .base-card { grid-template-columns: 1fr; }
+        .base-viz { border-left: none; border-top: 1px solid var(--line); }
+        .cards, .core-grid, .boundary-list, .two-col { grid-template-columns: 1fr; }
+        .calc { grid-template-columns: 1fr; }
+        .dim { grid-template-columns: 1fr; gap: 2px; }
+      }
+      @media (prefers-reduced-motion: reduce) {
+        html { scroll-behavior: auto; }
+        * { transition: none !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="hero">
+        <p class="hero-eyebrow">Global research · Morphi planning library</p>
+        <h1>Block Puzzle Variants</h1>
+        <p class="lede">
+          A catalogue of named, published block-placement games and modes that change a rule compared with
+          Morphi's Block base — an 8×8 board, a three-piece tray, rows and columns clearing together, combo
+          scoring, and a no-fit ending. <strong>29 entries are listed: 22 verified and 7 flagged.</strong>
+          Collapsing same-dimension duplicates leaves <strong>16 distinct rule systems</strong>. Research only —
+          no variant pick or build is made here.
+        </p>
+        <div class="stats" role="list" aria-label="Headline counts">
+          <div class="stat" role="listitem"><span class="num">29</span><span class="lbl">Named entries listed (rows 1–29)</span></div>
+          <div class="stat" role="listitem"><span class="num">22</span><span class="lbl">Verified against a published source</span></div>
+          <div class="stat" role="listitem"><span class="num">7</span><span class="lbl">Flagged — sparse, unofficial, or not a placement-rule change</span></div>
+          <div class="stat" role="listitem"><span class="num">16</span><span class="lbl">Conservative core rule systems after collapsing duplicates</span></div>
+          <div class="stat hot" role="listitem"><span class="num">5,040</span><span class="lbl">Rule combinations — an upper bound, <em>not</em> published games</span></div>
+        </div>
+      </header>
+
+      <main>
+        <!-- ================= BASE ================= -->
+        <section id="base" aria-labelledby="base-h">
+          <h2 id="base-h">The base every variant is measured against</h2>
+          <p class="section-intro">
+            The comparison base is Morphi's Block game as stipulated for this research. Entry 0 in the research —
+            Block Blast! Classic and the generic 8×8 “Block Puzzle” — matches it almost exactly, so it is treated
+            as the base itself, not counted as a variant.
+          </p>
+          <div class="base-card">
+            <div class="base-text">
+              <h3>The base game</h3>
+              <ul class="base-rules">
+                <li>8×8 board; drag polyomino pieces from a three-piece tray onto the board.</li>
+                <li>A full row <em>or</em> a full column clears; rows and columns can clear together.</li>
+                <li>Clearing multiple lines at once gives a combo bonus.</li>
+                <li>Pieces have a fixed orientation — no rotation, no flipping.</li>
+                <li>The round ends when no tray piece fits anywhere (no-fit), with a move cap.</li>
+              </ul>
+            </div>
+            <div class="base-viz" aria-hidden="true">
+              <div class="board" id="baseBoard"></div>
+              <div class="tray" id="baseTray"></div>
+              <p class="viz-cap">The 8×8 base board mid-round, a full row about to clear, and the three-piece tray.</p>
+            </div>
+          </div>
+
+          <div class="callout" role="note">
+            <p>
+              <strong>Base discrepancy, flagged by the research:</strong> the published Blockudoku is 9×9 with
+              rows, columns <em>and</em> 3×3 squares clearing — not this 8×8 rows-and-columns base. The stipulated
+              base instead matches published Block Blast! Classic (8×8, 3 pieces, rows+columns, no rotation)
+              almost exactly.
+            </p>
+            <p>
+              <strong>Move-cap ambiguity:</strong> published Classic games are described as endless / no-fit with
+              no move cap. If a move cap is part of the base, move-limited levels (entries 4 and 9) are parameter
+              changes rather than new endings, and the core count would fall by at most 1 system. The full count
+              of 29 does not change.
+            </p>
+          </div>
+
+          <div class="convention">
+            <h3>Counting convention</h3>
+            <p>
+              A named published mode or game is counted <strong>once</strong>, and only if it <strong>changes a
+              rule</strong> versus the base — never for a new theme, colour, artwork, board skin, sound, or a mere
+              scoring-value change. Same-dimension duplicates stay in the full list of 29 but are collapsed in the
+              core count of 16. Classifications marked <strong>inference</strong> are the researcher's judgement,
+              not published facts. Evidence is web-index unless a page was opened; no live in-app verification was
+              possible (signed-out research only).
+            </p>
+          </div>
+        </section>
+
+        <!-- ================= CATALOGUE ================= -->
+        <section id="catalogue" aria-labelledby="cat-h">
+          <h2 id="cat-h">The catalogue — 29 named variants</h2>
+          <p class="section-intro">
+            Each entry states its exact rule change versus the base, its evidence status, and whether it is
+            <strong>data-only</strong> (same placement and clear mechanics, different parameters) or needs
+            <strong>new mechanics</strong> (a new rule such as rotation, gravity, colour matching, or special
+            pieces). Flagged entries are excluded from the core count of 16.
+          </p>
+
+          <div class="toolbar" role="group" aria-label="Catalogue filters">
+            <div class="filter-group" aria-label="Filter by status">
+              <span class="fg-label">Status</span>
+              <button class="chip" data-filter-status="all" aria-pressed="true">All</button>
+              <button class="chip" data-filter-status="verified" aria-pressed="false">Verified</button>
+              <button class="chip" data-filter-status="flagged" aria-pressed="false">Flagged</button>
+            </div>
+            <div class="filter-group" aria-label="Filter by build class">
+              <span class="fg-label">Class</span>
+              <button class="chip" data-filter-class="all" aria-pressed="true">All</button>
+              <button class="chip" data-filter-class="data" aria-pressed="false">Data-only</button>
+              <button class="chip" data-filter-class="mech" aria-pressed="false">New mechanics</button>
+            </div>
+            <div class="search-box">
+              <input type="search" id="catSearch" placeholder="Search names and rule changes…" aria-label="Search the catalogue" />
+            </div>
+          </div>
+          <p class="showing" id="showingCount" aria-live="polite"></p>
+
+          <div class="ref-card">
+            <h3>0 · Block Blast! Classic / generic Block Puzzle — the reference, not counted</h3>
+            <p>
+              <strong>No rule change:</strong> 8×8, 3-piece tray, rows+columns clear, no rotation, no-fit end.
+              This is the base itself.
+              Sources:
+              <a href="https://block-blast.cc/" target="_blank" rel="noopener">block-blast.cc</a> ·
+              <a href="https://blockblast.co/high-score" target="_blank" rel="noopener">blockblast.co</a>
+            </p>
+          </div>
+
+          <div class="cards" id="cards"></div>
+        </section>
+
+        <!-- ================= DIMENSIONS ================= -->
+        <section id="dimensions" aria-labelledby="dim-h">
+          <h2 id="dim-h">Rule dimensions — what actually varies</h2>
+          <p class="section-intro">
+            Twelve dimensions were checked across the catalogue. These are the values the research actually
+            found — including the dimensions where nothing verified exists, which matter as much as the ones
+            that do.
+          </p>
+          <dl class="dims">
+            <div class="dim">
+              <dt>Board size &amp; shape</dt>
+              <dd><strong>8×8</strong> (base / Block Blast) · <strong>10×10</strong> (1010!, TenTrix) · <strong>9×9</strong> (Blockudoku, Woodoku, Poweroku) · <strong>9×12</strong> rectangular (Blockwood) · <strong>10×20</strong> tall (Reverse Blocks) · <strong>hexagonal</strong>, 6 large triangles (Woody Trigon) · <strong>circular</strong> rings+spokes / slices+rings (Prism Blast 3D, Wheel Block). No verified square board other than 8×8 / 9×9 / 10×10, and no verified board with pre-placed holes as a standalone rule — holes and obstacles appear as <em>pieces</em> (ice, stone, junk, chocolate), not fixed board holes.</dd>
+            </div>
+            <div class="dim">
+              <dt>Tray size &amp; feed</dt>
+              <dd><strong>3 pieces, refill only when empty — universal</strong> in verified games. Deviations: Block Sudoku's Holder (3 + 1 held piece); Reverse Blocks' timed feed into Storage, where overflow ends the run. No verified 1-, 2-, 4- or 5-piece standard tray found.</dd>
+            </div>
+            <div class="dim">
+              <dt>Piece set</dt>
+              <dd>Polyominoes (squares, bars, L/T/S shapes, the 3×3 square, the 1×5 bar as a run-killer on 10×10) · triangular pieces (Woody Trigon) · diagonal-shaped pieces mentioned in Color Block Adventure — unverified whether diagonal <em>pieces</em> or diagonal <em>clears</em> · unspecified “new blocks” in Plus Mode (flagged) · bending circular pieces (Wheel Block). No verified published piece-set catalogue distinct enough to count beyond these.</dd>
+            </div>
+            <div class="dim">
+              <dt>Rotation &amp; flipping</dt>
+              <dd><strong>Fixed orientation</strong> in the base, 1010!, TenTrix, Block Blast and Blockudoku (one source claims Blockudoku rotation — see uncertainties). <strong>Rotatable:</strong> Poweroku (free rotation), Reverse Blocks (tap to rotate), Block Sudoku Rotators (consumable), Woody Trigon rotate-or-delete tools. <strong>No verified flipping (mirror) rule found</strong> — rotation only.</dd>
+            </div>
+            <div class="dim">
+              <dt>Clear rules</dt>
+              <dd>Rows+columns (base) · <strong>rows only</strong> (Blocks Puzzle) · rows+columns+<strong>3×3 squares</strong> (Blockudoku / Woodoku) · <strong>3+ connected same-colour</strong> (1010! Color) · <strong>same-colour full row</strong> (Sand Blast) · <strong>large-triangle fill</strong> (Woody Trigon) · <strong>slice / ring fill</strong> (Wheel Block) · <strong>ring / spoke fill</strong> (Prism Blast 3D) · <strong>exact cover, no clear</strong> (Jigsaw) · diagonal clears — <strong>unverified</strong>, unofficial web mode only (entry 28).</dd>
+            </div>
+            <div class="dim">
+              <dt>Scoring &amp; combo</dt>
+              <dd>Placement points + per-cell line points (Block Blast web: 1/cell placed, 10/cell cleared) · simultaneous multi-line bonus in all games · consecutive-turn streak multiplier (Blockudoku / Woodoku, Block Blast guides) · all-clear bonus (Block Blast web: 360 pts for emptying the board) · squared multi-line score (Blockwood). Streak vs combo wording varies by source for the <em>same</em> games — treated as parameter / wording, not separate variants.</dd>
+            </div>
+            <div class="dim">
+              <dt>Timer, move limit &amp; lives</dt>
+              <dd>No timer in the base / Classic. <strong>Fixed countdown:</strong> 15:00 (Blocks Puzzle), 60 s Rush (Sova). <strong>Replenishing:</strong> 90 s + time per line (Blockwood, Color Block Time Attack). <strong>Timed feed:</strong> Reverse Blocks Storage overflow. <strong>Move limit:</strong> Blockwood levels; Block Blast Adventure descriptions state one in some sources, not all (conflict — see uncertainties). <strong>Lives:</strong> one-use revive only (flagged, entry 29). No verified 3-lives system in a placement game found.</dd>
+            </div>
+            <div class="dim">
+              <dt>Level, mission &amp; target modes</dt>
+              <dd>Endless high-score (base) vs <strong>level-target</strong> (Block Blast Adventure, Color Block Adventure, Sova Arcade, Blockwood levels) · <strong>collection targets</strong> — gems / stars / hearts (entry 6) · <strong>daily fixed puzzles</strong> (Blockudoku Daily, Block Blast Daily, PolySlide Daily) · <strong>tournaments / leaderboards</strong> (Blockudoku, asynchronous only).</dd>
+            </div>
+            <div class="dim">
+              <dt>Endings</dt>
+              <dd><strong>No-fit</strong> (base, universal) · timer expiry (entries 7, 8, 10) · Storage overflow (entry 14) · level-goal completion / failure (entries 4, 6, 7, 9) · exact-cover completion (entry 23) · board-full with no room — the same as no-fit in TenTrix's wording.</dd>
+            </div>
+            <div class="dim">
+              <dt>Gravity &amp; shifting after clears</dt>
+              <dd><strong>None in the base</strong> — pieces stay where placed, explicitly stated for Block Blast. Fall-after-clear with chains (Gravity Tiles, TetroBlocks) · per-column slide on drop (Gravity Rise) · sand-grain settle (Sand Blast) · ring twist (Wheel Block — board rotation, not gravity). No verified “rows drop down after a line clear” in a non-gravity placement game beyond these.</dd>
+            </div>
+            <div class="dim">
+              <dt>Wild &amp; special pieces</dt>
+              <dd>Bomb clearing 3×3 (Blockwood, Gravity Rise Item mode) · rainbow single-cell wild (Blockwood) · ice needing 2 clears (Blockwood) · stone / magma / rifts (Gravity Tiles) · grey junk (Prism Blast 3D) · chocolate / gumballs / gems (Wheel Block). Line blasters, area bombs and rainbow blocks claimed for Block Blast in SEO guides were <strong>not relied on</strong> — they conflate it with match-3 games. Colour-bomb / line-blast creation rules (match-4/5) belong to match-3, not verified placement rules.</dd>
+            </div>
+            <div class="dim">
+              <dt>Multiplayer &amp; versus</dt>
+              <dd><strong>No verified real-time versus placement game found.</strong> Blockudoku tournaments are asynchronous leaderboard competition; TenTrix sources explicitly say solo / no multiplayer, score-challenge only. Versus exists only in boundary families (Tetris / Dr Mario versus).</dd>
+            </div>
+          </dl>
+        </section>
+
+        <!-- ================= CORE SYSTEMS ================= -->
+        <section id="core" aria-labelledby="core-h">
+          <h2 id="core-h">The conservative core — 16 rule systems</h2>
+          <p class="section-intro">
+            Collapsing same-dimension duplicates and dropping all seven flagged entries leaves 16 distinct rule
+            systems. This is a <em>system</em> count, not a game count: Blockwood alone contributes to systems 4,
+            15 and 16, which is why 22 verified games reduce to 16 systems rather than a simple subtraction.
+            Catalogue entry numbers are shown under each system.
+          </p>
+          <div class="core-grid" id="coreGrid"></div>
+        </section>
+
+        <!-- ================= CALCULATOR ================= -->
+        <section id="calculator" aria-labelledby="calc-h">
+          <h2 id="calc-h">Combinations calculator</h2>
+          <p class="section-intro">
+            The combinatorial total multiplies the verified values of seven independent dimensions (the base
+            value is included in each, so the product counts the base game itself once). Toggle values off to
+            see how the space shrinks. <strong>These are combinations, not published games</strong> — many are
+            unplayable in combination and have never been published.
+          </p>
+          <div class="calc">
+            <div id="calcDims"></div>
+            <div class="calc-side">
+              <div class="calc-result">
+                <span class="big" id="calcTotal">5,040</span>
+                <span class="cap">possible combinations of verified rule values</span>
+              </div>
+              <div class="chain" id="calcChain" aria-live="polite"></div>
+              <label class="versus-row">
+                <input type="checkbox" id="versusToggle" />
+                <span>Also multiply by <strong>real-time versus (×2)</strong> — an <em>unverified</em> dimension. The research does not claim this figure.</span>
+              </label>
+              <button class="reset-btn" id="calcReset" type="button">Reset to the research's verified set</button>
+            </div>
+          </div>
+        </section>
+
+        <!-- ================= BOUNDARY ================= -->
+        <section id="boundary" aria-labelledby="bound-h">
+          <h2 id="bound-h">Boundary games — similar-looking, different family</h2>
+          <p class="section-intro">
+            These look like block puzzles but are not variants of the placement base, and are not counted.
+          </p>
+          <div class="boundary-list">
+            <div class="boundary-item"><strong>Tetris &amp; falling-block games (incl. Columns)</strong><span>Pieces fall on a timer and the game ends when the stack tops out; placement is not free drag-to-any-cell and there is no tray / no-fit ending.</span></div>
+            <div class="boundary-item"><strong>Dr. Mario</strong><span>Falling two-colour capsules matched 4-in-a-line by colour with gravity chains — colour-matching of falling pieces, not tray placement.</span></div>
+            <div class="boundary-item"><strong>Candy Crush Saga / Bejeweled (match-3)</strong><span>The board is pre-filled and the move is swapping adjacent tiles to make 3+ in a line, with gravity refill; no tray pieces are placed and no line is completed by filling a row.</span></div>
+            <div class="boundary-item"><strong>Unblock Me / Klotski / Rush Hour (sliding-block)</strong><span>Blocks already on the board slide along their axis to free an exit piece; nothing is placed from a tray and nothing clears by completing a line.</span></div>
+            <div class="boundary-item"><strong>2048 / Threes! (sliding merge)</strong><span>One swipe moves the whole board and equal tiles merge; the goal is a target tile, not line completion by placement.</span></div>
+            <div class="boundary-item"><strong>15-puzzle / Sokoban</strong><span>A fixed set of tiles or boxes is slid or pushed to a target arrangement; no new pieces, no clears.</span></div>
+            <div class="boundary-item"><strong>1010 nine-modes — Pop Mode (entry 27)</strong><span>Tap-to-crush pre-placed same-colour groups; listed as flagged / boundary-adjacent because the placement loop is absent.</span></div>
+            <div class="boundary-item"><strong>Classic tangram / jigsaw</strong><span>A close cousin of entry 23, but with a fixed piece set and no random tray; entry 23 counts only because its games reuse the tray-placement loop with a fill goal.</span></div>
+          </div>
+        </section>
+
+        <!-- ================= UNCERTAINTIES ================= -->
+        <section id="gaps" aria-labelledby="gaps-h">
+          <h2 id="gaps-h">Uncertainties, gaps &amp; what was not counted</h2>
+          <div class="two-col">
+            <div>
+              <h3>Open questions</h3>
+              <ul class="plain-list">
+                <li><strong>Blockudoku rotation / diagonal conflict:</strong> official-description sources say no rotation and rows/columns/squares only; one low-quality PDF summary claims blocks can be rotated and diagonal lines clear. The official line is followed; rotation and diagonals for Blockudoku itself are unverified and conflicting.</li>
+                <li><strong>Block Blast Adventure specifics conflict:</strong> some descriptions say target score / clear-N-blocks, others add move or time limits, and several SEO guides conflate it with match-3 bomb/rainbow creation. Only “level objectives exist” is treated as verified; per-level mechanics are not.</li>
+                <li><strong>Possible clones / re-skins of one system:</strong> Woodoku vs Blockudoku (same 9×9 + square system, different publisher and theme); 1010! vs TenTrix vs generic 10×10; Woody Trigon vs Woody Poly (possibly same publisher lineage); “Block Puzzle / Block Sudoku / Wood Block Puzzle” store titles reuse each other's descriptions verbatim — several may be the same game under different listings.</li>
+                <li><strong>Sparse modes:</strong> the 1010 nine-modes Bomb, Plus, Hexa and Slide are one-line store listings with no rule detail; only Slide is corroborated by an independent game (PolySlide), Hexa only by analogy to Woody Trigon.</li>
+                <li><strong>Dimensions with no verified published value:</strong> real-time versus / multiplayer placement; tray sizes other than 3 (+hold); piece flipping / mirroring; fixed board holes as a starting layout (obstacles found only as pieces / junk); 3-lives systems; diagonal clears in a first-party published game.</li>
+                <li><strong>Evidence quality:</strong> most entries rest on store descriptions or secondary guides, not first-party rulebooks or hands-on play; store listings are marketing copy and may describe planned or version-specific features. No source systematically enumerates modes for any single title.</li>
+              </ul>
+            </div>
+            <div>
+              <h3>Not counted, and why</h3>
+              <ul class="plain-list">
+                <li><strong>Theme / skin clones:</strong> 1010! Fish Blocks, Jewel Blocks Quest, Wolfoo Block Blast, Luma Blocks and dozens of “wood / jewel / neon” reskins use the base rules with different art — excluded by the counting convention.</li>
+                <li><strong>Pure scoring-value differences:</strong> e.g. Block Blast's 10 pts/cell vs 1010!'s line tables, or combo vs streak wording — parameters, not rule systems; recorded in the dimensions section, not counted.</li>
+                <li><strong>Boosters alone:</strong> hammer, undo, refresh, or a bomb as a paid item in otherwise-base games — not standalone variants, unless the game or mode is built around them (entries 9, 15, 17, 18).</li>
+                <li><strong>Match-3 conflation:</strong> SEO / guide claims that Block Blast's Adventure mode involves “matching 4–5 same-colour blocks to earn bombs / rainbow blocks” mix Block Blast up with match-3 games. Those descriptions were not relied on; the Adventure entry rests on level-objective descriptions only.</li>
+              </ul>
+            </div>
+          </div>
+        </section>
+      </main>
+
+      <footer>
+        <span>Sources are linked on every catalogue entry. All sources were read on 2026-11-04 via web index; the 1010 nine-modes Play page was also opened directly.</span>
+        <span>Research catalogue only — compiled for Morphi's long-term planning. No variant selection, plan, or build is implied by anything on this page.</span>
+      </footer>
+    </div>
+
+    <script>
+      /* ================= Mini board diagram ================= */
+      (function () {
+        var colors = { a: "var(--p1)", b: "var(--p2)", c: "var(--p3)", d: "var(--p6)", e: "var(--p5)", f: "var(--p4)", g: "var(--p3)" };
+        var pattern = [
+          "........",
+          ".aa.....",
+          ".aa..bb.",
+          "....cbb.",
+          ".dd.c...",
+          ".dd...ee",
+          "ffffffff",
+          "..g...ee"
+        ];
+        var board = document.getElementById("baseBoard");
+        board.style.gridTemplateColumns = "repeat(8, 19px)";
+        pattern.forEach(function (row, r) {
+          row.split("").forEach(function (ch) {
+            var cell = document.createElement("span");
+            cell.className = "cell" + (r === 6 ? " clearing" : "");
+            if (ch !== ".") cell.style.background = colors[ch];
+            board.appendChild(cell);
+          });
+        });
+        var pieces = [
+          { shape: ["xx", "x."], color: "var(--p1)" },
+          { shape: ["xx", "xx"], color: "var(--p2)" },
+          { shape: ["xxx"], color: "var(--p3)" }
+        ];
+        var tray = document.getElementById("baseTray");
+        pieces.forEach(function (p) {
+          var el = document.createElement("div");
+          el.className = "piece";
+          el.style.gridTemplateColumns = "repeat(" + p.shape[0].length + ", 13px)";
+          p.shape.forEach(function (row) {
+            row.split("").forEach(function (ch) {
+              var cell = document.createElement("span");
+              cell.className = "cell" + (ch === "." ? " ghost" : "");
+              if (ch !== ".") cell.style.background = p.color;
+              el.appendChild(cell);
+            });
+          });
+          tray.appendChild(el);
+        });
+      })();
+
+      /* ================= Catalogue data ================= */
+      var ENTRIES = [
+        { n: 1, name: "1010! (Gram Games, 2014) / TenTrix", status: "verified", cls: "data",
+          change: "Board is 10×10 instead of 8×8; otherwise rows+columns clear, 3-piece tray, no rotation, no-fit end.",
+          note: "Data-only — a board-size parameter change.",
+          sources: [["gamesgames.com", "https://www.gamesgames.com/games/10x10"], ["101games.io", "https://101games.io/tentrix"]] },
+        { n: 2, name: "Blockudoku® (Easybrain)", status: "verified", cls: "mech",
+          change: "Board is 9×9 and a completed 3×3 square also clears, in addition to rows and columns; 3-piece tray, combo + streak (consecutive-turn clears).",
+          note: "New mechanics — a new clear predicate. That classification is an inference: a clear-pattern rule, not just a size parameter.",
+          sources: [["blockblastunblocked.io", "https://blockblastunblocked.io/blockudoku"], ["AppBrain", "https://www.appbrain.com/app/blockudoku%C2%AE-block-puzzle-game/com.easybrain.block.puzzle.games"]] },
+        { n: 3, name: "Woodoku (Tripledot)", status: "verified", cls: "mech",
+          change: "The same rule system as Blockudoku: 9×9, rows+columns+3×3 squares, combo + streak, no timer. The wooden theme alone would not count; the square clear is the rule change.",
+          note: "Verified — a duplicate of entry 2's system, collapsed in the core count.",
+          sources: [["nogentech.org", "https://www.nogentech.org/woodoku-the-best-block-puzzle-game/"], ["darkpattern.games", "https://www.darkpattern.games/game/19241/2/woodoku.html"]] },
+        { n: 4, name: "Block Blast! — Adventure Mode", status: "verified", cls: "mech",
+          change: "Endless no-fit survival is replaced or augmented by level-based progression: each level has a specified objective (target score, or a number of blocks or gems to clear, within a move limit in some descriptions). The Daily Challenge is the same goal-based form.",
+          note: "Verified via secondary / app-store descriptions; exact per-level objectives vary by version. Classing the goal-based ending as new mechanics is an inference.",
+          sources: [["blockblast.org", "https://blockblast.org"], ["blockblast.co FAQ", "https://blockblast.co/faq"], ["APKPure", "https://apkpure.net/block-blast/com.block.juggle/amp"]] },
+        { n: 5, name: "Blockudoku — Daily Challenges / Tournaments", status: "flagged", cls: "data",
+          change: "A fixed daily puzzle (same placement rules, preset deal/board) played for trophies, and asynchronous tournament leaderboard ranking instead of a pure personal high score. No placement or clear rule changes are stated.",
+          note: "Flagged — competition / preset deal, not a verified placement-rule change. Data-only at most (inference); excluded from the core count.",
+          sources: [["AppBrain", "https://www.appbrain.com/app/blockudoku%C2%AE-block-puzzle-game/com.easybrain.block.puzzle.games"]] },
+        { n: 6, name: "Color Block Classic — Adventure mode (96 levels)", status: "verified", cls: "mech",
+          change: "Level-based play: clear lines to collect gems, stars and hearts per level. The listing also mentions “tricky diagonal blocks” in Adventure — ambiguous: diagonal-shaped pieces, not verified diagonal clears.",
+          note: "Verified from the store description — a duplicate of entry 4's goal dimension, with a collection target.",
+          sources: [["AppBrain", "https://www.appbrain.com/app/color-block-classic/com.ivankadev.neonblock"]] },
+        { n: 7, name: "Sova Blocks — Rush + Arcade", status: "verified", cls: "mech",
+          change: "Rush: a 60-second clock, highest score wins (a timer ending). Arcade: 500 handcrafted levels on a map, no timer. Its Classic mode is the base.",
+          note: "Verified from the store description. New mechanics — timer ending and level progression.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=com.SovaGameStudio.SovaBlocks&hl=en&gl=cn"]] },
+        { n: 8, name: "Blocks Puzzle (GamePix browser)", status: "verified", cls: "mech",
+          change: "Rows only clear — columns do not clear, per a hands-on review — and a fixed 15:00 countdown ends the round; 3-piece tray, no rotation.",
+          note: "Verified via a secondary hands-on review. New mechanics — timer plus a restricted clear rule; its rows-only clear is kept as its own core system.",
+          sources: [["brickbreaker.app", "https://www.brickbreaker.app/blocks-puzzle/"]] },
+        { n: 9, name: "Blockwood", status: "verified", cls: "mech",
+          change: "Rectangular board 9 wide × 12 tall (rows need 9, columns 12). Timed mode: 90 s + 5 s per line cleared; levels can have a move limit. Special pieces: a bomb clears 3×3, rainbow is a single-cell wild, ice needs 2 clears; an energy bar can wipe the whole board.",
+          note: "Verified on the developer site. One game spanning several dimensions — board shape, timer, specials and obstacles.",
+          sources: [["Developer site", "https://blockwood.douhouse.com/"]] },
+        { n: 10, name: "Color Block Classic — Time Attack", status: "verified", cls: "mech",
+          change: "90 seconds on the clock, and every line cleared adds more time — a replenishing timer, distinct from the fixed countdown in entry 8.",
+          note: "Verified from the store description — a duplicate of the timer dimension, merged with countdown timers in the core count.",
+          sources: [["AppBrain", "https://www.appbrain.com/app/color-block-classic/com.ivankadev.neonblock"]] },
+        { n: 11, name: "1010! Color (Gram Games)", status: "verified", cls: "mech",
+          change: "Pieces are multi-coloured and the clear rule is replaced: 3+ connected same-colour squares disappear, with no full line required. Otherwise drag-to-10×10, no-fit end, high score.",
+          note: "New mechanics — a colour-matching clear instead of line completion.",
+          sources: [["superparent.com", "https://www.superparent.com/1010-color-a-superparent-first-look/"], ["minigamesville.com", "https://minigamesville.com/game/1010-color-match/"]] },
+        { n: 12, name: "Poweroku", status: "verified", cls: "mech",
+          change: "9×9 board with rows+columns+3×3 boxes — but pieces can be rotated before placement, where the base fixes orientation.",
+          note: "Verified from a store-comparison description. New mechanics — free rotation.",
+          sources: [["SimilarWeb", "https://www.similarweb.com/tr/app/apple/6446333684/vs/1524613492/"]] },
+        { n: 13, name: "Block Sudoku (TetriBlock) — Holder + Rotators", status: "verified", cls: "mech",
+          change: "Holder: one extra piece can be held for later use — the tray is effectively 3 + 1 hold. Rotators: consumable items rotate a piece. The game also has Daily / Puzzle / Jigsaw modes (Jigsaw is entry 23's dimension).",
+          note: "Verified from the store description. New mechanics — a hold slot plus consumable rotation.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=block.puzzle.sudoku.free.game.classic.offline&hl=en_ZA"]] },
+        { n: 14, name: "Reverse Blocks", status: "verified", cls: "mech",
+          change: "Tall board 10×20, pieces are rotatable, and a new ending pressure: new pieces keep arriving in Storage on a timer, and Storage overflow ends the run — in addition to no-fit.",
+          note: "Verified from the store description. New mechanics — board, rotation, and a timed-feed ending.",
+          sources: [["AppBrain", "https://www.appbrain.com/app/reverse-blocks-block-puzzle/com.reverse.blocks.game"]] },
+        { n: 15, name: "Gravity Tiles", status: "verified", cls: "mech",
+          change: "After every placement, all blocks fall under gravity; filling a full row explodes it, and falling blocks can complete new rows — chain reactions, with streak bonuses. Obstacles: stone (cracks over several clears), magma cores (countdown, then harden to stone), rifts (holes that swallow falling blocks).",
+          note: "Verified from the App Store description. New mechanics — gravity, chains, and obstacles.",
+          sources: [["App Store", "https://apps.apple.com/us/app/gravity-tiles-block-puzzle/id6808166955"]] },
+        { n: 16, name: "TetroBlocks — Gravity Drop (mode)", status: "verified", cls: "mech",
+          change: "The same gravity dimension as entry 15: cleared lines cause the cells above to cascade down, potentially creating chain combos with multipliers. Otherwise the base: 8×8, 3 pieces, rows+columns.",
+          note: "Verified on the developer site — a duplicate gravity dimension, collapsed with entry 15 in the core count.",
+          sources: [["Developer site", "https://tetroblocks.vshyrochuk.com/"]] },
+        { n: 17, name: "Gravity Rise", status: "verified", cls: "mech",
+          change: "A different gravity mechanism from entries 15–16: a placed piece does not set as one solid block — each column slides down independently to fill gaps below — and the floor rises from the bottom. Item mode adds bombs, lasers and ice; Classic mode is the no-gravity base.",
+          note: "Verified from the store description. New mechanics — column-slide gravity plus a rising floor.",
+          sources: [["AppBrain", "https://www.appbrain.com/app/gravity-rise-block-puzzle/com.yunjin.puzzle.gravityrise"]] },
+        { n: 18, name: "Sand Blast (Inspired Square)", status: "verified", cls: "mech",
+          change: "A placed piece crumbles into sand grains that fall and settle under gravity; a row clears only if the whole row is one colour of sand. Bomb blocks free space.",
+          note: "Verified via a secondary guide, with the mobile publisher named. New mechanics — sand gravity plus a colour-restricted clear.",
+          sources: [["blockcrush.net", "https://blockcrush.net/games/sand-blast"]] },
+        { n: 19, name: "Wheel Block (Kimbu Studio)", status: "verified", cls: "mech",
+          change: "A circular board: fill a whole slice (centre to edge) or a whole ring to clear; pieces bend to fit the circle. A ring-twist move — swipe a ring to rotate it and line up gaps, with twists earned by clears. Collection and obstacles: gems inside blocks, chocolate that breaks only on a line clear, gumballs that roll around their ring.",
+          note: "Verified on the developer site. New mechanics — board geometry, the twist move, and obstacles.",
+          sources: [["Developer site", "https://kimbustudio.com/wheelblock/"]] },
+        { n: 20, name: "Prism Blast 3D (Cong Game)", status: "verified", cls: "mech",
+          change: "A circular board of rings and spokes: completing a ring or a spoke blasts it. Grey junk creeps inward from outside and can only be removed by blasts in the affected areas — an obstacle pressure distinct from entry 19's twist.",
+          note: "Verified via a secondary guide. New mechanics — board geometry plus a creeping obstacle.",
+          sources: [["brightygames.com", "https://www.brightygames.com/games/prism-blast-3d.html"]] },
+        { n: 21, name: "Woody Trigon / Woody Poly Block Hexa Triangle", status: "verified", cls: "mech",
+          change: "A hexagonal board of 6 large triangles: fill a large triangle to clear it; clearing multiple triangles at once is a combo, and a combo-6 clears the whole board. Rotate-or-delete tools are offered; no space left is game over.",
+          note: "New mechanics — board geometry plus a triangle clear rule.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=com.DTA.trigon"], ["APKPure", "https://apkpure.com/woody-trigon-block-puzzle-game/woody.poly.hexa.triangle.block.puzzle"]] },
+        { n: 22, name: "1010 block puzzle — nine modes: Hexa Mode", status: "flagged", cls: "mech",
+          change: "A hexagonal board mode is listed, but no board size, clear rule or piece detail is published in the listing.",
+          note: "Flagged — sparse; likely a duplicate of entry 21's board dimension. New mechanics if confirmed (inference); excluded from the core count.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=com.youqu.blockpuzzle1010"]] },
+        { n: 23, name: "Jigsaw mode — 1010 nine-modes Jigsaw; Block Puzzle Classic Jigsaw; Puzzle Block", status: "verified", cls: "mech",
+          change: "The goal replaces clearing entirely: drag the given pieces to fill a fixed outline or shape exactly — unlock a picture, complete the level. No lines clear, and there is no endless no-fit survival.",
+          note: "Verified from a store listing plus a hands-on review. New mechanics — an exact-cover goal.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=com.youqu.blockpuzzle1010"], ["brickbreaker.app", "https://www.brickbreaker.app/puzzle-block/"]] },
+        { n: 24, name: "Slide mode — 1010 nine-modes Slide; PolySlide", status: "verified", cls: "mech",
+          change: "Placement movement is replaced by sliding: in 1010's Slide, blocks slide left/right to form lines; in PolySlide, one swipe moves every piece on the field until it hits a wall or another piece, then a new shape arrives; full lines clear; campaign, endless, daily and IQ modes.",
+          note: "Verified for PolySlide on the developer site; the 1010 Slide detail is sparse — flagged in part. New mechanics — slide movement.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=com.youqu.blockpuzzle1010"], ["Developer site", "https://polyslide.tsoftfactory.com/"]] },
+        { n: 25, name: "1010 nine-modes — Bomb Mode", status: "flagged", cls: "mech",
+          change: "Listed only as a mode to “challenge your logic and strategy”; no bomb trigger, radius or clear rule is published in the listing.",
+          note: "Flagged — sparse; the special-piece dimension is otherwise verified in entries 9, 15 and 17. New mechanics if confirmed (inference); excluded from the core count.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=com.youqu.blockpuzzle1010"]] },
+        { n: 26, name: "1010 nine-modes — Plus Mode", status: "flagged", cls: "data",
+          change: "Listed only as having new blocks in this mode only — a piece-set change with no shapes, sizes or rule stated.",
+          note: "Flagged — vague. Data-only if confirmed (inference); excluded from the core count.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=com.youqu.blockpuzzle1010"]] },
+        { n: 27, name: "1010 nine-modes — Pop Mode", status: "flagged", cls: "mech",
+          change: "Select and crush 2+ adjacent same-colour blocks already on the board. This drops the drag-from-tray placement loop, so it is closer to a tap-match game than to the base.",
+          note: "Flagged — boundary-adjacent; not counted in the core count. New mechanics — tap-clear, not placement.",
+          sources: [["Google Play", "https://play.google.com/store/apps/details?id=com.youqu.blockpuzzle1010"]] },
+        { n: 28, name: "Diagonal-clear web mode (blockblast.co “Block Blast Unblocked”)", status: "flagged", cls: "mech",
+          change: "An optional mode where diagonal lines clear in addition to rows and columns, plus combo protection. The site itself states it is an unofficial fan game, separate from Hungry Studio's app — so this is not a published Hungry Studio rule.",
+          note: "Flagged — an unofficial clone only, and it conflicts with base descriptions. New mechanics if confirmed (inference); excluded from the core count.",
+          sources: [["blockblast.co FAQ", "https://blockblast.co/faq"]] },
+        { n: 29, name: "One-use revive / second life (blockblast.co web; Jewelock Revive)", status: "flagged", cls: "mech",
+          change: "A no-fit state does not immediately end the run once: the web version offers a one-use revive, and Jewelock's Revive clears middle rows when the tray is full. Boosters in general (bomb / refresh / undo) are purchasable aids, not a standalone published mode.",
+          note: "Flagged — a booster / lives feature, version-dependent. New mechanics (lives) is an inference; excluded from the core count.",
+          sources: [["blockblast.co FAQ", "https://blockblast.co/faq"], ["AppBrain", "https://www.appbrain.com/app/jewelock-block-puzzle/com.vrmoby.jewelock"]] }
+      ];
+
+      var cardsEl = document.getElementById("cards");
+      var showingEl = document.getElementById("showingCount");
+      var state = { status: "all", cls: "all", q: "" };
+
+      function badge(status) {
+        return status === "verified"
+          ? '<span class="badge verified">Verified</span>'
+          : '<span class="badge flagged">Flagged</span>';
+      }
+      function classBadge(cls) {
+        return cls === "data"
+          ? '<span class="badge data">Data-only</span>'
+          : '<span class="badge mech">New mechanics</span>';
+      }
+      function renderCards() {
+        var visible = ENTRIES.filter(function (e) {
+          if (state.status !== "all" && e.status !== state.status) return false;
+          if (state.cls !== "all" && e.cls !== state.cls) return false;
+          if (state.q) {
+            var hay = (e.name + " " + e.change + " " + e.note).toLowerCase();
+            if (hay.indexOf(state.q) === -1) return false;
+          }
+          return true;
+        });
+        cardsEl.innerHTML = "";
+        if (!visible.length) {
+          var empty = document.createElement("div");
+          empty.className = "empty-state";
+          empty.textContent = "No catalogue entries match these filters.";
+          cardsEl.appendChild(empty);
+        }
+        visible.forEach(function (e) {
+          var card = document.createElement("article");
+          card.className = "card" + (e.status === "flagged" ? " flagged" : "");
+          var srcs = e.sources.map(function (s) {
+            return '<a href="' + s[1] + '" target="_blank" rel="noopener">' + s[0] + "</a>";
+          }).join("");
+          card.innerHTML =
+            '<div class="card-top"><span class="card-num">No. ' + e.n + "</span>" +
+            badge(e.status) + classBadge(e.cls) + "</div>" +
+            "<h3>" + e.name + "</h3>" +
+            '<p class="change">' + e.change + "</p>" +
+            '<p class="note">' + e.note + "</p>" +
+            '<div class="sources"><span class="src-label">Source</span>' + srcs + "</div>";
+          cardsEl.appendChild(card);
+        });
+        showingEl.textContent = "Showing " + visible.length + " of 29 entries" +
+          (state.status !== "all" || state.cls !== "all" || state.q ? " (filtered)" : "");
+      }
+      function wireFilter(attr, key) {
+        var btns = document.querySelectorAll("[data-filter-" + attr + "]");
+        btns.forEach(function (b) {
+          b.addEventListener("click", function () {
+            btns.forEach(function (x) { x.setAttribute("aria-pressed", "false"); });
+            b.setAttribute("aria-pressed", "true");
+            state[key] = b.getAttribute("data-filter-" + attr);
+            renderCards();
+          });
+        });
+      }
+      wireFilter("status", "status");
+      wireFilter("class", "cls");
+      document.getElementById("catSearch").addEventListener("input", function (ev) {
+        state.q = ev.target.value.trim().toLowerCase();
+        renderCards();
+      });
+      renderCards();
+
+      /* ================= Core systems ================= */
+      var CORE = [
+        ["10×10 board", "Entry 1"],
+        ["9×9 board + 3×3-square clear", "Entries 2–3, collapsed"],
+        ["Level / target goal ending", "Entries 4, 6, collapsed"],
+        ["Timer ending — countdown and replenishing merged", "Entries 7, 8, 10, collapsed"],
+        ["Rows-only clear", "Entry 8's clear restriction, kept separate from its timer"],
+        ["Colour-connected clear", "Entry 11"],
+        ["Free rotation", "Entries 12, 14 (rotation) and 21 (tools), collapsed"],
+        ["Hold slot", "Entry 13 — its consumable rotation folds into system 7"],
+        ["Gravity fall-after-clear + chains", "Entries 15–16, collapsed"],
+        ["Column-slide / sand gravity", "Entries 17–18 — a distinct mechanism: the piece splits by column or crumbles, not a whole-board fall"],
+        ["Circular ring / slice board", "Entries 19–20, collapsed on geometry; twist vs junk treated as obstacle flavour within this system, for conservatism"],
+        ["Hexagonal / triangle board", "Entry 21"],
+        ["Jigsaw exact-cover goal", "Entry 23"],
+        ["Slide movement", "Entry 24"],
+        ["Rectangular non-square board", "Entry 9's 9×12 and entry 14's 10×20, collapsed on geometry alone"],
+        ["Special / obstacle pieces as a system — bomb / rainbow / ice / stone / junk", "Entries 9, 15, 17, 19, 20, collapsed"]
+      ];
+      var coreGrid = document.getElementById("coreGrid");
+      CORE.forEach(function (c) {
+        var d = document.createElement("div");
+        d.className = "core-item";
+        d.innerHTML = c[0] + '<span class="rows">' + c[1] + "</span>";
+        coreGrid.appendChild(d);
+      });
+
+      /* ================= Calculator ================= */
+      var CALC_DIMS = [
+        { name: "Board geometry", values: ["8×8", "10×10", "9×9", "9×12", "10×20", "Hexagonal", "Circular"] },
+        { name: "Clear rule", values: ["Rows + columns", "Rows only", "Rows + cols + 3×3 squares", "Colour-connected", "Ring / slice"] },
+        { name: "Rotation", values: ["Fixed orientation", "Rotatable"] },
+        { name: "Gravity", values: ["None", "Fall-after-clear", "Column-slide / sand"] },
+        { name: "Tray", values: ["3-piece", "3-piece + hold"] },
+        { name: "Ending", values: ["Endless no-fit", "Fixed countdown", "Replenishing timer", "Level-target"] },
+        { name: "Special / obstacle pieces", values: ["None", "Bomb / rainbow", "Ice / stone / junk"] }
+      ];
+      var calcState = CALC_DIMS.map(function (d) { return d.values.map(function () { return true; }); });
+      var calcDimsEl = document.getElementById("calcDims");
+      var totalEl = document.getElementById("calcTotal");
+      var chainEl = document.getElementById("calcChain");
+      var versusEl = document.getElementById("versusToggle");
+
+      function fmt(n) { return n.toLocaleString("en-US"); }
+
+      function renderCalc() {
+        calcDimsEl.innerHTML = "";
+        CALC_DIMS.forEach(function (dim, di) {
+          var on = calcState[di].filter(Boolean).length;
+          var block = document.createElement("div");
+          block.className = "calc-dim";
+          var head = document.createElement("div");
+          head.className = "calc-dim-head";
+          head.innerHTML = '<span class="name">' + dim.name + '</span><span class="n">n = ' + on + "</span>";
+          block.appendChild(head);
+          var chips = document.createElement("div");
+          chips.className = "vchips";
+          dim.values.forEach(function (v, vi) {
+            var b = document.createElement("button");
+            b.type = "button";
+            b.className = "vchip";
+            b.textContent = v;
+            b.setAttribute("aria-pressed", calcState[di][vi] ? "true" : "false");
+            b.addEventListener("click", function () {
+              var count = calcState[di].filter(Boolean).length;
+              if (calcState[di][vi] && count === 1) return; /* keep at least one value per dimension */
+              calcState[di][vi] = !calcState[di][vi];
+              renderCalc();
+            });
+            chips.appendChild(b);
+          });
+          block.appendChild(chips);
+          calcDimsEl.appendChild(block);
+        });
+        var counts = CALC_DIMS.map(function (d, di) { return calcState[di].filter(Boolean).length; });
+        var steps = [];
+        var running = counts[0];
+        steps.push(counts[0] + " × " + counts[1] + " = " + fmt(running * counts[1]));
+        running = running * counts[1];
+        for (var i = 2; i < counts.length; i++) {
+          steps.push(fmt(running) + " × " + counts[i] + " = " + fmt(running * counts[i]));
+          running = running * counts[i];
+        }
+        var total = running;
+        var versus = versusEl.checked;
+        var html = steps.map(function (s) { return '<span class="step">' + s + "</span>"; }).join("");
+        if (versus) {
+          html += '<span class="step">' + fmt(total) + " × 2 (versus, unverified) = " + fmt(total * 2) + "</span>";
+          total = total * 2;
+        }
+        chainEl.innerHTML = html;
+        totalEl.textContent = fmt(total);
+      }
+      versusEl.addEventListener("change", renderCalc);
+      document.getElementById("calcReset").addEventListener("click", function () {
+        calcState = CALC_DIMS.map(function (d) { return d.values.map(function () { return true; }); });
+        versusEl.checked = false;
+        renderCalc();
+      });
+      renderCalc();
+    </script>
+  </body>
+</html>
