@@ -13,6 +13,17 @@ export const messages = {
 	'resume.storage': 'Progress is kept in this tab only. Closing it will lose the active puzzle.',
 	'resume.failed': 'Unable to resume right now. Your saved puzzle is still here. Try again.',
 
+	'admin.games.enabledSwitch': 'Game enabled',
+	'admin.games.disabledSwitch': 'Game disabled',
+	'admin.games.on': 'On',
+	'admin.games.off': 'Off',
+	'admin.games.families': 'Games (families)',
+	'admin.games.familyStates': '{enabled} enabled · {disabled} disabled · {deleted} deleted',
+	'admin.games.enabledCount': '{enabled} enabled',
+	'admin.games.totalCompleted': 'Total completed',
+	'admin.games.overviewNote':
+		'Registered users only; guest solo starts are not counted. Total completed includes saved guest completions that have no start record, which are not counted in Shown or Played. Updated {time}.',
+
 	'admin.variants.title': 'Variants',
 	'admin.variants.registered': 'Registered users only; guest solo starts are not counted.',
 	'admin.variants.shown': 'Shown',
@@ -41,7 +52,7 @@ export const messages = {
 	'admin.test.start': 'Start test round',
 	'admin.test.stop': 'End test round',
 	'admin.test.notice':
-		'Ephemeral Memory test. No saved scores, leaderboard entries or activity statistics.',
+		'Ephemeral test round. No saved scores, leaderboard entries or activity statistics.',
 	'admin.test.loading': 'Preparing test round…',
 	'admin.test.failed': 'Unable to prepare or replay this test round. Try again.',
 	'admin.test.result': 'Test score: {score}',

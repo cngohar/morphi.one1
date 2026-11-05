@@ -134,6 +134,7 @@
 	const mismatchDelay = createActiveDelay(() =>
 		guard(() => {
 			game = resolveMismatch(game);
+			if (memoryVariant(game) === 'memory:moving') sound.play('reshuffle');
 		})
 	);
 
@@ -387,7 +388,7 @@
 		if (result.effect === 'match') {
 			const pair = [...revealedBefore, index];
 			matchStreak += 1;
-			sound.play('match', matchStreak - 1);
+			sound.play(trios ? 'trio-match' : 'match', matchStreak - 1);
 			announcement = t('status.match');
 			celebrating = pair;
 			clearTimer(celebrateTimer);

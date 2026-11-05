@@ -6,13 +6,14 @@
 	let {
 		action = '',
 		children,
-		oncomplete
+		oncomplete,
+		pending = $bindable(false)
 	}: {
 		action?: string;
 		children: Snippet<[boolean]>;
 		oncomplete?: (success: boolean) => void;
+		pending?: boolean;
 	} = $props();
-	let pending = $state(false);
 	let failed = $state(false);
 	const submit: SubmitFunction = ({ cancel }) => {
 		if (pending) {

@@ -14,6 +14,7 @@
 			family: PuzzleId;
 			variant?: string;
 			sharedVariants?: string[];
+			sharedNotice?: string;
 			liveVersion: string;
 			versions: { version: string; createdAt: number | null }[];
 		};
@@ -30,7 +31,9 @@
 					? ` · ${t('admin.variants.sharedScoring')}`
 					: ''}
 			</h2>
-			{#if config.sharedVariants?.length}<p>
+			{#if config.sharedNotice}<p>
+					{config.sharedNotice}
+				</p>{:else if config.sharedVariants?.length}<p>
 					{t('admin.variants.sharedNotice', {
 						variants: config.sharedVariants.map((name) => t(name as MessageKey)).join(', ')
 					})}

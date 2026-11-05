@@ -17,6 +17,34 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.1 — Block variants, admin games and sounds (2026-11-05)
+
+**Built:** classic-compatible Block board-10/rows-only/rush-60 with isolated groups/shared `brief-v1`; exact ranked rush ceiling; cached reconciled Games overview and selected-family detail reads; accessible header switch/dialog and audited reason-free enable; catalog-derived protected ephemeral test play; staged offline sound generation and three new static action assets. Full 42-path inventory and results: `docs/V1.3.1_WORK.md`.
+
+**Skipped:** D6/sidebar/pagination changes, Connect variants/Mahjong/new families, guest tracking, new routes/dependencies/migrations, full verify/global lint/type checks and unrelated suites, physical-device/performance/production measurements, commit/push and release/deployment work.
+
+**Known issues / decisions:** keep `block-placement-1` classic output and `brief-v1`; owner-approved rush ceiling is exactly 62 s after fixed 3 s Block and issued Card openings, with no extra 1 s allowance. Idle before first placement still counts server-side; legal-prefix replay cannot prove move times; checkpoint reload uses a wall-clock bridge. KV is eventually consistent; normal overview miss 7 statements/hit 0, detail 7 + V; current 19 groups/76 binds, mapping limit 25 groups. No versions upgraded. Admin test cleanup appends immutable scoring/audit versions restoring coefficients; saved runs and owner rows are unchanged. Successful audio cost 17 credits plus failed first local-processing attempt 6, total 23; original 22 hashes/provenance unchanged. **S5 owner audition remains pending, unsatisfied and not waived.**
+
+| Acceptance item                                                                                             | Evidence type / location                                                                                                                                           | Result                                                                |
+| ----------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------ | --------------------------------------------------------------------- |
+| B1–B5 Block logic, legacy compatibility, manifests, replay, labels/layout/clock/rotation and ranked ceiling | 39 unique targeted units, five Block D1 cases, eight Block browser cases, twelve identical six-runtime vectors; permanent `docs/evidence/v1.3.1/verification.json` | Pass                                                                  |
+| S1–S4 staged generator, integrity/decoded limits, mapping and sound hooks                                   | Unit checks, permanent `audio-quality.json`, three focused Chromium sound cases                                                                                    | Pass                                                                  |
+| S5 three owner sound auditions                                                                              | New uncommitted MP3s                                                                                                                                               | **NOT PASSED — owner audition pending; gate unsatisfied, not waived** |
+| A1–A5 statistics/cache/lifecycle/switch/permissions/ephemeral test play and updated specs                   | Two filtered admin D1 cases and two named admin browser cases                                                                                                      | Pass                                                                  |
+| Required shared boundaries and lazy client views                                                            | `boundaries.log`, final `build-focus-fix.log` / `lazy-focus-fix.log`                                                                                               | Pass                                                                  |
+
+**Evidence:** composite affected-only reruns total 39 unique units, 7 targeted D1 cases and 13 unique Chromium cases with one worker. Exact vector fingerprint and every B/S/A item live in the permanent summary; full logs are ignored local build output. Desktop Chromium viewports 390×844/844×390/1280×800 are emulated, not physical-device evidence. No global zero-warning type-check claim.
+
+**Measurements:** no application performance target was introduced or benchmarked; device/network/cold/preloaded medians/p95 and production resource measurements are not claimed. Three single-file decoded audio checks pass the brief's duration/peak/size limits; values are in the detailed report/permanent JSON.
+
+**Waivers:** none. S5 is pending rather than waived. **Questions / owner responsibilities:** listen to and approve/reject all three sounds, review the local variants/admin changes and provide confirmation/corrections. No commit/push, next phase or deployment is inferred. **CODEMAP updated:** yes. Stop for owner confirmation.
+
+### v1.3.1 Git handoff — 2026-11-05
+
+The owner explicitly requested updating the repository and pushing the v1.3.1 source handoff to the existing GitHub `origin/main`. This supersedes the earlier commit/push stop instruction for this handoff only; no local acceptance, deployment, release or next phase is inferred. Include implementation/tests, regenerated outputs, the approved brief, provenance manifest and report/evidence. The three new MP3s remain local and uncommitted until the owner approves their audition; a fresh checkout therefore lacks those assets even though their hooks/provenance are included. Prior local verification used the local files, and S5 remains NOT PASSED.
+
+The existing verification results are retained without repeating app checks. Pre-existing editor configuration, ignored credentials, databases and build output stay excluded. See the Git handoff note in `docs/V1.3.1_WORK.md`; execution status is reported separately after the source commit/push.
+
 ## v1.1 Work 3: Connect local integration — 2026-10-29
 
 - **Built:** Added Connect as the third Mix family behind the generated puzzle

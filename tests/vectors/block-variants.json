@@ -1,0 +1,2590 @@
+[
+	{
+		"seed": "0",
+		"variant": "block:board-10",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 1,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 9,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 8,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 2
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 3
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 2,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 8,
+				"y": 4
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 5
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 5
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 5
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 6
+			},
+			{
+				"trayIndex": 2,
+				"x": 9,
+				"y": 5
+			},
+			{
+				"trayIndex": 0,
+				"x": 2,
+				"y": 3
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 7
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 7
+			},
+			{
+				"trayIndex": 0,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 7
+			}
+		],
+		"board": [
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"l3",
+			null,
+			"l4",
+			null,
+			"square",
+			"square",
+			"domino",
+			"t4",
+			"t4",
+			"t4",
+			"l3",
+			"l3",
+			"l4",
+			"l4",
+			"square",
+			"square",
+			"domino",
+			null,
+			null,
+			null,
+			"l4",
+			"bar3",
+			"l4",
+			"square",
+			"square",
+			"bar4",
+			null,
+			"s4",
+			"s4",
+			"bar4",
+			"l4",
+			null,
+			"l4",
+			"s4",
+			"s4",
+			"bar4",
+			"s4",
+			"s4",
+			"bar3",
+			"bar4",
+			null,
+			null,
+			"l4",
+			"l4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"t4",
+			"t4",
+			"t4",
+			null,
+			"square",
+			"square",
+			"bar4",
+			"bar3",
+			"bar3",
+			"bar4",
+			"bar3",
+			"t4",
+			"s4",
+			"s4",
+			"l3",
+			null,
+			"bar4",
+			"bar3",
+			null,
+			"bar4",
+			"bar3",
+			"s4",
+			"s4",
+			null,
+			"l3",
+			"l3",
+			"bar4",
+			null,
+			null,
+			"bar4",
+			"bar3",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null
+		],
+		"tray": [null, "bar4", null],
+		"supplyIndex": 39,
+		"lines": 6,
+		"combo": 0,
+		"status": "ended",
+		"result": {
+			"score": 600,
+			"group": "block-placement-1:board-10",
+			"pairs": null,
+			"moves": 38
+		}
+	},
+	{
+		"seed": "42",
+		"variant": "block:board-10",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 8,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 2
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 3
+			},
+			{
+				"trayIndex": 2,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 9,
+				"y": 3
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 3
+			},
+			{
+				"trayIndex": 1,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 8,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 5,
+				"y": 2
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 2,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 4
+			},
+			{
+				"trayIndex": 0,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 5
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 6
+			},
+			{
+				"trayIndex": 0,
+				"x": 8,
+				"y": 5
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 7
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 6
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 8
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 8
+			},
+			{
+				"trayIndex": 2,
+				"x": 8,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 8,
+				"y": 5
+			}
+		],
+		"board": [
+			"l3",
+			"single",
+			"single",
+			"domino",
+			"bar3",
+			null,
+			"t4",
+			"t4",
+			"s4",
+			"s4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"s4",
+			"s4",
+			null,
+			"l4",
+			"l4",
+			"bar3",
+			null,
+			"bar3",
+			"t4",
+			"t4",
+			"t4",
+			null,
+			"bar3",
+			null,
+			null,
+			"bar3",
+			"square",
+			"square",
+			"bar4",
+			"t4",
+			null,
+			null,
+			"s4",
+			"l4",
+			null,
+			"bar4",
+			"square",
+			"square",
+			"bar4",
+			"l4",
+			"s4",
+			null,
+			"bar4",
+			"l4",
+			null,
+			"bar4",
+			"l4",
+			null,
+			"bar4",
+			"l4",
+			"l4",
+			"l4",
+			"bar4",
+			"l4",
+			"l4",
+			"l4",
+			"l4",
+			null,
+			"bar4",
+			"square",
+			"square",
+			"l4",
+			"bar4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"square",
+			"square",
+			"l4",
+			"l4",
+			"t4",
+			"t4",
+			"t4",
+			"l3",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"t4",
+			null,
+			"l3",
+			null,
+			null
+		],
+		"tray": [null, null, "s4"],
+		"supplyIndex": 57,
+		"lines": 12,
+		"combo": 1,
+		"status": "ended",
+		"result": {
+			"score": 1250,
+			"group": "block-placement-1:board-10",
+			"pairs": null,
+			"moves": 56
+		}
+	},
+	{
+		"seed": "18446744073709551615",
+		"variant": "block:board-10",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 8,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 2
+			},
+			{
+				"trayIndex": 1,
+				"x": 5,
+				"y": 3
+			},
+			{
+				"trayIndex": 2,
+				"x": 8,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 2,
+				"y": 3
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 8,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 8,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 6,
+				"y": 2
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 3
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 1,
+				"y": 3
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 4
+			},
+			{
+				"trayIndex": 0,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 8,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 6,
+				"y": 5
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 7,
+				"y": 6
+			},
+			{
+				"trayIndex": 0,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 6
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 6
+			},
+			{
+				"trayIndex": 0,
+				"x": 8,
+				"y": 5
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 5
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 5
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 8,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 3
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 5,
+				"y": 3
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 3
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 6
+			},
+			{
+				"trayIndex": 0,
+				"x": 9,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 0
+			}
+		],
+		"board": [
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"s4",
+			"s4",
+			null,
+			null,
+			null,
+			"l3",
+			"l3",
+			null,
+			"domino",
+			"s4",
+			"s4",
+			null,
+			null,
+			null,
+			"square",
+			"square",
+			null,
+			"bar3",
+			"l3",
+			"l3",
+			"t4",
+			"t4",
+			"t4",
+			"bar3",
+			"t4",
+			"t4",
+			"t4",
+			"s4",
+			"s4",
+			"bar4",
+			"square",
+			"square",
+			null,
+			null,
+			null,
+			"t4",
+			"s4",
+			"s4",
+			null,
+			"bar4",
+			"square",
+			"square",
+			"l3",
+			"l3",
+			null,
+			"s4",
+			"s4",
+			null,
+			"bar4",
+			"bar4",
+			null,
+			"bar3",
+			null,
+			null,
+			"s4",
+			"s4",
+			null,
+			null,
+			"bar4",
+			"bar4",
+			"l4",
+			"bar3",
+			"square",
+			"square",
+			null,
+			null,
+			"l4",
+			null,
+			"bar4",
+			"bar3",
+			"l4",
+			"s4",
+			"s4",
+			null,
+			null,
+			null,
+			"l4",
+			"l4",
+			"bar4",
+			"bar3",
+			"l4",
+			"l4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null
+		],
+		"tray": [null, "bar4", null],
+		"supplyIndex": 75,
+		"lines": 18,
+		"combo": 0,
+		"status": "ended",
+		"result": {
+			"score": 1900,
+			"group": "block-placement-1:board-10",
+			"pairs": null,
+			"moves": 74
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "block:rows-only",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 2
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 2,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 4
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 5,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 6
+			},
+			{
+				"trayIndex": 2,
+				"x": 7,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 5
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 4
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 6
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 3
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 3
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 0
+			}
+		],
+		"board": [
+			"bar3",
+			"domino",
+			"square",
+			"square",
+			"bar4",
+			"l4",
+			"l3",
+			null,
+			"t4",
+			"t4",
+			"t4",
+			"s4",
+			"s4",
+			"l4",
+			null,
+			null,
+			"bar3",
+			"t4",
+			"s4",
+			"s4",
+			"bar4",
+			"l4",
+			"l4",
+			null,
+			null,
+			"s4",
+			"s4",
+			"t4",
+			"bar4",
+			"l4",
+			"l4",
+			null,
+			"s4",
+			"s4",
+			"l3",
+			"l3",
+			null,
+			null,
+			null,
+			null,
+			"l4",
+			"bar4",
+			"bar3",
+			null,
+			"bar4",
+			"bar3",
+			"bar3",
+			"bar4",
+			null,
+			"bar4",
+			null,
+			null,
+			"square",
+			"square",
+			null,
+			null,
+			null,
+			"bar4",
+			null,
+			"t4",
+			"square",
+			"square",
+			"bar3",
+			"bar4"
+		],
+		"tray": ["t4", "l4", "s4"],
+		"supplyIndex": 57,
+		"lines": 16,
+		"combo": 0,
+		"status": "ended",
+		"result": {
+			"score": 2000,
+			"group": "block-placement-1:rows-only",
+			"pairs": null,
+			"moves": 54
+		}
+	},
+	{
+		"seed": "42",
+		"variant": "block:rows-only",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 4
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 4
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 1
+			}
+		],
+		"board": [
+			"domino",
+			"single",
+			"bar3",
+			"t4",
+			"t4",
+			"t4",
+			"l3",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"l3",
+			"l3",
+			"t4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			"square",
+			"square",
+			null,
+			"bar4",
+			"l3",
+			"l3",
+			"l4",
+			"l4",
+			null,
+			"s4",
+			"s4",
+			"bar4",
+			"square",
+			"square",
+			"l4",
+			null,
+			"s4",
+			"s4",
+			null,
+			"bar4",
+			"square",
+			"square",
+			"l4",
+			null,
+			null,
+			null,
+			null,
+			"bar4",
+			null,
+			null,
+			"l4",
+			"l4",
+			null,
+			null,
+			null,
+			"bar4",
+			null,
+			null,
+			null,
+			null
+		],
+		"tray": ["l4", null, null],
+		"supplyIndex": 21,
+		"lines": 4,
+		"combo": 1,
+		"status": "ended",
+		"result": {
+			"score": 400,
+			"group": "block-placement-1:rows-only",
+			"pairs": null,
+			"moves": 20
+		}
+	},
+	{
+		"seed": "18446744073709551615",
+		"variant": "block:rows-only",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 2,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 7,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 5,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 4
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 4
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 6
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 2
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 3
+			},
+			{
+				"trayIndex": 2,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 3
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 6
+			}
+		],
+		"board": [
+			"single",
+			null,
+			"t4",
+			"t4",
+			"t4",
+			null,
+			null,
+			"domino",
+			"t4",
+			"t4",
+			"t4",
+			"t4",
+			null,
+			"bar4",
+			"domino",
+			"domino",
+			"bar3",
+			"t4",
+			"bar4",
+			"bar3",
+			"l4",
+			"bar4",
+			null,
+			"domino",
+			null,
+			null,
+			"bar4",
+			"bar3",
+			"l3",
+			null,
+			null,
+			"bar4",
+			"bar3",
+			null,
+			"bar4",
+			"bar3",
+			"l3",
+			"l3",
+			null,
+			"bar4",
+			"l3",
+			"l3",
+			"bar4",
+			"l4",
+			null,
+			"s4",
+			"s4",
+			"bar4",
+			"square",
+			"square",
+			null,
+			"l4",
+			"l4",
+			"square",
+			"square",
+			"bar4",
+			"square",
+			"square",
+			null,
+			null,
+			null,
+			"square",
+			"square",
+			null
+		],
+		"tray": [null, "t4", null],
+		"supplyIndex": 33,
+		"lines": 7,
+		"combo": 0,
+		"status": "ended",
+		"result": {
+			"score": 700,
+			"group": "block-placement-1:rows-only",
+			"pairs": null,
+			"moves": 32
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "block:rush-60",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 2
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 3
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 3
+			}
+		],
+		"board": [
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"domino",
+			null,
+			"l3",
+			"l3",
+			"square",
+			"square",
+			"l4",
+			"domino",
+			null,
+			"s4",
+			"s4",
+			"bar3",
+			"bar4",
+			null,
+			"l4",
+			"l4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"bar3",
+			"bar3",
+			"bar4",
+			null,
+			"t4",
+			null,
+			null,
+			null,
+			"bar3",
+			null,
+			"bar4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null
+		],
+		"tray": ["t4", "l3", "bar4"],
+		"supplyIndex": 15,
+		"lines": 2,
+		"combo": 2,
+		"status": "playing",
+		"result": {
+			"score": 250,
+			"group": "block-placement-1:rush-60",
+			"pairs": null,
+			"moves": 12
+		}
+	},
+	{
+		"seed": "42",
+		"variant": "block:rush-60",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			}
+		],
+		"board": [
+			"domino",
+			"single",
+			"bar3",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"square",
+			"square",
+			"bar3",
+			"bar4",
+			"l3",
+			null,
+			"l4",
+			"bar3",
+			"square",
+			"square",
+			null,
+			"bar4",
+			"l3",
+			"l3",
+			"l4",
+			"l4",
+			null,
+			"s4",
+			"s4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			"s4",
+			"s4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null
+		],
+		"tray": ["t4", "l3", "bar4"],
+		"supplyIndex": 15,
+		"lines": 2,
+		"combo": 1,
+		"status": "playing",
+		"result": {
+			"score": 200,
+			"group": "block-placement-1:rush-60",
+			"pairs": null,
+			"moves": 12
+		}
+	},
+	{
+		"seed": "18446744073709551615",
+		"variant": "block:rush-60",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 5,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 2
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 2
+			}
+		],
+		"board": [
+			"single",
+			"s4",
+			"s4",
+			"l3",
+			null,
+			null,
+			null,
+			"domino",
+			"s4",
+			"s4",
+			null,
+			"l3",
+			"l3",
+			"s4",
+			"s4",
+			null,
+			"bar3",
+			"l4",
+			null,
+			"bar4",
+			"s4",
+			"s4",
+			"square",
+			"square",
+			null,
+			"l4",
+			null,
+			"bar4",
+			null,
+			null,
+			"square",
+			"square",
+			null,
+			"l4",
+			"l4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null
+		],
+		"tray": ["bar3", "single", "domino"],
+		"supplyIndex": 15,
+		"lines": 2,
+		"combo": 0,
+		"status": "playing",
+		"result": {
+			"score": 200,
+			"group": "block-placement-1:rush-60",
+			"pairs": null,
+			"moves": 12
+		}
+	},
+	{
+		"seed": "42",
+		"variant": "block:classic",
+		"moves": [
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 7,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 6,
+				"y": 1
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 4,
+				"y": 2
+			},
+			{
+				"trayIndex": 2,
+				"x": 0,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 0,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 1,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 2,
+				"y": 0
+			},
+			{
+				"trayIndex": 0,
+				"x": 3,
+				"y": 0
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 0
+			},
+			{
+				"trayIndex": 2,
+				"x": 3,
+				"y": 4
+			},
+			{
+				"trayIndex": 0,
+				"x": 4,
+				"y": 4
+			},
+			{
+				"trayIndex": 1,
+				"x": 6,
+				"y": 4
+			},
+			{
+				"trayIndex": 2,
+				"x": 5,
+				"y": 1
+			},
+			{
+				"trayIndex": 1,
+				"x": 0,
+				"y": 1
+			},
+			{
+				"trayIndex": 2,
+				"x": 1,
+				"y": 1
+			}
+		],
+		"board": [
+			"domino",
+			"single",
+			"bar3",
+			"t4",
+			"t4",
+			"t4",
+			"l3",
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			null,
+			"l3",
+			"l3",
+			"t4",
+			null,
+			null,
+			null,
+			null,
+			null,
+			"square",
+			"square",
+			null,
+			"bar4",
+			"l3",
+			"l3",
+			"l4",
+			"l4",
+			null,
+			"s4",
+			"s4",
+			"bar4",
+			"square",
+			"square",
+			"l4",
+			null,
+			"s4",
+			"s4",
+			null,
+			"bar4",
+			"square",
+			"square",
+			"l4",
+			null,
+			null,
+			null,
+			null,
+			"bar4",
+			null,
+			null,
+			"l4",
+			"l4",
+			null,
+			null,
+			null,
+			"bar4",
+			null,
+			null,
+			null,
+			null
+		],
+		"tray": ["l4", null, null],
+		"supplyIndex": 21,
+		"lines": 4,
+		"combo": 1,
+		"status": "ended",
+		"result": {
+			"score": 400,
+			"group": "block-placement-1",
+			"pairs": null,
+			"moves": 20
+		}
+	}
+]

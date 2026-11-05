@@ -17,10 +17,18 @@
 		streak: number
 	) {
 		const summary = t('block.result.summary', { lines, pieces });
+		const timeUp = endReason === 'time-up';
 		props.onfinish({
 			score,
 			title: t('block.result.title'),
-			summary: t(endReason === 'cap' ? 'block.result.cap' : 'block.result.noFit', { summary }),
+			summary: t(
+				timeUp
+					? 'block.result.timeUp'
+					: endReason === 'cap'
+						? 'block.result.cap'
+						: 'block.result.noFit',
+				{ summary }
+			),
 			announcement: t('block.result.announce', { score: formatNumber(score), summary }),
 			stats: [
 				{ label: t('block.lines'), value: formatNumber(lines) },
@@ -28,6 +36,17 @@
 				{ label: t('block.streak'), value: streak > 0 ? `×${streak}` : '—' }
 			],
 			endingValues: { score: formatNumber(score), pieces: formatNumber(pieces) },
+			...(timeUp
+				? {
+						ending: {
+							headline: t('ending.block.timeUp'),
+							subline: t('ending.block.timeUp.subline', {
+								score: formatNumber(score),
+								pieces: formatNumber(pieces)
+							})
+						}
+					}
+				: {}),
 			cap: endReason === 'cap'
 		});
 	}
@@ -38,6 +57,6 @@
 	round={props.round as BlockRound}
 	{showHint}
 	onfinish={finish}
-	oncomplete={(score) => props.oncomplete(score, 0)}
+	oncomplete={props.oncomplete}
 	traySide="right"
 />

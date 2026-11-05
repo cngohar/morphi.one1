@@ -1,0 +1,305 @@
+{
+	"scope": "v1.3.1 Block variants, admin games and per-action sounds; local only",
+	"base": "f053fc39e5bb9e3daa3cba747761cf9e81c5c914",
+	"date": "2026-11-05",
+	"status": "Targeted automated checks passed; S5 owner audition gate unsatisfied; local owner review pending",
+	"summary": {
+		"uniqueUnitTestsPassed": 39,
+		"targetedD1IntegrationTestsPassed": 7,
+		"uniqueChromiumTestsPassed": 13,
+		"browserWorkers": 1,
+		"vectorCountPerRuntime": 12,
+		"vectorFingerprint": "09cc4372918d5d92e2edd3562cdbd0668bccf8268bf99a5b7433d73670ed74ee",
+		"runtimes": ["Node", "Bun", "Chromium", "Firefox", "WebKit", "workerd"]
+	},
+	"checks": {
+		"B1": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/headless-unit.log", "build/v1.3.1/block-variants-rerun.log"],
+			"result": "Existing Block logic and new variants; composite 39 unique unit checks across the targeted unit scope."
+		},
+		"B2": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/block-vectors-rerun.log"],
+			"result": "12 identical vectors in each of six runtimes; existing vectors unchanged."
+		},
+		"B3": {
+			"status": "pass",
+			"evidence": [
+				"build/v1.3.1/block-variants-rerun.log",
+				"build/v1.3.1/registry-b3-before.sha256",
+				"build/v1.3.1/registry-b3-after.sha256"
+			],
+			"result": "All Block labels/help/endings/shared score key resolve; five regenerated outputs repeat identically."
+		},
+		"B4": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/browser-rerun3.log"],
+			"result": "8 Block cases; variant labels, board fit, rush clock/Help/hidden/reload, selector rotation."
+		},
+		"B5": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/block-integration.log"],
+			"result": "Exact 62-second ranked ceiling after fixed openings; reduced-motion acceptance; legacy classic payload and elapsed behavior preserved."
+		},
+		"S1": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/headless-unit.log"],
+			"result": "Forced later failure leaves manifest complete and publishes no partial assets; append preserves existing provenance."
+		},
+		"S2": {
+			"status": "pass",
+			"evidence": ["docs/evidence/v1.3.1/audio-quality.json"],
+			"result": "3 decoded assets meet duration/peak/size checks; 22 existing hashes and raw manifest entries unchanged."
+		},
+		"S3": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/headless-unit.log"],
+			"result": "All actions resolve to existing/reused or new static assets; preload kinds unique."
+		},
+		"S4": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/browser-s4.log"],
+			"result": "3 cases: classic match baseline, trio-match with shared pitch, one reshuffle after moving mismatch; no external gameplay host."
+		},
+		"S5": {
+			"status": "not_passed",
+			"gateSatisfied": false,
+			"waived": false,
+			"evidence": [],
+			"result": "Owner must listen to and approve trio-match.mp3, reshuffle.mp3 and timer-tick.mp3; all three remain uncommitted.",
+			"pendingOwnerAudition": true
+		},
+		"A1": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/admin-integration.log", "build/v1.3.1/browser-operator-final.log"],
+			"result": "Global/family/variant sums and both activity identities; cache hit/miss/expiry/corruption/invalidation; scoped detail queries."
+		},
+		"A2": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/admin-integration.log", "build/v1.3.1/browser-operator-final.log"],
+			"result": "Header switch in both subviews; reason/confirm validation; pending/failure old state; fixed enable audit; Tab/Shift+Tab containment and Escape focus return."
+		},
+		"A3": {
+			"status": "pass",
+			"evidence": [
+				"build/v1.3.1/admin-integration.log",
+				"build/v1.3.1/block-integration.log",
+				"build/v1.3.1/browser-remaining.log"
+			],
+			"result": "Family/variant enable ignores submitted reason, missing reason accepted, disable reasons validated; all-disabled Block unavailable."
+		},
+		"A4": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/browser-remaining.log"],
+			"result": "Both families reject unauthenticated/nonoperator requests; noindex; disabled Block rush test play produces no fixture-user completion/session/activity, no player POST or variant-count changes."
+		},
+		"A5": {
+			"status": "pass",
+			"evidence": ["build/v1.3.1/browser-remaining.log", "build/v1.3.1/browser-operator-final.log"],
+			"result": "Both updated named admin browser specs pass."
+		},
+		"sharedBoundaries": {
+			"status": "pass",
+			"evidence": [
+				"build/v1.3.1/boundaries.log",
+				"build/v1.3.1/build-focus-fix.log",
+				"build/v1.3.1/lazy-focus-fix.log"
+			],
+			"result": "Purity/import boundaries, production build and independent lazy Game views pass."
+		}
+	},
+	"browserEvidence": {
+		"scope": "v1.3.1 section 8 targeted browser and vector checks",
+		"browser": {
+			"project": "chromium",
+			"workers": 1,
+			"tests": 13,
+			"passed": 13,
+			"failed": 0,
+			"groups": {
+				"B4": {
+					"passed": 8,
+					"cases": [
+						"block:classic labels HUD, help and result",
+						"block:board-10 labels HUD, help and result",
+						"block:rows-only labels HUD, help and result",
+						"block:rush-60 labels HUD, help and result",
+						"10 x 10 board fits phone portrait, phone landscape and desktop emulated sizes",
+						"rush starts on first valid placement and reaches time-up through Help and hidden-page time",
+						"rush checkpoint reload preserves variant and elapsed time",
+						"selector rotates enabled Block variants without consecutive repeats"
+					],
+					"log": "build/v1.3.1/browser-rerun3.log"
+				},
+				"S4": {
+					"passed": 3,
+					"cases": [
+						"classic match baseline plays match with shared streak pitch",
+						"trios match plays trio-match, not match, with shared streak pitch",
+						"moving miss plays reshuffle once after the active hold"
+					],
+					"log": "build/v1.3.1/browser-s4.log"
+				},
+				"A2_A5": {
+					"passed": 1,
+					"case": "games admin manages availability and restores scoring without losing saved history",
+					"coverage": [
+						"switch on Statistics and Settings",
+						"disable reason and confirmation",
+						"enable without reason",
+						"focus stays in the dialog and Escape restores focus",
+						"disable without reason rejected",
+						"enable audit uses fixed reason",
+						"operator availability admin regression"
+					],
+					"log": "build/v1.3.1/browser-operator-final.log"
+				},
+				"A4": {
+					"passed": 1,
+					"case": "Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds",
+					"coverage": [
+						"operator-only and noindex",
+						"disabled Block rush variant can be test-played",
+						"test play creates no completed run, leaderboard entry, variant count or player activity"
+					],
+					"log": "build/v1.3.1/browser-remaining.log"
+				}
+			}
+		},
+		"blockVectors": {
+			"passed": true,
+			"vectors": 12,
+			"runtimes": ["Node", "Bun", "Chromium", "Firefox", "WebKit", "workerd"],
+			"fingerprint": "09cc4372918d5d92e2edd3562cdbd0668bccf8268bf99a5b7433d73670ed74ee",
+			"log": "build/v1.3.1/block-vectors-rerun.log"
+		},
+		"supportingChecks": {
+			"B3RegistryRepeat": {
+				"passed": true,
+				"outputs": 5,
+				"beforeHashes": "build/v1.3.1/registry-b3-before.sha256",
+				"afterHashes": "build/v1.3.1/registry-b3-after.sha256",
+				"runLog": "build/v1.3.1/registry-b3-run.log"
+			},
+			"boundaries": {
+				"passed": true,
+				"log": "build/v1.3.1/boundaries.log"
+			},
+			"build": {
+				"passed": true,
+				"log": "build/v1.3.1/build-focus-fix.log"
+			},
+			"lazyBundle": {
+				"passed": true,
+				"log": "build/v1.3.1/lazy-focus-fix.log"
+			},
+			"localMigration": {
+				"passed": true,
+				"result": "No migrations to apply",
+				"log": "build/v1.3.1/db-migrate.log"
+			}
+		}
+	},
+	"headlessEvidence": {
+		"scope": "Targeted headless v1.3.1 checks",
+		"status": "pass",
+		"checks": [
+			{
+				"name": "Block existing logic, Block variant logic, and sound S1/S3 unit tests",
+				"command": "bun run test:unit -- --run src/lib/puzzles/block-placement/logic.test.ts src/lib/puzzles/block-placement/variants.test.ts src/lib/block-variants.test.ts tests/slices/v1.3.1-sounds.test.ts",
+				"initialResult": "37 passed, 1 failed; the only failure was the then-current Block selector rotation test",
+				"log": "build/v1.3.1/headless-unit.log"
+			},
+			{
+				"name": "Block selector rotation rerun after the scoped fix",
+				"command": "bun run test:unit -- --run src/lib/block-variants.test.ts",
+				"result": "3/3 passed",
+				"log": "build/v1.3.1/block-variants-rerun.log"
+			},
+			{
+				"name": "Admin A1-A3 targeted integration cases",
+				"command": "bun run test:accounts -- tests/integration/memory-variants.test.ts -t 'caches reconciled overview|requires disable reasons'",
+				"result": "2 passed, 5 unrelated cases skipped",
+				"log": "build/v1.3.1/admin-integration.log"
+			},
+			{
+				"name": "Block ranked and availability integration cases B5/A3",
+				"command": "bun run test:accounts -- tests/integration/block-variants.test.ts",
+				"result": "5/5 passed",
+				"log": "build/v1.3.1/block-integration.log"
+			},
+			{
+				"name": "Independent S2 audio measurements and existing asset baseline",
+				"result": "pass",
+				"details": "All 3 new MP3s decoded; durations were within 0.15s, peaks were <= -1 dBFS, each file was under 12,000 bytes, and file hashes matched the manifest. All 22 pre-existing manifest entries were byte-identical to git HEAD and all 22 files matched their baseline hashes.",
+				"log": "build/v1.3.1/s2-audio-quality.log",
+				"measurements": "build/v1.3.1/s2-audio-quality.json"
+			}
+		],
+		"notRun": [
+			"No source edits or failure fixes were made by this verifier.",
+			"S5 owner audition remains pending and is not marked passed.",
+			"Browser, six-runtime vector, build, boundary, and lazy-bundle checks are owned by the browser agent."
+		]
+	},
+	"registryGeneratedHashes": {
+		"src/lib/catalog.ts": "665fc024f5a0f0550b544929b9a1a3100c3ca8d107691fc17ec6438bd91e5224",
+		"src/lib/registry.ts": "963b9d9d967eccbb5166907eb9b7f6aab91b8eb44037b35290bc8753e3f245a5",
+		"src/lib/family-index.ts": "7e036814bff2d043677018d5afc3798ea5d9aff939fba2244234727cab050ff2",
+		"src/lib/puzzle-metadata.ts": "c5bb3fac9ef0207428dc563105610eb47a1de9bbf7b464c72c9b5087384a9011",
+		"src/lib/puzzle-messages.ts": "beb10f4d03855df7b9c72e6f716dbf677433ecd4d6b5c630f30131cec8b89554"
+	},
+	"adminQueries": {
+		"overviewCacheTtlSeconds": 60,
+		"overviewMissD1StatementsExistingFamilies": 7,
+		"overviewMissD1StatementsAllThreeFamiliesMissing": 10,
+		"overviewHitAggregateD1Statements": 0,
+		"detailGameReadD1Statements": "7 + declared variant count",
+		"excluded": "Authentication, scoring and admin read audit statements",
+		"mappingGroups": 19,
+		"mappingBoundParameters": 76,
+		"d1BoundParameterLimit": 100,
+		"mappingGroupLimit": 25
+	},
+	"emulatedViewports": [
+		{
+			"width": 390,
+			"height": 844
+		},
+		{
+			"width": 844,
+			"height": 390
+		},
+		{
+			"width": 1280,
+			"height": 800
+		}
+	],
+	"audio": {
+		"quality": "docs/evidence/v1.3.1/audio-quality.json",
+		"generatedAt": "2026-11-05",
+		"paidPlan": "Starter; active at generation",
+		"ownerPreflightCreditsPerSecond": 40,
+		"projectedCredits": 68,
+		"successfulCredits": 17,
+		"failedFirstAttemptCredits": 6,
+		"totalCredits": 23,
+		"audition": "pending; not waived",
+		"existingEntriesByteIdentical": 22
+	},
+	"compositeEvidenceNote": "Scoped reruns after fixes, not one all-green run. Final UI fixes covered by final build/lazy and operator case. The unchanged Block and sound cases retain their successful runs. Shared local D1 tests isolate the authenticated fixture because the owner was playing concurrently; no owner rows were deleted or reset.",
+	"notRun": [
+		"Full bun run verify",
+		"Global lint, format or type-check suites",
+		"Full accounts, unit or browser suites",
+		"Users and moderation suites",
+		"Connect and Mahjong gameplay",
+		"Unrelated Memory gameplay beyond sound hooks/admin test play",
+		"Physical-device and production/performance measurements"
+	],
+	"noNewDependenciesRoutesMigrations": true,
+	"committed": false,
+	"pushed": false,
+	"deployed": false
+}

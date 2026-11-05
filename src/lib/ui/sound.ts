@@ -21,7 +21,10 @@ export type SoundKind =
 	| 'connect-cut'
 	| 'connect-redraw'
 	| 'connect-invalid'
-	| 'connect-win';
+	| 'connect-win'
+	| 'trio-match'
+	| 'reshuffle'
+	| 'timer-tick';
 const kinds: SoundKind[] = [
 	'flip',
 	'match',
@@ -44,7 +47,10 @@ const kinds: SoundKind[] = [
 	'connect-cut',
 	'connect-redraw',
 	'connect-invalid',
-	'connect-win'
+	'connect-win',
+	'trio-match',
+	'reshuffle',
+	'timer-tick'
 ];
 class SoundEngine {
 	private context: AudioContext | null = null;
@@ -117,7 +123,9 @@ class SoundEngine {
 				gain = context.createGain();
 			node.buffer = buffer;
 			node.playbackRate.value =
-				kind === 'match' || kind === 'combo' ? 1 + Math.min(Math.max(step, 0), 4) * 0.025 : 1;
+				kind === 'match' || kind === 'trio-match' || kind === 'combo'
+					? 1 + Math.min(Math.max(step, 0), 4) * 0.025
+					: 1;
 			gain.gain.value = kind === 'win' || kind === 'end' ? 0.24 : 0.18;
 			node.connect(gain);
 			gain.connect(context.destination);

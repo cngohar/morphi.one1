@@ -7,7 +7,13 @@ import {
 	publishThemeDraft,
 	rollbackThemeConfig
 } from '#lib/server/theme-admin.js';
-import { gameOverview, gameStatistics, changeGame, changeVariant } from '#lib/server/games.js';
+import {
+	gameOverview,
+	cachedGameOverview,
+	gameStatistics,
+	changeGame,
+	changeVariant
+} from '#lib/server/games.js';
 import { readAudit, exportAuditYear } from '#lib/server/audit.js';
 import { softDeleteUser, restoreDeletedUser } from '#lib/server/user-lifecycle.js';
 import { userDirectory, userDetail, userOverview } from '#lib/server/admin-users.js';
@@ -87,6 +93,7 @@ export const load: PageServerLoad = async (event) => {
 	if (event.params.view === 'games' && gameParam !== null && !Object.hasOwn(catalog, gameParam))
 		error(400, 'Invalid game');
 	const selectedGame = event.params.view === 'games' ? (gameParam as PuzzleId | null) : null;
+	const gameFamilies = Object.keys(catalog);
 	const userSearch = event.url.searchParams.get('search') ?? '';
 	const userStatus = event.url.searchParams.get('status') ?? 'all';
 	const requestedTab = event.url.searchParams.get('tab') ?? 'stats';
@@ -98,6 +105,7 @@ export const load: PageServerLoad = async (event) => {
 		family: PuzzleId;
 		variant?: string;
 		sharedVariants?: string[];
+		sharedNotice?: string;
 		liveVersion: string;
 		versions: Awaited<ReturnType<typeof listScoreVersions>>;
 	})[] = [];
@@ -107,6 +115,7 @@ export const load: PageServerLoad = async (event) => {
 		versions: Awaited<ReturnType<typeof listThemeVersions>>;
 	} | null = null;
 	let games: Awaited<ReturnType<typeof gameOverview>> = [];
+	let gamesOverview: Awaited<ReturnType<typeof cachedGameOverview>> | null = null;
 	let gameStats: Awaited<ReturnType<typeof gameStatistics>> = {
 		rows: [],
 		more: false,
@@ -151,8 +160,13 @@ export const load: PageServerLoad = async (event) => {
 			else usersOverview = await userOverview(env.DB, actor);
 		}
 		if (event.params.view === 'games') {
-			games = await gameOverview(env.DB);
-			if (selectedGame) gameStats = await gameStatistics(env.DB, selectedGame);
+			if (selectedGame) {
+				games = await gameOverview(env.DB, selectedGame);
+				gameStats = await gameStatistics(env.DB, selectedGame, games[0]);
+			} else {
+				gamesOverview = await cachedGameOverview(env.DB, env.CONFIG_CACHE);
+				games = gamesOverview.games;
+			}
 		}
 		if (event.params.view === 'scoring' || selectedGame)
 			scoring = await Promise.all(
@@ -177,6 +191,11 @@ export const load: PageServerLoad = async (event) => {
 								: catalog[family].variants
 										?.filter((entry) => !entry.scoring)
 										.map((entry) => entry.name),
+							sharedNotice: variant
+								? undefined
+								: (catalog[family].messages as Record<string, string>)[
+										`scoring.${family}.sharedNotice`
+									],
 							...config,
 							liveVersion,
 							versions: await listScoreVersions(env.DB, family, variant)
@@ -278,6 +297,7 @@ export const load: PageServerLoad = async (event) => {
 			filters,
 			subview,
 			selectedGame,
+			gameFamilies,
 			testPlayFamilies: [],
 			gameStats,
 			detailTab,
@@ -289,6 +309,7 @@ export const load: PageServerLoad = async (event) => {
 			detail,
 			themes: null,
 			scoring: [],
+			gamesOverview: null,
 			games: [],
 			view: event.params.view,
 			ranked: ranked?.enabled !== 0,
@@ -307,7 +328,8 @@ export const load: PageServerLoad = async (event) => {
 		filters,
 		subview,
 		selectedGame,
-		testPlayFamilies: ['memory'],
+		gameFamilies,
+		testPlayFamilies: Object.keys(catalog),
 		gameStats,
 		detailTab,
 		userSearch,
@@ -318,6 +340,7 @@ export const load: PageServerLoad = async (event) => {
 		detail,
 		themes,
 		scoring,
+		gamesOverview,
 		games,
 		view: event.params.view,
 		ranked: ranked?.enabled !== 0,
@@ -407,7 +430,10 @@ export const actions: Actions = {
 									? 'ranked'
 									: action;
 			const actor = await operatorRequest(event, permission, action !== 'logout');
-			const reason = reasonValue(body.get('reason')),
+			const reason =
+					action === 'game-enable' || action === 'variant-enable'
+						? 'Resumed by operator (no reason entered)'
+						: reasonValue(body.get('reason')),
 				target = identifier(body.get('target'));
 			if (action === 'logout') {
 				await env.DB.batch([
@@ -462,7 +488,9 @@ export const actions: Actions = {
 					target,
 					String(body.get('variant') ?? ''),
 					action as 'variant-enable' | 'variant-disable',
-					reason
+					reason,
+					undefined,
+					env.CONFIG_CACHE
 				);
 				return { success: true };
 			}
@@ -475,7 +503,9 @@ export const actions: Actions = {
 					target as PuzzleId,
 					action as Parameters<typeof changeGame>[3],
 					reason,
-					days
+					days,
+					undefined,
+					env.CONFIG_CACHE
 				);
 				return { success: true };
 			}

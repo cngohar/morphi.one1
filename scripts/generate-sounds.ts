@@ -1,15 +1,21 @@
 /** Owner-authorized offline asset generation. Never imported by the app. */
 import { ElevenLabsClient } from '@elevenlabs/elevenlabs-js';
-import { existsSync, readFileSync, writeFileSync } from 'node:fs';
+import {
+	existsSync,
+	mkdirSync,
+	mkdtempSync,
+	readFileSync,
+	renameSync,
+	rmSync,
+	writeFileSync
+} from 'node:fs';
 import { createHash } from 'node:crypto';
-const local = existsSync('.env.local') ? readFileSync('.env.local', 'utf8') : '';
-const match = local.match(/^ELEVENLABS_API_KEY\s*=\s*["']?([^"'\r\n]+)/m);
-const apiKey = process.env.ELEVENLABS_API_KEY || match?.[1]?.trim();
-if (!apiKey) throw new Error('ELEVENLABS_API_KEY missing; no request sent');
-const client = new ElevenLabsClient({ apiKey });
+import { spawnSync } from 'node:child_process';
+import { join, resolve } from 'node:path';
+import { fileURLToPath } from 'node:url';
 const palette =
 	'Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. ';
-const sounds = [
+export const sounds = [
 	[
 		'flip',
 		0.5,
@@ -119,70 +125,159 @@ const sounds = [
 		'connect-win',
 		0.8,
 		'A full grid of tiny ceramic dots joins in one airy left-to-right cascade ending in a warm clear completion chord, under 700 milliseconds.'
+	],
+	[
+		'trio-match',
+		0.6,
+		'Three small porcelain tiles click together in one quick cluster, a warm hollow resonant finish, a touch fuller than a single pair click. Successful set of three, under 350 milliseconds.'
+	],
+	[
+		'reshuffle',
+		0.6,
+		'A handful of small walnut and ceramic tiles slide softly across felt and settle into new spots, a short dry scatter with two gentle rests. Cards moving to new places after a miss, under 400 milliseconds.'
+	],
+	[
+		'timer-tick',
+		0.5,
+		'A tiny dry wooden tick on felt, quiet and steady, a single soft click. Under 80 milliseconds.'
 	]
 ] as const;
-const previous = existsSync('static/audio/manifest.json')
-	? (JSON.parse(readFileSync('static/audio/manifest.json', 'utf8')).sounds as Record<
-			string,
-			unknown
-		>)
-	: {};
-const manifest: Record<string, unknown> = {};
-for (const [name, durationSeconds, description] of sounds) {
-	const path = `static/audio/${name}.mp3`;
-	if (!existsSync(path)) {
-		try {
-			const stream = await client.textToSoundEffects.convert(
-				{
-					text: palette + description,
-					durationSeconds,
-					promptInfluence: 0.75,
-					modelId: 'eleven_text_to_sound_v2',
-					outputFormat: 'mp3_44100_128'
-				},
-				{ timeoutInSeconds: 120, maxRetries: 0 }
-			);
-			const buffer = Buffer.from(await new Response(stream).arrayBuffer());
-			if (buffer.length < 1000) throw new Error('empty audio');
-			writeFileSync(path, buffer);
-			console.log(`Generated ${name}: ${buffer.length} bytes`);
-		} catch (error) {
-			// Never serialize provider request objects: they can contain credentials.
-			console.error(
-				`Generation failed for ${name}; status=${error && typeof error === 'object' && 'statusCode' in error ? error.statusCode : 'unknown'}`
-			);
-			if (error && typeof error === 'object' && 'body' in error) {
-				const body = error.body as { detail?: { status?: string; message?: string } };
-				console.error(
-					JSON.stringify({ providerStatus: body.detail?.status, message: body.detail?.message })
-				);
-			}
-			process.exitCode = 1;
-			break;
-		}
-	}
-	const bytes = readFileSync(path);
-	const provenance = {
-		file: `${name}.mp3`,
-		durationSeconds,
-		prompt: palette + description,
-		sha256: createHash('sha256').update(bytes).digest('hex')
+
+type GeneratedSound = { source: Buffer; bytes: Buffer; credits: number | null };
+const sha256 = (bytes: Buffer) => createHash('sha256').update(bytes).digest('hex');
+
+export async function generateSounds(
+	directory: string,
+	generate: (sound: (typeof sounds)[number]) => Promise<GeneratedSound>
+): Promise<void> {
+	const manifestPath = join(directory, 'manifest.json');
+	const manifest = JSON.parse(readFileSync(manifestPath, 'utf8')) as {
+		sounds: Record<string, unknown>;
 	};
-	manifest[name] = name.startsWith('connect-')
-		? { ...provenance, generatedAt: '2026-10-28' }
-		: (previous[name] ?? provenance);
+	const staging = mkdtempSync(join(directory, '.generate-'));
+	const published: string[] = [];
+	try {
+		for (const sound of sounds) {
+			const [name, durationSeconds, description] = sound;
+			if (existsSync(join(directory, `${name}.mp3`))) {
+				if (!manifest.sounds[name]) throw new Error('Existing audio lacks provenance');
+				continue;
+			}
+			const { source, bytes, credits } = await generate(sound);
+			writeFileSync(join(staging, `${name}.mp3`), bytes);
+			manifest.sounds[name] = {
+				file: `${name}.mp3`,
+				durationSeconds,
+				prompt: palette + description,
+				sha256: sha256(bytes),
+				sourceSha256: sha256(source),
+				processing:
+					'Leading silence trimmed (-60 dBFS), -3 dB gain, padded/trimmed to requested duration, mono MP3 44.1 kHz / 64 kbps; decoded peak <= -1 dBFS',
+				generatedAt: new Date().toISOString().slice(0, 10),
+				credits
+			};
+		}
+		writeFileSync(join(staging, 'manifest.json'), JSON.stringify(manifest, null, 2) + '\n');
+		for (const [name] of sounds) {
+			const staged = join(staging, `${name}.mp3`);
+			if (!existsSync(staged)) continue;
+			const destination = join(directory, `${name}.mp3`);
+			renameSync(staged, destination);
+			published.push(destination);
+		}
+		renameSync(join(staging, 'manifest.json'), manifestPath);
+	} catch (error) {
+		for (const path of published) rmSync(path);
+		throw error;
+	} finally {
+		rmSync(staging, { recursive: true, force: true });
+	}
 }
-writeFileSync(
-	'static/audio/manifest.json',
-	JSON.stringify(
+
+function ffmpeg(source: Buffer, arguments_: string[]): Buffer {
+	const result = spawnSync(
+		'ffmpeg',
+		['-hide_banner', '-loglevel', 'error', '-i', 'pipe:0', ...arguments_],
 		{
-			provider: 'ElevenLabs',
-			model: 'eleven_text_to_sound_v2',
-			sdk: '2.74.0',
-			generated: '2026-10-28',
-			sounds: manifest
-		},
-		null,
-		2
-	) + '\n'
-);
+			input: source,
+			maxBuffer: 8 * 1024 * 1024
+		}
+	);
+	if (result.status !== 0) throw new Error('Audio processing failed');
+	return result.stdout;
+}
+
+export function processSound(source: Buffer, durationSeconds: number): Buffer {
+	if (source.length < 1000) throw new Error('Empty audio');
+	const bytes = ffmpeg(source, [
+		'-af',
+		`silenceremove=start_periods=1:start_threshold=-60dB,volume=-3dB,apad,atrim=duration=${durationSeconds}`,
+		'-ac',
+		'1',
+		'-ar',
+		'44100',
+		'-b:a',
+		'64k',
+		'-f',
+		'mp3',
+		'pipe:1'
+	]);
+	const pcm = ffmpeg(bytes, ['-ac', '1', '-ar', '44100', '-f', 'f32le', 'pipe:1']);
+	let peak = 0;
+	for (let offset = 0; offset < pcm.length; offset += 4)
+		peak = Math.max(peak, Math.abs(pcm.readFloatLE(offset)));
+	const seconds = pcm.length / 4 / 44100;
+	console.log(
+		`Processed audio: ${bytes.length} bytes, ${seconds.toFixed(3)} s, ${(20 * Math.log10(peak)).toFixed(2)} dBFS`
+	);
+	if (
+		bytes.length >= 12000 ||
+		Math.abs(seconds - durationSeconds) > 0.15 ||
+		!Number.isFinite(peak) ||
+		peak === 0 ||
+		20 * Math.log10(peak) > -1
+	)
+		throw new Error('Audio acceptance check failed');
+	return bytes;
+}
+
+if (process.argv[1] && resolve(process.argv[1]) === fileURLToPath(import.meta.url)) {
+	try {
+		const local = existsSync('.env.local') ? readFileSync('.env.local', 'utf8') : '';
+		const apiKey = local.match(/^ELEVENLABS_API_KEY\s*=\s*["']?([^"'\r\n]+)/m)?.[1]?.trim();
+		if (!apiKey || spawnSync('ffmpeg', ['-version']).status !== 0)
+			throw new Error('Local key or ffmpeg unavailable');
+		const client = new ElevenLabsClient({ apiKey });
+		const sourceDirectory = 'build/v1.3.1/audio-source';
+		mkdirSync(sourceDirectory, { recursive: true });
+		await generateSounds('static/audio', async ([name, durationSeconds, description]) => {
+			const { data, rawResponse } = await client.textToSoundEffects
+				.convert(
+					{
+						text: palette + description,
+						durationSeconds,
+						promptInfluence: 0.75,
+						modelId: 'eleven_text_to_sound_v2',
+						outputFormat: 'mp3_44100_128'
+					},
+					{ timeoutInSeconds: 120, maxRetries: 0 }
+				)
+				.withRawResponse();
+			const source = Buffer.from(await new Response(data).arrayBuffer());
+			const cost = rawResponse.headers.get('character-cost');
+			const credits = cost !== null && /^\d+$/.test(cost) ? Number(cost) : null;
+			console.log(`Generated ${name}; credits=${credits ?? 'not returned'}`);
+			// Keep charged source audio for manual recovery if local processing fails.
+			writeFileSync(join(sourceDirectory, `${name}.mp3`), source);
+			return { source, bytes: processSound(source, durationSeconds), credits };
+		});
+	} catch (error) {
+		// Provider requests, errors and response bodies can contain credentials.
+		const safeReasons = ['Empty audio', 'Audio processing failed', 'Audio acceptance check failed'];
+		if (error instanceof Error && safeReasons.includes(error.message)) console.error(error.message);
+		console.error(
+			'Sound generation failed; existing manifest preserved. No provider details logged.'
+		);
+		process.exitCode = 1;
+	}
+}

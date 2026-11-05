@@ -170,6 +170,36 @@
       "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A full grid of tiny ceramic dots joins in one airy left-to-right cascade ending in a warm clear completion chord, under 700 milliseconds.",
       "sha256": "54569bc8ee96b71e8bdc3460e405428719c1c69edd389492c219cf855d551115",
       "generatedAt": "2026-10-28"
+    },
+    "trio-match": {
+      "file": "trio-match.mp3",
+      "durationSeconds": 0.6,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. Three small porcelain tiles click together in one quick cluster, a warm hollow resonant finish, a touch fuller than a single pair click. Successful set of three, under 350 milliseconds.",
+      "sha256": "a6b17e971cb5067a21e4090ed121d761135ac072b458fd7e340750a2a2fee189",
+      "sourceSha256": "824620482a56b9e652014b264f2451b60f172d800f71b88837d4df658890f6e1",
+      "processing": "Leading silence trimmed (-60 dBFS), -3 dB gain, padded/trimmed to requested duration, mono MP3 44.1 kHz / 64 kbps; decoded peak <= -1 dBFS",
+      "generatedAt": "2026-11-05",
+      "credits": 6
+    },
+    "reshuffle": {
+      "file": "reshuffle.mp3",
+      "durationSeconds": 0.6,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A handful of small walnut and ceramic tiles slide softly across felt and settle into new spots, a short dry scatter with two gentle rests. Cards moving to new places after a miss, under 400 milliseconds.",
+      "sha256": "017416ab97c90b2cd25fce54ae9243bee547d2658af1d8fc31032b2ec071c131",
+      "sourceSha256": "33392766d8b71496ab73f877b3ddf101b2cdf7b686d6e85d87af479895a88631",
+      "processing": "Leading silence trimmed (-60 dBFS), -3 dB gain, padded/trimmed to requested duration, mono MP3 44.1 kHz / 64 kbps; decoded peak <= -1 dBFS",
+      "generatedAt": "2026-11-05",
+      "credits": 6
+    },
+    "timer-tick": {
+      "file": "timer-tick.mp3",
+      "durationSeconds": 0.5,
+      "prompt": "Original Morphi.One tactile puzzle UI. Dry close warm felt, ceramic and wood. Single immediate fast gesture, clean short decay. No speech, music, arcade beeps or background noise. A tiny dry wooden tick on felt, quiet and steady, a single soft click. Under 80 milliseconds.",
+      "sha256": "c4524383f71ab8541f2c6ca267dd3664adbab3534284ad887f0d2d4a07a54559",
+      "sourceSha256": "f1ae441773c51270606de685d047750ee794b2b5a81e8dd1abf61604ad623963",
+      "processing": "Leading silence trimmed (-60 dBFS), -3 dB gain, padded/trimmed to requested duration, mono MP3 44.1 kHz / 64 kbps; decoded peak <= -1 dBFS",
+      "generatedAt": "2026-11-05",
+      "credits": 5
     }
   }
 }

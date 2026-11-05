@@ -1,0 +1,52 @@
+{
+	"scope": "S2 independent decoded-audio measurements and prior asset integrity",
+	"status": "pass",
+	"baseline": {
+		"revision": "HEAD",
+		"entryCount": 22,
+		"rawEntriesByteIdentical": true,
+		"allExistingFileHashesMatchBaseline": true
+	},
+	"newAssets": [
+		{
+			"kind": "trio-match",
+			"file": "trio-match.mp3",
+			"bytes": 5060,
+			"decodedSeconds": 0.626939,
+			"requestedSeconds": 0.6,
+			"durationDeltaSeconds": 0.026939,
+			"sampleRate": 44100,
+			"channels": 1,
+			"peakDbfs": -6.908,
+			"sha256MatchesManifest": true,
+			"pass": true
+		},
+		{
+			"kind": "reshuffle",
+			"file": "reshuffle.mp3",
+			"bytes": 5060,
+			"decodedSeconds": 0.626939,
+			"requestedSeconds": 0.6,
+			"durationDeltaSeconds": 0.026939,
+			"sampleRate": 44100,
+			"channels": 1,
+			"peakDbfs": -3.768,
+			"sha256MatchesManifest": true,
+			"pass": true
+		},
+		{
+			"kind": "timer-tick",
+			"file": "timer-tick.mp3",
+			"bytes": 4433,
+			"decodedSeconds": 0.548571,
+			"requestedSeconds": 0.5,
+			"durationDeltaSeconds": 0.048571,
+			"sampleRate": 44100,
+			"channels": 1,
+			"peakDbfs": -4.374,
+			"sha256MatchesManifest": true,
+			"pass": true
+		}
+	],
+	"failures": []
+}

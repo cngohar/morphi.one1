@@ -9,6 +9,9 @@
 	import SoundToggle from '#lib/components/SoundToggle.svelte';
 	import {
 		BLOCK_BOARD_SIZE,
+		BLOCK_RUSH_SECONDS,
+		endBlockRush,
+		parseBlockVariant,
 		PIECE_BY_ID,
 		canPlace,
 		placeBlockPiece,
@@ -18,7 +21,8 @@
 	} from '#lib/puzzles/block-placement/logic.js';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	import { blockThemeForSeed, blockThemeStyle } from '#lib/puzzles/block-placement/themes.js';
-	import { formatNumber } from '#lib/ui/format.js';
+	import { formatDuration, formatNumber } from '#lib/ui/format.js';
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import { sound } from '#lib/ui/sound.js';
 	import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 	import { themeStyle as proceduralStyle } from '#lib/engine/theme/style.js';
@@ -41,9 +45,13 @@
 		onready,
 		resolvedTheme = null,
 		resume,
-		registerCheckpoint
+		checkpointSavedAt,
+		registerCheckpoint,
+		paused = false
 	}: {
+		paused?: boolean;
 		resume?: CheckpointState;
+		checkpointSavedAt?: number;
 		registerCheckpoint?: (read: () => CheckpointState) => void;
 		round: BlockRound;
 		roundNumber: number;
@@ -59,7 +67,7 @@
 			streak: number
 		) => void;
 		onhome: () => void;
-		oncomplete?: (score: number) => void;
+		oncomplete?: (score: number, seconds: number) => void;
 		onmove?: (move: { trayIndex: number; x: number; y: number }) => void;
 		traySide?: 'left' | 'right';
 		entranceReady?: boolean;
@@ -98,8 +106,14 @@
 	const themeStyle = $derived(
 		blockThemeStyle(theme) + ';' + (resolvedTheme ? proceduralStyle(resolvedTheme) : '')
 	);
-	const boardRows = Array.from({ length: BLOCK_BOARD_SIZE }, (_, row) =>
-		Array.from({ length: BLOCK_BOARD_SIZE }, (_, column) => row * BLOCK_BOARD_SIZE + column)
+	const boardSize = $derived(round.boardSize ?? BLOCK_BOARD_SIZE);
+	const variant = $derived(parseBlockVariant(round.variant));
+	const rush = $derived(variant === 'block:rush-60');
+	const variantLabel = $derived(familyName('block', variant));
+	const boardRows = $derived(
+		Array.from({ length: boardSize }, (_, row) =>
+			Array.from({ length: boardSize }, (_, column) => row * boardSize + column)
+		)
 	);
 	const traySlots = Array.from({ length: 3 }, (_, index) => index);
 
@@ -176,6 +190,63 @@
 	let gainTimer: ReturnType<typeof setTimeout> | null = null;
 	let suppressTimer: ReturnType<typeof setTimeout> | null = null;
 	let focusFrame: number | null = null;
+	let clockBase = 0;
+	let clockStart: number | null = null;
+	let clockStarted = false;
+	let ticker: ReturnType<typeof setInterval> | null = null;
+	let completionSent = false;
+	let remaining = $state(BLOCK_RUSH_SECONDS);
+	let lastTick = BLOCK_RUSH_SECONDS;
+
+	function clockMs(): number {
+		return Math.min(
+			BLOCK_RUSH_SECONDS * 1000,
+			clockBase + (clockStart === null ? 0 : performance.now() - clockStart)
+		);
+	}
+
+	function stopClock(): void {
+		clockBase = clockMs();
+		clockStart = null;
+		if (ticker !== null) clearInterval(ticker);
+		ticker = null;
+	}
+
+	function startClock(): void {
+		clockStarted = true;
+		clockStart = performance.now();
+		ticker = setInterval(updateClock, 100);
+	}
+
+	function completeRound(): void {
+		if (completionSent) return;
+		stopClock();
+		oncomplete?.(game.score, rush ? Math.floor(clockBase / 1000) : 0);
+		completionSent = true;
+	}
+
+	function updateClock(): boolean {
+		if (!rush || !clockStarted) return false;
+		try {
+			remaining = Math.max(0, Math.ceil((BLOCK_RUSH_SECONDS * 1000 - clockMs()) / 1000));
+			if (remaining > 0 && remaining <= 10 && remaining !== lastTick) sound.play('timer-tick');
+			lastTick = remaining;
+			if (remaining !== 0 || game.status !== 'playing') return game.status === 'ended';
+			game = endBlockRush(game);
+			cancelDrag();
+			selected = null;
+			hideGhost();
+			completeRound();
+			// An accepted placement keeps its existing clear/settle before the ending.
+			if (!busy && !entering) beginEnd();
+			return true;
+		} catch {
+			stopClock();
+			finishFailed = true;
+			console.error('morphi:block_clock_failed');
+			return true;
+		}
+	}
 
 	function pieceColor(piece: PieceId): string {
 		return `var(--piece-${PIECE_COLORS[piece]})`;
@@ -194,8 +265,8 @@
 	}
 
 	function cellLabel(index: number): string {
-		const row = Math.floor(index / BLOCK_BOARD_SIZE) + 1;
-		const column = (index % BLOCK_BOARD_SIZE) + 1;
+		const row = Math.floor(index / boardSize) + 1;
+		const column = (index % boardSize) + 1;
 		return game.board[index] === null
 			? t('block.cellEmpty', { row, column })
 			: t('block.cellFilled', { row, column });
@@ -217,7 +288,7 @@
 		}
 
 		const rect = boardEl.getBoundingClientRect();
-		const cell = (rect.width - (BLOCK_BOARD_SIZE - 1) * GAP) / BLOCK_BOARD_SIZE;
+		const cell = (rect.width - (boardSize - 1) * GAP) / boardSize;
 		return { rect, cell, pitch: cell + GAP };
 	}
 
@@ -292,7 +363,7 @@
 	}
 
 	function selectPiece(index: number, fromKeyboard = false): void {
-		if (busy || game.status !== 'playing') {
+		if (busy || paused || game.status !== 'playing') {
 			return;
 		}
 
@@ -309,7 +380,7 @@
 		announce(t('block.statusSelected', { name: shapeName(piece) }));
 
 		if (fromKeyboard) {
-			showGhostAt(piece, 0, 0, canPlace(game.board, piece, 0, 0));
+			showGhostAt(piece, 0, 0, canPlace(game.board, piece, 0, 0, boardSize));
 		} else {
 			hideGhost();
 		}
@@ -368,14 +439,14 @@
 
 		const shape = PIECE_BY_ID[piece];
 		keyboardAnchor = {
-			x: Math.max(0, Math.min(BLOCK_BOARD_SIZE - shape.width, keyboardAnchor.x + dx)),
-			y: Math.max(0, Math.min(BLOCK_BOARD_SIZE - shape.height, keyboardAnchor.y + dy))
+			x: Math.max(0, Math.min(boardSize - shape.width, keyboardAnchor.x + dx)),
+			y: Math.max(0, Math.min(boardSize - shape.height, keyboardAnchor.y + dy))
 		};
 		showGhostAt(
 			piece,
 			keyboardAnchor.x,
 			keyboardAnchor.y,
-			canPlace(game.board, piece, keyboardAnchor.x, keyboardAnchor.y)
+			canPlace(game.board, piece, keyboardAnchor.x, keyboardAnchor.y, boardSize)
 		);
 	}
 
@@ -389,18 +460,24 @@
 		selected = null;
 		hideGhost();
 		sound.play('end');
-		announce(game.endReason === 'cap' ? t('block.statusCap') : t('block.statusEnded'));
-		finishDelay.start(motion.reduced() ? 0 : END_MS, document.hidden);
+		announce(
+			game.endReason === 'time-up'
+				? t('block.statusTimeUp')
+				: game.endReason === 'cap'
+					? t('block.statusCap')
+					: t('block.statusEnded')
+		);
+		finishDelay.start(motion.reduced() ? 0 : END_MS, document.hidden || paused);
 	}
 
-	function finishPlacement(cleared: boolean, ended: boolean): void {
+	function finishPlacement(cleared: boolean): void {
 		if (cleared) {
 			clearTimerRef(clearTimer);
 			clearTimer = setTimeout(() => {
 				clearing = {};
 				clearTimer = null;
 
-				if (ended) {
+				if (game.status === 'ended') {
 					beginEnd();
 				} else {
 					busy = false;
@@ -416,7 +493,7 @@
 			clearDelays = {};
 			settleTimer = null;
 
-			if (ended) {
+			if (game.status === 'ended') {
 				beginEnd();
 			} else {
 				busy = false;
@@ -426,25 +503,23 @@
 	}
 
 	function placeAt(trayIndex: number, x: number, y: number): boolean {
-		if (busy || game.status !== 'playing') {
+		if (busy || paused || document.hidden || game.status !== 'playing' || updateClock()) {
 			return false;
 		}
 
 		const refilling = game.tray.filter(Boolean).length === 1;
 		const result = placeBlockPiece(game, trayIndex, x, y, scoring);
 		if (result.effect === 'invalid') {
-			const cell =
-				x >= 0 && x < BLOCK_BOARD_SIZE && y >= 0 && y < BLOCK_BOARD_SIZE
-					? y * BLOCK_BOARD_SIZE + x
-					: null;
+			const cell = x >= 0 && x < boardSize && y >= 0 && y < boardSize ? y * boardSize + x : null;
 			showInvalid(trayIndex, cell);
 			return false;
 		}
 
 		game = result.round;
+		if (rush && !clockStarted) startClock();
 		if (refilling && game.status === 'playing') sound.play('refill');
 		onmove?.({ trayIndex, x, y });
-		if (game.status === 'ended') oncomplete?.(game.score);
+		if (game.status === 'ended') completeRound();
 		selected = null;
 		invalidSlot = null;
 		hideGhost();
@@ -452,7 +527,7 @@
 
 		if (result.effect === 'cleared') {
 			const cleared: Record<number, PieceId> = {};
-			const clearedCells = Array.from({ length: BLOCK_BOARD_SIZE * BLOCK_BOARD_SIZE }, () => false);
+			const clearedCells = Array.from({ length: boardSize * boardSize }, () => false);
 			for (const cell of result.cleared) {
 				cleared[cell.index] = cell.piece;
 				clearedCells[cell.index] = true;
@@ -461,10 +536,10 @@
 			const rows: number[] = [];
 			const columns: number[] = [];
 
-			for (let row = 0; row < BLOCK_BOARD_SIZE; row += 1) {
+			for (let row = 0; row < boardSize; row += 1) {
 				let full = true;
-				for (let column = 0; column < BLOCK_BOARD_SIZE; column += 1) {
-					if (!clearedCells[row * BLOCK_BOARD_SIZE + column]) {
+				for (let column = 0; column < boardSize; column += 1) {
+					if (!clearedCells[row * boardSize + column]) {
 						full = false;
 						break;
 					}
@@ -474,10 +549,10 @@
 				}
 			}
 
-			for (let column = 0; column < BLOCK_BOARD_SIZE; column += 1) {
+			for (let column = 0; column < boardSize; column += 1) {
 				let full = true;
-				for (let row = 0; row < BLOCK_BOARD_SIZE; row += 1) {
-					if (!clearedCells[row * BLOCK_BOARD_SIZE + column]) {
+				for (let row = 0; row < boardSize; row += 1) {
+					if (!clearedCells[row * boardSize + column]) {
 						full = false;
 						break;
 					}
@@ -489,8 +564,8 @@
 
 			const delays: Record<number, number> = {};
 			for (const cell of result.cleared) {
-				const row = Math.floor(cell.index / BLOCK_BOARD_SIZE);
-				const column = cell.index % BLOCK_BOARD_SIZE;
+				const row = Math.floor(cell.index / boardSize);
+				const column = cell.index % boardSize;
 				const rowDelay = rows.includes(row) ? column * CLEAR_STEP_MS : CLEAR_MS;
 				const columnDelay = columns.includes(column) ? row * CLEAR_STEP_MS : CLEAR_MS;
 				delays[cell.index] = Math.min(rowDelay, columnDelay);
@@ -533,7 +608,7 @@
 			announce(t('block.statusPlaced', { score: formatNumber(game.score) }));
 		}
 
-		finishPlacement(result.effect === 'cleared', result.round.status === 'ended');
+		finishPlacement(result.effect === 'cleared');
 		return true;
 	}
 
@@ -553,11 +628,11 @@
 			return null;
 		}
 
-		return { x: index % BLOCK_BOARD_SIZE, y: Math.floor(index / BLOCK_BOARD_SIZE) };
+		return { x: index % boardSize, y: Math.floor(index / boardSize) };
 	}
 
 	function handleBoardClick(event: MouseEvent): void {
-		if (suppressClick || busy || game.status !== 'playing' || selected === null) {
+		if (suppressClick || busy || paused || game.status !== 'playing' || selected === null) {
 			return;
 		}
 
@@ -584,7 +659,12 @@
 			return;
 		}
 
-		showGhostAt(piece, position.x, position.y, canPlace(game.board, piece, position.x, position.y));
+		showGhostAt(
+			piece,
+			position.x,
+			position.y,
+			canPlace(game.board, piece, position.x, position.y, boardSize)
+		);
 	}
 
 	function handleBoardPointerLeave(): void {
@@ -598,6 +678,7 @@
 			drag !== null ||
 			!event.isPrimary ||
 			busy ||
+			paused ||
 			game.status !== 'playing' ||
 			(event.pointerType === 'mouse' && event.button !== 0)
 		) {
@@ -690,23 +771,17 @@
 		if (over) {
 			const boardX = Math.max(
 				0,
-				Math.min(
-					BLOCK_BOARD_SIZE - 1,
-					Math.floor((event.clientX - metrics.rect.left) / metrics.pitch)
-				)
+				Math.min(boardSize - 1, Math.floor((event.clientX - metrics.rect.left) / metrics.pitch))
 			);
 			const boardY = Math.max(
 				0,
-				Math.min(
-					BLOCK_BOARD_SIZE - 1,
-					Math.floor((event.clientY - metrics.rect.top) / metrics.pitch)
-				)
+				Math.min(boardSize - 1, Math.floor((event.clientY - metrics.rect.top) / metrics.pitch))
 			);
 			anchorX = boardX - current.grabX;
 			anchorY = boardY - current.grabY;
 			left = metrics.rect.left + anchorX * metrics.pitch;
 			top = metrics.rect.top + anchorY * metrics.pitch;
-			valid = canPlace(game.board, current.piece, anchorX, anchorY);
+			valid = canPlace(game.board, current.piece, anchorX, anchorY, boardSize);
 		} else {
 			left = event.clientX - (current.grabX + current.grabFracX) * metrics.pitch;
 			top = event.clientY - (current.grabY + current.grabFracY) * metrics.pitch;
@@ -752,10 +827,10 @@
 			const cell =
 				current.over &&
 				current.anchorX >= 0 &&
-				current.anchorX < BLOCK_BOARD_SIZE &&
+				current.anchorX < boardSize &&
 				current.anchorY >= 0 &&
-				current.anchorY < BLOCK_BOARD_SIZE
-					? current.anchorY * BLOCK_BOARD_SIZE + current.anchorX
+				current.anchorY < boardSize
+					? current.anchorY * boardSize + current.anchorX
 					: null;
 			showInvalid(current.index, cell);
 		}
@@ -775,7 +850,7 @@
 	}
 
 	function handleTrayClick(index: number): void {
-		if (suppressClick || busy || game.status !== 'playing') {
+		if (suppressClick || busy || paused || game.status !== 'playing') {
 			return;
 		}
 
@@ -788,7 +863,7 @@
 	}
 
 	function handleTrayKeydown(event: KeyboardEvent, index: number): void {
-		if (busy || game.status !== 'playing') {
+		if (busy || paused || game.status !== 'playing') {
 			return;
 		}
 
@@ -856,7 +931,8 @@
 	}
 
 	function handleVisibility(): void {
-		if (document.hidden) {
+		updateClock();
+		if (document.hidden || paused) {
 			finishDelay.pause();
 			entrance?.pause();
 			entranceDelay.pause();
@@ -868,6 +944,11 @@
 			entranceDelay.resume();
 		}
 	}
+	$effect(() => {
+		if (!mounted) return;
+		paused;
+		untrack(handleVisibility);
+	});
 
 	function handleResize(): void {
 		cancelDrag();
@@ -884,9 +965,10 @@
 				entering = false;
 				busy = false;
 				onready?.();
+				updateClock();
 				if (game.status === 'ended') {
-					oncomplete?.(game.score);
-					finishDelay.start(0, document.hidden);
+					completeRound();
+					beginEnd();
 				}
 				return;
 			}
@@ -904,10 +986,20 @@
 	});
 
 	onMount(() => {
+		if (rush && resume?.clockStarted && game.placements > 0) {
+			clockBase = Math.min(
+				BLOCK_RUSH_SECONDS * 1000,
+				resume.elapsedMs +
+					(checkpointSavedAt === undefined ? 0 : Math.max(0, Date.now() - checkpointSavedAt))
+			);
+			remaining = Math.max(0, Math.ceil((BLOCK_RUSH_SECONDS * 1000 - clockBase) / 1000));
+			lastTick = remaining;
+			startClock();
+		}
 		registerCheckpoint?.(() => ({
 			phase: entering ? 'arrival' : 'playing',
-			elapsedMs: 0,
-			clockStarted: false,
+			elapsedMs: rush ? clockMs() : 0,
+			clockStarted,
 			pending: {}
 		}));
 		const motionQuery = matchMedia('(prefers-reduced-motion: reduce)');
@@ -924,6 +1016,7 @@
 		boardEl?.addEventListener('click', handleBoardClick);
 
 		return () => {
+			stopClock();
 			motionQuery.removeEventListener('change', preferenceChanged);
 			document.removeEventListener('keydown', handleWindowKeydown);
 			document.removeEventListener('visibilitychange', handleVisibility);
@@ -948,15 +1041,16 @@
 <div
 	class="game"
 	class:is-over={ending}
-	style={`${themeStyle};--block-grid-gap:${GAP}px`}
+	style={`${themeStyle};--block-grid-gap:${GAP}px;--block-board-size:${boardSize}`}
 	data-theme={theme.id}
 	data-theme-version={resolvedTheme?.themeConfigVersion}
 	data-theme-generator={resolvedTheme?.themeGeneratorVersion}
 	data-family="block"
+	data-variant={variant}
 	data-round={roundNumber}
 	data-phase={entering ? 'dealing' : 'playing'}
 >
-	<h2 class="sr-only">{t('block.title')}</h2>
+	<h2 class="sr-only">{variantLabel}</h2>
 
 	<header class="hud">
 		<button type="button" class="home-button" aria-label={t('block.home')} onclick={onhome}>
@@ -988,11 +1082,18 @@
 					<strong class:is-bump={game.combo > 0}>{game.combo > 0 ? `×${game.combo}` : '—'}</strong>
 				{/key}
 			</div>
+			{#if rush}
+				<div class="stat" data-countdown={remaining}>
+					<span class="stat-label">{t('block.timeLeft')}</span>
+					<strong>{formatDuration(remaining)}</strong>
+				</div>
+			{/if}
 		</div>
 
 		<SoundToggle enabled={soundEnabled} ontoggle={ontogglesound} />
 
 		<p class="round-meta">
+			<span>{variantLabel}</span>
 			<span>{t('block.round', { number: roundNumber })}</span>
 			<span>{t('block.best', { score: formatNumber(best) })}</span>
 		</p>
@@ -1005,7 +1106,7 @@
 				bind:this={boardEl}
 				role="grid"
 				tabindex="-1"
-				aria-label={t('block.board')}
+				aria-label={t('block.boardSize', { size: boardSize })}
 				onpointermove={handleBoardPointerMove}
 				onpointerleave={handleBoardPointerLeave}
 			>
@@ -1020,7 +1121,7 @@
 								class:is-settling={settling[index] !== undefined}
 								data-entering={entering}
 								class:is-invalid={invalidCell === index}
-								style={`${cellStyle(index) ?? ''};--ripple:${(rowIndex + (index % BLOCK_BOARD_SIZE)) * 12}ms;--clear-delay:${clearDelays[index] ?? 0}ms`}
+								style={`${cellStyle(index) ?? ''};--ripple:${(rowIndex + (index % boardSize)) * 12}ms;--clear-delay:${clearDelays[index] ?? 0}ms`}
 								data-index={index}
 								role="gridcell"
 								aria-label={cellLabel(index)}
@@ -1051,7 +1152,7 @@
 						class:is-invalid={invalidSlot === index}
 						aria-label={pieceLabel(piece, index)}
 						aria-pressed={selected === index}
-						aria-disabled={busy || game.status !== 'playing'}
+						aria-disabled={busy || paused || game.status !== 'playing'}
 						data-tray-index={index}
 						onclick={() => handleTrayClick(index)}
 						onkeydown={(event) => handleTrayKeydown(event, index)}
@@ -1084,8 +1185,8 @@
 				{selected !== null
 					? t('block.hintSelected')
 					: game.placements === 0
-						? t('block.hint')
-						: t('block.hintShort')}
+						? t(variant === 'block:rows-only' ? 'block.rowsOnly.hint' : 'block.hint')
+						: t(variant === 'block:rows-only' ? 'block.rowsOnly.hintShort' : 'block.hintShort')}
 			</span>
 		</footer>
 	{/if}
@@ -1238,7 +1339,7 @@
 	.board {
 		position: relative;
 		display: grid;
-		grid-template-rows: repeat(8, minmax(0, 1fr));
+		grid-template-rows: repeat(var(--block-board-size), minmax(0, 1fr));
 		gap: var(--block-grid-gap, 1px);
 		width: min(100vw, 440px, calc(100dvh - 248px));
 		aspect-ratio: 1;
@@ -1247,7 +1348,7 @@
 
 	.row {
 		display: grid;
-		grid-template-columns: repeat(8, minmax(0, 1fr));
+		grid-template-columns: repeat(var(--block-board-size), minmax(0, 1fr));
 		gap: var(--block-grid-gap, 1px);
 		min-height: 0;
 	}

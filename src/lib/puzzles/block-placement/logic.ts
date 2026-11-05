@@ -9,6 +9,20 @@ export const BLOCK_TRAY_SIZE = 3;
 export const BLOCK_MOVE_CAP = 300;
 export const BLOCK_OPENING_TURNS = 10;
 export const BLOCK_SO_CLOSE_GAP = 250;
+export const BLOCK_RUSH_SECONDS = 60;
+export const BLOCK_VARIANTS = [
+	'block:classic',
+	'block:board-10',
+	'block:rows-only',
+	'block:rush-60'
+] as const;
+export type BlockVariant = (typeof BLOCK_VARIANTS)[number];
+
+export function parseBlockVariant(variant?: string): BlockVariant {
+	if (variant === undefined) return 'block:classic';
+	if (!BLOCK_VARIANTS.includes(variant as BlockVariant)) throw new RangeError('variant');
+	return variant as BlockVariant;
+}
 
 export const PIECE_IDS = [
 	'single',
@@ -107,9 +121,12 @@ export const PIECE_BY_ID: Readonly<Record<PieceId, PieceShape>> = {
 
 export type BoardCell = PieceId | null;
 export type BlockStatus = 'playing' | 'ended';
-export type BlockEndReason = 'none' | 'no-fit' | 'cap';
+export type BlockEndReason = 'none' | 'no-fit' | 'cap' | 'time-up';
 
 export interface BlockRound {
+	variant?: BlockVariant;
+	/** Classic keeps its original serialized shape; absent means eight. */
+	boardSize?: number;
 	engineVersion: string;
 	seed: string;
 	board: BoardCell[];
@@ -165,35 +182,38 @@ export function canPlace(
 	board: readonly BoardCell[],
 	pieceId: PieceId,
 	x: number,
-	y: number
+	y: number,
+	boardSize = BLOCK_BOARD_SIZE
 ): boolean {
 	if (
 		!Number.isSafeInteger(x) ||
 		!Number.isSafeInteger(y) ||
 		x < 0 ||
 		y < 0 ||
-		board.length !== BLOCK_BOARD_SIZE * BLOCK_BOARD_SIZE
+		![8, 10].includes(boardSize) ||
+		board.length !== boardSize * boardSize
 	) {
 		return false;
 	}
 
 	const piece = PIECE_BY_ID[pieceId];
-	if (x + piece.width > BLOCK_BOARD_SIZE || y + piece.height > BLOCK_BOARD_SIZE) {
+	if (x + piece.width > boardSize || y + piece.height > boardSize) {
 		return false;
 	}
 
-	return piece.cells.every((cell) => board[(y + cell.y) * BLOCK_BOARD_SIZE + x + cell.x] === null);
+	return piece.cells.every((cell) => board[(y + cell.y) * boardSize + x + cell.x] === null);
 }
 
 export function findPlacement(
 	board: readonly BoardCell[],
-	pieceId: PieceId
+	pieceId: PieceId,
+	boardSize = BLOCK_BOARD_SIZE
 ): { x: number; y: number } | null {
 	const piece = PIECE_BY_ID[pieceId];
 
-	for (let y = 0; y <= BLOCK_BOARD_SIZE - piece.height; y += 1) {
-		for (let x = 0; x <= BLOCK_BOARD_SIZE - piece.width; x += 1) {
-			if (canPlace(board, pieceId, x, y)) {
+	for (let y = 0; y <= boardSize - piece.height; y += 1) {
+		for (let x = 0; x <= boardSize - piece.width; x += 1) {
+			if (canPlace(board, pieceId, x, y, boardSize)) {
 				return { x, y };
 			}
 		}
@@ -202,8 +222,12 @@ export function findPlacement(
 	return null;
 }
 
-export function canPlaceAnywhere(board: readonly BoardCell[], pieceId: PieceId): boolean {
-	return findPlacement(board, pieceId) !== null;
+export function canPlaceAnywhere(
+	board: readonly BoardCell[],
+	pieceId: PieceId,
+	boardSize = BLOCK_BOARD_SIZE
+): boolean {
+	return findPlacement(board, pieceId, boardSize) !== null;
 }
 
 export function findAnyPlacement(round: BlockRound): BlockMove | null {
@@ -213,7 +237,7 @@ export function findAnyPlacement(round: BlockRound): BlockMove | null {
 			continue;
 		}
 
-		const placement = findPlacement(round.board, pieceId);
+		const placement = findPlacement(round.board, pieceId, round.boardSize);
 		if (placement) {
 			return { trayIndex, x: placement.x, y: placement.y };
 		}
@@ -226,7 +250,8 @@ export function dealBlockTray(
 	board: readonly BoardCell[],
 	supply: readonly PieceId[],
 	supplyIndex: number,
-	placements: number
+	placements: number,
+	boardSize = BLOCK_BOARD_SIZE
 ): { tray: (PieceId | null)[]; supplyIndex: number } {
 	const tray: (PieceId | null)[] = [];
 	let nextIndex = supplyIndex;
@@ -237,7 +262,9 @@ export function dealBlockTray(
 	}
 
 	const opening = placements < BLOCK_OPENING_TURNS;
-	const hasFit = tray.some((pieceId) => pieceId !== null && canPlaceAnywhere(board, pieceId));
+	const hasFit = tray.some(
+		(pieceId) => pieceId !== null && canPlaceAnywhere(board, pieceId, boardSize)
+	);
 
 	if (opening && !hasFit) {
 		tray[BLOCK_TRAY_SIZE - 1] = 'single';
@@ -262,15 +289,15 @@ function withStatus(round: BlockRound): BlockRound {
 	return round;
 }
 
-export function createBlockRound(seed: string): BlockRound {
+export function createBlockRound(seed: string, variant?: string): BlockRound {
+	const selectedVariant = parseBlockVariant(variant);
+	const boardSize = selectedVariant === 'block:board-10' ? 10 : BLOCK_BOARD_SIZE;
 	const supply = buildSupply(seed);
-	const board: BoardCell[] = Array.from(
-		{ length: BLOCK_BOARD_SIZE * BLOCK_BOARD_SIZE },
-		() => null
-	);
-	const dealt = dealBlockTray(board, supply, 0, 0);
+	const board: BoardCell[] = Array.from({ length: boardSize * boardSize }, () => null);
+	const dealt = dealBlockTray(board, supply, 0, 0, boardSize);
 
 	return withStatus({
+		...(selectedVariant === 'block:classic' ? {} : { variant: selectedVariant, boardSize }),
 		engineVersion: BLOCK_ENGINE_VERSION,
 		seed,
 		board,
@@ -286,14 +313,18 @@ export function createBlockRound(seed: string): BlockRound {
 	});
 }
 
-function fullLines(board: readonly BoardCell[]): { rows: number[]; columns: number[] } {
+function fullLines(
+	board: readonly BoardCell[],
+	boardSize: number,
+	rowsOnly: boolean
+): { rows: number[]; columns: number[] } {
 	const rows: number[] = [];
 	const columns: number[] = [];
 
-	for (let y = 0; y < BLOCK_BOARD_SIZE; y += 1) {
+	for (let y = 0; y < boardSize; y += 1) {
 		let full = true;
-		for (let x = 0; x < BLOCK_BOARD_SIZE; x += 1) {
-			if (board[y * BLOCK_BOARD_SIZE + x] === null) {
+		for (let x = 0; x < boardSize; x += 1) {
+			if (board[y * boardSize + x] === null) {
 				full = false;
 				break;
 			}
@@ -303,10 +334,10 @@ function fullLines(board: readonly BoardCell[]): { rows: number[]; columns: numb
 		}
 	}
 
-	for (let x = 0; x < BLOCK_BOARD_SIZE; x += 1) {
+	for (let x = 0; !rowsOnly && x < boardSize; x += 1) {
 		let full = true;
-		for (let y = 0; y < BLOCK_BOARD_SIZE; y += 1) {
-			if (board[y * BLOCK_BOARD_SIZE + x] === null) {
+		for (let y = 0; y < boardSize; y += 1) {
+			if (board[y * boardSize + x] === null) {
 				full = false;
 				break;
 			}
@@ -339,34 +370,35 @@ export function placeBlockPiece(
 	scoring: ScoreValues = scoringDefinition.defaults
 ): PlaceResult {
 	const pieceId = round.tray[trayIndex];
+	const boardSize = round.boardSize ?? BLOCK_BOARD_SIZE;
 
-	if (round.status !== 'playing' || !pieceId || !canPlace(round.board, pieceId, x, y)) {
+	if (round.status !== 'playing' || !pieceId || !canPlace(round.board, pieceId, x, y, boardSize)) {
 		return { round, effect: 'invalid', placed: [], cleared: [], lines: 0, gained: 0 };
 	}
 
 	const piece = PIECE_BY_ID[pieceId];
 	const board = round.board.slice();
 	const tray = round.tray.slice();
-	const placed = piece.cells.map((cell) => (y + cell.y) * BLOCK_BOARD_SIZE + x + cell.x);
+	const placed = piece.cells.map((cell) => (y + cell.y) * boardSize + x + cell.x);
 
 	for (const index of placed) {
 		board[index] = pieceId;
 	}
 	tray[trayIndex] = null;
 
-	const { rows, columns } = fullLines(board);
+	const { rows, columns } = fullLines(board, boardSize, round.variant === 'block:rows-only');
 	const lineCount = rows.length + columns.length;
 	const clearedIndexes = new Set<number>();
 
 	for (const row of rows) {
-		for (let column = 0; column < BLOCK_BOARD_SIZE; column += 1) {
-			clearedIndexes.add(row * BLOCK_BOARD_SIZE + column);
+		for (let column = 0; column < boardSize; column += 1) {
+			clearedIndexes.add(row * boardSize + column);
 		}
 	}
 
 	for (const column of columns) {
-		for (let row = 0; row < BLOCK_BOARD_SIZE; row += 1) {
-			clearedIndexes.add(row * BLOCK_BOARD_SIZE + column);
+		for (let row = 0; row < boardSize; row += 1) {
+			clearedIndexes.add(row * boardSize + column);
 		}
 	}
 
@@ -392,7 +424,7 @@ export function placeBlockPiece(
 	};
 
 	if (tray.every((piece) => piece === null) && placements < BLOCK_MOVE_CAP) {
-		const dealt = dealBlockTray(board, round.supply, round.supplyIndex, placements);
+		const dealt = dealBlockTray(board, round.supply, round.supplyIndex, placements, boardSize);
 		next = { ...next, tray: dealt.tray, supplyIndex: dealt.supplyIndex };
 	}
 
@@ -409,9 +441,10 @@ export function placeBlockPiece(
 export function replayBlockMoves(
 	seed: string,
 	moves: readonly BlockMove[],
-	scoring: ScoreValues = scoringDefinition.defaults
+	scoring: ScoreValues = scoringDefinition.defaults,
+	variant?: string
 ): BlockRound {
-	let round = createBlockRound(seed);
+	let round = createBlockRound(seed, variant);
 
 	for (let index = 0; index < moves.length; index += 1) {
 		const move = moves[index];
@@ -428,4 +461,11 @@ export function replayBlockMoves(
 	}
 
 	return round;
+}
+
+/** The view owns the deadline; replay never reads a clock. */
+export function endBlockRush(round: BlockRound): BlockRound {
+	return round.variant === 'block:rush-60' && round.status === 'playing'
+		? { ...round, status: 'ended', endReason: 'time-up' }
+		: round;
 }

@@ -65,6 +65,10 @@ for (const directory of directories) {
 			!Number.isSafeInteger(variant.maxMoves) ||
 			variant.maxMoves <= 0 ||
 			variant.maxMoves > manifest.maxMoves ||
+			(variant.maxSeconds !== undefined &&
+				(!Number.isSafeInteger(variant.maxSeconds) ||
+					variant.maxSeconds <= 0 ||
+					variant.maxSeconds > 7200)) ||
 			!variant.leaderboardGroups.length ||
 			variant.leaderboardGroups.some((group) => !manifest.leaderboardGroups.includes(group))
 		)

@@ -1,4 +1,4 @@
-import { test, expect, type Page } from '@playwright/test';
+import { test, expect, type Page, type Route } from '@playwright/test';
 import { getPlatformProxy } from 'wrangler';
 import { betterAuth } from 'better-auth';
 import { testUtils } from 'better-auth/plugins';
@@ -285,12 +285,9 @@ test('games admin manages availability and restores scoring without losing saved
 	const cleanupFailures: string[] = [];
 	try {
 		expect(originalState?.state).toBe('enabled');
-		const before = await proxy.env.DB.prepare(
-			"SELECT count(*) AS count FROM completed_run WHERE family='memory'"
-		).first<{ count: number }>();
 		await proxy.env.DB.prepare(
 			`INSERT INTO completed_run(id,user_id,family,engine_version,rules_group,score,moves,seconds,seed,move_log,payload_hash,ranked,created_at)
-			 VALUES(?,?,'memory','1','fixture',1234,8,30,'1','[]',?,0,?)`
+			 VALUES(?,?,'memory','memory-1','memory-1:6',1234,8,30,'1','[]',?,0,?)`
 		)
 			.bind(roundId, player.id, crypto.randomUUID(), Date.now())
 			.run();
@@ -303,14 +300,17 @@ test('games admin manages availability and restores scoring without losing saved
 		await page.goto('/admin/games');
 		expect((await context.request.get('/admin/games?game=unknown')).status()).toBe(400);
 		await expect(
-			page.getByText('Retained saved account completions only', { exact: false })
+			page.getByText(
+				'Registered users only; guest solo starts are not counted. Total completed includes',
+				{ exact: false }
+			)
 		).toBeVisible();
-		for (const family of ['Block puzzle', 'Memory', 'Connect']) {
+		for (const family of ['Block', 'Memory', 'Connect']) {
 			const card = page
-				.locator('a.game-card')
-				.filter({ has: page.getByRole('heading', { name: `${family} · Enabled`, exact: true }) });
+				.locator('a.game-row')
+				.filter({ has: page.getByRole('heading', { name: family, exact: true }) });
 			await expect(card).toBeVisible();
-			await expect(card).toContainText('Saved completions');
+			await expect(card).toContainText('Total completed');
 		}
 		await captureAdmin(page, 'games-overview');
 		for (const viewport of [
@@ -320,20 +320,97 @@ test('games admin manages availability and restores scoring without losing saved
 		]) {
 			await page.setViewportSize(viewport);
 			await expect(page.getByRole('heading', { name: 'Games', exact: true })).toBeVisible();
-			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
-				false
+			const overflow = await page.evaluate(() => {
+				const viewport = innerWidth,
+					documentWidth = document.documentElement.scrollWidth;
+				const elements =
+					documentWidth <= viewport
+						? []
+						: [...document.querySelectorAll('body *')]
+								.flatMap((element) => {
+									const rect = element.getBoundingClientRect();
+									if (!rect.width || (rect.left >= 0 && rect.right <= viewport)) return [];
+									const style = getComputedStyle(element);
+									return [
+										{
+											tag: element.tagName,
+											class: element.getAttribute('class'),
+											left: rect.left,
+											right: rect.right,
+											width: rect.width,
+											scrollWidth: element.scrollWidth,
+											clientWidth: element.clientWidth,
+											minWidth: style.minWidth,
+											gridColumns: style.gridTemplateColumns,
+											flexBasis: style.flexBasis
+										}
+									];
+								})
+								.slice(0, 20);
+				return { viewport, documentWidth, elements };
+			});
+			expect(overflow.documentWidth, JSON.stringify(overflow)).toBeLessThanOrEqual(
+				overflow.viewport
 			);
 		}
 		await page
-			.locator('a.game-card')
-			.filter({ has: page.getByRole('heading', { name: 'Memory · Enabled', exact: true }) })
+			.locator('a.game-row')
+			.filter({ has: page.getByRole('heading', { name: 'Memory', exact: true }) })
 			.click();
 		await expect(page).toHaveURL(/game=memory/);
-		const card = page
-			.locator('section.admin-card')
-			.filter({ has: page.getByRole('heading', { name: /^Memory ·/ }) });
-		await expect(card).toContainText(`Saved completions: ${(before?.count ?? 0) + 1}`);
-		await expect(card).toContainText('fixture');
+		const card = page.locator('main > section.admin-card').first();
+		const heading = page.locator('.game-heading');
+		const gameSwitch = page.getByRole('switch');
+		await expect(gameSwitch).toHaveAttribute('aria-checked', 'true');
+		await gameSwitch.click();
+		const switchDialog = page.getByRole('dialog');
+		await expect(switchDialog).toBeVisible();
+		const reasonInput = switchDialog.locator('input[name=reason]');
+		await reasonInput.fill('CASE-KEYBOARD-AND-FAILURE');
+		await switchDialog.locator('input[name=confirm]').check();
+		const disableButton = switchDialog.getByRole('button', { name: 'Disable game', exact: true });
+		await disableButton.focus();
+		await page.keyboard.press('Tab');
+		await expect(reasonInput).toBeFocused();
+		await page.keyboard.press('Shift+Tab');
+		await expect(disableButton).toBeFocused();
+		let holdRequest!: (route: Route) => void;
+		const submitted = new Promise<Route>((resolve) => {
+			holdRequest = resolve;
+		});
+		await page.route('**/admin/games?game=memory', (route) => holdRequest(route), { times: 1 });
+		await disableButton.click();
+		const heldRequest = await submitted;
+		await expect(gameSwitch).toBeDisabled();
+		await expect(gameSwitch).toHaveAttribute('aria-checked', 'true');
+		const rejectedResponse = await heldRequest.fetch({
+			postData: heldRequest.request().postData()!.replace('CASE-KEYBOARD-AND-FAILURE', 'x')
+		});
+		expect(rejectedResponse.status()).toBe(400);
+		await heldRequest.fulfill({ response: rejectedResponse });
+		await expect(gameSwitch).toBeEnabled();
+		await expect(gameSwitch).toHaveAttribute('aria-checked', 'true');
+		await expect(page.locator('.notice[role=alert]')).toBeVisible();
+		await expect(switchDialog).toBeVisible();
+		await page.keyboard.press('Escape');
+		await expect(page.getByRole('dialog')).not.toBeVisible();
+		await expect(gameSwitch).toBeFocused();
+		const variantTotals = await page
+			.locator('.variant-row')
+			.getByText(/^Total completed:/)
+			.allTextContents();
+		expect(variantTotals).toHaveLength(4);
+		const familyTotal = variantTotals.reduce(
+			(sum, text) => sum + Number(text.match(/^Total completed: (\d+)/)![1]),
+			0
+		);
+		await expect(
+			card
+				.locator('dl > div')
+				.filter({ has: page.getByText('Total completed', { exact: true }) })
+				.locator('dd')
+		).toHaveText(String(familyTotal));
+		await expect(card).toContainText('memory-1:6');
 		await expect(card).toContainText('1234');
 		await captureAdmin(page, 'games-statistics');
 		for (const viewport of [
@@ -351,7 +428,7 @@ test('games admin manages availability and restores scoring without losing saved
 			.getByRole('navigation', { name: 'Game sections' })
 			.getByRole('link', { name: 'Settings' })
 			.click();
-		await expect(card.getByRole('button', { name: 'Disable game' })).toBeVisible();
+		await expect(gameSwitch).toBeVisible();
 		await captureAdmin(page, 'games-settings');
 		for (const viewport of [
 			{ width: 390, height: 844 },
@@ -359,7 +436,7 @@ test('games admin manages availability and restores scoring without losing saved
 			{ width: 1280, height: 800 }
 		]) {
 			await page.setViewportSize(viewport);
-			await expect(card.getByRole('button', { name: 'Disable game' })).toBeVisible();
+			await expect(gameSwitch).toBeVisible();
 			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
 				false
 			);
@@ -369,21 +446,46 @@ test('games admin manages availability and restores scoring without losing saved
 			await form.locator('input[name=confirm]').check();
 			await form.getByRole('button', { name: button, exact: true }).click();
 		};
-		await apply(card.locator('form').first(), 'Disable game', 'CASE-GAME-DISABLE');
-		await expect(card).toContainText('Memory · Disabled');
-		await apply(card.locator('form').first(), 'Enable game', 'CASE-GAME-ENABLE');
-		await expect(card).toContainText('Memory · Enabled');
-		await apply(card.locator('form').first(), 'Disable game', 'CASE-GAME-DISABLE-DELETE');
+		const toggle = async (button: 'Disable game' | 'Enable game', reason?: string) => {
+			await gameSwitch.click();
+			const dialog = page.getByRole('dialog');
+			if (button === 'Disable game') {
+				await expect(dialog.getByRole('button', { name: button, exact: true })).toBeDisabled();
+				await dialog.locator('input[name=reason]').fill(reason!);
+			} else await expect(dialog.locator('input[name=reason]')).toHaveCount(0);
+			await dialog.locator('input[name=confirm]').check();
+			await dialog.getByRole('button', { name: button, exact: true }).click();
+			await expect(dialog).not.toBeVisible();
+			await expect(gameSwitch).toBeFocused();
+		};
+		const missingReason = await context.request.post('/admin/games?game=memory', {
+			headers: { origin: 'http://localhost:5173' },
+			form: { action: 'game-disable', target: 'memory', confirm: 'yes' }
+		});
+		expect(missingReason.status()).toBe(400);
+		await toggle('Disable game', 'CASE-GAME-DISABLE');
+		await expect(heading).toContainText('Disabled');
+		await toggle('Enable game');
+		expect(
+			await proxy.env.DB.prepare(
+				"SELECT id FROM admin_audit WHERE actor=? AND action='game-enable' AND target='memory' AND reason='Resumed by operator (no reason entered)'"
+			)
+				.bind(operator.id)
+				.first()
+		).toBeTruthy();
+		await expect(heading).toContainText('Enabled');
+		await toggle('Disable game', 'CASE-GAME-DISABLE-DELETE');
 		await card.locator('summary').click();
 		await apply(card.locator('details form'), 'Soft-delete game', 'CASE-GAME-DELETE');
-		await expect(card).toContainText('Memory · Soft-deleted');
+		await expect(heading).toContainText('Soft-deleted');
+		await expect(gameSwitch).toHaveCount(0);
 		expect(
 			await proxy.env.DB.prepare('SELECT id FROM completed_run WHERE id=?').bind(roundId).first()
 		).toBeTruthy();
 		await apply(card.locator('form').first(), 'Restore game', 'CASE-GAME-RESTORE');
-		await expect(card).toContainText('Memory · Disabled');
-		await apply(card.locator('form').first(), 'Enable game', 'CASE-GAME-REENABLE');
-		await expect(card).toContainText('Memory · Enabled');
+		await expect(heading).toContainText('Disabled');
+		await toggle('Enable game');
+		await expect(heading).toContainText('Enabled');
 
 		const editor = page
 			.locator('section.scoring-card')

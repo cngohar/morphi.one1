@@ -174,6 +174,7 @@ export async function saveRun(
 	let seconds = run.elapsedSeconds;
 	let submittedAt = now;
 	let rankedWallMs = 0;
+	let rankedElapsedMs = 0;
 	let cardOpeningMs = 0;
 	let resolvedTheme: ResolvedTheme | null = null;
 	if (run.theme && !run.rankedSession) {
@@ -240,7 +241,8 @@ export async function saveRun(
 				submittedAt = raced.claimedAt!;
 			} else submittedAt = claimed.claimedAt!;
 		} else submittedAt = issued.claimedAt!;
-		rankedWallMs = Math.max(0, submittedAt - issued.createdAt - 1000);
+		rankedElapsedMs = Math.max(0, submittedAt - issued.createdAt);
+		rankedWallMs = Math.max(0, rankedElapsedMs - 1000);
 		seconds = Math.floor(rankedWallMs / 1000);
 	}
 	let result;
@@ -248,10 +250,22 @@ export async function saveRun(
 	try {
 		result = catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values, run.variant);
 		const timing = catalog[run.family].rankedTiming;
-		if (run.rankedSession && timing) {
-			seconds = Math.floor(
-				Math.max(0, rankedWallMs - timing.openingMs(result, run.variant) - cardOpeningMs) / 1000
+		const openingMs = timing?.openingMs(result, run.variant) ?? null;
+		const maxSeconds = puzzleVariant(run.family, run.variant)?.maxSeconds;
+		if (run.rankedSession && maxSeconds !== undefined) {
+			// Timed rounds use an exact ceiling; the existing scoring allowance must not add grace.
+			const gameplayMs = Math.max(0, rankedElapsedMs - (openingMs ?? 0) - cardOpeningMs);
+			if (gameplayMs > (maxSeconds + 2) * 1000) throw new RunError('too_slow');
+			seconds = Math.floor(gameplayMs / 1000);
+			result = catalog[run.family].replay(
+				run.seed,
+				run.moves,
+				seconds,
+				scoring.values,
+				run.variant
 			);
+		} else if (run.rankedSession && timing && openingMs !== null) {
+			seconds = Math.floor(Math.max(0, rankedWallMs - openingMs - cardOpeningMs) / 1000);
 			result = catalog[run.family].replay(
 				run.seed,
 				run.moves,

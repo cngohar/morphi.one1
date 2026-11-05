@@ -8,6 +8,73 @@ const metadata = {
 			fields: ['line', 'extraLine', 'combo'],
 			defaults: { line: 100, extraLine: 50, combo: 50 }
 		},
+		variants: [
+			{
+				id: 'block:classic',
+				name: 'variant.block:classic',
+				weight: 1,
+				maxMoves: 300,
+				leaderboardGroups: ['block-placement-1']
+			},
+			{
+				id: 'block:board-10',
+				name: 'variant.block:board-10',
+				weight: 1,
+				maxMoves: 300,
+				leaderboardGroups: ['block-placement-1:board-10'],
+				help: {
+					steps: ['block.board10.step1', 'v1.game.block.step2', 'v1.game.block.step3'],
+					rows: [
+						{ label: 'v1.game.block.row1', field: 'line', sign: '+' },
+						{ label: 'v1.game.block.row2', field: 'extraLine', sign: '+' },
+						{ label: 'v1.game.block.row3', field: 'combo', sign: '+' },
+						{ label: 'v1.game.block.row4', value: 'v1.game.block.value4' },
+						{ label: 'block.help.boardSize', value: 'block.board10.size' }
+					],
+					note: 'v1.game.block.scoringNote',
+					tips: 'v1.game.block.tips'
+				}
+			},
+			{
+				id: 'block:rows-only',
+				name: 'variant.block:rows-only',
+				weight: 1,
+				maxMoves: 300,
+				leaderboardGroups: ['block-placement-1:rows-only'],
+				help: {
+					steps: ['v1.game.block.step1', 'block.rowsOnly.step2', 'v1.game.block.step3'],
+					rows: [
+						{ label: 'v1.game.block.row1', field: 'line', sign: '+' },
+						{ label: 'v1.game.block.row2', field: 'extraLine', sign: '+' },
+						{ label: 'v1.game.block.row3', field: 'combo', sign: '+' },
+						{ label: 'v1.game.block.row4', value: 'v1.game.block.value4' },
+						{ label: 'block.help.columns', value: 'block.rowsOnly.columns' }
+					],
+					note: 'v1.game.block.scoringNote',
+					tips: 'block.rowsOnly.tips'
+				}
+			},
+			{
+				id: 'block:rush-60',
+				name: 'variant.block:rush-60',
+				weight: 1,
+				maxMoves: 300,
+				maxSeconds: 60,
+				leaderboardGroups: ['block-placement-1:rush-60'],
+				help: {
+					steps: ['v1.game.block.step1', 'v1.game.block.step2', 'block.rush.step3'],
+					rows: [
+						{ label: 'v1.game.block.row1', field: 'line', sign: '+' },
+						{ label: 'v1.game.block.row2', field: 'extraLine', sign: '+' },
+						{ label: 'v1.game.block.row3', field: 'combo', sign: '+' },
+						{ label: 'v1.game.block.row4', value: 'v1.game.block.value4' },
+						{ label: 'block.help.clock', value: 'block.rush.clock' }
+					],
+					note: 'block.rush.scoringNote',
+					tips: 'block.rush.tips'
+				}
+			}
+		],
 		ending: {
 			kind: 'run_over',
 			headlines: { default: 'ending.block.noMoves', cap: 'ending.block.cap' },
@@ -24,7 +91,12 @@ const metadata = {
 				extraLine: 'scoring.block.extraLine',
 				combo: 'scoring.block.combo'
 			},
-			groups: { 'block-placement-1': 'leaderboard.block' },
+			groups: {
+				'block-placement-1': 'leaderboard.block',
+				'block-placement-1:board-10': 'variant.block:board-10',
+				'block-placement-1:rows-only': 'variant.block:rows-only',
+				'block-placement-1:rush-60': 'variant.block:rush-60'
+			},
 			help: {
 				steps: ['v1.game.block.step1', 'v1.game.block.step2', 'v1.game.block.step3'],
 				rows: [

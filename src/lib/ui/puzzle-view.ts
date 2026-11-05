@@ -17,12 +17,14 @@ export interface PuzzleResult {
 	announcement: string;
 	stats: { label: string; value: string }[];
 	endingValues: Record<string, string | number>;
+	ending?: { headline: string; subline: string };
 	cap?: boolean;
 }
 
 export interface PuzzleViewProps {
 	round: PuzzleRound;
 	resume?: CheckpointState;
+	checkpointSavedAt?: number;
 	rankedStartedAt?: number | null;
 	registerCheckpoint?: (read: () => CheckpointState) => void;
 	roundNumber: number;

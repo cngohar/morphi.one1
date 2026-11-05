@@ -29,6 +29,7 @@ export interface PuzzleVariant {
 	weight: number;
 	enabled?: boolean;
 	maxMoves: number;
+	maxSeconds?: number;
 	leaderboardGroups: readonly string[];
 	scoring?: import('./scoring.js').ScoreDefinition;
 	help?: PuzzlePresentation['help'];
@@ -89,7 +90,8 @@ export interface PuzzleManifest {
 	leaderboardGroups: readonly string[];
 	/** Null preserves games whose ranked score has no presentation allowance. */
 	rankedTiming: {
-		openingMs(result: ReplayedResult, variant?: string): number;
+		/** Null preserves the family's legacy timing for this variant. */
+		openingMs(result: ReplayedResult, variant?: string): number | null;
 		minimumSeconds(result: ReplayedResult, variant?: string): number;
 	} | null;
 	scoring: import('./scoring.js').ScoreDefinition;

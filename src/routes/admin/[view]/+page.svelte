@@ -4,6 +4,7 @@
 	import ThemeEditor from '#lib/components/ThemeEditor.svelte';
 	import { puzzleVariant } from '#lib/scoring.js';
 	import AdminTestPlay from '#lib/components/AdminTestPlay.svelte';
+	import GameSwitch from '#lib/components/GameSwitch.svelte';
 	import ScoringEditor from '#lib/components/ScoringEditor.svelte';
 	import Brand from '#lib/components/Brand.svelte';
 	import { resolve } from '$app/paths';
@@ -28,6 +29,7 @@
 		'scoring',
 		'themes'
 	];
+	const activityMetrics = ['shown', 'ignored', 'played', 'abandoned', 'finished', 'open'] as const;
 	let ref = $state('');
 	const key = (suffix: string) => `v1.admin.${suffix}` as MessageKey;
 	const count = (name: string) => new Intl.NumberFormat('en').format(data.metrics[name] ?? 0);
@@ -868,34 +870,91 @@
 						aria-current={!data.selectedGame ? 'page' : undefined}
 						href={resolve('/admin/[view]', { view: 'games' })}>{t('v1.admin.games.overview')}</a
 					>
-					{#each data.games as game (game.family)}<a
-							class:active={data.selectedGame === game.family}
-							aria-current={data.selectedGame === game.family ? 'page' : undefined}
-							href="{resolve('/admin/[view]', { view: 'games' })}?game={game.family}"
-							>{familyName(game.family)}</a
+					{#each data.gameFamilies as family (family)}<a
+							class:active={data.selectedGame === family}
+							aria-current={data.selectedGame === family ? 'page' : undefined}
+							href="{resolve('/admin/[view]', { view: 'games' })}?game={family}"
+							>{familyName(family)}</a
 						>{/each}
 				</nav>
-				<p>
-					{t(data.gameStats.variants.length ? 'admin.variants.totals' : 'v1.admin.games.stats')}
-				</p>
 				{#if !data.selectedGame}
-					<div class="game-grid">
-						{#each data.games as game (game.family)}<a
-								class="admin-card game-card"
-								href="{resolve('/admin/[view]', { view: 'games' })}?game={game.family}"
-								><h2>
-									{familyName(game.family)} · {t(`v1.admin.games.${game.state}` as MessageKey)}
-								</h2>
-								<p>{t('v1.admin.games.completed')}: {game.completed}</p>
+					{#if data.gamesOverview}
+						<div class="metric-grid">
+							<article class="metric">
+								<p>{t('admin.games.families')}</p>
+								<strong>{data.gamesOverview.families.total}</strong>
+								<p>{t('admin.games.familyStates', data.gamesOverview.families)}</p>
+							</article>
+							<article class="metric">
+								<p>{t('admin.variants.title')}</p>
+								<strong>{data.gamesOverview.variants.total}</strong>
+								<p>{t('admin.games.enabledCount', data.gamesOverview.variants)}</p>
+							</article>
+							{#each activityMetrics as metric (metric)}<article class="metric">
+									<p>{t(`admin.variants.${metric}` as MessageKey)}</p>
+									<strong>{data.gamesOverview.totals[metric]}</strong>
+								</article>{/each}
+							<article class="metric">
+								<p>{t('admin.games.totalCompleted')}</p>
+								<strong>{data.gamesOverview.totals.totalCompleted}</strong>
 								<p>
-									{t('v1.admin.games.ranked')}: {game.ranked} · {t('v1.admin.games.solo')}: {game.completed -
-										game.ranked}
+									{t('v1.admin.games.ranked')}: {data.gamesOverview.totals.ranked} · {t(
+										'v1.admin.games.solo'
+									)}: {data.gamesOverview.totals.totalCompleted - data.gamesOverview.totals.ranked}
 								</p>
-								<span>{t('v1.admin.games.open')}</span></a
-							>{/each}
+							</article>
+						</div>
+						<p>
+							{t('admin.games.overviewNote', {
+								time: new Date(data.gamesOverview.updatedAt).toISOString()
+							})}
+						</p>
+					{/if}
+					<div class="game-list">
+						{#each data.games as game (game.family)}<a
+								class="admin-card game-row"
+								href="{resolve('/admin/[view]', { view: 'games' })}?game={game.family}"
+							>
+								<div>
+									<h2>{familyName(game.family)}</h2>
+									<span class="state-badge">{t(`v1.admin.games.${game.state}` as MessageKey)}</span>
+								</div>
+								<dl class="variant-counts">
+									<div>
+										<dt>{t('admin.variants.title')}</dt>
+										<dd>{game.variantCount}</dd>
+									</div>
+									<div>
+										<dt>{t('admin.variants.played')}</dt>
+										<dd>{game.played}</dd>
+									</div>
+									<div>
+										<dt>{t('admin.variants.finished')}</dt>
+										<dd>{game.finished}</dd>
+									</div>
+									<div>
+										<dt>{t('admin.games.totalCompleted')}</dt>
+										<dd>{game.totalCompleted}</dd>
+									</div>
+								</dl>
+							</a>{/each}
 					</div>
 				{:else}
 					{#each data.games.filter((game) => game.family === data.selectedGame) as game (game.family)}
+						<header class="game-heading">
+							<div>
+								<h2>{familyName(game.family)}</h2>
+								<span class="state-badge">{t(`v1.admin.games.${game.state}` as MessageKey)}</span>
+							</div>
+							{#if game.state === 'enabled' || game.state === 'disabled'}<GameSwitch
+									family={game.family}
+									enabled={game.state === 'enabled'}
+									allowed={can(
+										data.actor.role,
+										game.state === 'enabled' ? 'game-disable' : 'game-enable'
+									)}
+								/>{/if}
+						</header>
 						<nav class="section-tabs" aria-label={t('v1.admin.games.detailSections')}>
 							<a
 								class:active={data.subview !== 'settings'}
@@ -909,41 +968,30 @@
 							>
 						</nav>
 						<section class="admin-card">
-							<h2>
-								{familyName(game.family)} · {t(`v1.admin.games.${game.state}` as MessageKey)}
-							</h2>
 							{#if data.subview === 'settings'}
 								{#if game.restoreUntil}<p>
 										{t('v1.admin.users.deadline')}: {new Date(game.restoreUntil).toISOString()}
 									</p>{/if}
 								{#if game.state !== 'hard-deleted'}
-									<AccountForm
-										>{#snippet children(pending)}<input
-												type="hidden"
-												name="target"
-												value={game.family}
-											/>{#if game.state === 'deleted'}<input
+									{#if game.state === 'deleted'}<AccountForm
+											>{#snippet children(pending)}<input
+													type="hidden"
+													name="target"
+													value={game.family}
+												/><input
 													type="hidden"
 													name="action"
 													value={game.restoreUntil && game.restoreUntil > Date.now()
 														? 'game-restore'
 														: 'game-hard-delete'}
-												/>{:else}<input
-													type="hidden"
-													name="action"
-													value={game.state === 'enabled' ? 'game-disable' : 'game-enable'}
-												/>{/if}{@render reason()}<button class="btn primary" disabled={pending}
-												>{t(
-													game.state === 'enabled'
-														? 'v1.admin.games.disable'
-														: game.state === 'disabled'
-															? 'v1.admin.games.enable'
-															: game.restoreUntil && game.restoreUntil > Date.now()
-																? 'v1.admin.games.restore'
-																: 'v1.admin.games.hardDelete'
-												)}</button
-											>{/snippet}</AccountForm
-									>
+												/>{@render reason()}<button class="btn primary" disabled={pending}
+													>{t(
+														game.restoreUntil && game.restoreUntil > Date.now()
+															? 'v1.admin.games.restore'
+															: 'v1.admin.games.hardDelete'
+													)}</button
+												>{/snippet}</AccountForm
+										>{/if}
 									{#if game.state === 'disabled'}<details>
 											<summary>{t('v1.admin.games.delete')}</summary><AccountForm
 												>{#snippet children(pending)}<input
@@ -967,11 +1015,22 @@
 										</details>{/if}
 								{/if}
 							{:else}
+								<p>{t('admin.variants.registered')}</p>
+								<p>{t('admin.variants.reconcile')}</p>
+								<dl class="variant-counts">
+									{#each activityMetrics as metric (metric)}<div>
+											<dt>{t(`admin.variants.${metric}` as MessageKey)}</dt>
+											<dd>{game[metric]}</dd>
+										</div>{/each}
+									<div>
+										<dt>{t('admin.games.totalCompleted')}</dt>
+										<dd>{game.totalCompleted}</dd>
+									</div>
+								</dl>
 								<p>
-									{t('v1.admin.games.completed')}: {game.completed} · {t('v1.admin.games.ranked')}: {game.ranked}
-									· {t('v1.admin.games.solo')}: {game.completed - game.ranked}
+									{t('v1.admin.games.ranked')}: {game.ranked} · {t('v1.admin.games.solo')}: {game.totalCompleted -
+										game.ranked}
 								</p>
-								{#if !data.gameStats.variants.length}<p>{t('v1.admin.games.unavailable')}</p>{/if}
 								<div class="table-wrap game-stats-table">
 									<table>
 										<thead
@@ -1004,8 +1063,8 @@
 						{#if data.gameStats.variants.length}
 							<section class="admin-card variant-section">
 								<h2>{t('admin.variants.title')}</h2>
-								<p>{t('admin.variants.registered')}</p>
-								<p>{t('admin.variants.reconcile')}</p>
+								{#if data.subview === 'settings'}<p>{t('admin.variants.registered')}</p>
+									<p>{t('admin.variants.reconcile')}</p>{/if}
 								{#each data.gameStats.variants as variant (variant.id)}
 									<details class="variant-row" data-variant={variant.id}>
 										<summary
@@ -1071,14 +1130,14 @@
 															? 'variant-disable'
 															: 'variant-enable'}
 													/>
-													<label
-														>{t('v1.operator.reason')}<input
-															name="reason"
-															required
-															minlength="3"
-															maxlength="240"
-														/></label
-													>
+													{#if variant.state === 'enabled'}<label
+															>{t('v1.operator.reason')}<input
+																name="reason"
+																required
+																minlength="3"
+																maxlength="240"
+															/></label
+														>{/if}
 													<label class="confirm"
 														><input type="checkbox" name="confirm" value="yes" required />{t(
 															'admin.variants.confirm'
@@ -1193,6 +1252,51 @@
 	>{/snippet}
 
 <style>
+	.game-heading {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 16px;
+		margin: 24px 0 16px;
+	}
+	.game-heading h2,
+	.game-row h2 {
+		margin: 0 0 8px;
+	}
+	.state-badge {
+		display: inline-block;
+		padding: 4px 8px;
+		border: 1px solid var(--border);
+		border-radius: 6px;
+		font-size: 12px;
+	}
+	.game-list {
+		display: grid;
+		gap: 12px;
+	}
+	.game-row {
+		display: flex;
+		align-items: center;
+		justify-content: space-between;
+		gap: 20px;
+	}
+	.game-row .variant-counts {
+		flex: 1;
+		min-width: 0;
+		max-width: 640px;
+		margin: 0;
+	}
+	@media (max-width: 700px) {
+		.game-heading,
+		.game-row {
+			flex-direction: column;
+			align-items: flex-start;
+		}
+		.game-row .variant-counts {
+			width: 100%;
+		}
+	}
+
 	.variant-row {
 		padding: 16px 0;
 		border-top: 1px solid var(--border);
@@ -1234,20 +1338,14 @@
 		background: var(--surface);
 		color: var(--primary-strong);
 	}
-	.game-grid {
-		display: grid;
-		grid-template-columns: repeat(auto-fit, minmax(min(240px, 100%), 1fr));
-		gap: 16px;
-	}
-	.game-card {
-		display: block;
+	.game-row {
 		text-decoration: none;
 		margin: 0;
 	}
-	.game-card:hover {
+	.game-row:hover {
 		border-color: var(--primary);
 	}
-	.game-card span {
+	.game-row span {
 		color: var(--primary-strong);
 		font-size: 13px;
 		font-weight: 800;

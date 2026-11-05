@@ -1,4 +1,35 @@
 export const messages = {
+	'variant.block:classic': 'Classic',
+	'variant.block:board-10': '10 x 10 board',
+	'variant.block:rows-only': 'Rows only',
+	'variant.block:rush-60': '60-second rush',
+	'ending.block.timeUp': "Time's up!",
+	'ending.block.timeUp.subline': '60 seconds complete · {score} points · {pieces} pieces',
+	'scoring.block.sharedNotice':
+		'Shared with Block Classic, 10 x 10 board, Rows only and 60-second rush. A change applies to future rounds only.',
+	'block.boardSize': '{size} by {size} board',
+	'block.timeLeft': 'Time left',
+	'block.statusTimeUp': "Time's up.",
+	'block.result.timeUp': "Time's up · {summary}",
+	'block.board10.step1': 'Choose a piece, then tap an empty space on the 10 × 10 board.',
+	'block.help.boardSize': 'Board size',
+	'block.board10.size': '10 × 10',
+	'block.rowsOnly.step2':
+		'Fill a whole row to clear it. Columns never clear. Pieces cannot rotate.',
+	'block.help.columns': 'Full columns',
+	'block.rowsOnly.columns': 'Stay filled; no points',
+	'block.rowsOnly.tips':
+		'Leave space for larger pieces and finish rows. Full columns stay on the board and block placements.',
+	'block.rowsOnly.hint': 'Drag or tap a piece. Fill a row; columns never clear.',
+	'block.rowsOnly.hintShort': 'Fill a row. Columns never clear.',
+	'block.rush.step3':
+		'Your first valid placement starts a 60-second clock. Play ends at zero, when nothing fits, or after 300 placements.',
+	'block.help.clock': 'Clock',
+	'block.rush.clock': '60 seconds from the first valid placement',
+	'block.rush.scoringNote':
+		'A placement that clears nothing resets the combo. The clock keeps running in Help and while the page is hidden. Scores are counted by replaying moves.',
+	'block.rush.tips':
+		'Plan your opening before placing the first piece. Keep space for all three pieces; the clock keeps running during clears.',
 	'ending.block.noMoves': 'No moves left!',
 	'ending.block.cap': 'Board full!',
 	'ending.block.subline': '{score} points · {pieces} pieces',
@@ -28,7 +59,7 @@ export const messages = {
 	'v1.nav.block': 'Block puzzle',
 	'v1.game.block.title': 'Play the Free Block Puzzle Game',
 	'v1.game.block.intro': 'Place blocks, clear full lines, build combos, and beat your high score.',
-	'v1.game.block': 'Block puzzle',
+	'v1.game.block': 'Block',
 	'v1.game.block.how':
 		'Choose a piece from the tray, then place it on an empty part of the 8 × 8 board. Fill a row or column to clear it. A new tray arrives after all three pieces are used. Pieces cannot rotate.',
 	'v1.game.block.scoring':

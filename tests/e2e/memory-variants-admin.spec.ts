@@ -9,7 +9,8 @@ import { totp } from '../../src/lib/server/admin-totp.js';
 test.use({ baseURL: 'http://localhost:5173' });
 
 async function apply(form: Locator, button: string, reason: string) {
-	await form.locator('input[name=reason]').fill(reason);
+	if (await form.locator('input[name=reason]').count())
+		await form.locator('input[name=reason]').fill(reason);
 	await form.locator('input[name=confirm]').check();
 	await Promise.all([
 		form
@@ -40,6 +41,11 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			.all<{ variant: string; state: string; reason: string }>()
 	).results;
 	const originalScores: { scope: string; variant?: string; version: string }[] = [];
+	const originalBlockLifecycle = (
+		await db
+			.prepare("SELECT variant,state,reason FROM variant_lifecycle WHERE family='block'")
+			.all<{ variant: string; state: string; reason: string }>()
+	).results;
 	try {
 		const helpers = (
 			await betterAuth({
@@ -60,13 +66,15 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		);
 		userId = user.id;
 		const login = await helpers.login({ userId });
-		expect(
-			(await context.request.get('/admin/games?game=memory', { maxRedirects: 0 })).status()
-		).toBe(303);
+		for (const family of ['memory', 'block'])
+			expect(
+				(await context.request.get(`/admin/games?game=${family}`, { maxRedirects: 0 })).status()
+			).toBe(303);
 		await context.addCookies(login.cookies);
-		expect(
-			(await context.request.get('/admin/games?game=memory', { maxRedirects: 0 })).status()
-		).toBe(403);
+		for (const family of ['memory', 'block'])
+			expect(
+				(await context.request.get(`/admin/games?game=${family}`, { maxRedirects: 0 })).status()
+			).toBe(403);
 		const secret = new Uint8Array(20).fill(19),
 			iv = randomBytes(12);
 		const cipher = createCipheriv(
@@ -86,7 +94,13 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		await page.getByRole('textbox').fill(totp(secret, Date.now()));
 		await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
 		await expect(page).toHaveURL(/\/admin\/dashboard$/);
-		await page.goto('/admin/games?game=memory&subview=settings');
+		await page.goto('/admin/games?game=memory');
+		await expect(page.getByRole('switch', { name: 'Game enabled' })).toBeVisible();
+		await page
+			.getByRole('navigation', { name: 'Game sections' })
+			.getByRole('link', { name: 'Settings' })
+			.click();
+		await expect(page.getByRole('switch', { name: 'Game enabled' })).toBeVisible();
 		await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
 		await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', 'noindex');
 		await expect(
@@ -106,8 +120,10 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			await expect(moving.getByText(label, { exact: true })).toBeVisible();
 		await expect(moving).toContainText('Imported guest completions');
 		const movingState = await moving.locator('input[name=action]').inputValue();
-		if (movingState === 'variant-enable')
+		if (movingState === 'variant-enable') {
+			await expect(moving.locator('input[name=reason]')).toHaveCount(0);
 			await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-ENABLE');
+		}
 		await apply(moving.locator('form'), 'Disable variant', 'CASE-VARIANT-DISABLE');
 		await expect(moving.locator('summary')).toContainText('Disabled');
 		await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-REENABLE');
@@ -132,7 +148,7 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		expect(
 			await db
 				.prepare(
-					"SELECT id FROM admin_audit WHERE actor=? AND action='variant-enable' AND target='memory:moving' AND reason='CASE-VARIANT-REENABLE'"
+					"SELECT id FROM admin_audit WHERE actor=? AND action='variant-enable' AND target='memory:moving' AND reason='Resumed by operator (no reason entered)'"
 				)
 				.bind(userId)
 				.first()
@@ -153,6 +169,7 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 				)
 				.all()
 		).results;
+		const beforeScoreIds = new Set(beforeScores.map((row) => row.id));
 		const editors = page.locator('.scoring-card');
 		await expect(editors).toHaveCount(2);
 		await expect(editors.first()).toContainText(
@@ -198,13 +215,14 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 						"SELECT id,score,score_config_version FROM completed_run WHERE family='memory' ORDER BY id"
 					)
 					.all()
-			).results
+			).results.filter((row) => beforeScoreIds.has(row.id))
 		).toEqual(beforeScores);
 		const counts = async () =>
 			await db
 				.prepare(
-					"SELECT (SELECT count(*) FROM completed_run WHERE family='memory') completed,(SELECT count(*) FROM play_session WHERE family='memory') sessions,(SELECT count(*) FROM account_round_activity WHERE family='memory') activity"
+					"SELECT (SELECT count(*) FROM completed_run WHERE family='memory' AND user_id=?) completed,(SELECT count(*) FROM play_session WHERE family='memory' AND user_id=?) sessions,(SELECT count(*) FROM account_round_activity WHERE family='memory' AND user_id=?) activity"
 				)
+				.bind(userId, userId, userId)
 				.first();
 		const beforeCounts = await counts();
 		const testPlay = page.locator('.admin-test');
@@ -243,6 +261,41 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		}
 		expect(playerWrites).toEqual([]);
 		expect(await counts()).toEqual(beforeCounts);
+		// Block uses the same protected test harness even when its rush variant is disabled.
+		await page.goto('/admin/games?game=block&subview=settings');
+		await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', 'noindex');
+		await expect(page.locator('.scoring-card')).toContainText(
+			'Shared with Block Classic, 10 x 10 board, Rows only and 60-second rush. A change applies to future rounds only.'
+		);
+		const rush = page.locator('.variant-row[data-variant="block:rush-60"]');
+		await rush.locator('summary').click();
+		if ((await rush.locator('input[name=action]').inputValue()) === 'variant-disable')
+			await apply(rush.locator('form'), 'Disable variant', 'CASE-BLOCK-TEST-DISABLED');
+		await expect(rush.locator('summary')).toContainText('Disabled');
+		const blockCounts = async () =>
+			await db
+				.prepare(
+					"SELECT (SELECT count(*) FROM completed_run WHERE family='block' AND user_id=?) completed,(SELECT count(*) FROM play_session WHERE family='block' AND user_id=?) sessions,(SELECT count(*) FROM account_round_activity WHERE family='block' AND user_id=?) activity,(SELECT count(*) FROM variant_lifecycle WHERE family='block') variants"
+				)
+				.bind(userId, userId, userId)
+				.first();
+		const beforeBlock = await blockCounts();
+		playerWrites.length = 0;
+		await page.clock.install();
+		await testPlay
+			.getByRole('combobox', { name: 'Variant', exact: true })
+			.selectOption('block:rush-60');
+		await testPlay.getByRole('button', { name: /^(Start test round|Next test round)$/ }).click();
+		await expect(testPlay.locator('.game')).toHaveAttribute('data-variant', 'block:rush-60');
+		await expect(testPlay.locator('.game')).toHaveAttribute('data-phase', 'playing');
+		await testPlay.locator('.tray-slot:not(.is-empty)').first().click();
+		await testPlay.locator('[role=gridcell]').first().click();
+		await page.clock.fastForward(61000);
+		await expect(testPlay.getByText(/^Test score:/)).toBeVisible();
+		await expect(testPlay.getByRole('alert')).toHaveCount(0);
+		expect(playerWrites).toEqual([]);
+		expect(await blockCounts()).toEqual(beforeBlock);
+		await page.goto('/admin/games?game=memory&subview=settings');
 		await page.reload();
 		await expect(moving.locator('summary')).toContainText('Disabled');
 		for (const viewport of [
@@ -256,6 +309,12 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			);
 		}
 	} finally {
+		await db.prepare("DELETE FROM variant_lifecycle WHERE family='block'").run();
+		for (const row of originalBlockLifecycle)
+			await db
+				.prepare("INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('block',?,?,?)")
+				.bind(row.variant, row.state, row.reason)
+				.run();
 		for (const score of originalScores) {
 			const live = await db
 				.prepare('SELECT version FROM score_live WHERE family=?')

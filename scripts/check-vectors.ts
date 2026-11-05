@@ -9,6 +9,9 @@ import { chromium, firefox, webkit } from '@playwright/test';
 import type { verifyVectors } from '../tests/vectors/runner.js';
 const run = promisify(execFile);
 const memoryOnly = process.argv.includes('--memory');
+const blockOnly = process.argv.includes('--block');
+if (memoryOnly && blockOnly) throw new Error('Choose one family vector filter.');
+const prefix = memoryOnly ? 'memory-' : blockOnly ? 'block-' : '';
 const directory = await mkdtemp(join(tmpdir(), 'morphi-vectors-'));
 const server = createServer((_request, response) => {
 	response.setHeader('Content-Type', 'text/html');
@@ -27,7 +30,7 @@ try {
 	] as const) {
 		await run('bun', [
 			'build',
-			`tests/vectors/${memoryOnly ? 'memory-' : ''}${entry}.ts`,
+			`tests/vectors/${prefix}${entry}.ts`,
 			'--target',
 			target,
 			'--format',

@@ -14,6 +14,9 @@ import {
 } from '../../src/lib/server/activity.js';
 import {
 	changeVariant,
+	changeGame,
+	cachedGameOverview,
+	gameOverview,
 	enabledVariants,
 	gameAvailable,
 	gameStatistics
@@ -348,4 +351,193 @@ it('keeps a delayed first-flip report as played after an explicit departure', as
 			.bind(round.runId)
 			.first()
 	).toEqual({ first_move_at: now + 100002 });
+});
+
+it('caches reconciled overview totals, includes families without variants, and invalidates every lifecycle write', async () => {
+	const db = proxy.env.DB;
+	const entries = new Map<string, string>();
+	const cache = {
+		get: async (key: string) => (entries.has(key) ? JSON.parse(entries.get(key)!) : null),
+		put: async (key: string, value: string, options: { expirationTtl: number }) => {
+			expect(options.expirationTtl).toBe(60);
+			entries.set(key, value);
+		},
+		delete: async (key: string) => {
+			entries.delete(key);
+		}
+	} as unknown as KVNamespace;
+	let statements = 0;
+	const countedDb = {
+		prepare: (sql: string) => {
+			statements++;
+			return db.prepare(sql);
+		}
+	} as D1Database;
+	const round = { runId: crypto.randomUUID(), family: 'connect', rankedSession: null };
+	await recordRoundStart(db, userId, round, now);
+	await recordRoundPlay(db, userId, round, now + 1);
+	await gameOverview(db);
+	const first = await cachedGameOverview(countedDb, cache, now);
+	// All three lifecycle rows exist by this point: one ensure SELECT per family plus four aggregate reads.
+	expect(statements).toBe(Object.keys(catalog).length + 4);
+	const metrics = [
+		'shown',
+		'ignored',
+		'played',
+		'abandoned',
+		'finished',
+		'open',
+		'imported',
+		'totalCompleted',
+		'ranked'
+	] as const;
+	for (const game of first.games) {
+		for (const key of metrics)
+			expect(game[key]).toBe(game.variants.reduce((sum, row) => sum + row[key], 0));
+		expect(game.shown).toBe(game.ignored + game.played);
+		expect(game.played).toBe(game.abandoned + game.finished + game.open);
+	}
+	for (const key of metrics)
+		expect(first.totals[key]).toBe(first.games.reduce((sum, game) => sum + game[key], 0));
+	statements = 0;
+	const selected = await gameOverview(countedDb, 'connect');
+	expect(selected).toEqual(first.games.filter((game) => game.family === 'connect'));
+	expect(statements).toBe(5);
+	statements = 0;
+	await gameStatistics(countedDb, 'connect', selected[0]);
+	expect(statements).toBe(2);
+	expect(first.games.find((game) => game.family === 'connect')).toMatchObject({
+		played: 1,
+		open: 1,
+		variantCount: 0
+	});
+	await recordRoundAbandon(db, userId, round, now + 2);
+	await saveRun(db, userId, completion('memory:moving'), now + 2);
+	await db
+		.prepare(
+			`INSERT INTO completed_run(id,user_id,family,engine_version,rules_group,score,moves,seconds,seed,move_log,payload_hash,ranked,created_at) VALUES(?,?,?,?,?,123,1,1,'42','[]',?,0,?)`
+		)
+		.bind(
+			round.runId,
+			userId,
+			'connect',
+			catalog.connect.engineVersion,
+			catalog.connect.leaderboardGroups[0],
+			crypto.randomUUID(),
+			now + 2
+		)
+		.run();
+	statements = 0;
+	expect(await cachedGameOverview(countedDb, cache, now + 3)).toEqual(first);
+	expect(statements).toBe(0);
+	await changeGame(
+		db,
+		'operator',
+		'connect',
+		'game-disable',
+		'Overview invalidation',
+		7,
+		now + 4,
+		cache
+	);
+	expect(entries.size).toBe(0);
+	const disabled = await cachedGameOverview(db, cache, now + 5);
+	expect(disabled.totals.totalCompleted).toBe(first.totals.totalCompleted + 2);
+	expect(disabled.games.find((game) => game.family === 'connect')).toMatchObject({
+		state: 'disabled',
+		finished: 1,
+		open: 0
+	});
+	await changeGame(db, 'operator', 'connect', 'game-enable', undefined, 7, now + 6, cache);
+	expect(entries.size).toBe(0);
+	const resumed = await cachedGameOverview(db, cache, now + 7);
+	const variant = resumed.games.find((game) => game.family === 'memory')!.variants[0];
+	await changeVariant(
+		db,
+		'operator',
+		'memory',
+		variant.id,
+		variant.state === 'enabled' ? 'variant-disable' : 'variant-enable',
+		'Overview variant invalidation',
+		now + 8,
+		cache
+	);
+	expect(entries.size).toBe(0);
+	await cachedGameOverview(db, cache, now + 9);
+	await changeVariant(
+		db,
+		'operator',
+		'memory',
+		variant.id,
+		variant.state === 'enabled' ? 'variant-enable' : 'variant-disable',
+		'Restore overview fixture',
+		now + 10,
+		cache
+	);
+	expect(entries.size).toBe(0);
+	const refreshed = await cachedGameOverview(db, cache, now + 11);
+	const expired = await cachedGameOverview(db, cache, now + 60_011);
+	expect(expired.updatedAt).toBe(now + 60_011);
+	expect(expired.totals).toEqual(refreshed.totals);
+	entries.set(
+		'admin:games-overview:v1',
+		JSON.stringify({ ...expired, totals: { ...expired.totals, shown: -1 } })
+	);
+	expect((await cachedGameOverview(db, cache, now + 60_012)).totals).toEqual(refreshed.totals);
+});
+
+it('requires disable reasons, ignores supplied enable reasons, and audits missing enable reasons for families and variants', async () => {
+	const db = proxy.env.DB;
+	for (const reason of ['', 'ab', 'Contains@address', 'Line\nbreak', 'x'.repeat(241)]) {
+		await expect(
+			changeGame(db, 'operator', 'connect', 'game-disable', reason)
+		).rejects.toMatchObject({ code: 'input' });
+		await expect(
+			changeVariant(db, 'operator', 'memory', 'memory:trios', 'variant-disable', reason)
+		).rejects.toMatchObject({ code: 'input' });
+	}
+	await changeGame(db, 'operator', 'connect', 'game-disable', 'Enable reason fixture');
+	await changeGame(db, 'operator', 'connect', 'game-enable', 'Ignore@this\nclient input');
+	await changeGame(db, 'operator', 'connect', 'game-disable', 'Missing reason fixture');
+	await changeGame(db, 'operator', 'connect', 'game-enable');
+	if ((await enabledVariants(db, 'memory')).includes('memory:trios'))
+		await changeVariant(
+			db,
+			'operator',
+			'memory',
+			'memory:trios',
+			'variant-disable',
+			'Enable reason fixture'
+		);
+	await changeVariant(
+		db,
+		'operator',
+		'memory',
+		'memory:trios',
+		'variant-enable',
+		'Ignore@this\nclient input'
+	);
+	await changeVariant(
+		db,
+		'operator',
+		'memory',
+		'memory:trios',
+		'variant-disable',
+		'Missing reason fixture'
+	);
+	await changeVariant(db, 'operator', 'memory', 'memory:trios', 'variant-enable');
+	const audit = (
+		await db
+			.prepare("SELECT reason FROM admin_audit WHERE action IN ('game-enable','variant-enable')")
+			.all<{ reason: string }>()
+	).results;
+	expect(audit.length).toBeGreaterThanOrEqual(4);
+	expect(audit.every((row) => row.reason === 'Resumed by operator (no reason entered)')).toBe(true);
+	expect(
+		await db
+			.prepare(
+				"SELECT reason FROM variant_lifecycle WHERE family='memory' AND variant='memory:trios'"
+			)
+			.first()
+	).toEqual({ reason: 'Resumed by operator (no reason entered)' });
 });

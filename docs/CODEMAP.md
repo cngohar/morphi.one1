@@ -1,13 +1,15 @@
 # CODEMAP.md
 
+- **v1.3.1 local implementation (2026-11-05):** Block variants, admin Games/cache/switch and three new per-action sounds are implemented. Targeted automated checks pass; S5 owner audition and owner local review remain pending. The owner subsequently authorized a source-only commit/push; the three unauditioned MP3s stay local. No deployment or next phase is inferred. See `docs/V1.3.1_WORK.md` and `docs/evidence/v1.3.1/verification.json`.
+
 Read this map before searching. Types and implementation live in code; decisions and historical evidence live in the linked docs.
 
 ## Current scope
 
-- v1.3 Memory variants are implemented locally from post-refactor `c7bdb03`, pending owner confirmation. The owner approved the v1.3 brief and the separate registered-start/imported-completion statistics cohorts. The refactor remains closed; no release or next game is authorized. See `docs/V1.3_WORK.md` and `docs/evidence/v1.3/verification.json`.
-- Scope: classic compatibility plus no-preview, trios and moving Memory; generic variant selection/persistence/replay; same-page admin statistics/lifecycle/immutable scoring/test play. The owner subsequently authorized committing and pushing this source handoff; no deployment or next phase is authorized.
+- v1.3.1 is implemented locally from the v1.3 source baseline `f053fc39e5bb9e3daa3cba747761cf9e81c5c914`. Targeted automated checks pass; S5 sound audition and owner local review remain pending. The refactor stays closed; this does not infer v1.3 functional acceptance. The owner subsequently authorized a source-only GitHub handoff; unauditioned MP3s remain excluded, with no deployment or next phase authorized. See `docs/V1.3.1_WORK.md` and `docs/evidence/v1.3.1/verification.json`.
+- Current scope: classic-compatible Block board-10, rows-only and rush-60; cached reconciled admin Games statistics, header switch/dialog, audited reason-free family/variant enable and catalog test play; offline per-action sounds and the two Memory sound hooks. Preserve the existing v1.3 Memory implementation and evidence without reopening that phase. The three new MP3s remain uncommitted pending owner audition.
 - v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/NEXT_PHASE_REVIEW.md`, `docs/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
-- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved `docs/morphi-v1.3-memory-variants-codex-brief.md` controls v1.3, with the owner's registered-start/imported-completion clarification. No deployment, production provisioning, secrets, DNS or Google changes are authorized.
+- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved `docs/morphi-v1.3.1-codex-brief.md` controls this local scope, retaining the registered-start/imported-completion cohorts. The owner authorized committing/pushing the source handoff on 2026-11-05, while the three new MP3s remain local pending audition. No deployment, production provisioning, secret installation, DNS/Google changes or next phase is authorized.
 - The published guest/privacy version remains `b50a7a18-2e85-4406-bd40-77f27c4b3da3` at `https://morphi.one` and `https://morphi-one.electrasincng.workers.dev`. Cloudflare injects its intentional analytics beacon at delivery. Source repository: `https://github.com/cngohar/morphi.one1`; pushing does not authorize deployment.
 
 ## Engine and registration
@@ -176,3 +178,13 @@ Slice 6 additions:
 - `routes/admin/[view]/+page.{server.ts,svelte}`, `components/{ScoringEditor,AdminTestPlay}.svelte`: existing games detail variant expansion, shared/trio editors and authenticated ephemeral test play. No new route.
 - `memory/variants.test.ts`, `lib/memory-variants.test.ts`, `tests/integration/memory-variants.test.ts`, `tests/e2e/memory-variants{,-admin}.spec.ts`, `tests/vectors/memory-*`: scoped acceptance checks. `bun scripts/check-vectors.ts --memory` runs only Memory vectors in six runtimes; `bun scripts/check-palettes.ts --memory` checks only Memory palettes.
 - `docs/V1.3_WORK.md`, `docs/evidence/v1.3/`: final report, exact groups, full file inventory, targeted verification and local diagnostic measurements. Full verify and other-family suites were deliberately not run.
+
+## v1.3.1 Block variants, admin and sounds
+
+- `src/lib/puzzles/block-placement/{logic,manifest,messages,Game,View}` and package README: classic-compatible optional variant/size, board-10, rows-only, continuous rush clock, help/results and shared score copy.
+- `src/lib/engine/contract.ts`, `server/runs.ts`, `ui/puzzle-view.ts`, `screens/PlaySession.svelte`: optional maxSeconds, exact ranked elapsed ceiling, checkpoint save-time bridge and family-owned time-up ending.
+- `server/games.ts`, `routes/admin/[view]/+page.{server.ts,svelte}`, `components/{GameSwitch,ScoringEditor}.svelte`, `components/account/AccountForm.svelte`: cached global sums, selected-family queries, audited reason-free enable, accessible switch/dialog and catalog test-play families.
+- `scripts/generate-sounds.ts`, `static/audio/manifest.json`, `static/audio/{trio-match,reshuffle,timer-tick}.mp3`, `ui/sound.ts`, `puzzles/memory/Game.svelte`: staged offline generation, preserved old provenance, new action assets and runtime hooks. New MP3 owner audition remains pending.
+- `scripts/{generate-registry,check-vectors}.ts`, generated `puzzle-{metadata,messages}.ts`, `tests/vectors/block-*`: maxSeconds projection, `bun scripts/check-vectors.ts --block`, three-seed vectors per new variant plus preserved classic vectors in six runtimes.
+- `puzzles/block-placement/variants.test.ts`, `src/lib/block-variants.test.ts`, `tests/integration/block-variants.test.ts`, filtered `tests/integration/memory-variants.test.ts`, `tests/slices/v1.3.1-sounds.test.ts`, `tests/e2e/{block-variants,variant-sounds,memory-variants-admin,operator}.spec.ts`: targeted logic, compatibility, ceiling, statistics/cache/lifecycle, action sounds and admin evidence.
+- `docs/V1.3.1_WORK.md`, `docs/evidence/v1.3.1/{verification,audio-quality}.json`: complete inventory, B/S/A results, known risks and pending S5 gate. No full verify/global lint/type checks or physical-device claim.

@@ -233,6 +233,7 @@
 	let lockNotice = $state(false);
 	let resumeState = $state<CheckpointState | undefined>();
 	let checkpointReader: (() => CheckpointState) | null = null;
+	let checkpointSavedAt = $state<number | undefined>();
 	let checkpointLease: CheckpointLease | null = null;
 	let restoring = false;
 	let rankedStartedAt = $state<number | null>(null);
@@ -567,6 +568,7 @@
 					: null;
 			rankedRound = Boolean(rankedSession);
 			runMoves = moves.slice();
+			checkpointSavedAt = checkpoint?.savedAt;
 			resumeState = checkpoint?.state ?? {
 				phase: 'playing',
 				elapsedMs: 0,
@@ -892,6 +894,7 @@
 			rankedSession = nextSession;
 			rankedStartedAt = nextStartedAt;
 			resumeState = undefined;
+			checkpointSavedAt = undefined;
 			checkpointReader = null;
 			roundActivity = null;
 			rankedRound = Boolean(nextSession);
@@ -953,6 +956,7 @@
 		announcement,
 		stats,
 		endingValues,
+		ending: resultEnding,
 		cap = false
 	}: PuzzleResult): void {
 		const game = family;
@@ -968,7 +972,7 @@
 
 		resultAnnouncement = announcement;
 		const endingSpec = puzzleVariant(game, variant)?.ending ?? puzzleMetadata[game].ending;
-		ending = {
+		ending = resultEnding ?? {
 			headline: t(
 				(cap
 					? (endingSpec.headlines.cap ?? endingSpec.headlines.default)
@@ -1186,6 +1190,7 @@
 					onfinish={recordResult}
 					onhome={goHome}
 					resume={resumeState}
+					{checkpointSavedAt}
 					{rankedStartedAt}
 					registerCheckpoint={(read) => {
 						checkpointReader = read;
