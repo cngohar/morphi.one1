@@ -1,8 +1,28 @@
 # CODEMAP.md
 
-- **Source handoff (2026-11-05):** Owner requested updating and pushing the current source to existing GitHub `origin/main`, including accepted v1.3.2, local v1.3.3 and documentation organization. Full verification remains deferred and owner v1.3.3 review pending. Local editor settings, ignored credentials/runtime artifacts, unauditioned audio and pre-existing palette timing changes are excluded; no deployment is authorized.
+- **Current v1.3.4 Slice 0 admin/query (2026-11-06):** Owner-authorized local
+  completion of Games admin/query review gaps. Mahjong is explicitly excluded;
+  it belongs to later plans. `server/games.ts` owns `ActivityMappingEntry`,
+  `buildActivityMapping` and the single-bind `queryActivityCounts` runner.
+  `routes/admin/[view]/+page.svelte`, `i18n/messages.ts` and
+  `ui/dismiss-dialog.ts` provide one responsive row per variant, translated
+  controls and the inspection drawer. The 40-group exact-count D1 test lives in
+  `tests/integration/memory-variants.test.ts`; drawer/viewport/audit checks live
+  in `tests/e2e/memory-variants-admin.spec.ts` and `operator.spec.ts`.
+  Scope, verification and limits: [Slice 0 work record](work/V1.3.4_SLICE0_WORK.md).
+  Local implementation and targeted checks are complete; owner visual review
+  remains separate. Eight focused D1 tests and six unique Chromium cases pass
+  across retained runs; a separate broader Support timeout is recorded.
+  Full verify remains deferred; no deployment or next feature is authorized.
 
-- **v1.3.3 Member Support (2026-11-05):** Implemented locally on accepted v1.3.2; 7 focused D1 and 4 unique Chromium cases pass, with zero type errors/warnings and scoped lint passing. Owner explicitly deferred full `bun run verify` to later stages; no full pass or waiver is inferred. Local owner review remains pending. See [approved plan](planning/V1.3.3_MEMBER_SUPPORT.md), [work record](work/V1.3.3_WORK.md) and [evidence](evidence/v1.3.3/verification.json). No source push or deployment is authorized.
+
+- **Mahjong variant research (2026-11-05):** `docs/references/puzzle-variants/Mahjong Solitaire Variants.html` follows the existing Memory research format, with 28 sourced examples across 18 variation dimensions, 21 linked sources, filters/comparison, a tile-freedom diagram and a configuration estimator. Direct Chromium review and screenshots: `docs/evidence/v1.3.4/research/`. Reference only; no expansion of v1.3.4 implementation scope.
+
+- **Proposed v1.3.4 Mahjong Solitaire:** Draft plan and puzzle brief at `docs/planning/V1.3.4_MAHJONG.md` and `docs/puzzles/mahjong-solitaire.md`. Proposed variants: Turtle 144, Quick 56 and Fortress 144. Awaiting owner decisions; no game implementation is authorized. Existing guide: `docs/references/game-guides/Mahjong Solitaire — How It Is Played.html`. Visual review draft: `static/demo/v1.3.4-mahjong.html` (conceptual geometry only). Screenshots: `docs/evidence/v1.3.4/` (three desktop variants and Turtle phone emulation).
+
+- **Source handoff (2026-11-05):** Owner requested updating and pushing the current source to existing GitHub `origin/main`, including accepted v1.3.2, local v1.3.3 and documentation organization. Full verification remains deferred; the owner subsequently confirmed v1.3.3 local review and acceptance, with remaining improvements deferred to later stages. Local editor settings, ignored credentials/runtime artifacts, unauditioned audio and pre-existing palette timing changes are excluded; no deployment is authorized.
+
+- **v1.3.3 Member Support accepted locally (2026-11-05):** Implemented on accepted v1.3.2; 7 focused D1 and 4 unique Chromium cases pass, with zero type errors/warnings and scoped lint passing. Owner explicitly deferred full `bun run verify` to later stages; no full pass or waiver is inferred. The owner confirmed local review and acceptance; remaining improvements are deferred to later stages, with details and scope not supplied. Device/browser details were not supplied. See [approved plan](planning/V1.3.3_MEMBER_SUPPORT.md), [work record](work/V1.3.3_WORK.md) and [evidence](evidence/v1.3.3/verification.json). No source push or deployment is authorized.
 
 - **v1.3.2 accepted locally (2026-11-05):** Owner acceptance covers the existing Connect variants, per-game admin scoring tabs, audit pagination and profile summary/activity changes. Automated verification evidence and device/browser details were not supplied; no test pass or waiver is inferred. No commit/push, deployment or next phase is authorized. See `docs/briefs/morphi-v1.3.2-codex-brief.md` and `docs/PHASE_REPORTS.md`.
 
@@ -15,9 +35,9 @@ Read this map before searching. Types and implementation live in code; decisions
 ## Current scope
 
 - v1.3.1 is implemented locally from the v1.3 source baseline `f053fc39e5bb9e3daa3cba747761cf9e81c5c914`. Targeted automated checks pass; S5 sound audition and owner local review remain pending. The refactor stays closed; this does not infer v1.3 functional acceptance. The owner subsequently authorized a source-only GitHub handoff; unauditioned MP3s remain excluded, with no deployment or next phase authorized. See `docs/work/V1.3.1_WORK.md` and `docs/evidence/v1.3.1/verification.json`.
-- Current scope: v1.3.3 Member Support only, on the owner-accepted local v1.3.2 working tree. Preserve earlier game, admin and sound changes and their acceptance/evidence boundaries. The three new v1.3.1 MP3s remain uncommitted pending owner audition.
+- v1.3.3 Member Support is accepted locally on the owner-accepted v1.3.2 baseline; remaining improvements are deferred to later stages. Current local work is the v1.3.4 admin/query Slice 0. Mahjong is excluded and deferred to later plans; its proposal and puzzle brief remain drafts without game implementation authorization. Preserve earlier game, admin and sound changes and their acceptance/evidence boundaries. The three new v1.3.1 MP3s remain uncommitted pending owner audition.
 - v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/reviews/NEXT_PHASE_REVIEW.md`, `docs/work/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
-- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The approved `docs/planning/V1.3.3_MEMBER_SUPPORT.md` controls this local scope, retaining the registered-start/imported-completion cohorts. The owner authorized committing/pushing the source handoff on 2026-11-05, while the three new MP3s remain local pending audition. No deployment, production provisioning, secret installation, DNS/Google changes or next phase is authorized.
+- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The current owner-authorized scope is the admin/query Slice 0 work recorded in `docs/work/V1.3.4_SLICE0_WORK.md`; accepted Member Support and registered-start/imported-completion cohorts remain unchanged. The owner authorized committing/pushing the source handoff on 2026-11-05, while the three new MP3s remain local pending audition. No deployment, production provisioning, secret installation, DNS/Google changes or next phase is authorized.
 - The published guest/privacy version remains `b50a7a18-2e85-4406-bd40-77f27c4b3da3` at `https://morphi.one` and `https://morphi-one.electrasincng.workers.dev`. Cloudflare injects its intentional analytics beacon at delivery. Source repository: `https://github.com/cngohar/morphi.one1`; pushing does not authorize deployment.
 
 ## Engine and registration

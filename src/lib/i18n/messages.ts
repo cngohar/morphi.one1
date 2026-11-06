@@ -90,6 +90,11 @@ export const messages = {
 		'Registered users only; guest solo starts are not counted. Total completed includes saved guest completions that have no start record, which are not counted in Shown or Played. Updated {time}.',
 
 	'admin.variants.title': 'Variants',
+	'admin.variants.playRate': 'Play rate',
+	'admin.variants.inspect': 'Inspect',
+	'admin.variants.disableReason': 'Reason for disabling',
+	'admin.variants.closeDetails': 'Close variant details',
+	'admin.variants.telemetry': 'Funnel telemetry',
 	'admin.variants.registered': 'Registered users only; guest solo starts are not counted.',
 	'admin.variants.shown': 'Shown',
 	'admin.variants.ignored': 'Ignored (zero flips)',

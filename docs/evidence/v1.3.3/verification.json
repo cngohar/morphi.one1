@@ -2,7 +2,8 @@
 	"version": "v1.3.3",
 	"scope": "Member Support, local only",
 	"baseline": "Owner-accepted v1.3.2 working tree",
-	"ownerReview": "pending",
+	"ownerReview": "accepted locally; owner confirmed prior review and acceptance on 2026-11-05",
+	"deferredImprovements": "Remaining improvements deferred by owner to later stages; details and scope not supplied",
 	"checks": [
 		{
 			"command": "bunx vitest run --config vitest.accounts.config.ts tests/integration/support.test.ts",

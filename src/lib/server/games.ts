@@ -51,24 +51,40 @@ function sumCounts(rows: Counts[]): Counts {
 	return total;
 }
 
-/** One catalog mapping keeps legacy defaults and all family/variant totals in the same cohort. */
-async function activityCounts(db: D1Database, family?: PuzzleId) {
-	// shortcut: four binds per leaderboard group allow 25 groups; batch the mapping before the catalog exceeds that.
-	const mapping = (family ? [family] : Object.keys(catalog)).flatMap((family) =>
-		variantDefinitions(family).flatMap((variant) =>
-			variant.leaderboardGroups.map((group) => [
+export type ActivityMappingEntry = {
+	family: string;
+	variant: string;
+	defaultVariant: string;
+	rulesGroup: string;
+};
+
+export function buildActivityMapping(family?: PuzzleId): ActivityMappingEntry[] {
+	const families = family ? [family] : (Object.keys(catalog) as PuzzleId[]);
+	return families.flatMap((family) => {
+		const defs = variantDefinitions(family);
+		const defaultVariant = defs[0].id;
+		return defs.flatMap((variant) =>
+			variant.leaderboardGroups.map((group) => ({
 				family,
-				variant.id,
-				variantDefinitions(family)[0].id,
-				group
-			])
-		)
-	);
+				variant: variant.id,
+				defaultVariant,
+				rulesGroup: group
+			}))
+		);
+	});
+}
+
+export async function queryActivityCounts(
+	db: D1Database,
+	mapping: ActivityMappingEntry[]
+): Promise<(Counts & { family: PuzzleId; variant: string })[]> {
+	if (mapping.length === 0) return [];
 	const rows = (
 		await db
 			.prepare(
-				`WITH mapping(family,variant,default_variant,rules_group) AS (VALUES ${mapping.map(() => '(?,?,?,?)').join(',')}),
- starts AS (
+				`WITH mapping(family,variant,default_variant,rules_group) AS (
+ SELECT value ->> 'family', value ->> 'variant', value ->> 'defaultVariant', value ->> 'rulesGroup' FROM json_each(?)
+ ), starts AS (
  SELECT id,user_id,family,variant,first_move_at,abandoned_at FROM play_session WHERE family IN (SELECT family FROM mapping)
  UNION ALL
  SELECT run_id,user_id,family,variant,first_move_at,abandoned_at FROM account_round_activity a
@@ -94,11 +110,16 @@ async function activityCounts(db: D1Database, family?: PuzzleId) {
  COALESCE(s.abandoned,0) abandoned,COALESCE(s.finished,0) finished,COALESCE(s.open,0) open
  FROM completions c LEFT JOIN starts_counts s ON s.family=c.family AND s.variant=c.variant`
 			)
-			.bind(...mapping.flat())
+			.bind(JSON.stringify(mapping))
 			.all<Counts & { family: PuzzleId; variant: string }>()
 	).results;
 	sumCounts(rows);
 	return rows;
+}
+
+/** One catalog mapping keeps legacy defaults and all family/variant totals in the same cohort. */
+async function activityCounts(db: D1Database, family?: PuzzleId) {
+	return queryActivityCounts(db, buildActivityMapping(family));
 }
 
 export async function gameOverview(db: D1Database, selectedFamily?: PuzzleId) {

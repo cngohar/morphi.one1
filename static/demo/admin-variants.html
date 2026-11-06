@@ -1,0 +1,1022 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Morphi Admin — High-Volume Variant Directory Architecture</title>
+<style>
+:root {
+	color-scheme: light;
+	--bg: #f4f6fa;
+	--surface: #ffffff;
+	--surface-2: #edf2f9;
+	--surface-3: #e2eaf5;
+	--border: #d0dbe7;
+	--border-strong: #8da0b5;
+	--ink: #16202e;
+	--ink-2: #2f3e53;
+	--muted: #5e7188;
+	--label: #6c7f96;
+	--primary: #e5532d;
+	--primary-strong: #c9441f;
+	--accent: #2764db;
+	--success: #0b8a6e;
+	--success-bg: #e2f7f1;
+	--warning: #b26200;
+	--warning-bg: #fff3d6;
+	--danger: #c02b2b;
+	--danger-bg: #fde8e8;
+	--chip-blue: #dce9fc;
+	--chip-purple: #eedcfc;
+	--chip-teal: #d7efea;
+	--font: 'Nunito Variable', 'Nunito', system-ui, -apple-system, sans-serif;
+	--radius-sm: 6px;
+	--radius-md: 10px;
+	--radius-lg: 14px;
+	--radius-pill: 999px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+	background: #111822;
+	color: var(--ink);
+	font-family: var(--font);
+	font-size: 14px;
+	line-height: 1.5;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 16px 8px 60px;
+}
+
+/* Prototype Control Bar */
+.proto-bar {
+	width: 100%;
+	max-width: 1200px;
+	background: #1b2533;
+	color: #e2eaf5;
+	border: 1px solid #2d3d52;
+	border-radius: var(--radius-md);
+	padding: 12px 18px;
+	margin-bottom: 16px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	align-items: center;
+	justify-content: space-between;
+}
+.proto-title {
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.proto-title span {
+	background: var(--primary);
+	color: #fff;
+	padding: 2px 7px;
+	border-radius: var(--radius-sm);
+	font-size: 10px;
+	text-transform: uppercase;
+}
+.view-modes {
+	display: flex;
+	background: #111822;
+	padding: 3px;
+	border-radius: var(--radius-sm);
+	border: 1px solid #2d3d52;
+	gap: 3px;
+}
+.view-btn {
+	background: transparent;
+	border: 0;
+	color: #8da0b5;
+	padding: 6px 12px;
+	font-size: 12px;
+	font-weight: 700;
+	border-radius: 4px;
+	cursor: pointer;
+	font-family: inherit;
+	transition: all 0.15s ease;
+}
+.view-btn.active {
+	background: var(--accent);
+	color: #fff;
+}
+
+/* Frame Canvas */
+.canvas-frame {
+	width: 100%;
+	max-width: 1200px;
+	background: var(--bg);
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+	box-shadow: 0 16px 40px rgba(0,0,0,0.4);
+	display: flex;
+	min-height: 840px;
+	transition: max-width 0.25s ease;
+}
+body.mode-phone .canvas-frame { max-width: 420px; }
+body.mode-landscape .canvas-frame { max-width: 860px; }
+
+/* Admin Sidebar */
+.admin-sidebar {
+	width: 230px;
+	flex-shrink: 0;
+	background: var(--surface);
+	border-right: 1px solid var(--border);
+	padding: 24px 18px;
+	display: flex;
+	flex-direction: column;
+}
+body.mode-phone .admin-sidebar { display: none; }
+.brand {
+	font-size: 22px;
+	font-weight: 900;
+	letter-spacing: -0.04em;
+	color: var(--ink);
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 20px;
+}
+.brand .dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--primary);
+}
+.eyebrow {
+	font-size: 10px;
+	font-weight: 800;
+	letter-spacing: 0.12em;
+	color: var(--muted);
+	text-transform: uppercase;
+	margin: 12px 0 8px;
+}
+.nav-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	list-style: none;
+}
+.nav-link {
+	padding: 9px 12px;
+	font-size: 13px;
+	font-weight: 800;
+	color: var(--ink-2);
+	text-decoration: none;
+	border-radius: var(--radius-sm);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.nav-link:hover { background: var(--surface-2); }
+.nav-link.active {
+	background: var(--surface-2);
+	color: var(--primary-strong);
+}
+.nav-badge {
+	background: var(--chip-blue);
+	color: var(--accent);
+	padding: 1px 6px;
+	border-radius: var(--radius-pill);
+	font-size: 11px;
+}
+
+/* Admin Main Body */
+.admin-body {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	background: var(--bg);
+}
+.admin-topbar {
+	min-height: 64px;
+	background: var(--surface);
+	border-bottom: 1px solid var(--border);
+	padding: 12px 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+.family-switcher {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.family-label {
+	font-size: 11px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--muted);
+	font-weight: 800;
+}
+.family-select {
+	padding: 8px 14px;
+	border: 1px solid var(--border);
+	background: var(--surface-2);
+	border-radius: var(--radius-sm);
+	font-size: 14px;
+	font-weight: 800;
+	color: var(--ink);
+	font-family: inherit;
+	cursor: pointer;
+}
+.admin-main {
+	padding: 24px;
+	flex: 1;
+}
+
+/* Metric Cards Grid */
+.metric-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+	gap: 12px;
+	margin-bottom: 20px;
+}
+.metric-card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 14px 16px;
+}
+.metric-card p {
+	font-size: 11px;
+	color: var(--muted);
+	font-weight: 700;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+}
+.metric-card strong {
+	font-size: 24px;
+	font-weight: 900;
+	display: block;
+	margin-top: 4px;
+	color: var(--ink);
+}
+.metric-card .sub {
+	font-size: 11px;
+	color: var(--muted);
+	margin-top: 2px;
+}
+
+/* Directory Toolbar */
+.directory-toolbar {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md) var(--radius-md) 0 0;
+	padding: 14px 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	border-bottom: 1px solid var(--border);
+}
+.toolbar-top {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+	justify-content: space-between;
+}
+.search-box {
+	position: relative;
+	flex: 1;
+	min-width: 220px;
+	max-width: 360px;
+}
+.search-input {
+	width: 100%;
+	padding: 8px 12px 8px 34px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	font-size: 13px;
+	font-family: inherit;
+	background: var(--surface-2);
+	color: var(--ink);
+}
+.search-icon {
+	position: absolute;
+	left: 10px;
+	top: 50%;
+	transform: translateY(-50%);
+	color: var(--muted);
+	font-size: 14px;
+}
+.toolbar-actions {
+	display: flex;
+	gap: 8px;
+	align-items: center;
+}
+.btn {
+	padding: 7px 12px;
+	font-size: 12px;
+	font-weight: 800;
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--border);
+	background: var(--surface);
+	color: var(--ink-2);
+	cursor: pointer;
+	font-family: inherit;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	text-decoration: none;
+}
+.btn:hover { background: var(--surface-2); }
+.btn.primary {
+	background: var(--primary);
+	border-color: var(--primary);
+	color: #fff;
+}
+.btn.primary:hover { background: var(--primary-strong); }
+.btn.danger {
+	background: var(--danger-bg);
+	border-color: #f7c3c3;
+	color: var(--danger);
+}
+
+/* Filter Chips Bar */
+.filter-chips {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 6px;
+	align-items: center;
+}
+.filter-label {
+	font-size: 11px;
+	color: var(--muted);
+	font-weight: 800;
+	margin-right: 4px;
+}
+.chip {
+	border: 1px solid var(--border);
+	background: var(--surface);
+	color: var(--ink-2);
+	font-size: 12px;
+	font-weight: 700;
+	padding: 4px 10px;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+.chip.active {
+	background: var(--ink);
+	border-color: var(--ink);
+	color: #fff;
+}
+.chip .count {
+	font-size: 10px;
+	opacity: 0.75;
+	margin-left: 2px;
+}
+
+/* Batch Action Bar (Dynamic) */
+.batch-bar {
+	background: var(--surface-3);
+	border-left: 4px solid var(--accent);
+	padding: 8px 16px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 12px;
+	font-weight: 700;
+}
+
+/* Variant Data Table */
+.table-container {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-top: 0;
+	border-radius: 0 0 var(--radius-md) var(--radius-md);
+	overflow-x: auto;
+}
+table.variant-table {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	font-size: 13px;
+}
+table.variant-table th {
+	background: var(--surface-2);
+	padding: 10px 14px;
+	font-size: 11px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--label);
+	border-bottom: 1px solid var(--border);
+	white-space: nowrap;
+}
+table.variant-table td {
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--border);
+	vertical-align: middle;
+}
+table.variant-table tr:hover {
+	background: #f8fafc;
+}
+table.variant-table tr.selected {
+	background: var(--surface-2);
+}
+
+/* Table Cell Badges & Components */
+.variant-name-cell {
+	display: flex;
+	flex-direction: column;
+	gap: 2px;
+}
+.variant-title {
+	font-weight: 800;
+	color: var(--ink);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+.variant-code {
+	font-family: monospace;
+	font-size: 11px;
+	color: var(--muted);
+}
+.badge {
+	font-size: 10px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 2px 7px;
+	border-radius: var(--radius-pill);
+	display: inline-block;
+}
+.badge.enabled { background: var(--success-bg); color: var(--success); }
+.badge.disabled { background: var(--danger-bg); color: var(--danger); }
+.tag-pill {
+	font-size: 11px;
+	font-weight: 700;
+	background: var(--surface-2);
+	color: var(--ink-2);
+	padding: 2px 8px;
+	border-radius: var(--radius-sm);
+	display: inline-block;
+	border: 1px solid var(--border);
+}
+.tag-pill.timed { background: var(--warning-bg); color: var(--warning); border-color: #fce2a6; }
+.tag-pill.layout { background: var(--chip-blue); color: var(--accent); border-color: #c4dbfa; }
+.tag-pill.rules { background: var(--chip-purple); color: #792db8; border-color: #e2c8fa; }
+
+/* Conversion Stat Pill */
+.rate-bar {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	font-size: 12px;
+	font-weight: 700;
+}
+.progress-mini {
+	width: 50px;
+	height: 6px;
+	background: var(--surface-2);
+	border-radius: var(--radius-pill);
+	overflow: hidden;
+}
+.progress-mini-fill {
+	height: 100%;
+	background: var(--success);
+}
+
+/* Action Trigger */
+.action-link {
+	color: var(--accent);
+	font-weight: 800;
+	text-decoration: none;
+	cursor: pointer;
+	padding: 4px 8px;
+	border-radius: var(--radius-sm);
+}
+.action-link:hover {
+	background: var(--chip-blue);
+}
+
+/* Slide-Over Drawer */
+.variant-drawer {
+	position: fixed;
+	inset: 0 0 0 auto;
+	width: min(500px, 100vw);
+	height: 100%;
+	background: var(--surface);
+	border: 0;
+	border-left: 1px solid var(--border);
+	box-shadow: -10px 0 30px rgba(0,0,0,0.25);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	z-index: 100;
+	transform: translateX(100%);
+	transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.variant-drawer.open {
+	transform: translateX(0);
+}
+.drawer-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(14, 21, 32, 0.5);
+	backdrop-filter: blur(2px);
+	z-index: 99;
+	display: none;
+}
+.drawer-backdrop.open { display: block; }
+.drawer-header {
+	padding: 20px 24px;
+	border-bottom: 1px solid var(--border);
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	background: var(--surface-2);
+}
+.drawer-body {
+	padding: 24px;
+	overflow-y: auto;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+.drawer-section {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 16px;
+}
+.drawer-section h3 {
+	font-size: 13px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--label);
+	margin-bottom: 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.counts-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 10px;
+}
+.count-item {
+	background: var(--surface-2);
+	padding: 8px 10px;
+	border-radius: var(--radius-sm);
+}
+.count-item span {
+	font-size: 10px;
+	text-transform: uppercase;
+	color: var(--muted);
+	font-weight: 800;
+	display: block;
+}
+.count-item strong {
+	font-size: 18px;
+	color: var(--ink);
+}
+.drawer-footer {
+	padding: 16px 24px;
+	border-top: 1px solid var(--border);
+	background: var(--surface-2);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+</style>
+</head>
+<body>
+
+<div class="proto-bar">
+	<div class="proto-title">
+		<span>Visual Prototype</span> Morphi Admin — High-Volume Variant Directory Architecture
+	</div>
+	<div class="view-modes">
+		<button class="view-btn active" onclick="setView('desktop')">🖥️ Desktop</button>
+		<button class="view-btn" onclick="setView('landscape')">🔄 Phone Land (844px)</button>
+		<button class="view-btn" onclick="setView('phone')">📱 Phone Port (390px)</button>
+	</div>
+</div>
+
+<div class="canvas-frame">
+	<!-- Admin Sidebar -->
+	<aside class="admin-sidebar">
+		<a class="brand" href="#"><span class="dot"></span>Morphi.One</a>
+		<p class="eyebrow">Workspace</p>
+		<ul class="nav-list">
+			<li><a class="nav-link" href="#">Dashboard</a></li>
+			<li><a class="nav-link" href="#">Users <span class="nav-badge">142</span></a></li>
+			<li><a class="nav-link active" href="#">Games & Variants <span class="nav-badge">24</span></a></li>
+			<li><a class="nav-link" href="#">Themes</a></li>
+			<li><a class="nav-link" href="#">Audit Viewer</a></li>
+			<li><a class="nav-link" href="#">Support Desk</a></li>
+		</ul>
+	</aside>
+
+	<!-- Admin Body -->
+	<div class="admin-body">
+		<!-- Top Bar with Family Dropdown -->
+		<header class="admin-topbar">
+			<div class="family-switcher">
+				<span class="family-label">Active Family:</span>
+				<select class="family-select" id="familySelect" onchange="switchFamily(this.value)">
+					<option value="connect">Connect (4 variants)</option>
+					<option value="memory">Memory (4 variants)</option>
+					<option value="block">Block Placement (4 variants)</option>
+					<option value="mahjong" selected>Mahjong Solitaire (12 variants / scales to 100+)</option>
+				</select>
+			</div>
+			<div>
+				<button class="btn" onclick="alert('Navigating to AdminTestPlay with current family...')">▶ Play Test Game</button>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<main class="admin-main">
+			<!-- Summary Cards -->
+			<div class="metric-grid">
+				<div class="metric-card">
+					<p>Total Variants</p>
+					<strong id="statTotal">12</strong>
+					<div class="sub">10 Enabled · 2 Disabled</div>
+				</div>
+				<div class="metric-card">
+					<p>Total Played</p>
+					<strong>28,491</strong>
+					<div class="sub">94.2% Start Rate</div>
+				</div>
+				<div class="metric-card">
+					<p>Completions</p>
+					<strong>19,840</strong>
+					<div class="sub">69.6% Avg Finish</div>
+				</div>
+				<div class="metric-card">
+					<p>Avg Solve Time</p>
+					<strong>3m 42s</strong>
+					<div class="sub">Fastest: 44s</div>
+				</div>
+			</div>
+
+			<!-- Directory Toolbar with Search and Filters -->
+			<div class="directory-toolbar">
+				<div class="toolbar-top">
+					<div class="search-box">
+						<span class="search-icon">🔍</span>
+						<input type="text" id="variantSearch" class="search-input" placeholder="Search by name, ID or rule..." oninput="filterTable()">
+					</div>
+					<div class="toolbar-actions">
+						<button class="btn" onclick="toggleAllCheckboxes()">Toggle Select All</button>
+						<button class="btn primary" onclick="batchEnable()">Bulk Enable</button>
+						<button class="btn danger" onclick="batchDisable()">Bulk Disable</button>
+					</div>
+				</div>
+
+				<!-- Tag Filter Chips -->
+				<div class="filter-chips">
+					<span class="filter-label">Filter:</span>
+					<button class="chip active" data-filter="all" onclick="setChip(this, 'all')">All <span class="count" id="countAll">12</span></button>
+					<button class="chip" data-filter="status:enabled" onclick="setChip(this, 'status:enabled')">Enabled <span class="count">10</span></button>
+					<button class="chip" data-filter="status:disabled" onclick="setChip(this, 'status:disabled')">Disabled <span class="count">2</span></button>
+					<button class="chip" data-filter="tag:timed" onclick="setChip(this, 'tag:timed')">⏱️ Timed / Rush <span class="count">3</span></button>
+					<button class="chip" data-filter="tag:layout" onclick="setChip(this, 'tag:layout')">📐 Layouts <span class="count">6</span></button>
+					<button class="chip" data-filter="tag:rules" onclick="setChip(this, 'tag:rules')">🧩 Rulesets <span class="count">3</span></button>
+				</div>
+			</div>
+
+			<!-- Batch Selection Alert (Hidden by default) -->
+			<div class="batch-bar" id="batchBar" style="display: none;">
+				<span id="batchCount">0 variants selected</span>
+				<div>
+					<button class="btn" onclick="batchEnable()">Enable Selected</button>
+					<button class="btn danger" onclick="batchDisable()">Disable Selected</button>
+				</div>
+			</div>
+
+			<!-- Variant Table -->
+			<div class="table-container">
+				<table class="variant-table" id="variantTable">
+					<thead>
+						<tr>
+							<th style="width: 32px;"><input type="checkbox" id="masterCheck" onchange="toggleMaster(this)"></th>
+							<th>Variant / ID</th>
+							<th>Dimension / Category</th>
+							<th>State</th>
+							<th>Shown / Played</th>
+							<th>Finished (Rate)</th>
+							<th>Leaderboard Group</th>
+							<th style="text-align: right;">Actions</th>
+						</tr>
+					</thead>
+					<tbody id="tableBody">
+						<!-- Injected by JavaScript -->
+					</tbody>
+				</table>
+			</div>
+		</main>
+	</div>
+</div>
+
+<!-- Slide-Over Drawer for Variant Deep Dive -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<aside class="variant-drawer" id="variantDrawer">
+	<div class="drawer-header">
+		<div>
+			<span class="badge enabled" id="drawerBadge">ENABLED</span>
+			<h2 id="drawerTitle" style="font-size: 18px; margin-top: 6px;">Turtle (144 Tiles)</h2>
+			<span id="drawerId" style="font-family: monospace; font-size: 11px; color: var(--muted);">mahjong:turtle-144</span>
+		</div>
+		<button class="btn" onclick="closeDrawer()">✕ Close</button>
+	</div>
+
+	<div class="drawer-body">
+		<!-- Summary Metrics -->
+		<div class="drawer-section">
+			<h3>Activity Funnel</h3>
+			<div class="counts-grid">
+				<div class="count-item"><span>Shown</span><strong id="dShown">12,450</strong></div>
+				<div class="count-item"><span>Ignored</span><strong id="dIgnored">820</strong></div>
+				<div class="count-item"><span>Played</span><strong id="dPlayed">11,630</strong></div>
+				<div class="count-item"><span>Abandoned</span><strong id="dAbandoned">3,120</strong></div>
+				<div class="count-item"><span>Finished</span><strong id="dFinished">8,510</strong></div>
+				<div class="count-item"><span>Imported</span><strong id="dImported">440</strong></div>
+			</div>
+		</div>
+
+		<!-- Rules & Dimension Specification -->
+		<div class="drawer-section">
+			<h3>Variant Specification</h3>
+			<table style="width: 100%; font-size: 12px;">
+				<tr><td style="color: var(--muted); padding: 4px 0;">Max Moves:</td><td style="font-weight: 700;">144</td></tr>
+				<tr><td style="color: var(--muted); padding: 4px 0;">Countdown Clock:</td><td style="font-weight: 700;" id="dClock">None (Untimed)</td></tr>
+				<tr><td style="color: var(--muted); padding: 4px 0;">Allowed Orientations:</td><td style="font-weight: 700;">Desktop & Phone Landscape</td></tr>
+				<tr><td style="color: var(--muted); padding: 4px 0;">Rules Group:</td><td style="font-family: monospace;" id="dGroup">mahjong-solitaire-1:turtle</td></tr>
+			</table>
+		</div>
+
+		<!-- Scoped Scoring Configuration -->
+		<div class="drawer-section">
+			<h3>Scoring Multipliers <code>v1.0.0</code></h3>
+			<p style="font-size: 12px; color: var(--muted); margin-bottom: 10px;">Operator can tune scoring without affecting classic or other variants.</p>
+			<div style="display: grid; grid-template-columns: 1fr 1fr; gap: 8px;">
+				<label style="font-size: 11px; font-weight: 700;">Match Pair (+pts)
+					<input type="number" value="100" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px;">
+				</label>
+				<label style="font-size: 11px; font-weight: 700;">Season Bonus (+pts)
+					<input type="number" value="250" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px;">
+				</label>
+			</div>
+			<button class="btn" style="margin-top: 10px; width: 100%;" onclick="alert('Scoring updated for this variant!')">Save Scoring Multipliers</button>
+		</div>
+
+		<!-- Test Play Launcher -->
+		<div class="drawer-section">
+			<h3>Sandbox Play</h3>
+			<p style="font-size: 12px; color: var(--muted); margin-bottom: 10px;">Launch directly into AdminTestPlay with this specific variant preselected.</p>
+			<button class="btn primary" style="width: 100%;" onclick="alert('Launching AdminTestPlay with exact variant seed...')">▶ Test Play This Variant</button>
+		</div>
+	</div>
+
+	<div class="drawer-footer">
+		<button class="btn danger" id="drawerToggleBtn" onclick="toggleDrawerState()">Disable Variant</button>
+		<button class="btn" onclick="closeDrawer()">Done</button>
+	</div>
+</aside>
+
+<script>
+// Mock data representing a high-volume variant catalog
+const variantDatabase = {
+	mahjong: [
+		{ id: 'mahjong:turtle-144', name: 'Turtle Classic (144 Tiles)', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 12450, played: 11630, finished: 8510, group: 'mahjong-solitaire-1:turtle', clock: 'None' },
+		{ id: 'mahjong:quick-56', name: 'Quick Sprint (56 Tiles)', tag: 'timed', tagLabel: '⏱️ Timed', state: 'enabled', shown: 8200, played: 7950, finished: 6890, group: 'mahjong-solitaire-1:quick', clock: '90s Limit' },
+		{ id: 'mahjong:fortress-144', name: 'Fortress (144 Tiles)', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 4100, played: 3820, finished: 2100, group: 'mahjong-solitaire-1:fortress', clock: 'None' },
+		{ id: 'mahjong:pyramid-72', name: 'Pyramid (72 Tiles)', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 3900, played: 3710, finished: 2840, group: 'mahjong-solitaire-1:pyramid', clock: 'None' },
+		{ id: 'mahjong:rush-60', name: 'Blitz Rush (60s)', tag: 'timed', tagLabel: '⏱️ Timed', state: 'enabled', shown: 5120, played: 4890, finished: 3210, group: 'mahjong-solitaire-1:rush-60', clock: '60s Limit' },
+		{ id: 'mahjong:spider-144', name: 'Spider (144 Tiles)', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 2400, played: 2150, finished: 1120, group: 'mahjong-solitaire-1:spider', clock: 'None' },
+		{ id: 'mahjong:four-rivers', name: 'Four Rivers (Four Winds)', tag: 'rules', tagLabel: '🧩 Rules', state: 'enabled', shown: 1890, played: 1650, finished: 940, group: 'mahjong-solitaire-1:rivers', clock: 'None' },
+		{ id: 'mahjong:monument', name: 'Monument (120 Tiles)', tag: 'layout', tagLabel: '📐 Layout', state: 'disabled', shown: 420, played: 380, finished: 110, group: 'mahjong-solitaire-1:monument', clock: 'None' },
+		{ id: 'mahjong:zen-match', name: 'Zen Relax (No Penalties)', tag: 'rules', tagLabel: '🧩 Rules', state: 'enabled', shown: 3100, played: 2950, finished: 2450, group: 'mahjong-solitaire-1:zen', clock: 'None' },
+		{ id: 'mahjong:dragon-wings', name: 'Dragon Wings (108 Tiles)', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 1450, played: 1320, finished: 870, group: 'mahjong-solitaire-1:dragon', clock: 'None' },
+		{ id: 'mahjong:countdown-120', name: 'Countdown (120s)', tag: 'timed', tagLabel: '⏱️ Timed', state: 'disabled', shown: 610, played: 520, finished: 280, group: 'mahjong-solitaire-1:countdown', clock: '120s Limit' },
+		{ id: 'mahjong:blind-tiles', name: 'Hidden Faces (Memory Style)', tag: 'rules', tagLabel: '🧩 Rules', state: 'enabled', shown: 980, played: 890, finished: 410, group: 'mahjong-solitaire-1:blind', clock: 'None' }
+	],
+	connect: [
+		{ id: 'connect:classic', name: 'Connect Classic (5×5, 6×6, 7×7)', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 18200, played: 17500, finished: 14200, group: 'connect-1:classic', clock: 'None' },
+		{ id: 'connect:full-grid', name: 'Full Grid Bonus', tag: 'rules', tagLabel: '🧩 Rules', state: 'enabled', shown: 9400, played: 8800, finished: 7100, group: 'connect-1:full-grid', clock: 'None' },
+		{ id: 'connect:board-8', name: '8×8 Large Board', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 6300, played: 5900, finished: 4200, group: 'connect-1:board-8', clock: 'None' },
+		{ id: 'connect:rush-60', name: 'Connect Rush (60s)', tag: 'timed', tagLabel: '⏱️ Timed', state: 'enabled', shown: 7200, played: 6900, finished: 5100, group: 'connect-1:rush-60', clock: '60s Limit' }
+	],
+	memory: [
+		{ id: 'memory:classic', name: 'Memory Classic (6, 8, 10 Pairs)', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 24100, played: 23200, finished: 20100, group: 'memory-1:classic', clock: 'None' },
+		{ id: 'memory:no-preview', name: 'No Preview (Instant Start)', tag: 'rules', tagLabel: '🧩 Rules', state: 'enabled', shown: 11200, played: 10400, finished: 8900, group: 'memory-1:no-preview', clock: 'None' },
+		{ id: 'memory:trios', name: 'Trios (3 Matching Cards)', tag: 'rules', tagLabel: '🧩 Rules', state: 'enabled', shown: 9300, played: 8500, finished: 6200, group: 'memory-1:trios', clock: 'None' },
+		{ id: 'memory:moving', name: 'Moving Cards (Reshuffle)', tag: 'rules', tagLabel: '🧩 Rules', state: 'enabled', shown: 6400, played: 5800, finished: 3900, group: 'memory-1:moving', clock: 'None' }
+	],
+	block: [
+		{ id: 'block:classic', name: 'Block Classic (8×8)', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 31200, played: 30100, finished: 24200, group: 'block-1:classic', clock: 'None' },
+		{ id: 'block:board-10', name: 'Board 10×10 Grid', tag: 'layout', tagLabel: '📐 Layout', state: 'enabled', shown: 14200, played: 13500, finished: 9800, group: 'block-1:board-10', clock: 'None' },
+		{ id: 'block:rows-only', name: 'Rows Only Clears', tag: 'rules', tagLabel: '🧩 Rules', state: 'enabled', shown: 8900, played: 8200, finished: 6100, group: 'block-1:rows-only', clock: 'None' },
+		{ id: 'block:rush-60', name: 'Block Rush (60s)', tag: 'timed', tagLabel: '⏱️ Timed', state: 'enabled', shown: 12100, played: 11400, finished: 8700, group: 'block-1:rush-60', clock: '60s Limit' }
+	]
+};
+
+let currentFamily = 'mahjong';
+let activeFilter = 'all';
+let selectedVariants = new Set();
+let activeDrawerVariant = null;
+
+function renderTable() {
+	const variants = variantDatabase[currentFamily] || [];
+	const tbody = document.getElementById('tableBody');
+	const query = document.getElementById('variantSearch').value.toLowerCase();
+	tbody.innerHTML = '';
+
+	let visibleCount = 0;
+	variants.forEach((v) => {
+		// Filter checks
+		if (activeFilter === 'status:enabled' && v.state !== 'enabled') return;
+		if (activeFilter === 'status:disabled' && v.state !== 'disabled') return;
+		if (activeFilter === 'tag:timed' && v.tag !== 'timed') return;
+		if (activeFilter === 'tag:layout' && v.tag !== 'layout') return;
+		if (activeFilter === 'tag:rules' && v.tag !== 'rules') return;
+
+		if (query && !v.name.toLowerCase().includes(query) && !v.id.toLowerCase().includes(query)) return;
+
+		visibleCount++;
+		const isChecked = selectedVariants.has(v.id);
+		const finishRate = ((v.finished / v.played) * 100).toFixed(1);
+
+		const tr = document.createElement('tr');
+		if (isChecked) tr.classList.add('selected');
+
+		tr.innerHTML = `
+			<td><input type="checkbox" onchange="toggleSelect('${v.id}', this)" ${isChecked ? 'checked' : ''}></td>
+			<td>
+				<div class="variant-name-cell">
+					<span class="variant-title">${v.name}</span>
+					<span class="variant-code">${v.id}</span>
+				</div>
+			</td>
+			<td><span class="tag-pill ${v.tag}">${v.tagLabel}</span></td>
+			<td><span class="badge ${v.state}">${v.state}</span></td>
+			<td><strong>${v.played.toLocaleString()}</strong> <span style="color:var(--muted); font-size:11px;">/ ${v.shown.toLocaleString()}</span></td>
+			<td>
+				<div class="rate-bar">
+					<div class="progress-mini"><div class="progress-mini-fill" style="width: ${finishRate}%;"></div></div>
+					<span>${finishRate}%</span>
+				</div>
+			</td>
+			<td><code style="font-size: 11px; color: var(--muted);">${v.group}</code></td>
+			<td style="text-align: right; white-space: nowrap;">
+				<a class="action-link" onclick="openDrawer('${v.id}')">Inspect & Stats</a>
+				<button class="btn" style="padding: 3px 8px; font-size: 11px;" onclick="toggleStatus('${v.id}')">${v.state === 'enabled' ? 'Disable' : 'Enable'}</button>
+			</td>
+		`;
+		tbody.appendChild(tr);
+	});
+
+	document.getElementById('statTotal').innerText = variants.length;
+	document.getElementById('countAll').innerText = variants.length;
+}
+
+function switchFamily(val) {
+	currentFamily = val;
+	selectedVariants.clear();
+	updateBatchBar();
+	renderTable();
+}
+
+function filterTable() {
+	renderTable();
+}
+
+function setChip(el, filter) {
+	document.querySelectorAll('.chip').forEach(c => c.classList.remove('active'));
+	el.classList.add('active');
+	activeFilter = filter;
+	renderTable();
+}
+
+function toggleSelect(id, checkbox) {
+	if (checkbox.checked) selectedVariants.add(id);
+	else selectedVariants.delete(id);
+	updateBatchBar();
+}
+
+function toggleMaster(master) {
+	const variants = variantDatabase[currentFamily] || [];
+	if (master.checked) variants.forEach(v => selectedVariants.add(v.id));
+	else selectedVariants.clear();
+	updateBatchBar();
+	renderTable();
+}
+
+function toggleAllCheckboxes() {
+	const master = document.getElementById('masterCheck');
+	master.checked = !master.checked;
+	toggleMaster(master);
+}
+
+function updateBatchBar() {
+	const bar = document.getElementById('batchBar');
+	const count = selectedVariants.size;
+	if (count > 0) {
+		bar.style.display = 'flex';
+		document.getElementById('batchCount').innerText = `${count} variant(s) selected`;
+	} else {
+		bar.style.display = 'none';
+	}
+}
+
+function batchEnable() {
+	if (!selectedVariants.size) return alert('Select variants first.');
+	selectedVariants.forEach(id => {
+		const item = variantDatabase[currentFamily].find(x => x.id === id);
+		if (item) item.state = 'enabled';
+	});
+	renderTable();
+	alert(`Enabled ${selectedVariants.size} variants.`);
+}
+
+function batchDisable() {
+	if (!selectedVariants.size) return alert('Select variants first.');
+	const reason = prompt('Enter audit reason for batch disabling:', 'Scheduled rotation / testing');
+	if (!reason) return;
+	selectedVariants.forEach(id => {
+		const item = variantDatabase[currentFamily].find(x => x.id === id);
+		if (item) item.state = 'disabled';
+	});
+	renderTable();
+	alert(`Disabled ${selectedVariants.size} variants.`);
+}
+
+function toggleStatus(id) {
+	const v = variantDatabase[currentFamily].find(x => x.id === id);
+	if (!v) return;
+	if (v.state === 'enabled') {
+		const reason = prompt(`Enter reason to disable ${v.name}:`, 'Balancing difficulty');
+		if (reason) v.state = 'disabled';
+	} else {
+		v.state = 'enabled';
+	}
+	renderTable();
+}
+
+// Drawer Controls
+function openDrawer(id) {
+	const v = variantDatabase[currentFamily].find(x => x.id === id);
+	if (!v) return;
+	activeDrawerVariant = v;
+
+	document.getElementById('drawerTitle').innerText = v.name;
+	document.getElementById('drawerId').innerText = v.id;
+	document.getElementById('drawerBadge').innerText = v.state.toUpperCase();
+	document.getElementById('drawerBadge').className = `badge ${v.state}`;
+	document.getElementById('dClock').innerText = v.clock || 'None (Untimed)';
+	document.getElementById('dGroup').innerText = v.group;
+
+	document.getElementById('dShown').innerText = v.shown.toLocaleString();
+	document.getElementById('dPlayed').innerText = v.played.toLocaleString();
+	document.getElementById('dFinished').innerText = v.finished.toLocaleString();
+	document.getElementById('dIgnored').innerText = (v.shown - v.played).toLocaleString();
+	document.getElementById('dAbandoned').innerText = Math.round(v.played * 0.25).toLocaleString();
+	document.getElementById('dImported').innerText = Math.round(v.finished * 0.05).toLocaleString();
+
+	const btn = document.getElementById('drawerToggleBtn');
+	btn.innerText = v.state === 'enabled' ? 'Disable Variant' : 'Enable Variant';
+	btn.className = v.state === 'enabled' ? 'btn danger' : 'btn primary';
+
+	document.getElementById('variantDrawer').classList.add('open');
+	document.getElementById('drawerBackdrop').classList.add('open');
+}
+
+function closeDrawer() {
+	document.getElementById('variantDrawer').classList.remove('open');
+	document.getElementById('drawerBackdrop').classList.remove('open');
+}
+
+function toggleDrawerState() {
+	if (!activeDrawerVariant) return;
+	toggleStatus(activeDrawerVariant.id);
+	openDrawer(activeDrawerVariant.id);
+}
+
+function setView(mode) {
+	document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+	document.body.className = `mode-${mode}`;
+	event.target.classList.add('active');
+}
+
+// Initialize
+renderTable();
+</script>
+</body>
+</html>

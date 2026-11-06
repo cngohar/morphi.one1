@@ -1,0 +1,49 @@
+{
+  "date": "2026-11-05",
+  "artifact": "docs/references/puzzle-variants/Mahjong Solitaire Variants.html",
+  "evidence": "Direct Chromium review of standalone HTML; application suites not run",
+  "testingAgent": "Required gpt-6-luna/max agent hit usage limit before browser verification; parent completed and disclosed direct scoped review",
+  "counts": {
+    "entries": 28,
+    "dimensions": 18,
+    "sources": 21
+  },
+  "interactions": {
+    "searchWindstorm": 1,
+    "communityEvidenceFilter": 3,
+    "boardFilter": 5,
+    "compare": 2,
+    "uncompare": 1,
+    "tileFreedomCounts": {
+      "horizontal": 7,
+      "vertical": 11,
+      "fourSides": 13
+    },
+    "calculatorDraft": 3,
+    "calculatorIllustration": 288
+  },
+  "pageErrors": [],
+  "horizontalOverflow": {
+    "1440x1000": false,
+    "390x844": false,
+    "844x390": false,
+    "dark1440x1000": false
+  },
+  "screenshotsInspected": [
+    "desktop.png",
+    "phone.png",
+    "landscape.png",
+    "dark.png",
+    "catalogue.png",
+    "explorer.png",
+    "phone-catalogue.png",
+    "phone-explorer.png"
+  ],
+  "limitations": [
+    "No physical-device evidence",
+    "No full application verification",
+    "Counts are curated examples, not a world total",
+    "Secondary Microsoft mode details and historical multiplayer evidence are labelled",
+    "Source HTTPS destinations checked syntactically; games not installed or live services tested"
+  ]
+}

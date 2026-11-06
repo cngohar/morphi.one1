@@ -1,5 +1,10 @@
 # DECISIONS.md
 
+## 2026-11-05 — v1.3.3 Member Support local acceptance
+
+- The owner confirmed they already reviewed and accepted Member Support. This supersedes earlier pending-review notes. Remaining improvements are deferred to later stages; details and scope were not supplied.
+- Full `bun run verify` remains deferred, not passed or waived. No device/browser details or new automated evidence were supplied. This acceptance does not start the next feature or authorize deployment.
+
 ## 2026-11-05 — v1.3.3 Member Support authorization
 
 - Explicit owner decision during handoff: leave full `bun run verify` for later stages and record that decision. The active run was stopped during global ESLint after Prettier passed. Full verification and unrun stages remain deferred, not passed or waived. Targeted support checks remain current evidence. Do not resume or expand verification until the later owner-directed stage.
@@ -1233,3 +1238,24 @@ the palette stage changed timing fields only. Keep final evidence under
 - No-preview has a face-down arrival and zero game-opening allowance; the existing separately issued Card allowance remains. Trios caps at 18 flips/group, keeps its board and Home recovery, and emits no completion at an unfinished cap. Moving continues the same seeded stream and pins revealed/matched positions.
 - Test play is inline on the existing protected/noindex admin games page. The component uses generic family metadata; only Memory is allowed in v1.3. No player persistence/statistics APIs are called.
 - No dependency upgrades; TypeScript remains `~6.0.3` (installed 6.0.3). Existing D1 batch/conditional-write patterns retained; current Cloudflare D1 batch and local Wrangler migration documentation checked. See `docs/work/V1.3_WORK.md` for evidence and local scoring-test version effects.
+
+
+## 2026-11-06 — v1.3.4 Slice 0 Games admin/query boundaries
+
+- The owner authorized completing the Games admin/query review gaps locally and
+  explicitly excluded Mahjong from this plan; game work belongs to later plans.
+- Activity statistics pass the complete catalog mapping as one JSON string to
+  D1 `json_each(?)`. JSON keys remain camelCase; CTE columns remain snake_case.
+  This removes the activity mapping's bind-count ceiling, not all D1 resource
+  limits or limits in other queries. No chunking or schema migration is needed.
+- Keep registered-start and imported-completion cohorts unchanged, preserve
+  legacy default variants and deduplicate ranked activity starts. A 40-group
+  exact-count fixture pins the one-bind behavior.
+- Use one responsive row per variant, a read-only inspection dialog, and the
+  existing audited per-variant forms. Scoring remains in the Scoring subview;
+  test play stays on the main page. No bulk actions or matrix controls.
+- Reuse message keys, approved site colors and gesture-aware backdrop dismissal.
+  Explicit Tab/Shift+Tab wrapping follows the existing game dialog pattern;
+  browser coverage includes the Scoring link and focus restoration.
+- No dependency/version change. Full verification remains deferred under the
+  owner's earlier direction; scoped checks do not constitute a full pass.

@@ -1,4 +1,4 @@
-import { expect, test, type Locator } from '@playwright/test';
+import { expect, test, type Locator, type Page } from '@playwright/test';
 import { createCipheriv, createHash, randomBytes } from 'node:crypto';
 import { betterAuth } from 'better-auth';
 import { testUtils } from 'better-auth/plugins';
@@ -22,6 +22,78 @@ async function apply(form: Locator, button: string, reason: string) {
 		form.getByRole('button', { name: button, exact: true }).click()
 	]);
 	await expect(form).toHaveAttribute('aria-busy', 'false');
+}
+
+async function inspectDrawer(page: Page, row: Locator) {
+	const trigger = row.getByRole('button', { name: 'Inspect', exact: true });
+	const drawer = page.locator('dialog.variant-drawer');
+	const close = drawer.getByRole('button', { name: 'Close variant details', exact: true });
+	await trigger.click();
+	await expect(drawer).toBeVisible();
+	await expect(drawer).toHaveAccessibleName('Moving cards');
+	await expect(drawer.locator('.drawer-kicker')).toHaveText('Memory');
+	await expect(drawer.locator('.drawer-description')).toContainText(
+		'After a mismatch, the still face-down unmatched cards shuffle.'
+	);
+	const bounds = await drawer.boundingBox();
+	const viewport = page.viewportSize()!;
+	expect(bounds).not.toBeNull();
+	expect(bounds!.x).toBeGreaterThanOrEqual(0);
+	expect(bounds!.y).toBeGreaterThanOrEqual(0);
+	expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(viewport.width);
+	expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport.height);
+	expect(await drawer.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+	await page.screenshot({
+		path: `build/v1.3.4-slice0/drawer-${viewport.width}x${viewport.height}.png`
+	});
+	for (const key of ['Tab', 'Shift+Tab']) {
+		await close.focus();
+		for (let i = 0; i < 6; i++) {
+			await page.keyboard.press(key);
+			await expect
+				.poll(() => drawer.evaluate((node) => node.contains(document.activeElement)))
+				.toBe(true);
+		}
+	}
+	const rules = drawer.locator('.drawer-rules');
+	await rules.scrollIntoViewIfNeeded();
+	await expect(rules.getByRole('heading', { name: 'Rules group', exact: true })).toBeInViewport();
+	if (viewport.height === 390)
+		expect(await drawer.evaluate((node) => node.scrollHeight > node.clientHeight)).toBe(true);
+	const table = rules.locator('.table-wrap');
+	await table.evaluate((node) => {
+		node.scrollLeft = node.scrollWidth;
+	});
+	await expect(
+		table.getByRole('columnheader', { name: 'Average duration (seconds)' })
+	).toBeInViewport();
+	if (viewport.height === 390)
+		await page.screenshot({ path: 'build/v1.3.4-slice0/drawer-landscape-scrolled.png' });
+	await drawer.evaluate((node) => {
+		node.scrollTop = 0;
+	});
+	await page.mouse.click(bounds!.x + 8, bounds!.y + 8);
+	await expect(drawer).toBeVisible();
+	if (bounds!.x > 4) {
+		await page.mouse.move(bounds!.x + 8, bounds!.y + 8);
+		await page.mouse.down();
+		await page.mouse.move(bounds!.x / 2, bounds!.y + 8);
+		await page.mouse.up();
+		await expect(drawer).toBeVisible();
+	}
+	await page.keyboard.press('Escape');
+	await expect(drawer).not.toBeVisible();
+	await expect(trigger).toBeFocused();
+	await trigger.click();
+	await close.click();
+	await expect(drawer).not.toBeVisible();
+	await expect(trigger).toBeFocused();
+	if (bounds!.x > 4) {
+		await trigger.click();
+		await page.mouse.click(bounds!.x / 2, bounds!.y + 8);
+		await expect(drawer).not.toBeVisible();
+		await expect(trigger).toBeFocused();
+	}
 }
 
 test('Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds', async ({
@@ -106,9 +178,13 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		await expect(
 			page.getByText('Registered users only; guest solo starts are not counted.', { exact: true })
 		).toBeVisible();
+		await expect(page.locator('.scoring-card')).toHaveCount(0);
 		await expect(page.locator('.variant-row')).toHaveCount(4);
 		const moving = page.locator('.variant-row[data-variant="memory:moving"]');
-		await moving.locator('summary').click();
+		await expect(moving.getByText('Total completed', { exact: true })).toBeVisible();
+		await moving.getByRole('button', { name: 'Inspect' }).click();
+		const drawer = page.locator('dialog.variant-drawer');
+		await expect(drawer).toBeVisible();
 		for (const label of [
 			'Shown',
 			'Ignored (zero flips)',
@@ -117,21 +193,22 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			'Finished',
 			'Still open / unknown exit'
 		])
-			await expect(moving.getByText(label, { exact: true })).toBeVisible();
-		await expect(moving).toContainText('Imported guest completions');
+			await expect(drawer.getByText(label, { exact: true })).toBeVisible();
+		await expect(drawer).toContainText('Imported guest completions');
+		await page.keyboard.press('Escape');
+		await expect(drawer).not.toBeVisible();
 		const movingState = await moving.locator('input[name=action]').inputValue();
 		if (movingState === 'variant-enable') {
 			await expect(moving.locator('input[name=reason]')).toHaveCount(0);
 			await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-ENABLE');
 		}
 		await apply(moving.locator('form'), 'Disable variant', 'CASE-VARIANT-DISABLE');
-		await expect(moving.locator('summary')).toContainText('Disabled');
+		await expect(moving.locator('.status-pill')).toContainText('Disabled');
 		await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-REENABLE');
-		await expect(moving.locator('summary')).toContainText('Enabled');
+		await expect(moving.locator('.status-pill')).toContainText('Enabled');
 		await apply(moving.locator('form'), 'Disable variant', 'CASE-VARIANT-DISABLE-AGAIN');
 		for (const id of ['memory:classic', 'memory:no-preview', 'memory:trios']) {
 			const row = page.locator(`.variant-row[data-variant="${id}"]`);
-			await row.locator('summary').click();
 			if ((await row.locator('input[name=action]').inputValue()) === 'variant-disable')
 				await apply(row.locator('form'), 'Disable variant', 'CASE-ALL-VARIANTS-DISABLED');
 		}
@@ -170,6 +247,10 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 				.all()
 		).results;
 		const beforeScoreIds = new Set(beforeScores.map((row) => row.id));
+		await page
+			.getByRole('navigation', { name: 'Game sections' })
+			.getByRole('link', { name: 'Scoring' })
+			.click();
 		const editors = page.locator('.scoring-card');
 		await expect(editors).toHaveCount(2);
 		await expect(editors.first()).toContainText(
@@ -262,16 +343,20 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		expect(playerWrites).toEqual([]);
 		expect(await counts()).toEqual(beforeCounts);
 		// Block uses the same protected test harness even when its rush variant is disabled.
-		await page.goto('/admin/games?game=block&subview=settings');
+		await page.goto('/admin/games?game=block&subview=scoring');
 		await expect(page.locator('meta[name=robots]')).toHaveAttribute('content', 'noindex');
 		await expect(page.locator('.scoring-card')).toContainText(
 			'Shared with Block Classic, 10 x 10 board, Rows only and 60-second rush. A change applies to future rounds only.'
 		);
+		await page
+			.getByRole('navigation', { name: 'Game sections' })
+			.getByRole('link', { name: 'Settings' })
+			.click();
+		await expect(page).toHaveURL(/subview=settings/);
 		const rush = page.locator('.variant-row[data-variant="block:rush-60"]');
-		await rush.locator('summary').click();
 		if ((await rush.locator('input[name=action]').inputValue()) === 'variant-disable')
 			await apply(rush.locator('form'), 'Disable variant', 'CASE-BLOCK-TEST-DISABLED');
-		await expect(rush.locator('summary')).toContainText('Disabled');
+		await expect(rush.locator('.status-pill')).toContainText('Disabled');
 		const blockCounts = async () =>
 			await db
 				.prepare(
@@ -297,7 +382,7 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		expect(await blockCounts()).toEqual(beforeBlock);
 		await page.goto('/admin/games?game=memory&subview=settings');
 		await page.reload();
-		await expect(moving.locator('summary')).toContainText('Disabled');
+		await expect(moving.locator('.status-pill')).toContainText('Disabled');
 		for (const viewport of [
 			{ width: 390, height: 844 },
 			{ width: 844, height: 390 },
@@ -307,7 +392,22 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
 				false
 			);
+			await inspectDrawer(page, moving);
 		}
+		await page.locator('dialog.variant-drawer').evaluate((node: HTMLDialogElement) => {
+			node.showModal = () => {
+				throw new Error('CASE-DIALOG-OPEN');
+			};
+		});
+		await moving.getByRole('button', { name: 'Inspect', exact: true }).click();
+		await expect(page.getByRole('alert')).toContainText('We couldn’t load this data. Try again.');
+		await page.locator('dialog.variant-drawer').evaluate((node: HTMLDialogElement) => {
+			delete (node as Partial<HTMLDialogElement>).showModal;
+		});
+		await moving.getByRole('button', { name: 'Inspect', exact: true }).click();
+		await expect(drawer).toBeVisible();
+		await expect(page.getByRole('alert')).toHaveCount(0);
+		await page.keyboard.press('Escape');
 	} finally {
 		await db.prepare("DELETE FROM variant_lifecycle WHERE family='block'").run();
 		for (const row of originalBlockLifecycle)

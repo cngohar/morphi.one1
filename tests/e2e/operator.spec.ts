@@ -428,6 +428,11 @@ test('games admin manages availability and restores scoring without losing saved
 			.getByRole('navigation', { name: 'Game sections' })
 			.getByRole('link', { name: 'Settings' })
 			.click();
+		await expect(
+			page
+				.getByRole('navigation', { name: 'Game sections' })
+				.getByRole('link', { name: 'Settings' })
+		).toHaveClass(/active/);
 		await expect(gameSwitch).toBeVisible();
 		await captureAdmin(page, 'games-settings');
 		for (const viewport of [
@@ -445,6 +450,7 @@ test('games admin manages availability and restores scoring without losing saved
 			await form.locator('input[name=reason]').fill(reason);
 			await form.locator('input[name=confirm]').check();
 			await form.getByRole('button', { name: button, exact: true }).click();
+			await expect(page.locator('form[aria-busy="true"]')).toHaveCount(0);
 		};
 		const toggle = async (button: 'Disable game' | 'Enable game', reason?: string) => {
 			await gameSwitch.click();
@@ -486,6 +492,14 @@ test('games admin manages availability and restores scoring without losing saved
 		await expect(heading).toContainText('Disabled');
 		await toggle('Enable game');
 		await expect(heading).toContainText('Enabled');
+
+		await page
+			.getByRole('navigation', { name: 'Game sections' })
+			.getByRole('link', { name: 'Scoring' })
+			.click();
+		await expect(
+			page.getByRole('navigation', { name: 'Game sections' }).getByRole('link', { name: 'Scoring' })
+		).toHaveClass(/active/);
 
 		const editor = page
 			.locator('section.scoring-card')

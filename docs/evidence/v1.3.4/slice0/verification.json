@@ -1,0 +1,119 @@
+{
+	"version": "v1.3.4 Slice 0",
+	"date": "2026-11-06",
+	"scope": "Games admin/query only; Mahjong excluded and deferred to later plans",
+	"ownerReview": "pending; no physical-device or deployment acceptance inferred",
+	"checks": [
+		{
+			"command": "scoped Prettier and ESLint of six source/test files",
+			"result": "pass",
+			"logs": ["build/v1.3.4-slice0/format.log", "build/v1.3.4-slice0/lint.log"],
+			"finalChangedFilesLogs": [
+				"build/v1.3.4-slice0/format-final.log",
+				"build/v1.3.4-slice0/lint-final.log",
+				"build/v1.3.4-slice0/format-closeout.log",
+				"build/v1.3.4-slice0/lint-closeout.log"
+			]
+		},
+		{
+			"command": "bun run check",
+			"result": "pass",
+			"errors": 0,
+			"warnings": 0,
+			"seconds": 29.0,
+			"log": "build/v1.3.4-slice0/types-closeout.log"
+		},
+		{
+			"command": "bunx vitest run --config vitest.accounts.config.ts tests/integration/memory-variants.test.ts",
+			"result": "pass",
+			"tests": 8,
+			"seconds": 22.99,
+			"log": "build/v1.3.4-slice0/focused-integration.log"
+		},
+		{
+			"command": "Chromium operator.spec.ts unaffected four cases in initial two-spec run, one worker",
+			"result": "pass",
+			"tests": 4,
+			"log": "build/v1.3.4-slice0/browser.log"
+		},
+		{
+			"command": "Chromium memory-variants-admin.spec.ts recovered-state rerun, one worker",
+			"result": "pass",
+			"tests": 1,
+			"log": "build/v1.3.4-slice0/browser-recovered.log",
+			"note": "The other selected operator case failed in this run and was subsequently corrected and rerun separately."
+		},
+		{
+			"command": "bunx playwright test tests/e2e/operator.spec.ts --grep \"games admin manages availability\" --project=chromium --workers=1",
+			"result": "pass",
+			"tests": 1,
+			"seconds": 43.8,
+			"log": "build/v1.3.4-slice0/browser-operator-closeout.log"
+		},
+		{
+			"command": "default site-token status contrast calculation",
+			"result": "pass",
+			"enabledRatio": 12.94,
+			"disabledRatio": 6.57
+		},
+		{
+			"command": "bun run verify",
+			"result": "deferred by existing explicit owner decision; not run and not waived"
+		}
+	],
+	"browserEvidence": {
+		"uniquePassingCases": 6,
+		"viewports": ["390x844", "844x390", "1280x800"],
+		"workers": 1,
+		"coverage": [
+			"one row and reconciliation text per variant",
+			"lifecycle reason/confirmation/audit",
+			"Scoring-only editor placement",
+			"drawer accessible name and family/help",
+			"Tab and Shift+Tab containment including Scoring link",
+			"Escape/Close and focus return",
+			"inside click and inside-to-outside drag retention",
+			"backdrop dismissal where exposed",
+			"short viewport scroll and rules table horizontal reachability",
+			"drawer open failure/retry"
+		],
+		"screenshots": [
+			"build/v1.3.4-slice0/drawer-390x844.png",
+			"build/v1.3.4-slice0/drawer-844x390.png",
+			"build/v1.3.4-slice0/drawer-1280x800.png",
+			"build/v1.3.4-slice0/drawer-landscape-scrolled.png"
+		],
+		"visualReview": "Parent inspected phone, desktop and scrolled landscape screenshots; emulation only"
+	},
+	"corrections": [
+		"Unused import and formatting fixed",
+		"New labels/placeholders/accessibility text use message catalog",
+		"Status tokens replaced with readable approved pairs",
+		"Drawer family/help reused from existing metadata",
+		"Native Tab wrap failure fixed with existing explicit dialog pattern and visible/logged failure handling",
+		"Scoring removed from Settings",
+		"Operator test waits for active section and finished form update; redundant same-URL navigation racing deletion invalidation removed"
+	],
+	"broaderIntegrationObservation": {
+		"initialRun": "Agent observed 9 files / 61 tests passing; output was not retained in the requested log",
+		"loggedRerun": "60 passed, 1 failed: Support quota concurrency test at tests/integration/support.test.ts:424 exceeded 15-second timeout",
+		"log": "build/v1.3.4-slice0/integration.log",
+		"disposition": "Outside admin/query scope; not fixed, not treated as a clean broader-suite or full-verification pass"
+	},
+	"localState": {
+		"recovery": "Initial timed-out operator test left Memory disabled when browser cleanup lost its context. Recorded enabled starting state restored through existing audited changeGame with a temporary test actor, removed afterwards.",
+		"recoveryLog": "build/v1.3.4-slice0/state-recovery.log",
+		"finalMemoryState": "enabled",
+		"finalRestoreUntil": null,
+		"testServers": "Playwright-owned Vite servers exited"
+	},
+	"notClaimed": [
+		"full verification pass",
+		"physical-device review",
+		"performance gate",
+		"owner visual acceptance",
+		"Mahjong implementation",
+		"commit or push",
+		"deployment"
+	]
+}

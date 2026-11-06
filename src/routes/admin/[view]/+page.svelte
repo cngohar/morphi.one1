@@ -1,6 +1,8 @@
 <script lang="ts">
 	import { familyName } from '#lib/ui/puzzle-presentation.js';
-	import { onMount, untrack } from 'svelte';
+	import { dismissOnBackdrop } from '#lib/ui/dismiss-dialog.js';
+	import { onMount, tick, untrack } from 'svelte';
+	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
 	import { SvelteSet } from 'svelte/reactivity';
 	import SupportDesk from '#lib/components/SupportDesk.svelte';
 	import ThemeEditor from '#lib/components/ThemeEditor.svelte';
@@ -62,6 +64,68 @@
 	function viewUser(user: (typeof data.directory.rows)[number]) {
 		preview = user;
 		drawer?.showModal();
+	}
+	type VariantStat = NonNullable<PageProps['data']['gameStats']>['variants'][number];
+	let inspectedVariant = $state<VariantStat | null>(null);
+	let variantDrawer = $state<HTMLDialogElement>();
+	let variantTriggerEl = $state<HTMLButtonElement | null>(null);
+	let variantDrawerFailed = $state(false);
+	async function openVariantDrawer(variant: VariantStat, event: MouseEvent) {
+		try {
+			variantDrawerFailed = false;
+			inspectedVariant = variant;
+			variantTriggerEl = event.currentTarget as HTMLButtonElement;
+			await tick();
+			variantDrawer?.showModal();
+		} catch {
+			console.error('morphi:variant_drawer_dialog_failed');
+			variantDrawerFailed = true;
+		}
+	}
+	function closeVariantDrawer() {
+		try {
+			variantDrawer?.close();
+		} catch {
+			console.error('morphi:variant_drawer_dialog_failed');
+			variantDrawerFailed = true;
+		}
+	}
+	function trapVariantTab(event: KeyboardEvent) {
+		if (event.key !== 'Tab') return;
+		try {
+			const controls = [
+				...variantDrawer!.querySelectorAll<HTMLButtonElement | HTMLAnchorElement>(
+					'button:enabled, a[href]'
+				)
+			].filter(
+				(control) =>
+					control.getClientRects().length && getComputedStyle(control).visibility !== 'hidden'
+			);
+			const first = controls[0],
+				last = controls.at(-1);
+			if (!first || !last) {
+				event.preventDefault();
+				return;
+			}
+			if (document.activeElement === (event.shiftKey ? first : last)) {
+				event.preventDefault();
+				(event.shiftKey ? last : first).focus();
+			}
+		} catch {
+			event.preventDefault();
+			console.error('morphi:variant_drawer_focus_failed');
+			variantDrawerFailed = true;
+		}
+	}
+	async function restoreVariantFocus() {
+		try {
+			inspectedVariant = null;
+			await tick();
+			if (variantTriggerEl?.isConnected && !variantDrawer?.open) variantTriggerEl.focus();
+		} catch {
+			console.error('morphi:variant_drawer_focus_failed');
+			variantDrawerFailed = true;
+		}
 	}
 </script>
 
@@ -1097,98 +1161,205 @@
 						{#if data.gameStats.variants.length}
 							<section class="admin-card variant-section">
 								<h2>{t('admin.variants.title')}</h2>
-								{#if data.subview === 'settings'}<p>{t('admin.variants.registered')}</p>
-									<p>{t('admin.variants.reconcile')}</p>{/if}
-								{#each data.gameStats.variants as variant (variant.id)}
-									<details class="variant-row" data-variant={variant.id}>
-										<summary
-											>{t(puzzleVariant(game.family, variant.id)!.name as MessageKey)} · {t(
-												`v1.admin.games.${variant.state}` as MessageKey
-											)}</summary
-										>
-										<dl class="variant-counts">
-											{#each ['shown', 'ignored', 'played', 'abandoned', 'finished', 'open'] as metric (metric)}
-												<div>
-													<dt>{t(`admin.variants.${metric}` as MessageKey)}</dt>
-													<dd>
-														{variant[
-															metric as
-																'shown' | 'ignored' | 'played' | 'abandoned' | 'finished' | 'open'
-														]}
-													</dd>
+								{#if data.subview === 'settings'}
+									<p>{t('admin.variants.registered')}</p>
+									<p>{t('admin.variants.reconcile')}</p>
+								{/if}
+								<div class="variant-list">
+									{#each data.gameStats.variants as variant (variant.id)}
+										{@const def = puzzleVariant(game.family, variant.id)}
+										{@const playRate =
+											variant.shown > 0
+												? `${Math.round((variant.played / variant.shown) * 100)}%`
+												: '—'}
+										<div class="variant-row" data-variant={variant.id}>
+											<div class="variant-row-header">
+												<div class="variant-name-group">
+													<span class="variant-title">{t(def!.name as MessageKey)}</span>
+													<code class="variant-slug">{variant.id}</code>
+													<span class="pill status-pill status-{variant.state}">
+														{t(`v1.admin.games.${variant.state}` as MessageKey)}
+													</span>
 												</div>
-											{/each}
-										</dl>
-										<p>{t('admin.variants.imported')}: <strong>{variant.imported}</strong></p>
-										<p>{t('admin.variants.importedNote')}</p>
-										<p>
-											{t('admin.variants.completedTotal', {
-												total: variant.totalCompleted,
-												finished: variant.finished,
-												imported: variant.imported
-											})}
-										</p>
-										<div class="table-wrap game-stats-table">
-											<table>
-												<thead
-													><tr
-														>{#each ['rulesGroup', 'version', 'completed', 'ranked', 'solo', 'best', 'average', 'duration'] as heading (heading)}<th
-																>{t(`v1.admin.games.${heading}` as MessageKey)}</th
-															>{/each}</tr
-													></thead
-												>
-												<tbody
-													>{#each variant.rows as row (`${row.rules_group}:${row.score_config_version}`)}<tr
-															><td>{row.rules_group}</td><td>{row.score_config_version}</td><td
-																>{row.completed}</td
-															><td>{row.ranked}</td><td>{row.completed - row.ranked}</td><td
-																>{row.bestScore}</td
-															><td>{row.averageScore.toFixed(1)}</td><td
-																>{row.averageSeconds.toFixed(1)}</td
-															></tr
-														>{:else}<tr><td colspan="8">{t('v1.admin.empty')}</td></tr
-														>{/each}</tbody
-												>
-											</table>
+												<div class="variant-row-stats">
+													<div class="stat-col">
+														<span class="stat-label">{t('admin.variants.shown')}</span>
+														<span class="stat-val">{variant.shown}</span>
+													</div>
+													<div class="stat-col">
+														<span class="stat-label">{t('admin.variants.played')}</span>
+														<span class="stat-val">{variant.played}</span>
+													</div>
+													<div class="stat-col">
+														<span class="stat-label">{t('admin.variants.playRate')}</span>
+														<span class="stat-val">{playRate}</span>
+													</div>
+													<div class="stat-col">
+														<span class="stat-label">{t('admin.games.totalCompleted')}</span>
+														<span class="stat-val">{variant.totalCompleted}</span>
+													</div>
+												</div>
+												<div class="variant-actions">
+													<button
+														type="button"
+														class="btn inspect-btn"
+														aria-haspopup="dialog"
+														onclick={(e) => openVariantDrawer(variant, e)}
+													>
+														{t('admin.variants.inspect')}
+													</button>
+													{#if can(data.actor.role, variant.state === 'enabled' ? 'variant-disable' : 'variant-enable')}
+														<AccountForm>
+															{#snippet children(pending)}
+																<input type="hidden" name="target" value={game.family} />
+																<input type="hidden" name="variant" value={variant.id} />
+																<input
+																	type="hidden"
+																	name="action"
+																	value={variant.state === 'enabled'
+																		? 'variant-disable'
+																		: 'variant-enable'}
+																/>
+																{#if variant.state === 'enabled'}
+																	<label class="reason-field">
+																		{t('v1.operator.reason')}
+																		<input
+																			name="reason"
+																			required
+																			minlength="3"
+																			maxlength="240"
+																			placeholder={t('admin.variants.disableReason')}
+																		/>
+																	</label>
+																{/if}
+																<label class="confirm">
+																	<input type="checkbox" name="confirm" value="yes" required />
+																	{t('admin.variants.confirm')}
+																</label>
+																<button class="btn" disabled={pending}>
+																	{t(
+																		variant.state === 'enabled'
+																			? 'admin.variants.disable'
+																			: 'admin.variants.enable'
+																	)}
+																</button>
+															{/snippet}
+														</AccountForm>
+													{/if}
+												</div>
+											</div>
+											<p class="reconciliation-line">
+												{t('admin.variants.completedTotal', {
+													total: variant.totalCompleted,
+													finished: variant.finished,
+													imported: variant.imported
+												})}
+											</p>
 										</div>
-										{#if variant.more}<p>{t('v1.admin.games.limited')}</p>{/if}
-										{#if can(data.actor.role, variant.state === 'enabled' ? 'variant-disable' : 'variant-enable')}
-											<AccountForm
-												>{#snippet children(pending)}
-													<input type="hidden" name="target" value={game.family} />
-													<input type="hidden" name="variant" value={variant.id} />
-													<input
-														type="hidden"
-														name="action"
-														value={variant.state === 'enabled'
-															? 'variant-disable'
-															: 'variant-enable'}
-													/>
-													{#if variant.state === 'enabled'}<label
-															>{t('v1.operator.reason')}<input
-																name="reason"
-																required
-																minlength="3"
-																maxlength="240"
-															/></label
-														>{/if}
-													<label class="confirm"
-														><input type="checkbox" name="confirm" value="yes" required />{t(
-															'admin.variants.confirm'
-														)}</label
-													>
-													<button class="btn" disabled={pending}
-														>{t(
-															variant.state === 'enabled'
-																? 'admin.variants.disable'
-																: 'admin.variants.enable'
-														)}</button
-													>
-												{/snippet}</AccountForm
+									{/each}
+								</div>
+
+								{#if variantDrawerFailed}<p role="alert">{t('v1.admin.error')}</p>{/if}
+								<dialog
+									bind:this={variantDrawer}
+									use:dismissOnBackdrop={closeVariantDrawer}
+									onclose={restoreVariantFocus}
+									onkeydown={trapVariantTab}
+									class="variant-drawer"
+									aria-labelledby="variant-drawer-title"
+								>
+									{#if inspectedVariant}
+										{@const def = puzzleVariant(game.family, inspectedVariant.id)}
+										{#if variantDrawerFailed}<p role="alert">{t('v1.admin.error')}</p>{/if}
+										<div class="drawer-header">
+											<button
+												type="button"
+												class="btn drawer-close"
+												onclick={closeVariantDrawer}
+												aria-label={t('admin.variants.closeDetails')}
 											>
-										{/if}
-									</details>
-								{/each}
+												{t('v1.admin.users.close')}
+											</button>
+											<p class="drawer-kicker">{familyName(game.family)}</p>
+											<h2 id="variant-drawer-title">{t(def!.name as MessageKey)}</h2>
+											<code class="variant-slug">{inspectedVariant.id}</code>
+											<span class="pill status-pill status-{inspectedVariant.state}">
+												{t(`v1.admin.games.${inspectedVariant.state}` as MessageKey)}
+											</span>
+										</div>
+
+										<div class="drawer-description">
+											{#each (def?.help ?? puzzleMetadata[game.family].presentation!.help).steps as step (step)}
+												<p>{t(step as MessageKey)}</p>
+											{/each}
+										</div>
+										<div class="drawer-metrics">
+											<h3>{t('admin.variants.telemetry')}</h3>
+											<dl class="variant-counts">
+												{#each ['shown', 'ignored', 'played', 'abandoned', 'finished', 'open'] as metric (metric)}
+													<div>
+														<dt>{t(`admin.variants.${metric}` as MessageKey)}</dt>
+														<dd>
+															{inspectedVariant[
+																metric as
+																	'shown' | 'ignored' | 'played' | 'abandoned' | 'finished' | 'open'
+															]}
+														</dd>
+													</div>
+												{/each}
+											</dl>
+											<p>
+												{t('admin.variants.imported')}: <strong>{inspectedVariant.imported}</strong>
+											</p>
+											<p>{t('admin.variants.importedNote')}</p>
+										</div>
+
+										<div class="drawer-section">
+											<a
+												class="btn drawer-scoring-link"
+												href="{resolve('/admin/[view]', {
+													view: 'games'
+												})}?game={encodeURIComponent(game.family)}&subview=scoring"
+											>
+												{t('admin.variants.sharedScoring')}
+											</a>
+										</div>
+
+										<div class="drawer-rules">
+											<h3>{t('v1.admin.games.rulesGroup')}</h3>
+											<div class="table-wrap game-stats-table">
+												<table>
+													<thead>
+														<tr>
+															{#each ['rulesGroup', 'version', 'completed', 'ranked', 'solo', 'best', 'average', 'duration'] as heading (heading)}
+																<th>{t(`v1.admin.games.${heading}` as MessageKey)}</th>
+															{/each}
+														</tr>
+													</thead>
+													<tbody>
+														{#each inspectedVariant.rows as row (`${row.rules_group}:${row.score_config_version}`)}
+															<tr>
+																<td>{row.rules_group}</td>
+																<td>{row.score_config_version}</td>
+																<td>{row.completed}</td>
+																<td>{row.ranked}</td>
+																<td>{row.completed - row.ranked}</td>
+																<td>{row.bestScore}</td>
+																<td>{row.averageScore.toFixed(1)}</td>
+																<td>{row.averageSeconds.toFixed(1)}</td>
+															</tr>
+														{:else}
+															<tr><td colspan="8">{t('v1.admin.empty')}</td></tr>
+														{/each}
+													</tbody>
+												</table>
+											</div>
+											{#if inspectedVariant.more}
+												<p>{t('v1.admin.games.limited')}</p>
+											{/if}
+										</div>
+									{/if}
+								</dialog>
 							</section>
 						{/if}
 						{#if data.testPlayFamilies.some((family) => family === game.family)}<AdminTestPlay
@@ -1354,13 +1525,168 @@
 		}
 	}
 
-	.variant-row {
-		padding: 16px 0;
-		border-top: 1px solid var(--border);
+	.variant-section {
+		container-type: inline-size;
 	}
-	.variant-row summary {
-		cursor: pointer;
+	.variant-list {
+		display: flex;
+		flex-direction: column;
+		gap: 14px;
+		margin-top: 16px;
+	}
+	.variant-row {
+		padding: 16px;
+		border: 1px solid var(--border);
+		border-radius: 8px;
+		background: var(--surface);
+		display: flex;
+		flex-direction: column;
+		gap: 12px;
+	}
+	.variant-row-header {
+		display: grid;
+		grid-template-columns: minmax(140px, 1.2fr) minmax(240px, 2fr) auto;
+		gap: 16px;
+		align-items: center;
+	}
+	.variant-name-group {
+		display: flex;
+		flex-direction: column;
+		gap: 4px;
+		align-items: flex-start;
+	}
+	.variant-title {
 		font-weight: 800;
+		font-size: 15px;
+		color: var(--ink);
+	}
+	.variant-slug {
+		font-size: 11px;
+		color: var(--muted);
+		font-family: monospace;
+	}
+	.status-pill {
+		display: inline-block;
+		font-size: 11px;
+		font-weight: 800;
+		padding: 2px 8px;
+		border-radius: 999px;
+		text-transform: uppercase;
+		letter-spacing: 0.04em;
+	}
+	.status-pill.status-enabled {
+		background: var(--chip-teal);
+		color: var(--ink);
+	}
+	.status-pill.status-disabled {
+		background: var(--danger);
+		color: var(--surface);
+	}
+	.variant-row-stats {
+		display: grid;
+		grid-template-columns: repeat(4, 1fr);
+		gap: 10px;
+		text-align: center;
+		background: var(--surface-2);
+		padding: 8px 12px;
+		border-radius: 6px;
+	}
+	.stat-col {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+	}
+	.stat-label {
+		font-size: 10px;
+		color: var(--muted);
+		text-transform: uppercase;
+		letter-spacing: 0.02em;
+	}
+	.stat-val {
+		font-size: 14px;
+		font-weight: 800;
+		color: var(--ink);
+	}
+	.variant-actions {
+		display: flex;
+		align-items: center;
+		gap: 8px;
+		flex-wrap: wrap;
+		justify-content: flex-end;
+	}
+	.inspect-btn {
+		cursor: pointer;
+	}
+	.reason-field {
+		display: flex;
+		flex-direction: column;
+		gap: 2px;
+		font-size: 12px;
+	}
+	.reason-field input {
+		font-size: 12px;
+		padding: 4px 8px;
+	}
+	.reconciliation-line {
+		margin: 0;
+		font-size: 12px;
+		color: var(--muted);
+		line-height: 1.4;
+		border-top: 1px dashed var(--border);
+		padding-top: 8px;
+	}
+	@container (max-width: 600px) {
+		.variant-row-header {
+			grid-template-columns: 1fr;
+			gap: 12px;
+		}
+		.variant-row-stats {
+			grid-template-columns: repeat(2, 1fr);
+			gap: 8px;
+		}
+		.variant-actions {
+			justify-content: flex-start;
+		}
+	}
+	.variant-drawer {
+		max-width: 100%;
+		position: fixed;
+		margin: 0 0 0 auto;
+		inset: 0 0 0 auto;
+		height: 100%;
+		max-height: none;
+		width: min(500px, 100%);
+		border: 0;
+		padding: 28px;
+		background: var(--surface);
+		color: var(--ink);
+		overflow-y: auto;
+		box-sizing: border-box;
+	}
+	.variant-drawer::backdrop {
+		background: rgb(0 0 0 / 45%);
+	}
+	.variant-drawer h2 {
+		overflow-wrap: anywhere;
+		font-size: 20px;
+		margin: 4px 0 12px;
+	}
+	.variant-drawer h3 {
+		font-size: 13px;
+		text-transform: uppercase;
+		letter-spacing: 0.05em;
+		color: var(--muted);
+		margin: 20px 0 10px;
+	}
+	.drawer-header {
+		margin-bottom: 20px;
+	}
+	.drawer-section {
+		margin: 16px 0;
+	}
+	.drawer-scoring-link {
+		text-decoration: none;
+		display: inline-block;
 	}
 	.variant-counts {
 		display: grid;

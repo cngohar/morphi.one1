@@ -520,3 +520,23 @@ Evidence: `src/lib/puzzles/block-placement/{logic,variants}.test.ts`, `src/lib/b
 - Length checks use the same documented trimmed-string count on client and server; oversized streamed bodies are rejected. HTML/Markdown/URLs remain escaped plain text with line breaks.
 - Network failure, duplicate submit and expired session retain drafts only in the current page. Leaving/reloading/closing discards drafts; no conversation content enters browser persistence, audit metadata, analytics or URLs.
 - Account deletion removes owned conversations and every staff/member message in them; lifecycle restoration timing and audit retention remain unchanged. Explicit maintenance prunes expired limiter state, without implying a scheduler.
+
+
+## v1.3.4 Slice 0 Games admin/query
+
+- More than 25 rules groups: pass the whole mapping through one JSON bind;
+  groups on either side of the old boundary reconcile without splitting starts.
+- Legacy NULL variants use the family's default; a start present in both session
+  tables counts once; imported completions never inflate Shown or Played.
+- Zero Shown displays an unavailable play rate; otherwise Played / Shown is the
+  percentage. Each responsive variant has one DOM row and reconciliation line.
+- Inspect opens a read-only dialog. Keyboard focus stays inside, Escape/Close
+  restore the trigger, and backdrop gestures use the shared dismissal helper.
+  Inside clicks and inside-to-outside drags must leave it open. Short/phone
+  viewports keep content scrollable without page overflow.
+- Query/UI changes preserve disable reason/confirmation, reason-free audited
+  enable, permission checks, pending/error behavior and cache invalidation.
+
+Evidence: `tests/integration/memory-variants.test.ts`,
+`tests/e2e/memory-variants-admin.spec.ts`, `tests/e2e/operator.spec.ts`;
+results and limits in `docs/work/V1.3.4_SLICE0_WORK.md`.

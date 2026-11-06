@@ -17,6 +17,80 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## Source-only GitHub update — owner authorization (2026-11-06)
+
+- **Scope:** The owner requested updating the local Git repository and pushing to
+  the existing GitHub `origin/main` after the admin/query Slice 0 closeout.
+  Include source, tests, project status/acceptance records and existing draft
+  reference/demo artifacts. Drafts remain reference material, not gameplay
+  implementation or authorization for later work.
+- **Exclusions:** Local editor/MCP configuration, ignored credentials/runtime
+  output, three unauditioned MP3s and the pre-existing palette timing changes
+  remain local. No deployment is authorized.
+- **Evidence:** Existing Slice 0 targeted verification remains unchanged; no app
+  checks are repeated for this source-only handoff. Git diff/secret screening
+  and remote ancestry checks cover the handoff. Full verify remains deferred,
+  with the separate broader Support timeout recorded below.
+
+## v1.3.4 Slice 0 — Games admin/query closeout (2026-11-06)
+
+- **Built:** Completed the owner-supplied admin/query implementation and review gaps: single JSON-bind activity mapping with exported builder/runner; exact-count 40-group regression; one responsive variant row and stable reconciliation text; translated controls; readable status tokens; family/help and telemetry/rules drawer; guarded dialog failures and explicit keyboard containment; Scoring-only editor placement. Updated browser section/form synchronization and the active plan, decisions, edge cases, work record and CODEMAP.
+- **Skipped (and why):** Mahjong and every gameplay feature are excluded by the owner and belong to later plans. No matrix/bulk actions, dependencies, migrations, auth changes, commit/push, production operation or deployment. Full verify remains deferred under the earlier owner direction.
+- **Known issues:** An extra broader integration logging run had 60 passes and one Support quota concurrency test timeout at 15 seconds. That area was not changed or investigated as part of admin/query work. Earlier unlogged 61/61 success was reported by the verification agent; no clean final broader-suite pass is claimed. Physical-device review remains absent.
+- **Decisions and pinned versions:** No dependency/version changes. One JSON bind removes the activity mapping parameter ceiling, not every D1 limit. Preserve registered/imported cohorts, audit/permission/cache behavior, existing family help and gesture helper. Details: `docs/DECISIONS.md`, `docs/work/V1.3.4_SLICE0_WORK.md`.
+- **Questions for the owner:** Review the completed local admin slice; next feature scope remains separate.
+
+| Acceptance item | Evidence type and location | Result |
+| --- | --- | --- |
+| Single bind, 40 groups, exact totals, legacy NULL fallback and duplicate starts | Real local D1/Workerd via focused Vitest; `build/v1.3.4-slice0/focused-integration.log` | Pass: 8/8 integration tests |
+| Responsive single rows, reconciliation text and audited per-variant actions | Memory admin Chromium and operator reconciliation/lifecycle coverage; `browser-recovered.log`, `browser-operator-closeout.log` | Pass |
+| Translated labels, family/help content and readable approved status tokens | Source review, browser accessible-name/help checks and screenshots; `docs/evidence/v1.3.4/slice0/verification.json` | Pass; default contrast 12.94:1 enabled / 6.57:1 disabled |
+| Drawer Tab/Shift+Tab, Escape/Close, focus return, backdrop/inside/drag behavior, failed-open retry and scrolling | Corrected Memory admin test; `build/v1.3.4-slice0/browser-recovered.log`; drawer screenshots in the same folder | Pass at 390×844, 844×390 and 1280×800; emulation only |
+| Scoring tab, game disable/delete/restore and saved-history preservation | Final filtered operator case; `build/v1.3.4-slice0/browser-operator-closeout.log` | Pass: 1/1 final case |
+| Other selected operator authentication/permission/audit cases | Four passing cases in `build/v1.3.4-slice0/browser.log` | Pass; six unique passing browser cases across retained runs |
+| Format, lint and types | Scoped `format*.log`, `lint*.log`; `types-closeout.log` under `build/v1.3.4-slice0/` | Pass; 0 type errors / 0 warnings |
+| Full verification | Earlier explicit owner deferral; no `bun run verify` run in this slice | Deferred, not passed or waived |
+| Owner visual/device acceptance | Owner review | Pending; no acceptance inferred |
+
+- **Measurements:** Local Linux development server, Chromium emulation at the three listed sizes, one worker, no network shaping. No performance target introduced, no timed gameplay benchmark, median or p95 claimed. Focused D1 suite 22.99 s and final operator case 43.8 s are diagnostic suite durations, not product performance gates. Parent visually inspected phone/desktop and scrolled-landscape screenshots.
+- **Corrections and local state:** Browser checks found native Tab wrap leakage and a test-only same-URL navigation racing deletion invalidation. Both were corrected and affected cases rerun. A timed-out operator cleanup left Memory disabled; its recorded enabled starting state was restored through existing audited `changeGame` using a temporary test actor, removed afterwards. Final read-only check: Memory enabled, no restore deadline; Playwright-owned servers exited.
+- **Waivers:** None added. Full verify remains deferred rather than waived; the broader Support timeout is not hidden by the targeted passes.
+- **Owner responsibilities:** Review this local admin slice and direct later scope/full-verification timing. Physical devices and any deployment remain separate owner actions.
+- **CODEMAP updated:** Yes. Compact permanent evidence: `docs/evidence/v1.3.4/slice0/verification.json`; detailed work record: `docs/work/V1.3.4_SLICE0_WORK.md`.
+
+## Mahjong Solitaire variant research — reference only (2026-11-05)
+
+- **Built:** Owner-requested standalone interactive research HTML in the existing Memory/Connect research format. Includes 28 sourced modes/parameters, 18 variation dimensions, 21 source links, catalogue filters/search/comparison, a tile-freedom diagram and a configuration estimator. Broad factors include structural geometry and usability as well as rules. Links added to README, CODEMAP and the draft v1.3.4 plan.
+- **Skipped:** App implementation, new gameplay variants, installations, production operations and deployment; this task is reference research only.
+- **Known issues:** No authoritative worldwide total; catalogue entries overlap. Community Microsoft descriptions and historical Shanghai modes are labelled. Source game binaries/services and physical devices were not checked.
+- **Decisions:** Reuse the existing research-page visual system. Keep layouts, modes, policies and cosmetic changes distinguishable; configuration products are illustrative, not verified variant counts. No dependency/version change.
+- **Questions for the owner:** None to deliver this research; v1.3.4 design acceptance remains separate.
+
+| Acceptance item | Evidence | Result |
+| --- | --- | --- |
+| Web research with direct sources and evidence labels | Source registry and per-entry evidence in the HTML | 21 sources; 28 curated examples |
+| Same report format and broader variation factors | Memory report CSS reused; 18 dimension cards | Implemented |
+| Search, filters, compare/uncompare, rule lab, estimator | Direct Chromium review; `docs/evidence/v1.3.4/research/review.json` | Pass for this artifact |
+| Responsive light/dark presentation | Captured and inspected desktop, phone, landscape and interaction screenshots in the same evidence folder | No observed overflow; emulation only |
+
+- **Measurements:** Viewports 1440×1000, 390×844 and 844×390; local standalone Chromium, no network shaping. No performance target or median/p95 claimed.
+- **Waivers:** None. Required gpt-6-luna/max verification agent hit its usage limit before browser checks; this was disclosed and the parent completed direct scoped browser review. No agent verification pass is claimed.
+- **Owner responsibilities:** Review research and separately decide the v1.3.4 brief; no new implementation approval is inferred.
+- **CODEMAP updated:** Yes.
+
+## v1.3.3 — Owner-confirmed local acceptance (2026-11-05)
+
+- **Built:** Recorded the owner's confirmation that Member Support was already reviewed and accepted locally. This supersedes earlier pending-review notes in the handoff below.
+- **Skipped:** Remaining improvements are deferred to later stages by the owner; details and scope were not supplied. No implementation changes or application checks were needed for this documentation correction.
+- **Known issues:** Full regression/build/runtime verification remains deferred, not passed or waived. Device/browser details were not supplied; no physical-device evidence is inferred.
+- **Decisions:** Local acceptance closes the working-build review gate. Earlier targeted verification results and the separate v1.3.1 sound-audition gate remain unchanged. No versions changed.
+- **Questions for the owner:** None for this closeout; the next implementation scope remains to be agreed.
+- **Acceptance evidence:** Owner statement in this conversation: “i already reviewed it and accepted it”; result: accepted locally. Owner also deferred remaining improvements to later stages. Existing automated evidence remains in `docs/evidence/v1.3.3/verification.json`.
+- **Measurements:** None added; previous measurement limits remain unchanged.
+- **Waivers:** None added; full verification remains deferred.
+- **Owner responsibilities:** Direct the later improvement scope and full-verification stage; deployment requires separate authorization.
+- **CODEMAP updated:** Yes, along with the active plan, guidance, support plan/work record, decisions, index and evidence summary.
+
 ## v1.3.3 — Member Support local handoff (2026-11-05)
 
 **Built:** Member Support at `/account/support`, staff inbox at `/admin/support`,

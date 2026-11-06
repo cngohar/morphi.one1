@@ -1,0 +1,395 @@
+<!doctype html>
+<html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover"><meta name="color-scheme" content="light dark"><link rel="icon" href="data:,"><title>Mahjong Solitaire Variants</title><style>
+      :root {
+        --bg: #f2efe6;
+        --bg-raise: #faf8f1;
+        --card: #fffdf6;
+        --ink: #1d2420;
+        --ink-soft: #4a554e;
+        --ink-faint: #77817a;
+        --line: #d8d2c0;
+        --line-strong: #b9b198;
+        --felt: #17573f;
+        --felt-deep: #0f4230;
+        --felt-ink: #eaf3ec;
+        --amber: #b06f14;
+        --amber-soft: #f3e3c2;
+        --red: #a83a28;
+        --red-soft: #f2d9d2;
+        --chip-bg: #e9e4d2;
+        --shadow: 0 1px 2px rgba(29, 36, 32, .07), 0 8px 24px rgba(29, 36, 32, .06);
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #101511;
+          --bg-raise: #171d18;
+          --card: #1b221c;
+          --ink: #ece8da;
+          --ink-soft: #b3baae;
+          --ink-faint: #828c80;
+          --line: #333b33;
+          --line-strong: #4a554a;
+          --felt: #1d6a4c;
+          --felt-deep: #0d2c20;
+          --felt-ink: #e6f2ea;
+          --amber: #e0a458;
+          --amber-soft: #3a2f1c;
+          --red: #e08a76;
+          --red-soft: #3d2620;
+          --chip-bg: #262e27;
+          --shadow: 0 1px 2px rgba(0, 0, 0, .35), 0 8px 24px rgba(0, 0, 0, .3);
+          color-scheme: dark;
+        }
+      }
+      * { box-sizing: border-box; }
+      html { scroll-behavior: smooth; }
+      @media (prefers-reduced-motion: reduce) { html { scroll-behavior: auto; } }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "IBM Plex Sans", system-ui, sans-serif;
+        font-size: 16.5px;
+        line-height: 1.6;
+        -webkit-font-smoothing: antialiased;
+      }
+      .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
+      h1, h2, h3 { font-family: "Bricolage Grotesque", "IBM Plex Sans", sans-serif; line-height: 1.12; margin: 0; }
+      h2 { font-size: clamp(1.55rem, 3.4vw, 2.15rem); font-weight: 800; letter-spacing: -.01em; }
+      h3 { font-size: 1.12rem; font-weight: 700; }
+      p { margin: 0; }
+      a { color: var(--felt); text-underline-offset: 3px; }
+      @media (prefers-color-scheme: dark) { a { color: #7cc7a4; } }
+      .mono { font-family: "IBM Plex Mono", ui-monospace, monospace; }
+      section { padding: 56px 0 8px; }
+      .sec-head { max-width: 46rem; margin-bottom: 26px; }
+      .sec-head p { color: var(--ink-soft); margin-top: 10px; }
+      .sec-tag {
+        font-family: "IBM Plex Mono", monospace; font-size: .78rem; font-weight: 600;
+        letter-spacing: .14em; text-transform: uppercase; color: var(--amber); margin-bottom: 10px;
+      }
+
+      /* ---------- Hero ---------- */
+      .hero { padding: 52px 0 10px; }
+      .hero-grid { display: grid; grid-template-columns: 1.25fr .75fr; gap: 36px; align-items: center; }
+      .hero h1 { font-size: clamp(2.1rem, 5.4vw, 3.5rem); font-weight: 800; letter-spacing: -.015em; }
+      .hero h1 em { font-style: normal; color: var(--felt); }
+      @media (prefers-color-scheme: dark) { .hero h1 em { color: #7cc7a4; } }
+      .hero .lede { margin-top: 18px; font-size: 1.08rem; color: var(--ink-soft); max-width: 34rem; }
+      .hero .meta { margin-top: 20px; font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--ink-faint); }
+      .deck { display: grid; grid-template-columns: repeat(4, 1fr); gap: 10px; max-width: 340px; margin-left: auto; }
+      .mini {
+        aspect-ratio: 3 / 4; border-radius: 9px; position: relative;
+        display: flex; align-items: center; justify-content: center;
+        font-size: clamp(1.1rem, 3vw, 1.6rem); font-weight: 700;
+      }
+      .mini.down {
+        background:
+          repeating-linear-gradient(45deg, rgba(255,255,255,.09) 0 6px, transparent 6px 12px),
+          linear-gradient(150deg, var(--felt), var(--felt-deep));
+        border: 1px solid var(--felt-deep);
+        box-shadow: inset 0 0 0 4px rgba(255,255,255,.14), var(--shadow);
+      }
+      .mini.down::after {
+        content: ""; width: 34%; height: 34%; border-radius: 50%;
+        border: 2px solid rgba(255,255,255,.45);
+      }
+      .mini.up { background: var(--card); border: 1px solid var(--line-strong); box-shadow: var(--shadow); color: var(--ink); }
+      .mini.up.red { color: var(--red); }
+      .mini.up .sub { position: absolute; bottom: 7px; right: 9px; font-size: .62rem; font-family: "IBM Plex Mono", monospace; color: var(--ink-faint); font-weight: 500; }
+      @media (max-width: 760px) {
+        .hero-grid { grid-template-columns: 1fr; }
+        .deck { margin: 4px auto 0 0; max-width: 300px; }
+      }
+
+      /* ---------- Stat band ---------- */
+      .stats {
+        margin-top: 44px; display: grid; grid-template-columns: repeat(5, 1fr);
+        border: 1px solid var(--line); border-radius: 14px; overflow: hidden; background: var(--card);
+        box-shadow: var(--shadow);
+      }
+      .stat { padding: 18px 18px 14px; border-left: 1px solid var(--line); }
+      .stat:first-child { border-left: none; }
+      .stat .n { font-family: "IBM Plex Mono", monospace; font-size: clamp(1.35rem, 2.6vw, 1.9rem); font-weight: 600; line-height: 1.1; }
+      .stat .l { font-size: .82rem; color: var(--ink-soft); margin-top: 6px; line-height: 1.45; }
+      @media (max-width: 860px) { .stats { grid-template-columns: repeat(2, 1fr); } .stat { border-top: 1px solid var(--line); } .stat:nth-child(-n+2) { border-top: none; } .stat:nth-child(odd) { border-left: none; } .stat:last-child { grid-column: 1 / -1; } }
+      .answer {
+        margin-top: 22px; background: var(--felt-deep); color: var(--felt-ink);
+        border-radius: 14px; padding: 24px 26px; font-size: 1.05rem; line-height: 1.65;
+      }
+      .answer strong { color: #ffd98a; }
+      @media (prefers-color-scheme: dark) { .answer strong { color: #f0bd72; } }
+
+      /* ---------- Classic baseline ---------- */
+      .baseline {
+        margin-top: 26px; display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px;
+      }
+      .base-step { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 12px; padding: 16px; }
+      .base-step .k { font-family: "IBM Plex Mono", monospace; font-size: .75rem; color: var(--amber); font-weight: 600; letter-spacing: .1em; }
+      .base-step p { font-size: .92rem; color: var(--ink-soft); margin-top: 6px; }
+      @media (max-width: 860px) { .baseline { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 480px) { .baseline { grid-template-columns: 1fr; } }
+
+      /* ---------- Counts / doesn't count ---------- */
+      .split2 { display: grid; grid-template-columns: 1fr 1fr; gap: 16px; }
+      @media (max-width: 760px) { .split2 { grid-template-columns: 1fr; } }
+      .panel { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 22px; box-shadow: var(--shadow); }
+      .panel h3 { display: flex; align-items: center; gap: 10px; margin-bottom: 6px; }
+      .badge { font-family: "IBM Plex Mono", monospace; font-size: .72rem; font-weight: 600; padding: 3px 9px; border-radius: 999px; letter-spacing: .06em; }
+      .badge.yes { background: var(--felt); color: #fff; }
+      .badge.no { background: var(--red-soft); color: var(--red); }
+      .panel ul { margin: 10px 0 0; padding: 0; list-style: none; }
+      .panel li { padding: 10px 0; border-top: 1px solid var(--line); font-size: .95rem; }
+      .panel li:first-child { border-top: none; }
+      .panel li b { display: block; font-weight: 600; }
+      .panel li span { color: var(--ink-soft); font-size: .9rem; }
+
+      /* ---------- Variant explorer ---------- */
+      .chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 8px; }
+      .chip {
+        font-family: "IBM Plex Sans", sans-serif; font-size: .86rem; font-weight: 500;
+        padding: 7px 14px; border-radius: 999px; border: 1px solid var(--line-strong);
+        background: var(--bg-raise); color: var(--ink); cursor: pointer;
+      }
+      .chip:hover { border-color: var(--felt); }
+      .chip[aria-pressed="true"] { background: var(--felt); border-color: var(--felt); color: #fff; }
+      .chip .cnt { font-family: "IBM Plex Mono", monospace; font-size: .76rem; opacity: .75; margin-left: 4px; }
+      .vcount { font-family: "IBM Plex Mono", monospace; font-size: .82rem; color: var(--ink-faint); margin: 10px 0 16px; }
+      .vgrid { display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 760px) { .vgrid { grid-template-columns: 1fr; } }
+      .vcard { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); }
+      .vcard .top { display: flex; align-items: baseline; gap: 10px; }
+      .vcard .num { font-family: "IBM Plex Mono", monospace; font-size: .8rem; color: var(--ink-faint); font-weight: 600; }
+      .vcard h3 { font-size: 1.02rem; flex: 1; }
+      .dim { font-family: "IBM Plex Mono", monospace; font-size: .68rem; font-weight: 600; letter-spacing: .07em; text-transform: uppercase; color: var(--amber); white-space: nowrap; }
+      .vcard .rule { font-size: .93rem; color: var(--ink-soft); margin-top: 7px; }
+      .vcard .src { margin-top: 10px; font-size: .8rem; }
+      .vcard .src a { color: var(--ink-faint); }
+      .vcard .flag { margin-top: 8px; font-size: .8rem; background: var(--amber-soft); color: var(--ink); border-radius: 8px; padding: 7px 10px; }
+      .vcard[hidden] { display: none; }
+
+      /* ---------- Dimensions grid ---------- */
+      .dims { display: grid; grid-template-columns: repeat(3, 1fr); gap: 12px; }
+      @media (max-width: 860px) { .dims { grid-template-columns: repeat(2, 1fr); } }
+      @media (max-width: 520px) { .dims { grid-template-columns: 1fr; } }
+      .dimcard { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; }
+      .dimcard .n { font-family: "IBM Plex Mono", monospace; font-size: 1.5rem; font-weight: 600; color: var(--felt); }
+      @media (prefers-color-scheme: dark) { .dimcard .n { color: #7cc7a4; } }
+      .dimcard h3 { font-size: .98rem; margin-top: 2px; }
+      .dimcard p { font-size: .86rem; color: var(--ink-soft); margin-top: 4px; }
+
+      /* ---------- Ladder ---------- */
+      .ladder { display: flex; flex-direction: column; gap: 0; }
+      .rung { display: grid; grid-template-columns: 190px 1fr; gap: 18px; padding: 18px 0; border-top: 1px solid var(--line); align-items: baseline; }
+      .rung:first-child { border-top: none; }
+      .rung .big { font-family: "IBM Plex Mono", monospace; font-size: clamp(1.5rem, 3.4vw, 2.2rem); font-weight: 600; line-height: 1; }
+      .rung .what b { display: block; font-weight: 600; }
+      .rung .what span { color: var(--ink-soft); font-size: .93rem; }
+      .rung .mult { font-family: "IBM Plex Mono", monospace; color: var(--amber); font-weight: 600; }
+      @media (max-width: 620px) { .rung { grid-template-columns: 1fr; gap: 6px; } }
+      .inf-note { margin-top: 8px; background: var(--amber-soft); border-radius: 12px; padding: 18px 20px; font-size: .97rem; }
+      table.opts { width: 100%; border-collapse: collapse; margin-top: 26px; background: var(--card); border: 1px solid var(--line); border-radius: 12px; overflow: hidden; box-shadow: var(--shadow); }
+      table.opts th, table.opts td { text-align: left; padding: 11px 16px; font-size: .93rem; vertical-align: top; }
+      table.opts th { font-family: "IBM Plex Mono", monospace; font-size: .74rem; letter-spacing: .1em; text-transform: uppercase; color: var(--ink-faint); border-bottom: 1px solid var(--line-strong); }
+      table.opts td { border-top: 1px solid var(--line); color: var(--ink-soft); }
+      table.opts td:first-child { color: var(--ink); font-weight: 600; white-space: nowrap; }
+      table.opts td.c { font-family: "IBM Plex Mono", monospace; color: var(--amber); font-weight: 600; white-space: nowrap; }
+      @media (max-width: 620px) {
+        table.opts, table.opts tbody, table.opts tr, table.opts td { display: block; }
+        table.opts thead { display: none; }
+        table.opts td { border-top: none; padding: 3px 16px; }
+        table.opts td:first-child { padding-top: 14px; }
+        table.opts td:last-child { padding-bottom: 14px; }
+        table.opts tr { border-top: 1px solid var(--line); }
+        table.opts tr:first-child { border-top: none; }
+      }
+
+      /* ---------- Tests / degenerate ---------- */
+      .tests { counter-reset: t; display: grid; grid-template-columns: 1fr 1fr; gap: 12px; }
+      @media (max-width: 760px) { .tests { grid-template-columns: 1fr; } }
+      .test { background: var(--card); border: 1px solid var(--line); border-radius: 12px; padding: 16px 18px; box-shadow: var(--shadow); display: flex; gap: 14px; }
+      .test .tn { counter-increment: t; font-family: "IBM Plex Mono", monospace; font-weight: 600; color: var(--felt); font-size: 1.15rem; line-height: 1.3; }
+      @media (prefers-color-scheme: dark) { .test .tn { color: #7cc7a4; } }
+      .test .tn::before { content: counter(t, decimal-leading-zero); }
+      .test p { font-size: .93rem; color: var(--ink-soft); }
+      .test p b { color: var(--ink); display: block; font-size: .98rem; }
+      .warn { margin-top: 16px; border: 1px solid var(--red); border-radius: 12px; padding: 18px 20px; background: var(--red-soft); font-size: .95rem; }
+      .warn b { color: var(--red); }
+
+      /* ---------- Data-only vs mechanics ---------- */
+      .mech-list { margin: 8px 0 0; padding: 0; list-style: none; }
+      .mech-list li { padding: 9px 0; border-top: 1px solid var(--line); font-size: .93rem; }
+      .mech-list li:first-child { border-top: none; }
+      .mech-list b { font-weight: 600; }
+      .mech-list span { color: var(--ink-soft); }
+      .mech-list code { font-family: "IBM Plex Mono", monospace; font-size: .82em; background: var(--chip-bg); padding: 1px 6px; border-radius: 5px; }
+      .implication { margin-top: 16px; background: var(--felt-deep); color: var(--felt-ink); border-radius: 12px; padding: 18px 20px; font-size: .97rem; }
+
+      /* ---------- Boundary ---------- */
+      .brow { display: grid; grid-template-columns: 200px 1fr 1fr; gap: 16px; padding: 15px 0; border-top: 1px solid var(--line); }
+      .brow:first-of-type { border-top: none; }
+      .brow h3 { font-size: 1rem; }
+      .brow p { font-size: .92rem; color: var(--ink-soft); }
+      .brow p b { color: var(--ink); font-weight: 600; display: block; font-size: .78rem; font-family: "IBM Plex Mono", monospace; letter-spacing: .08em; text-transform: uppercase; margin-bottom: 2px; }
+      @media (max-width: 760px) { .brow { grid-template-columns: 1fr; gap: 6px; } }
+
+      /* ---------- Calculator ---------- */
+      .calc { background: var(--card); border: 1px solid var(--line); border-radius: 14px; padding: 24px; box-shadow: var(--shadow); }
+      .calc-grid { display: grid; grid-template-columns: 1fr 1fr auto; gap: 26px; align-items: end; }
+      @media (max-width: 760px) { .calc-grid { grid-template-columns: 1fr; gap: 18px; } }
+      .calc label { display: block; font-weight: 600; font-size: .95rem; margin-bottom: 8px; }
+      .calc label output { font-family: "IBM Plex Mono", monospace; color: var(--felt); font-weight: 600; }
+      @media (prefers-color-scheme: dark) { .calc label output { color: #7cc7a4; } }
+      .calc input[type="range"] { width: 100%; accent-color: var(--felt); }
+      .calc .total { text-align: right; }
+      .calc .total .n { font-family: "IBM Plex Mono", monospace; font-size: clamp(2rem, 5vw, 3rem); font-weight: 600; line-height: 1; color: var(--felt); }
+      @media (prefers-color-scheme: dark) { .calc .total .n { color: #7cc7a4; } }
+      .calc .total .l { font-size: .85rem; color: var(--ink-soft); margin-top: 6px; }
+      @media (max-width: 760px) { .calc .total { text-align: left; } }
+      .calc-note { margin-top: 18px; font-size: .92rem; color: var(--ink-soft); border-top: 1px solid var(--line); padding-top: 14px; }
+
+      /* ---------- Open questions / sources ---------- */
+      .openq { background: var(--bg-raise); border: 1px solid var(--line); border-radius: 12px; padding: 20px 22px; }
+      .openq ul { margin: 6px 0 0; padding-left: 20px; }
+      .openq li { font-size: .95rem; color: var(--ink-soft); padding: 4px 0; }
+      .openq li b { color: var(--ink); }
+      footer { padding: 54px 0 60px; margin-top: 56px; border-top: 1px solid var(--line); }
+      footer h2 { font-size: 1.3rem; margin-bottom: 14px; }
+      .srcs { columns: 2; column-gap: 34px; font-size: .84rem; }
+      @media (max-width: 700px) { .srcs { columns: 1; } }
+      .srcs p { padding: 5px 0; break-inside: avoid; color: var(--ink-soft); }
+      .srcs a { word-break: break-all; }
+      .foot-note { margin-top: 22px; font-size: .84rem; color: var(--ink-faint); max-width: 44rem; }
+
+/* Same research-page system as Memory; additions support the broader factor explorer. */
+.sr-only{position:absolute;width:1px;height:1px;padding:0;margin:-1px;overflow:hidden;clip:rect(0,0,0,0);white-space:nowrap;border:0}body{font-family:"IBM Plex Sans",system-ui,sans-serif}.hero{padding-top:34px}.toolbar{display:flex;gap:10px;flex-wrap:wrap;margin:16px 0}.toolbar input,.toolbar select{font:inherit;background:var(--bg-raise);color:var(--ink);border:1px solid var(--line-strong);padding:10px 12px;border-radius:8px;min-width:0}.toolbar input{flex:1;min-width:180px}.jump{display:flex;flex-wrap:wrap;gap:16px;padding:16px 0;border-bottom:1px solid var(--line);font-size:.85rem}.status{font-size:.74rem;color:var(--ink-faint);margin-top:7px}.vcard .top{flex-wrap:wrap}.vcard h3{min-width:160px}.dim{white-space:normal}.pin{font:inherit;font-size:.8rem;margin-top:10px;padding:5px 10px;border-radius:6px;background:var(--bg-raise);color:var(--ink);border:1px solid var(--line-strong);cursor:pointer}.pin[aria-pressed=true]{border-color:var(--felt);color:var(--felt)}.compare{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-top:16px}.compare[hidden]{display:none}.compare .panel{min-width:0}.lab{position:relative;max-width:540px;height:260px;margin:20px auto;background:var(--bg-raise);border:1px solid var(--line);border-radius:12px}.lab-tile{position:absolute;width:14%;height:20%;border:2px solid var(--line-strong);border-radius:7px;color:var(--ink-faint);background:var(--card);font:600 16px system-ui;cursor:pointer}.lab-tile.free{background:var(--felt);color:white;border-color:var(--felt)}.lab-tile.upper{border-style:dashed}.lab-tile[aria-pressed=true]{outline:3px solid var(--amber);outline-offset:2px}.lab-status{min-height:3em;font-size:.9rem;color:var(--ink-soft)}.factor-controls{display:grid;grid-template-columns:repeat(3,1fr);gap:20px}.factor-controls output{float:right}.factor-controls label{margin:0}.factor-controls input{margin-top:10px}.calc .total{text-align:left;margin-top:22px}.select-factor{font:inherit;width:100%;padding:9px;background:var(--bg-raise);color:var(--ink);border:1px solid var(--line);border-radius:8px;margin-top:7px}.sticky-label{font-size:.85rem;color:var(--ink-soft)}:focus-visible{outline:3px solid var(--amber);outline-offset:3px}a{overflow-wrap:anywhere}.deck .mini{font-family:Georgia,serif}.count-chip{display:inline-block;margin-top:8px;color:var(--felt);font-weight:600}.evidence-key{display:flex;gap:14px;flex-wrap:wrap;font-size:.8rem;color:var(--ink-faint);margin-bottom:12px}@media(max-width:700px){.factor-controls{grid-template-columns:1fr 1fr}.compare{grid-template-columns:1fr}.lab{height:220px}}@media(max-width:440px){.factor-controls{grid-template-columns:1fr}.wrap{padding-inline:14px}.lab-tile{font-size:13px}.rung .big{font-size:1.7rem}}@media(prefers-reduced-motion:reduce){html{scroll-behavior:auto}}
+</style></head><body><main class="wrap">
+<div class="hero"><div class="hero-grid"><div><p class="sec-tag">Global research · Mahjong Solitaire · For Morphi</p><h1>How many Mahjong variants are there? <em>Rules are only the beginning.</em></h1><p class="lede">Hundreds of layouts. Multiple matching, timing, scoring and player formats. No authoritative worldwide total. This catalogue maps the <strong>whole design space</strong> of Mahjong Solitaire, keeping published examples, structural variants and proposed combinations clearly labelled.</p><p class="meta">Research snapshot · 5 November 2026 · Publisher documentation first · Standalone, offline HTML</p></div><div class="deck" aria-hidden="true"><div class="mini up">東</div><div class="mini up">三</div><div class="mini up">竹</div><div class="mini up">春</div><div class="mini up">七</div><div class="mini up">北</div><div class="mini up">三</div><div class="mini up">竹</div><div class="mini up">東</div><div class="mini up">七</div><div class="mini up">春</div><div class="mini up">北</div></div></div>
+<div class="stats"><div class="stat"><div class="n">28</div><div class="l">sourced catalogue entries, mixing modes and parameters — not 28 distinct rulesets</div></div><div class="stat"><div class="n">18</div><div class="l">variation dimensions, including geometry, information, goals and player format</div></div><div class="stat"><div class="n">390</div><div class="l">layouts advertised by one publisher; a product count, not a global total</div></div><div class="stat"><div class="n">3</div><div class="l">layout candidates in Morphi's current v1.3.4 draft; not an approved build</div></div><div class="stat"><div class="n">Open</div><div class="l">design space: finite under fixed limits; no universal finite ceiling when layouts can grow</div></div></div>
+<div class="answer"><strong>The short answer:</strong> there are already hundreds of published <strong>structural variants</strong>, plus multiple documented ways to change play. A Mahjong layout changes the blocking graph, not just appearance. There is no honest single “total variants” number without defining whether it counts rulesets, layouts, modes, policies or all their combinations.</div>
+<p class="meta">Layout count: <a href="https://goodsol.com/pgmj/index.html?src=mainindex">Goodsol's collection page</a>. It separately lists 55 tile-based games; many are different puzzle families. Do not add those figures or combine publishers' overlapping layout catalogues.</p>
+</div>
+<nav class="jump" aria-label="Research sections"><a href="#baseline">Baseline</a><a href="#counting">Counting</a><a href="#catalogue">Catalogue</a><a href="#dimensions">Dimensions</a><a href="#lab">Rule explorer</a><a href="#combinations">Combinations</a><a href="#engineering">Implementation</a><a href="#boundaries">Related games</a><a href="#sources">Sources</a></nav>
+<section id="baseline"><div class="sec-head"><p class="sec-tag">The baseline</p><h2>Mahjong Solitaire, in four moves</h2><p>This research concerns the solo stacked-tile game, also called Shanghai. Four-player hand-building Mahjong belongs to a different game family.</p></div><div class="baseline"><div class="base-step"><p class="k">01 · DEAL</p><p>Tiles form a layered layout. Covered faces may be partly or fully hidden.</p></div><div class="base-step"><p class="k">02 · FIND FREE TILES</p><p>Nothing may cover a tile, and at least one long side must be open.</p></div><div class="base-step"><p class="k">03 · MATCH A PAIR</p><p>Remove matching free tiles. Standard Flowers and Seasons match within their own groups.</p></div><div class="base-step"><p class="k">04 · OPEN THE BOARD</p><p>Clear every tile. Without recovery aids, a board with tiles left and no legal pair is blocked.</p></div></div><p class="meta">Baseline: <a href="https://goodsol.com/pgmj/tilematching.html">Goodsol's tile-matching rules</a>. Implementations differ; this is the comparison baseline, not a universal software specification.</p></section>
+<section id="counting"><div class="sec-head"><p class="sec-tag">The counting rule</p><h2>Count each kind of variety on its own terms</h2><p>The earlier variant reports emphasise rule changes. This report keeps the same structure and adds a broader taxonomy suited to Mahjong. Each catalogue entry has one primary dimension and an explicit evidence type; entries can overlap and must not be added together as unique games.</p></div><div class="split2"><div class="panel"><h3><span class="badge yes">PLAY VARIETY</span> More than rules alone</h3><ul><li><b>Rules &amp; mechanics</b><span>What may match, which edges open a tile, what a move changes and what ends a round.</span></li><li><b>Structural variants</b><span>Tile count, depth, overlap, row lengths, disconnected stacks and the graph of blockers. These can change strategy under identical removal rules.</span></li><li><b>Mode &amp; policy variants</b><span>Countdowns, target objectives, score systems, aids, fair-deal guarantees, daily attempts and competitive formats.</span></li></ul></div><div class="panel"><h3><span class="badge no">KEEP SEPARATE</span> Avoid inflated totals</h3><ul><li><b>Cosmetic themes</b><span>Artwork, sound and backgrounds affect readability or feel. Under Morphi's contract, they never change legality, difficulty or score.</span></li><li><b>New seeds</b><span>New deals are replay content within a variant, not automatically new variants.</span></li><li><b>Duplicate names &amp; products</b><span>Two publishers may use the same layout name for different geometry, or different names for equivalent geometry. Counts here are not a deduplicated world registry.</span></li></ul></div></div></section>
+<section id="catalogue"><div class="sec-head"><p class="sec-tag">The catalogue</p><h2>28 researched examples, each with its actual difference</h2><p>Filter by the main factor, search a name, or compare two entries. “Publisher mode” identifies a released format; “Parameter” identifies a sourced implementation choice or layout. Microsoft details marked “Community detail” are version-specific walkthrough evidence, with publisher confirmation that the modes exist.</p></div><div class="chips" id="chips" role="group" aria-label="Filter catalogue by dimension"></div><div class="toolbar"><label class="sr-only" for="search">Search catalogue</label><input id="search" type="search" placeholder="Search name, mechanic or publisher…"><label class="sr-only" for="kind">Evidence type</label><select id="kind"><option value="all">All evidence types</option><option value="Publisher mode">Publisher modes</option><option value="Parameter">Parameters &amp; layouts</option><option value="Community detail">Community detail</option></select><button class="chip" id="clearFilters" type="button">Reset filters</button></div><div class="vcount" id="vcount" aria-live="polite"></div><div class="vgrid" id="catalogueGrid"></div><div class="compare" id="comparison" hidden aria-live="polite"></div><noscript><p>The interactive catalogue needs JavaScript. The baseline, dimensions, methodology, implementation notes and all source links below remain readable without it.</p></noscript></section>
+<section id="dimensions"><div class="sec-head"><p class="sec-tag">The anatomy of variation</p><h2>18 dimensions — not 18 independent switches</h2><p>Some factors change decisions, some organise play, and some improve presentation. The labels below distinguish observed examples from design possibilities. Geometry, tile count and depth are coupled; a smaller board is not automatically an easier one.</p></div><div class="dims" id="dimensionGrid"></div></section>
+<section id="lab"><div class="sec-head"><p class="sec-tag">The interactive rule explorer</p><h2>Same tiles. Different open edges. Different choices.</h2><p>This schematic isolates the freedom rule described by Shanghai's Windstorm manual. Green tiles are free; neutral tiles are blocked. The dashed tile sits above the centre tile. Choose the permitted exit direction, then inspect a tile. This is an explanatory diagram, not a playable deal or a reconstruction of the original game.</p></div><div class="chips" id="windControls" role="group" aria-label="Allowed exit direction"><button class="chip" type="button" data-wind="horizontal" aria-pressed="true">Left or right</button><button class="chip" type="button" data-wind="vertical" aria-pressed="false">Up or down</button><button class="chip" type="button" data-wind="both" aria-pressed="false">Any of four sides</button></div><div class="lab" id="tileLab" role="group" aria-label="Tile freedom diagram"></div><p class="lab-status" id="labStatus" aria-live="polite"></p><p class="meta">Source: <a href="https://sloperama.com/shanghai/Images/menus.htm">Shanghai: Second Dynasty manual preserved by its designer</a>. The diagram and tile geometry are original illustrations.</p></section>
+<section id="combinations"><div class="sec-head"><p class="sec-tag">The scale above the catalogue</p><h2>From published examples to a design-space estimate</h2><p>A product can combine validated layouts with clock, scoring, objective and assistance choices. This calculator counts hypothetical configuration slots. It does not count published games, prove compatibility, or promise that every combination is fun.</p></div><div class="ladder"><div class="rung"><div class="big">390 layouts</div><div class="what"><b>One publisher's observed catalogue size</b><span>Goodsol reports this number. It is evidence that layout variety alone reaches hundreds, not a count of mechanical rulesets.</span></div></div><div class="rung"><div class="big">3 candidates</div><div class="what"><b>Morphi's current draft</b><span>Turtle, Quick and Fortress are structural variants with one core match rule. The local prototype's geometries and small face set are provisional, not canonical published layouts.</span></div></div><div class="rung"><div class="big">No fixed ceiling</div><div class="what"><b>When layout size and rule design may expand</b><span>Under a fixed tile count and fixed option list the space is finite. Without those limits, no universal finite total follows. Seeds and cosmetic themes are excluded here.</span></div></div></div>
+<div class="calc"><div class="chips"><button class="chip" id="draftPreset" type="button">Current draft: 3 configurations</button><button class="chip" id="explorePreset" type="button">Illustrative expansion</button></div><div class="factor-controls" id="factorControls"></div><div class="total"><div class="n" id="combinationTotal">3</div><div class="l">hypothetical configuration slots · product of selected option counts</div></div><p class="calc-note" id="combinationFormula"></p><p class="calc-note">This is an upper-bound planning product before deduplication and compatibility filtering. For example, a no-score Zen mode cannot meaningfully vary ranked score formulas, and an objective to clear target tiles changes which layout/deal distributions are valid. Layout count already bundles size and depth, so those axes are not multiplied a second time.</p></div></section>
+<section><div class="sec-head"><p class="sec-tag">The quality gate</p><h2>Five checks before calling a combination a useful variant</h2></div><div class="tests"><div class="test"><div class="tn"></div><p><b>Does the decision change?</b>A new layout should change meaningful dependencies, not only move an unchanged board around.</p></div><div class="test"><div class="tn"></div><p><b>Is the challenge understandable?</b>Show why a tile is blocked and explain any new win condition without a long tutorial.</p></div><div class="test"><div class="tn"></div><p><b>Can it be solved fairly?</b>Validate the layout and generated deal. A solvable starting position does not make every legal player choice safe.</p></div><div class="test"><div class="tn"></div><p><b>Can it be played on a phone?</b>144 tiny targets can fail even when a screenshot fits. Geometry, hit regions, layers and zoom need direct review.</p></div><div class="test"><div class="tn"></div><p><b>Can scores be compared?</b>Different assistance, timers, objectives or difficulty distributions require a deliberate ranking policy.</p></div></div></section>
+<section id="engineering"><div class="sec-head"><p class="sec-tag">Data versus new mechanics</p><h2>Same core can support variety — each axis still has a cost</h2><p>These are Morphi planning judgments, not measured effort estimates or a code audit. Each item still needs generation, replay, accessibility and responsive evidence.</p></div><div class="split2"><div class="panel"><h3><span class="badge yes">CORE REUSE</span> Data and configuration</h3><ul class="mech-list"><li><b>Layout records</b><span> — explicit positions, layers, covers and side blockers. More data still means more solvability and sizing work.</span></li><li><b>Face composition</b><span> — match-group ids, vocabulary and copy counts, with parity and solution validation.</span></li><li><b>Clock / score / objective</b><span> — reusable policies only after the family has authoritative implementations and separate ranking scopes.</span></li></ul></div><div class="panel"><h3><span class="badge no">NEW BEHAVIOR</span> State and interaction</h3><ul class="mech-list"><li><b>Wind direction, shuffle tiles, boosters</b><span> — new transitions, move records, explanations and replay cases.</span></li><li><b>Daily attempts and campaigns</b><span> — scheduling, persistence and eligibility work beyond a new board file.</span></li><li><b>Competitive or 3D play</b><span> — coordination or rendering/input architecture; not a small theme option.</span></li></ul></div></div><div class="implication"><b>For v1.3.4:</b> this research supports layout-driven growth and a wider future palette of mechanics. It does not promote the whole catalogue into the build. The current proposal, its acceptance gates and owner-directed verification schedule remain separate.</div></section>
+<section id="boundaries"><div class="sec-head"><p class="sec-tag">Family boundaries</p><h2>Related Mahjong-branded games deserve their own labels</h2><p>A broad discovery catalogue can include these branches. A strict count of stacked pair-removal variants should show them separately. These classifications are editorial judgments; publishers often market all of them as “Mahjong”.</p></div><div id="boundaryRows"></div></section>
+<section><div class="sec-head"><p class="sec-tag">What remains uncertain</p><h2>The limits are part of the research</h2></div><div class="openq"><ul><li><b>No exhaustive world registry.</b> The 28 entries are a curated research set, not a census or a mathematical maximum.</li><li><b>Layout names are not specifications.</b> Turtle and Fortress need exact coordinates, face distribution and freedom tests before implementation. The local visual draft is not such a specification.</li><li><b>Counts overlap.</b> One released game may combine countdown, combos, assists and several layouts. The catalogue groups by main factor rather than pretending entries are disjoint.</li><li><b>Version differences matter.</b> Microsoft modes are publisher-confirmed; detailed Lightning/Match/Score rules are community walkthrough evidence, not a tested current binary.</li><li><b>Historical multiplayer is historical evidence.</b> Shanghai manuals prove published formats, not that their online services work today.</li><li><b>Generation study is limited.</b> Meow-Jong's experiment uses its own exact-face distribution, finite samples and an explicit search budget. It is not a universal solvability percentage for every Mahjong product.</li><li><b>No popularity ranking.</b> No reliable per-variant replay or retention comparison was established. Suggested Morphi fit is design judgment.</li><li><b>No silent plan changes.</b> Neither source data, research examples nor proposed combinations accept the v1.3.4 game or authorize implementation/deployment.</li></ul></div></section>
+<footer id="sources"><h2>Sources</h2><p class="meta">Direct publisher, official documentation and original research links are preferred. A secondary walkthrough is identified explicitly. Source pages were read for this 5 November 2026 snapshot; live games, paid downloads and historical network services were not installed or auditioned.</p><div class="srcs" id="sourceList"></div><p class="foot-note">Same research-page layout and interaction pattern as Morphi's Memory and Connect variant reports. Sources remain attached to entries. This file has no external script, font, image or API dependency; only source links require the internet. Research conclusions are independent of the provisional playable demo.</p></footer>
+</main>
+<script>
+'use strict';
+const SOURCES={
+ baseline:{name:'Goodsol — classic tile matching',url:'https://goodsol.com/pgmj/tilematching.html',type:'Publisher rules',note:'Free edges, matching groups and standard clear condition.'},
+ goodsol:{name:'Goodsol — collection and layout inventory',url:'https://goodsol.com/pgmj/index.html?src=mainindex',type:'Publisher catalogue',note:'Advertises 390 layouts and 55 tile-based games separately; not 445 rulesets.'},
+ layouts:{name:'TheMahjong — layout variety',url:'https://themahjong.com/',type:'Publisher description',note:'Homepage advertises 260+ layouts; do not add to other publishers’ counts.'},
+ fortress:{name:'TheMahjong — Fortress',url:'https://themahjong.com/mahjong/fortress-free-mahjong',type:'Publisher layout',note:'An explicit multilayer layout. Its older 200+ site count differs from the homepage.'},
+ spider:{name:'Mahjong Ninja — Spider',url:'https://mahjong.ninja/mahjong-spider/',type:'Publisher layout',note:'Named layout and separate presentation options.'},
+ shanghai:{name:'Shanghai: Second Dynasty — preserved manual',url:'https://sloperama.com/shanghai/Images/menus.htm',type:'Historical primary manual',note:'Designer-hosted documentation of released formats and settings.'},
+ kde:{name:'KDE — KMahjongg interface',url:'https://docs.kde.org/stable_kf6/en/kmahjongg/kmahjongg/interface.html',type:'Official documentation',note:'Layout editing, undo, hints, shuffle and view rotation.'},
+ meow:{name:'Meow-Jong — original solvability study',url:'https://www.meowjong.com/mahjong-solitaire/is-mahjong-solitaire-always-solvable/',type:'Developer research',note:'160 layouts in its sample; own face distribution, finite trials and bounded solver.'},
+ legend:{name:'Arkadium — Solitaire II modes',url:'https://support.arkadium.com/en/support/solutions/articles/44002570312--mahjong-solitaire-ii-legend-how-to-play-tips-scoring',type:'Publisher rules',note:'Zen and daily challenge constraints; modes overlap other factors.'},
+ candy:{name:'Arkadium — Candy rules',url:'https://support.arkadium.com/support/solutions/articles/44001824783--mahjong-candy-how-to-play-tips-scoring',type:'Publisher rules',note:'Countdown, multipliers, chaining and shuffle cost.'},
+ toy:{name:'Arkadium — Toy Chest rules',url:'https://support.arkadium.com/support/solutions/articles/44001865336--mahjong-toy-chest-how-to-play-special-tiles-scoring',type:'Publisher rules',note:'Guitar shuffle tiles and top-down/isometric view choice.'},
+ microsoft:{name:'Microsoft — Mahjong modes',url:'https://www.microsoftcasualgames.com/mahjong',type:'Publisher overview',note:'Five named daily modes; Golden Tiles objective described directly.'},
+ walkthrough:{name:'TrueAchievements — Microsoft mobile walkthrough',url:'https://www.trueachievements.com/game/mahjong-by-microsoft/walkthrough/3',type:'Secondary community guide',note:'Detailed Lightning, Match Attack and Score Attack descriptions; version-specific.'},
+ g5:{name:'G5 — Mahjong Journey support',url:'https://support.g5.com/hc/en-us/articles/115005748769-Mahjong-Journey',type:'Publisher support',note:'Booster effects and speed-based combo scoring.'},
+ dimensions:{name:'Arkadium — Dimensions',url:'https://support.arkadium.com/en/support/solutions/articles/44001959343--mahjong-dimensions-how-to-play-tips-scoring',type:'Publisher rules',note:'Rotatable three-dimensional blocks and score bonuses.'},
+ dark:{name:'Arkadium — Dark Dimensions',url:'https://support.arkadium.com/support/solutions/articles/44001813492--mahjong-dark-dimensions-how-to-play-tips-scoring',type:'Publisher rules',note:'Ongoing 3D levels with time-extension blocks.'},
+ remix:{name:'Arkadium — Remix',url:'https://support.arkadium.com/support/solutions/articles/44001938893--mahjong-remix-how-to-play-scoring',type:'Publisher rules',note:'Pair legality depends on a path of at most three orthogonal segments.'},
+ origins:{name:'Goodsol — original tile games',url:'https://goodsol.com/pgmj/solitaire.html',type:'Publisher explanation',note:'Distinguishes card-solitaire adaptations from classic pair removal.'},
+ tray:{name:'GameDavinci — Tray Match',url:'https://www.gamedavinci.com/game/tray-match/',type:'Developer rules',note:'Uncovered tiles enter a seven-slot tray; three alike clear.'},
+ riichi:{name:'European Mahjong Association — Riichi rules',url:'https://mahjong-europe.org/portal/index.php?Itemid=166&id=30&option=com_content&view=article',type:'Rules organisation',note:'Hand-building competition Mahjong, outside stacked solitaire.'},
+ complexity:{name:'De Bondt — solving with peeking',url:'https://arxiv.org/abs/1203.6559',type:'Research paper',note:'Perfect-information solving is NP-complete; not a runtime performance benchmark.'}
+};
+const CATS={board:'Board & structure',match:'Match & composition',clock:'Time',series:'Progression & attempts',dynamic:'Board dynamics',score:'Scoring',goal:'Objectives',help:'Assistance',deal:'Deal generation',players:'Player format',view:'View & usability'};
+const ENTRIES=[
+ ['Turtle layout','board','Parameter','Layered geometry gives a particular graph of covers and side blockers. A new deal keeps that graph.',['layouts'],'Structural variant; a named layout still needs exact coordinates.'],
+ ['Fortress layout','board','Parameter','A different multilayer footprint changes the routes by which tiles become available.',['fortress'],'Structural variant, not a new matching rule.'],
+ ['Spider layout','board','Parameter','A published alternative board arrangement within Mahjong Solitaire.',['spider'],'Do not confuse this layout with Mahjongg Spider, the card-solitaire adaptation.'],
+ ['Compact teaching boards','board','Parameter','Shanghai includes smaller learning layouts with fewer than 72 tiles.',['shanghai'],'Tile count and depth are substantive difficulty parameters, not a new removal rule.'],
+ ['Custom layout topology','board','Parameter','KMahjongg includes a layout editor with explicit tile positions and levels.',['kde'],'Layout data still needs solvability and small-screen validation.'],
+ ['Flower / Season match groups','match','Parameter','Each bonus group allows non-identical faces to match within that group.',['baseline'],'Part of the baseline here; separates visual identity from match identity.'],
+ ['Exact-face-only matching','match','Parameter','Meow-Jong uses identical faces and no Flower/Season matching groups.',['meow'],'A sourced match-policy alternative; not a newly invented named mode.'],
+ ['Copy distribution / face vocabulary','match','Parameter','Meow-Jong describes a picture pool with faces appearing four times or twice on smaller boards.',['meow'],'Multiplicity changes which partner choices exist; not merely a new skin.'],
+ ['Zen / clock-free play','clock','Publisher mode','Solitaire II offers a mode without a timer and does not record a competitive score there.',['legend'],'Pace and ranking policy change together.'],
+ ['Stopwatch best-time play','clock','Publisher mode','Shanghai optionally records the time taken to clear a board.',['shanghai'],'No deadline is implied by a stopwatch.'],
+ ['Countdown clear','clock','Publisher mode','Candy asks players to clear the board within five minutes.',['candy'],'Changes the failure condition; 60 versus 120 seconds alone is tuning.'],
+ ['Daily challenge with limited attempts','series','Publisher mode','Solitaire II fixes a daily deal, grants three attempts, permits one shuffle and sets a ten-minute limit.',['legend'],'Schedule, resources and clock form one combined published format.'],
+ ['Arcade series','series','Publisher mode','Shanghai Arcade chains 25 timed solitaire games into one challenge.',['shanghai'],'Series structure is a play format even with unchanged pair rules.'],
+ ['Windstorm','dynamic','Publisher mode','Shanghai changes which exit directions make a tile available.',['shanghai'],'A rule transition, not camera rotation. Explore the schematic below.'],
+ ['Multiplier and same-symbol chaining','score','Publisher mode','Candy rewards early multiplier tiles and consecutive matches of the same symbol.',['candy'],'The scoring system changes which legal pair is most valuable next.'],
+ ['Match-triggered reshuffle','dynamic','Publisher mode','Toy Chest guitar pairs shuffle the remaining board.',['toy'],'Special-tile behavior; not just toy-themed artwork.'],
+ ['Golden Tiles objective','goal','Publisher mode','Microsoft asks players to uncover and match designated golden pairs rather than clear the entire board.',['microsoft'],'Target-only completion changes which removals are necessary.'],
+ ['Lightning Tiles move deadlines','goal','Community detail','The mobile walkthrough describes special pairs whose counters decrease after matches; a zero counter loses.',['microsoft','walkthrough'],'Mode existence is publisher-confirmed; detailed counter behavior is community evidence.'],
+ ['Match Attack','goal','Community detail','The mobile walkthrough describes a required number of matches before time expires.',['microsoft','walkthrough'],'A partial-board target differs from clearing every tile. Exact limits depend on the challenge.'],
+ ['Score Attack','goal','Community detail','The mobile walkthrough describes reaching a target score under a time limit.',['microsoft','walkthrough'],'A score target may favor chains over the shortest board-clearing path.'],
+ ['Active booster set','help','Publisher mode','Journey offers effects including automatic pair removal, combo freezing, hints, shuffle and undo.',['g5'],'Mechanics-rich assistance; exact amounts and economy are product-specific.'],
+ ['Hint / undo / shuffle policy','help','Parameter','KMahjongg exposes hints, undo/redo and shuffle as distinct actions.',['kde'],'Unlimited, capped, penalized and ranked-disabled policies are different design choices, not all verified named modes.'],
+ ['Guaranteed-winnable deal','deal','Parameter','Shanghai can require that an initial deal has at least one solution.',['shanghai'],'A solvable deal does not guarantee every legal choice succeeds.'],
+ ['Unconstrained random deal','deal','Parameter','Shanghai allows the guarantee to be disabled; a random deal may be impossible.',['shanghai'],'Observed policy, not a recommendation for Morphi.'],
+ ['Two-player alternating turns','players','Publisher mode','Shanghai offers two players taking turns with one mouse.',['shanghai'],'Shared-board turn-taking changes competition and move ownership.'],
+ ['Dynasty separate-board race','players','Publisher mode','Shanghai races players to clear their own layouts, with power tiles.',['shanghai'],'Historical format; current online-service availability was not verified.'],
+ ['Pandamonium shared-board race','players','Publisher mode','Shanghai has simultaneous competition on one shared layout.',['shanghai'],'Needs coordinated actions; not the same as separate-board time comparison.'],
+ ['Top-down / isometric view','view','Parameter','Toy Chest can switch the same board between two perspectives.',['toy'],'Usability variation; view changes alone do not change legal moves or create a ranked ruleset.']
+].map((a,i)=>({id:i+1,name:a[0],cat:a[1],kind:a[2],rule:a[3],sources:a[4],note:a[5]}));
+const FACTORS=[
+ ['Blocking topology','Observed','Covers, side neighbors, long rows, separate islands and bottlenecks. Layout variation is functional.','board'],
+ ['Tile count','Observed','Compact versus large deals changes scan load and run length; source counts are not universal standards.','board'],
+ ['Depth & overlap','Observed','More layers hide faces and create cover dependencies; exact offsets matter.','board'],
+ ['Match relation','Observed','Exact face versus bonus match groups. Faces are not necessarily match keys.','match'],
+ ['Match size / arity','Boundary','Pairs directly from the board versus triples collected in a tray; often a different family.','match'],
+ ['Copies & face vocabulary','Observed','How often a face repeats controls ambiguity and partner choices.','match'],
+ ['Information & visibility','Research / design','Covered faces, optional peeking and hidden identities change knowledge. A face-down flip game crosses toward Memory.','match'],
+ ['Clock policy','Observed','No clock, stopwatch or countdown. Exact duration is another tuning parameter.','clock'],
+ ['Goal & end condition','Observed','Clear all, collect targets, reach a match count or score.','goal'],
+ ['Score priorities','Observed','Time, chains, special tile values and completion bonuses influence pair order.','score'],
+ ['Board dynamics','Observed','Changing exit directions and tile-triggered shuffle alter state during play.','dynamic'],
+ ['Assistance & resources','Observed','Undo, hint, shuffle and boosters affect recovery and score comparability.','help'],
+ ['Deal guarantees','Observed','Random, initially solvable or stronger safety promises are different policies.','deal'],
+ ['Player model','Observed','Solo, alternating, separate-board race and simultaneous shared-board play.','players'],
+ ['Progression & schedule','Observed','Single run, series, daily fixed deal and attempt budget.','series'],
+ ['Difficulty distribution','Design parameter','Measure branching, blockers and solution depth; size alone cannot define difficulty.','board'],
+ ['View & interaction','Observed','Perspective, keyboard/touch, zoom and hit targets affect usability; not automatically a game mode.','view'],
+ ['Cosmetics & feedback','Presentation','Symbol art, sounds and entrance motion affect readability and feel. Morphi keeps them independent of difficulty and score.','view']
+];
+const BOUNDARIES=[
+ ['Mahjong Connect / Remix','Route planning replaces the open-side test.','Match pairs through an unblocked orthogonal route; Remix permits at most three segments.','remix'],
+ ['Great Wall / collapse matching','The board falls after adjacent matches.','Goodsol describes adjacent identical tiles followed by a falling wall.','goodsol'],
+ ['Memory with Mahjong tiles','Hidden-card recall replaces spatial unblocking.','Goodsol explicitly includes Pelmanism, a flip-and-remember game using the tiles.','goodsol'],
+ ['Mahjongg FreeCell / Spider','Card-solitaire structures expressed with Mahjong tiles.','Suit-building and holding cells are not the classic stacked pair-removal loop.','origins'],
+ ['Rotatable 3D Dimensions','Spatial matching becomes a three-dimensional navigation problem.','Arkadium rotates blocks and uses open-edge eligibility; editorially a major branch, not a small layout option.','dimensions'],
+ ['Dark Dimensions','Survival and time-extension mechanics within that 3D branch.','Timer blocks extend a run across continuing levels. Not merely a dark theme.','dark'],
+ ['Triple tray matching','One tile at a time enters a capacity-limited tray.','Developer example: seven slots; three identical tiles clear. This is not just three-at-once classic Mahjong.','tray'],
+ ['Riichi / four-player Mahjong','Draw, discard and build a hand against opponents.','Competition Mahjong has a separate rules tradition. Its regional variants are outside this solitaire catalogue.','riichi']
+];
+function make(tag,cls,content){const e=document.createElement(tag);if(cls)e.className=cls;if(content!==undefined)e.textContent=content;return e;}
+function sourceLink(key){const s=SOURCES[key],a=make('a','',s.name);a.href=s.url;a.target='_blank';a.rel='noopener noreferrer';return a;}
+let active='all';const pinned=new Set();
+const catalogueGrid=document.getElementById('catalogueGrid');
+ENTRIES.forEach(e=>{const card=make('article','vcard');card.dataset.id=e.id;const top=make('div','top');top.append(make('span','num',String(e.id).padStart(2,'0')),make('h3','',e.name),make('span','dim',CATS[e.cat]));card.append(top,make('p','rule',e.rule),make('p','status',e.kind));const details=make('details','');details.append(make('summary','', 'Evidence & interpretation'));details.append(make('p','flag',e.note));const links=make('p','src');e.sources.forEach((key,i)=>{if(i)links.append(document.createTextNode(' · '));links.append(sourceLink(key));});details.append(links);card.append(details);const pin=make('button','pin','Compare');pin.type='button';pin.setAttribute('aria-pressed','false');pin.setAttribute('aria-label','Compare '+e.name);pin.addEventListener('click',()=>{if(pinned.has(e.id))pinned.delete(e.id);else if(pinned.size<2)pinned.add(e.id);else{document.getElementById('vcount').textContent='Two entries are selected. Unselect one to compare another.';return;}pin.setAttribute('aria-pressed',String(pinned.has(e.id)));pin.textContent=pinned.has(e.id)?'Remove comparison':'Compare';renderCompare();});card.append(pin);catalogueGrid.append(card);});
+function renderCompare(){const area=document.getElementById('comparison');area.replaceChildren();area.hidden=pinned.size===0;for(const id of pinned){const e=ENTRIES.find(x=>x.id===id);const p=make('div','panel');p.append(make('p','sec-tag','Selected comparison'),make('h3','',e.name),make('p','',CATS[e.cat]+' · '+e.kind),make('p','rule',e.rule),make('p','flag',e.note));area.append(p);}if(pinned.size===1)area.append(make('p','sticky-label','Choose one more entry to compare.'));}
+const chips=document.getElementById('chips');
+[['all','All entries'],...Object.entries(CATS)].forEach(([key,label])=>{const b=make('button','chip',label+' '+(key==='all'?ENTRIES.length:ENTRIES.filter(e=>e.cat===key).length));b.type='button';b.dataset.filter=key;b.setAttribute('aria-pressed',String(key==='all'));b.addEventListener('click',()=>{active=key;applyFilters();});chips.append(b);});
+function applyFilters(){const q=document.getElementById('search').value.toLowerCase().trim(),kind=document.getElementById('kind').value;let count=0;for(const e of ENTRIES){const match=(active==='all'||active===e.cat)&&(kind==='all'||kind===e.kind)&&[e.name,e.rule,e.note,...e.sources.map(x=>SOURCES[x].name)].join(' ').toLowerCase().includes(q);catalogueGrid.querySelector('[data-id="'+e.id+'"]').hidden=!match;if(match)count++;}chips.querySelectorAll('button').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.filter===active)));document.getElementById('vcount').textContent='Showing '+count+' of '+ENTRIES.length+' research entries · overlapping modes and parameters, not unique rulesets';}
+document.getElementById('search').addEventListener('input',applyFilters);document.getElementById('kind').addEventListener('change',applyFilters);document.getElementById('clearFilters').addEventListener('click',()=>{active='all';document.getElementById('search').value='';document.getElementById('kind').value='all';applyFilters();});applyFilters();
+FACTORS.forEach(([name,status,desc,cat],i)=>{const c=make('div','dimcard');c.append(make('div','n',String(i+1).padStart(2,'0')),make('h3','',name),make('p','',desc),make('p','status',status));const b=make('button','pin','Explore examples');b.type='button';b.addEventListener('click',()=>{active=cat;document.getElementById('search').value='';document.getElementById('kind').value='all';applyFilters();document.getElementById('catalogue').scrollIntoView();});c.append(b);document.getElementById('dimensionGrid').append(c);});
+const labTiles=[];for(let y=0;y<3;y++)for(let x=0;x<5;x++)labTiles.push({x,y,z:0});labTiles.push({x:2,y:1,z:1});let wind='horizontal',inspected=labTiles[0];
+function tileInfo(t){const covered=labTiles.some(o=>o.z>t.z&&o.x===t.x&&o.y===t.y);const has=(dx,dy)=>labTiles.some(o=>o.z===t.z&&o.x===t.x+dx&&o.y===t.y+dy);const h=!has(-1,0)||!has(1,0),v=!has(0,-1)||!has(0,1);return {covered,h,v,free:!covered&&(wind==='horizontal'?h:wind==='vertical'?v:h||v)};}
+labTiles.forEach((t,i)=>{const b=make('button','lab-tile'+(t.z?' upper':''),t.z?'Top':String(i+1));b.type='button';b.style.left=(9+t.x*16+(t.z?2:0))+'%';b.style.top=(14+t.y*23-(t.z?5:0))+'%';b.style.zIndex=String(t.z+1);b.addEventListener('click',()=>{inspected=t;updateLab();});t.button=b;document.getElementById('tileLab').append(b);});
+function updateLab(){labTiles.forEach((t,i)=>{const info=tileInfo(t);t.button.classList.toggle('free',info.free);t.button.setAttribute('aria-pressed',String(inspected===t));t.button.setAttribute('aria-label',(t.z?'Upper tile':'Tile '+(i+1))+': '+(info.free?'free':'blocked'));});document.querySelectorAll('[data-wind]').forEach(b=>b.setAttribute('aria-pressed',String(b.dataset.wind===wind)));const info=tileInfo(inspected),count=labTiles.filter(t=>tileInfo(t).free).length;document.getElementById('labStatus').textContent=count+' of '+labTiles.length+' tiles are free. Selected '+(inspected.z?'upper tile':'tile '+(labTiles.indexOf(inspected)+1))+': '+(info.covered?'blocked by the tile above.':info.free?'free under the selected exit rule.':'blocked on both permitted sides.');}
+document.querySelectorAll('[data-wind]').forEach(b=>b.addEventListener('click',()=>{wind=b.dataset.wind;updateLab();}));updateLab();
+const knobs=[['layouts','Validated layouts',1,100,3],['clocks','Clock policies',1,3,1],['scores','Scoring policies',1,4,1],['goals','Goal types',1,4,1],['helps','Assistance policies',1,4,1]];
+knobs.forEach(([id,label,min,max,value])=>{const wrap=make('div','');const lab=make('label','',label+' ');lab.htmlFor=id;const out=make('output','',String(value));out.id=id+'Out';lab.append(out);const input=make('input','');input.type='range';input.id=id;input.min=min;input.max=max;input.value=value;input.addEventListener('input',calc);wrap.append(lab,input);document.getElementById('factorControls').append(wrap);});
+function calc(){let total=1;const parts=[];knobs.forEach(([id,label])=>{const n=Number(document.getElementById(id).value);total*=n;document.getElementById(id+'Out').textContent=n;parts.push(n+' '+label.toLowerCase());});document.getElementById('combinationTotal').textContent=total.toLocaleString('en-US');document.getElementById('combinationFormula').textContent=parts.join(' × ')+' = '+total.toLocaleString('en-US')+' configuration slots before compatibility filtering.';}
+function preset(values){knobs.forEach(([id],i)=>document.getElementById(id).value=values[i]);calc();}document.getElementById('draftPreset').onclick=()=>preset([3,1,1,1,1]);document.getElementById('explorePreset').onclick=()=>preset([12,3,2,2,2]);calc();
+BOUNDARIES.forEach(([name,why,rule,src])=>{const row=make('div','brow');const p1=make('p','');p1.append(make('b','','Core difference'),document.createTextNode(why));const p2=make('p','');p2.append(make('b','','Evidence'),document.createTextNode(rule+' '),sourceLink(src));row.append(make('h3','',name),p1,p2);document.getElementById('boundaryRows').append(row);});
+Object.entries(SOURCES).forEach(([key,s],i)=>{const p=make('p','');p.id='source-'+key;p.append(make('b','',String(i+1).padStart(2,'0')+' · '+s.type+' — '),sourceLink(key),document.createTextNode('. '+s.note));document.getElementById('sourceList').append(p);});
+</script></body></html>

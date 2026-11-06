@@ -2,7 +2,7 @@ import { afterAll, beforeAll, expect, it } from 'vitest';
 import { readFile, readdir } from 'node:fs/promises';
 import { getPlatformProxy } from 'wrangler';
 import { catalog } from '../../src/lib/catalog.js';
-import type { CompletedRun } from '../../src/lib/engine/contract.js';
+import type { CompletedRun, PuzzleId } from '../../src/lib/engine/contract.js';
 import { defaultScoreConfig } from '../../src/lib/scoring.js';
 import { CARD_RANKED_OPENING_MS } from '../../src/lib/round-timing.js';
 import { createMemoryRound } from '../../src/lib/puzzles/memory/logic.js';
@@ -19,7 +19,9 @@ import {
 	gameOverview,
 	enabledVariants,
 	gameAvailable,
-	gameStatistics
+	gameStatistics,
+	queryActivityCounts,
+	type ActivityMappingEntry
 } from '../../src/lib/server/games.js';
 import {
 	accountHistory,
@@ -145,6 +147,202 @@ it('reconciles ignored, played, abandoned, finished and open independently of im
 	expect(counts.shown).toBe(counts.ignored + counts.played);
 	expect(counts.played).toBe(counts.abandoned + counts.finished + counts.open);
 	expect(counts.rows.reduce((sum, row) => sum + row.completed, 0)).toBe(2);
+});
+
+it('binds 40 synthetic groups in one parameter and reconciles exact counts across boundaries', async () => {
+	const db = proxy.env.DB;
+	const syntheticFamily = 'synth-fam' as PuzzleId;
+	const varA = 'synth:var-a';
+	const varB = 'synth:var-b';
+	const defaultVar = varA;
+
+	const groupsA = Array.from({ length: 26 }, (_, i) => `synth-grp-${i + 1}`);
+	const groupsB = Array.from({ length: 14 }, (_, i) => `synth-grp-${26 + i + 1}`);
+	const mapping: ActivityMappingEntry[] = [
+		...groupsA.map((rulesGroup) => ({
+			family: syntheticFamily,
+			variant: varA,
+			defaultVariant: defaultVar,
+			rulesGroup
+		})),
+		...groupsB.map((rulesGroup) => ({
+			family: syntheticFamily,
+			variant: varB,
+			defaultVariant: defaultVar,
+			rulesGroup
+		}))
+	];
+	expect(mapping).toHaveLength(40);
+
+	const u1 = crypto.randomUUID(),
+		u2 = crypto.randomUUID(),
+		u3 = crypto.randomUUID(),
+		u4 = crypto.randomUUID();
+
+	try {
+		await db.batch([
+			// 1. Registered start for varA with first move, completed in group 26 (crosses old 25-group threshold)
+			db
+				.prepare(
+					'INSERT INTO play_session(id,user_id,family,seed,engine_version,created_at,expires_at,ip_hash,variant,first_move_at) VALUES(?,?,?,?,?,?,?,?,?,?)'
+				)
+				.bind(u1, userId, syntheticFamily, '1', 'synth-1', now, now - 1000, 'test', varA, now + 1),
+			db
+				.prepare(
+					'INSERT INTO completed_run(id,user_id,family,engine_version,rules_group,score,moves,seconds,seed,move_log,payload_hash,ranked,hidden,created_at,score_config_version) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+				)
+				.bind(
+					u1,
+					userId,
+					syntheticFamily,
+					'synth-1',
+					'synth-grp-26',
+					1000,
+					10,
+					20,
+					'1',
+					'[]',
+					'hash1',
+					1,
+					0,
+					now + 2,
+					'v1'
+				),
+
+			// 2. Imported guest completion for varA in group 1 (no start session exists)
+			db
+				.prepare(
+					'INSERT INTO completed_run(id,user_id,family,engine_version,rules_group,score,moves,seconds,seed,move_log,payload_hash,ranked,hidden,created_at,score_config_version) VALUES(?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)'
+				)
+				.bind(
+					u2,
+					userId,
+					syntheticFamily,
+					'synth-1',
+					'synth-grp-1',
+					800,
+					8,
+					15,
+					'2',
+					'[]',
+					'hash2',
+					0,
+					0,
+					now + 3,
+					'v1'
+				),
+
+			// 3. Legacy start with variant = NULL in play_session (resolves to defaultVariant varA), abandoned
+			db
+				.prepare(
+					'INSERT INTO play_session(id,user_id,family,seed,engine_version,created_at,expires_at,ip_hash,variant,first_move_at,abandoned_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)'
+				)
+				.bind(
+					u3,
+					userId,
+					syntheticFamily,
+					'3',
+					'synth-1',
+					now + 4,
+					now - 1000,
+					'test',
+					null,
+					now + 5,
+					now + 6
+				),
+
+			// 4. Start present in both play_session and account_round_activity (varB), ignored
+			db
+				.prepare(
+					'INSERT INTO play_session(id,user_id,family,seed,engine_version,created_at,expires_at,ip_hash,variant,first_move_at,abandoned_at) VALUES(?,?,?,?,?,?,?,?,?,?,?)'
+				)
+				.bind(
+					u4,
+					userId,
+					syntheticFamily,
+					'4',
+					'synth-1',
+					now + 7,
+					now - 1000,
+					'test',
+					varB,
+					null,
+					null
+				),
+			db
+				.prepare(
+					'INSERT INTO account_round_activity(run_id,ranked,user_id,family,started_at,variant,first_move_at,abandoned_at) VALUES(?,?,?,?,?,?,?,?)'
+				)
+				.bind(u4, 0, userId, syntheticFamily, now + 7, varB, null, null)
+		]);
+
+		const bindSpy: unknown[][] = [];
+		const originalPrepare = db.prepare.bind(db);
+		const spiedDb = {
+			...db,
+			prepare(query: string) {
+				const statement = originalPrepare(query);
+				return {
+					...statement,
+					bind(...params: unknown[]) {
+						bindSpy.push(params);
+						return statement.bind(...params);
+					}
+				};
+			}
+		} as unknown as D1Database;
+
+		const rows = await queryActivityCounts(spiedDb, mapping);
+
+		expect(bindSpy).toHaveLength(1);
+		expect(bindSpy[0]).toHaveLength(1);
+		expect(typeof bindSpy[0][0]).toBe('string');
+		expect(rows).toHaveLength(2);
+
+		const rowA = rows.find((r) => r.variant === varA)!;
+		expect(rowA).toBeDefined();
+		expect(rowA).toMatchObject({
+			family: syntheticFamily,
+			variant: varA,
+			shown: 2,
+			ignored: 0,
+			played: 2,
+			abandoned: 1,
+			finished: 1,
+			open: 0,
+			imported: 1,
+			totalCompleted: 2,
+			ranked: 1
+		});
+		expect(rowA.shown).toBe(rowA.ignored + rowA.played);
+		expect(rowA.played).toBe(rowA.abandoned + rowA.finished + rowA.open);
+		expect(rowA.totalCompleted).toBe(rowA.finished + rowA.imported);
+
+		const rowB = rows.find((r) => r.variant === varB)!;
+		expect(rowB).toBeDefined();
+		expect(rowB).toMatchObject({
+			family: syntheticFamily,
+			variant: varB,
+			shown: 1,
+			ignored: 1,
+			played: 0,
+			abandoned: 0,
+			finished: 0,
+			open: 0,
+			imported: 0,
+			totalCompleted: 0,
+			ranked: 0
+		});
+		expect(rowB.shown).toBe(rowB.ignored + rowB.played);
+		expect(rowB.played).toBe(rowB.abandoned + rowB.finished + rowB.open);
+		expect(rowB.totalCompleted).toBe(rowB.finished + rowB.imported);
+	} finally {
+		await db.batch([
+			db.prepare("DELETE FROM completed_run WHERE family='synth-fam'"),
+			db.prepare("DELETE FROM play_session WHERE family='synth-fam'"),
+			db.prepare("DELETE FROM account_round_activity WHERE family='synth-fam'")
+		]);
+	}
 });
 
 it('isolates shared pair scoring from trios and changes only future scores and live eligibility', async () => {

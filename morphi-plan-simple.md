@@ -1,19 +1,27 @@
 # Morphi: Simple Plan
 
-## Active local work — v1.3.3 Member Support (2026-11-05)
+## Current local work — v1.3.4 Slice 0 admin/query (2026-11-06)
 
-The owner authorized Member Support on the accepted local v1.3.2 baseline and
-corrected its planned version from v1.3.4 to v1.3.3. All proposed defaults, limits,
-retention and behavior are approved in
-[the Member Support plan](docs/planning/V1.3.3_MEMBER_SUPPORT.md). Implement
-locally, verify, write the report and stop for owner review. This supersedes the
-previous next-implementation restriction only for this scope. No commit/push,
-production provisioning, secrets, DNS/Google changes or deployment is authorized.
-Status and evidence: [V1.3.3_WORK.md](docs/work/V1.3.3_WORK.md).
-The implementation and targeted checks are complete locally; owner review is
-pending. The owner explicitly deferred full `bun run verify` to later stages.
-The active run was stopped during global ESLint after Prettier passed; no full
-pass or verification waiver is inferred.
+The owner authorized completing the reviewed Games admin/query gaps locally.
+Scope: single-bind activity mapping, exact-count regression coverage, responsive
+variant rows, accessible inspection drawer, message/token cleanup and scoped
+verification. Mahjong is explicitly excluded and belongs to later plans. Existing
+Mahjong proposals below are future reference, not this slice's implementation plan.
+Full `bun run verify` remains deferred under the existing owner decision. No commit,
+push, deployment, production change or next feature is authorized by this task.
+Local implementation and targeted verification are complete; owner visual
+acceptance remains separate. Scoped lint/format/types, 8 focused D1 tests and six
+unique Chromium cases pass across retained runs. The separate broader Support
+quota timeout remains recorded; this is not a full verification pass.
+Closeout: [Slice 0 work record](docs/work/V1.3.4_SLICE0_WORK.md).
+
+## Future planning — proposed Mahjong Solitaire (2026-11-05)
+
+Member Support v1.3.3 is accepted locally. The next candidate is Mahjong
+Solitaire with Turtle (144), Quick (56) and Fortress (144) layouts. The plan and
+puzzle brief are drafts; owner decisions and implementation authorization remain
+pending. See [v1.3.4 plan](docs/planning/V1.3.4_MAHJONG.md) and [draft puzzle
+brief](docs/puzzles/mahjong-solitaire.md). No deployment is authorized.
 
 ## Current local status — 2026-11-05
 

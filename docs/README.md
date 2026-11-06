@@ -2,7 +2,7 @@
 
 Supporting documents are grouped by purpose. Core plan, decisions, edge cases, phase reports, and code map retain their established paths.
 
-Files under `references/` are imported source material, not authorization to implement their contents. The imported briefs are preserved unchanged; maintained project copies live under `briefs/`. The two engine-refactor versions differ and have not been merged.
+Files under `references/` are reference material, not authorization to implement their contents. The Mahjong Solitaire variant report is locally authored web research; the other imported originals remain preserved. The imported briefs are preserved unchanged; maintained project copies live under `briefs/`. The two engine-refactor versions differ and have not been merged.
 
 ## Core guidance
 
@@ -29,6 +29,8 @@ Files under `references/` are imported source material, not authorization to imp
 - [morphi-v1.3.2-codex-brief](briefs/morphi-v1.3.2-codex-brief.md) — accepted locally on 2026-11-05; verification evidence unconfirmed.
 
 ## Work records
+
+- [V1.3.4_SLICE0_WORK](work/V1.3.4_SLICE0_WORK.md) — admin/query only; Mahjong excluded and deferred to later plans.
 
 - [STEP6_WORK](work/STEP6_WORK.md)
 - [V1.1_WORK](work/V1.1_WORK.md)
@@ -69,9 +71,12 @@ Files under `references/` are imported source material, not authorization to imp
 - [Block Puzzle Variants](<references/puzzle-variants/Block Puzzle Variants.html>)
 - [Connect Puzzle Variants](<references/puzzle-variants/Connect Puzzle Variants.html>)
 - [Memory Puzzle Variants](<references/puzzle-variants/Memory Puzzle Variants.html>)
+- [Mahjong Solitaire Variants](<references/puzzle-variants/Mahjong Solitaire Variants.html>) — locally authored research: 28 examples, 18 dimensions, 21 sources and interactive exploration.
 - [Full Road Map(2)](<references/roadmaps/Full Road Map(2).html>)
 
 ## Existing design and evidence collections
+
+- [v1.3.4 Mahjong Solitaire proposal](planning/V1.3.4_MAHJONG.md) and [draft puzzle brief](puzzles/mahjong-solitaire.md); awaiting owner decisions. [Visual layout draft](../static/demo/v1.3.4-mahjong.html) shows the three conceptual boards; geometry is for review, not validated game data. Captured desktop views and a phone view are in [evidence/v1.3.4/](evidence/v1.3.4/).
 
 - [Puzzle briefs](puzzles/)
 - [Verification and visual evidence](evidence/)
@@ -80,4 +85,4 @@ Files under `references/` are imported source material, not authorization to imp
 
 Member Support v1.3.3: [approved local plan](planning/V1.3.3_MEMBER_SUPPORT.md). The owner corrected the earlier v1.3.4 numbering; v1.3.2 is the accepted baseline.
 
-Member Support [local handoff](work/V1.3.3_WORK.md) and [targeted verification](evidence/v1.3.3/verification.json): full `bun run verify` is explicitly deferred by the owner to later stages; working-build review remains pending.
+Member Support [local handoff](work/V1.3.3_WORK.md) and [targeted verification](evidence/v1.3.3/verification.json): full `bun run verify` is explicitly deferred by the owner to later stages; the owner confirmed local review and acceptance on 2026-11-05, with remaining improvements deferred to later stages.

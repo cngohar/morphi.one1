@@ -1,0 +1,847 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Morphi — Leaderboard Architecture for 100+ Variants</title>
+<style>
+:root {
+	color-scheme: light;
+	--bg: #eef2f7;
+	--surface: #ffffff;
+	--surface-2: #e5edf7;
+	--border: #c9d6e4;
+	--border-strong: #7a889e;
+	--ink: #1b2433;
+	--ink-2: #344257;
+	--muted: #5a6b82;
+	--primary: #e5532d;
+	--primary-strong: #c9441f;
+	--accent: #2f6fed;
+	--success: #009a86;
+	--label: #68798e;
+	--chip-blue: #dce9fc;
+	--chip-teal: #d7efea;
+	--chip-amber: #fcecc6;
+	--chip-purple: #eedcfc;
+	--chip-red: #ffdcd6;
+	--warning-fill: #f5a524;
+	--warning-text: #8a5a00;
+	--danger: #b42318;
+	--font: 'Nunito Variable', 'Nunito', system-ui, -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+	--radius-sm: 8px;
+	--radius-md: 12px;
+	--radius-pill: 999px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+	background: var(--bg);
+	color: var(--ink);
+	font-family: var(--font);
+	font-size: 15px;
+	line-height: 1.5;
+	padding: 24px 16px 60px;
+}
+.shell {
+	max-width: 1040px;
+	margin: 0 auto;
+	transition: max-width 0.25s ease;
+}
+body.preview-phone .shell {
+	max-width: 400px;
+}
+body.preview-landscape .shell {
+	max-width: 760px;
+}
+
+/* Prototype control bar */
+.proto-banner {
+	background: #182230;
+	color: #fff;
+	padding: 14px 18px;
+	border-radius: var(--radius-md);
+	margin-bottom: 20px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	align-items: center;
+	justify-content: space-between;
+}
+.proto-title {
+	font-size: 14px;
+	font-weight: 800;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.proto-tag {
+	background: var(--primary);
+	font-size: 11px;
+	padding: 2px 7px;
+	border-radius: var(--radius-pill);
+	text-transform: uppercase;
+	font-weight: 900;
+}
+.proto-actions {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+}
+.proto-btn {
+	background: #253346;
+	color: #e2e8f0;
+	border: 1px solid #3d4f68;
+	font: inherit;
+	font-size: 12px;
+	font-weight: 700;
+	padding: 6px 12px;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
+	transition: all 0.15s ease;
+}
+.proto-btn:hover { background: #344761; color: #fff; }
+.proto-btn.active {
+	background: var(--accent);
+	border-color: var(--accent);
+	color: #fff;
+}
+
+/* Strategic solution switcher */
+.pattern-nav {
+	display: flex;
+	gap: 6px;
+	overflow-x: auto;
+	padding: 4px;
+	background: #e1e8f2;
+	border-radius: var(--radius-md);
+	margin-bottom: 20px;
+	scrollbar-width: none;
+}
+.pattern-nav::-webkit-scrollbar { display: none; }
+.pattern-tab {
+	flex: 1;
+	min-width: 140px;
+	border: none;
+	background: transparent;
+	color: var(--muted);
+	font: inherit;
+	font-size: 13px;
+	font-weight: 800;
+	padding: 10px 14px;
+	border-radius: var(--radius-sm);
+	cursor: pointer;
+	text-align: center;
+	transition: all 0.15s ease;
+	white-space: nowrap;
+}
+.pattern-tab:hover { color: var(--ink); }
+.pattern-tab.active {
+	background: var(--surface);
+	color: var(--ink);
+	box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+}
+
+/* Main card */
+.board-card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 28px 24px;
+	box-shadow: 0 4px 20px rgba(0, 0, 0, 0.03);
+}
+
+.account-eyebrow {
+	color: var(--muted);
+	font-size: 12px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	margin-bottom: 4px;
+}
+.account-title {
+	font-size: 26px;
+	font-weight: 900;
+	letter-spacing: -0.03em;
+	color: var(--ink);
+	margin-bottom: 14px;
+}
+.pattern-explainer {
+	background: var(--surface-2);
+	border-left: 3px solid var(--accent);
+	padding: 12px 16px;
+	border-radius: 0 var(--radius-sm) var(--radius-sm) 0;
+	margin-bottom: 22px;
+	font-size: 13.5px;
+	color: var(--ink-2);
+	line-height: 1.5;
+}
+.pattern-explainer strong { color: var(--ink); }
+
+/* --- UI Controls --- */
+.family-tabs {
+	display: flex;
+	gap: 8px;
+	border-bottom: 2px solid var(--surface-2);
+	margin-bottom: 16px;
+	overflow-x: auto;
+	scrollbar-width: none;
+}
+.family-tabs::-webkit-scrollbar { display: none; }
+.family-tab {
+	background: none;
+	border: none;
+	font: inherit;
+	font-size: 15px;
+	font-weight: 800;
+	color: var(--muted);
+	padding: 10px 16px;
+	cursor: pointer;
+	position: relative;
+	white-space: nowrap;
+	transition: color 0.15s ease;
+}
+.family-tab:hover { color: var(--ink); }
+.family-tab.active { color: var(--ink); }
+.family-tab.active::after {
+	content: '';
+	position: absolute;
+	bottom: -2px;
+	left: 0;
+	right: 0;
+	height: 3px;
+	background: var(--primary);
+	border-radius: 3px 3px 0 0;
+}
+
+/* Modifiers / Multipliers pills in table */
+.mod-tag {
+	display: inline-flex;
+	align-items: center;
+	gap: 3px;
+	font-size: 11px;
+	font-weight: 800;
+	padding: 2px 7px;
+	border-radius: var(--radius-pill);
+	margin-left: 4px;
+	vertical-align: middle;
+}
+.mod-trios { background: var(--chip-purple); color: #5b21b6; }
+.mod-moving { background: var(--chip-blue); color: #1e40af; }
+.mod-nopreview { background: var(--chip-amber); color: #92400e; }
+.mod-rush { background: var(--chip-red); color: #991b1b; }
+
+/* Dimension Selectors (Axis Grid) */
+.axis-container {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+	gap: 12px;
+	background: #f8fafc;
+	border: 1px solid var(--border);
+	padding: 14px;
+	border-radius: var(--radius-sm);
+	margin-bottom: 22px;
+}
+.axis-group label {
+	display: block;
+	font-size: 11.5px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	color: var(--muted);
+	margin-bottom: 6px;
+}
+.axis-group select {
+	width: 100%;
+	min-height: 40px;
+	padding: 8px 10px;
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	background: var(--surface);
+	font: inherit;
+	font-size: 13.5px;
+	font-weight: 700;
+	color: var(--ink);
+}
+
+/* Codex / Compendium Grid */
+.codex-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 10px;
+	margin-bottom: 16px;
+	padding-bottom: 12px;
+	border-bottom: 1px solid var(--border);
+}
+.codex-stats {
+	font-size: 14px;
+	font-weight: 800;
+	color: var(--ink);
+}
+.codex-progress-bar {
+	width: 100%;
+	height: 8px;
+	background: var(--surface-2);
+	border-radius: var(--radius-pill);
+	overflow: hidden;
+	margin-top: 6px;
+}
+.codex-progress-fill {
+	height: 100%;
+	background: var(--success);
+	width: 41%;
+	border-radius: var(--radius-pill);
+	transition: width 0.3s ease;
+}
+.codex-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+	gap: 12px;
+	margin-bottom: 24px;
+}
+.codex-card {
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	padding: 14px;
+	background: var(--surface);
+	display: flex;
+	flex-direction: column;
+	justify-content: space-between;
+	min-height: 115px;
+	transition: transform 0.15s ease, box-shadow 0.15s ease;
+}
+.codex-card.unlocked:hover {
+	transform: translateY(-2px);
+	box-shadow: 0 4px 12px rgba(0,0,0,0.06);
+}
+.codex-card.locked {
+	background: #f8fafc;
+	border-style: dashed;
+	opacity: 0.75;
+}
+.codex-card-title {
+	font-size: 13.5px;
+	font-weight: 800;
+	color: var(--ink);
+	margin-bottom: 4px;
+}
+.codex-card-desc {
+	font-size: 11.5px;
+	color: var(--muted);
+	line-height: 1.35;
+}
+.codex-card-footer {
+	margin-top: 10px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	font-size: 11.5px;
+}
+.codex-badge {
+	font-size: 10px;
+	font-weight: 900;
+	padding: 2px 6px;
+	border-radius: var(--radius-pill);
+	text-transform: uppercase;
+}
+.codex-badge.found { background: var(--chip-teal); color: #065f46; }
+.codex-badge.mystery { background: #e2e8f0; color: #475569; }
+
+/* Table styling matching Morphi */
+.table-wrap { overflow-x: auto; }
+table {
+	width: 100%;
+	border-collapse: collapse;
+	font-variant-numeric: tabular-nums;
+	font-size: 14px;
+}
+th, td {
+	padding: 12px 10px;
+	text-align: left;
+	border-bottom: 1px solid var(--border);
+}
+th {
+	font-size: 12px;
+	font-weight: 800;
+	color: var(--muted);
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+}
+th:last-child, td:last-child { text-align: right; }
+tr.own { background: var(--chip-blue); font-weight: 800; }
+.rank-badge {
+	display: inline-grid;
+	place-items: center;
+	width: 24px;
+	height: 24px;
+	border-radius: 50%;
+	font-weight: 900;
+	font-size: 12px;
+}
+.rank-1 { background: #ffe484; color: #725100; }
+.rank-2 { background: #e3e8ee; color: #445366; }
+.rank-3 { background: #f5d4be; color: #843c10; }
+
+.own-summary {
+	margin-top: 18px;
+	padding: 12px 14px;
+	background: var(--surface-2);
+	border-radius: var(--radius-sm);
+	font-size: 13px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+.own-summary strong { color: var(--ink); }
+
+/* Deep Architectural Guide */
+.guide-section {
+	margin-top: 36px;
+	padding-top: 24px;
+	border-top: 1px solid var(--border);
+}
+.guide-title {
+	font-size: 20px;
+	font-weight: 900;
+	margin-bottom: 14px;
+	color: var(--ink);
+}
+.guide-grid {
+	display: grid;
+	grid-template-columns: repeat(auto-fit, minmax(290px, 1fr));
+	gap: 16px;
+}
+.guide-card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-sm);
+	padding: 18px;
+}
+.guide-card h3 {
+	font-size: 15px;
+	font-weight: 800;
+	margin-bottom: 8px;
+	color: var(--ink);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+.guide-card p {
+	font-size: 13px;
+	color: var(--muted);
+	line-height: 1.45;
+	margin-bottom: 10px;
+}
+.guide-card ul {
+	padding-left: 18px;
+	font-size: 12px;
+	color: var(--ink-2);
+}
+.guide-card li { margin-bottom: 4px; }
+
+@media (max-width: 600px) {
+	body { padding: 12px 8px 40px; }
+	.board-card { padding: 18px 14px; }
+	.account-title { font-size: 22px; }
+	.proto-banner { flex-direction: column; align-items: flex-start; }
+}
+</style>
+</head>
+<body>
+
+<div class="shell">
+	<!-- Prototype Bar -->
+	<aside class="proto-banner">
+		<div class="proto-title">
+			<span class="proto-tag">Scalability Architecture</span>
+			<span>Handling 100+ Variants Without Clutter or Spoilers</span>
+		</div>
+		<div class="proto-actions">
+			<span style="font-size:12px;color:#94a3b8;">Viewport:</span>
+			<button class="proto-btn active" id="btnDesk">Desktop</button>
+			<button class="proto-btn" id="btnPhone">Phone 390px</button>
+		</div>
+	</aside>
+
+	<!-- Architectural Solution Switcher -->
+	<nav class="pattern-nav" aria-label="Select 100+ variant design pattern">
+		<button class="pattern-tab active" data-solution="1">1. Score Multiplier (Hades/Roguelike)</button>
+		<button class="pattern-tab" data-solution="2">2. Codex vs Leaderboard (Balatro/Smash)</button>
+		<button class="pattern-tab" data-solution="3">3. Orthogonal 3-Axis Facets</button>
+		<button class="pattern-tab" data-solution="4">4. Daily Seed Spotlight (Spelunky)</button>
+	</nav>
+
+	<!-- Main Card Content -->
+	<main class="board-card">
+		<p class="account-eyebrow" id="eyebrowText">Competitive Ranking</p>
+		<h1 class="account-title" id="viewTitle">Memory Ranked Leaderboard</h1>
+
+		<div class="pattern-explainer" id="patternExplainer">
+			<!-- Populated by JS -->
+		</div>
+
+		<!-- Dynamic Controls Slot -->
+		<div id="controlsContainer"></div>
+
+		<!-- Table View -->
+		<div id="tableContainer" class="table-wrap">
+			<table>
+				<thead>
+					<tr>
+						<th scope="col" style="width: 50px;">Rank</th>
+						<th scope="col">Player &amp; Active Modifiers</th>
+						<th scope="col">Multiplier</th>
+						<th scope="col">Total Score</th>
+					</tr>
+				</thead>
+				<tbody id="boardBody">
+					<!-- Populated by JS -->
+				</tbody>
+			</table>
+		</div>
+
+		<!-- Codex View Slot (for Solution 2) -->
+		<div id="codexContainer" style="display:none;"></div>
+
+		<div class="own-summary" id="ownSummary">
+			<span>Your Position: <strong id="ownRank">#4</strong></span>
+			<span>Your Best Run: <strong id="ownScore">34,500</strong></span>
+		</div>
+	</main>
+
+	<!-- Comprehensive Architectural Guide -->
+	<section class="guide-section">
+		<h2 class="guide-title">How Industry Standards Handle 100+ Permutations</h2>
+		<div class="guide-grid">
+			<div class="guide-card">
+				<h3>🎯 1. Score Multiplier / Heat System</h3>
+				<p><em>Used by: Hades (Pact of Punishment), Brotato, Slay the Spire.</em></p>
+				<p>Instead of 100 separate leaderboards with 1 player each, there is <strong>ONE central leaderboard per game</strong>. Harder modifiers multiply the score!</p>
+				<ul>
+					<li><strong>Zero Clutter:</strong> 4 games = 4 clean leaderboards total.</li>
+					<li><strong>Zero Spoilers:</strong> Players never see a list of variants until The Card flips.</li>
+					<li><strong>Maximum Rivalry:</strong> Everyone competes on the same board.</li>
+				</ul>
+			</div>
+			<div class="guide-card">
+				<h3>📖 2. Split Leaderboard vs Codex</h3>
+				<p><em>Used by: Balatro, Super Smash Bros, Pokemon.</em></p>
+				<p>Separate the <strong>Competitor</strong> from the <strong>Collector</strong>:</p>
+				<ul>
+					<li><strong>Leaderboard:</strong> Kept strictly for standard competitive baseline play.</li>
+					<li><strong>The Codex (in Profile):</strong> Houses all 100+ variants as discoverable mystery entries (<code>???</code> until encountered).</li>
+					<li>Preserves suspense and satisfies completionists without wrecking the UI.</li>
+				</ul>
+			</div>
+			<div class="guide-card">
+				<h3>🧭 3. Orthogonal 3-Axis Facets</h3>
+				<p><em>Used by: TrackMania, Speedrun.com, Steam Workshop.</em></p>
+				<p>Never treat 100+ variants as a 1D flat list. Break the 9 Memory dimensions down into 3 independent orthogonal dials:</p>
+				<ul>
+					<li><strong>Axis 1 (Board Size):</strong> 6, 8, 10, 16 pairs.</li>
+					<li><strong>Axis 2 (Mode):</strong> Standard, Rush Timer, Survival.</li>
+					<li><strong>Axis 3 (Modifier Class):</strong> Clean, Moving Cards, Trios.</li>
+				</ul>
+			</div>
+			<div class="guide-card">
+				<h3>⚡ 4. 24-Hour Daily Mutation</h3>
+				<p><em>Used by: Spelunky Daily, Wordle, Slay the Spire Daily Climb.</em></p>
+				<p>Keep 1 permanent Classic board. The other 100+ modifiers are served exclusively through the <strong>Daily Mystery Challenge</strong>.</p>
+				<ul>
+					<li>Each day, the server HMAC-seeds a surprise combo.</li>
+					<li>Today: <em>Trios + Moving Cards</em>. Tomorrow: <em>No Preview + 16 Pairs</em>.</li>
+					<li>Concentrates all players onto one exciting event daily.</li>
+				</ul>
+			</div>
+		</div>
+	</section>
+</div>
+
+<script>
+// Mock data representing Memory's 100+ variants & combinations
+const memoryVariants100 = [
+	{ id: 'classic-6', name: 'Classic (6 Pairs)', cat: 'Standard', mult: 1.0, found: true, desc: 'Original turn-based discovery.' },
+	{ id: 'classic-8', name: 'Classic (8 Pairs)', cat: 'Standard', mult: 1.1, found: true, desc: 'Balanced 16-card layout.' },
+	{ id: 'classic-10', name: 'Classic (10 Pairs)', cat: 'Standard', mult: 1.25, found: true, desc: 'Extended 20-card memory run.' },
+	{ id: 'nopreview-8', name: 'Blind Start', cat: 'Visibility', mult: 1.35, found: true, desc: 'Zero preview time before cards flip face-down.' },
+	{ id: 'trios-6', name: 'Trios Match', cat: 'Match Size', mult: 1.5, found: true, desc: 'Match sets of 3 identical symbols.' },
+	{ id: 'moving-8', name: 'Shifting Ground', cat: 'Board Dynamics', mult: 1.45, found: false, desc: 'Misses trigger adjacent card swaps.' },
+	{ id: 'rush-60', name: 'Countdown Blitz', cat: 'Time Attack', mult: 1.4, found: false, desc: '60-second sudden death clock.' },
+	{ id: 'opposite-color', name: 'Chroma Reversal', cat: 'Match Relation', mult: 1.3, found: false, desc: 'Match same icon with opposing palette.' },
+	{ id: 'one-flip', name: 'One Flip Per Turn', cat: 'Turn Rules', mult: 1.6, found: false, desc: 'Reveal only 1 card per turn; remember previous flips.' },
+	{ id: 'hazard-bomb', name: 'Hazard Bombs', cat: 'Obstacles', mult: 1.75, found: false, desc: 'Avoid trapped tiles that reshuffle cleared pairs.' },
+	{ id: 'split-boards', name: 'Split Deck Dual', cat: 'Layout', mult: 1.55, found: false, desc: 'Two independent 4×4 quadrants.' },
+	{ id: 'pip-sum', name: 'Pip Sum 10', cat: 'Match Relation', mult: 1.65, found: false, desc: 'Match cards whose dot values sum to 10.' }
+];
+
+// Current State
+let activeSolution = 1;
+
+// Viewport Switcher
+document.getElementById('btnDesk').addEventListener('click', () => {
+	document.body.classList.remove('preview-phone');
+	document.getElementById('btnDesk').classList.add('active');
+	document.getElementById('btnPhone').classList.remove('active');
+});
+document.getElementById('btnPhone').addEventListener('click', () => {
+	document.body.classList.add('preview-phone');
+	document.getElementById('btnPhone').classList.add('active');
+	document.getElementById('btnDesk').classList.remove('active');
+});
+
+// Solution Switcher
+document.querySelectorAll('.pattern-tab').forEach(tab => {
+	tab.addEventListener('click', () => {
+		document.querySelectorAll('.pattern-tab').forEach(t => t.classList.remove('active'));
+		tab.classList.add('active');
+		activeSolution = Number(tab.dataset.solution);
+		render();
+	});
+});
+
+function render() {
+	const tableContainer = document.getElementById('tableContainer');
+	const codexContainer = document.getElementById('codexContainer');
+	const ownSummary = document.getElementById('ownSummary');
+	const eyebrow = document.getElementById('eyebrowText');
+	const title = document.getElementById('viewTitle');
+	const explainer = document.getElementById('patternExplainer');
+	const controls = document.getElementById('controlsContainer');
+
+	tableContainer.style.display = 'block';
+	codexContainer.style.display = 'none';
+	ownSummary.style.display = 'flex';
+
+	switch (activeSolution) {
+		case 1:
+			eyebrow.textContent = 'Competitive Benchmark';
+			title.textContent = 'Memory: Grand Prix (Unified Multipliers)';
+			explainer.innerHTML = `
+				<strong>How it solves 100+ variants:</strong> Instead of fragmenting the player base across 100 separate dead leaderboards, there is <strong>ONE central competitive leaderboard per game</strong>.
+				<br>• When a player draws a wild variant in rotation (e.g. <em>Trios + Moving</em>), it applies a <strong>Score Multiplier</strong>.
+				<br>• Zero dropdown clutter, zero spoilers, and every player competes on the same active stage!
+			`;
+			renderSolution1(controls);
+			break;
+
+		case 2:
+			eyebrow.textContent = 'Player Progression & Compendium';
+			title.textContent = 'Memory: Discovery Codex (100+ Variants)';
+			explainer.innerHTML = `
+				<strong>How it solves 100+ variants:</strong> Separate the <strong>Competitive Leaderboard</strong> from the <strong>Collection / Completionist Codex</strong>.
+				<br>• The Leaderboard stays pristine with only standard baseline modes.
+				<br>• In the Player Profile, all 100+ variants live in a <strong>Discovery Codex</strong> where undiscovered variants stay locked as mysterious <code>???</code> cards until encountered during play!
+			`;
+			tableContainer.style.display = 'none';
+			codexContainer.style.display = 'block';
+			ownSummary.style.display = 'none';
+			renderSolution2(controls, codexContainer);
+			break;
+
+		case 3:
+			eyebrow.textContent = 'Faceted Navigation';
+			title.textContent = 'Memory: 3-Axis Orthogonal Filtering';
+			explainer.innerHTML = `
+				<strong>How it solves 100+ variants:</strong> Never put 100 items in one list. The 9 Memory dimensions are decomposed into <strong>3 orthogonal dials</strong>:
+				<br><code>[ Board Size ]</code> × <code>[ Time / Mode ]</code> × <code>[ Modifier Bundle ]</code>.
+				<br>This compresses thousands of permutations into 3 quick taps on mobile.
+			`;
+			renderSolution3(controls);
+			break;
+
+		case 4:
+			eyebrow.textContent = 'Daily Mutation';
+			title.textContent = 'Memory: Daily Challenge Mutation';
+			explainer.innerHTML = `
+				<strong>How it solves 100+ variants:</strong> Only <strong>Two Leaderboards</strong> exist:
+				<br>1. <strong>Classic Ranked (All-Time)</strong> — Pure skill benchmark.
+				<br>2. <strong>Daily Mystery Challenge (24 Hours)</strong> — The server bundles 2–3 random modifiers (e.g. <em>Trios + Shifting Ground</em>) for all players today.
+				<br>All 100+ variants get featured over time without ever cluttering the UI.
+			`;
+			renderSolution4(controls);
+			break;
+	}
+}
+
+/* ========================================================
+   SOLUTION 1: Unified Leaderboard with Modifier Multipliers
+   ======================================================== */
+function renderSolution1(controls) {
+	controls.innerHTML = `
+		<div class="family-tabs">
+			<button class="family-tab active">Memory (Unified)</button>
+			<button class="family-tab">Block Placement</button>
+			<button class="family-tab">Connect</button>
+			<button class="family-tab">Mahjong Solitaire</button>
+		</div>
+	`;
+
+	const mockRows = [
+		{ name: 'KiraZen', s: 54200, mult: '2.15×', mods: [{ t: 'Trios', c: 'mod-trios' }, { t: 'Moving', c: 'mod-moving' }, { t: 'No-Preview', c: 'mod-nopreview' }] },
+		{ name: 'Atlas_99', s: 48900, mult: '1.75×', mods: [{ t: 'Hazard Bomb', c: 'mod-rush' }, { t: '8 Pairs', c: 'mod-moving' }] },
+		{ name: 'PuzzlerX', s: 41250, mult: '1.50×', mods: [{ t: 'Trios', c: 'mod-trios' }] },
+		{ name: 'You (Player)', s: 34500, mult: '1.35×', own: true, mods: [{ t: 'No-Preview', c: 'mod-nopreview' }] },
+		{ name: 'EchoFlow', s: 29800, mult: '1.00×', mods: [{ t: 'Classic', c: 'mod-moving' }] }
+	];
+
+	renderTableRows(mockRows);
+}
+
+/* ========================================================
+   SOLUTION 2: Discovery Codex Grid (Completionist Mode)
+   ======================================================== */
+function renderSolution2(controls, codexContainer) {
+	controls.innerHTML = `
+		<div class="codex-header">
+			<div class="codex-stats">
+				<span>Discovered: <strong>5 / 12 Core Archetypes</strong> (Total 100+ Permutations)</span>
+				<div class="codex-progress-bar"><div class="codex-progress-fill" style="width:41%;"></div></div>
+			</div>
+			<div style="font-size:12px;color:var(--muted);">
+				Encountered automatically during mystery play
+			</div>
+		</div>
+	`;
+
+	let gridHtml = '<div class="codex-grid">';
+	memoryVariants100.forEach(v => {
+		if (v.found) {
+			gridHtml += `
+				<div class="codex-card unlocked">
+					<div>
+						<div class="codex-card-title">${v.name}</div>
+						<div class="codex-card-desc">${v.desc}</div>
+					</div>
+					<div class="codex-card-footer">
+						<span class="codex-badge found">Discovered</span>
+						<span style="font-weight:800;color:var(--accent);">${v.mult}× Multiplier</span>
+					</div>
+				</div>
+			`;
+		} else {
+			gridHtml += `
+				<div class="codex-card locked">
+					<div>
+						<div class="codex-card-title" style="color:var(--muted);">🔒 ??? Mystery Variant</div>
+						<div class="codex-card-desc">Dimension: ${v.cat}. Play more rounds in rotation to encounter this rule change!</div>
+					</div>
+					<div class="codex-card-footer">
+						<span class="codex-badge mystery">Undiscovered</span>
+						<span style="color:var(--muted);font-weight:700;">Locked</span>
+					</div>
+				</div>
+			`;
+		}
+	});
+	gridHtml += '</div>';
+	codexContainer.innerHTML = gridHtml;
+}
+
+/* ========================================================
+   SOLUTION 3: Orthogonal 3-Axis Facets
+   ======================================================== */
+function renderSolution3(controls) {
+	controls.innerHTML = `
+		<div class="axis-container">
+			<div class="axis-group">
+				<label for="axisSize">1. Board Scale</label>
+				<select id="axisSize">
+					<option>6 Pairs (Casual)</option>
+					<option selected>8 Pairs (Standard)</option>
+					<option>10 Pairs (Extended)</option>
+					<option>16 Pairs (Master)</option>
+				</select>
+			</div>
+			<div class="axis-group">
+				<label for="axisMode">2. Clock / Turn Rule</label>
+				<select id="axisMode">
+					<option selected>Standard (Uncapped)</option>
+					<option>Rush 60s (Countdown)</option>
+					<option>One Flip Per Turn</option>
+				</select>
+			</div>
+			<div class="axis-group">
+				<label for="axisMod">3. Modifier Mutation</label>
+				<select id="axisMod">
+					<option selected>Standard Clean</option>
+					<option>Trios (Match 3)</option>
+					<option>Shifting Cards (Moving)</option>
+					<option>Blind (No Preview)</option>
+				</select>
+			</div>
+		</div>
+	`;
+
+	const mockRows = [
+		{ name: 'GridMaster', s: 31200, mult: '1.0×', mods: [{ t: '8 Pairs · Standard', c: 'mod-moving' }] },
+		{ name: 'ZenSeeker', s: 28400, mult: '1.0×', mods: [{ t: '8 Pairs · Standard', c: 'mod-moving' }] },
+		{ name: 'You (Player)', s: 24100, mult: '1.0×', own: true, mods: [{ t: '8 Pairs · Standard', c: 'mod-moving' }] },
+		{ name: 'Nova', s: 19800, mult: '1.0×', mods: [{ t: '8 Pairs · Standard', c: 'mod-moving' }] }
+	];
+	renderTableRows(mockRows);
+}
+
+/* ========================================================
+   SOLUTION 4: Daily Mutation Spotlight
+   ======================================================== */
+function renderSolution4(controls) {
+	controls.innerHTML = `
+		<div class="family-tabs">
+			<button class="family-tab">🏆 All-Time Classic (Standard)</button>
+			<button class="family-tab active">⚡ Today's Mutation: Trios + Shifting Ground</button>
+		</div>
+		<div style="background:#fff8eb;border:1px solid #fed7aa;padding:12px 14px;border-radius:8px;margin-bottom:18px;font-size:13px;display:flex;justify-content:space-between;align-items:center;">
+			<span>Today's active seed rules: <strong>Trios (3 matches)</strong> + <strong>Swapping miss cards</strong></span>
+			<span style="font-weight:800;color:#c2410c;">Resets in 7h 24m</span>
+		</div>
+	`;
+
+	const mockRows = [
+		{ name: 'TriforceKing', s: 62400, mult: '2.1×', mods: [{ t: 'Trios', c: 'mod-trios' }, { t: 'Shifting', c: 'mod-moving' }] },
+		{ name: 'ShadowMind', s: 57100, mult: '2.1×', mods: [{ t: 'Trios', c: 'mod-trios' }, { t: 'Shifting', c: 'mod-moving' }] },
+		{ name: 'You (Player)', s: 44200, mult: '2.1×', own: true, mods: [{ t: 'Trios', c: 'mod-trios' }, { t: 'Shifting', c: 'mod-moving' }] },
+		{ name: 'MemoryPro', s: 39800, mult: '2.1×', mods: [{ t: 'Trios', c: 'mod-trios' }, { t: 'Shifting', c: 'mod-moving' }] }
+	];
+	renderTableRows(mockRows);
+}
+
+function renderTableRows(rows) {
+	const boardBody = document.getElementById('boardBody');
+	boardBody.innerHTML = '';
+
+	rows.forEach((row, i) => {
+		const pos = i + 1;
+		const tr = document.createElement('tr');
+		if (row.own) tr.classList.add('own');
+
+		let badgeClass = '';
+		if (pos === 1) badgeClass = 'rank-1';
+		else if (pos === 2) badgeClass = 'rank-2';
+		else if (pos === 3) badgeClass = 'rank-3';
+
+		const rankDisplay = badgeClass ? `<span class="rank-badge ${badgeClass}">${pos}</span>` : pos;
+
+		let modsHtml = '';
+		if (row.mods) {
+			row.mods.forEach(m => {
+				modsHtml += `<span class="mod-tag ${m.c}">${m.t}</span>`;
+			});
+		}
+
+		tr.innerHTML = `
+			<td>${rankDisplay}</td>
+			<td><strong>${row.name}</strong> ${modsHtml}</td>
+			<td style="font-weight:700;color:var(--muted);">${row.mult}</td>
+			<td><strong>${row.s.toLocaleString()}</strong></td>
+		`;
+		boardBody.appendChild(tr);
+	});
+}
+
+// Initial draw
+render();
+</script>
+</body>
+</html>

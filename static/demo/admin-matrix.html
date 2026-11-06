@@ -1,0 +1,1256 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>Morphi Admin — 100k+ Variant Matrix Controller Demo</title>
+<style>
+:root {
+	color-scheme: light;
+	--bg: #f4f6fa;
+	--surface: #ffffff;
+	--surface-2: #edf2f9;
+	--surface-3: #e2eaf5;
+	--border: #d0dbe7;
+	--border-strong: #8da0b5;
+	--ink: #16202e;
+	--ink-2: #2f3e53;
+	--muted: #5e7188;
+	--label: #6c7f96;
+	--primary: #e5532d;
+	--primary-strong: #c9441f;
+	--accent: #2764db;
+	--accent-soft: #dbeafe;
+	--success: #0b8a6e;
+	--success-bg: #e2f7f1;
+	--warning: #b26200;
+	--warning-bg: #fff3d6;
+	--danger: #c02b2b;
+	--danger-bg: #fde8e8;
+	--chip-blue: #dce9fc;
+	--chip-purple: #eedcfc;
+	--chip-teal: #d7efea;
+	--font: 'Nunito Variable', 'Nunito', system-ui, -apple-system, sans-serif;
+	--radius-sm: 6px;
+	--radius-md: 10px;
+	--radius-lg: 14px;
+	--radius-pill: 999px;
+}
+* { box-sizing: border-box; margin: 0; padding: 0; }
+body {
+	background: #0f1722;
+	color: var(--ink);
+	font-family: var(--font);
+	font-size: 14px;
+	line-height: 1.5;
+	min-height: 100vh;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	padding: 16px 8px 60px;
+}
+
+/* Control Topbar */
+.proto-bar {
+	width: 100%;
+	max-width: 1240px;
+	background: #192331;
+	color: #e2eaf5;
+	border: 1px solid #2d3d52;
+	border-radius: var(--radius-md);
+	padding: 12px 18px;
+	margin-bottom: 16px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 14px;
+	align-items: center;
+	justify-content: space-between;
+}
+.proto-title {
+	font-size: 13px;
+	font-weight: 700;
+	letter-spacing: 0.04em;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.proto-badge {
+	background: var(--primary);
+	color: #fff;
+	padding: 2px 7px;
+	border-radius: var(--radius-sm);
+	font-size: 10px;
+	text-transform: uppercase;
+	font-weight: 800;
+}
+.view-modes {
+	display: flex;
+	background: #111822;
+	padding: 3px;
+	border-radius: var(--radius-sm);
+	border: 1px solid #2d3d52;
+	gap: 3px;
+}
+.view-btn {
+	background: transparent;
+	border: 0;
+	color: #8da0b5;
+	padding: 6px 12px;
+	font-size: 12px;
+	font-weight: 700;
+	border-radius: 4px;
+	cursor: pointer;
+	font-family: inherit;
+	transition: all 0.15s ease;
+}
+.view-btn.active {
+	background: var(--accent);
+	color: #fff;
+}
+
+/* App Canvas */
+.canvas-frame {
+	width: 100%;
+	max-width: 1240px;
+	background: var(--bg);
+	border-radius: var(--radius-lg);
+	overflow: hidden;
+	box-shadow: 0 20px 48px rgba(0,0,0,0.45);
+	display: flex;
+	min-height: 880px;
+	transition: max-width 0.25s ease;
+}
+body.mode-phone .canvas-frame { max-width: 420px; }
+body.mode-landscape .canvas-frame { max-width: 860px; }
+
+/* Admin Sidebar */
+.admin-sidebar {
+	width: 230px;
+	flex-shrink: 0;
+	background: var(--surface);
+	border-right: 1px solid var(--border);
+	padding: 24px 18px;
+	display: flex;
+	flex-direction: column;
+}
+body.mode-phone .admin-sidebar { display: none; }
+.brand {
+	font-size: 22px;
+	font-weight: 900;
+	letter-spacing: -0.04em;
+	color: var(--ink);
+	text-decoration: none;
+	display: flex;
+	align-items: center;
+	gap: 6px;
+	margin-bottom: 20px;
+}
+.brand .dot {
+	width: 8px;
+	height: 8px;
+	border-radius: 50%;
+	background: var(--primary);
+}
+.eyebrow {
+	font-size: 10px;
+	font-weight: 800;
+	letter-spacing: 0.12em;
+	color: var(--muted);
+	text-transform: uppercase;
+	margin: 12px 0 8px;
+}
+.nav-list {
+	display: flex;
+	flex-direction: column;
+	gap: 4px;
+	list-style: none;
+}
+.nav-link {
+	padding: 9px 12px;
+	font-size: 13px;
+	font-weight: 800;
+	color: var(--ink-2);
+	text-decoration: none;
+	border-radius: var(--radius-sm);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+}
+.nav-link:hover { background: var(--surface-2); }
+.nav-link.active {
+	background: var(--surface-2);
+	color: var(--primary-strong);
+}
+.nav-badge {
+	background: var(--chip-blue);
+	color: var(--accent);
+	padding: 1px 6px;
+	border-radius: var(--radius-pill);
+	font-size: 11px;
+}
+
+/* Main Body */
+.admin-body {
+	flex: 1;
+	min-width: 0;
+	display: flex;
+	flex-direction: column;
+	background: var(--bg);
+}
+.admin-topbar {
+	min-height: 64px;
+	background: var(--surface);
+	border-bottom: 1px solid var(--border);
+	padding: 12px 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+.family-switcher {
+	display: flex;
+	align-items: center;
+	gap: 10px;
+}
+.family-select {
+	padding: 8px 14px;
+	border: 1px solid var(--border);
+	background: var(--surface-2);
+	border-radius: var(--radius-sm);
+	font-size: 14px;
+	font-weight: 800;
+	color: var(--ink);
+	font-family: inherit;
+	cursor: pointer;
+}
+.tab-pill-group {
+	display: flex;
+	background: var(--surface-2);
+	padding: 3px;
+	border-radius: var(--radius-pill);
+	border: 1px solid var(--border);
+}
+.tab-pill-btn {
+	padding: 5px 14px;
+	border-radius: var(--radius-pill);
+	border: 0;
+	background: transparent;
+	font-size: 12px;
+	font-weight: 800;
+	color: var(--muted);
+	cursor: pointer;
+	font-family: inherit;
+}
+.tab-pill-btn.active {
+	background: var(--surface);
+	color: var(--ink);
+	box-shadow: 0 1px 3px rgba(0,0,0,0.1);
+}
+
+.admin-main {
+	padding: 24px;
+	flex: 1;
+	overflow-y: auto;
+}
+
+/* Matrix Live Calculator Hero Banner */
+.matrix-hero {
+	background: linear-gradient(135deg, #1b2636, #121c29);
+	color: #ffffff;
+	border-radius: var(--radius-md);
+	padding: 22px 26px;
+	margin-bottom: 24px;
+	display: flex;
+	flex-wrap: wrap;
+	gap: 24px;
+	align-items: center;
+	justify-content: space-between;
+	box-shadow: 0 4px 16px rgba(0,0,0,0.15);
+}
+.matrix-stats {
+	display: flex;
+	align-items: baseline;
+	gap: 16px;
+	flex-wrap: wrap;
+}
+.matrix-count-huge {
+	font-size: 42px;
+	font-weight: 950;
+	letter-spacing: -0.04em;
+	line-height: 1;
+	color: #ffd27a;
+	font-family: monospace;
+	transition: all 0.2s ease;
+}
+.matrix-label {
+	font-size: 13px;
+	color: #a6b8ce;
+	line-height: 1.4;
+	max-width: 380px;
+}
+.matrix-actions {
+	display: flex;
+	gap: 10px;
+	align-items: center;
+	flex-wrap: wrap;
+}
+.btn {
+	padding: 8px 14px;
+	font-size: 12px;
+	font-weight: 800;
+	border-radius: var(--radius-sm);
+	border: 1px solid var(--border);
+	background: var(--surface);
+	color: var(--ink-2);
+	cursor: pointer;
+	font-family: inherit;
+	display: inline-flex;
+	align-items: center;
+	gap: 6px;
+	text-decoration: none;
+	transition: all 0.15s ease;
+}
+.btn:hover { background: var(--surface-2); }
+.btn.primary {
+	background: var(--primary);
+	border-color: var(--primary);
+	color: #fff;
+}
+.btn.primary:hover { background: var(--primary-strong); }
+.btn.dark {
+	background: #233144;
+	border-color: #3b4e68;
+	color: #fff;
+}
+.btn.dark:hover { background: #2f425b; }
+
+/* Preset Archetype Pills */
+.archetype-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 8px;
+	align-items: center;
+	margin-bottom: 20px;
+}
+.archetype-title {
+	font-size: 11px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--muted);
+	margin-right: 4px;
+}
+.preset-chip {
+	border: 1px solid var(--border);
+	background: var(--surface);
+	color: var(--ink-2);
+	font-size: 12px;
+	font-weight: 700;
+	padding: 5px 12px;
+	border-radius: var(--radius-pill);
+	cursor: pointer;
+}
+.preset-chip:hover { border-color: var(--accent); }
+.preset-chip.active {
+	background: var(--accent);
+	color: #fff;
+	border-color: var(--accent);
+}
+
+/* 9-Dimension Matrix Grid (Tier 1) */
+.matrix-grid {
+	display: grid;
+	grid-template-columns: repeat(3, 1fr);
+	gap: 16px;
+	margin-bottom: 28px;
+}
+@media (max-width: 1024px) {
+	.matrix-grid { grid-template-columns: repeat(2, 1fr); }
+}
+@media (max-width: 680px) {
+	.matrix-grid { grid-template-columns: 1fr; }
+}
+
+.dimension-card {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 16px 18px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	box-shadow: 0 1px 3px rgba(0,0,0,0.02);
+}
+.dimension-header {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	border-bottom: 1px solid var(--border);
+	padding-bottom: 8px;
+}
+.dim-title {
+	font-size: 13px;
+	font-weight: 800;
+	color: var(--ink);
+	display: flex;
+	align-items: center;
+	gap: 6px;
+}
+.dim-count {
+	font-size: 11px;
+	font-weight: 800;
+	background: var(--surface-2);
+	color: var(--accent);
+	padding: 2px 7px;
+	border-radius: var(--radius-pill);
+	font-family: monospace;
+}
+.option-list {
+	display: flex;
+	flex-direction: column;
+	gap: 6px;
+}
+.option-label {
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 12px;
+	font-weight: 700;
+	color: var(--ink-2);
+	cursor: pointer;
+	padding: 4px 6px;
+	border-radius: var(--radius-sm);
+	transition: background 0.1s ease;
+}
+.option-label:hover {
+	background: var(--surface-2);
+}
+.option-left {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.option-meta {
+	font-size: 11px;
+	color: var(--muted);
+	font-weight: 500;
+}
+.option-checkbox {
+	accent-color: var(--accent);
+	width: 15px;
+	height: 15px;
+	cursor: pointer;
+}
+
+/* Degenerate Warning Callout */
+.safeguard-banner {
+	background: #fff8e8;
+	border: 1px solid #fedf9e;
+	border-left: 4px solid var(--warning);
+	border-radius: var(--radius-sm);
+	padding: 12px 16px;
+	margin-bottom: 24px;
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 12.5px;
+	color: #6d4000;
+	gap: 12px;
+}
+.safeguard-banner strong { color: #4e2b00; }
+
+/* Tier 2: Real-time Sample Table */
+.sample-section-header {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 12px;
+	align-items: center;
+	justify-content: space-between;
+	margin-bottom: 12px;
+}
+.sample-section-header h2 {
+	font-size: 16px;
+	font-weight: 800;
+	color: var(--ink);
+}
+.table-container {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	overflow-x: auto;
+}
+table.matrix-table {
+	width: 100%;
+	border-collapse: collapse;
+	text-align: left;
+	font-size: 13px;
+}
+table.matrix-table th {
+	background: var(--surface-2);
+	padding: 10px 14px;
+	font-size: 11px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.06em;
+	color: var(--label);
+	border-bottom: 1px solid var(--border);
+	white-space: nowrap;
+}
+table.matrix-table td {
+	padding: 12px 14px;
+	border-bottom: 1px solid var(--border);
+	vertical-align: middle;
+}
+table.matrix-table tr:hover { background: #f8fafc; }
+.badge {
+	font-size: 10px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.05em;
+	padding: 2px 7px;
+	border-radius: var(--radius-pill);
+	display: inline-block;
+}
+.badge.enabled { background: var(--success-bg); color: var(--success); }
+.badge.disabled { background: var(--danger-bg); color: var(--danger); }
+.badge.deg { background: var(--warning-bg); color: var(--warning); }
+
+.tag-pill {
+	font-size: 11px;
+	font-weight: 700;
+	background: var(--surface-2);
+	color: var(--ink-2);
+	padding: 2px 7px;
+	border-radius: var(--radius-sm);
+	display: inline-block;
+	border: 1px solid var(--border);
+}
+
+/* Pagination Bar */
+.pagination-bar {
+	padding: 12px 16px;
+	background: var(--surface);
+	border-top: 1px solid var(--border);
+	display: flex;
+	align-items: center;
+	justify-content: space-between;
+	font-size: 12px;
+	color: var(--muted);
+}
+
+/* Slide-Over Drawer */
+.matrix-drawer {
+	position: fixed;
+	inset: 0 0 0 auto;
+	width: min(520px, 100vw);
+	height: 100%;
+	background: var(--surface);
+	border: 0;
+	border-left: 1px solid var(--border);
+	box-shadow: -10px 0 30px rgba(0,0,0,0.3);
+	padding: 0;
+	display: flex;
+	flex-direction: column;
+	z-index: 100;
+	transform: translateX(100%);
+	transition: transform 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+}
+.matrix-drawer.open { transform: translateX(0); }
+.drawer-backdrop {
+	position: fixed;
+	inset: 0;
+	background: rgba(14, 21, 32, 0.5);
+	backdrop-filter: blur(2px);
+	z-index: 99;
+	display: none;
+}
+.drawer-backdrop.open { display: block; }
+.drawer-header {
+	padding: 20px 24px;
+	border-bottom: 1px solid var(--border);
+	display: flex;
+	align-items: flex-start;
+	justify-content: space-between;
+	background: var(--surface-2);
+}
+.drawer-body {
+	padding: 24px;
+	overflow-y: auto;
+	flex: 1;
+	display: flex;
+	flex-direction: column;
+	gap: 20px;
+}
+.drawer-section {
+	background: var(--surface);
+	border: 1px solid var(--border);
+	border-radius: var(--radius-md);
+	padding: 16px;
+}
+.drawer-section h3 {
+	font-size: 12px;
+	text-transform: uppercase;
+	letter-spacing: 0.08em;
+	color: var(--label);
+	margin-bottom: 12px;
+}
+.drawer-footer {
+	padding: 16px 24px;
+	border-top: 1px solid var(--border);
+	background: var(--surface-2);
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+}
+</style>
+</head>
+<body>
+
+<div class="proto-bar">
+	<div class="proto-title">
+		<span class="proto-badge">Tier 1 Matrix Demo</span> Morphi Admin — 100,000+ Combinations Controller
+	</div>
+	<div class="view-modes">
+		<button class="view-btn active" onclick="setView('desktop')">🖥️ Desktop</button>
+		<button class="view-btn" onclick="setView('landscape')">🔄 Phone Land (844px)</button>
+		<button class="view-btn" onclick="setView('phone')">📱 Phone Port (390px)</button>
+	</div>
+</div>
+
+<div class="canvas-frame">
+	<!-- Admin Sidebar -->
+	<aside class="admin-sidebar">
+		<a class="brand" href="#"><span class="dot"></span>Morphi.One</a>
+		<p class="eyebrow">Workspace</p>
+		<ul class="nav-list">
+			<li><a class="nav-link" href="#">Dashboard</a></li>
+			<li><a class="nav-link" href="#">Users <span class="nav-badge">142</span></a></li>
+			<li><a class="nav-link active" href="#">Games & Matrix <span class="nav-badge">103k</span></a></li>
+			<li><a class="nav-link" href="#">Themes & Styles</a></li>
+			<li><a class="nav-link" href="#">Audit Viewer</a></li>
+			<li><a class="nav-link" href="#">Support Desk</a></li>
+		</ul>
+	</aside>
+
+	<!-- Admin Body -->
+	<div class="admin-body">
+		<!-- Top Bar -->
+		<header class="admin-topbar">
+			<div class="family-switcher">
+				<select class="family-select" id="familySelect" onchange="switchFamily(this.value)">
+					<option value="memory" selected>Memory (103,680 Combinations)</option>
+					<option value="mahjong">Mahjong Solitaire (1,200 Combinations)</option>
+					<option value="connect">Connect / Flow (480 Combinations)</option>
+					<option value="block">Block Placement (640 Combinations)</option>
+				</select>
+			</div>
+			<div class="tab-pill-group">
+				<button class="tab-pill-btn active" onclick="switchView('matrix')">⚙️ 9-Dimension Matrix (Dials)</button>
+				<button class="tab-pill-btn" onclick="switchView('samples')">📋 Active Variants (Samples)</button>
+			</div>
+		</header>
+
+		<!-- Main Content -->
+		<main class="admin-main">
+			<!-- Live Combination Calculator Hero Banner -->
+			<div class="matrix-hero">
+				<div class="matrix-stats">
+					<div class="matrix-count-huge" id="totalCombos">103,680</div>
+					<div class="matrix-label">
+						<strong>Active Parameter Matrix</strong><br>
+						Real-time generated variant space for <em id="matrixFamilyName">Memory</em> across all active dimension dials below.
+					</div>
+				</div>
+				<div class="matrix-actions">
+					<button class="btn dark" onclick="resetAllDials()">Reset All Dials</button>
+					<button class="btn primary" onclick="deployMatrix()">Deploy Matrix to Edge</button>
+				</div>
+			</div>
+
+			<!-- Quick Archetype Presets Bar -->
+			<div class="archetype-bar">
+				<span class="archetype-title">Archetype Presets:</span>
+				<button class="preset-chip active" onclick="applyPreset('all', this)">Full Matrix (103,680)</button>
+				<button class="preset-chip" onclick="applyPreset('casual', this)">☕ Casual Untimed (1,280)</button>
+				<button class="preset-chip" onclick="applyPreset('speed', this)">⚡ Speed Rush Series (3,840)</button>
+				<button class="preset-chip" onclick="applyPreset('trios', this)">🔺 Trios Master (12,960)</button>
+				<button class="preset-chip" onclick="applyPreset('curated', this)">⭐ Curated Tournaments (24)</button>
+			</div>
+
+			<!-- Degenerate Safeguard Notice -->
+			<div class="safeguard-banner" id="safeguardBanner">
+				<div>
+					<strong>🛡️ Degenerate Rule Filter Active:</strong>
+					<span id="degCount">2,880 unplayable combinations</span> automatically filtered out (e.g. <em>Blind Preview + Chaos Moving Swaps</em> or <em>Wild Cards with Opposite-Color Only</em>).
+				</div>
+				<button class="btn" style="padding: 4px 10px; font-size: 11px;" onclick="alert('Degenerate filter rules:\n1. Blind preview + Moving cards = Banned (unfair)\n2. Wild cards + Opposite color = Banned (deadlock)\n3. Simultaneous turns + Token block = Banned (race condition)')">View Rules</button>
+			</div>
+
+			<!-- 9-Dimension Matrix Cards (Tier 1) -->
+			<div class="matrix-grid" id="matrixGrid">
+				<!-- Injected by JavaScript -->
+			</div>
+
+			<!-- Tier 2: Real-time Sample Table of Matching Variants -->
+			<div class="sample-section-header">
+				<h2>Active Samples in Current Matrix Pool</h2>
+				<span style="font-size: 12px; color: var(--muted);" id="sampleCountNote">Showing 5 samples matching active dials</span>
+			</div>
+
+			<div class="table-container">
+				<table class="matrix-table">
+					<thead>
+						<tr>
+							<th>Variant Code ID</th>
+							<th>Dimension Parameters</th>
+							<th>State</th>
+							<th>Played / Shown</th>
+							<th>Finish Rate</th>
+							<th>Rules Group</th>
+							<th style="text-align: right;">Action</th>
+						</tr>
+					</thead>
+					<tbody id="sampleTableBody">
+						<!-- Injected by JavaScript -->
+					</tbody>
+				</table>
+				<div class="pagination-bar">
+					<span>Server Pagination: Showing 1–5 of 103,680 combinations</span>
+					<div style="display: flex; gap: 6px;">
+						<button class="btn" disabled>Previous</button>
+						<button class="btn">Next (50)</button>
+					</div>
+				</div>
+			</div>
+		</main>
+	</div>
+</div>
+
+<!-- Slide-Over Drawer for Variant Inspection -->
+<div class="drawer-backdrop" id="drawerBackdrop" onclick="closeDrawer()"></div>
+<aside class="matrix-drawer" id="matrixDrawer">
+	<div class="drawer-header">
+		<div>
+			<span class="badge enabled" id="dState">ENABLED IN MATRIX</span>
+			<h2 id="dName" style="font-size: 17px; margin-top: 6px;">Memory Trios Rush (60s)</h2>
+			<span id="dId" style="font-family: monospace; font-size: 11px; color: var(--muted);">memory:trios:rush-60:4x5:opposite</span>
+		</div>
+		<button class="btn" onclick="closeDrawer()">✕ Close</button>
+	</div>
+
+	<div class="drawer-body">
+		<!-- Parameter DNA -->
+		<div class="drawer-section">
+			<h3>Variant Parameter DNA</h3>
+			<table style="width: 100%; font-size: 12px;">
+				<tr><td style="color:var(--muted); padding:3px 0;">Match Size:</td><td style="font-weight:700;">Trios (3 cards)</td></tr>
+				<tr><td style="color:var(--muted); padding:3px 0;">Relation:</td><td style="font-weight:700;">Opposite Color</td></tr>
+				<tr><td style="color:var(--muted); padding:3px 0;">Board Dynamics:</td><td style="font-weight:700;">Static (No Move)</td></tr>
+				<tr><td style="color:var(--muted); padding:3px 0;">Timer Limit:</td><td style="font-weight:700; color:var(--warning);">60 Seconds Countdown</td></tr>
+				<tr><td style="color:var(--muted); padding:3px 0;">Visibility:</td><td style="font-weight:700;">Classic Face-Down</td></tr>
+				<tr><td style="color:var(--muted); padding:3px 0;">Grid:</td><td style="font-weight:700;">4×5 (10 sets)</td></tr>
+			</table>
+		</div>
+
+		<!-- Scoped Scoring -->
+		<div class="drawer-section">
+			<h3>Inherited Scoring Formula</h3>
+			<p style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">Inherits the global Trios Multiplier matrix preset (1.5× base score).</p>
+			<label style="font-size: 11px; font-weight:700;">Override Trios Multiplier
+				<input type="number" value="1.5" step="0.1" style="width: 100%; padding: 6px; border: 1px solid var(--border); border-radius: 4px; margin-top: 4px;">
+			</label>
+			<button class="btn" style="margin-top: 10px; width: 100%;" onclick="alert('Scoring formula saved for this parameter combination!')">Save Formula Override</button>
+		</div>
+
+		<!-- Sandbox Play -->
+		<div class="drawer-section">
+			<h3>Sandbox Play</h3>
+			<p style="font-size: 12px; color: var(--muted); margin-bottom: 8px;">Test this exact procedural parameter combination in AdminTestPlay.</p>
+			<button class="btn primary" style="width: 100%;" onclick="alert('Launching AdminTestPlay with exact parameter combination...')">▶ Test Play This Combination</button>
+		</div>
+	</div>
+
+	<div class="drawer-footer">
+		<button class="btn danger" onclick="alert('Combination excluded from generation matrix.')">Ban Combination</button>
+		<button class="btn" onclick="closeDrawer()">Done</button>
+	</div>
+</aside>
+
+<script>
+// Multi-Family Database: Dimensions & Samples from Research Documents
+const familyCatalog = {
+	memory: {
+		name: 'Memory',
+		totalLabel: '103,680 Combinations',
+		degRatio: 0.027,
+		degDesc: '2,880 unplayable combinations (e.g. Blind Preview + Chaos Swaps or Wilds + Opposite Color)',
+		presets: [
+			{ id: 'all', label: 'Full Matrix (103,680)' },
+			{ id: 'casual', label: '☕ Casual Untimed (1,280)' },
+			{ id: 'speed', label: '⚡ Speed Rush Series (3,840)' },
+			{ id: 'trios', label: '🔺 Trios Master (12,960)' },
+			{ id: 'curated', label: '⭐ Curated Tournaments (24)' }
+		],
+		dimensions: [
+			{
+				id: 'matchSize',
+				title: '1. Match Size',
+				options: [
+					{ id: 'pairs', label: 'Pairs (2 cards)', checked: true },
+					{ id: 'trios', label: 'Trios (3 cards)', checked: true },
+					{ id: 'quads', label: 'Quads (4 cards)', checked: true }
+				]
+			},
+			{
+				id: 'matchRelation',
+				title: '2. Match Relation',
+				options: [
+					{ id: 'identical', label: 'Identical Card Faces', checked: true },
+					{ id: 'rankOnly', label: 'Rank Only (Any Colour)', checked: true },
+					{ id: 'oppositeColor', label: 'Opposite Colour Only', checked: true },
+					{ id: 'suitExact', label: 'Identical Rank & Suit', checked: true },
+					{ id: 'associated', label: 'Associated (Word/Pic)', checked: true },
+					{ id: 'sumToN', label: 'Pip Sum equals N', checked: true }
+				]
+			},
+			{
+				id: 'boardDynamics',
+				title: '3. Board Dynamics',
+				options: [
+					{ id: 'static', label: 'Static (Cards stay in place)', checked: true },
+					{ id: 'moving', label: 'Moving Misses (Relocate)', checked: true },
+					{ id: 'shuffle', label: 'Mid-Game Reshuffle', checked: true },
+					{ id: 'swap', label: 'Chaos Pair Swaps', checked: true }
+				]
+			},
+			{
+				id: 'timeScoring',
+				title: '4. Time & Scoring',
+				options: [
+					{ id: 'untimed', label: 'Untimed (Fewest Turns)', checked: true },
+					{ id: 'rush60', label: 'Rush (60s Countdown)', checked: true },
+					{ id: 'rush90', label: 'Rush (90s Countdown)', checked: true },
+					{ id: 'moveLimit', label: 'Move Limit Survival', checked: true },
+					{ id: 'combo', label: 'Combo Multipliers', checked: true }
+				]
+			},
+			{
+				id: 'visibility',
+				title: '5. Visibility & Info',
+				options: [
+					{ id: 'faceDown', label: 'Classic Face-Down', checked: true },
+					{ id: 'blind', label: 'Blind Preview (3s Peek)', checked: true },
+					{ id: 'scramble', label: 'Mismatches Stay Up', checked: true }
+				]
+			},
+			{
+				id: 'layout',
+				title: '6. Layout & Grid',
+				options: [
+					{ id: 'gridSmall', label: 'Compact Grid (4×4)', checked: true },
+					{ id: 'gridMedium', label: 'Medium Grid (4×5)', checked: true },
+					{ id: 'gridLarge', label: 'Large Grid (6×6)', checked: true }
+				]
+			},
+			{
+				id: 'turnRule',
+				title: '7. Turn Allocation',
+				options: [
+					{ id: 'extraTurn', label: 'Match = Extra Turn', checked: true },
+					{ id: 'oneFlip', label: 'One Flip Only (No Extra)', checked: true }
+				]
+			},
+			{
+				id: 'helpers',
+				title: '8. Helpers & Obstacles',
+				options: [
+					{ id: 'none', label: 'Pure (No Helpers)', checked: true },
+					{ id: 'hint', label: 'Peek Hint Power-up', checked: true },
+					{ id: 'wild', label: 'Wild Star Card', checked: true },
+					{ id: 'bomb', label: 'Bomb / Token Block', checked: true }
+				]
+			},
+			{
+				id: 'playerMode',
+				title: '9. Mode / Win Rule',
+				options: [
+					{ id: 'solo', label: 'Solo Clearing', checked: true },
+					{ id: 'versus', label: 'Head-to-Head 2P', checked: true },
+					{ id: 'simultaneous', label: 'Simultaneous Speed Race', checked: true }
+				]
+			}
+		],
+		samples: [
+			{ id: 'memory:classic', dims: 'Pairs · Identical · Static · Untimed', state: 'enabled', played: 23200, shown: 24100, rate: '83.4%', group: 'memory-1:classic' },
+			{ id: 'memory:trios:rush-60', dims: 'Trios · Identical · Static · 60s Limit', state: 'enabled', played: 9400, shown: 10200, rate: '71.2%', group: 'memory-1:trios-rush' },
+			{ id: 'memory:moving:opposite', dims: 'Pairs · Opposite Color · Moving · Untimed', state: 'enabled', played: 5800, shown: 6400, rate: '60.9%', group: 'memory-1:moving-opp' },
+			{ id: 'memory:blind:grid-6x6', dims: 'Pairs · Identical · 3s Preview · Large Grid', state: 'enabled', played: 11200, shown: 12100, rate: '78.5%', group: 'memory-1:blind-6x6' },
+			{ id: 'memory:quads:rush-90', dims: 'Quads · Identical · Static · 90s Limit', state: 'enabled', played: 3100, shown: 3600, rate: '54.2%', group: 'memory-1:quads-90' }
+		]
+	},
+	mahjong: {
+		name: 'Mahjong Solitaire',
+		totalLabel: '2,400 Combinations',
+		degRatio: 0.05,
+		degDesc: '120 unplayable layouts (e.g. Disconnected Stacks without matching pairs)',
+		presets: [
+			{ id: 'all', label: 'All Geometries (2,400)' },
+			{ id: 'casual', label: '🐢 Classic Turtle (360)' },
+			{ id: 'speed', label: '⚡ Quick Sprint (560)' },
+			{ id: 'trios', label: '🏰 Fortress Pro (480)' },
+			{ id: 'curated', label: '⭐ Draft Baseline (3)' }
+		],
+		dimensions: [
+			{
+				id: 'geometry',
+				title: '1. Layout Geometry',
+				options: [
+					{ id: 'turtle', label: 'Turtle (144 Tiles, 5 Layers)', checked: true },
+					{ id: 'quick', label: 'Quick Sprint (56 Tiles, Flat)', checked: true },
+					{ id: 'fortress', label: 'Fortress (144 Tiles, High Depth)', checked: true },
+					{ id: 'monument', label: 'Monument (120 Tiles)', checked: true },
+					{ id: 'pyramid', label: 'Pyramid (72 Tiles, 4 Layers)', checked: true }
+				]
+			},
+			{
+				id: 'freedom',
+				title: '2. Tile Freedom Rule',
+				options: [
+					{ id: 'standard', label: 'Standard (Left or Right Open)', checked: true },
+					{ id: 'loose', label: 'Loose (Any 1 of 4 Edges Open)', checked: true },
+					{ id: 'strict', label: 'Strict (Both L & R Open)', checked: true }
+				]
+			},
+			{
+				id: 'matching',
+				title: '3. Match Logic',
+				options: [
+					{ id: 'exact', label: 'Exact Pairs Only', checked: true },
+					{ id: 'seasons', label: 'Seasons & Flowers Wildcards', checked: true },
+					{ id: 'dragons', label: 'Dragon Pair Multipliers', checked: true }
+				]
+			},
+			{
+				id: 'clocks',
+				title: '4. Timing & Score Mode',
+				options: [
+					{ id: 'zen', label: 'Zen Untimed (No Clock)', checked: true },
+					{ id: 'rush60', label: 'Blitz Rush (60s Limit)', checked: true },
+					{ id: 'rush120', label: 'Countdown (120s Limit)', checked: true },
+					{ id: 'combos', label: 'Lightning Chain Multiplier', checked: true }
+				]
+			},
+			{
+				id: 'assists',
+				title: '5. In-Game Assists',
+				options: [
+					{ id: 'pure', label: 'Pure Hardcore (No Assists)', checked: true },
+					{ id: 'shuffle', label: 'Solvable Reshuffle (1x)', checked: true },
+					{ id: 'hints', label: 'Highlight Available Pairs', checked: true },
+					{ id: 'undo', label: 'Unlimited Undo Moves', checked: true }
+				]
+			},
+			{
+				id: 'orientation',
+				title: '6. Allowed Orientation',
+				options: [
+					{ id: 'landscapeOnly', label: 'Landscape & Desktop Only', checked: true },
+					{ id: 'portraitMobile', label: 'Adaptive Portrait Fit', checked: true }
+				]
+			}
+		],
+		samples: [
+			{ id: 'mahjong:turtle-144', dims: 'Turtle 144 · Standard Freedom · Seasons · Zen', state: 'enabled', played: 11630, shown: 12450, rate: '68.4%', group: 'mahjong-solitaire-1:turtle' },
+			{ id: 'mahjong:quick-56', dims: 'Quick 56 · Standard Freedom · 60s Rush · Hints', state: 'enabled', played: 7950, shown: 8200, rate: '84.0%', group: 'mahjong-solitaire-1:quick' },
+			{ id: 'mahjong:fortress-144', dims: 'Fortress 144 · Strict Freedom · Untimed · Pure', state: 'enabled', played: 3820, shown: 4100, rate: '51.2%', group: 'mahjong-solitaire-1:fortress' },
+			{ id: 'mahjong:pyramid-72', dims: 'Pyramid 72 · Loose Freedom · 90s Countdown', state: 'enabled', played: 3710, shown: 3900, rate: '72.8%', group: 'mahjong-solitaire-1:pyramid' }
+		]
+	},
+	connect: {
+		name: 'Connect / Flow',
+		totalLabel: '480 Combinations',
+		degRatio: 0.02,
+		degDesc: '10 unplayable path density configurations (impossible uncrossed paths)',
+		presets: [
+			{ id: 'all', label: 'All Combinations (480)' },
+			{ id: 'casual', label: 'Standard Boards (5×5, 6×6)' },
+			{ id: 'speed', label: '⚡ Connect Rush 60s' },
+			{ id: 'trios', label: '🏁 Full-Grid Only' },
+			{ id: 'curated', label: '⭐ Live 4 Variants' }
+		],
+		dimensions: [
+			{
+				id: 'gridSize',
+				title: '1. Grid Dimensions',
+				options: [
+					{ id: 'g5', label: '5×5 Starter Grid', checked: true },
+					{ id: 'g6', label: '6×6 Standard Grid', checked: true },
+					{ id: 'g7', label: '7×7 Advanced Grid', checked: true },
+					{ id: 'g8', label: '8×8 Large Grid', checked: true },
+					{ id: 'g10', label: '10×10 Master Grid', checked: true }
+				]
+			},
+			{
+				id: 'winCondition',
+				title: '2. Completion Target',
+				options: [
+					{ id: 'pairsOnly', label: 'All Pairs Connected (Empty Cells OK)', checked: true },
+					{ id: 'fullGrid', label: 'Full Grid Bonus (100% Filled Cells)', checked: true }
+				]
+			},
+			{
+				id: 'timer',
+				title: '3. Timer / Stress',
+				options: [
+					{ id: 'untimed', label: 'Untimed Relaxed', checked: true },
+					{ id: 'rush60', label: 'Rush (60s Limit)', checked: true },
+					{ id: 'rush30', label: 'Blitz (30s Limit)', checked: true }
+				]
+			},
+			{
+				id: 'topology',
+				title: '4. Board Topology',
+				options: [
+					{ id: 'flat', label: 'Standard Flat Grid', checked: true },
+					{ id: 'bridges', label: 'Bridge Overpasses (Crossing Paths)', checked: true },
+					{ id: 'warps', label: 'Edge Warp Tunnels', checked: true }
+				]
+			}
+		],
+		samples: [
+			{ id: 'connect:classic', dims: '5×5 to 7×7 · Pairs Connected · Flat · Untimed', state: 'enabled', played: 17500, shown: 18200, rate: '81.1%', group: 'connect-1:classic' },
+			{ id: 'connect:full-grid', dims: '6×6 · 100% Full Grid Required · Flat · Untimed', state: 'enabled', played: 8800, shown: 9400, rate: '75.5%', group: 'connect-1:full-grid' },
+			{ id: 'connect:board-8', dims: '8×8 Large Grid · Pairs Connected · Flat · Untimed', state: 'enabled', played: 5900, shown: 6300, rate: '66.7%', group: 'connect-1:board-8' },
+			{ id: 'connect:rush-60', dims: '6×6 · Pairs Connected · 60s Countdown', state: 'enabled', played: 6900, shown: 7200, rate: '70.8%', group: 'connect-1:rush-60' }
+		]
+	},
+	block: {
+		name: 'Block Placement',
+		totalLabel: '640 Combinations',
+		degRatio: 0.03,
+		degDesc: '20 impossible piece supply setups',
+		presets: [
+			{ id: 'all', label: 'All Configurations (640)' },
+			{ id: 'casual', label: 'Classic 8×8 (Rows & Cols)' },
+			{ id: 'speed', label: '⚡ Block Rush (60s)' },
+			{ id: 'trios', label: 'Board 10×10 Grid' },
+			{ id: 'curated', label: '⭐ Live 4 Variants' }
+		],
+		dimensions: [
+			{
+				id: 'gridSize',
+				title: '1. Board Dimensions',
+				options: [
+					{ id: 'b8', label: '8×8 Classic Board', checked: true },
+					{ id: 'b10', label: '10×10 Large Board', checked: true }
+				]
+			},
+			{
+				id: 'clears',
+				title: '2. Clear Mechanic',
+				options: [
+					{ id: 'both', label: 'Rows & Columns Clears', checked: true },
+					{ id: 'rowsOnly', label: 'Rows Only Clears', checked: true },
+					{ id: 'colsOnly', label: 'Columns Only Clears', checked: true },
+					{ id: 'squares', label: '3×3 Box Clears (Blockudoku style)', checked: true }
+				]
+			},
+			{
+				id: 'pieces',
+				title: '3. Piece Pool Supply',
+				options: [
+					{ id: 'standard3', label: 'Standard 3 Pieces in Hand', checked: true },
+					{ id: 'extended4', label: 'Extended 4 Pieces in Hand', checked: true },
+					{ id: 'pentominoes', label: 'Complex Pentomino Shapes', checked: true }
+				]
+			},
+			{
+				id: 'timing',
+				title: '4. Timing Mode',
+				options: [
+					{ id: 'untimed', label: 'Endless Survival (No Clock)', checked: true },
+					{ id: 'rush60', label: 'Rush (60s Countdown)', checked: true },
+					{ id: 'comboStreak', label: 'Streak Multiplier Timer', checked: true }
+				]
+			}
+		],
+		samples: [
+			{ id: 'block:classic', dims: '8×8 · Rows & Cols Clears · Standard 3 · Untimed', state: 'enabled', played: 30100, shown: 31200, rate: '80.4%', group: 'block-placement-1:classic' },
+			{ id: 'block:board-10', dims: '10×10 Grid · Rows & Cols Clears · Standard 3', state: 'enabled', played: 13500, shown: 14200, rate: '69.0%', group: 'block-placement-1:board-10' },
+			{ id: 'block:rows-only', dims: '8×8 Grid · Rows Only Clears · Standard 3', state: 'enabled', played: 8200, shown: 8900, rate: '68.5%', group: 'block-placement-1:rows-only' },
+			{ id: 'block:rush-60', dims: '8×8 Grid · Rows & Cols Clears · 60s Countdown', state: 'enabled', played: 11400, shown: 12100, rate: '71.9%', group: 'block-placement-1:rush-60' }
+		]
+	}
+};
+
+let currentFamilyKey = 'memory';
+let currentFamilyData = familyCatalog.memory;
+
+function renderMatrixGrid() {
+	const grid = document.getElementById('matrixGrid');
+	grid.innerHTML = '';
+
+	currentFamilyData.dimensions.forEach(dim => {
+		const card = document.createElement('div');
+		card.className = 'dimension-card';
+
+		let checkedCount = dim.options.filter(o => o.checked).length;
+
+		let optionsHtml = '';
+		dim.options.forEach(opt => {
+			optionsHtml += `
+				<label class="option-label">
+					<div class="option-left">
+						<input type="checkbox" class="option-checkbox" ${opt.checked ? 'checked' : ''} onchange="toggleOption('${dim.id}', '${opt.id}', this)">
+						<span>${opt.label}</span>
+					</div>
+					<span class="option-meta">1 dial</span>
+				</label>
+			`;
+		});
+
+		card.innerHTML = `
+			<div class="dimension-header">
+				<span class="dim-title">${dim.title}</span>
+				<span class="dim-count">${checkedCount} / ${dim.options.length}</span>
+			</div>
+			<div class="option-list">
+				${optionsHtml}
+			</div>
+		`;
+		grid.appendChild(card);
+	});
+
+	updateTotalCombos();
+	renderSampleTable();
+}
+
+function toggleOption(dimId, optId, checkbox) {
+	const dim = currentFamilyData.dimensions.find(d => d.id === dimId);
+	if (!dim) return;
+	const opt = dim.options.find(o => o.id === optId);
+	if (opt) opt.checked = checkbox.checked;
+	renderMatrixGrid();
+}
+
+function updateTotalCombos() {
+	let total = 1;
+	currentFamilyData.dimensions.forEach(dim => {
+		const activeCount = dim.options.filter(o => o.checked).length;
+		total *= (activeCount > 0 ? activeCount : 1);
+	});
+
+	let deg = Math.round(total * currentFamilyData.degRatio);
+	let safeTotal = Math.max(0, total - deg);
+
+	document.getElementById('totalCombos').innerText = safeTotal.toLocaleString();
+	document.getElementById('degCount').innerText = `${deg.toLocaleString()} unplayable combinations`;
+}
+
+function renderSampleTable() {
+	const tbody = document.getElementById('sampleTableBody');
+	tbody.innerHTML = '';
+
+	currentFamilyData.samples.forEach(s => {
+		const tr = document.createElement('tr');
+		tr.innerHTML = `
+			<td>
+				<strong style="color:var(--ink);">${s.id}</strong>
+			</td>
+			<td><span class="tag-pill">${s.dims}</span></td>
+			<td><span class="badge ${s.state}">${s.state}</span></td>
+			<td><strong>${s.played.toLocaleString()}</strong> <span style="color:var(--muted); font-size:11px;">/ ${s.shown.toLocaleString()}</span></td>
+			<td>
+				<div style="display:flex; align-items:center; gap:8px;">
+					<div style="width:40px; height:5px; background:var(--surface-2); border-radius:10px; overflow:hidden;">
+						<div style="height:100%; width:${s.rate}; background:var(--success);"></div>
+					</div>
+					<strong>${s.rate}</strong>
+				</div>
+			</td>
+			<td><code style="font-size:11px; color:var(--muted);">${s.group}</code></td>
+			<td style="text-align:right;">
+				<button class="btn" style="padding:3px 8px; font-size:11px;" onclick="openDrawer('${s.id}')">Inspect & Test</button>
+			</td>
+		`;
+		tbody.appendChild(tr);
+	});
+}
+
+function renderArchetypeBar() {
+	const bar = document.querySelector('.archetype-bar');
+	bar.innerHTML = '<span class="archetype-title">Archetype Presets:</span>';
+	currentFamilyData.presets.forEach((p, index) => {
+		const btn = document.createElement('button');
+		btn.className = `preset-chip ${index === 0 ? 'active' : ''}`;
+		btn.innerText = p.label;
+		btn.onclick = function() { applyPreset(p.id, this); };
+		bar.appendChild(btn);
+	});
+}
+
+function switchFamily(val) {
+	if (!familyCatalog[val]) return;
+	currentFamilyKey = val;
+	currentFamilyData = familyCatalog[val];
+	document.getElementById('matrixFamilyName').innerText = currentFamilyData.name;
+	renderArchetypeBar();
+	renderMatrixGrid();
+}
+
+function applyPreset(preset, el) {
+	document.querySelectorAll('.preset-chip').forEach(c => c.classList.remove('active'));
+	if (el) el.classList.add('active');
+
+	if (preset === 'all') {
+		currentFamilyData.dimensions.forEach(d => d.options.forEach(o => o.checked = true));
+	} else {
+		// Toggle specific options based on preset
+		currentFamilyData.dimensions.forEach(d => {
+			d.options.forEach((o, i) => {
+				if (preset.includes('speed') && (o.id.includes('rush') || o.id.includes('60'))) o.checked = true;
+				else if (preset.includes('casual') && (o.id.includes('untimed') || o.id.includes('zen') || o.id.includes('static'))) o.checked = true;
+				else o.checked = (i === 0);
+			});
+		});
+	}
+	renderMatrixGrid();
+}
+
+function resetAllDials() {
+	currentFamilyData.dimensions.forEach(d => d.options.forEach(o => o.checked = true));
+	renderMatrixGrid();
+}
+
+function deployMatrix() {
+	const count = document.getElementById('totalCombos').innerText;
+	alert(`Successfully deployed matrix configuration to Cloudflare Edge!\n\n${count} procedural parameter combinations are now active in the rotation pool.`);
+}
+
+function openDrawer(id) {
+	document.getElementById('matrixDrawer').classList.add('open');
+	document.getElementById('drawerBackdrop').classList.add('open');
+}
+
+function closeDrawer() {
+	document.getElementById('matrixDrawer').classList.remove('open');
+	document.getElementById('drawerBackdrop').classList.remove('open');
+}
+
+function setView(mode) {
+	document.querySelectorAll('.view-btn').forEach(b => b.classList.remove('active'));
+	document.body.className = `mode-${mode}`;
+	event.target.classList.add('active');
+}
+
+function switchView(tab) {
+	alert(`Switched view to ${tab}`);
+}
+
+// Initial Render
+renderArchetypeBar();
+renderMatrixGrid();
+</script>
+</body>
+</html>
