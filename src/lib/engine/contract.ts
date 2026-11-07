@@ -74,6 +74,16 @@ export interface PuzzlePresentation {
 }
 export interface PuzzleManifest {
 	variants?: readonly PuzzleVariant[];
+	/** Finite family-owned controls; absence means no dimension policy for this family. */
+	dimensionPolicy?: {
+		dimensions: readonly {
+			key: string;
+			label: string;
+			values: readonly { id: string; label: string }[];
+		}[];
+		archetypes: readonly { id: string; label: string }[];
+		variants: readonly { id: string; archetype: string; change?: readonly [string, string] }[];
+	};
 	id: PuzzleId;
 	presentation: PuzzlePresentation;
 	selectionOrder?: number;

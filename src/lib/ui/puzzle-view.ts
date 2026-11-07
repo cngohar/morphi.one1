@@ -37,6 +37,8 @@ export interface PuzzleViewProps {
 	entranceReady: boolean;
 	ontogglesound: () => void;
 	onhome: () => void;
+	/** Run-over only: abandon the failed round and start another puzzle. */
+	ontryanother?: () => void;
 	onready: () => void;
 	onmove: (move: Move) => void;
 	oncomplete: (score: number, seconds: number) => void;

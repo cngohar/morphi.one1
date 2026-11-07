@@ -13,6 +13,7 @@
 		clearCheckpoint,
 		claimCheckpoint,
 		checkpointDurable,
+		checkpointMatchesIssued,
 		type RoundCheckpoint,
 		type CheckpointState,
 		type CheckpointLease
@@ -356,7 +357,10 @@
 			return;
 		}
 		if (active && 'family' in active) {
-			resumeChoice = checkpoint?.rankedSession === active.id ? checkpoint : active;
+			if (checkpoint?.rankedSession === active.id && !checkpointMatchesIssued(checkpoint, active))
+				console.warn('morphi:checkpoint_identity_mismatch');
+			resumeChoice =
+				checkpoint && checkpointMatchesIssued(checkpoint, active) ? checkpoint : active;
 		} else if (checkpoint) {
 			// A released/expired ranked checkpoint may still continue locally, without a ranked claim.
 			resumeChoice = { ...checkpoint, rankedSession: null, rankedStartedAt: null };
@@ -517,12 +521,26 @@
 				const active = await activeSession(account.ownerKey);
 				if (!active || active.id !== choice.id || active.saving)
 					throw new Error('ranked_resume_unavailable');
+				if (!('family' in active)) {
+					resumeInvalid = true;
+					checkpointLease?.release();
+					return;
+				}
+				if ('moves' in choice && !checkpointMatchesIssued(choice, active)) {
+					console.warn('morphi:checkpoint_identity_mismatch');
+					choice = active;
+				}
 			}
 			if (!puzzleMetadata[choice.family].variants?.length) await assertGameAvailable(choice.family);
 			const module = await loadPuzzleModule(puzzlePools[choice.family], generationLifetime.signal);
 			const checkpoint = 'moves' in choice ? choice : null;
 			const config = choice.scoring;
 			validateScoreValues(choice.family, config.values, choice.variant);
+			if (
+				config.version !== defaultScoreConfig(choice.family, choice.variant).version &&
+				!/^[0-9a-f-]{36}$/.test(config.version)
+			)
+				throw new Error('checkpoint_version');
 			const theme = 'theme' in choice ? choice.theme : null;
 			if (
 				theme &&
@@ -1107,6 +1125,26 @@
 			});
 	}
 
+	/** Budget run-over: no result is saved; abandon the issued session by exact id, then deal again. */
+	async function tryAnother(): Promise<void> {
+		if (screen !== 'game' || starting) return;
+		if (roundOwner && rankedSession)
+			await abandonSession(rankedSession, roundOwner).catch(() =>
+				console.warn('morphi:ranked_abandon_failed')
+			);
+		reportAbandon();
+		console.info(JSON.stringify({ event: 'round_abandoned', family, reason: 'run_over' }));
+		await clearCheckpoint(roundOwner, roundId);
+		stage?.stop();
+		round = null;
+		View = null;
+		checkpointReader = null;
+		cardReady = false;
+		revealed = false;
+		screen = 'home';
+		startRound();
+	}
+
 	function goHome(): void {
 		if (screen === 'game' && completedQueuedId !== roundId && roundOwner && rankedSession) {
 			void abandonSession(rankedSession, roundOwner).catch(() =>
@@ -1189,6 +1227,7 @@
 					ontogglesound={toggleSound}
 					onfinish={recordResult}
 					onhome={goHome}
+					ontryanother={() => void tryAnother()}
 					resume={resumeState}
 					{checkpointSavedAt}
 					{rankedStartedAt}

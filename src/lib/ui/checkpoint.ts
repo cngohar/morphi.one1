@@ -1,4 +1,5 @@
-import { puzzleVariant } from '#lib/scoring.js';
+import { puzzleVariant, validateScoreValues } from '#lib/scoring.js';
+import type { ResumableRankedSession } from './progress.js';
 import type { Move } from '#lib/engine/contract.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import type { ScoreConfig } from '#lib/engine/scoring.js';
@@ -27,6 +28,34 @@ export interface RoundCheckpoint {
 	savedAt: number;
 	rankedSession: string | null;
 	rankedStartedAt: number | null;
+}
+export function checkpointMatchesIssued(
+	checkpoint: RoundCheckpoint,
+	issued: Pick<
+		ResumableRankedSession,
+		'id' | 'family' | 'variant' | 'seed' | 'engineVersion' | 'scoring'
+	>
+): boolean {
+	if (
+		checkpoint.id !== issued.id ||
+		checkpoint.rankedSession !== issued.id ||
+		checkpoint.family !== issued.family ||
+		checkpoint.seed !== issued.seed ||
+		checkpoint.engineVersion !== issued.engineVersion ||
+		checkpoint.scoring.version !== issued.scoring.version
+	)
+		return false;
+	try {
+		if (
+			puzzleVariant(issued.family, checkpoint.variant)?.id !==
+			puzzleVariant(issued.family, issued.variant)?.id
+		)
+			return false;
+		const values = validateScoreValues(issued.family, checkpoint.scoring.values, issued.variant);
+		return Object.entries(values).every(([field, value]) => issued.scoring.values[field] === value);
+	} catch {
+		return false;
+	}
 }
 const memory = new Map<string, RoundCheckpoint | null>();
 const shadow = new Set<string>();

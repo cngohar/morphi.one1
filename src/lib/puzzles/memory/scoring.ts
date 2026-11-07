@@ -11,3 +11,9 @@ export const triosScoring = {
 	fields: ['trio', 'mismatch', 'second'],
 	defaults: { trio: 1500, mismatch: 150, second: 5 }
 } as const satisfies ScoreDefinition;
+
+export const quadsScoring = {
+	version: 'memory-quads-v1',
+	fields: ['quad', 'mismatch', 'second'],
+	defaults: { quad: 2000, mismatch: 150, second: 5 }
+} as const satisfies ScoreDefinition;

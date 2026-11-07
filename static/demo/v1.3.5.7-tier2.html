@@ -1,0 +1,691 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Morphi v1.3.5.7 — Tier 2 Directory Review (Fixture)</title>
+<style>
+:root{
+  color-scheme:light;
+  --bg:#eef2f7;
+  --surface:#fff;
+  --surface-2:#e5edf7;
+  --surface-3:#f4f7fa;
+  --border:#c9d6e4;
+  --ink:#1b2433;
+  --ink-2:#344257;
+  --muted:#5a6b82;
+  --primary:#e5532d;
+  --primary-hover:#c9441f;
+  --danger:#b42318;
+  --warning:#b54708;
+  --warning-bg:#fffaeb;
+  --warning-border:#fedf89;
+  --focus:#2f6fed;
+  --chip:#d7efea;
+  --chip-blue:#d0e2ff;
+  --chip-amber:#fef0c7;
+  --chip-red:#fee4e2;
+  font:600 15px/1.35 'Nunito Variable','Nunito',system-ui,-apple-system,sans-serif;
+}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink)}
+button,input,select,textarea{font:inherit;color:inherit}
+button{cursor:pointer}
+button:disabled{cursor:default;opacity:.5}
+button,a{min-height:38px}
+a{color:var(--ink-2);text-decoration:none}
+:focus-visible{outline:3px solid var(--focus);outline-offset:3px}
+h1,h2,h3,p{margin-top:0}
+h1{font-size:22px;margin-bottom:4px}
+h2{font-size:18px;margin-bottom:12px}
+h3{font-size:14px;margin-bottom:8px;text-transform:uppercase;letter-spacing:.03em;color:var(--muted)}
+p,li{line-height:1.45}
+
+/* Review Bar */
+.review{
+  display:flex;gap:12px;align-items:center;flex-wrap:wrap;
+  padding:10px 24px;background:#fff;border-bottom:1px solid var(--border);
+  font-size:13px;position:sticky;top:0;z-index:40;
+}
+.review strong{color:var(--danger)}
+.review label{display:flex;align-items:center;gap:6px;font-weight:700;max-width:100%}
+.review select{padding:6px 10px;border-radius:6px;border:1px solid var(--border);background:var(--surface);max-width:100%}
+.review small{color:var(--muted)}
+
+/* App Shell */
+.shell{display:grid;grid-template-columns:210px minmax(0,1fr);min-height:100svh}
+.sidebar{background:var(--surface);border-right:1px solid var(--border);padding:24px 18px;display:flex;flex-direction:column;gap:20px}
+.brand{font-size:26px;font-weight:900;letter-spacing:-.04em}
+.sidebar nav{display:grid;gap:4px}
+.sidebar nav span{padding:10px 12px;font-size:13px;font-weight:700;color:var(--ink-2);border-radius:8px}
+.sidebar nav .active{background:var(--surface-2);color:var(--primary)}
+.body{min-width:0}
+header.top-bar{
+  min-height:68px;border-bottom:1px solid var(--border);padding:14px 28px;
+  background:var(--surface);display:flex;align-items:center;justify-content:space-between;
+  gap:12px;font-size:13px;color:var(--muted);
+}
+header.top-bar h1{font-size:20px;color:var(--ink);margin:0}
+main{max-width:1200px;padding:24px 28px 48px;margin:auto}
+
+/* Section Tabs */
+.tabs{
+  display:flex;flex-wrap:wrap;gap:6px;padding:5px;margin-bottom:20px;
+  background:var(--surface-2);border-radius:10px;width:fit-content;max-width:100%;
+}
+.tabs button{
+  padding:8px 14px;border:0;border-radius:7px;background:transparent;
+  font-size:13px;font-weight:800;color:var(--ink-2);
+}
+.tabs button[aria-current=page]{color:#fff;background:var(--ink)}
+
+/* Panels & Cards */
+.panel{background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:20px;margin-bottom:20px}
+.hint{color:var(--muted);font-size:13px;line-height:1.5;margin-bottom:14px}
+
+/* Filter Toolbar */
+.filter-bar{
+  display:grid;grid-template-columns:minmax(180px,1.5fr) repeat(3,minmax(130px,1fr)) auto;
+  gap:10px;align-items:center;padding:14px;background:var(--surface-3);
+  border:1px solid var(--border);border-radius:10px;margin-bottom:16px;
+}
+.filter-bar input, .filter-bar select{
+  width:100%;padding:8px 10px;border:1px solid var(--border);border-radius:7px;
+  background:var(--surface);font-size:13px;
+}
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;
+  background:var(--surface);border:1px solid var(--border);border-radius:8px;
+  padding:8px 14px;font-size:13px;font-weight:800;color:var(--ink);
+}
+.btn:hover{background:var(--surface-2)}
+.btn.primary{background:var(--primary);color:#fff;border-color:var(--primary)}
+.btn.primary:hover{background:var(--primary-hover)}
+.btn.sm{padding:5px 9px;min-height:30px;font-size:12px}
+
+/* Directory Meta Summary */
+.dir-summary{
+  display:flex;justify-content:space-between;align-items:center;
+  flex-wrap:wrap;gap:10px;margin-bottom:12px;font-size:13px;color:var(--muted);
+}
+.dir-summary strong{color:var(--ink)}
+
+/* Variant Row Card */
+.variant-list{display:grid;gap:12px}
+.variant-row{
+  background:var(--surface);border:1px solid var(--border);border-radius:10px;
+  padding:16px;display:grid;grid-template-columns:minmax(160px,1.4fr) minmax(200px,2fr) minmax(170px,1.2fr) auto;
+  gap:14px;align-items:center;transition:border-color .15s;
+}
+.variant-row:hover{border-color:var(--focus)}
+.v-info strong{display:block;font-size:15px;color:var(--ink)}
+.v-info code{font-size:11px;color:var(--muted);overflow-wrap:anywhere}
+.v-badges{display:flex;flex-wrap:wrap;gap:6px;margin-top:6px}
+
+/* Pills & Badges */
+.pill{
+  display:inline-flex;align-items:center;font-size:11px;font-weight:800;
+  padding:2px 8px;border-radius:99px;white-space:nowrap;
+}
+.pill.source-curated{background:var(--chip);color:#0e6251}
+.pill.source-observed{background:var(--chip-blue);color:#0f4c81}
+.pill.status-enabled{background:var(--chip);color:#0e6251}
+.pill.status-disabled{background:var(--chip-amber);color:#8a5a00}
+.pill.status-blocked{background:var(--chip-red);color:var(--danger)}
+.pill.status-unplayed{background:var(--surface-2);color:var(--muted)}
+.pill.archetype{background:var(--surface-2);color:var(--ink-2);font-weight:700}
+
+/* Dimension tags */
+.v-dims{display:flex;flex-wrap:wrap;gap:5px}
+.dim-tag{
+  font-size:11px;background:var(--surface-2);color:var(--ink-2);
+  padding:3px 7px;border-radius:5px;border:1px solid #d8e2ed;
+}
+.dim-tag.blocked{background:var(--chip-red);color:var(--danger);border-color:#fecdca}
+
+/* Telemetry Stats Column */
+.v-stats{
+  display:grid;grid-template-columns:repeat(3,1fr);gap:6px;
+  background:var(--surface-3);padding:8px 10px;border-radius:7px;text-align:center;
+}
+.v-stats small{display:block;font-size:11px;color:var(--muted)}
+.v-stats strong{font-size:13px;color:var(--ink)}
+
+/* Actions Column */
+.v-actions{display:flex;gap:8px;justify-content:flex-end}
+
+/* Pagination Bar */
+.pagination{
+  display:flex;flex-wrap:wrap;gap:8px;align-items:center;
+  margin:20px 0 0;padding-top:16px;border-top:1px solid var(--border);
+}
+.pagination .status-text{font-size:13px;color:var(--muted);margin-right:auto}
+.pagination .cursor-badge{
+  font-size:11px;color:var(--muted);background:var(--surface-2);
+  padding:4px 8px;border-radius:6px;font-family:monospace;margin-right:8px;
+}
+
+/* Empty / Failed Alert */
+.alert{border-left:4px solid var(--danger);background:#fff3f2;padding:14px 18px;border-radius:8px;font-size:13px}
+.empty-box{padding:32px 20px;text-align:center;background:var(--surface-3);border:1px dashed var(--border);border-radius:10px}
+.empty-box p{margin-bottom:12px;color:var(--muted)}
+
+/* Drawer Modal */
+.drawer{
+  position:fixed;margin:0 0 0 auto;inset:0 0 0 auto;
+  width:min(540px,100%);height:100%;max-height:none;
+  border:0;padding:24px;background:var(--surface);color:var(--ink);
+  overflow-y:auto;box-shadow:-4px 0 24px rgba(0,0,0,.15);
+}
+.drawer::backdrop{background:rgb(27 36 51 / 45%)}
+.drawer-header{display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:16px;border-bottom:1px solid var(--border);padding-bottom:14px}
+.drawer-header h2{font-size:22px;margin:4px 0}
+.drawer-header code{font-size:12px;color:var(--muted)}
+.drawer-section{margin-bottom:20px}
+.dim-grid{display:grid;grid-template-columns:repeat(2,1fr);gap:10px;margin-top:8px}
+.dim-card{padding:8px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface-3)}
+.dim-card small{display:block;font-size:11px;color:var(--muted)}
+.dim-card strong{font-size:13px;color:var(--ink)}
+.dim-card.is-blocked{border-color:var(--danger);background:var(--chip-red)}
+.dim-card.is-blocked strong{color:var(--danger)}
+.policy-warning{
+  margin-top:8px;padding:8px 12px;border-radius:6px;
+  background:var(--warning-bg);border:1px solid var(--warning-border);
+  color:var(--warning);font-size:12px;font-weight:700;
+}
+.table-wrap{overflow-x:auto;max-width:100%;margin-top:8px}
+table.drawer-table{width:100%;border-collapse:collapse;font-size:12px}
+table.drawer-table th, table.drawer-table td{padding:8px 10px;text-align:left;border-bottom:1px solid var(--border)}
+table.drawer-table th{background:var(--surface-2);color:var(--muted);text-transform:uppercase;font-size:10px}
+
+/* Responsive Overrides */
+@media(max-width:1024px){
+  .filter-bar{grid-template-columns:repeat(2,1fr)}
+  .variant-row{grid-template-columns:1fr;gap:12px}
+  .v-stats{grid-template-columns:repeat(3,1fr);text-align:left}
+  .v-actions{justify-content:flex-start}
+}
+@media(max-width:768px){
+  .sidebar{display:none}
+  .shell{display:block}
+  header.top-bar{padding:12px 16px}
+  main{padding:16px 14px 36px}
+  .review{padding:8px 12px}
+  .review label{width:100%}
+  .review select{flex:1;min-width:0}
+  .filter-bar{grid-template-columns:1fr}
+}
+</style>
+</head>
+<body>
+
+<div class="review" aria-label="Fixture review controls">
+  <strong>FIXTURE ONLY · Morphi v1.3.5.7 Tier 2 Directory</strong>
+  <label>Scenario:
+    <select id="scenario-select">
+      <option value="normal">All variants (Curated + Observed · Paging)</option>
+      <option value="curated-only">Curated presets only (10 items)</option>
+      <option value="never-played">Never-played preset (memory:collapse)</option>
+      <option value="blocked-policy">Policy-blocked preset (memory:quads)</option>
+      <option value="empty">Empty search results (no match)</option>
+      <option value="failure">Directory query error state</option>
+    </select>
+  </label>
+  <small>Viewport: 390×844 (Mobile portrait), 844×390 (Mobile landscape), or 1280×800 (Desktop).</small>
+</div>
+
+<div class="shell">
+  <aside class="sidebar">
+    <span class="brand">morphi.</span>
+    <nav aria-label="Operator sections">
+      <span>Dashboard</span>
+      <span class="active">Games</span>
+      <span>Users</span>
+      <span>Audit</span>
+    </nav>
+  </aside>
+
+  <div class="body">
+    <header class="top-bar">
+      <div>
+        <h1>Memory Directory</h1>
+        <small>Games / Memory · Tier 2 Curated &amp; Observed Directory</small>
+      </div>
+      <span class="pill status-enabled">Family Enabled</span>
+    </header>
+
+    <main>
+      <!-- Option 1A: Dedicated Directory Tab -->
+      <nav class="tabs" aria-label="Memory sections">
+        <button type="button">Statistics</button>
+        <button type="button" aria-current="page">Directory</button>
+        <button type="button">Scoring</button>
+        <button type="button">Policy</button>
+        <button type="button">Settings</button>
+      </nav>
+
+      <section class="panel">
+        <h2>Curated &amp; Observed Variants</h2>
+        <p class="hint">
+          Browse, filter, and inspect all Memory variants. Sourced from both authoritative curated catalog presets and observed game sessions. Zero traffic-only blind spots: unplayed and disabled configurations remain fully accessible.
+        </p>
+
+        <!-- Multi-Dimensional Filter Toolbar (Option 3A) -->
+        <div class="filter-bar" role="search" aria-label="Variant filters">
+          <input type="search" id="filter-search" placeholder="Search slug or name…" aria-label="Search variant">
+          <select id="filter-status" aria-label="Filter by status">
+            <option value="all">All statuses</option>
+            <option value="enabled">Enabled (active)</option>
+            <option value="disabled">Disabled by switch</option>
+            <option value="blocked">Blocked by policy</option>
+            <option value="unplayed">Never played (0 plays)</option>
+          </select>
+          <select id="filter-archetype" aria-label="Filter by archetype">
+            <option value="all">All archetypes</option>
+            <option value="Core">Core / Standard</option>
+            <option value="Information">Information &amp; Visibility</option>
+            <option value="Grouping">Extended Grouping</option>
+            <option value="Dynamics">Grid Dynamics</option>
+            <option value="Pressure">Resource Pressure</option>
+            <option value="Constraints">Turn Constraints</option>
+          </select>
+          <select id="filter-source" aria-label="Filter by source">
+            <option value="all">All sources</option>
+            <option value="curated">Curated presets</option>
+            <option value="observed">Observed identities</option>
+          </select>
+          <button type="button" id="filter-reset" class="btn sm">Reset</button>
+        </div>
+
+        <!-- Directory Summary Line -->
+        <div class="dir-summary" id="dir-summary" aria-live="polite"></div>
+
+        <!-- Variant List Container -->
+        <div id="dir-content"></div>
+
+        <!-- Keyset / Cursor Pagination Bar (Option 2A) -->
+        <div class="pagination" id="pagination-bar" aria-label="Directory pagination"></div>
+      </section>
+    </main>
+  </div>
+</div>
+
+<!-- Inspection Drawer Modal -->
+<dialog class="drawer" id="drawer" aria-labelledby="drawer-title">
+  <div class="drawer-header">
+    <div>
+      <span class="pill" id="drawer-source-pill">Curated</span>
+      <h2 id="drawer-title">Variant Title</h2>
+      <code id="drawer-slug">memory:slug</code>
+    </div>
+    <button type="button" class="btn sm" id="drawer-close-btn" aria-label="Close details">Close</button>
+  </div>
+  <div id="drawer-body"></div>
+</dialog>
+
+<script>
+// Authoritative 10 accepted Memory pilot variants
+const CURATED_PILOT = [
+  {
+    id: 'memory:classic', name: 'Classic', archetype: 'Core', source: 'curated',
+    state: 'enabled', shown: 412, played: 142, finished: 120,
+    dims: { matchSize: '2 (Pairs)', opening: '3s Preview', movement: 'Static', backs: 'Uniform', budget: 'Standard (6/grp)', availability: 'Standard' }
+  },
+  {
+    id: 'memory:no-preview', name: 'No Preview', archetype: 'Information', source: 'curated',
+    state: 'enabled', shown: 230, played: 89, finished: 74,
+    dims: { matchSize: '2 (Pairs)', opening: 'No preview (0s)', movement: 'Static', backs: 'Uniform', budget: 'Standard (6/grp)', availability: 'Standard' }
+  },
+  {
+    id: 'memory:trios', name: 'Trios', archetype: 'Grouping', source: 'curated',
+    state: 'enabled', shown: 298, played: 114, finished: 96,
+    dims: { matchSize: '3 (Trios)', opening: '3s Preview', movement: 'Static', backs: 'Uniform', budget: 'Standard (6/grp)', availability: 'Standard' }
+  },
+  {
+    id: 'memory:moving', name: 'Moving Cards', archetype: 'Dynamics', source: 'curated',
+    state: 'disabled', shown: 160, played: 56, finished: 44,
+    dims: { matchSize: '2 (Pairs)', opening: '3s Preview', movement: 'Moving', backs: 'Uniform', budget: 'Standard (6/grp)', availability: 'Standard' }
+  },
+  {
+    id: 'memory:budget', name: 'Budget', archetype: 'Pressure', source: 'curated',
+    state: 'enabled', shown: 195, played: 78, finished: 58,
+    dims: { matchSize: '2 (Pairs)', opening: '3s Preview', movement: 'Static', backs: 'Uniform', budget: 'Strict (2/grp)', availability: 'Standard' }
+  },
+  {
+    id: 'memory:lockout', name: 'Lockout', archetype: 'Constraints', source: 'curated',
+    state: 'enabled', shown: 120, played: 45, finished: 39,
+    dims: { matchSize: '2 (Pairs)', opening: '3s Preview', movement: 'Static', backs: 'Uniform', budget: 'Standard (6/grp)', availability: 'Lockout' }
+  },
+  {
+    id: 'memory:swaps', name: 'Swaps', archetype: 'Dynamics', source: 'curated',
+    state: 'enabled', shown: 174, played: 62, finished: 51,
+    dims: { matchSize: '2 (Pairs)', opening: '3s Preview', movement: 'Swaps', backs: 'Uniform', budget: 'Standard (6/grp)', availability: 'Standard' }
+  },
+  {
+    id: 'memory:two-backs', name: 'Two Backs', archetype: 'Information', source: 'curated',
+    state: 'enabled', shown: 110, played: 38, finished: 32,
+    dims: { matchSize: '2 (Pairs)', opening: '3s Preview', movement: 'Static', backs: 'Two backs', budget: 'Standard (6/grp)', availability: 'Standard' }
+  },
+  {
+    id: 'memory:quads', name: 'Quads', archetype: 'Grouping', source: 'curated',
+    state: 'blocked', shown: 240, played: 95, finished: 78,
+    dims: { matchSize: '4 (Quads)', opening: '3s Preview', movement: 'Static', backs: 'Uniform', budget: 'Standard (6/grp)', availability: 'Standard' },
+    policyBlocker: 'matchSize = 4 (Quads)'
+  },
+  {
+    id: 'memory:collapse', name: 'Collapse', archetype: 'Dynamics', source: 'curated',
+    state: 'unplayed', shown: 0, played: 0, finished: 0,
+    dims: { matchSize: '2 (Pairs)', opening: '3s Preview', movement: 'Collapse', backs: 'Uniform', budget: 'Standard (6/grp)', availability: 'Standard' }
+  }
+];
+
+// Additional observed identities to test cursor pagination up to synthetic scale
+const OBSERVED_IDENTITIES = Array.from({ length: 15 }, (_, i) => ({
+  id: `memory:observed-exp-${String(i + 1).padStart(2, '0')}`,
+  name: `Observed Variant ${i + 1}`,
+  archetype: ['Core', 'Information', 'Grouping', 'Dynamics', 'Pressure', 'Constraints'][i % 6],
+  source: 'observed',
+  state: i % 4 === 0 ? 'disabled' : 'enabled',
+  shown: (i + 1) * 12,
+  played: (i + 1) * 6,
+  finished: (i + 1) * 5,
+  dims: { matchSize: '2 (Pairs)', opening: '3s Preview', movement: 'Static', backs: 'Uniform', budget: 'Standard', availability: 'Standard' }
+}));
+
+const ALL_RECORDS = [...CURATED_PILOT, ...OBSERVED_IDENTITIES].sort((a, b) => a.id.localeCompare(b.id));
+
+const PAGE_SIZE = 10;
+let currentPage = 0;
+let inspectedItem = null;
+let lastTriggerEl = null;
+
+const $ = id => document.getElementById(id);
+
+function getFilteredData() {
+  const scenario = $('scenario-select').value;
+  if (scenario === 'failure') return { error: true, items: [] };
+  if (scenario === 'empty') return { error: false, items: [] };
+  if (scenario === 'curated-only') return { error: false, items: CURATED_PILOT };
+  if (scenario === 'never-played') return { error: false, items: CURATED_PILOT.filter(v => v.played === 0) };
+  if (scenario === 'blocked-policy') return { error: false, items: CURATED_PILOT.filter(v => v.state === 'blocked') };
+
+  const query = $('filter-search').value.trim().toLowerCase();
+  const status = $('filter-status').value;
+  const archetype = $('filter-archetype').value;
+  const source = $('filter-source').value;
+
+  return {
+    error: false,
+    items: ALL_RECORDS.filter(item => {
+      if (query && !item.id.toLowerCase().includes(query) && !item.name.toLowerCase().includes(query)) return false;
+      if (status !== 'all') {
+        if (status === 'unplayed' && item.played > 0) return false;
+        if (status !== 'unplayed' && item.state !== status) return false;
+      }
+      if (archetype !== 'all' && item.archetype !== archetype) return false;
+      if (source !== 'all' && item.source !== source) return false;
+      return true;
+    })
+  };
+}
+
+function renderDirectory() {
+  const { error, items } = getFilteredData();
+  const summaryEl = $('dir-summary');
+  const contentEl = $('dir-content');
+  const pagerEl = $('pagination-bar');
+
+  if (error) {
+    summaryEl.innerHTML = '<strong>Error loading directory</strong>';
+    contentEl.innerHTML = `
+      <div class="alert" role="alert">
+        <strong>Directory query failed.</strong> Unable to load directory records from the database.
+        <br><button type="button" class="btn sm" style="margin-top:8px" onclick="$('scenario-select').value='normal';renderDirectory()">Retry Query</button>
+      </div>`;
+    pagerEl.innerHTML = '';
+    return;
+  }
+
+  const total = items.length;
+  const totalPages = Math.max(1, Math.ceil(total / PAGE_SIZE));
+  if (currentPage >= totalPages) currentPage = Math.max(0, totalPages - 1);
+
+  const startIdx = currentPage * PAGE_SIZE;
+  const endIdx = Math.min(startIdx + PAGE_SIZE, total);
+  const pagedItems = items.slice(startIdx, endIdx);
+
+  summaryEl.innerHTML = `
+    <span>Showing <strong>${total ? startIdx + 1 : 0}–${endIdx}</strong> of <strong>${total}</strong> variants matching active filters</span>
+    <span class="muted">${CURATED_PILOT.length} curated pilot presets registered</span>
+  `;
+
+  if (items.length === 0) {
+    contentEl.innerHTML = `
+      <div class="empty-box" role="status">
+        <p>No variants match the selected filter criteria.</p>
+        <button type="button" class="btn sm" onclick="resetFilters()">Clear all filters</button>
+      </div>`;
+    pagerEl.innerHTML = '';
+    return;
+  }
+
+  contentEl.innerHTML = `
+    <div class="variant-list">
+      ${pagedItems.map(renderRow).join('')}
+    </div>
+  `;
+
+  // Render Keyset Cursor Pager
+  const nextItem = pagedItems[pagedItems.length - 1];
+  const cursorToken = nextItem ? btoa(JSON.stringify({ after: nextItem.id, dir: 'next' })).slice(0, 16) + '…' : 'none';
+
+  pagerEl.innerHTML = `
+    <span class="status-text">Page ${currentPage + 1} of ${totalPages} · Bounded 10 per page</span>
+    <span class="cursor-badge" title="Opaque keyset cursor token">cursor:${cursorToken}</span>
+    <button type="button" class="btn" ${currentPage === 0 ? 'disabled' : ''} onclick="gotoPage(0)">First</button>
+    <button type="button" class="btn" ${currentPage === 0 ? 'disabled' : ''} onclick="gotoPage(${currentPage - 1})">Previous</button>
+    <button type="button" class="btn" ${currentPage >= totalPages - 1 ? 'disabled' : ''} onclick="gotoPage(${currentPage + 1})">Next</button>
+    <button type="button" class="btn" ${currentPage >= totalPages - 1 ? 'disabled' : ''} onclick="gotoPage(${totalPages - 1})">Last</button>
+  `;
+}
+
+function renderRow(v) {
+  const playRate = v.shown > 0 ? `${Math.round((v.played / v.shown) * 100)}%` : '—';
+  const statusLabel =
+    v.state === 'enabled' ? 'Enabled' :
+    v.state === 'disabled' ? 'Disabled' :
+    v.state === 'blocked' ? 'Blocked by Policy' : 'Never Played';
+
+  return `
+    <article class="variant-row" data-id="${v.id}">
+      <div class="v-info">
+        <strong>${v.name}</strong>
+        <code>${v.id}</code>
+        <div class="v-badges">
+          <span class="pill source-${v.source}">${v.source === 'curated' ? 'Curated' : 'Observed'}</span>
+          <span class="pill status-${v.state}">${statusLabel}</span>
+          <span class="pill archetype">${v.archetype}</span>
+        </div>
+      </div>
+
+      <div class="v-dims">
+        <span class="dim-tag ${v.dims.matchSize.includes('4') && v.state === 'blocked' ? 'blocked' : ''}">
+          Size: ${v.dims.matchSize}
+        </span>
+        <span class="dim-tag">Opening: ${v.dims.opening}</span>
+        <span class="dim-tag">Move: ${v.dims.movement}</span>
+        <span class="dim-tag">Backs: ${v.dims.backs}</span>
+        <span class="dim-tag">Budget: ${v.dims.budget}</span>
+      </div>
+
+      <div class="v-stats">
+        <div><small>Shown</small><strong>${v.shown}</strong></div>
+        <div><small>Played</small><strong>${v.played}</strong></div>
+        <div><small>Play Rate</small><strong>${playRate}</strong></div>
+      </div>
+
+      <div class="v-actions">
+        <button type="button" class="btn sm" onclick="inspectVariant('${v.id}', this)" aria-haspopup="dialog">Inspect</button>
+        <button type="button" class="btn sm" disabled title="Lifecycle changes disabled in preview">${v.state === 'enabled' ? 'Disable' : 'Enable'}</button>
+      </div>
+    </article>
+  `;
+}
+
+function inspectVariant(id, trigger) {
+  const item = ALL_RECORDS.find(v => v.id === id);
+  if (!item) return;
+  inspectedItem = item;
+  lastTriggerEl = trigger;
+
+  $('drawer-title').textContent = item.name;
+  $('drawer-slug').textContent = item.id;
+  $('drawer-source-pill').textContent = item.source === 'curated' ? 'Curated Preset' : 'Observed Identity';
+  $('drawer-source-pill').className = `pill source-${item.source}`;
+
+  const isBlocked = item.state === 'blocked';
+  const playRate = item.shown > 0 ? `${Math.round((item.played / item.shown) * 100)}%` : '—';
+
+  $('drawer-body').innerHTML = `
+    <div class="drawer-section">
+      <span class="pill status-${item.state}">${isBlocked ? 'Blocked by Dimension Policy' : item.state.toUpperCase()}</span>
+      <span class="pill archetype">${item.archetype} Archetype</span>
+
+      ${isBlocked ? `
+        <div class="policy-warning" role="alert">
+          <strong>Policy Blocker:</strong> ${item.policyBlocker}. This variant cannot be issued in new rounds until that dimension value is re-enabled in Policy settings.
+        </div>
+      ` : ''}
+    </div>
+
+    <div class="drawer-section">
+      <h3>Supported Dimension Breakdown</h3>
+      <div class="dim-grid">
+        <div class="dim-card ${isBlocked && item.dims.matchSize.includes('4') ? 'is-blocked' : ''}">
+          <small>Match Size</small>
+          <strong>${item.dims.matchSize}</strong>
+        </div>
+        <div class="dim-card">
+          <small>Opening Exposure</small>
+          <strong>${item.dims.opening}</strong>
+        </div>
+        <div class="dim-card">
+          <small>Board Movement</small>
+          <strong>${item.dims.movement}</strong>
+        </div>
+        <div class="dim-card">
+          <small>Card Backs</small>
+          <strong>${item.dims.backs}</strong>
+        </div>
+        <div class="dim-card">
+          <small>Attempt Budget</small>
+          <strong>${item.dims.budget}</strong>
+        </div>
+        <div class="dim-card">
+          <small>Turn Availability</small>
+          <strong>${item.dims.availability}</strong>
+        </div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <h3>Telemetry Counters</h3>
+      <div class="v-stats" style="grid-template-columns:repeat(4,1fr);padding:12px">
+        <div><small>Shown</small><strong>${item.shown}</strong></div>
+        <div><small>Played</small><strong>${item.played}</strong></div>
+        <div><small>Finished</small><strong>${item.finished}</strong></div>
+        <div><small>Play Rate</small><strong>${playRate}</strong></div>
+      </div>
+    </div>
+
+    <div class="drawer-section">
+      <h3>Rules Group &amp; Scoring</h3>
+      <p class="hint">Leaderboard rules group: <code>${item.id === 'memory:quads' ? 'memory-quads-v1' : 'memory-1'}</code></p>
+      <div class="table-wrap">
+        <table class="drawer-table">
+          <thead>
+            <tr><th>Rules Group</th><th>Version</th><th>Completions</th><th>Best</th><th>Avg Secs</th></tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>${item.id === 'memory:quads' ? 'memory-quads-v1' : 'memory-1'}</td>
+              <td>live</td>
+              <td>${item.finished}</td>
+              <td>${item.finished ? 840 : '—'}</td>
+              <td>${item.finished ? '28.4s' : '—'}</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div style="margin-top:10px">
+        <button type="button" class="btn sm" onclick="alert('In production, this jumps directly to /admin/games?game=memory&subview=scoring#${item.id}')">
+          Open in Scoring Editor →
+        </button>
+      </div>
+    </div>
+
+    <div class="drawer-section" style="border-top:1px solid var(--border);padding-top:16px">
+      <h3>Inline Lifecycle Action</h3>
+      <p class="hint">Toggle variant availability for new rounds. Requires reason and confirmation.</p>
+      <button type="button" class="btn" disabled style="width:100%">
+        ${item.state === 'enabled' ? 'Disable Variant (Simulated)' : 'Enable Variant (Simulated)'}
+      </button>
+    </div>
+  `;
+
+  $('drawer').showModal();
+}
+
+function closeDrawer() {
+  $('drawer').close();
+}
+
+$('drawer').addEventListener('close', () => {
+  if (lastTriggerEl && lastTriggerEl.isConnected) lastTriggerEl.focus();
+  inspectedItem = null;
+  lastTriggerEl = null;
+});
+
+// Backdrop click dismissal
+let backdropStart = false;
+$('drawer').addEventListener('pointerdown', e => {
+  const r = $('drawer').getBoundingClientRect();
+  backdropStart = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+});
+$('drawer').addEventListener('pointerup', e => {
+  const r = $('drawer').getBoundingClientRect();
+  const onBackdrop = e.clientX < r.left || e.clientX > r.right || e.clientY < r.top || e.clientY > r.bottom;
+  if (backdropStart && onBackdrop) closeDrawer();
+  backdropStart = false;
+});
+
+$('drawer-close-btn').onclick = closeDrawer;
+
+function gotoPage(page) {
+  currentPage = page;
+  renderDirectory();
+}
+
+function resetFilters() {
+  $('filter-search').value = '';
+  $('filter-status').value = 'all';
+  $('filter-archetype').value = 'all';
+  $('filter-source').value = 'all';
+  $('scenario-select').value = 'normal';
+  currentPage = 0;
+  renderDirectory();
+}
+
+$('filter-search').addEventListener('input', () => { currentPage = 0; renderDirectory(); });
+$('filter-status').addEventListener('change', () => { currentPage = 0; renderDirectory(); });
+$('filter-archetype').addEventListener('change', () => { currentPage = 0; renderDirectory(); });
+$('filter-source').addEventListener('change', () => { currentPage = 0; renderDirectory(); });
+$('filter-reset').addEventListener('click', resetFilters);
+$('scenario-select').addEventListener('change', () => { currentPage = 0; renderDirectory(); });
+
+renderDirectory();
+</script>
+</body>
+</html>

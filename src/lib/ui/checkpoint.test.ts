@@ -1,6 +1,7 @@
 import { afterEach, expect, it, vi } from 'vitest';
-import { validCheckpoint, type RoundCheckpoint } from './checkpoint.js';
+import { checkpointMatchesIssued, validCheckpoint, type RoundCheckpoint } from './checkpoint.js';
 import { manifest as memory } from '#lib/puzzles/memory/manifest.js';
+import { triosScoring } from '#lib/puzzles/memory/scoring.js';
 import { manifest as block } from '#lib/puzzles/block-placement/manifest.js';
 import { manifest as connect } from '#lib/puzzles/connect/manifest.js';
 
@@ -41,6 +42,35 @@ it('rejects stale, future-version, malformed and different-owner checkpoints', (
 		{ ...value, state: { ...value.state, pending: { mismatch: -1 } } }
 	])
 		expect(validCheckpoint(invalid, null)).toBe(false);
+});
+it('accepts only the exact issued Memory identity and score snapshot for ranked recovery', () => {
+	for (const variant of ['memory:classic', 'memory:no-preview', 'memory:trios', 'memory:moving']) {
+		const local = { ...checkpoint(), owner: 'player', rankedSession: 'round', variant };
+		const scoring = variant === 'memory:trios' ? triosScoring : memory.scoring;
+		local.scoring = { version: scoring.version, values: scoring.defaults };
+		const issued = {
+			id: 'round',
+			family: 'memory',
+			variant,
+			seed: '42',
+			engineVersion: 'memory-1',
+			scoring: local.scoring
+		};
+		expect(checkpointMatchesIssued(local, issued)).toBe(true);
+		if (variant === 'memory:classic')
+			expect(checkpointMatchesIssued({ ...local, variant: undefined }, issued)).toBe(true);
+		for (const changed of [
+			{ ...local, id: 'other' },
+			{ ...local, rankedSession: null },
+			{ ...local, variant: 'memory:unknown' },
+			{ ...local, seed: '43' },
+			{ ...local, engineVersion: 'memory-future' },
+			{ ...local, scoring: { ...local.scoring, version: 'other' } },
+			{ ...local, scoring: { ...local.scoring, values: { ...local.scoring.values, mismatch: 1 } } },
+			{ ...local, scoring: { ...local.scoring, values: { mismatch: 1 } } }
+		])
+			expect(checkpointMatchesIssued(changed, issued)).toBe(false);
+	}
 });
 it('accepts family-owned checkpoint phases while rejecting malformed or unbounded phases', () => {
 	const value = checkpoint();

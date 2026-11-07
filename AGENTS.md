@@ -33,6 +33,67 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.7 accepted locally; source-only GitHub handoff authorized (2026-11-07):**
+The owner said “got them, approved and now comit and push to github”, accepting the
+completed Tier 2 Memory directory and authorizing this source-only commit/push to
+existing `origin/main`. This supersedes earlier .7 pending-review and commit/push limits
+for this handoff only. Scoped format/lint/types (0 errors/warnings), real-D1 integration
+suite (15/15 passed), and Playwright Chromium admin suite (3/3 passed at single worker,
+including directory checks across 390×844, 844×390, and 1280×800 with zero horizontal
+overflow and retained captures in `build/v1.3.5.7/`) remain the verification evidence.
+Ten Memory variants remain the accepted catalogue; .7 adds no new variants. Full `bun run verify`
+remains deferred; unauditioned audio and unrelated local editor/MCP files remain excluded.
+No .8, future commit/push, deployment, or production change is authorized. See
+`docs/briefs/v1.3.5.7-tier2-directory-brief.md` and `docs/work/V1.3.5.7_WORK.md`.
+
+**v1.3.5.6 Memory Tier 1 policy locally completed (2026-11-07):**
+The owner accepted the .6 fixture as a functional visual baseline at the three
+required sizes, deferred visual polish, and explicitly authorized local
+implementation. They allowed direct parent work/testing because required
+`gpt-6.1-sol`/`gpt-6-luna` models are unavailable; no substitute agent evidence
+is claimed. Memory-only supported dimensions, immutable `game_config` snapshots,
+audited CAS policy writes, admin Policy tab, effective availability and atomic
+ranked issuance are connected. Existing in-flight rounds retain issued rules;
+other families and the ten locally accepted Memory variants are unchanged.
+Scoped format/lint/types (0 errors/warnings), dimension unit (1/1), real-D1
+(14/14), Chromium admin (2/2 at one worker, policy at three sizes), four focused
+shared config/issuance tests, and 38 Memory vectors in six runtimes pass.
+Owner functional acceptance of .6 is recorded; .6 completed. Full `bun run verify` remains
+deferred; no commit/push, deployment, or production change is authorized.
+The pre-existing .4 slice6 unit failure remains recorded. Preserve C1–C10,
+unauditioned audio and unrelated palette/editor/MCP files. See
+`docs/briefs/v1.3.5.6-tier1-policy-brief.md` and `docs/work/V1.3.5.6_WORK.md`.
+
+**v1.3.5.4 Memory identity locally implemented, owner-accepted (2026-11-07):**
+The owner selected .4 local work with “ok do it”. Ranked checkpoint recovery now
+compares the existing four-variant identity and score snapshot to authoritative
+issuance both before Resume and after ownership refresh. Unknown historical
+ranked identities return a safe non-resumable conflict. A pre-existing .2 admin
+initializer failed `bun run check`; the owner separately authorized its four-
+field pagination-default correction. Scoped format/lint, type check (0 errors/
+warnings), 15/15 units, 10/10 real D1, six-runtime Memory vectors and focused
+Chromium recovery cases pass. No new variants, UI, schema or version. Existing
+four Memory variants remain accepted; six .3 additions remain design candidates.
+Full verify stays deferred. The owner's later “Accept .4; start .5” closes
+local .4 functional review, without authorizing new commit/push or deployment. Preserve C1–C10,
+the audio exclusion and unrelated local palette/editor/MCP files. See
+`docs/briefs/v1.3.5.4-identity-brief.md` and `docs/work/V1.3.5.4_WORK.md`.
+
+**v1.3.5.3 Memory design matrix and representative visuals approved (2026-11-07):**
+After directing “.3 finish the decision and visual review first”, the owner
+separately selected “Approve recommendations” for the six pilot rule/identity/
+scoring decisions and “Approve three sizes” for the fixture-only preview at
+390×844, 844×390 and 1280×800 (including six-group Quads and Budget run-over).
+Four existing Memory variants remain the only implemented/accepted catalogue;
+six new IDs are approved design candidates, not implemented or functionally
+accepted. Local focused fixture checks passed after correcting a 24-card short-
+landscape overflow; no app tests, physical-device review or production UI
+acceptance is inferred. Full verification remains deferred. No .4/.5 app work,
+new commit/push, deployment or production change is authorized by this planning
+approval; await separate selection. Preserve C1–C10 and unrelated local/audio
+exclusions. See `docs/briefs/v1.3.5.3-memory-matrix-brief.md` and
+`docs/work/V1.3.5.3_WORK.md`.
+
 **v1.3.5.2 accepted locally; source-only GitHub handoff authorized (2026-11-07):**
 The owner said “update the git repo and push to github”, accepting the completed
 bounded Games admin queries and pagination and authorizing this source-only

@@ -3,6 +3,7 @@ import type { PuzzleId } from '#lib/engine/contract.js';
 import { RunError } from './runs.js';
 import { puzzleVariant } from '#lib/scoring.js';
 import { ensureCatalogFamily } from './config.js';
+import { memoryBlockers, readMemoryPolicy } from './memory-policy.js';
 
 // Catalog ids drive reads and audited lifecycle writes; no family-specific dispatch.
 type GameAction =
@@ -165,6 +166,7 @@ export async function gameOverview(db: D1Database, selectedFamily?: PuzzleId) {
 			}>()
 	).results;
 	const counts = await activityCounts(db, selectedFamily);
+	const memoryPolicy = families.includes('memory') ? (await readMemoryPolicy(db)).values : null;
 	return families.map((family) => {
 		const state = states.find((row) => row.family === family);
 		if (!state) throw new Error('missing_game_lifecycle');
@@ -188,7 +190,13 @@ export async function gameOverview(db: D1Database, selectedFamily?: PuzzleId) {
 			variants,
 			variantCount: catalog[family].variants?.length ?? 0,
 			enabledVariantCount: catalog[family].variants?.length
-				? variants.filter((row) => row.state === 'enabled').length
+				? variants.filter(
+						(row) =>
+							row.state === 'enabled' &&
+							(family !== 'memory' ||
+								!memoryPolicy ||
+								memoryBlockers(row.id, memoryPolicy).length === 0)
+					).length
 				: 0
 		};
 	});
@@ -278,7 +286,7 @@ export async function cachedGameOverview(
 		}
 	return overview;
 }
-async function invalidateOverview(cache?: KVNamespace) {
+export async function invalidateOverview(cache?: KVNamespace) {
 	if (cache)
 		try {
 			await cache.delete(overviewKey);
@@ -426,8 +434,11 @@ export async function variantOverview(db: D1Database, family: PuzzleId) {
 	}));
 }
 export async function enabledVariants(db: D1Database, family: PuzzleId) {
-	return (await variantOverview(db, family))
-		.filter((variant) => variant.state === 'enabled')
+	const rows = (await variantOverview(db, family)).filter((variant) => variant.state === 'enabled');
+	if (family !== 'memory') return rows.map((variant) => variant.id);
+	const { values } = await readMemoryPolicy(db);
+	return rows
+		.filter((variant) => memoryBlockers(variant.id, values).length === 0)
 		.map((variant) => variant.id);
 }
 export async function variantAvailable(db: D1Database, family: PuzzleId, variant?: string) {
@@ -439,7 +450,8 @@ export async function variantAvailable(db: D1Database, family: PuzzleId, variant
 	}
 	return (
 		(await gameAvailable(db, family)) &&
-		(!definition || (await enabledVariants(db, family)).includes(definition.id))
+		((family !== 'memory' && !definition) ||
+			(await enabledVariants(db, family)).includes(definition?.id ?? 'memory:classic'))
 	);
 }
 export async function changeVariant(

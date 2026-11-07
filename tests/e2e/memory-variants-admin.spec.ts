@@ -96,6 +96,20 @@ async function inspectDrawer(page: Page, row: Locator) {
 	}
 }
 
+const legacyVariants = ['memory:classic', 'memory:no-preview', 'memory:trios'];
+const memoryVariants = [
+	'memory:classic',
+	'memory:no-preview',
+	'memory:trios',
+	'memory:moving',
+	'memory:budget',
+	'memory:lockout',
+	'memory:swaps',
+	'memory:two-backs',
+	'memory:quads',
+	'memory:collapse'
+];
+
 test('Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds', async ({
 	browser
 }) => {
@@ -179,7 +193,7 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			page.getByText('Registered users only; guest solo starts are not counted.', { exact: true })
 		).toBeVisible();
 		await expect(page.locator('.scoring-card')).toHaveCount(0);
-		await expect(page.locator('.variant-row')).toHaveCount(4);
+		await expect(page.locator('.variant-row')).toHaveCount(memoryVariants.length);
 		const moving = page.locator('.variant-row[data-variant="memory:moving"]');
 		await expect(moving.getByText('Total completed', { exact: true })).toBeVisible();
 		await moving.getByRole('button', { name: 'Inspect' }).click();
@@ -223,7 +237,16 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-REENABLE');
 		await expect(moving.locator('.status-pill')).toContainText('Enabled');
 		await apply(moving.locator('form'), 'Disable variant', 'CASE-VARIANT-DISABLE-AGAIN');
-		for (const id of ['memory:classic', 'memory:no-preview', 'memory:trios']) {
+		// The six v1.3.5.5 identities are disabled directly: 60 operator requests per minute cannot
+		// cover a click-through of every row. Their lifecycle is restored in `finally`.
+		for (const id of memoryVariants.slice(4))
+			await db
+				.prepare(
+					"INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('memory',?,'disabled','CASE-ALL-VARIANTS-DISABLED') ON CONFLICT(family,variant) DO UPDATE SET state='disabled'"
+				)
+				.bind(id)
+				.run();
+		for (const id of legacyVariants) {
 			const row = page.locator(`.variant-row[data-variant="${id}"]`);
 			if ((await row.locator('input[name=action]').inputValue()) === 'variant-disable')
 				await apply(row.locator('form'), 'Disable variant', 'CASE-ALL-VARIANTS-DISABLED');
@@ -234,7 +257,7 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		expect(
 			(await (await context.request.get('/api/play/availability?family=memory')).json()).available
 		).toBe(false);
-		for (const id of ['memory:classic', 'memory:no-preview', 'memory:trios']) {
+		for (const id of legacyVariants) {
 			const row = page.locator(`.variant-row[data-variant="${id}"]`);
 			await apply(row.locator('form'), 'Enable variant', 'CASE-RESTORE-VARIANT');
 		}
@@ -268,13 +291,14 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			.getByRole('link', { name: 'Scoring' })
 			.click();
 		const editors = page.locator('.scoring-card');
-		await expect(editors).toHaveCount(2);
+		await expect(editors).toHaveCount(3);
 		await expect(editors.first()).toContainText(
-			'Edits affect Classic, No preview, Moving cards in future rounds.'
+			'Edits affect Classic, No preview, Moving cards, Tight Budget, Lockout, Marked Swaps, Two Backs, Collapse in future rounds.'
 		);
 		for (const [index, variant, field, scope] of [
 			[0, undefined, 'Points per pair', 'memory'],
-			[1, 'memory:trios', 'Points per trio', 'memory:trios']
+			[1, 'memory:trios', 'Points per trio', 'memory:trios'],
+			[2, 'memory:quads', 'Points per quad', 'memory:quads']
 		] as const) {
 			const editor = editors.nth(index),
 				save = editor.locator('form').first();
@@ -328,31 +352,28 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			if (request.method() === 'POST' && /\/api\/(play|progress)/.test(request.url()))
 				playerWrites.push(request.url());
 		});
-		for (const variant of [
-			'memory:classic',
-			'memory:no-preview',
-			'memory:trios',
-			'memory:moving'
-		]) {
+		for (const variant of memoryVariants) {
 			await testPlay.getByRole('combobox', { name: 'Variant', exact: true }).selectOption(variant);
 			await testPlay.getByRole('button', { name: /^(Start test round|Next test round)$/ }).click();
 			await expect(testPlay.locator('.game')).toHaveAttribute('data-phase', 'playing', {
 				timeout: 12000
 			});
 			await expect(testPlay.locator('.test-banner')).toContainText('Admin test · Memory');
-			const groups = await testPlay.locator('.memory-card').evaluateAll((cards) => {
-				const matches = new Map<string, number[]>();
-				cards.forEach((card, index) => {
-					const symbol = card.querySelector('.card-front')!.innerHTML;
-					matches.set(symbol, [...(matches.get(symbol) ?? []), index]);
-				});
-				return [...matches.values()];
-			});
-			expect(groups.every((group) => group.length === (variant === 'memory:trios' ? 3 : 2))).toBe(
-				true
-			);
-			for (const group of groups)
-				for (const index of group) await testPlay.locator('.memory-card').nth(index).click();
+			const size = { 'memory:trios': 3, 'memory:quads': 4 }[variant] ?? 2;
+			const open = testPlay.locator('.memory-card:not(.is-matched)');
+			const symbolsOf = () =>
+				open.evaluateAll((cards) =>
+					cards.map((card) => card.querySelector('.card-front')!.innerHTML)
+				);
+			const first = await symbolsOf();
+			expect(first.filter((symbol) => symbol === first[0])).toHaveLength(size);
+			// Live solve: collapse removes matched cards, so positions are re-read after every group.
+			while ((await testPlay.getByText(/^Test score:/).count()) === 0 && (await open.count()) > 0) {
+				const deck = await symbolsOf();
+				for (const [index, symbol] of deck.entries())
+					if (symbol === deck[0]) await open.nth(index).click();
+				await page.waitForTimeout(60);
+			}
 			await expect(testPlay.getByText(/^Test score:/)).toBeVisible({ timeout: 12000 });
 			await expect(testPlay.getByRole('alert')).toHaveCount(0);
 		}
@@ -414,7 +435,7 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 				await page.goto(`/admin/games${query}`);
 				await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
 				await expect(page.getByRole('alert')).toHaveCount(0);
-				await expect(page.locator('.scoring-card')).toHaveCount(state === 'scoring' ? 2 : 0);
+				await expect(page.locator('.scoring-card')).toHaveCount(state === 'scoring' ? 3 : 0);
 				expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
 					false
 				);
@@ -470,6 +491,302 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		}
 		await db.prepare("DELETE FROM variant_lifecycle WHERE family='memory'").run();
 		for (const row of originalLifecycle)
+			await db
+				.prepare(
+					"INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('memory',?,?,?)"
+				)
+				.bind(row.variant, row.state, row.reason)
+				.run();
+		if (userId)
+			await db.batch([
+				db.prepare('DELETE FROM admin_web_operator WHERE user_id=?').bind(userId),
+				db.prepare('DELETE FROM admin_actor WHERE id=?').bind(userId),
+				db.prepare('DELETE FROM user WHERE id=?').bind(userId)
+			]);
+		await context.close();
+		await proxy.dispose();
+	}
+});
+
+test('dimension policy editor previews and saves only supported Memory values', async ({
+	browser
+}) => {
+	test.setTimeout(120_000);
+	const proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc' });
+	const db = proxy.env.DB;
+	const original = await db
+		.prepare("SELECT version FROM config_live WHERE key='game:memory'")
+		.first<{ version: string }>();
+	const lifecycle = (
+		await db
+			.prepare("SELECT variant,state,reason FROM variant_lifecycle WHERE family='memory'")
+			.all<{ variant: string; state: string; reason: string }>()
+	).results;
+	const context = await browser.newContext({
+		baseURL: 'http://localhost:5173',
+		reducedMotion: 'reduce'
+	});
+	let userId: string | undefined;
+	try {
+		await db.batch([
+			db.prepare("DELETE FROM config_live WHERE key='game:memory'"),
+			db.prepare("DELETE FROM variant_lifecycle WHERE family='memory'")
+		]);
+		const helpers = (
+			await betterAuth({
+				...createAuth(db, {
+					baseURL: 'http://localhost:5173',
+					secret: proxy.env.BETTER_AUTH_SECRET,
+					googleClientId: '',
+					googleClientSecret: ''
+				}).options,
+				plugins: [testUtils()]
+			}).$context
+		).test;
+		const user = await helpers.saveUser(
+			helpers.createUser({
+				email: `${crypto.randomUUID()}@example.test`,
+				name: 'Memory policy operator'
+			})
+		);
+		userId = user.id;
+		const login = await helpers.login({ userId });
+		await context.addCookies(login.cookies);
+		const secret = new Uint8Array(20).fill(23),
+			iv = randomBytes(12);
+		const cipher = createCipheriv(
+			'aes-256-gcm',
+			createHash('sha256').update(`operator-v1:${proxy.env.BETTER_AUTH_SECRET}`).digest(),
+			iv
+		);
+		const data = Buffer.concat([cipher.update(secret), cipher.final(), cipher.getAuthTag()]);
+		await db.batch([
+			db.prepare("INSERT INTO admin_actor(id,role) VALUES(?,'admin')").bind(userId),
+			db
+				.prepare('INSERT INTO admin_web_operator(user_id,secret_cipher) VALUES(?,?)')
+				.bind(userId, JSON.stringify({ iv: Array.from(iv), data: Array.from(data) }))
+		]);
+		const page = await context.newPage();
+		await page.goto('/admin/sign-in');
+		await page.getByRole('textbox').fill(totp(secret, Date.now()));
+		await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
+		await expect(page).toHaveURL(/\/admin\/dashboard$/);
+		for (const viewport of [
+			{ width: 390, height: 844 },
+			{ width: 844, height: 390 },
+			{ width: 1280, height: 800 }
+		]) {
+			await page.setViewportSize(viewport);
+			await page.goto('/admin/games?game=memory&subview=policy');
+			await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
+			await expect(page.getByRole('heading', { name: 'Supported dimensions' })).toBeVisible();
+			await expect(page.getByText('10 of 10 variants eligible')).toBeVisible();
+			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
+				false
+			);
+			await page.screenshot({
+				path: `build/v1.3.5.6/real-policy-${viewport.width}x${viewport.height}.png`,
+				fullPage: true
+			});
+		}
+		await page
+			.getByRole('group', { name: 'Match size' })
+			.getByRole('checkbox', { name: 'Quads' })
+			.uncheck();
+		await expect(page.getByText('9 of 10 variants eligible')).toBeVisible();
+		await page.getByRole('button', { name: 'Review policy change' }).click();
+		const dialog = page.getByRole('dialog', { name: 'Review policy change' });
+		await expect(dialog.getByText('memory:quads')).toBeVisible();
+		await dialog.getByRole('textbox', { name: /Reason/ }).fill('Disable Quads for policy review');
+		await dialog.getByRole('checkbox', { name: 'I have checked the affected presets' }).check();
+		const [saved] = await Promise.all([
+			page.waitForResponse(
+				(response) =>
+					response.request().method() === 'POST' && response.url().includes('/admin/games')
+			),
+			dialog.getByRole('button', { name: 'Apply policy' }).click()
+		]);
+		expect(saved.status()).toBe(200);
+		await expect(dialog).not.toBeVisible();
+		await expect(page.getByText('9 of 10 variants eligible')).toBeVisible();
+		const available = await context.request.get(
+			'/api/play/availability?family=memory&variant=memory:quads'
+		);
+		expect((await available.json()).available).toBe(false);
+		const stale = await context.request.post('/admin/games?game=memory&subview=policy', {
+			headers: { Origin: 'http://localhost:5173' },
+			form: {
+				action: 'dimension-policy-update',
+				target: 'memory',
+				expected: original?.version ?? 'catalog-v1',
+				values: await page.locator('input[name=values]').inputValue(),
+				reason: 'Stale change',
+				confirm: 'yes'
+			}
+		});
+		expect(stale.status()).toBe(409);
+		await page
+			.getByRole('group', { name: 'Match size' })
+			.getByRole('checkbox', { name: 'Pairs' })
+			.uncheck();
+		await page
+			.getByRole('group', { name: 'Match size' })
+			.getByRole('checkbox', { name: 'Trios' })
+			.uncheck();
+		await expect(page.getByText(/No playable Memory variants remain/)).toBeVisible();
+		await expect(page.getByRole('button', { name: 'Review policy change' })).toBeDisabled();
+	} finally {
+		if (original)
+			await db
+				.prepare("UPDATE config_live SET version=? WHERE key='game:memory'")
+				.bind(original.version)
+				.run();
+		else await db.prepare("DELETE FROM config_live WHERE key='game:memory'").run();
+		await db.prepare("DELETE FROM variant_lifecycle WHERE family='memory'").run();
+		for (const row of lifecycle)
+			await db
+				.prepare(
+					"INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('memory',?,?,?)"
+				)
+				.bind(row.variant, row.state, row.reason)
+				.run();
+		if (userId)
+			await db.batch([
+				db.prepare('DELETE FROM admin_web_operator WHERE user_id=?').bind(userId),
+				db.prepare('DELETE FROM admin_actor WHERE id=?').bind(userId),
+				db.prepare('DELETE FROM user WHERE id=?').bind(userId)
+			]);
+		await context.close();
+		await proxy.dispose();
+	}
+});
+
+test('memory directory tab filters variants, inspects dimensions breakdown, and pages deterministically across viewports', async ({
+	browser
+}) => {
+	test.setTimeout(120_000);
+	const proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc' });
+	const db = proxy.env.DB;
+	const original = await db
+		.prepare("SELECT version FROM config_live WHERE key='game:memory'")
+		.first<{ version: string }>();
+	const lifecycle = (
+		await db
+			.prepare("SELECT variant,state,reason FROM variant_lifecycle WHERE family='memory'")
+			.all<{ variant: string; state: string; reason: string }>()
+	).results;
+	const context = await browser.newContext({
+		baseURL: 'http://localhost:5173',
+		reducedMotion: 'reduce'
+	});
+	let userId: string | undefined;
+	try {
+		await db.batch([
+			db.prepare("DELETE FROM config_live WHERE key='game:memory'"),
+			db.prepare("DELETE FROM variant_lifecycle WHERE family='memory'")
+		]);
+		const helpers = (
+			await betterAuth({
+				...createAuth(db, {
+					baseURL: 'http://localhost:5173',
+					secret: proxy.env.BETTER_AUTH_SECRET,
+					googleClientId: '',
+					googleClientSecret: ''
+				}).options,
+				plugins: [testUtils()]
+			}).$context
+		).test;
+		const user = await helpers.saveUser(
+			helpers.createUser({
+				email: `${crypto.randomUUID()}@example.test`,
+				name: 'Memory directory operator'
+			})
+		);
+		userId = user.id;
+		const login = await helpers.login({ userId });
+		await context.addCookies(login.cookies);
+		const secret = new Uint8Array(20).fill(23),
+			iv = randomBytes(12);
+		const cipher = createCipheriv(
+			'aes-256-gcm',
+			createHash('sha256').update(`operator-v1:${proxy.env.BETTER_AUTH_SECRET}`).digest(),
+			iv
+		);
+		const data = Buffer.concat([cipher.update(secret), cipher.final(), cipher.getAuthTag()]);
+		await db.batch([
+			db.prepare("INSERT INTO admin_actor(id,role) VALUES(?,'admin')").bind(userId),
+			db
+				.prepare('INSERT INTO admin_web_operator(user_id,secret_cipher) VALUES(?,?)')
+				.bind(userId, JSON.stringify({ iv: Array.from(iv), data: Array.from(data) }))
+		]);
+		const page = await context.newPage();
+		await page.goto('/admin/sign-in');
+		await page.getByRole('textbox').fill(totp(secret, Date.now()));
+		await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
+		await expect(page).toHaveURL(/\/admin\/dashboard$/);
+		// Test responsive rendering and zero horizontal scroll across three required viewports
+		for (const viewport of [
+			{ width: 390, height: 844 },
+			{ width: 844, height: 390 },
+			{ width: 1280, height: 800 }
+		]) {
+			await page.setViewportSize(viewport);
+			await page.goto('/admin/games?game=memory&subview=directory');
+			await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
+			await expect(page.getByRole('link', { name: 'Directory' })).toHaveClass(/active/);
+			await expect(page.locator('.directory-container')).toBeVisible();
+			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
+				false
+			);
+			await page.screenshot({
+				path: `build/v1.3.5.7/real-directory-${viewport.width}x${viewport.height}.png`,
+				fullPage: true
+			});
+		}
+
+		// Filter and drawer interaction on desktop
+		await page.setViewportSize({ width: 1280, height: 800 });
+		await page.goto('/admin/games?game=memory&subview=directory');
+		await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
+		await expect(page.locator('.variant-row')).toHaveCount(10);
+
+		// Search filter: 'quads'
+		await page.locator('input[name="q"]').fill('quads');
+		await page.locator('form.filter-bar button[type="submit"]').click();
+		await page.waitForURL((url) => url.searchParams.get('q') === 'quads');
+		await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
+		await expect(page.locator('.variant-row')).toHaveCount(1);
+		await expect(page.locator('.variant-row[data-id="memory:quads"]')).toBeVisible();
+
+		// Inspect drawer
+		const quadsRow = page.locator('.variant-row[data-id="memory:quads"]');
+		await quadsRow.getByRole('button', { name: 'Inspect' }).click();
+		const drawer = page.locator('dialog.drawer');
+		await expect(drawer).toBeVisible();
+		await expect(drawer.locator('#drawer-title')).toContainText('Quads');
+		await expect(drawer.locator('.dim-grid')).toBeVisible();
+		const scoringLink = drawer.getByRole('link', {
+			name: /Scoring Editor/i
+		});
+		await expect(scoringLink).toBeVisible();
+		expect(await scoringLink.getAttribute('href')).toContain('subview=scoring');
+
+		await page.screenshot({
+			path: 'build/v1.3.5.7/real-directory-drawer-1280x800.png'
+		});
+
+		// Close drawer
+		await drawer.getByRole('button', { name: 'Close variant details' }).click();
+		await expect(drawer).not.toBeVisible();
+	} finally {
+		if (original)
+			await db
+				.prepare("UPDATE config_live SET version=? WHERE key='game:memory'")
+				.bind(original.version)
+				.run();
+		else await db.prepare("DELETE FROM config_live WHERE key='game:memory'").run();
+		await db.prepare("DELETE FROM variant_lifecycle WHERE family='memory'").run();
+		for (const row of lifecycle)
 			await db
 				.prepare(
 					"INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('memory',?,?,?)"

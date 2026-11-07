@@ -8,6 +8,13 @@ import {
 	rollbackThemeConfig
 } from '#lib/server/theme-admin.js';
 import { loadGamesAdmin, changeGamesAdmin } from '#lib/server/games-admin.js';
+import { invalidateOverview, variantOverview } from '#lib/server/games.js';
+import { readMemoryPolicy, changeMemoryPolicy } from '#lib/server/memory-policy.js';
+import {
+	loadMemoryDirectory,
+	type DirectoryFilter,
+	type MemoryDirectoryResult
+} from '#lib/server/memory-directory.js';
 import { readAudit, exportAuditYear } from '#lib/server/audit.js';
 import { softDeleteUser, restoreDeletedUser } from '#lib/server/user-lifecycle.js';
 import { userDirectory, userDetail, userOverview } from '#lib/server/admin-users.js';
@@ -117,10 +124,30 @@ export const load: PageServerLoad = async (event) => {
 	type GamesAdminData = Awaited<ReturnType<typeof loadGamesAdmin>>;
 	let games: GamesAdminData['games'] = [];
 	let gamesOverview: GamesAdminData['gamesOverview'] = null;
+	let memoryPolicy:
+		| (Awaited<ReturnType<typeof readMemoryPolicy>> & {
+				dimensions: typeof catalog.memory.dimensionPolicy.dimensions;
+				archetypes: typeof catalog.memory.dimensionPolicy.archetypes;
+				variants: typeof catalog.memory.dimensionPolicy.variants;
+				lifecycle: Awaited<ReturnType<typeof variantOverview>>;
+		  })
+		| null = null;
+	let memoryDirectory: MemoryDirectoryResult | null = null;
+	let directoryFilter = {
+		q: '',
+		status: 'all',
+		archetype: 'all',
+		source: 'all',
+		cursor: ''
+	};
 	let gameStats: GamesAdminData['gameStats'] = {
 		rows: [],
 		more: false,
-		variants: []
+		variants: [],
+		totalVariants: 0,
+		variantPage: 0,
+		variantPageSize: 10,
+		totalVariantPages: 1
 	};
 	let metrics: Record<string, number> = {},
 		daily: { day: string; total: number }[] = [],
@@ -172,6 +199,28 @@ export const load: PageServerLoad = async (event) => {
 				selectedGame,
 				variantPage
 			));
+			if (selectedGame === 'memory' && subview === 'policy')
+				memoryPolicy = {
+					...(await readMemoryPolicy(env.DB)),
+					...catalog.memory.dimensionPolicy,
+					lifecycle: await variantOverview(env.DB, 'memory')
+				};
+			if (selectedGame === 'memory' && subview === 'directory') {
+				directoryFilter = {
+					q: event.url.searchParams.get('q') ?? '',
+					status: event.url.searchParams.get('status') ?? 'all',
+					archetype: event.url.searchParams.get('archetype') ?? 'all',
+					source: event.url.searchParams.get('source') ?? 'all',
+					cursor: event.url.searchParams.get('cursor') ?? ''
+				};
+				memoryDirectory = await loadMemoryDirectory(env.DB, {
+					q: directoryFilter.q || undefined,
+					status: directoryFilter.status as DirectoryFilter['status'],
+					archetype: directoryFilter.archetype !== 'all' ? directoryFilter.archetype : undefined,
+					source: directoryFilter.source as DirectoryFilter['source'],
+					cursor: directoryFilter.cursor || undefined
+				});
+			}
 		}
 		if (event.params.view === 'scoring' || selectedGame)
 			scoring = await Promise.all(
@@ -320,6 +369,9 @@ export const load: PageServerLoad = async (event) => {
 			themes: null,
 			scoring: [],
 			gamesOverview: null,
+			memoryPolicy: null,
+			memoryDirectory: null,
+			directoryFilter,
 			games: [],
 			view: event.params.view,
 			ranked: ranked?.enabled !== 0,
@@ -353,6 +405,9 @@ export const load: PageServerLoad = async (event) => {
 		themes,
 		scoring,
 		gamesOverview,
+		memoryPolicy,
+		memoryDirectory,
+		directoryFilter,
 		games,
 		view: event.params.view,
 		ranked: ranked?.enabled !== 0,
@@ -406,6 +461,7 @@ export const actions: Actions = {
 					'score-rollback',
 					'variant-enable',
 					'variant-disable',
+					'dimension-policy-update',
 					'game-enable',
 					'game-disable',
 					'game-delete',
@@ -436,15 +492,17 @@ export const actions: Actions = {
 					? event.params.view === 'support'
 						? 'support-tickets'
 						: event.params.view
-					: action.startsWith('theme-')
-						? 'themes'
-						: action.startsWith('game-')
-							? 'games'
-							: action.startsWith('score-')
-								? 'scoring'
-								: action.startsWith('ranked-')
-									? 'ranked'
-									: action;
+					: action === 'dimension-policy-update'
+						? 'games'
+						: action.startsWith('theme-')
+							? 'themes'
+							: action.startsWith('game-')
+								? 'games'
+								: action.startsWith('score-')
+									? 'scoring'
+									: action.startsWith('ranked-')
+										? 'ranked'
+										: action;
 			const actor = await operatorRequest(event, permission, action !== 'logout');
 			const reason =
 					action === 'game-enable' || action === 'variant-enable'
@@ -493,6 +551,25 @@ export const actions: Actions = {
 						return fail(400, { code: 'input' });
 					throw e;
 				}
+				return { success: true };
+			}
+			if (action === 'dimension-policy-update') {
+				if (event.params.view !== 'games' || target !== 'memory')
+					return fail(400, { code: 'input' });
+				let values: unknown;
+				try {
+					values = JSON.parse(String(body.get('values')));
+				} catch {
+					return fail(400, { code: 'input' });
+				}
+				await changeMemoryPolicy(
+					env.DB,
+					actor.id,
+					String(body.get('expected') ?? ''),
+					values,
+					reason
+				);
+				await invalidateOverview(env.CONFIG_CACHE);
 				return { success: true };
 			}
 			if (action.startsWith('variant-') || action.startsWith('game-'))

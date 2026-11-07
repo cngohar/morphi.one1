@@ -10,6 +10,8 @@
 	import AccountForm from '#lib/components/account/AccountForm.svelte';
 	import AdminTestPlay from '#lib/components/AdminTestPlay.svelte';
 	import GameSwitch from '#lib/components/GameSwitch.svelte';
+	import MemoryDirectory from '#lib/components/MemoryDirectory.svelte';
+	import MemoryPolicy from '#lib/components/MemoryPolicy.svelte';
 	import ScoringEditor from '#lib/components/ScoringEditor.svelte';
 	import type { PageData } from '../../routes/admin/[view]/$types';
 
@@ -26,6 +28,9 @@
 			| 'games'
 			| 'subview'
 			| 'gameStats'
+			| 'memoryPolicy'
+			| 'memoryDirectory'
+			| 'directoryFilter'
 			| 'testPlayFamilies'
 			| 'scoring'
 		>;
@@ -211,15 +216,29 @@
 		</header>
 		<nav class="section-tabs" aria-label={t('v1.admin.games.detailSections')}>
 			<a
-				class:active={!data.subview || (data.subview !== 'scoring' && data.subview !== 'settings')}
+				class:active={!data.subview ||
+					(data.subview !== 'scoring' &&
+						data.subview !== 'settings' &&
+						data.subview !== 'policy' &&
+						data.subview !== 'directory')}
 				href="{resolve('/admin/[view]', { view: 'games' })}?game={game.family}"
 				>{t('v1.admin.games.statistics')}</a
-			><a
+			>
+			{#if game.family === 'memory'}<a
+					class:active={data.subview === 'directory'}
+					href="{resolve('/admin/[view]', { view: 'games' })}?game=memory&subview=directory"
+					>{t('admin.directory.title')}</a
+				>{/if}<a
 				class:active={data.subview === 'scoring'}
 				href="{resolve('/admin/[view]', {
 					view: 'games'
 				})}?game={game.family}&subview=scoring">{t('v1.admin.nav.scoring')}</a
-			><a
+			>
+			{#if game.family === 'memory'}<a
+					class:active={data.subview === 'policy'}
+					href="{resolve('/admin/[view]', { view: 'games' })}?game=memory&subview=policy"
+					>{t('policy.title')}</a
+				>{/if}<a
 				class:active={data.subview === 'settings'}
 				href="{resolve('/admin/[view]', {
 					view: 'games'
@@ -227,7 +246,21 @@
 			>
 		</nav>
 		<section class="admin-card">
-			{#if data.subview === 'settings'}
+			{#if data.subview === 'directory' && game.family === 'memory' && data.memoryDirectory}
+				<MemoryDirectory
+					directory={data.memoryDirectory}
+					role={data.actor.role}
+					familyEnabled={game.state === 'enabled'}
+					filterParams={data.directoryFilter}
+					{reason}
+				/>
+			{:else if data.subview === 'policy' && data.memoryPolicy}
+				<MemoryPolicy
+					policy={data.memoryPolicy}
+					role={data.actor.role}
+					familyEnabled={game.state === 'enabled'}
+				/>
+			{:else if data.subview === 'settings'}
 				{#if game.restoreUntil}<p>
 						{t('v1.admin.users.deadline')}: {new Date(game.restoreUntil).toISOString()}
 					</p>{/if}
@@ -370,7 +403,7 @@
 				{#if data.gameStats.more}<p>{t('v1.admin.games.limited')}</p>{/if}
 			{/if}
 		</section>
-		{#if data.gameStats.variants.length || (data.gameStats.totalVariants ?? 0) > 0}
+		{#if data.subview !== 'policy' && data.subview !== 'directory' && (data.gameStats.variants.length || (data.gameStats.totalVariants ?? 0) > 0)}
 			<section class="admin-card variant-section">
 				<h2>{t('admin.variants.title')}</h2>
 				{#if data.subview === 'settings'}
@@ -688,7 +721,7 @@
 				</dialog>
 			</section>
 		{/if}
-		{#if data.testPlayFamilies.some((family) => family === game.family)}<AdminTestPlay
+		{#if data.subview !== 'policy' && data.testPlayFamilies.some((family) => family === game.family)}<AdminTestPlay
 				family={game.family}
 				scoring={data.scoring}
 			/>{/if}

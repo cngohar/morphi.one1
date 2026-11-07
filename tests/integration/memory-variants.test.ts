@@ -3,9 +3,10 @@ import { readFile, readdir } from 'node:fs/promises';
 import { getPlatformProxy } from 'wrangler';
 import { catalog } from '../../src/lib/catalog.js';
 import type { CompletedRun, PuzzleId } from '../../src/lib/engine/contract.js';
-import { defaultScoreConfig } from '../../src/lib/scoring.js';
+import { defaultScoreConfig, scoreScope } from '../../src/lib/scoring.js';
 import { CARD_RANKED_OPENING_MS } from '../../src/lib/round-timing.js';
 import { createMemoryRound } from '../../src/lib/puzzles/memory/logic.js';
+import { generateTheme } from '../../src/lib/engine/theme/generator.js';
 import {
 	parseRoundActivity,
 	recordRoundStart,
@@ -19,6 +20,7 @@ import {
 	gameOverview,
 	enabledVariants,
 	gameAvailable,
+	variantAvailable,
 	gameStatistics,
 	queryActivityCounts,
 	type ActivityMappingEntry
@@ -31,6 +33,12 @@ import {
 	startRanked
 } from '../../src/lib/server/runs.js';
 import { loadGamesAdmin } from '../../src/lib/server/games-admin.js';
+import { loadMemoryDirectory } from '../../src/lib/server/memory-directory.js';
+import {
+	changeMemoryPolicy,
+	defaultMemoryPolicy,
+	readMemoryPolicy
+} from '../../src/lib/server/memory-policy.js';
 import { abandonRanked, resumableRanked } from '../../src/lib/server/ranked-session.js';
 import {
 	listScoreVersions,
@@ -81,6 +89,129 @@ beforeAll(async () => {
 });
 afterAll(async () => {
 	await proxy?.dispose();
+});
+
+it('dimension policy persists atomically, denies new issuance and preserves an issued round', async () => {
+	const db = proxy.env.DB;
+	const original = await db
+		.prepare("SELECT version FROM config_live WHERE key='game:memory'")
+		.first<{ version: string }>();
+	try {
+		const initial = await readMemoryPolicy(db);
+		const issued = await startRanked(
+			db,
+			userId,
+			'memory',
+			'dimension-ip',
+			now + 10_000,
+			null,
+			undefined,
+			'memory:quads'
+		);
+		const narrowed = { ...defaultMemoryPolicy(), 'matchSize:4': false };
+		const version = await changeMemoryPolicy(
+			db,
+			'operator',
+			initial.version,
+			narrowed,
+			'Disable Quads',
+			now + 10_001
+		);
+		expect((await readMemoryPolicy(db)).version).toBe(version);
+		expect(await enabledVariants(db, 'memory')).not.toContain('memory:quads');
+		expect(await variantAvailable(db, 'memory', 'memory:quads')).toBe(false);
+		expect(await gameAvailable(db, 'memory')).toBe(true);
+		await expect(
+			startRanked(
+				db,
+				userId,
+				'memory',
+				'dimension-ip',
+				now + 10_002,
+				issued.id,
+				undefined,
+				'memory:quads'
+			)
+		).rejects.toMatchObject({ code: 'game_disabled' });
+		await expect(
+			changeMemoryPolicy(db, 'operator', initial.version, defaultMemoryPolicy(), 'Stale client')
+		).rejects.toMatchObject({ code: 'game_conflict' });
+		const zero = { ...narrowed, 'matchSize:2': false, 'matchSize:3': false };
+		await expect(
+			changeMemoryPolicy(db, 'operator', version, zero, 'No playable variants')
+		).rejects.toMatchObject({ code: 'game_conflict' });
+		expect((await readMemoryPolicy(db)).version).toBe(version);
+		await expect(
+			changeMemoryPolicy(db, 'nonoperator', version, defaultMemoryPolicy(), 'Not allowed')
+		).rejects.toMatchObject({ code: 'game_conflict' });
+		const run = {
+			...completion('memory:quads', issued.seed, issued.id),
+			rankedSession: issued.id,
+			scoreConfigVersion: issued.scoring.version
+		};
+		await expect(
+			saveRun(db, userId, run, issued.startedAt + CARD_RANKED_OPENING_MS + 30_000)
+		).resolves.toMatchObject({ group: expect.stringMatching(/^memory-1:quads:/) });
+		expect(
+			(
+				await db
+					.prepare("SELECT count(*) total FROM admin_audit WHERE action='dimension-policy-update'")
+					.first<{ total: number }>()
+			)?.total
+		).toBe(1);
+	} finally {
+		if (original)
+			await db
+				.prepare("UPDATE config_live SET version=? WHERE key='game:memory'")
+				.bind(original.version)
+				.run();
+		else await db.prepare("DELETE FROM config_live WHERE key='game:memory'").run();
+	}
+});
+
+it('dimension policy fails closed on a corrupt live snapshot', async () => {
+	const db = proxy.env.DB;
+	const original = await db
+		.prepare("SELECT version FROM config_live WHERE key='game:memory'")
+		.first<{ version: string }>();
+	const version = crypto.randomUUID();
+	try {
+		await db.batch([
+			db
+				.prepare(
+					"INSERT INTO game_config(version,family,parent,values_json,created_at) VALUES(?,'memory','catalog-v1',?,?)"
+				)
+				.bind(version, '{invalid', now),
+			db
+				.prepare(
+					"INSERT INTO config_live(key,version) VALUES('game:memory',?) ON CONFLICT(key) DO UPDATE SET version=excluded.version"
+				)
+				.bind(version)
+		]);
+		await expect(readMemoryPolicy(db)).rejects.toMatchObject({
+			code: 'game_disabled',
+			status: 503
+		});
+		await expect(
+			startRanked(
+				db,
+				userId,
+				'memory',
+				'invalid-policy-ip',
+				now + 90_000,
+				null,
+				undefined,
+				'memory:classic'
+			)
+		).rejects.toMatchObject({ code: 'game_disabled' });
+	} finally {
+		if (original)
+			await db
+				.prepare("UPDATE config_live SET version=? WHERE key='game:memory'")
+				.bind(original.version)
+				.run();
+		else await db.prepare("DELETE FROM config_live WHERE key='game:memory'").run();
+	}
 });
 
 it('validates family-owned variant ids and preserves legacy classic payloads', () => {
@@ -496,7 +627,7 @@ it('persists authoritative ranked variants, counts ranked starts once, and permi
 				.prepare("SELECT count(*) count FROM admin_audit WHERE action='variant-disable'")
 				.first<{ count: number }>()
 		)?.count
-	).toBe(4);
+	).toBe(catalog.memory.variants!.length);
 	const replacement = await startRanked(
 		db,
 		userId,
@@ -520,6 +651,69 @@ it('persists authoritative ranked variants, counts ranked starts once, and permi
 	await expect(
 		startRanked(db, userId, 'memory', 'variant-ip', now + 50_000, null, undefined, variant)
 	).rejects.toMatchObject({ code: 'game_disabled' });
+});
+
+it('keeps historical ranked identity intact and fails closed for unknown stored versions', async () => {
+	const db = proxy.env.DB;
+	const id = crypto.randomUUID(),
+		createdAt = now + 1_000_000;
+	const themeSnapshot = JSON.stringify(generateTheme('42', 'memory'));
+	await db
+		.prepare(
+			`INSERT INTO play_session(id,user_id,family,variant,seed,engine_version,created_at,expires_at,ip_hash,score_config_version,theme_snapshot)
+			VALUES(?,?,?,?,?,?,?,?,?,?,?)`
+		)
+		.bind(
+			id,
+			userId,
+			'memory',
+			null,
+			'42',
+			'memory-1',
+			createdAt,
+			createdAt + 7200000,
+			'identity-ip',
+			'brief-v1',
+			themeSnapshot
+		)
+		.run();
+	const original = await resumableRanked(db, userId, createdAt + 1);
+	expect(original).toMatchObject({
+		id,
+		family: 'memory',
+		variant: 'memory:classic',
+		engineVersion: 'memory-1',
+		scoring: defaultScoreConfig('memory')
+	});
+	const incompatible = { id, expiresAt: createdAt + 7200000, saving: false };
+	for (const [column, value] of [
+		['variant', 'memory:unknown'],
+		['score_config_version', 'missing-version'],
+		['engine_version', 'memory-future'],
+		['theme_snapshot', null],
+		['theme_snapshot', '{}']
+	] as const) {
+		await db.prepare(`UPDATE play_session SET ${column}=? WHERE id=?`).bind(value, id).run();
+		expect(await resumableRanked(db, userId, createdAt + 1)).toEqual(incompatible);
+		await db
+			.prepare(`UPDATE play_session SET ${column}=? WHERE id=?`)
+			.bind(
+				column === 'variant'
+					? null
+					: column === 'theme_snapshot'
+						? themeSnapshot
+						: column === 'engine_version'
+							? 'memory-1'
+							: 'brief-v1',
+				id
+			)
+			.run();
+	}
+	expect(await resumableRanked(db, userId, createdAt + 1)).toMatchObject({
+		id,
+		variant: 'memory:classic'
+	});
+	await abandonRanked(db, userId, id, createdAt + 2);
 });
 
 it('keeps a delayed first-flip report as played after an explicit departure', async () => {
@@ -577,8 +771,8 @@ it('caches reconciled overview totals, includes families without variants, and i
 	await recordRoundPlay(db, userId, round, now + 1);
 	await gameOverview(db);
 	const first = await cachedGameOverview(countedDb, cache, now);
-	// All three lifecycle rows exist by this point: one ensure SELECT per family plus four aggregate reads.
-	expect(statements).toBe(Object.keys(catalog).length + 4);
+	// One ensure SELECT per family, four aggregate reads and the Memory live-policy pointer.
+	expect(statements).toBe(Object.keys(catalog).length + 5);
 	const metrics = [
 		'shown',
 		'ignored',
@@ -756,7 +950,7 @@ it('bounds Games queries, pages variants deterministically, and isolates scoring
 	statements = 0;
 	const stats = await gameStatistics(countedDb, 'memory', summary);
 	expect(statements).toBe(1); // exactly 1 grouped query, never 1 + N
-	expect(stats.variants).toHaveLength(4);
+	expect(stats.variants).toHaveLength(catalog.memory.variants!.length);
 	for (const v of stats.variants) {
 		expect(Array.isArray(v.rows)).toBe(true);
 		expect(typeof v.more).toBe('boolean');
@@ -764,21 +958,18 @@ it('bounds Games queries, pages variants deterministically, and isolates scoring
 
 	// 2. loadGamesAdmin bounding and deterministic pagination for actual catalog.
 	const adminPage0 = await loadGamesAdmin(db, undefined, 'memory', 0, 10);
-	expect(adminPage0.gameStats.totalVariants).toBe(4);
+	expect(adminPage0.gameStats.totalVariants).toBe(catalog.memory.variants!.length);
 	expect(adminPage0.gameStats.totalVariantPages).toBe(1);
 	expect(adminPage0.gameStats.variantPage).toBe(0);
 	expect(adminPage0.gameStats.variantPageSize).toBe(10);
-	expect(adminPage0.gameStats.variants).toHaveLength(4);
-	expect(adminPage0.gameStats.variants.map((v) => v.id)).toEqual([
-		'memory:classic',
-		'memory:no-preview',
-		'memory:trios',
-		'memory:moving'
-	]);
+	expect(adminPage0.gameStats.variants).toHaveLength(catalog.memory.variants!.length);
+	expect(adminPage0.gameStats.variants.map((v) => v.id)).toEqual(
+		catalog.memory.variants!.map((variant) => variant.id)
+	);
 
 	// 3. Out-of-bounds page returns safe empty array with page index preserved.
 	const adminPage99 = await loadGamesAdmin(db, undefined, 'memory', 99, 10);
-	expect(adminPage99.gameStats.totalVariants).toBe(4);
+	expect(adminPage99.gameStats.totalVariants).toBe(catalog.memory.variants!.length);
 	expect(adminPage99.gameStats.totalVariantPages).toBe(1);
 	expect(adminPage99.gameStats.variantPage).toBe(99);
 	expect(adminPage99.gameStats.variants).toHaveLength(0);
@@ -838,4 +1029,225 @@ it('bounds Games queries, pages variants deterministically, and isolates scoring
 	expect(allPaged.reduce((sum, v) => sum + v.played, 0)).toBe(
 		syntheticStats.variants.reduce((sum, v) => sum + v.played, 0)
 	);
+});
+
+const PILOT = [
+	'memory:budget',
+	'memory:lockout',
+	'memory:swaps',
+	'memory:two-backs',
+	'memory:quads',
+	'memory:collapse'
+];
+/** Miss-free solution on the live board, so collapse positions stay correct. */
+function liveSolution(seed: string, variant: string) {
+	const moves: { index: number }[] = [];
+	let round = catalog.memory.resumeRound!(seed, moves, undefined, variant) as unknown as {
+		status: string;
+		matched: number[];
+		cards: { symbol: string }[];
+	};
+	while (round.status !== 'won') {
+		const open = round.cards.flatMap((card, index) =>
+			round.matched.includes(index) ? [] : [{ card, index }]
+		);
+		for (const { index } of open.filter(({ card }) => card.symbol === open[0].card.symbol))
+			moves.push({ index });
+		round = catalog.memory.resumeRound!(seed, moves, undefined, variant) as typeof round;
+	}
+	return moves;
+}
+
+it('saves each pilot identity under its own immutable group and scoring scope', async () => {
+	const db = proxy.env.DB;
+	for (const variant of PILOT) {
+		const run = { ...completion(variant), moves: liveSolution('42', variant) };
+		const saved = await saveRun(db, userId, run, now + 30);
+		const groups = catalog.memory.variants!.find(
+			(entry) => entry.id === variant
+		)!.leaderboardGroups;
+		expect(groups).toContain(saved.group);
+		expect(saved.group.startsWith(`memory-1:${variant.slice('memory:'.length)}:`)).toBe(true);
+		expect(scoreScope('memory', variant)).toBe(variant === 'memory:quads' ? variant : 'memory');
+	}
+	expect(defaultScoreConfig('memory', 'memory:quads')).toEqual({
+		version: 'memory-quads-v1',
+		values: { quad: 2000, mismatch: 150, second: 5 }
+	});
+	for (const variant of PILOT.filter((id) => id !== 'memory:quads'))
+		expect(defaultScoreConfig('memory', variant)).toEqual(defaultScoreConfig('memory'));
+	expect(Object.keys(parseRun(completion('memory:quads')))).toContain('variant');
+});
+
+it('rejects an exhausted or over-long budget payload and releases the session by exact id', async () => {
+	const db = proxy.env.DB;
+	const variant = 'memory:budget';
+	// Earlier cases leave variants disabled in the shared database.
+	await changeVariant(db, 'operator', 'memory', variant, 'variant-enable', 'Pilot budget test');
+	const session = await startRanked(
+		db,
+		userId,
+		'memory',
+		'budget-ip',
+		now + 5000,
+		null,
+		undefined,
+		variant
+	);
+	const round = createMemoryRound(session.seed, variant);
+	// Two flips per attempt, each on different symbols, until the 2×groups attempts are spent.
+	const first = round.cards.findIndex((card) => card.symbol !== round.cards[0].symbol);
+	const attempts = Array.from({ length: round.pairs * 2 }, () => [{ index: 0 }, { index: first }]);
+	const exhausted = {
+		...completion(variant, session.seed, session.id),
+		rankedSession: session.id,
+		scoreConfigVersion: session.scoring.version,
+		moves: attempts.flat()
+	};
+	await expect(
+		saveRun(db, userId, exhausted, session.startedAt + CARD_RANKED_OPENING_MS + 10_000)
+	).rejects.toMatchObject({ code: 'invalid_replay' });
+	expect(
+		(
+			await db
+				.prepare('SELECT count(*) count FROM completed_run WHERE id=?')
+				.bind(session.id)
+				.first<{ count: number }>()
+		)?.count
+	).toBe(0);
+
+	const next = await startRanked(
+		db,
+		userId,
+		'memory',
+		'budget-ip',
+		now + 6000,
+		null,
+		undefined,
+		variant
+	);
+	await abandonRanked(db, userId, next.id);
+	expect(await resumableRanked(db, userId, now + 6001)).toBeNull();
+	await expect(
+		saveRun(
+			db,
+			userId,
+			{
+				...completion(variant, next.seed, next.id),
+				rankedSession: next.id,
+				scoreConfigVersion: next.scoring.version
+			},
+			now + 6002
+		)
+	).rejects.toBeTruthy();
+});
+
+it('loads Memory directory, filters by search/status/archetype, supports keyset cursor pagination and discovers observed variants', async () => {
+	const db = proxy.env.DB;
+
+	// 1. Default directory load returns all 10 curated pilot variants.
+	const initial = await loadMemoryDirectory(db);
+	expect(initial.curatedCount).toBe(10);
+	expect(initial.total).toBeGreaterThanOrEqual(10);
+	expect(initial.items.length).toBeLessThanOrEqual(10);
+
+	const classic = initial.items.find((v) => v.id === 'memory:classic');
+	expect(classic).toBeDefined();
+	expect(classic?.source).toBe('curated');
+	expect(classic?.archetype).toBe('core');
+	expect(classic?.dims.length).toBe(6);
+
+	const quads = initial.items.find((v) => v.id === 'memory:quads');
+	expect(quads).toBeDefined();
+	expect(quads?.archetype).toBe('grouping');
+	expect(quads?.dims.find((d) => d.key === 'matchSize')?.valueId).toBe('4');
+
+	// 2. Keyset cursor pagination with page size 4.
+	const page0 = await loadMemoryDirectory(db, { pageSize: 4 });
+	expect(page0.items).toHaveLength(4);
+	expect(page0.page).toBe(0);
+	expect(page0.nextCursor).toBeDefined();
+
+	const page1 = await loadMemoryDirectory(db, { pageSize: 4, cursor: page0.nextCursor });
+	expect(page1.items).toHaveLength(4);
+	expect(page1.page).toBe(1);
+	// No duplicate items across pages
+	const page0Ids = new Set(page0.items.map((i) => i.id));
+	expect(page1.items.some((i) => page0Ids.has(i.id))).toBe(false);
+
+	// 3. Search filter by slug / name.
+	const searchResult = await loadMemoryDirectory(db, { q: 'quads' });
+	expect(searchResult.total).toBe(1);
+	expect(searchResult.items[0].id).toBe('memory:quads');
+
+	// 4. Archetype filter.
+	const groupingResult = await loadMemoryDirectory(db, { archetype: 'grouping' });
+	expect(groupingResult.total).toBeGreaterThanOrEqual(2);
+	expect(groupingResult.items.map((v) => v.id)).toContain('memory:trios');
+	expect(groupingResult.items.map((v) => v.id)).toContain('memory:quads');
+
+	// 5. Status filter with policy blocker.
+	// Earlier test cases may leave variants in disabled lifecycle state. Ensure quads is enabled first.
+	await changeVariant(
+		db,
+		'operator',
+		'memory',
+		'memory:quads',
+		'variant-enable',
+		'Enable quads for test'
+	);
+	const policyBefore = await readMemoryPolicy(db);
+	const narrowedPolicy = { ...policyBefore.values, 'matchSize:4': false };
+	await changeMemoryPolicy(
+		db,
+		'operator',
+		policyBefore.version,
+		narrowedPolicy,
+		'Block quads for test'
+	);
+
+	try {
+		const blockedResult = await loadMemoryDirectory(db, { status: 'blocked' });
+		expect(blockedResult.items.map((v) => v.id)).toContain('memory:quads');
+		const blockedQuads = blockedResult.items.find((v) => v.id === 'memory:quads');
+		expect(blockedQuads?.state).toBe('blocked');
+		expect(blockedQuads?.policyBlocker).toBeDefined();
+	} finally {
+		// Restore policy
+		const current = await readMemoryPolicy(db);
+		await changeMemoryPolicy(
+			db,
+			'operator',
+			current.version,
+			policyBefore.values,
+			'Restore policy'
+		);
+	}
+
+	// 6. Observed uncataloged variant discovery.
+	const observedId = 'memory:observed-test-directory';
+	await db
+		.prepare(
+			"INSERT INTO variant_lifecycle(family, variant, state, reason) VALUES('memory', ?, 'enabled', 'Test observed')"
+		)
+		.bind(observedId)
+		.run();
+
+	try {
+		const withObserved = await loadMemoryDirectory(db);
+		expect(withObserved.total).toBe(initial.total + 1);
+
+		const observedOnly = await loadMemoryDirectory(db, { source: 'observed' });
+		expect(observedOnly.items.map((v) => v.id)).toContain(observedId);
+		const observedItem = observedOnly.items.find((v) => v.id === observedId);
+		expect(observedItem?.source).toBe('observed');
+
+		const curatedOnly = await loadMemoryDirectory(db, { source: 'curated' });
+		expect(curatedOnly.items.map((v) => v.id)).not.toContain(observedId);
+	} finally {
+		await db
+			.prepare("DELETE FROM variant_lifecycle WHERE family='memory' AND variant=?")
+			.bind(observedId)
+			.run();
+	}
 });

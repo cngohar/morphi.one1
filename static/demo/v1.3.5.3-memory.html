@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Morphi v1.3.5.3 — Memory pilot mechanics review</title>
+<style>
+:root{color-scheme:light;--bg:#eef2f7;--surface:#fff;--surface-2:#e5edf7;--border:#c9d6e4;--ink:#1b2433;--ink-2:#344257;--muted:#5a6b82;--primary:#e5532d;--accent:#2f6fed;--success:#009a86;--violet:#7d61ae;--amber:#f5a524;--danger:#b42318;--focus:#2f6fed;--memory-bg:#dfe9f5;--memory-back:#a9bfdf;--memory-edge:#90aac9;--c:64px;font:600 16px/1.35 'Nunito Variable','Nunito',system-ui,sans-serif}
+*{box-sizing:border-box}html,body{height:100%}body{margin:0;background:var(--bg);color:var(--ink);display:flex;flex-direction:column}
+button,select{font:inherit;color:inherit}button{cursor:pointer}button:disabled{cursor:default;opacity:.5}:focus-visible{outline:3px solid var(--focus);outline-offset:3px}select{min-height:38px;padding:6px;border:1px solid var(--border);border-radius:8px;background:var(--surface)}
+.review{display:flex;gap:10px;align-items:center;flex-wrap:wrap;padding:8px 16px;background:#fff;border-bottom:1px solid var(--border);font-size:12px}.review strong{color:var(--danger)}.review small{color:var(--muted)}
+.tabs{display:flex;flex-wrap:wrap;gap:6px;padding:8px 16px}.tabs button{min-height:38px;padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:13px;font-weight:800}.tabs button[aria-current=page]{background:var(--ink);color:#fff;border-color:var(--ink)}
+.layout{flex:1;min-height:0;display:grid;grid-template-columns:minmax(0,1fr) 340px;gap:14px;padding:0 16px 14px}
+.play{display:flex;flex-direction:column;min-height:0;min-width:0;background:var(--memory-bg);border-radius:14px;padding:10px}
+.hud{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:center;font-size:13px}.hud b{font-weight:900}.hud .sp{margin-left:auto;display:flex;gap:6px}
+.btn{min-height:38px;padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:var(--surface);font-size:13px;font-weight:800}
+.stage{flex:1;min-height:0;display:grid;place-items:center;position:relative}
+.board{display:grid;grid-template-columns:repeat(var(--cols),var(--c));gap:8px;justify-content:center}
+.card{position:relative;width:var(--c);height:var(--c);padding:0;border:2px solid var(--memory-edge);border-radius:12px;background:var(--memory-back);transition:transform var(--dur,250ms)}
+.card svg{width:100%;height:100%;display:block}.card .face{fill:currentColor}
+.card[data-up=true]{background:#fff;border-color:var(--memory-edge)}.card[data-matched=true]{background:#eef3fc;opacity:.6}
+.card[data-mark=true]{outline:3px dashed var(--ink);outline-offset:2px}
+.card[data-locked=true]{border-color:var(--ink);border-style:dashed}
+.badge{position:absolute;right:2px;top:2px;width:22px;height:22px;border-radius:6px;background:var(--ink);display:grid;place-items:center}.badge svg{width:16px;height:16px;fill:none;stroke:#fff;stroke-width:3;stroke-linecap:round}
+.note{font-size:12px;color:var(--ink-2);min-height:1.4em;margin:4px 0 0}
+.over{position:absolute;inset:0;display:grid;place-items:center;background:rgb(223 233 245 / 86%)}.over div{background:#fff;border:1px solid var(--border);border-radius:12px;padding:16px 20px;text-align:center;max-width:300px}.over p{margin:0 0 10px;font-size:14px}
+.rules{background:var(--surface);border:1px solid var(--border);border-radius:14px;padding:14px 16px;overflow:auto;font-size:13px;line-height:1.5}.rules h2{font-size:17px;margin:0 0 6px}.rules h3{font-size:11px;text-transform:uppercase;color:var(--muted);margin:12px 0 2px}.rules p{margin:0;color:var(--ink-2)}.rules code{font-size:11px;color:var(--muted)}
+@media(max-width:820px){.layout{grid-template-columns:1fr;grid-auto-rows:auto;overflow:auto}.play{min-height:420px}.rules{overflow:visible}}
+@media(max-height:500px) and (min-width:700px){.layout{grid-template-columns:minmax(0,1fr) 280px}.review small{display:none}.tabs{padding:4px 16px}}
+@media(prefers-reduced-motion:reduce){.card{transition:none}}
+</style>
+</head>
+<body>
+<div class="review"><strong>FIXTURE ONLY · not the production engine, no scoring, no saved data</strong><small>Review at 390×844, 844×390 and 1280×800. Sizes, counts and timings are illustrative, not approved. Preview/hide timing is represented by the Preview button.</small></div>
+<nav class="tabs" id="tabs" aria-label="Pilot mechanics"></nav>
+<div class="layout"><section class="play" aria-label="Memory fixture board"><div class="hud" id="hud"></div><div class="stage" id="stage"><div class="board" id="board"></div></div><p class="note" id="note" role="status" aria-live="polite"></p></section><aside class="rules" id="rules" aria-label="Rule comparison"></aside></div>
+<script>
+const SH=[['Circle','<circle cx="30" cy="30" r="15"/>'],['Square','<rect x="16" y="16" width="28" height="28" rx="3"/>'],['Triangle','<path d="M30 13 47 45H13Z"/>'],['Diamond','<path d="M30 11 49 30 30 49 11 30Z"/>'],['Plus','<path d="M25 13h10v12h12v10H35v12H25V35H13V25h12Z"/>'],['Hexagon','<path d="M30 12 46 21v18L30 48 14 39V21Z"/>']];
+const COL=[['orange','#e5532d'],['blue','#2f6fed'],['teal','#009a86'],['violet','#7d61ae'],['amber','#b97300'],['slate','#344257']];
+const BACK={a:'<circle cx="18" cy="18" r="4"/><circle cx="42" cy="18" r="4"/><circle cx="30" cy="30" r="4"/><circle cx="18" cy="42" r="4"/><circle cx="42" cy="42" r="4"/>',b:'<path d="M10 20h40M10 30h40M10 40h40" stroke-width="4" stroke-linecap="round" fill="none"/>'};
+const LOCK='<svg viewBox="0 0 16 16" aria-hidden="true"><rect x="3" y="7" width="10" height="7" rx="1.5"/><path d="M5 7V5a3 3 0 0 1 6 0v2"/></svg>',SWAP='<svg viewBox="0 0 16 16" aria-hidden="true"><path d="M3 5h9l-3-3M13 11H4l3 3"/></svg>';
+const MODES={
+classic:{n:'Classic (reference)',size:2,groups:6,base:'Existing memory:classic',delta:'None — this is the unchanged baseline for comparison.',help:'Flip two cards. A match stays up. A miss turns back down.'},
+budget:{n:'Tight Budget',id:'memory:budget',size:2,groups:6,limit:12,base:'memory:classic',delta:'A fixed attempt budget (2 × groups). Using the last attempt without clearing the board ends the run: no score, no saved result.',help:'You have 12 attempts. A match or a miss each use one. Clear every pair before they run out.'},
+lockout:{n:'Lockout',id:'memory:lockout',size:2,groups:6,lock:1,base:'memory:classic',delta:'After a miss, the last card you flipped is locked for exactly the next attempt; flips on it are ignored.',help:'After a miss, the second card is locked for your next attempt. Pick other cards, then it opens again.'},
+swaps:{n:'Marked Swaps',id:'memory:swaps',size:2,groups:6,swap:1,base:'memory:classic',delta:'After every miss two hidden, unmatched cards exchange places and both positions are marked, so the change can be tracked.',help:'After a miss, two hidden cards swap. Both are marked so you know which places changed.'},
+backs:{n:'Two Backs',id:'memory:two-backs',size:2,groups:6,backs:1,base:'memory:classic',delta:'Cards have one of two back designs, and every matching pair has one of each. Two cards with the same back never match.',help:'Backs are dotted or striped. A pair always has one of each, so look for the other back.'},
+quads:{n:'Quads',id:'memory:quads',size:4,groups:5,base:'memory:trios (match size 3)',delta:'A match is four identical cards, flipped four per attempt; boards use 4/5/6 groups, not 6/8/10.',help:'Flip four cards per attempt. All four must show the same symbol and colour.'},
+collapse:{n:'Collapse',id:'memory:collapse',size:2,groups:6,collapse:1,base:'memory:classic',delta:'Matched cards leave the board and the remaining cards close up in reading order, so later positions shift.',help:'Matched cards disappear and the rest move up to fill the gap. Positions change after every match.'}
+};
+let mode='classic',st,busy=false,seed=1;const $=id=>document.getElementById(id);
+function boardCols(){return mode==='quads'?(MODES.quads.groups===6&&innerHeight<=500?6:5):4}
+function rnd(){seed=(seed*1664525+1013904223)>>>0;return seed/4294967296}
+function shuffle(a){for(let i=a.length-1;i>0;i--){const j=Math.floor(rnd()*(i+1));[a[i],a[j]]=[a[j],a[i]]}return a}
+function deal(){const m=MODES[mode];seed=7;const cards=[];for(let g=0;g<m.groups;g++)for(let k=0;k<m.size;k++)cards.push({id:`${g}:${k}`,g,back:m.backs?(k%2?'b':'a'):null,up:false,matched:false});
+st={cards:shuffle(cards),rev:[],attempts:0,miss:0,locked:null,mark:[],over:false,won:false,msg:m.help};busy=false;render()}
+function click(i){const m=MODES[mode],c=st.cards[i];if(busy||st.over||st.won||c.matched||st.rev.includes(i))return;if(st.locked===i){st.msg='That card is locked for this attempt.';return render()}
+st.mark=[];st.rev.push(i);if(st.rev.length<m.size)return render();busy=true;render();const all=st.rev.every(x=>st.cards[x].g===c.g),last=i;st.attempts++;
+setTimeout(()=>{st.locked=null;if(all){st.rev.forEach(x=>st.cards[x].matched=true);st.msg='Match.';if(m.collapse)return flip(()=>{st.cards=st.cards.filter(x=>!x.matched);st.rev=[];after()});}else{st.miss++;st.msg='No match.';if(m.lock){st.locked=last;st.msg='No match. The last card is locked for your next attempt.'}}
+st.rev=[];if(!all&&m.swap){const hid=st.cards.map((x,k)=>k).filter(k=>!st.cards[k].matched);const a=hid.splice(Math.floor(rnd()*hid.length),1)[0],b=hid[Math.floor(rnd()*hid.length)];flip(()=>{[st.cards[a],st.cards[b]]=[st.cards[b],st.cards[a]];st.mark=[a,b];st.msg=`Cards ${a+1} and ${b+1} swapped places.`;after()});return}after()},all?350:800)}
+function after(){const m=MODES[mode];st.won=st.cards.every(x=>x.matched)||st.cards.length===0;if(st.won)st.msg='Board cleared.';else if(m.limit&&st.attempts>=m.limit){st.over=true;st.msg='Run over: no attempts left.'}busy=false;render()}
+function flip(fn){const el=[...$('board').children],r=el.map(e=>e.getBoundingClientRect());fn();render();[...$('board').children].forEach((e,k)=>{const o=r[k];if(!o)return;const n=e.getBoundingClientRect(),dx=o.left-n.left,dy=o.top-n.top;if(!dx&&!dy)return;e.style.setProperty('--dur','0ms');e.style.transform=`translate(${dx}px,${dy}px)`;requestAnimationFrame(()=>{e.style.removeProperty('--dur');e.style.transform=''})})}
+function face(c,m){const[nm,p]=SH[c.g],[cn,hex]=COL[c.g];return `<svg viewBox="0 0 60 60" style="color:${hex}" aria-hidden="true"><g class="face">${p}</g></svg>`}
+function render(){const m=MODES[mode],cols=boardCols(),rows=Math.ceil(st.cards.length/cols);
+$('board').style.setProperty('--cols',cols);const b=$('board'),active=b.contains(document.activeElement)?document.activeElement:null,focusId=active?.dataset.cardId,focusIndex=active?[...b.children].indexOf(active):-1;b.innerHTML='';
+st.cards.forEach((c,i)=>{const up=c.matched||st.rev.includes(i)||st.preview,[nm]=SH[c.g],[cn]=COL[c.g],e=document.createElement('button');e.className='card';e.type='button';e.dataset.cardId=c.id;e.dataset.up=up;e.dataset.matched=c.matched;e.dataset.locked=st.locked===i;e.dataset.mark=st.mark.includes(i);
+e.setAttribute('aria-label',`Card ${i+1}, ${up?`${cn} ${nm}${c.matched?', matched':''}`:`face down${c.back?`, ${c.back==='a'?'dotted':'striped'} back`:''}`}${st.locked===i?', locked':''}`);
+e.innerHTML=(up?face(c,m):`<svg viewBox="0 0 60 60" aria-hidden="true" style="color:#6f8fbd;fill:#6f8fbd;stroke:#6f8fbd">${c.back?BACK[c.back]:'<rect x="19" y="19" width="22" height="22" rx="4" fill="none" stroke-width="3"/>'}</svg>`)+(st.locked===i?`<span class="badge">${LOCK}</span>`:st.mark.includes(i)?`<span class="badge">${SWAP}</span>`:'');
+e.onclick=()=>click(i);b.append(e)});
+if(focusId){const target=[...b.children].find(e=>e.dataset.cardId===focusId&&e.dataset.matched!=='true')??[...b.children].filter(e=>e.dataset.matched!=='true')[Math.min(focusIndex,b.children.length-1)];target?.focus({preventScroll:true})}
+$('hud').innerHTML=`<span>Matched <b>${m.groups-st.cards.filter(c=>!c.matched).length/m.size}</b>/${m.groups}</span><span>Misses <b>${st.miss}</b></span>${m.limit?`<span>Attempts left <b>${Math.max(0,m.limit-st.attempts)}</b>/${m.limit}</span>`:''}<span class="sp"><button class="btn" id="pv" type="button">Preview</button><button class="btn" id="rs" type="button">Restart</button></span>`;
+$('pv').disabled=busy||st.attempts>0||st.rev.length>0||st.preview||st.won||st.over;
+$('pv').onclick=()=>{if($('pv').disabled)return;const scene=st;st.preview=true;render();setTimeout(()=>{if(st!==scene)return;st.preview=false;render()},2000)};$('rs').onclick=deal;$('note').textContent=st.msg;
+const old=document.querySelector('.over');old?.remove();if(st.over||st.won){const o=document.createElement('div');o.className='over';o.innerHTML=`<div><p><b>${st.won?'Board cleared':'Run over'}</b><br>${st.won?'Result Card, score and Next appear here in the real app.':'No score or saved result. Use Home or try another.'}</p><button class="btn" type="button" id="nx">${st.over?'Try another (fixture)':'Play again (fixture)'}</button></div>`;$('stage').append(o);$('nx').onclick=deal;$('nx').focus()}
+$('rules').innerHTML=`<h2>${m.n}</h2>${m.id?`<code>${m.id} · candidate</code>`:'<code>memory:classic · accepted</code>'}${mode==='quads'?`<p><label for="quad-groups">Preview group count</label> <select id="quad-groups" aria-label="Quad preview group count">${[4,5,6].map(n=>`<option value="${n}" ${n===m.groups?'selected':''}>${n} groups</option>`).join('')}</select></p>`:''}<h3>Baseline</h3><p>${m.base}</p><h3>Rule difference</h3><p>${m.delta}</p><h3>Help text (draft)</h3><p>${m.help}</p><h3>Fixture notes</h3><p>${m.groups} groups here (production uses its own group counts). Symbols differ by shape as well as colour. Keyboard: Tab to a card, Enter or Space to flip.</p>`;
+if(mode==='quads')$('quad-groups').onchange=e=>{m.groups=Number(e.target.value);deal();$('quad-groups').focus()};fit()}
+function fit(){const s=$('stage'),cols=boardCols(),rows=Math.ceil(st.cards.length/cols)||1,c=Math.floor(Math.min((s.clientWidth-8*(cols-1)-8)/cols,(s.clientHeight-8*(rows-1)-8)/rows,96));document.documentElement.style.setProperty('--c',Math.max(44,c)+'px')}
+$('tabs').innerHTML=Object.entries(MODES).map(([k,v])=>`<button type="button" data-m="${k}">${v.n}</button>`).join('');
+$('tabs').onclick=e=>{const k=e.target.dataset.m;if(!k)return;mode=k;[...$('tabs').children].forEach(b=>b.dataset.m===k?b.setAttribute('aria-current','page'):b.removeAttribute('aria-current'));deal()};
+new ResizeObserver(fit).observe($('stage'));$('tabs').children[0].click();
+</script>
+</body>
+</html>

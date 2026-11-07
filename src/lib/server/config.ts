@@ -13,6 +13,7 @@ import { RunError } from './runs.js';
 
 export interface GameConfig {
 	weight: number;
+	dimensions?: Record<string, boolean>;
 }
 type Snapshot = { version: string; parent: string; values_json: string };
 type ConfigKind = 'game' | 'theme' | 'style';
@@ -39,12 +40,29 @@ export function validateGameConfig(value: unknown): GameConfig {
 		throw new RangeError('game_config');
 	const config = value as GameConfig;
 	if (
-		Object.keys(config).join(',') !== 'weight' ||
+		Object.keys(config).some((key) => key !== 'weight' && key !== 'dimensions') ||
 		!Number.isSafeInteger(config.weight) ||
 		config.weight < 0 ||
 		config.weight > 10000
 	)
 		throw new RangeError('game_config');
+	if (config.dimensions !== undefined) {
+		const keys = catalog.memory.dimensionPolicy.dimensions.flatMap((dimension) =>
+			dimension.values.map((value) => `${dimension.key}:${value.id}`)
+		);
+		if (
+			!config.dimensions ||
+			typeof config.dimensions !== 'object' ||
+			Array.isArray(config.dimensions) ||
+			Object.keys(config.dimensions).length !== keys.length ||
+			keys.some((key) => typeof config.dimensions![key] !== 'boolean')
+		)
+			throw new RangeError('game_config');
+		return {
+			weight: config.weight,
+			dimensions: Object.fromEntries(keys.map((key) => [key, config.dimensions![key]]))
+		};
+	}
 	return { weight: config.weight };
 }
 

@@ -17,6 +17,8 @@
 		celebrating,
 		winWave,
 		locked,
+		lockedOut = false,
+		marked = false,
 		dealDelay,
 		matchDelay,
 		waveDelay,
@@ -35,6 +37,10 @@
 		celebrating: boolean;
 		winWave: boolean;
 		locked: boolean;
+		/** Lockout: this card cannot be flipped on the next attempt. */
+		lockedOut?: boolean;
+		/** Swaps: this position was exchanged by the last miss. */
+		marked?: boolean;
 		dealDelay: number;
 		matchDelay: number;
 		waveDelay: number;
@@ -49,7 +55,16 @@
 			? t('card.matched', { symbol: name })
 			: faceUp
 				? t('card.up', { number: index + 1, symbol: name })
-				: t('card.down', { number: index + 1 })
+				: lockedOut
+					? t('card.lockedDown', { number: index + 1 })
+					: marked
+						? t('card.swappedDown', { number: index + 1 })
+						: card.back === undefined
+							? t('card.down', { number: index + 1 })
+							: t('card.downBack', {
+									number: index + 1,
+									back: t(card.back === 0 ? 'back.dotted' : 'back.striped')
+								})
 	);
 </script>
 
@@ -62,6 +77,8 @@
 	class:is-shaking={shaking}
 	class:is-selected={selected}
 	class:is-delayed-flip={delayedFlip}
+	class:is-lockout={lockedOut}
+	class:is-marked={marked}
 	class:is-celebrating={celebrating}
 	class:is-win-wave={winWave}
 	style={`--deal-delay:${dealDelay}ms;--match-delay:${matchDelay}ms;--wave-delay:${waveDelay}ms`}
@@ -72,7 +89,37 @@
 >
 	<span class="card-inner">
 		<span class="card-face card-back" aria-hidden="true">
-			<span class="back-mark"></span>
+			{#if card.back === undefined}
+				<span class="back-mark"></span>
+			{:else}
+				<svg class="back-pattern" viewBox="0 0 40 40" focusable="false">
+					{#if card.back === 0}
+						{#each [8, 20, 32] as y (y)}{#each [8, 20, 32] as x (x)}<circle
+									cx={x}
+									cy={y}
+									r="3.5"
+									fill="currentColor"
+								/>{/each}{/each}
+					{:else}
+						<path d="M5 9H35M5 20H35M5 31H35" stroke="currentColor" stroke-width="5" fill="none" />
+					{/if}
+				</svg>
+			{/if}
+			{#if lockedOut}
+				<svg class="badge" viewBox="0 0 24 24" focusable="false">
+					<rect x="5" y="11" width="14" height="10" rx="2" fill="currentColor" />
+					<path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" stroke-width="2.5" fill="none" />
+				</svg>
+			{:else if marked}
+				<svg class="badge" viewBox="0 0 24 24" focusable="false">
+					<path
+						d="M3 8H19M15 4L19 8L15 12M21 17H5M9 13L5 17L9 21"
+						stroke="currentColor"
+						stroke-width="2.5"
+						fill="none"
+					/>
+				</svg>
+			{/if}
 		</span>
 		<span class="card-face card-front" aria-hidden="true">
 			<Symbol symbol={card.symbol} color={symbolColor} {glyph} {fillMode} />
@@ -198,6 +245,28 @@
 		border: 3px solid var(--memory-mark, rgba(255, 255, 255, 0.62));
 		border-radius: 3px;
 		transform: rotate(45deg);
+	}
+
+	.back-pattern {
+		width: 52%;
+		color: var(--memory-mark, rgba(255, 255, 255, 0.62));
+	}
+
+	/* Outranks the procedural theme's relative-position rule for face children. */
+	.card-face > .badge {
+		position: absolute;
+		right: 6%;
+		bottom: 6%;
+		width: 34%;
+		color: var(--memory-mark, var(--ink));
+	}
+
+	.is-lockout .card-back {
+		border-style: dashed;
+	}
+
+	.is-marked .card-back {
+		border-width: 4px;
 	}
 
 	.memory-card:focus-visible {

@@ -1,5 +1,127 @@
 # DECISIONS.md
 
+## 2026-11-07 — .7 Memory Tier 2 directory accepted; source-only GitHub handoff authorized
+
+- The owner said “got them, approved and now comit and push to github”, accepting the
+  completed Tier 2 Memory directory and authorizing this source-only commit and push to
+  `origin/main`. This supersedes earlier .7 pending-review limits for this handoff.
+- The directory architecture unifies curated presets with observed D1 identities without
+  generating Cartesian combinations or suffering traffic-only blind spots. Keyset cursor
+  pagination (`encodeCursor`/`decodeCursor`) provides stable O(1) paging. Inspection
+  drawer surfaces dimension matrix and direct links to Scoring Editor.
+- Scoped format/lint/types (0 errors/warnings), real-D1 suite (15/15 passed), and Playwright
+  Chromium admin suite across 390×844, 844×390, and 1280×800 remain the verification evidence.
+- Ten Memory variants remain the accepted catalogue; .7 adds no new variants. Unauditioned audio
+  and unrelated local editor/MCP settings remain excluded. Full verification remains deferred;
+  no production deployment is authorized. [Work](work/V1.3.5.7_WORK.md).
+
+## 2026-11-07 — .6 Tier 1 implementation and functional visual baseline
+
+- The owner reviewed the .6 Policy fixture, accepted it as a **functional visual
+  baseline at 390×844, 844×390 and 1280×800**, deferred visual polish, and
+  explicitly authorized local implementation. Because the required delegation
+  models are unavailable, the owner allowed direct parent execution/verification;
+  no substitute agent evidence is claimed. Owner .6 functional acceptance of
+  the integrated app remains separate. No .7, source handoff or deployment.
+- Memory owns six finite dimensions/15 values and the ten existing mappings;
+  operator edits can only narrow them. Reuse immutable `game_config` snapshots
+  and D1 `config_live` with reasoned audit/CAS updates; a corrupt live pointer
+  fails closed, not via a possibly stale KV fallback. Versioned snapshot content
+  preserves existing weight-only rows and the family weight. New-round ranked
+  issuance enforces the live policy in the same conditional D1 insert; the
+  availability API filters solo selection. Already-issued sessions and solo
+  checkpoints continue under their original rules. Existing individual variant
+  switches can still disable the last variant: the zero-playable guard is
+  deliberately scoped to **policy writes** under the owner's 4A choice, rather
+  than changing accepted lifecycle controls within .6. No schema, dependency,
+  variant identity, score or engine version changed. [Work](work/V1.3.5.6_WORK.md).
+
+## 2026-11-07 — .5 local acceptance and .6 fixture-only preview
+
+- The owner said “accepte .5 locally and do the next step”, accepting all six
+  locally implemented Memory rule additions. Together with the original four,
+  ten variants are now locally accepted; existing .5 tests and limits remain the
+  evidence, with no new physical-device review or full verification claimed.
+  [Pilot work](work/V1.3.5.5_WORK.md).
+- The owner accepted .6 planning recommendations **1A** (reuse immutable
+  `game_config` snapshots with D1-live enforcement), **2A** (Memory-only Policy
+  tab), **3A** (value switches; archetype summaries), **4A** (reject a policy
+  change leaving zero eligible variants while Memory is enabled), and preview
+  first. They then directed the next step: create only the
+  [interactive .6 fixture](../static/demo/v1.3.5.6-tier1.html) for three-size
+  review. No .6 app/server code, new role, schema, commit/push or deployment is
+  authorized. Existing individual variant switches can disable the last variant;
+  align or scope that exception before claiming a family-wide invariant.
+  [Brief](briefs/v1.3.5.6-tier1-policy-brief.md), [work](work/V1.3.5.6_WORK.md).
+
+## 2026-11-07 — v1.3.5.4 acceptance and v1.3.5.5 pilot startup
+
+- The owner explicitly chose “Accept .4; start .5” after the scoped identity
+  work/evidence. This accepts .4 locally without a new test, physical-device
+  claim or verification waiver. Six .3-approved rule identities remain design
+  candidates; no new implementation or acceptance is inferred from selection.
+- The owner requested Ponytail for .5. Use the approved .3 representative
+  Memory fixture, and present the **new** loss-to-selector, resumed Budget
+  failure and 24-card quad shell states at all three sizes before UI integration.
+  `static/demo/v1.3.5.5-pilot.html` is fixture-only and awaits owner visual
+  approval; focused Chromium emulation passed after short-landscape correction.
+  Scope/evidence: [selected brief](briefs/v1.3.5.5-memory-pilot-brief.md) and
+  [startup work](work/V1.3.5.5_WORK.md). No .5 app code, .6, commit/push or
+  deployment; full verification remains deferred.
+
+## 2026-11-07 — v1.3.5.4 local identity path and bounded admin type correction
+
+- The owner selected .4 implementation (“ok do it”). Preserve the existing
+  `(family, variant, engineVersion, scoreConfigVersion)` identity, omitted classic
+  payload and `memory-1` without a new table/version/DSL. On ranked Resume,
+  compare the local checkpoint with the issued ID, canonical variant, seed,
+  engine and immutable scoring snapshot both before and after acquiring the
+  latest checkpoint; mismatch resumes issuance afresh, never wrong local moves.
+  Unknown stored variants/score versions and missing historical theme snapshots
+  remain non-resumable conflicts with explicit takeover; storage errors still
+  propagate for retry. Solo stays offline-capable, with malformed score-version
+  shapes rejected locally. This is locally implemented, not owner accepted.
+- An initial project type check exposed four missing pagination default fields
+  in the earlier accepted .2 admin route; the owner explicitly selected “Fix four
+  fields”. The narrow default initializer now matches `loadGamesAdmin`; rerun
+  Svelte/TS check passes with zero errors/warnings. No admin policy/behavior,
+  dependency, migration or Memory runtime version changed. Targeted tests and
+  limitations: [work/evidence](work/V1.3.5.4_WORK.md). Full verify remains
+  deferred; .5, new commit/push and deployment still require separate approval.
+
+## 2026-11-07 — v1.3.5.3 Memory matrix and representative visuals
+
+- The owner separately chose “Approve recommendations” for the six proposed
+  Memory design candidates and “Approve three sizes” for the fixture-only
+  visual reference at 390×844, 844×390 and 1280×800. See the exact
+  [matrix/decision table](briefs/v1.3.5.3-memory-matrix-brief.md) and
+  [work/evidence](work/V1.3.5.3_WORK.md). Existing four variants remain the only
+  implemented and owner-accepted catalogue entries; other-family matrices stay
+  UNPOPULATED. No .4/.5, new commit/push or deployment is authorized.
+- Approved single-rule candidate IDs/baselines: `memory:budget`, `lockout`,
+  `swaps`, `two-backs`, `collapse` relative to classic; `memory:quads` relative
+  to trios. Pair modes keep 6/8/10 seed-selected groups; quads 4/5/6 groups of
+  four, six attempts/group, with six columns at 844×390 for the 24-card case.
+  No combinations or cosmetic/seed relabels. Candidate/pilot total is not an
+  accepted preset count.
+- Budget: 2 attempts/group; unfinished exhaustion is a visible no-score,
+  no-saved-completion run-over with Home/Try another; ranked issuance is abandoned
+  by exact ID, never submitted as a win. Last-attempt completion still wins.
+  Lockout blocks the last mismatched card for the next completed attempt, with
+  no-deadlock fallback. Marked Swaps exchanges exactly two hidden unmatched
+  cards after a miss with markers until the next accepted flip. Collapse removes
+  matches and compacts survivors while retaining card identity/focus. Two Backs
+  gives each pair one of each distinguishable/informative back, not a cosmetic skin.
+- Separate per-variant leaderboard groups. Five new pair candidates share
+  existing `brief-v1` coefficients/family scoring scope. Quad scoring uses
+  proposed new `memory-quads-v1` values (2000/quad, 150/miss, 5/second), separate
+  editable scope and 0.8-second/group ranked minimum. Preserve `memory-1`, old
+  omitted-classic serialization and legacy score histories; never silently
+  change old variant rules. Use existing `(family,variant,engineVersion,
+scoreConfigVersion)` identity where viable, prove compatibility in later .4/.5
+  rather than adding speculative schema. No runtime version/dependency is changed
+  by this design approval. Full verification remains deferred.
+
 ## 2026-11-07 — v1.3.5.2 local acceptance and source-only GitHub handoff
 
 - Owner instruction: “update the git repo and push to github”. This accepts

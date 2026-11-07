@@ -17,6 +17,178 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.5.7 — Memory Tier 2 directory accepted locally (2026-11-07)
+
+- **Built:** After the owner approved the preview fixture (`static/demo/v1.3.5.7-tier2.html`) and brief, the Tier 2 curated and observed Memory directory was implemented under ponytail principles. Delivers dual-source curated/observed union (`src/lib/server/memory-directory.ts`), keyset cursor pagination (`encodeCursor`/`decodeCursor`), multi-filter toolbar (`q`, `status`, `archetype`, `source`), dimension breakdown evaluator, and accessible inspection drawer (`dialog.drawer`) with direct rules-group scoring editor links. Wired into `/admin/games?game=memory&subview=directory` via `MemoryDirectory.svelte`, `GamesAdmin.svelte`, and `+page.server.ts`. [Brief](briefs/v1.3.5.7-tier2-directory-brief.md), [work/evidence](work/V1.3.5.7_WORK.md).
+- **Skipped (and why):** No new variants (ten accepted pilot variants unchanged; cap 100 preserved); non-Memory matrices (Block, Connect, Mahjong) remain unpopulated; unauditioned audio and local editor settings excluded; full repo `bun run verify` deferred per standing instructions.
+- **Known issues:** No physical device review; browser testing performed via Chromium responsive emulation. Full verify deferred.
+- **Decisions and pinned versions:** Owner approved recommended options (1A dedicated Directory tab, 2A base64 cursor token, 3A multi-filter toolbar, preview first) and accepted implementation. Direct parent execution utilized due to unavailable `gpt-6.1-sol`/`gpt-6-luna` models.
+- **Questions for the owner:** None; source-only commit and push to GitHub authorized.
+
+| Acceptance item | Evidence type and location | Result |
+| --- | --- | --- |
+| Visual preview fixture at three sizes | `static/demo/v1.3.5.7-tier2.html`, Chromium captures in `build/v1.3.5.7/tier2-*.png` | ACCEPTED by owner |
+| Dual-source union, keyset pagination, multi-filtering & observed variant discovery | `src/lib/server/memory-directory.ts`, [real-D1 tests](tests/integration/memory-variants.test.ts) | PASS 15/15 |
+| Real Games Directory tab, filters, inspection drawer & scoring links across 3 viewports | [Chromium admin spec](tests/e2e/memory-variants-admin.spec.ts), captures in `build/v1.3.5.7/real-directory-*.png` | PASS 3/3 at one worker |
+| Responsive layout (390×844, 844×390, 1280×800) | Zero horizontal scroll overflow (`scrollWidth <= innerWidth`) | PASS at all 3 sizes |
+| Format, lint and types | Scoped Prettier/ESLint; `bun run check` | PASS; 0 lint warnings, 0 type errors/warnings |
+| Owner functional acceptance & push authorization | Owner: “got them, approved and now comit and push to github” | ACCEPTED locally; source handoff authorized |
+| Full `bun run verify` | Standing owner deferral | NOT RUN; deferred, not passed/waived |
+
+- **Measurements:** Checked in local Linux Chromium responsive emulation at 390×844, 844×390, and 1280×800 (one worker). Directory queries are bounded O(1) single-bind SQL.
+- **Waivers:** None.
+- **Owner responsibilities:** Owner pushes to GitHub or provisions future environments.
+- **CODEMAP updated:** Yes, maps `server/memory-directory.ts`, `MemoryDirectory.svelte`, and admin directory route.
+
+## v1.3.5.6 — Memory Tier 1 policy locally implemented, functional review pending (2026-11-07)
+
+- **Built:** After the owner approved the [fixture](../static/demo/v1.3.5.6-tier1.html) as a functional visual baseline and directed local implementation, six family-owned dimensions/15 values, ten existing variant mappings, audited immutable policy snapshots, D1-live/atomic ranked issuance checks, effective solo availability and an admin Memory-only Policy tab were connected end to end. [Brief](briefs/v1.3.5.6-tier1-policy-brief.md), [work/evidence](work/V1.3.5.6_WORK.md).
+- **Skipped (and why):** No new variant, score or engine version, schema/migration, role, route, dependency, arbitrary rule builder, other-family policy, audio, full verification, commit/push or deployment. The owner selected only .6 local work; .7 and production remain separate.
+- **Known issues:** The owner deferred visual polish. The zero-playable guard covers policy writes, not previously accepted individual switches (which still allow disabling the last variant). A corrupt D1 live pointer fails closed until repaired. No physical-device/production or non-Chromium admin evidence. One pre-existing .4 slice6 unit failure remains outside this milestone.
+- **Decisions and pinned versions:** Owner-selected 1A/2A/3A/4A and preview-first. Preserve weight-only config, existing variants, `memory-1`, replay and scoring; new policy values are immutable with a D1 live pointer and CAS/audit. KV may cache immutable snapshots but never govern issuance. No dependency or runtime version changed. Required delegated models unavailable; owner allowed direct parent work and verification, without substitute agent claims.
+- **Questions for the owner:** Review the integrated .6 Memory Policy flow locally and confirm functional acceptance or changes. This does not itself authorize .7 or a source handoff.
+
+| Acceptance item | Evidence type and location | Result |
+| --- | --- | --- |
+| Owner visual baseline at three sizes | Owner “accept as a base”, [fixture](../static/demo/v1.3.5.6-tier1.html) and earlier fixture-focused Chromium evidence | ACCEPTED as functional visual baseline; later polish deferred |
+| Finite rules, validated strict policy values and unchanged ten Memory identities | [family unit](../src/lib/puzzles/memory/dimensions.test.ts), [work record](work/V1.3.5.6_WORK.md) | PASS 1/1; no new variant |
+| D1 policy CAS, permission/audit, zero guard, authoritative issuance, in-flight and invalid live snapshot | [real-D1 tests](../tests/integration/memory-variants.test.ts), [work record](work/V1.3.5.6_WORK.md) | PASS 14/14 |
+| Real Games Policy editor/action and three-size responsive UI | [Chromium admin spec](../tests/e2e/memory-variants-admin.spec.ts); ignored `build/v1.3.5.6/real-policy-*.png` | PASS 2/2 at one worker; policy case at all three sizes |
+| Shared non-Memory ranked/config behavior | Four filtered Slice 3 cases, [work record](work/V1.3.5.6_WORK.md) | PASS 4/4 (4 unrelated skipped) |
+| Memory engine/replay fingerprint | `bun scripts/check-vectors.ts --memory`, six runtimes, 38 vectors | PASS, identical fingerprint |
+| Format, lint and types | Scoped Prettier/ESLint; `bun run check` | PASS; 0 lint warnings, 0 type errors/warnings |
+| Owner functional acceptance of .6 | Awaiting owner integrated-app review | PENDING; no acceptance inferred from checks |
+| Full `bun run verify` | Standing owner deferral | NOT RUN; deferred, not passed/waived |
+
+- **Measurements:** No new product performance target; layout was checked in local Linux Chromium responsive emulation at 390×844, 844×390 and 1280×800 (one worker), no physical device or network shaping. No cold/preloaded product-load run, median/p95 or gate/goal applies. Admin overview adds one bounded D1 live-pointer read; no speedup is claimed.
+- **Waivers:** None. Earlier full-verification deferral and pre-existing unrelated unit failure are recorded, not waived. Intermediate focused test failures were corrected and affected checks rerun.
+- **Owner responsibilities:** Functional review of integrated .6 locally; any physical-device review, .7 selection, source commit/push or deployment requires a separate direction.
+- **CODEMAP updated:** Yes, maps family policy data, server issuance, admin UI and direct checks.
+
+## v1.3.5.5 — Six-rule Memory pilot accepted locally (2026-11-07)
+
+- **Built:** Six complete Memory additions (`budget`, `lockout`, `swaps`, `two-backs`, `quads`, `collapse`) on the earlier four; `memory-quads-v1` scoring and failure/recovery flow. The owner said “accepte .5 locally and do the next step”, accepting all ten Memory variants locally. See [pilot brief](briefs/v1.3.5.5-memory-pilot-brief.md) and [work/evidence](work/V1.3.5.5_WORK.md).
+- **Skipped (and why):** No schema, dependency, route, audio change, full verify, new source push or deployment; outside bounded .5 scope or previously deferred. Owner acceptance did not add evidence.
+- **Known issues:** One pre-existing .4 slice6 unit failure persists; generic Resume copy for an exhausted Budget and no Collapse exit animation are recorded in the work record. No physical-device acceptance supplied.
+- **Decisions and pinned versions:** Existing `memory-1` serialization preserved; `memory-quads-v1` scoring scope for Quads. Six additions are now locally accepted, not merely candidates. No new package version pinned.
+- **Questions for the owner:** None for .5 acceptance; .6 fixture is separately selected for visual review.
+
+| Acceptance item | Evidence type and location | Result |
+| --- | --- | --- |
+| Six rules, existing four, scoring, replay and ranked recovery | [pilot work](work/V1.3.5.5_WORK.md): Memory units, six-runtime vectors (38), real D1 12/12 | PASS, scoped; one unrelated pre-existing slice6 failure recorded |
+| Player and operator/browser flows | Chromium Memory 21/21, admin 1/1 and resume 13/13; local screenshots in `build/v1.3.5.5/` | PASS, scoped Chromium emulation |
+| Owner .5 visual and functional acceptance | “Yes, fixture approved” at three sizes; “accepte .5 locally and do the next step” | ACCEPTED locally, not physical-device review |
+| Full `bun run verify` | Standing owner deferral | NOT RUN; not waived or passed |
+
+- **Measurements:** No .5 product performance target was introduced; Chromium viewport evidence is emulation, not a cold/preloaded load or latency gate. Device/network profile, runs and median/p95 are not applicable.
+- **Waivers:** None. Existing full-verification deferral and pre-existing failure are recorded, not waived.
+- **Owner responsibilities:** .5 is locally accepted; .6 visual and any later app/production/push decisions remain separate.
+- **CODEMAP updated:** Yes, .5 acceptance and .6 fixture mapped.
+
+## v1.3.5.4 — Existing Memory identity owner-accepted locally (2026-11-07)
+
+The owner explicitly chose “Accept .4; start .5”. This closes .4 functional review
+and selects local .5 work, but does not add verification/device evidence, waive
+full verification, or authorize a commit/push or deployment. The original
+scoped results and limitations below remain unchanged.
+
+- **Built:** Compared local ranked checkpoint identity to server issuance before
+  offering Resume and again after checkpoint lease refresh; mismatches fall back
+  to original issuance rather than replaying wrong local moves. Invalid historical
+  ranked variant/version/theme returns the existing non-resumable conflict.
+  Malformed local score-version shapes use existing failure/New UI. The owner
+  separately authorized a four-field default pagination fix in the earlier
+  Games admin route after the initial project type check failed. See
+  [brief](briefs/v1.3.5.4-identity-brief.md) and [work/evidence](work/V1.3.5.4_WORK.md).
+- **Skipped (and why):** No new preset, schema/migration, manifest/engine version,
+  generated projection, new UI, full verify, .5, commit/push or deployment. The
+  four existing Memory variants already had immutable server and D1 scoring
+  paths; .4 only connected the missing local/server resume validation.
+- **Known issues:** The initial type check failed on the accepted .2 route's
+  default `gameStats`; owner-approved correction resolved it (final 0 errors/
+  warnings). Corrupt same-ID local ranked moves are not replayed, though the
+  issued session remains available afresh. A no-theme historical active session
+  remains non-resumable with explicit takeover. A solo offline score UUID cannot
+  be checked against D1 until submission. No physical-device evidence.
+- **Decisions and pinned versions:** Preserve `memory-1`, omitted/explicit classic,
+  immutable `brief-v1`/`memory-trios-v1` and existing D1/KV patterns. Compare
+  normalized score coefficients as well as immutable version on resume; reject
+  inconsistent checkpoint choice, not issued server authority. Four-field admin
+  fix was separately owner-approved. No new runtime/dependency version pinned.
+- **Questions for the owner:** None for .4 acceptance. .5 is separately selected;
+  any future source handoff still requires explicit owner direction.
+
+| Acceptance item | Evidence type and location | Result |
+| --- | --- | --- |
+| Four legacy Memory identities and omitted classic preserve replay | Existing code plus [work record](work/V1.3.5.4_WORK.md), units and Memory-only six-runtime vectors | PASS; 15/15 units, six runtimes |
+| Exact ranked issuance/checkpoint recovery, wrong tuple and score rejection | `checkpoint.test.ts`, `tests/e2e/resume.spec.ts`; `build/v1.3.5.4/{unit,browser,browser-final}.log` | PASS; 3/3 initial and 2/2 final Chromium cases (four unique) |
+| Historical NULL-classic, invalid ranked variants/version/theme, scoring/lifecycle | Real isolated D1 `tests/integration/memory-variants.test.ts`; `integration.log` | PASS 10/10 |
+| Type/format/lint compatibility, bounded admin default correction | `types.log` failure, owner approval, `types-final.log`, touched-file Prettier/ESLint | PASS after fix; 0 type errors/warnings, 0 lint warnings |
+| Owner .4 functional acceptance | Explicit 2026-11-07 choice “Accept .4; start .5” | ACCEPTED locally; no new check or device claim |
+| Full `bun run verify` | Standing owner deferral | NOT RUN; not waived or passed |
+
+- **Measurements:** Identity-only behavior has no new performance target; device
+  class, network shaping, cold/preloaded status, runs, median/p95 and gate/goal
+  do not apply. Browser evidence is local Linux Chromium with one worker; no
+  physical-device or new product latency measurement is inferred.
+- **Waivers:** None. Initial type failure was fixed, not waived. Full verify
+  remains deferred under the existing owner decision.
+- **Owner responsibilities:** .4 functional acceptance is recorded; review .5
+  visual changes and later functionality separately. Commit/push, physical-device
+  review and deployment remain distinct approvals.
+- **CODEMAP updated:** Yes; the .4 mapping links changed files and evidence.
+
+## v1.3.5.3 — Memory matrix and representative visual approval (2026-11-07)
+
+- **Built:** Planning/design only: finite Memory matrix, six named candidate
+  baselines/rule deltas, invalid combinations, scoring/group/identity and
+  failure/recovery decisions, help/acceptance cases and an updated interactive
+  fixture. The owner separately approved the [design package](briefs/v1.3.5.3-memory-matrix-brief.md)
+  (“Approve recommendations”) and representative visuals (“Approve three sizes”)
+  at 390×844, 844×390, 1280×800, including Quads with six groups and Budget
+  run-over. [Work/evidence](work/V1.3.5.3_WORK.md).
+- **Skipped (and why):** No app/game implementation, D1 change, generated registry,
+  unit/D1/vector/E2E app tests, full verification, commit/push or deployment; .3
+  is a design checkpoint, and .4/.5 require separate selection. Four existing
+  Memory variants remain the only accepted implemented catalogue entries.
+- **Known issues:** First six-group fixture at 844×390 overflowed; after a
+  six-column fix, the focused fixture check passed. 46px minimum card at that
+  size is emulated fixture geometry, not production accessibility/fit proof.
+  The demo uses a manual preview and simplified timing/animations and omits
+  authoritative scoring, server ranked issuance and checkpoint recovery. The
+  single live Memory engine-version check makes a careless bump unsafe for old
+  runs/sessions; later work must prove compatibility and budget loss handling.
+- **Decisions and pinned versions:** Six approved _design candidates_ and exact
+  rule/scoring/identity intent are in [DECISIONS](DECISIONS.md) and the brief.
+  Preserve `memory-1`, `brief-v1`, `memory-trios-v1` legacy identities; propose
+  `memory-quads-v1` for later implementation, not pinned in runtime today. No
+  dependency/schema/version changed in this phase. C1–C10, 100-total cap and
+  full-verification deferral remain in force.
+- **Questions for the owner:** No unresolved .3 design/visual decision. Select
+  .4 separately if desired; future .5 UI states not represented by this fixture
+  require their own owner visual decision before integration.
+
+| Acceptance item                                                                       | Evidence type and location                                                                                                   | Result                                                |
+| ------------------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| .3 finite rule-distinct Memory matrix, six pilot candidates, compatibility and bounds | [brief](briefs/v1.3.5.3-memory-matrix-brief.md), explicit owner “Approve recommendations”                                    | PASS: design approved; no live variants added         |
+| Scoring, run-over, help, identity, fairness/acceptance decisions                      | Brief decision table; [DECISIONS](DECISIONS.md)                                                                              | PASS: approved design; production fairness unmeasured |
+| Representative fixture at 390×844, 844×390 and 1280×800                               | [local fixture](../static/demo/v1.3.5.3-memory.html); ignored `build/v1.3.5.3-review/` captures; owner “Approve three sizes” | PASS: owner visual approval of fixture only           |
+| Focused interaction/layout regression                                                 | Exact local Chromium command, output and initial failed landscape probe in [work record](work/V1.3.5.3_WORK.md)              | PASS after fix at three sizes; fixture only           |
+| Legacy app replay/ranked, new rules, D1, vectors and physical-device acceptance       | Not part of .3 design; .4/.5 are not selected                                                                                | NOT RUN; no pass/waiver inferred                      |
+| Full `bun run verify`                                                                 | Existing owner deferral                                                                                                      | NOT RUN; deferred, not passed/waived                  |
+
+- **Measurements:** No product performance target in this documentation/fixture
+  stage, so device class, network profile, load state, median/p95 and gate/goal
+  are not applicable. Local Chromium responsive emulation used the three named
+  viewport sizes with no network shaping or physical device; card widths were
+  57/46/96px at the six-group quad maximum, not latency measurements.
+- **Waivers:** None. The owner's design/visual approvals do not waive production
+  tests, physical-device review or the deferred full verification.
+- **Owner responsibilities:** Separately select any next milestone and approve
+  new UI not covered by the representative fixture before that UI is integrated;
+  later functional acceptance and every push/deployment remain separate.
+- **CODEMAP updated:** Yes; .3 entry maps brief, fixture and work evidence.
+
 ## v1.3.5.1 — Owner local acceptance and source-only GitHub handoff (2026-11-07)
 
 - **Built:** Recorded owner acceptance of the completed local Games extraction.

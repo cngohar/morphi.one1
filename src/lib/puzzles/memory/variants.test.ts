@@ -10,16 +10,33 @@ import {
 	memoryCapReached,
 	memoryMoveLimit,
 	resolveMismatch,
-	type MemoryRound
+	type MemoryRound,
+	type MemoryVariant
 } from './logic.js';
 import { manifest } from './manifest.js';
 import { messages } from './messages.js';
-import { triosScoring } from './scoring.js';
+import { quadsScoring, triosScoring } from './scoring.js';
 
 function matchingMoves(round: MemoryRound) {
 	return [...new Set(round.cards.map((card) => card.symbol))].flatMap((symbol) =>
 		round.cards.flatMap((card, index) => (card.symbol === symbol ? [{ index }] : []))
 	);
+}
+
+/** Plays a miss-free game on the live board, so collapse positions stay correct. */
+function solve(seed: string, variant: string) {
+	let round = createMemoryRound(seed, variant);
+	const moves: { index: number }[] = [];
+	while (round.status === 'playing') {
+		const live = round.cards.flatMap((card, index) =>
+			round.matched.includes(index) ? [] : [{ card, index }]
+		);
+		for (const { index } of live.filter(({ card }) => card.symbol === live[0].card.symbol)) {
+			moves.push({ index });
+			round = flipCard(round, index).round;
+		}
+	}
+	return moves;
 }
 
 function mismatch(round: MemoryRound) {
@@ -157,16 +174,24 @@ describe('Memory variants', () => {
 	});
 
 	it('owns separate groups, complete messages, and trio scoring without changing pair scoring', () => {
-		expect(new Set(manifest.leaderboardGroups).size).toBe(12);
+		expect(new Set(manifest.leaderboardGroups).size).toBe(30);
 		for (const variant of manifest.variants) {
 			expect(MEMORY_VARIANTS).toContain(variant.id);
 			expect(messages[variant.name as keyof typeof messages]).toBeTruthy();
 			for (const group of variant.leaderboardGroups)
 				expect(manifest.leaderboardGroups).toContain(group);
 			const round = createMemoryRound('42', variant.id);
-			const replay = manifest.replay(round.seed, matchingMoves(round), 10, undefined, variant.id);
+			const replay = manifest.replay(
+				round.seed,
+				solve(round.seed, variant.id),
+				10,
+				undefined,
+				variant.id
+			);
 			expect(variant.leaderboardGroups).toContain(replay.group);
-			expect(replay.score).toBe(round.pairs * (variant.id === 'memory:trios' ? 1500 : 1000) - 50);
+			expect(replay.score).toBe(
+				round.pairs * ({ 'memory:trios': 1500, 'memory:quads': 2000 }[variant.id] ?? 1000) - 50
+			);
 		}
 		expect(triosScoring.version).toBe('memory-trios-v1');
 		expect(validateScoreValues(triosScoring, { trio: 1800, mismatch: 75, second: 3 })).toEqual({
@@ -187,5 +212,262 @@ describe('Memory variants', () => {
 				'memory:trios'
 			).score
 		).toBe(round.pairs * 1800 - 30);
+	});
+});
+
+describe('Memory v1.3.5.5 pilot rules', () => {
+	const classicDeck = (seed: string) => createMemoryRound(seed).cards.map((card) => card.id);
+
+	it('keeps the classic deck for the four new pair identities and adds only their own state', () => {
+		for (const seed of ['0', '42', '18446744073709551615']) {
+			for (const variant of [
+				'memory:budget',
+				'memory:lockout',
+				'memory:swaps',
+				'memory:two-backs',
+				'memory:collapse'
+			]) {
+				const round = createMemoryRound(seed, variant);
+				expect(round.cards.map((card) => card.id)).toEqual(classicDeck(seed));
+				expect(round.variant).toBe(variant);
+			}
+			expect(createMemoryRound(seed, 'memory:lockout').lock).toBeNull();
+			expect(createMemoryRound(seed, 'memory:swaps').marked).toEqual([]);
+			expect(createMemoryRound(seed, 'memory:collapse').cleared).toBe(0);
+		}
+	});
+
+	it('budget gives two attempts per pair, lets the last attempt win and never scores a loss', () => {
+		let round = createMemoryRound('42', 'memory:budget');
+		const limit = round.pairs * 2;
+		expect(memoryMoveLimit(round)).toBe(limit * 2);
+		const moves: { index: number }[] = [];
+		for (let attempt = 0; attempt < limit; attempt++) {
+			expect(memoryCapReached(round)).toBe(false);
+			round = mismatch(round);
+			moves.push(...round.revealed.map((index) => ({ index })));
+			round = resolveMismatch(round);
+		}
+		expect(memoryCapReached(round)).toBe(true);
+		expect(round.status).toBe('playing');
+		expect(flipCard(round, 0).effect).toBe('ignored');
+		expect(() => manifest.replay('42', moves, 10, undefined, 'memory:budget')).toThrow(
+			'incomplete'
+		);
+		expect(() =>
+			manifest.replay('42', [...moves, { index: 0 }], 10, undefined, 'memory:budget')
+		).toThrow('move_limit');
+
+		const winning = createMemoryRound('42', 'memory:budget');
+		const finalSymbol = winning.cards[0].symbol;
+		winning.matched = winning.cards.flatMap((card, index) =>
+			card.symbol === finalSymbol ? [] : [index]
+		);
+		winning.moves = limit - 1;
+		let result = winning;
+		for (const move of matchingMoves(winning).filter(
+			(move) => !winning.matched.includes(move.index)
+		))
+			result = flipCard(result, move.index).round;
+		expect(result.status).toBe('won');
+		expect(memoryCapReached(result)).toBe(false);
+	});
+
+	it('lockout blocks only the last missed card for exactly one completed attempt', () => {
+		let round = createMemoryRound('42', 'memory:lockout');
+		round = mismatch(round);
+		const locked = round.revealed[1];
+		expect(round.lock).toBe(locked);
+		round = resolveMismatch(round);
+		expect(round.lock).toBe(locked);
+		const ignored = flipCard(round, locked);
+		expect(ignored.effect).toBe('ignored');
+		expect(ignored.round).toBe(round);
+		const free = round.cards.map((_, index) => index).filter((index) => index !== locked);
+		const first = flipCard(round, free[0]);
+		expect(first.round.lock).toBe(locked);
+		expect(flipCard(first.round, locked).effect).toBe('ignored');
+		const partner = free.find(
+			(index) => index !== free[0] && round.cards[index].symbol === round.cards[free[0]].symbol
+		)!;
+		const matched = flipCard(first.round, partner);
+		expect(matched.effect).toBe('match');
+		expect(matched.round.lock).toBeNull();
+		expect(flipCard(matched.round, locked).effect).toBe('flip');
+	});
+
+	it('lockout never locks when fewer than two other unmatched cards remain', () => {
+		const round = createMemoryRound('42', 'memory:lockout');
+		const pair = round.cards.findIndex((card) => card.symbol !== round.cards[0].symbol);
+		round.matched = round.cards.flatMap((_, index) =>
+			index === 0 || index === pair ? [] : [index]
+		);
+		const result = flipCard(flipCard(round, 0).round, pair);
+		expect(result.effect).toBe('mismatch');
+		expect(result.round.lock).toBeNull();
+	});
+
+	it('swaps exchange exactly two hidden unmatched cards from the continued logic stream', () => {
+		let round = createMemoryRound('42', 'memory:swaps');
+		for (const move of matchingMoves(round).slice(0, 2)) round = flipCard(round, move.index).round;
+		for (let attempt = 0; attempt < 4; attempt++) {
+			const missed = mismatch(round);
+			expect(missed.cards).toEqual(round.cards);
+			expect(missed.rngDraws).toBe(round.rngDraws);
+			const before = missed.cards;
+			const eligible = before
+				.map((_, index) => index)
+				.filter((index) => !missed.matched.includes(index));
+			const rng = createRng(missed.seed);
+			for (let draw = 0; draw < missed.rngDraws!; draw++) rng.nextU64();
+			const first = rng.nextInt(eligible.length);
+			let second = rng.nextInt(eligible.length - 1);
+			if (second >= first) second += 1;
+			const after = resolveMismatch(missed);
+			const changed = before.flatMap((card, index) => (after.cards[index] === card ? [] : [index]));
+			expect(changed).toEqual([eligible[first], eligible[second]].sort((a, b) => a - b));
+			expect(after.marked).toEqual(changed);
+			expect(after.cards[eligible[first]]).toBe(before[eligible[second]]);
+			for (const index of missed.matched) expect(after.cards[index]).toBe(before[index]);
+			expect(after.rngDraws).toBeGreaterThan(missed.rngDraws!);
+			const next = flipCard(after, eligible.find((index) => !changed.includes(index)) ?? 0);
+			expect(next.round.marked).toEqual([]);
+			round = after;
+		}
+	});
+
+	it('swaps make no draw and no mark when fewer than two cards can swap', () => {
+		const round = createMemoryRound('42', 'memory:swaps');
+		round.matched = round.cards.flatMap((_, index) => (index === 1 ? [] : [index]));
+		round.revealed = [0, 1];
+		const result = resolveMismatch(round);
+		expect(result.revealed).toEqual([]);
+		expect(result.rngDraws).toBe(round.rngDraws);
+		expect(result.marked).toEqual([]);
+		expect(result.cards).toBe(round.cards);
+	});
+
+	it('two-backs puts one dotted and one striped card in every pair', () => {
+		for (const seed of ['0', '42', '18446744073709551615']) {
+			const round = createMemoryRound(seed, 'memory:two-backs');
+			for (const symbol of new Set(round.cards.map((card) => card.symbol)))
+				expect(
+					round.cards
+						.filter((card) => card.symbol === symbol)
+						.map((card) => card.back)
+						.sort()
+				).toEqual([0, 1]);
+			const sameBack = round.cards.findIndex((card, index) =>
+				round.cards.some(
+					(other, otherIndex) =>
+						otherIndex > index && other.back === card.back && other.symbol !== card.symbol
+				)
+			);
+			expect(sameBack).toBeGreaterThanOrEqual(0);
+		}
+	});
+
+	it('quads match four identical cards over 4/5/6 groups with six attempts each', () => {
+		const sizes = new Set<number>();
+		for (let seed = 0; seed < 40; seed++) {
+			const round = createMemoryRound(String(seed), 'memory:quads');
+			sizes.add(round.pairs);
+			expect(round.cards).toHaveLength(round.pairs * 4);
+			for (const symbol of new Set(round.cards.map((card) => card.symbol)))
+				expect(round.cards.filter((card) => card.symbol === symbol)).toHaveLength(4);
+			expect(memoryMoveLimit(round)).toBe(round.pairs * 24);
+			const indices = matchingMoves(round)
+				.slice(0, 4)
+				.map((move) => move.index);
+			let next = round;
+			for (const index of indices.slice(0, 3)) {
+				const flipped = flipCard(next, index);
+				expect(flipped.effect).toBe('flip');
+				expect(resolveMismatch(flipped.round)).toBe(flipped.round);
+				next = flipped.round;
+			}
+			const match = flipCard(next, indices[3]);
+			expect(match.effect).toBe('match');
+			expect(match.round.moves).toBe(1);
+			expect(match.round.matched).toHaveLength(4);
+		}
+		expect([...sizes].sort()).toEqual([4, 5, 6]);
+		const mixed = createMemoryRound('42', 'memory:quads');
+		const miss = [0, 1, 2, 3].reduce((round, index) => flipCard(round, index).round, mixed);
+		expect(miss.mismatches).toBe(
+			mixed.cards.slice(0, 4).every((card) => card.symbol === mixed.cards[0].symbol) ? 0 : 1
+		);
+		expect(
+			manifest.rankedTiming.minimumSeconds(
+				{ score: 0, group: '', pairs: 6, moves: 6 },
+				'memory:quads'
+			)
+		).toBeCloseTo(4.8);
+		expect(quadsScoring.defaults).toEqual({ quad: 2000, mismatch: 150, second: 5 });
+	});
+
+	it('collapse removes matched cards, keeps survivor identity and order, and wins when none remain', () => {
+		let round = createMemoryRound('42', 'memory:collapse');
+		const order = round.cards.map((card) => card.id);
+		const symbol = round.cards[0].symbol;
+		const partner = round.cards.findIndex((card, index) => index > 0 && card.symbol === symbol);
+		round = flipCard(round, 0).round;
+		const result = flipCard(round, partner);
+		expect(result.effect).toBe('match');
+		expect(result.round.matched).toEqual([]);
+		expect(result.round.cleared).toBe(2);
+		expect(result.round.cards.map((card) => card.id)).toEqual(
+			order.filter((id) => !id.startsWith(`${symbol}:`))
+		);
+		const moves = solve('42', 'memory:collapse');
+		const final = manifest.resumeRound!('42', moves, undefined, 'memory:collapse') as MemoryRound;
+		expect(final.status).toBe('won');
+		expect(final.cards).toHaveLength(0);
+		expect(manifest.replay('42', moves, 10, undefined, 'memory:collapse').group).toBe(
+			`memory-1:collapse:${final.pairs}`
+		);
+	});
+
+	it('replays every new identity from seed and accepted flips alone', () => {
+		for (const variant of [
+			'memory:budget',
+			'memory:lockout',
+			'memory:swaps',
+			'memory:two-backs',
+			'memory:collapse'
+		] as MemoryVariant[]) {
+			for (const seed of ['0', '42', '99']) {
+				let round = createMemoryRound(seed, variant);
+				const moves: { index: number }[] = [];
+				for (
+					let attempt = 0;
+					attempt < 16 && round.status === 'playing' && !memoryCapReached(round);
+					attempt++
+				) {
+					if (round.revealed.length === 2) round = resolveMismatch(round);
+					const open = round.cards
+						.map((_, index) => index)
+						.filter((index) => !round.matched.includes(index) && index !== round.lock);
+					const pairs = open.flatMap((i) =>
+						open
+							.filter((j) => j > i && round.cards[j].symbol === round.cards[i].symbol)
+							.map((j) => [i, j])
+					);
+					const miss = open.flatMap((i) =>
+						open
+							.filter((j) => j > i && round.cards[j].symbol !== round.cards[i].symbol)
+							.map((j) => [i, j])
+					);
+					const [a, b] = (attempt % 2 === 0 ? miss : pairs)[0] ?? miss[0] ?? pairs[0];
+					for (const index of [a, b]) {
+						moves.push({ index });
+						round = flipCard(round, index).round;
+					}
+				}
+				expect(
+					JSON.parse(JSON.stringify(manifest.resumeRound!(seed, moves, undefined, variant)))
+				).toEqual(JSON.parse(JSON.stringify(round)));
+			}
+		}
 	});
 });

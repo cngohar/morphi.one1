@@ -13,6 +13,7 @@ import { readLiveScoreConfig, readScoreConfig } from './scoring.js';
 import { RunError } from './runs.js';
 import { ensureCatalogFamily, readThemeConfig } from './config.js';
 import { variantAvailable } from './games.js';
+import { memorySqlPaths } from './memory-policy.js';
 import { assertAccountActive } from './user-lifecycle.js';
 
 /** Returns only the authenticated account's original issuance snapshot; never a new seed. */
@@ -54,20 +55,45 @@ export async function resumableRanked(
 		console.warn(JSON.stringify({ event: 'ranked_resume_incompatible', family: row.family }));
 		return { id: row.id, expiresAt: row.expiresAt, saving: false };
 	}
-	const { themeSnapshot, scoreVersion, saving, ...session } = row;
-	return {
-		...session,
-		variant: puzzleVariant(row.family, row.variant ?? undefined)?.id,
-		saving: Boolean(saving),
-		theme: themeSnapshot ? (JSON.parse(themeSnapshot) as ResolvedTheme) : null,
-		scoring: await readScoreConfig(
-			binding,
-			row.family,
-			scoreVersion,
-			cache,
-			row.variant ?? undefined
+	if (!row.themeSnapshot) {
+		console.warn(JSON.stringify({ event: 'ranked_resume_incompatible', family: row.family }));
+		return { id: row.id, expiresAt: row.expiresAt, saving: false };
+	}
+	try {
+		const { themeSnapshot, scoreVersion, saving, ...session } = row;
+		const theme = JSON.parse(themeSnapshot) as ResolvedTheme;
+		if (
+			!theme ||
+			typeof theme !== 'object' ||
+			theme.family !== row.family ||
+			theme.seed !== row.seed ||
+			typeof theme.themeConfigVersion !== 'string' ||
+			typeof theme.themeGeneratorVersion !== 'string'
 		)
-	};
+			throw new RangeError('theme_snapshot');
+		return {
+			...session,
+			variant: puzzleVariant(row.family, row.variant ?? undefined)?.id,
+			saving: Boolean(saving),
+			theme,
+			scoring: await readScoreConfig(
+				binding,
+				row.family,
+				scoreVersion,
+				cache,
+				row.variant ?? undefined
+			)
+		};
+	} catch (error) {
+		if (
+			!(error instanceof RangeError) &&
+			!(error instanceof SyntaxError) &&
+			!(error instanceof RunError && error.code === 'score_version')
+		)
+			throw error;
+		console.warn(JSON.stringify({ event: 'ranked_resume_incompatible', family: row.family }));
+		return { id: row.id, expiresAt: row.expiresAt, saving: false };
+	}
 }
 
 export async function activeRanked(binding: D1Database, userId: string, now = Date.now()) {
@@ -117,6 +143,10 @@ export async function startRanked(
 		throw new RunError('variant');
 	}
 	variant = selected?.id;
+	const policyPaths =
+		family === 'memory'
+			? memorySqlPaths(variant ?? 'memory:classic')
+			: Array(6).fill('$.dimensions');
 	await ensureCatalogFamily(binding, family);
 	const db = createDatabase(binding);
 	const id = crypto.randomUUID();
@@ -150,6 +180,17 @@ export async function startRanked(
 		AND NOT EXISTS (SELECT 1 FROM user_lifecycle WHERE user_id=?)
 		AND EXISTS (SELECT 1 FROM game_lifecycle WHERE family=? AND state='enabled')
 		AND COALESCE((SELECT state FROM variant_lifecycle WHERE family=? AND variant=?),?)='enabled'
+		AND (? != 'memory' OR NOT EXISTS (
+			SELECT 1 FROM config_live live WHERE live.key='game:memory' AND NOT EXISTS (
+				SELECT 1 FROM game_config policy WHERE policy.version=live.version AND policy.family='memory'
+				AND CASE WHEN json_valid(policy.values_json) THEN
+					COALESCE(json_extract(policy.values_json, ?),1)=1
+					AND COALESCE(json_extract(policy.values_json, ?),1)=1
+					AND COALESCE(json_extract(policy.values_json, ?),1)=1
+					AND COALESCE(json_extract(policy.values_json, ?),1)=1
+					AND COALESCE(json_extract(policy.values_json, ?),1)=1
+					AND COALESCE(json_extract(policy.values_json, ?),1)=1
+				ELSE 0 END)))
 		AND NOT EXISTS (SELECT 1 FROM play_session active WHERE active.user_id=? AND active.abandoned_at IS NULL AND active.expires_at>?
 			AND NOT EXISTS (SELECT 1 FROM completed_run finished WHERE finished.id=active.id)
 			AND NOT (active.id=COALESCE(?, '') AND active.payload_hash IS NULL))
@@ -186,6 +227,8 @@ export async function startRanked(
 				family,
 				variant ?? null,
 				selected?.enabled === false ? 'disabled' : 'enabled',
+				family,
+				...policyPaths,
 				userId,
 				now,
 				takeoverSession,

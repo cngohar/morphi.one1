@@ -1,7 +1,7 @@
 <script lang="ts">
 	import type { CheckpointState } from '#lib/ui/checkpoint.js';
 	import type { ScoreValues } from '#lib/engine/scoring.js';
-	import { onMount, untrack } from 'svelte';
+	import { onMount, tick, untrack } from 'svelte';
 	import { motion } from '#lib/ui/motion.js';
 	import { memoryEntranceMs, MEMORY_PREVIEW_MS, MEMORY_HIDE_MS } from '#lib/round-timing.js';
 	import Confetti from '#lib/puzzles/memory/Confetti.svelte';
@@ -18,6 +18,7 @@
 		memoryVariantName,
 		memoryMoveLimit,
 		memoryCapReached,
+		matchedCount,
 		type MemoryRound
 	} from '#lib/puzzles/memory/logic.js';
 	import { SYMBOL_COLORS } from '#lib/puzzles/memory/symbols.js';
@@ -41,6 +42,7 @@
 		onhome,
 		onmove,
 		oncomplete,
+		ontryanother,
 		paused = false,
 		rankedRound = false,
 		entranceReady = true,
@@ -59,6 +61,8 @@
 		ontogglesound: () => void;
 		onfinish: (score: number, seconds: number, moves: number) => void;
 		onhome: () => void;
+		/** Budget run-over: abandon this round and start the next puzzle. */
+		ontryanother?: () => void;
 		oncomplete?: (score: number, seconds: number) => void;
 		onmove?: (move: { index: number }) => void;
 		paused?: boolean;
@@ -91,7 +95,9 @@
 				return;
 			}
 			phase = 'preview';
-			announcement = t(trios ? 'memory.trios.memorize' : 'status.memorize');
+			announcement = t(
+				trios ? 'memory.trios.memorize' : quads ? 'memory.quads.memorize' : 'status.memorize'
+			);
 			if (!(document.hidden || paused)) startPreviewClock();
 		})
 	);
@@ -135,32 +141,50 @@
 		guard(() => {
 			game = resolveMismatch(game);
 			if (memoryVariant(game) === 'memory:moving') sound.play('reshuffle');
+			if (swaps && game.marked?.length === 2)
+				announcement = t('memory.swaps.swapped', {
+					a: game.marked[0] + 1,
+					b: game.marked[1] + 1
+				});
 		})
 	);
 
 	const variant = $derived(memoryVariant(game));
 	const trios = $derived(variant === 'memory:trios');
+	const quads = $derived(variant === 'memory:quads');
+	const swaps = $derived(variant === 'memory:swaps');
+	const collapse = $derived(variant === 'memory:collapse');
+	const budget = $derived(variant === 'memory:budget');
 	const noPreview = $derived(variant === 'memory:no-preview');
 	const matchSize = $derived(cardsPerMatch(game));
 	const capped = $derived(memoryCapReached(game));
+	// Budget shows its run-over choice once the final miss has turned back down.
+	const runOver = $derived(budget && capped && game.revealed.length === 0);
+	const attemptsLeft = $derived(Math.max(0, memoryMoveLimit(game) / matchSize - game.moves));
+	const total = $derived(game.pairs * matchSize);
+	let tryButton = $state<HTMLButtonElement>();
 	const variantLabel = $derived(
 		t('memory.variantLabel', { variant: t(memoryVariantName(variant)) })
 	);
 
 	const columns = $derived(
-		layoutMode === 'compact-landscape'
-			? game.pairs === 10
-				? 5
-				: 4
-			: layoutMode === 'phone-landscape'
-				? game.pairs
-				: layoutMode === 'wide'
-					? game.pairs === 10
-						? 5
-						: 4
+		quads
+			? layoutMode === 'phone' || layoutMode === 'wide'
+				? Math.min(game.pairs, 5)
+				: 6
+			: layoutMode === 'compact-landscape'
+				? game.pairs === 10
+					? 5
 					: 4
+				: layoutMode === 'phone-landscape'
+					? game.pairs
+					: layoutMode === 'wide'
+						? game.pairs === 10
+							? 5
+							: 4
+						: 4
 	);
-	const rows = $derived(Math.ceil(game.cards.length / columns));
+	const rows = $derived(Math.ceil(total / columns));
 	const theme = $derived(
 		resolvedTheme ? memoryThemeFromResolved(resolvedTheme) : memoryThemeForSeed(game.seed)
 	);
@@ -358,6 +382,17 @@
 		}
 	}
 
+	/** Collapse removes the focused card; move focus to the next surviving card in reading order. */
+	async function refocusAfterCollapse(before: string[], index: number): Promise<void> {
+		const focused = boardEl.contains(document.activeElement);
+		const remaining = game.cards.map((card) => card.id);
+		const next = before.slice(index + 1).find((id) => remaining.includes(id));
+		await tick();
+		if (!focused) return;
+		const position = next === undefined ? remaining.length - 1 : remaining.indexOf(next);
+		boardEl.querySelectorAll<HTMLElement>('.memory-card')[position]?.focus();
+	}
+
 	function handleFlip(index: number): void {
 		guard(() => acceptFlip(index));
 	}
@@ -368,13 +403,18 @@
 		}
 
 		const revealedBefore = game.revealed;
+		const lockBefore = game.lock;
+		const survivors = game.cards.map((card) => card.id);
 		const result = flipCard(game, index);
 		if (result.effect === 'ignored') {
+			if (index === game.lock) announcement = t('memory.lockout.ignored', { number: index + 1 });
 			return;
 		}
 
 		game = result.round;
 		onmove?.({ index });
+		const released =
+			lockBefore != null && game.lock == null ? ` ${t('memory.lockout.released')}` : '';
 
 		if (!clockStarted) {
 			startClock();
@@ -389,8 +429,9 @@
 			const pair = [...revealedBefore, index];
 			matchStreak += 1;
 			sound.play(trios ? 'trio-match' : 'match', matchStreak - 1);
-			announcement = t('status.match');
-			celebrating = pair;
+			announcement = t('status.match') + released;
+			celebrating = collapse ? [] : pair;
+			if (collapse) void refocusAfterCollapse(survivors, index);
 			clearTimer(celebrateTimer);
 			celebrateTimer = setTimeout(() => {
 				celebrating = [];
@@ -402,7 +443,11 @@
 		if (result.effect === 'mismatch') {
 			matchStreak = 0;
 			sound.play('mismatch');
-			announcement = t(capped ? 'memory.trios.cap' : 'status.mismatch');
+			announcement = capped
+				? t(budget ? 'memory.budget.over' : 'memory.trios.cap')
+				: game.lock != null
+					? t('memory.lockout.locked', { number: game.lock + 1 })
+					: t('status.mismatch');
 			if (capped) freezeClock();
 			shake = [...game.revealed];
 			delayedFlip = game.revealed[matchSize - 1] ?? null;
@@ -431,7 +476,7 @@
 
 		matchStreak += 1;
 		sound.play('win');
-		announcement = t(trios ? 'memory.trios.won' : 'status.won');
+		announcement = t(trios ? 'memory.trios.won' : quads ? 'memory.quads.won' : 'status.won');
 		clearTimer(celebrateTimer);
 		celebrating = [];
 		winWave = false;
@@ -458,6 +503,9 @@
 		untrack(() => {
 			if (value || typeof document !== 'undefined') handleVisibility();
 		});
+	});
+	$effect(() => {
+		if (runOver) tryButton?.focus();
 	});
 	let mounted = $state(false);
 	let entranceStarted = false;
@@ -589,7 +637,7 @@
 
 <div
 	class="game"
-	class:is-capped={capped}
+	class:is-capped={capped && !budget}
 	style={`--cols:${columns};--rows:${rows};${memoryThemeStyle(theme)};${resolvedTheme ? proceduralStyle(resolvedTheme) : ''}`}
 	data-family="memory"
 	data-variant={variant}
@@ -629,9 +677,9 @@
 				<strong>{formatDuration(elapsed)}</strong>
 			</div>
 			<div class="stat">
-				<span class="stat-label">{t(trios ? 'memory.trios.label' : 'v1.game.pairs')}</span><strong
-					>{game.matched.length / matchSize} / {game.pairs}</strong
-				>
+				<span class="stat-label"
+					>{t(trios ? 'memory.trios.label' : quads ? 'memory.quads.label' : 'v1.game.pairs')}</span
+				><strong>{matchedCount(game) / matchSize} / {game.pairs}</strong>
 			</div>
 			<div class="stat">
 				<span class="stat-label"
@@ -640,6 +688,15 @@
 					></span
 				><strong>{game.mismatches}</strong>
 			</div>
+			{#if budget}
+				<div class="stat">
+					<span class="stat-label"
+						><span aria-hidden="true">{t('memory.budget.left')}</span><span class="sr-only"
+							>{t('memory.budget.leftFull')}</span
+						></span
+					><strong>{attemptsLeft} / {memoryMoveLimit(game) / matchSize}</strong>
+				</div>
+			{/if}
 		</div>
 
 		<SoundToggle enabled={soundEnabled} ontoggle={ontogglesound} />
@@ -654,7 +711,7 @@
 			{/if}
 		</p>
 	</header>
-	{#if capped}<p class="cap" role="status">{t('memory.trios.cap')}</p>{/if}
+	{#if capped && !budget}<p class="cap" role="status">{t('memory.trios.cap')}</p>{/if}
 
 	<main class="stage">
 		<div
@@ -681,6 +738,8 @@
 					celebrating={celebrating.includes(index)}
 					winWave={winWave && game.matched.includes(index)}
 					{locked}
+					lockedOut={index === game.lock}
+					marked={game.marked?.includes(index) ?? false}
 					dealDelay={Math.floor(index / columns) * 20}
 					matchDelay={celebrating[1] === index ? 40 : 0}
 					waveDelay={(Math.floor(index / columns) + (index % columns)) * 20}
@@ -688,13 +747,34 @@
 				/>
 			{/each}
 		</div>
+		{#if runOver}
+			<div class="run-over" role="dialog" aria-modal="true" aria-labelledby="run-over-title">
+				<div class="run-over-panel">
+					<h2 id="run-over-title">{t('memory.budget.over')}</h2>
+					<p>{t('memory.budget.overBody')}</p>
+					<div class="run-over-actions">
+						<button
+							type="button"
+							bind:this={tryButton}
+							onclick={() => guard(() => ontryanother?.())}>{t('memory.budget.tryAnother')}</button
+						>
+						<button type="button" onclick={() => guard(onhome)}>{t('game.home')}</button>
+					</div>
+				</div>
+			</div>
+		{/if}
 	</main>
 
 	<footer class="hint">
-		<span>{t(trios ? 'memory.trios.hint' : 'game.hint', { pairs: game.pairs })}</span>
-		{#if trios}<span>
+		<span
+			>{t(trios ? 'memory.trios.hint' : quads ? 'memory.quads.hint' : 'game.hint', {
+				pairs: game.pairs
+			})}</span
+		>
+		{#if trios || quads}<span>
 				· {t('memory.trios.flips', {
-					flips: game.moves * 3 + (game.revealed.length < 3 ? game.revealed.length : 0),
+					flips:
+						game.moves * matchSize + (game.revealed.length < matchSize ? game.revealed.length : 0),
 					limit: memoryMoveLimit(game)
 				})}</span
 			>{/if}
@@ -854,6 +934,7 @@
 	}
 
 	.stage {
+		position: relative;
 		display: grid;
 		place-items: center;
 		min-height: 0;
@@ -866,6 +947,65 @@
 		grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
 		gap: clamp(5px, 1.5vmin, var(--theme-gap, 12px));
 		width: min(92vw, 720px, calc((100dvh - 100px) * var(--cols) * 0.72 / var(--rows)));
+	}
+
+	.run-over {
+		position: absolute;
+		inset: 0;
+		z-index: 3;
+		display: grid;
+		place-items: center;
+		padding: 12px;
+		background: color-mix(in srgb, var(--memory-bg) 90%, transparent);
+	}
+
+	.run-over-panel {
+		width: min(100%, 320px);
+		padding: 16px;
+		border: 1px solid var(--memory-edge);
+		border-radius: 12px;
+		background: var(--surface);
+		color: var(--ink);
+		text-align: center;
+	}
+
+	.run-over-panel h2 {
+		margin: 0 0 6px;
+		font-size: var(--text-20);
+	}
+
+	.run-over-panel p {
+		margin: 0 0 12px;
+		font-size: var(--text-13);
+	}
+
+	.run-over-actions {
+		display: flex;
+		flex-wrap: wrap;
+		justify-content: center;
+		gap: 8px;
+	}
+
+	.run-over-actions button {
+		min-height: 44px;
+		padding: 8px 14px;
+		border: 1px solid var(--memory-edge);
+		border-radius: 10px;
+		background: var(--surface);
+		color: var(--ink);
+		font: inherit;
+		font-weight: 800;
+		cursor: pointer;
+	}
+
+	.run-over-actions button:first-child {
+		background: var(--ink);
+		color: var(--surface);
+	}
+
+	.run-over-actions button:focus-visible {
+		outline: 3px solid var(--focus);
+		outline-offset: 2px;
 	}
 
 	.hint {

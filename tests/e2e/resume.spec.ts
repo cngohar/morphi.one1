@@ -160,6 +160,19 @@ test('an engine-version mismatch offers a new puzzle and never replays old moves
 	await page.getByRole('button', { name: 'Abandon + New', exact: true }).click();
 	await expect(page.locator('.game')).toBeVisible({ timeout: 20000 });
 });
+test('an invalid local score version cannot replay saved Memory moves', async ({ page }) => {
+	await seed(page, {
+		...checkpoint(),
+		scoring: { version: 'unrecognized-score', values: memory.scoring.defaults }
+	});
+	await page.goto('/play');
+	await page.getByRole('button', { name: 'Resume', exact: true }).click();
+	await expect(
+		page.getByText('This saved puzzle can no longer be resumed. Choose a new puzzle.')
+	).toBeVisible();
+	await expect(page.locator('.game')).toHaveCount(0);
+	await expect(page.getByRole('button', { name: 'Abandon + New', exact: true })).toBeVisible();
+});
 test('leaving during checkpoint ownership acquisition releases its late live-tab lock', async ({
 	page
 }) => {
@@ -415,6 +428,40 @@ test('Home to Play refreshes account status and offers the active ranked session
 	await expect.poll(() => actions).toContain('abandon');
 	expect(releases).toBe(0);
 	expect(starts).toBe(0);
+});
+test('a stale same-id ranked checkpoint cannot replace the issued Memory variant on resume', async ({
+	page
+}) => {
+	const local = checkpoint();
+	local.owner = 'signed-owner';
+	local.rankedSession = local.id;
+	local.variant = 'memory:trios';
+	local.scoring = { version: 'memory-trios-v1', values: { trio: 1500, mismatch: 150, second: 5 } };
+	await page.route('**/api/account/status', (route) =>
+		route.fulfill({ json: { signedIn: true, ownerKey: 'signed-owner' } })
+	);
+	await page.route('**/api/play/active**', (route) =>
+		route.fulfill({
+			json: {
+				id: local.id,
+				family: 'memory',
+				variant: 'memory:classic',
+				seed: local.seed,
+				engineVersion: local.engineVersion,
+				startedAt: Date.now() - 10000,
+				expiresAt: Date.now() + 7200000,
+				saving: false,
+				theme: local.theme,
+				scoring: { version: 'brief-v1', values: memory.scoring.defaults }
+			}
+		})
+	);
+	await page.route('**/api/play/activity', (route) => route.fulfill({ json: { ok: true } }));
+	await seed(page, local);
+	await page.goto('/play');
+	await resume(page);
+	await expect(page.locator('.game')).toHaveAttribute('data-variant', 'memory:classic');
+	await expect(page.locator('.memory-card[aria-pressed="true"]')).toHaveCount(0);
 });
 test('an incompatible active ranked issuance offers explicit abandonment without replay or automatic start', async ({
 	page

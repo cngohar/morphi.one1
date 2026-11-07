@@ -5,11 +5,26 @@ import expected from './memory-variants.json';
 const manifest = catalog.memory;
 const createMemoryRound = manifest.createRound;
 
-function solvedMoves(round: ReturnType<typeof createMemoryRound>) {
-	const symbols = [...new Set(round.cards.map((card) => card.symbol))];
-	return symbols.flatMap((symbol) =>
-		round.cards.flatMap((card, index) => (card.symbol === symbol ? [{ index }] : []))
-	);
+type Cards = { cards: { id: string; symbol: string }[]; matched: number[] };
+function liveRound(seed: string, moves: { index: number }[], variant?: string) {
+	return manifest.resumeRound!(seed, moves, undefined, variant) as unknown as Cards & {
+		status: string;
+	};
+}
+
+/** Miss-free solution on the live board, so collapse positions stay correct. */
+function solvedMoves(round: { seed: string; variant?: string }) {
+	const moves: { index: number }[] = [];
+	let live = liveRound(round.seed, moves, round.variant);
+	while (live.status !== 'won') {
+		const open = live.cards.flatMap((card, index) =>
+			live.matched.includes(index) ? [] : [{ card, index }]
+		);
+		for (const { index } of open.filter(({ card }) => card.symbol === open[0].card.symbol))
+			moves.push({ index });
+		live = liveRound(round.seed, moves, round.variant);
+	}
+	return moves;
 }
 
 export async function verifyVectors() {
@@ -72,7 +87,28 @@ export async function verifyVectors() {
 		rngDraws: round.rngDraws,
 		result: manifest.replay(moving.seed, moving.moves, 10, undefined, moving.variant)
 	};
-	const vectors = { generation, movingReplay };
+	const pilotReplay = expected.pilotReplays.map(({ seed, variant, moves }) => {
+		const live = liveRound(seed, moves, variant) as unknown as Record<string, unknown> & Cards;
+		let result: unknown = null;
+		if (live.status === 'won') result = manifest.replay(seed, moves, 10, undefined, variant);
+		return {
+			seed,
+			variant,
+			moves,
+			deck: live.cards.map((card) => card.id),
+			state: {
+				status: live.status,
+				mismatches: live.mismatches,
+				attempts: live.moves,
+				rngDraws: live.rngDraws ?? null,
+				lock: live.lock ?? null,
+				marked: live.marked ?? null,
+				cleared: live.cleared ?? null
+			},
+			result
+		};
+	});
+	const vectors = { generation, movingReplay, pilotReplays: pilotReplay };
 	if (JSON.stringify(vectors) !== JSON.stringify(expected))
 		throw new Error('Memory variant generation/replay vector mismatch');
 	if (
@@ -89,7 +125,7 @@ export async function verifyVectors() {
 	return {
 		passed: true,
 		fingerprint: [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join(''),
-		vectors: baseline.length + generation.length + 1,
+		vectors: baseline.length + generation.length + 1 + pilotReplay.length,
 		themeVectors: 0
 	};
 }

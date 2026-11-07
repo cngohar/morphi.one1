@@ -434,6 +434,131 @@ const metadata = {
 					note: 'v1.game.memory.scoringNote',
 					tips: 'memory.moving.tips'
 				}
+			},
+			{
+				id: 'memory:budget',
+				name: 'variant.memory:budget',
+				weight: 1,
+				maxMoves: 40,
+				leaderboardGroups: ['memory-1:budget:6', 'memory-1:budget:8', 'memory-1:budget:10'],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.budget.step2', 'memory.budget.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.budget.tips'
+				}
+			},
+			{
+				id: 'memory:lockout',
+				name: 'variant.memory:lockout',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: ['memory-1:lockout:6', 'memory-1:lockout:8', 'memory-1:lockout:10'],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.lockout.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.lockout.tips'
+				}
+			},
+			{
+				id: 'memory:swaps',
+				name: 'variant.memory:swaps',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: ['memory-1:swaps:6', 'memory-1:swaps:8', 'memory-1:swaps:10'],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.swaps.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.swaps.tips'
+				}
+			},
+			{
+				id: 'memory:two-backs',
+				name: 'variant.memory:two-backs',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:two-backs:6',
+					'memory-1:two-backs:8',
+					'memory-1:two-backs:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.twoBacks.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.twoBacks.tips'
+				}
+			},
+			{
+				id: 'memory:quads',
+				name: 'variant.memory:quads',
+				weight: 1,
+				maxMoves: 144,
+				leaderboardGroups: ['memory-1:quads:4', 'memory-1:quads:5', 'memory-1:quads:6'],
+				scoring: {
+					version: 'memory-quads-v1',
+					fields: ['quad', 'mismatch', 'second'],
+					defaults: { quad: 2000, mismatch: 150, second: 5 }
+				},
+				help: {
+					steps: ['memory.quads.step1', 'memory.quads.step2', 'memory.quads.step3'],
+					rows: [
+						{ label: 'memory.quads.row1', field: 'quad', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.quads.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'ending.memory.quads.headline' },
+					subline: { key: 'ending.memory.quads.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition: 'All quads have been matched.'
+				}
+			},
+			{
+				id: 'memory:collapse',
+				name: 'variant.memory:collapse',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: ['memory-1:collapse:6', 'memory-1:collapse:8', 'memory-1:collapse:10'],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.collapse.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.collapse.tips'
+				}
 			}
 		],
 		ending: {
@@ -449,6 +574,7 @@ const metadata = {
 			scoringLabels: {
 				pair: 'scoring.memory.pair',
 				trio: 'scoring.memory.trio',
+				quad: 'scoring.memory.quad',
 				mismatch: 'scoring.memory.mismatch',
 				second: 'scoring.memory.second'
 			},
@@ -464,7 +590,25 @@ const metadata = {
 				'memory-1:trios:10': 'leaderboard.memory.trios.10',
 				'memory-1:moving:6': 'leaderboard.memory.moving.6',
 				'memory-1:moving:8': 'leaderboard.memory.moving.8',
-				'memory-1:moving:10': 'leaderboard.memory.moving.10'
+				'memory-1:moving:10': 'leaderboard.memory.moving.10',
+				'memory-1:budget:6': 'leaderboard.memory.budget.6',
+				'memory-1:budget:8': 'leaderboard.memory.budget.8',
+				'memory-1:budget:10': 'leaderboard.memory.budget.10',
+				'memory-1:lockout:6': 'leaderboard.memory.lockout.6',
+				'memory-1:lockout:8': 'leaderboard.memory.lockout.8',
+				'memory-1:lockout:10': 'leaderboard.memory.lockout.10',
+				'memory-1:swaps:6': 'leaderboard.memory.swaps.6',
+				'memory-1:swaps:8': 'leaderboard.memory.swaps.8',
+				'memory-1:swaps:10': 'leaderboard.memory.swaps.10',
+				'memory-1:two-backs:6': 'leaderboard.memory.two-backs.6',
+				'memory-1:two-backs:8': 'leaderboard.memory.two-backs.8',
+				'memory-1:two-backs:10': 'leaderboard.memory.two-backs.10',
+				'memory-1:collapse:6': 'leaderboard.memory.collapse.6',
+				'memory-1:collapse:8': 'leaderboard.memory.collapse.8',
+				'memory-1:collapse:10': 'leaderboard.memory.collapse.10',
+				'memory-1:quads:4': 'leaderboard.memory.quads.4',
+				'memory-1:quads:5': 'leaderboard.memory.quads.5',
+				'memory-1:quads:6': 'leaderboard.memory.quads.6'
 			},
 			help: {
 				steps: ['v1.game.memory.step1', 'v1.game.memory.step2', 'v1.game.memory.step3'],

@@ -1,6 +1,52 @@
 # Morphi: Simple Plan
 
-## Current local status — v1.3.5.2 accepted locally, source-only GitHub handoff authorized (2026-11-07)
+## Current local status — .6 policy implemented; owner functional review pending (2026-11-07)
+
+The owner locally accepted the six-rule .5 Memory pilot (ten variants total),
+then approved the [fixture-only .6 visual baseline](static/demo/v1.3.5.6-tier1.html)
+at the three required sizes and explicitly authorized local .6 implementation.
+They permitted direct parent work because the specified delegated models are
+unavailable. The [selected .6 brief](docs/briefs/v1.3.5.6-tier1-policy-brief.md)
+and [work/evidence](docs/work/V1.3.5.6_WORK.md) record Memory-only dimension
+controls, audited immutable policy snapshots and server new-round enforcement.
+Scoped types, lint, D1, Chromium and Memory six-runtime vectors pass; owner
+functional acceptance, physical-device review and full `bun run verify` are
+not claimed. No .7, commit/push, deployment or production change is authorized.
+Preserve C1–C10 and unrelated palette/editor/MCP/unauditioned audio.
+
+## Earlier local status — v1.3.5.4 Memory identity accepted (2026-11-07)
+
+The owner selected local .4 implementation with “ok do it”. Existing-four issued
+identity now gates ranked checkpoint recovery at both initial selection and
+lease refresh; malformed historical active identities remain non-resumable with
+explicit takeover rather than rewritten defaults. After an initial `bun run check`
+failure in a pre-existing .2 admin initializer, the owner separately approved its
+four-field default fix. Scoped Prettier/ESLint, `bun run check` (0 errors/warnings),
+Memory units (15/15), real D1 (10/10), Memory-only six-runtime vectors and focused
+Chromium recovery cases passed. See [selected .4 brief](docs/briefs/v1.3.5.4-identity-brief.md)
+and [work/evidence](docs/work/V1.3.5.4_WORK.md). No new variant, UI or schema was
+introduced; the accepted playable Memory catalogue remains four. The owner
+subsequently accepted .4 as recorded above. Full `bun run verify` is still
+deferred, not passed or waived. The earlier .4 handoff alone did not authorize .5,
+a new commit/push, deployment or production change. Preserve the unauditioned-audio and unrelated
+palette/editor/MCP exclusions.
+
+## Earlier local status — v1.3.5.3 Memory design approved (2026-11-07)
+
+The owner directed finishing .3 decisions and visual review before implementation,
+then explicitly approved the [six-rule decision package](docs/briefs/v1.3.5.3-memory-matrix-brief.md)
+and separately approved the [fixture-only visual reference](static/demo/v1.3.5.3-memory.html)
+at 390×844, 844×390 and 1280×800 (including six-group Quads and Budget run-over).
+Only the four existing Memory variants remain implemented and accepted; the six
+new IDs are approved **design candidates**. Focused local Chromium fixture checks
+passed after correcting a 24-card landscape overflow; no app, D1, vectors,
+real-device or new functional checks ran. See [work/evidence](docs/work/V1.3.5.3_WORK.md).
+Full verification remains deferred, not waived or passed. No .4/.5 app work,
+new commit/push, deployment or production change is authorized by this .3 approval;
+wait for a separate selection. Existing .2 acceptance and its source-only handoff
+remain historical and do not authorize a .3 handoff.
+
+## Earlier local status — v1.3.5.2 accepted locally, source-only GitHub handoff authorized (2026-11-07)
 
 The owner said “update the git repo and push to github”, accepting the completed
 [v1.3.5.2 bounded loading and pagination](docs/briefs/v1.3.5.2-bounded-games-brief.md) locally

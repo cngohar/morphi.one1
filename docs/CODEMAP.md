@@ -1,5 +1,64 @@
 # CODEMAP.md
 
+- **v1.3.5.7 Tier 2 Memory directory locally implemented (2026-11-07):**
+  `server/memory-directory.ts` provides dual-source curated/observed union, keyset cursor
+  pagination (`encodeCursor`/`decodeCursor`), dimension breakdown evaluation, and multi-filter
+  resolution; `components/MemoryDirectory.svelte` renders the dedicated Directory tab, responsive
+  multi-filter toolbar, keyset pagination bar, and accessible inspection drawer modal with dimension
+  breakdown, telemetry stats, and scoring links; `routes/admin/[view]/+page.server.ts` and
+  `components/GamesAdmin.svelte` integrate the tab. Scoped Prettier/ESLint/types (0 errors/warnings),
+  real-D1 `tests/integration/memory-variants.test.ts` (15/15 passed), and Playwright Chromium
+  `tests/e2e/memory-variants-admin.spec.ts` (3/3 passed at single worker across 390×844, 844×390, 1280×800
+  with zero horizontal scroll overflow and screenshots retained in `build/v1.3.5.7/`). [Brief](briefs/v1.3.5.7-tier2-directory-brief.md),
+  [work/evidence](work/V1.3.5.7_WORK.md), [fixture](../static/demo/v1.3.5.7-tier2.html). Owner functional
+  review pending. No new commit/push, deployment, or .8 is authorized.
+- **v1.3.5.6 Tier 1 Memory policy completed (2026-11-07):**
+  `puzzles/memory/dimensions.ts` and the manifest own six finite dimensions,
+  six archetypes and ten mappings; `engine/contract.ts` exposes optional family
+  policy metadata via generated `catalog.ts` without changing projections.
+  `server/{config,memory-policy,games,ranked-session}.ts` validate immutable
+  `game_config` snapshots, read D1-live policy, audit/CAS writes, filter eligible
+  variants and enforce policy inside atomic ranked issuance. The admin Games
+  route, `components/{GamesAdmin,MemoryPolicy}.svelte` and `i18n/messages.ts`
+  provide the Memory-only Policy tab, confirmation and affected summary; the
+  existing availability API reflects filtered variants. Tests: Memory dimensions
+  unit, real-D1 `tests/integration/memory-variants.test.ts`, browser
+  `tests/e2e/memory-variants-admin.spec.ts`, focused Slice 3 config/issuance,
+  six-runtime Memory vectors. The [fixture](../static/demo/v1.3.5.6-tier1.html)
+  is owner-approved as a functional visual baseline; [brief](briefs/v1.3.5.6-tier1-policy-brief.md)
+  and [work/evidence](work/V1.3.5.6_WORK.md). Owner confirmed .6 completed on 2026-11-07. No
+  new commit/push, deployment or unselected implementation is authorized.
+- **v1.3.5.5 six-rule Memory pilot accepted locally (2026-11-07):**
+  `memory:{budget,lockout,swaps,two-backs,quads,collapse}` live in
+  `src/lib/puzzles/memory/{logic,manifest,scoring,messages,Card,Game,View}`
+  with `memory-quads-v1` scoring; `PlaySession.svelte` `tryAnother` +
+  `ui/puzzle-view.ts` `ontryanother` handle Budget run-over (exact-ID ranked
+  abandon, checkpoint clear, no saved result). Tests: `memory/variants.test.ts`,
+  `tests/vectors/memory-{runner,variants}`, `tests/integration/memory-variants.test.ts`,
+  `tests/e2e/memory-variants{,-admin}.spec.ts`. [Brief](briefs/v1.3.5.5-memory-pilot-brief.md),
+  [work/evidence](work/V1.3.5.5_WORK.md). Fixtures: `static/demo/v1.3.5.{3,5}-*.html`.
+- **v1.3.5.4 Memory identity accepted locally (2026-11-07):**
+  [selected brief](briefs/v1.3.5.4-identity-brief.md) and
+  [work/evidence](work/V1.3.5.4_WORK.md) map existing-four checkpoint identity
+  validation in `src/lib/ui/checkpoint.ts` and `src/lib/screens/PlaySession.svelte`,
+  safe historical ranked-session fallback in `src/lib/server/ranked-session.ts`,
+  `checkpoint.test.ts`, `tests/integration/memory-variants.test.ts` and
+  `tests/e2e/resume.spec.ts`. Separately owner-approved `.2` type fix:
+  `src/routes/admin/[view]/+page.server.ts` empty Games defaults. Scoped units,
+  D1, Memory vectors, Chromium recovery, lint/format and project types pass.
+  The owner later accepted .4 locally and selected .5; this earlier evidence does
+  not authorize a new commit/push or deployment.
+
+- **v1.3.5.3 Memory design/visual acceptance (2026-11-07):**
+  [approved matrix brief](briefs/v1.3.5.3-memory-matrix-brief.md) names six
+  rule-distinct design candidates, approved compatibility/score/outcome intent
+  and scoped implementation/test reach. The [fixture-only preview](../static/demo/v1.3.5.3-memory.html)
+  is owner-approved for 390×844, 844×390 and 1280×800; a focused local Chromium
+  review corrected a 24-card quad landscape overflow. [Work/evidence](work/V1.3.5.3_WORK.md)
+  records exact scope, checks and limitations. No app source, registry, config,
+  schema, vector or test changed. Four existing Memory variants remain the only
+  implemented/accepted catalogue. No .4/.5, new push or deployment authorized.
+
 - **v1.3.5.2 bounded loading accepted locally (2026-11-07):** Owner said
   “update the git repo and push to github”, accepting completed .2 bounded
   Games queries, pagination, and lazy scoring version hydration and authorizing
@@ -241,7 +300,7 @@ Slice 6 additions:
 
 ## v1.3 Memory variants
 
-- `src/lib/puzzles/memory/{logic,manifest,scoring,messages,Game,View}.ts` (Svelte views use `.svelte`): classic/no-preview/trios/moving, pinned deterministic mismatch shuffle, trio cap and variant presentation; package README describes timing and compatibility.
+- `src/lib/puzzles/memory/{logic,manifest,scoring,messages,Game,View}.ts` (Svelte views use `.svelte`): classic/no-preview/trios/moving plus v1.3.5.5 budget/lockout/swaps/two-backs/quads/collapse, pinned deterministic mismatch shuffle, trio/quad/budget caps and variant presentation; package README describes timing and compatibility.
 - `engine/contract.ts`, `selector.ts`, `scoring.ts`, generated `puzzle-metadata.ts`/`puzzle-messages.ts`, `screens/PlaySession.svelte`, `ui/{checkpoint,progress,account-activity,selector-eligibility}.ts`: family-owned codes, weighted variant selection, default classic, durable round/ranked identity and isolated bests.
 - `server/{activity,games,ranked-session,runs,scoring}.ts`, `server/db/schema.ts`, `migrations/0013_variants.sql`, `routes/api/play/{activity,availability,start,scoring}`: first-flip/activity cohorts, lifecycle/audit, authoritative replay and independent immutable scoring scopes.
 - `routes/admin/[view]/+page.{server.ts,svelte}`, `components/{ScoringEditor,AdminTestPlay}.svelte`: existing games detail variant expansion, shared/trio editors and authenticated ephemeral test play. No new route.
