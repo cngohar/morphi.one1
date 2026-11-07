@@ -12,18 +12,43 @@ import {
 export async function loadGamesAdmin(
 	db: D1Database,
 	cache: KVNamespace | undefined,
-	selectedGame: PuzzleId | null
+	selectedGame: PuzzleId | null,
+	variantPage = 0,
+	pageSize = 10
 ) {
 	let games: Awaited<ReturnType<typeof gameOverview>>;
 	let gamesOverview: Awaited<ReturnType<typeof cachedGameOverview>> | null = null;
-	let gameStats: Awaited<ReturnType<typeof gameStatistics>> = {
+	let gameStats: Awaited<ReturnType<typeof gameStatistics>> & {
+		totalVariants: number;
+		variantPage: number;
+		variantPageSize: number;
+		totalVariantPages: number;
+	} = {
 		rows: [],
 		more: false,
-		variants: []
+		variants: [],
+		totalVariants: 0,
+		variantPage: 0,
+		variantPageSize: pageSize,
+		totalVariantPages: 1
 	};
 	if (selectedGame) {
 		games = await gameOverview(db, selectedGame);
-		gameStats = await gameStatistics(db, selectedGame, games[0]);
+		const stats = await gameStatistics(db, selectedGame, games[0]);
+		const totalVariants = stats.variants.length;
+		const totalVariantPages = Math.max(1, Math.ceil(totalVariants / pageSize));
+		const pagedVariants = stats.variants.slice(
+			variantPage * pageSize,
+			(variantPage + 1) * pageSize
+		);
+		gameStats = {
+			...stats,
+			variants: pagedVariants,
+			totalVariants,
+			variantPage,
+			variantPageSize: pageSize,
+			totalVariantPages
+		};
 	} else {
 		gamesOverview = await cachedGameOverview(db, cache);
 		games = gamesOverview.games;

@@ -1,141 +1,1166 @@
 <!doctype html>
 <html lang="en">
-<head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>Morphi v1.3.5 — Draft planning preview</title>
-<style>
-:root{color-scheme:light;font-family:system-ui,-apple-system,BlinkMacSystemFont,"Segoe UI",sans-serif;color:#202923;background:#f5f6f2;line-height:1.6}
-*{box-sizing:border-box}body{margin:0}main{max-width:1120px;margin:auto;padding:32px 24px 64px}header{padding-bottom:20px}h1{font-size:clamp(1.9rem,4vw,3rem);line-height:1.15;max-width:900px}h2{font-size:1.65rem;line-height:1.25}h3{font-size:1.15rem;margin-top:24px}p{max-width:95ch}a{color:#24583d;text-underline-offset:.18em}a:hover{color:#123722}a:focus-visible,[tabindex]:focus-visible{outline:3px solid #24583d;outline-offset:4px}.eyebrow{font-size:.85rem;font-weight:650;letter-spacing:.03em}.muted,footer{color:#536157;font-size:.93rem}.notice{border-left:4px solid #54765c;background:#e8eee5;padding:16px 20px}.notice p{margin:0}nav{display:flex;flex-wrap:wrap;gap:10px;padding:12px 0}nav a{padding:8px 14px;border:1px solid #a8b7a6;background:#fff;text-decoration:none}section{padding-top:28px;margin-top:28px;border-top:1px solid #cbd3c7;scroll-margin-top:20px}.table-scroll{overflow-x:auto;margin:20px 0;border:1px solid #cbd3c7;background:#fff}table{border-collapse:collapse;width:100%;font-size:.94rem}th,td{text-align:left;vertical-align:top;border-bottom:1px solid #d8ded4;padding:13px 15px;min-width:150px;overflow-wrap:anywhere}th{background:#e9eee5;font-weight:650}tr:last-child td{border-bottom:0}td:first-child{font-weight:600}footer{margin-top:32px;border-top:1px solid #cbd3c7;padding-top:16px}li{margin:8px 0}.links{display:flex;flex-wrap:wrap;gap:10px 24px}@media(max-width:600px){main{padding:22px 16px 40px}th,td{padding:10px 12px;min-width:145px}nav a{padding:7px 10px}h2{font-size:1.45rem}.notice{padding:13px 15px}}@media print{body{background:white}main{max-width:none;padding:0}nav{display:none}.table-scroll{overflow:visible}th,td{min-width:0}section{break-before:auto}a{color:inherit}}
-</style>
-</head>
-<body>
-<main id="top">
-<header>
-<p class="eyebrow">Morphi · v1.3.5 roadmap · 7 November 2026 · .1 accepted locally</p>
-<h1>Memory roadmap: up to 100 total variants</h1>
-<p><strong>Memory only, delivered in independently stoppable checkpoints.</strong> Recommendation: bounded Games admin work, an approved Memory matrix, then a pilot aiming for 10 total variants and reviewed expansion batches. The cap is <strong>100 total Memory variants, including the existing four</strong>; it is not a quota. Block, Connect and Mahjong expansion remains future work.</p>
-<p><strong>Standing rule for every update and future family:</strong> a variant must make a meaningful gameplay rule or rule-setting change. Each matrix/brief must name its baseline and concrete rule difference. Colors, palettes, artwork, themes, animation, purely visual layouts and different seeds/deals do not create variants or increase the count. Board size/layout qualifies only when it changes gameplay rules or rule settings. Existing accepted identities and replay behavior are preserved.</p>
-<p>The <strong>100-total cap applies to Memory in this plan</strong>, not automatically to every family. Future family counts belong to their own plans; the rule-distinct definition applies to all families.</p>
-<aside class="notice" aria-label="Draft scope"><p>The owner accepted the completed local v1.3.5.1 Games extraction on 7 November 2026: “ok mark this accepted and push to github”. This source-only commit/push to existing <code>origin/main</code> is authorized. See <a href="../work/V1.3.5.1_WORK.md">work and evidence</a>. Existing scoped checks and unchanged-UI comparisons remain the evidence; no new automated or device/browser evidence was supplied. Full verification remains deferred, not passed or waived. Unauditioned audio and unrelated local settings/palette changes remain excluded. Later milestones and Mahjong remain unselected; no future push, deployment or production change is authorized.</p></aside>
-<nav aria-label="Planning sections"><a href="#ai-handoff">AI handoff / start</a><a href="#roadmap">Numbered roadmap</a><a href="V1.3.5_ROADMAP.md">Editable master</a><a href="#recommendation">Recommendation</a><a href="#controls">Two-tier controls</a><a href="#matrix">Matrix / future reference</a><a href="#storage">Storage</a><a href="#evidence">Evidence</a></nav>
-<p class="muted">All sections are visible. Open this file directly in a browser; no installation or server is needed. On a narrow screen, scroll wide tables horizontally. Repository links open source files where your browser supports them.</p>
-</header>
-<section id="ai-handoff" aria-labelledby="ai-handoff-title">
-<h2 id="ai-handoff-title">AI coder: start with the master</h2>
-<aside class="notice"><p><strong><a href="V1.3.5_ROADMAP.md#start-here--agent-execution-contract">START HERE — agent execution contract</a></strong> is the authoritative handoff for Gemini, Codex and other AI coders. This page is a human summary. Read the master constraints C1–C10, selected-brief checklist, source/test map and resume format before work. The completed .1 is accepted locally on 7 November 2026, with this source-only GitHub handoff authorized. Brief/reference acceptance was recorded on 6 November 2026. Later milestones remain draft and unselected.</p></aside>
-<ul>
-<li><strong>Scope:</strong> Memory ≤100 total including four existing variants, never a quota; meaningful rule/setting differences only. Preserve existing other-family games/variants; future matrices stay <strong>UNPOPULATED</strong> and expansion is excluded.</li>
-<li><strong>Stop points:</strong> 17 provisional checkpoints, each a complete STOPPABLE/COMMIT-READY delivery; no automatic commit or next stage. Clear owner stage authorization is sufficient within its scope; visual approval remains a separate gate.</li>
-<li><strong>Checks:</strong> inspect actual scripts/test names before selecting filtered commands; owned and directly affected shared behavior only. Other-family cases only when shared logic actually changes. No unrelated suites/full <code>bun run verify</code>; docs/trivial-only edits need no tests. Preserve source stability, one browser owner/<code>workers: 1</code>, serial builds/D1/ports/generated writes and truthful evidence.</li>
-<li><strong>UI:</strong> fixture-only interaction previews and owner approval at 390×844, 844×390 and 1280×800 before actual UI integration. .1/.4 need no new preview if unchanged; .2/.3 pilot/.6/.7 and later new interactions do.</li>
-<li><strong>Handoff:</strong> retain exact authorization, files, checks/evidence, open decisions and next action. Separate awaiting visual review, checks failed, ready for owner review and owner accepted. Only the owner approves. Use their chosen main agent; keep existing applicable AGENTS delegation policy, with no provider configuration changes or silent substitutions.</li>
-</ul>
-<h3>Historical .1 planning kickoff</h3>
-<p>The kickoff below is retained as history. The completed .1 is accepted locally; complete only its authorized source handoff, then stop for the owner’s separate next selection.</p>
-<blockquote><p>Read AGENTS.md, the current-status top of morphi-plan-simple.md, docs/CODEMAP.md and docs/planning/V1.3.5_ROADMAP.md, starting with START HERE. Prepare only the v1.3.5.1 Games-extraction brief from actual source and existing accepted UI. Include touched callers/tests/fixtures/config/exports, complete deliverables, unchanged-UI reference, compatibility/recovery risks and proposed filtered checks after inspecting their scripts. Preserve C1–C10. Do not implement app code, build, test, install, migrate, commit, push, deploy or advance milestones. Leave unknowns explicit, record a handoff and stop with the brief ready for owner review.</p></blockquote>
-<p>Mechanics, actual Memory matrix/schema, preset names, scoring groups and exact selected test commands remain decisions for selected briefs, especially .3. Do not invent them or generate 17 empty briefs; retain completed briefs and evidence. Necessary approved contract/engine/preset version changes must preserve legacy replay; dependency upgrades and unrelated API changes are outside this plan.</p>
-</section>
-<section id="roadmap" aria-labelledby="roadmap-title">
-<h2 id="roadmap-title">v1.3.5.1–v1.3.5.17: provisional checkpoint roadmap</h2>
-<p><strong>Edit the <a href="V1.3.5_ROADMAP.md">master roadmap</a></strong> for scope, dependencies, stop conditions and validation boundaries. Keep one master, create only the next selected brief in advance, and retain completed briefs/handoffs/evidence. This draft does not authorize implementation or change the active simple plan.</p>
-<aside class="notice"><p><strong>Every checkpoint is STOPPABLE and COMMIT-READY.</strong> Its touched scope builds and works; the legacy path remains usable. Additive code alone is not a completed half-feature; new capabilities stay unexposed until their complete flow works. Check inside each milestone, record focused evidence and owner acceptance, then stop. No automatic next step, commit, push or deployment is inferred.</p></aside>
-<p><strong>Focused checks only:</strong> the milestone and directly affected shared-code behavior. No unrelated suites or full <code>bun run verify</code>; preserve the owner's deferral without claiming a full pass or waiver. Documentation and trivial-only changes need no tests. The final checkpoint is focused cross-feature closeout, not a place to defer milestone testing.</p>
-<h3>Visual review before actual implementation</h3>
-<p>Prepare previews one selected checkpoint at a time. Use local interactive HTML demos with fixture data where interaction matters; review new/changed screens at <strong>390×844, 844×390 and 1280×800</strong> before app integration. Demos are design references, not production rules or scoring evidence.</p>
-<ul>
-<li><strong>.1 and .4:</strong> no new preview when existing UI/behavior stays identical. Use the accepted screen as reference.</li>
-<li><strong>.2:</strong> preview changed pagination/detail-loading controls and loading, empty and failed states.</li>
-<li><strong>.3 before .5:</strong> review the rule comparison and representative Memory board interactions, help and timing/failure behavior before pilot implementation.</li>
-<li><strong>.6:</strong> preview Tier 1 controls, archetypes, invalid-combination feedback, affected presets and confirmations.</li>
-<li><strong>.7:</strong> preview Tier 2 filters, cursor pages, statuses, inspection and disabled/never-played/loading/empty/failed views.</li>
-<li><strong>.8–.16:</strong> preview new interactions/screens. Reuse already-approved layouts for presets that need no new presentation; 100 separate mockups are unnecessary.</li>
-<li><strong>.17:</strong> compare actual screens with approved references, with no new redesign.</li>
-</ul>
-<p>Record owner visual decisions in the selected brief. Functional acceptance remains separate. Interactive previews receive focused interaction/layout checks; text-only documentation needs no tests. These previews are planned deliverables, not yet built.</p>
-<div class="table-scroll" role="region" aria-label="Foundation checkpoint / Complete stopping point / Focused validation" tabindex="0"><table>
-<thead><tr><th scope="col">Checkpoint</th><th scope="col">Complete stopping point</th><th scope="col">Focused validation</th></tr></thead>
-<tbody>
-<tr><td>v1.3.5.1 — Games extraction<br>Accepted locally 7 November 2026</td><td>Bounded Games UI/server extraction. Existing routes, actions, permissions, audit, scoring, test play and recovery still work. No unrelated admin cleanup.</td><td>Touched types/lint and Games route/action, permission/audit and drawer/focus behavior. Other admin wiring only if directly affected.</td></tr>
-<tr><td>v1.3.5.2 — Bounded loading</td><td>After .1: paged summaries, grouped queries, lazy details/scoring and bounded relevant metadata. Existing variants remain fully manageable.</td><td>Exact counts, page boundaries, query/payload bounds at synthetic 100 presets, lazy detail recovery and relevant before/after measurements.</td></tr>
-<tr><td>v1.3.5.3 — Memory matrix</td><td>After .2: owner-approved supported dimensions, compatibility, preset/mechanic definitions, scoring/help and acceptance design. Select six pilot additions and representative visual interactions before .5. Candidate, implemented and accepted are separate statuses.</td><td>Document/gameplay/visual consistency and owner approval. No tests for text-only work; focused interaction/layout checks for interactive demo code. No arbitrary Cartesian-product publication.</td></tr>
-<tr><td>v1.3.5.4 — Exact identity</td><td>After .3 approval: minimal immutable family-owned identity working through existing four presets and start/replay/resume. Extend existing D1/KV only where required; preserve old runs, checkpoints and session completion rules.</td><td>Legacy Memory identity/vectors, start/replay/resume/retry, invalid versions and touched migration/cache fallback. No generic DSL or new remote resources.</td></tr>
-<tr><td>v1.3.5.5 — Memory pilot</td><td>After .4: aim for 10 total, existing four plus six approved additions. Whole player/operator flow using existing admin lifecycle; expose only functional presets. Owner accepts before expansion.</td><td>Affected Memory rules/vectors/runtimes, authoritative scoring/replay, D1 lifecycle, browser play/help/recovery and owner layout review.</td></tr>
-<tr><td>v1.3.5.6 — Tier 1 policy</td><td>After accepted .5: usable finite supported-dimension/archetype controls; enforce current policy at server issuance. Overrides cannot bypass disabled dimensions; existing rounds retain completion rules.</td><td>Permission/audit, invalid combinations, stale/concurrent starts, policy precedence, in-flight completion and cache fallback.</td></tr>
-<tr><td>v1.3.5.7 — Tier 2 directory</td><td>After .6: filtered cursor pages of curated/observed Memory identities, selected stats/scoring inspection and lifecycle management. Disabled and never-played curated presets remain reachable.</td><td>Cursor boundaries/ties, filter/count accuracy, bounded queries, permissions/audit and actual inspection/lifecycle paths.</td></tr>
-</tbody></table></div>
-<h3>Nine provisional batches, up to 10 additions each</h3>
-<p>Each depends on accepted .7 and then the accepted preceding batch. Group by approved mechanics and dependencies after .3; shrink or split a batch when a new mechanic is substantial. Each complete batch needs its own focused rule/replay/scoring, policy/directory, browser/recovery and owner checks. Previous accepted presets stay usable.</p>
-<div class="table-scroll" role="region" aria-label="Expansion checkpoint / Provisional total including existing four" tabindex="0"><table><thead><tr><th scope="col">Expansion checkpoint</th><th scope="col">Provisional total including existing four</th></tr></thead><tbody>
-<tr><td>v1.3.5.8 — Batch A</td><td>20</td></tr>
-<tr><td>v1.3.5.9 — Batch B</td><td>30</td></tr>
-<tr><td>v1.3.5.10 — Batch C</td><td>40</td></tr>
-<tr><td>v1.3.5.11 — Batch D</td><td>50</td></tr>
-<tr><td>v1.3.5.12 — Batch E</td><td>60</td></tr>
-<tr><td>v1.3.5.13 — Batch F</td><td>70</td></tr>
-<tr><td>v1.3.5.14 — Batch G</td><td>80</td></tr>
-<tr><td>v1.3.5.15 — Batch H</td><td>90</td></tr>
-<tr><td>v1.3.5.16 — Batch I</td><td>100 — cap</td></tr>
-</tbody></table></div>
-<p>These totals assume a 10-total pilot and ten additions in every batch. Exact content, totals and checkpoint count are refined after .3. The owner may stop after any accepted checkpoint; do not invent weak variants to fill 100. Support for other families follows this family-owned structure only in future separately approved plans.</p>
-<h3>v1.3.5.17 — Focused integration and owner closeout</h3>
-<p>After the last batch actually selected and accepted: check cross-feature selection/start/replay/resume/scoring, Tier 1 enforcement, Tier 2 inspection and bounded scale at the supported cap. Record actual accepted totals, evidence, limits and owner stop decision. Unused batches need not be built. This is scoped closeout, not full verification, deployment or automatic next-phase approval.</p>
-<p class="muted">17 is a planning layout: seven foundation/pilot checkpoints, nine provisional batches and one closeout. It is not a guarantee of 17 engineering releases. Refine the numbering when approved mechanics require smaller complete deliveries.</p>
-</section>
-<section id="recommendation" aria-labelledby="recommendation-title">
-<h2 id="recommendation-title">The supply already comes from generation</h2>
-<p>A named variant defines rules. A seed creates a deal or round within those rules. A hundred Memory presets would support far more than a hundred rounds; pre-storing every possible board is unnecessary.</p>
-<div class="table-scroll" role="region" aria-label="Concept / Memory example / What it adds" tabindex="0"><table><thead><tr><th scope="col">Concept</th><th scope="col">Memory example</th><th scope="col">What it adds</th></tr></thead><tbody><tr><td>Family</td><td>Memory</td><td>The game engine and interaction.</td></tr><tr><td>Ruleset / structural preset</td><td>Trios; a supported board-size setting</td><td>A different challenge or bounded configuration.</td></tr><tr><td>Seeded instance</td><td>A particular shuffled deal</td><td>Another round under those rules.</td></tr><tr><td>Cosmetic theme</td><td>Approved symbols, colors and card styling</td><td>Appearance; no change to rules, difficulty or scoring.</td></tr></tbody></table></div>
-<h3>Extract the Games admin surface and bound its work</h3>
-<p>Move Games rows, drawer and settings into a focused component, and Games server loading/actions into focused modules where that reduces coupling. Reuse existing editors. Retain route URLs, form action names, permissions, audit, recovery and keyboard behavior. Leave unrelated admin sections alone.</p>
-<p>Fetch a bounded page of summaries and detailed statistics/scoring only when requested. Replace per-variant query fan-out with grouped or paged queries. Preserve the existing aggregate-cohort definitions and single-JSON-bind mapping.</p>
-<h3>Define the Memory-owned matrix with compatibility rules</h3>
-<p>Record supported/proposed dimensions, valid combinations, generation bounds, scoring groups, viewport limits and implementation status. Start with source data and documentation. Do not generate a catalogue by blindly multiplying dimensions.</p>
-<h3>Deliver one Memory expansion pilot</h3>
-<p>Choose a small set of meaningfully different, owner-approved single-player presets. Resolve stable preset IDs into validated family-local options. Reuse generation, replay and view code; extend only for selected mechanics. Accept the pilot before further Memory batches; other-family expansion is excluded from v1.3.5.</p>
-<p class="muted">The exact pilot list is an owner design decision. Stop after the selected slice is accepted. The 100-total cap includes the existing four; no quota or generic visual rule editor is proposed.</p>
-<h3>The No Man’s Sky comparison</h3>
-<p>Hello Games describes a procedural universe and continues adding generation capabilities and gameplay. The useful lesson is to improve what generators can express while generating instances on demand. Design judgment: players must notice fresh decisions, not just a large possible count.</p>
-<p>Finite seeds and equivalent outputs mean “effectively endless” is a player-experience goal. Neither a large seed space nor the current selector proves an exact board will never repeat.</p>
-<p class="links"><a href="https://www.nomanssky.com/about/">Hello Games: about</a><a href="https://www.nomanssky.com/2024/07/no-mans-sky-worlds-part-i/">Worlds Part I</a><a href="https://www.gdcvault.com/play/1024514/Continuous-World-Generation-in-No">Sean Murray’s GDC talk</a></p>
-</section>
-<section id="controls" aria-labelledby="controls-title">
-<h2 id="controls-title">Memory management: two tiers</h2>
-<div class="table-scroll" role="region" aria-label="Tier / Operator controls / Implementation boundary" tabindex="0"><table><thead><tr><th scope="col">Tier</th><th scope="col">Operator controls</th><th scope="col">Implementation boundary</th></tr></thead><tbody><tr><td>1. Family policy and archetypes</td><td>Enable supported mechanics, set bounded values, curate named modes and preview affected combinations.</td><td>Family code defines supported dimensions and hard compatibility rules. Admin settings narrow the supported space; they cannot enable unimplemented mechanics or bypass validity checks.</td></tr><tr><td>2. Curated and observed combinations</td><td>Search/filter paginated records, inspect statistics, apply specific overrides and review history.</td><td>Persist curated presets and observed identities as needed. Include disabled and never-played curated presets; traffic-only views must not hide configurations that need management.</td></tr></tbody></table></div>
-<p>A master switch changes one family policy. New-round issuance checks that policy alongside a specific variant disable; an override cannot bypass a disabled dimension. Do not rewrite thousands of variant rows or alter immutable gameplay definitions. Existing rounds retain the previously agreed completion behavior.</p>
-<p>Persist and identify the exact gameplay configuration used by each round. Keep current eligibility separate from immutable replay rules. For large directories, use indexed filters, stable unique ordering and cursor pagination. OFFSET is acceptable for small lists but costs more at deep offsets.</p>
-<p>Choose from valid supported combinations without materializing the entire Cartesian product. Use bounded generation/validation with an explicit failure fallback. Leaderboard scopes require a separate fairness decision: avoid 100,000 empty boards and merging incomparable rules.</p>
-</section>
-<section id="matrix" aria-labelledby="matrix-title">
-<h2 id="matrix-title">Memory matrix inputs and other-family future reference</h2>
-<p>Only <strong>three families and 12 named variants</strong> are currently registered; Memory owns four. Memory candidates require the .3 design gate. <strong>Block and Connect existing variants are retained; their future matrices and Mahjong’s remain UNPOPULATED. Their research below is future reference only</strong>, excluded from this roadmap. Later families may follow the same family-owned structure under separate plans. No candidate dimension is authorized or implemented merely by appearing here.</p>
-<div class="table-scroll" role="region" aria-label="Family / Implemented / Candidate dimensions / Compatibility boundary" tabindex="0"><table><thead><tr><th scope="col">Family</th><th scope="col">Implemented</th><th scope="col">Candidate dimensions</th><th scope="col">Compatibility boundary</th></tr></thead><tbody><tr><td>Memory</td><td>4 modes: classic, no preview, trios, moving; each uses 6/8/10 match groups.</td><td>Match size/relation, preview, mismatch movement, board structure, time/move rules.</td><td>Only identical-symbol matching exists. Current modes are separate branches, not freely mixable switches.</td></tr><tr><td>Block</td><td>4 modes: classic 8×8, board 10×10, rows only, rush 60 s.</td><td>UNPOPULATED — future plan only.</td><td>Preserve existing variants; expansion is excluded here.</td></tr><tr><td>Connect</td><td>4 modes: classic, full grid, board 8×8, rush 60 s.</td><td>UNPOPULATED — future plan only.</td><td>Preserve existing variants; expansion is excluded here.</td></tr><tr><td>Mahjong</td><td>No implementation.</td><td>UNPOPULATED — future plan only.</td><td>Initial family needs separate approval and implementation.</td></tr></tbody></table></div><h3>The research counts describe a design space</h3><div class="table-scroll" role="region" aria-label="Reference / What its number means" tabindex="0"><table><thead><tr><th scope="col">Reference</th><th scope="col">What its number means</th></tr></thead><tbody><tr><td><a href="../../docs/references/puzzle-variants/Memory Puzzle Variants.html">Memory research</a></td><td>103,680 hypothetical rule combinations; compatibility and implementation remain unproven.</td></tr><tr><td><a href="../../docs/references/puzzle-variants/Block Puzzle Variants.html">Block research</a></td><td>5,040 hypothetical combinations; researched systems are not all supported by the engine.</td></tr><tr><td><a href="../../docs/references/puzzle-variants/Connect Puzzle Variants.html">Connect research</a></td><td>2,592 hypothetical combinations; topology changes need generation and replay work.</td></tr><tr><td><a href="../../docs/references/puzzle-variants/Mahjong Solitaire Variants.html">Mahjong research</a></td><td>28 research entries and 18 dimensions; configuration estimator is not an implemented catalogue.</td></tr></tbody></table></div>
-<p>Memory’s 103,680 multiplies match size, relation, turn rules, dynamics, scoring, player formats, helpers, visibility and layout. Some axes require multiplayer, conflict or overlap. It is not a verified lower bound on distinct, fair, implementable variants. The research estimates and compatibility remain unverified.</p>
-<aside class="notice"><p><strong>Useful matrix fields:</strong> family; stable preset ID/version; rule dimensions; valid combinations; invalid combinations and reasons; generation/time/move bounds; scoring/leaderboard group; help copy; supported viewports; test/approval status.</p></aside>
-<p>Memory cards must form complete match groups; no-preview must have no opening-preview allowance. Connect size/pair combinations must fit generator path-length bounds. Cosmetic palettes remain separate from gameplay combinations.</p>
-<p>Names and weights alone do not implement behavior. Connect bridges, Memory wildcards and Block obstacles each require rules, validation, rendering and replay support. Approve and build the initial Mahjong family separately before planning large variant counts.</p>
-</section>
-<section id="storage" aria-labelledby="storage-title">
-<h2 id="storage-title">Source definitions, D1 operations and selective caching</h2>
-<div class="table-scroll" role="region" aria-label="Layer / Responsibility / Recommendation" tabindex="0"><table><thead><tr><th scope="col">Layer</th><th scope="col">Responsibility</th><th scope="col">Recommendation</th></tr></thead><tbody><tr><td>Family source / manifest</td><td>Engine capability, validation, defaults and tested preset definitions.</td><td>Keep executable logic here. Extract repeated preset data into family-local files when useful.</td></tr><tr><td>D1 — already present</td><td>Lifecycle state, live configuration pointers, immutable score versions, sessions, history and audit.</td><td>Extend existing patterns. Add immutable preset records only if runtime editing is actually required.</td></tr><tr><td>KV — already present</td><td>Version-keyed immutable snapshots and the existing eventually fresh admin overview.</td><td>Keep optional with D1 fallback. Stale KV must not decide authoritative eligibility or scoring.</td></tr><tr><td>Generated rounds</td><td>Seed + exact preset/rules version + engine version reconstruct the round.</td><td>Generate on demand. Store actual sessions/results as needed; do not materialize all possible boards.</td></tr></tbody></table></div>
-<aside class="notice"><p><strong>A manifest does not become slow merely because it is a file.</strong> No benchmark establishes a manifest bottleneck. Identified growth risks are eager browser metadata, unbounded lists and per-variant database queries. Database definitions also require loading, validation and caching.</p></aside>
-<p>A few hundred compact source presets may be sufficient. At tens of thousands, avoid shipping the entire catalogue to every player. Retain the small family index, load relevant metadata on demand and bound admin responses. Game views and pools already load lazily.</p>
-<p>KV updates can take 60 seconds or more to appear elsewhere. Use D1 for live decisions and immutable versions for replay. Editing a preset in place must never silently change an old checkpoint, ranked session or saved run.</p>
-<p>D1 performance depends on query shape and rows read. Inspect query plans and row-read counts before adding indexes or storage. Source extraction improves maintenance; fewer fetched records and less loaded data improve runtime performance.</p>
-<p>For two-tier administration, D1 is the searchable record store. R2 holds objects such as assets or exports; it is not a drop-in SQL table and is not required for preset management. Source still owns executable rules, schemas and defaults; “never in TypeScript” is too absolute. Add runtime-editable immutable preset rows only when the operator workflow needs them.</p>
-<p>A global disable affects new authoritative starts only after the current policy is checked there, with concurrent-start behavior explicitly defined. A client may briefly display an old candidate. Eventually consistent KV cannot promise immediate global enforcement.</p>
-<p class="links"><a href="https://developers.cloudflare.com/kv/concepts/how-kv-works/">KV consistency</a><a href="https://developers.cloudflare.com/d1/best-practices/use-indexes/">D1 indexes</a><a href="https://developers.cloudflare.com/d1/platform/limits/">D1 limits</a><a href="https://developers.cloudflare.com/workers/platform/storage-options/">Cloudflare storage choices</a><a href="https://www.sqlite.org/rowvalue.html#scrolling_window_queries">SQLite pagination guidance</a></p>
-</section>
-<section id="evidence" aria-labelledby="evidence-title">
-<h2 id="evidence-title">Repository findings</h2>
-<p class="muted">Observations from the source review on 6 November 2026; source line numbers are reference locations from that review.</p>
-<div class="table-scroll" role="region" aria-label="Finding / Source / Observation" tabindex="0"><table><thead><tr><th scope="col">Finding</th><th scope="col">Source</th><th scope="col">Observation</th></tr></thead><tbody><tr><td>Current scope</td><td><a href="../../morphi-plan-simple.md">morphi-plan-simple.md:3</a></td><td>v1.3.4 admin/query Slice 0 is locally complete; Mahjong remains future planning.</td></tr><tr><td>Registration</td><td><a href="../../src/lib/registry.ts">src/lib/registry.ts:7</a></td><td>Only Block, Connect and Memory are registered: 12 named variants altogether.</td></tr><tr><td>Admin UI</td><td><a href="../../src/routes/admin/[view]/+page.svelte">src/routes/admin/[view]/+page.svelte:1</a></td><td>2,346 lines across multiple admin concerns. Extract Games first; reuse existing editors.</td></tr><tr><td>Admin server</td><td><a href="../../src/routes/admin/[view]/+page.server.ts">src/routes/admin/[view]/+page.server.ts:1</a></td><td>679 lines; selected-family detail also loads scoring data.</td></tr><tr><td>Statistics fan-out</td><td><a href="../../src/lib/server/games.ts">src/lib/server/games.ts:290</a></td><td>gameStatistics issues a query per variant, including unopened drawer details.</td></tr><tr><td>Generated metadata</td><td><a href="../../scripts/generate-registry.ts">scripts/generate-registry.ts:122</a></td><td>Full variant metadata is serialized into a shared browser projection. Game views/pools already load lazily.</td></tr><tr><td>Existing D1/KV</td><td><a href="../../src/lib/server/config.ts">src/lib/server/config.ts:49</a></td><td>D1 live pointers plus version-keyed cached immutable configuration already exist.</td></tr><tr><td>Lifecycle</td><td><a href="../../src/lib/server/db/schema.ts">src/lib/server/db/schema.ts:336</a></td><td>D1 already stores enabled/disabled state per variant.</td></tr><tr><td>Replay identity</td><td><a href="../../src/lib/engine/contract.ts">src/lib/engine/contract.ts:6</a></td><td>Runs carry family, variant, seed, engine version and scoring version.</td></tr><tr><td>Recent improvement</td><td><a href="../../docs/work/V1.3.4_SLICE0_WORK.md">docs/work/V1.3.4_SLICE0_WORK.md:9</a></td><td>Activity mapping now uses one JSON bind; this does not eliminate other query or payload limits.</td></tr></tbody></table></div><h3>Proposed acceptance evidence</h3><div class="table-scroll" role="region" aria-label="Area / Evidence to collect before acceptance" tabindex="0"><table><thead><tr><th scope="col">Area</th><th scope="col">Evidence to collect before acceptance</th></tr></thead><tbody><tr><td>Behavior preservation</td><td>Existing permission, audit, lifecycle, drawer/focus, scoring and test-play regressions; unchanged routes/forms.</td></tr><tr><td>Catalogue scale</td><td>Synthetic fixtures up to the 100-total Memory cap; bounded list/detail responses; query count bounded by requested page rather than total catalogue size.</td></tr><tr><td>Performance</td><td>Before/after query count, rows read, response bytes, browser payload, median/p95 timings on named device/network; run counts and cold/preloaded status. No speedup is claimed today.</td></tr><tr><td>Determinism and recovery</td><td>Legacy vectors unchanged; selected new presets checked in required runtimes; saved runs, checkpoints and in-flight sessions resolve exact rules.</td></tr><tr><td>Generator validity</td><td>Every enabled preset validates; bounded sampled-seed/property checks and known vectors; solvability guarantees only where design requires them.</td></tr><tr><td>Player experience</td><td>Phone portrait/landscape and desktop review; owner finds each selected pilot legible, fair and meaningfully different.</td></tr></tbody></table></div>
-<p>Apply the owner-directed focused checks inside each selected milestone and to directly affected shared-code behavior only. Do not run unrelated suites or full <code>bun run verify</code>. Documentation and trivial-only changes need no tests. The existing full-verification deferral remains recorded; scoped evidence is not a full pass or an indefinite waiver.</p>
-</section>
-<footer>
-<p>Source: the Morphi v1.3.5 direction canvas. Original review method: read-only source/document inspection plus official Hello Games, GDC and Cloudflare research. Graphify was attempted; no local graph or connected workspace was available. The research made no application changes, builds, benchmarks, tests, commits or deployments. Counts are observations or explicitly labeled reference estimates.</p>
-<p>The <a href="V1.3.5_ROADMAP.md">editable master roadmap</a> records the current Memory-only proposal and checkpoint boundaries. This static preview adds no application behavior or implementation authorization. <a href="#top" aria-label="Back to beginning">Back to beginning</a></p>
-</footer>
-</main>
-</body>
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Morphi v1.3.5 — Draft planning preview</title>
+		<style>
+			:root {
+				color-scheme: light;
+				font-family:
+					system-ui,
+					-apple-system,
+					BlinkMacSystemFont,
+					'Segoe UI',
+					sans-serif;
+				color: #202923;
+				background: #f5f6f2;
+				line-height: 1.6;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			body {
+				margin: 0;
+			}
+			main {
+				max-width: 1120px;
+				margin: auto;
+				padding: 32px 24px 64px;
+			}
+			header {
+				padding-bottom: 20px;
+			}
+			h1 {
+				font-size: clamp(1.9rem, 4vw, 3rem);
+				line-height: 1.15;
+				max-width: 900px;
+			}
+			h2 {
+				font-size: 1.65rem;
+				line-height: 1.25;
+			}
+			h3 {
+				font-size: 1.15rem;
+				margin-top: 24px;
+			}
+			p {
+				max-width: 95ch;
+			}
+			a {
+				color: #24583d;
+				text-underline-offset: 0.18em;
+			}
+			a:hover {
+				color: #123722;
+			}
+			a:focus-visible,
+			[tabindex]:focus-visible {
+				outline: 3px solid #24583d;
+				outline-offset: 4px;
+			}
+			.eyebrow {
+				font-size: 0.85rem;
+				font-weight: 650;
+				letter-spacing: 0.03em;
+			}
+			.muted,
+			footer {
+				color: #536157;
+				font-size: 0.93rem;
+			}
+			.notice {
+				border-left: 4px solid #54765c;
+				background: #e8eee5;
+				padding: 16px 20px;
+			}
+			.notice p {
+				margin: 0;
+			}
+			nav {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px;
+				padding: 12px 0;
+			}
+			nav a {
+				padding: 8px 14px;
+				border: 1px solid #a8b7a6;
+				background: #fff;
+				text-decoration: none;
+			}
+			section {
+				padding-top: 28px;
+				margin-top: 28px;
+				border-top: 1px solid #cbd3c7;
+				scroll-margin-top: 20px;
+			}
+			.table-scroll {
+				overflow-x: auto;
+				margin: 20px 0;
+				border: 1px solid #cbd3c7;
+				background: #fff;
+			}
+			table {
+				border-collapse: collapse;
+				width: 100%;
+				font-size: 0.94rem;
+			}
+			th,
+			td {
+				text-align: left;
+				vertical-align: top;
+				border-bottom: 1px solid #d8ded4;
+				padding: 13px 15px;
+				min-width: 150px;
+				overflow-wrap: anywhere;
+			}
+			th {
+				background: #e9eee5;
+				font-weight: 650;
+			}
+			tr:last-child td {
+				border-bottom: 0;
+			}
+			td:first-child {
+				font-weight: 600;
+			}
+			footer {
+				margin-top: 32px;
+				border-top: 1px solid #cbd3c7;
+				padding-top: 16px;
+			}
+			li {
+				margin: 8px 0;
+			}
+			.links {
+				display: flex;
+				flex-wrap: wrap;
+				gap: 10px 24px;
+			}
+			@media (max-width: 600px) {
+				main {
+					padding: 22px 16px 40px;
+				}
+				th,
+				td {
+					padding: 10px 12px;
+					min-width: 145px;
+				}
+				nav a {
+					padding: 7px 10px;
+				}
+				h2 {
+					font-size: 1.45rem;
+				}
+				.notice {
+					padding: 13px 15px;
+				}
+			}
+			@media print {
+				body {
+					background: white;
+				}
+				main {
+					max-width: none;
+					padding: 0;
+				}
+				nav {
+					display: none;
+				}
+				.table-scroll {
+					overflow: visible;
+				}
+				th,
+				td {
+					min-width: 0;
+				}
+				section {
+					break-before: auto;
+				}
+				a {
+					color: inherit;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<main id="top">
+			<header>
+				<p class="eyebrow">Morphi · v1.3.5 roadmap · 7 November 2026 · .1 accepted locally</p>
+				<h1>Memory roadmap: up to 100 total variants</h1>
+				<p>
+					<strong>Memory only, delivered in independently stoppable checkpoints.</strong>
+					Recommendation: bounded Games admin work, an approved Memory matrix, then a pilot aiming
+					for 10 total variants and reviewed expansion batches. The cap is
+					<strong>100 total Memory variants, including the existing four</strong>; it is not a
+					quota. Block, Connect and Mahjong expansion remains future work.
+				</p>
+				<p>
+					<strong>Standing rule for every update and future family:</strong> a variant must make a
+					meaningful gameplay rule or rule-setting change. Each matrix/brief must name its baseline
+					and concrete rule difference. Colors, palettes, artwork, themes, animation, purely visual
+					layouts and different seeds/deals do not create variants or increase the count. Board
+					size/layout qualifies only when it changes gameplay rules or rule settings. Existing
+					accepted identities and replay behavior are preserved.
+				</p>
+				<p>
+					The <strong>100-total cap applies to Memory in this plan</strong>, not automatically to
+					every family. Future family counts belong to their own plans; the rule-distinct definition
+					applies to all families.
+				</p>
+				<aside class="notice" aria-label="Current .2 acceptance">
+					<p>
+						<strong
+							>Current milestone: v1.3.5.2 accepted locally 7 November 2026; source-only GitHub
+							handoff authorized.</strong
+						>
+						Owner instruction: “update the git repo and push to github”. Bounded Games queries,
+						deterministic pagination, lazy scoring version hydration, and scoped tests are complete.
+						See <a href="../briefs/v1.3.5.2-bounded-games-brief.md">bounded Games brief</a>,
+						<a href="../../static/demo/v1.3.5.2-games.html">accepted visual demo</a>, and
+						<a href="../work/V1.3.5.2_WORK.md">work and evidence</a>. No .3 selection, future push,
+						deployment or production change is authorized.
+					</p>
+				</aside>
+				<nav aria-label="Planning sections">
+					<a href="#ai-handoff">AI handoff / start</a><a href="#roadmap">Numbered roadmap</a
+					><a href="V1.3.5_ROADMAP.md">Editable master</a
+					><a href="#recommendation">Recommendation</a><a href="#controls">Two-tier controls</a
+					><a href="#matrix">Matrix / future reference</a><a href="#storage">Storage</a
+					><a href="#evidence">Evidence</a>
+				</nav>
+				<p class="muted">
+					All sections are visible. Open this file directly in a browser; no installation or server
+					is needed. On a narrow screen, scroll wide tables horizontally. Repository links open
+					source files where your browser supports them.
+				</p>
+			</header>
+			<section id="ai-handoff" aria-labelledby="ai-handoff-title">
+				<h2 id="ai-handoff-title">AI coder: start with the master</h2>
+				<aside class="notice">
+					<p>
+						<strong
+							><a href="V1.3.5_ROADMAP.md#start-here--agent-execution-contract"
+								>START HERE — agent execution contract</a
+							></strong
+						>
+						is the authoritative handoff for Gemini, Codex and other AI coders. This page is a human
+						summary. Read the master constraints C1–C10, selected-brief checklist, source/test map
+						and resume format before work. The completed .2 is accepted locally on 7 November 2026,
+						with this source-only GitHub handoff authorized. Brief/visual acceptance was recorded on
+						7 November 2026. Later milestones remain draft and unselected.
+					</p>
+				</aside>
+				<ul>
+					<li>
+						<strong>Scope:</strong> Memory ≤100 total including four existing variants, never a
+						quota; meaningful rule/setting differences only. Preserve existing other-family
+						games/variants; future matrices stay <strong>UNPOPULATED</strong> and expansion is
+						excluded.
+					</li>
+					<li>
+						<strong>Stop points:</strong> 17 provisional checkpoints, each a complete
+						STOPPABLE/COMMIT-READY delivery; no automatic commit or next stage. Clear owner stage
+						authorization is sufficient within its scope; visual approval remains a separate gate.
+					</li>
+					<li>
+						<strong>Checks:</strong> inspect actual scripts/test names before selecting filtered
+						commands; owned and directly affected shared behavior only. Other-family cases only when
+						shared logic actually changes. No unrelated suites/full <code>bun run verify</code>;
+						docs/trivial-only edits need no tests. Preserve source stability, one browser
+						owner/<code>workers: 1</code>, serial builds/D1/ports/generated writes and truthful
+						evidence.
+					</li>
+					<li>
+						<strong>UI:</strong> fixture-only interaction previews and owner approval at 390×844,
+						844×390 and 1280×800 before actual UI integration. .1/.4 need no new preview if
+						unchanged; .2/.3 pilot/.6/.7 and later new interactions do.
+					</li>
+					<li>
+						<strong>Handoff:</strong> retain exact authorization, files, checks/evidence, open
+						decisions and next action. Separate awaiting visual review, checks failed, ready for
+						owner review and owner accepted. Only the owner approves. Use their chosen main agent;
+						keep existing applicable AGENTS delegation policy, with no provider configuration
+						changes or silent substitutions.
+					</li>
+				</ul>
+				<h3>Historical .1 planning kickoff</h3>
+				<p>
+					The kickoff below is retained as history. The completed .1 is accepted locally; complete
+					only its authorized source handoff, then stop for the owner’s separate next selection.
+				</p>
+				<blockquote>
+					<p>
+						Read AGENTS.md, the current-status top of morphi-plan-simple.md, docs/CODEMAP.md and
+						docs/planning/V1.3.5_ROADMAP.md, starting with START HERE. Prepare only the v1.3.5.1
+						Games-extraction brief from actual source and existing accepted UI. Include touched
+						callers/tests/fixtures/config/exports, complete deliverables, unchanged-UI reference,
+						compatibility/recovery risks and proposed filtered checks after inspecting their
+						scripts. Preserve C1–C10. Do not implement app code, build, test, install, migrate,
+						commit, push, deploy or advance milestones. Leave unknowns explicit, record a handoff
+						and stop with the brief ready for owner review.
+					</p>
+				</blockquote>
+				<p>
+					Mechanics, actual Memory matrix/schema, preset names, scoring groups and exact selected
+					test commands remain decisions for selected briefs, especially .3. Do not invent them or
+					generate 17 empty briefs; retain completed briefs and evidence. Necessary approved
+					contract/engine/preset version changes must preserve legacy replay; dependency upgrades
+					and unrelated API changes are outside this plan.
+				</p>
+			</section>
+			<section id="roadmap" aria-labelledby="roadmap-title">
+				<h2 id="roadmap-title">v1.3.5.1–v1.3.5.17: provisional checkpoint roadmap</h2>
+				<p>
+					<strong>Edit the <a href="V1.3.5_ROADMAP.md">master roadmap</a></strong> for scope,
+					dependencies, stop conditions and validation boundaries. Keep one master, create only the
+					next selected brief in advance, and retain completed briefs/handoffs/evidence. This draft
+					does not authorize implementation or change the active simple plan.
+				</p>
+				<aside class="notice">
+					<p>
+						<strong>Every checkpoint is STOPPABLE and COMMIT-READY.</strong> Its touched scope
+						builds and works; the legacy path remains usable. Additive code alone is not a completed
+						half-feature; new capabilities stay unexposed until their complete flow works. Check
+						inside each milestone, record focused evidence and owner acceptance, then stop. No
+						automatic next step, commit, push or deployment is inferred.
+					</p>
+				</aside>
+				<p>
+					<strong>Focused checks only:</strong> the milestone and directly affected shared-code
+					behavior. No unrelated suites or full <code>bun run verify</code>; preserve the owner's
+					deferral without claiming a full pass or waiver. Documentation and trivial-only changes
+					need no tests. The final checkpoint is focused cross-feature closeout, not a place to
+					defer milestone testing.
+				</p>
+				<h3>Visual review before actual implementation</h3>
+				<p>
+					Prepare previews one selected checkpoint at a time. Use local interactive HTML demos with
+					fixture data where interaction matters; review new/changed screens at
+					<strong>390×844, 844×390 and 1280×800</strong> before app integration. Demos are design
+					references, not production rules or scoring evidence.
+				</p>
+				<ul>
+					<li>
+						<strong>.1 and .4:</strong> no new preview when existing UI/behavior stays identical.
+						Use the accepted screen as reference.
+					</li>
+					<li>
+						<strong>.2:</strong> preview changed pagination/detail-loading controls and loading,
+						empty and failed states.
+					</li>
+					<li>
+						<strong>.3 before .5:</strong> review the rule comparison and representative Memory
+						board interactions, help and timing/failure behavior before pilot implementation.
+					</li>
+					<li>
+						<strong>.6:</strong> preview Tier 1 controls, archetypes, invalid-combination feedback,
+						affected presets and confirmations.
+					</li>
+					<li>
+						<strong>.7:</strong> preview Tier 2 filters, cursor pages, statuses, inspection and
+						disabled/never-played/loading/empty/failed views.
+					</li>
+					<li>
+						<strong>.8–.16:</strong> preview new interactions/screens. Reuse already-approved
+						layouts for presets that need no new presentation; 100 separate mockups are unnecessary.
+					</li>
+					<li>
+						<strong>.17:</strong> compare actual screens with approved references, with no new
+						redesign.
+					</li>
+				</ul>
+				<p>
+					Record owner visual decisions in the selected brief. Functional acceptance remains
+					separate. Interactive previews receive focused interaction/layout checks; text-only
+					documentation needs no tests. These previews are planned deliverables, not yet built.
+				</p>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Foundation checkpoint / Complete stopping point / Focused validation"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Checkpoint</th>
+								<th scope="col">Complete stopping point</th>
+								<th scope="col">Focused validation</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>v1.3.5.1 — Games extraction<br />Accepted locally 7 November 2026</td>
+								<td>
+									Bounded Games UI/server extraction. Existing routes, actions, permissions, audit,
+									scoring, test play and recovery still work. No unrelated admin cleanup.
+								</td>
+								<td>
+									Touched types/lint and Games route/action, permission/audit and drawer/focus
+									behavior. Other admin wiring only if directly affected.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../briefs/v1.3.5.2-bounded-games-brief.md">v1.3.5.2 — Bounded loading</a
+									><br />Accepted locally 7 November 2026
+								</td>
+								<td>
+									After .1: paged summaries, grouped queries, lazy details/scoring and bounded
+									relevant metadata. Existing variants remain fully manageable.
+								</td>
+								<td>
+									Exact counts, page boundaries, query/payload bounds at synthetic 100 presets, lazy
+									detail recovery and relevant before/after measurements.
+								</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.3 — Memory matrix</td>
+								<td>
+									After .2: owner-approved supported dimensions, compatibility, preset/mechanic
+									definitions, scoring/help and acceptance design. Select six pilot additions and
+									representative visual interactions before .5. Candidate, implemented and accepted
+									are separate statuses.
+								</td>
+								<td>
+									Document/gameplay/visual consistency and owner approval. No tests for text-only
+									work; focused interaction/layout checks for interactive demo code. No arbitrary
+									Cartesian-product publication.
+								</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.4 — Exact identity</td>
+								<td>
+									After .3 approval: minimal immutable family-owned identity working through
+									existing four presets and start/replay/resume. Extend existing D1/KV only where
+									required; preserve old runs, checkpoints and session completion rules.
+								</td>
+								<td>
+									Legacy Memory identity/vectors, start/replay/resume/retry, invalid versions and
+									touched migration/cache fallback. No generic DSL or new remote resources.
+								</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.5 — Memory pilot</td>
+								<td>
+									After .4: aim for 10 total, existing four plus six approved additions. Whole
+									player/operator flow using existing admin lifecycle; expose only functional
+									presets. Owner accepts before expansion.
+								</td>
+								<td>
+									Affected Memory rules/vectors/runtimes, authoritative scoring/replay, D1
+									lifecycle, browser play/help/recovery and owner layout review.
+								</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.6 — Tier 1 policy</td>
+								<td>
+									After accepted .5: usable finite supported-dimension/archetype controls; enforce
+									current policy at server issuance. Overrides cannot bypass disabled dimensions;
+									existing rounds retain completion rules.
+								</td>
+								<td>
+									Permission/audit, invalid combinations, stale/concurrent starts, policy
+									precedence, in-flight completion and cache fallback.
+								</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.7 — Tier 2 directory</td>
+								<td>
+									After .6: filtered cursor pages of curated/observed Memory identities, selected
+									stats/scoring inspection and lifecycle management. Disabled and never-played
+									curated presets remain reachable.
+								</td>
+								<td>
+									Cursor boundaries/ties, filter/count accuracy, bounded queries, permissions/audit
+									and actual inspection/lifecycle paths.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<h3>Nine provisional batches, up to 10 additions each</h3>
+				<p>
+					Each depends on accepted .7 and then the accepted preceding batch. Group by approved
+					mechanics and dependencies after .3; shrink or split a batch when a new mechanic is
+					substantial. Each complete batch needs its own focused rule/replay/scoring,
+					policy/directory, browser/recovery and owner checks. Previous accepted presets stay
+					usable.
+				</p>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Expansion checkpoint / Provisional total including existing four"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Expansion checkpoint</th>
+								<th scope="col">Provisional total including existing four</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>v1.3.5.8 — Batch A</td>
+								<td>20</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.9 — Batch B</td>
+								<td>30</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.10 — Batch C</td>
+								<td>40</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.11 — Batch D</td>
+								<td>50</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.12 — Batch E</td>
+								<td>60</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.13 — Batch F</td>
+								<td>70</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.14 — Batch G</td>
+								<td>80</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.15 — Batch H</td>
+								<td>90</td>
+							</tr>
+							<tr>
+								<td>v1.3.5.16 — Batch I</td>
+								<td>100 — cap</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					These totals assume a 10-total pilot and ten additions in every batch. Exact content,
+					totals and checkpoint count are refined after .3. The owner may stop after any accepted
+					checkpoint; do not invent weak variants to fill 100. Support for other families follows
+					this family-owned structure only in future separately approved plans.
+				</p>
+				<h3>v1.3.5.17 — Focused integration and owner closeout</h3>
+				<p>
+					After the last batch actually selected and accepted: check cross-feature
+					selection/start/replay/resume/scoring, Tier 1 enforcement, Tier 2 inspection and bounded
+					scale at the supported cap. Record actual accepted totals, evidence, limits and owner stop
+					decision. Unused batches need not be built. This is scoped closeout, not full
+					verification, deployment or automatic next-phase approval.
+				</p>
+				<p class="muted">
+					17 is a planning layout: seven foundation/pilot checkpoints, nine provisional batches and
+					one closeout. It is not a guarantee of 17 engineering releases. Refine the numbering when
+					approved mechanics require smaller complete deliveries.
+				</p>
+			</section>
+			<section id="recommendation" aria-labelledby="recommendation-title">
+				<h2 id="recommendation-title">The supply already comes from generation</h2>
+				<p>
+					A named variant defines rules. A seed creates a deal or round within those rules. A
+					hundred Memory presets would support far more than a hundred rounds; pre-storing every
+					possible board is unnecessary.
+				</p>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Concept / Memory example / What it adds"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Concept</th>
+								<th scope="col">Memory example</th>
+								<th scope="col">What it adds</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Family</td>
+								<td>Memory</td>
+								<td>The game engine and interaction.</td>
+							</tr>
+							<tr>
+								<td>Ruleset / structural preset</td>
+								<td>Trios; a supported board-size setting</td>
+								<td>A different challenge or bounded configuration.</td>
+							</tr>
+							<tr>
+								<td>Seeded instance</td>
+								<td>A particular shuffled deal</td>
+								<td>Another round under those rules.</td>
+							</tr>
+							<tr>
+								<td>Cosmetic theme</td>
+								<td>Approved symbols, colors and card styling</td>
+								<td>Appearance; no change to rules, difficulty or scoring.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<h3>Extract the Games admin surface and bound its work</h3>
+				<p>
+					Move Games rows, drawer and settings into a focused component, and Games server
+					loading/actions into focused modules where that reduces coupling. Reuse existing editors.
+					Retain route URLs, form action names, permissions, audit, recovery and keyboard behavior.
+					Leave unrelated admin sections alone.
+				</p>
+				<p>
+					Fetch a bounded page of summaries and detailed statistics/scoring only when requested.
+					Replace per-variant query fan-out with grouped or paged queries. Preserve the existing
+					aggregate-cohort definitions and single-JSON-bind mapping.
+				</p>
+				<h3>Define the Memory-owned matrix with compatibility rules</h3>
+				<p>
+					Record supported/proposed dimensions, valid combinations, generation bounds, scoring
+					groups, viewport limits and implementation status. Start with source data and
+					documentation. Do not generate a catalogue by blindly multiplying dimensions.
+				</p>
+				<h3>Deliver one Memory expansion pilot</h3>
+				<p>
+					Choose a small set of meaningfully different, owner-approved single-player presets.
+					Resolve stable preset IDs into validated family-local options. Reuse generation, replay
+					and view code; extend only for selected mechanics. Accept the pilot before further Memory
+					batches; other-family expansion is excluded from v1.3.5.
+				</p>
+				<p class="muted">
+					The exact pilot list is an owner design decision. Stop after the selected slice is
+					accepted. The 100-total cap includes the existing four; no quota or generic visual rule
+					editor is proposed.
+				</p>
+				<h3>The No Man’s Sky comparison</h3>
+				<p>
+					Hello Games describes a procedural universe and continues adding generation capabilities
+					and gameplay. The useful lesson is to improve what generators can express while generating
+					instances on demand. Design judgment: players must notice fresh decisions, not just a
+					large possible count.
+				</p>
+				<p>
+					Finite seeds and equivalent outputs mean “effectively endless” is a player-experience
+					goal. Neither a large seed space nor the current selector proves an exact board will never
+					repeat.
+				</p>
+				<p class="links">
+					<a href="https://www.nomanssky.com/about/">Hello Games: about</a
+					><a href="https://www.nomanssky.com/2024/07/no-mans-sky-worlds-part-i/">Worlds Part I</a
+					><a href="https://www.gdcvault.com/play/1024514/Continuous-World-Generation-in-No"
+						>Sean Murray’s GDC talk</a
+					>
+				</p>
+			</section>
+			<section id="controls" aria-labelledby="controls-title">
+				<h2 id="controls-title">Memory management: two tiers</h2>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Tier / Operator controls / Implementation boundary"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Tier</th>
+								<th scope="col">Operator controls</th>
+								<th scope="col">Implementation boundary</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>1. Family policy and archetypes</td>
+								<td>
+									Enable supported mechanics, set bounded values, curate named modes and preview
+									affected combinations.
+								</td>
+								<td>
+									Family code defines supported dimensions and hard compatibility rules. Admin
+									settings narrow the supported space; they cannot enable unimplemented mechanics or
+									bypass validity checks.
+								</td>
+							</tr>
+							<tr>
+								<td>2. Curated and observed combinations</td>
+								<td>
+									Search/filter paginated records, inspect statistics, apply specific overrides and
+									review history.
+								</td>
+								<td>
+									Persist curated presets and observed identities as needed. Include disabled and
+									never-played curated presets; traffic-only views must not hide configurations that
+									need management.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					A master switch changes one family policy. New-round issuance checks that policy alongside
+					a specific variant disable; an override cannot bypass a disabled dimension. Do not rewrite
+					thousands of variant rows or alter immutable gameplay definitions. Existing rounds retain
+					the previously agreed completion behavior.
+				</p>
+				<p>
+					Persist and identify the exact gameplay configuration used by each round. Keep current
+					eligibility separate from immutable replay rules. For large directories, use indexed
+					filters, stable unique ordering and cursor pagination. OFFSET is acceptable for small
+					lists but costs more at deep offsets.
+				</p>
+				<p>
+					Choose from valid supported combinations without materializing the entire Cartesian
+					product. Use bounded generation/validation with an explicit failure fallback. Leaderboard
+					scopes require a separate fairness decision: avoid 100,000 empty boards and merging
+					incomparable rules.
+				</p>
+			</section>
+			<section id="matrix" aria-labelledby="matrix-title">
+				<h2 id="matrix-title">Memory matrix inputs and other-family future reference</h2>
+				<p>
+					Only <strong>three families and 12 named variants</strong> are currently registered;
+					Memory owns four. Memory candidates require the .3 design gate.
+					<strong
+						>Block and Connect existing variants are retained; their future matrices and Mahjong’s
+						remain UNPOPULATED. Their research below is future reference only</strong
+					>, excluded from this roadmap. Later families may follow the same family-owned structure
+					under separate plans. No candidate dimension is authorized or implemented merely by
+					appearing here.
+				</p>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Family / Implemented / Candidate dimensions / Compatibility boundary"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Family</th>
+								<th scope="col">Implemented</th>
+								<th scope="col">Candidate dimensions</th>
+								<th scope="col">Compatibility boundary</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Memory</td>
+								<td>4 modes: classic, no preview, trios, moving; each uses 6/8/10 match groups.</td>
+								<td>
+									Match size/relation, preview, mismatch movement, board structure, time/move rules.
+								</td>
+								<td>
+									Only identical-symbol matching exists. Current modes are separate branches, not
+									freely mixable switches.
+								</td>
+							</tr>
+							<tr>
+								<td>Block</td>
+								<td>4 modes: classic 8×8, board 10×10, rows only, rush 60 s.</td>
+								<td>UNPOPULATED — future plan only.</td>
+								<td>Preserve existing variants; expansion is excluded here.</td>
+							</tr>
+							<tr>
+								<td>Connect</td>
+								<td>4 modes: classic, full grid, board 8×8, rush 60 s.</td>
+								<td>UNPOPULATED — future plan only.</td>
+								<td>Preserve existing variants; expansion is excluded here.</td>
+							</tr>
+							<tr>
+								<td>Mahjong</td>
+								<td>No implementation.</td>
+								<td>UNPOPULATED — future plan only.</td>
+								<td>Initial family needs separate approval and implementation.</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<h3>The research counts describe a design space</h3>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Reference / What its number means"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Reference</th>
+								<th scope="col">What its number means</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>
+									<a href="../../docs/references/puzzle-variants/Memory Puzzle Variants.html"
+										>Memory research</a
+									>
+								</td>
+								<td>
+									103,680 hypothetical rule combinations; compatibility and implementation remain
+									unproven.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../docs/references/puzzle-variants/Block Puzzle Variants.html"
+										>Block research</a
+									>
+								</td>
+								<td>
+									5,040 hypothetical combinations; researched systems are not all supported by the
+									engine.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../docs/references/puzzle-variants/Connect Puzzle Variants.html"
+										>Connect research</a
+									>
+								</td>
+								<td>
+									2,592 hypothetical combinations; topology changes need generation and replay work.
+								</td>
+							</tr>
+							<tr>
+								<td>
+									<a href="../../docs/references/puzzle-variants/Mahjong Solitaire Variants.html"
+										>Mahjong research</a
+									>
+								</td>
+								<td>
+									28 research entries and 18 dimensions; configuration estimator is not an
+									implemented catalogue.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					Memory’s 103,680 multiplies match size, relation, turn rules, dynamics, scoring, player
+					formats, helpers, visibility and layout. Some axes require multiplayer, conflict or
+					overlap. It is not a verified lower bound on distinct, fair, implementable variants. The
+					research estimates and compatibility remain unverified.
+				</p>
+				<aside class="notice">
+					<p>
+						<strong>Useful matrix fields:</strong> family; stable preset ID/version; rule
+						dimensions; valid combinations; invalid combinations and reasons; generation/time/move
+						bounds; scoring/leaderboard group; help copy; supported viewports; test/approval status.
+					</p>
+				</aside>
+				<p>
+					Memory cards must form complete match groups; no-preview must have no opening-preview
+					allowance. Connect size/pair combinations must fit generator path-length bounds. Cosmetic
+					palettes remain separate from gameplay combinations.
+				</p>
+				<p>
+					Names and weights alone do not implement behavior. Connect bridges, Memory wildcards and
+					Block obstacles each require rules, validation, rendering and replay support. Approve and
+					build the initial Mahjong family separately before planning large variant counts.
+				</p>
+			</section>
+			<section id="storage" aria-labelledby="storage-title">
+				<h2 id="storage-title">Source definitions, D1 operations and selective caching</h2>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Layer / Responsibility / Recommendation"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Layer</th>
+								<th scope="col">Responsibility</th>
+								<th scope="col">Recommendation</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Family source / manifest</td>
+								<td>Engine capability, validation, defaults and tested preset definitions.</td>
+								<td>
+									Keep executable logic here. Extract repeated preset data into family-local files
+									when useful.
+								</td>
+							</tr>
+							<tr>
+								<td>D1 — already present</td>
+								<td>
+									Lifecycle state, live configuration pointers, immutable score versions, sessions,
+									history and audit.
+								</td>
+								<td>
+									Extend existing patterns. Add immutable preset records only if runtime editing is
+									actually required.
+								</td>
+							</tr>
+							<tr>
+								<td>KV — already present</td>
+								<td>
+									Version-keyed immutable snapshots and the existing eventually fresh admin
+									overview.
+								</td>
+								<td>
+									Keep optional with D1 fallback. Stale KV must not decide authoritative eligibility
+									or scoring.
+								</td>
+							</tr>
+							<tr>
+								<td>Generated rounds</td>
+								<td>Seed + exact preset/rules version + engine version reconstruct the round.</td>
+								<td>
+									Generate on demand. Store actual sessions/results as needed; do not materialize
+									all possible boards.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<aside class="notice">
+					<p>
+						<strong>A manifest does not become slow merely because it is a file.</strong> No
+						benchmark establishes a manifest bottleneck. Identified growth risks are eager browser
+						metadata, unbounded lists and per-variant database queries. Database definitions also
+						require loading, validation and caching.
+					</p>
+				</aside>
+				<p>
+					A few hundred compact source presets may be sufficient. At tens of thousands, avoid
+					shipping the entire catalogue to every player. Retain the small family index, load
+					relevant metadata on demand and bound admin responses. Game views and pools already load
+					lazily.
+				</p>
+				<p>
+					KV updates can take 60 seconds or more to appear elsewhere. Use D1 for live decisions and
+					immutable versions for replay. Editing a preset in place must never silently change an old
+					checkpoint, ranked session or saved run.
+				</p>
+				<p>
+					D1 performance depends on query shape and rows read. Inspect query plans and row-read
+					counts before adding indexes or storage. Source extraction improves maintenance; fewer
+					fetched records and less loaded data improve runtime performance.
+				</p>
+				<p>
+					For two-tier administration, D1 is the searchable record store. R2 holds objects such as
+					assets or exports; it is not a drop-in SQL table and is not required for preset
+					management. Source still owns executable rules, schemas and defaults; “never in
+					TypeScript” is too absolute. Add runtime-editable immutable preset rows only when the
+					operator workflow needs them.
+				</p>
+				<p>
+					A global disable affects new authoritative starts only after the current policy is checked
+					there, with concurrent-start behavior explicitly defined. A client may briefly display an
+					old candidate. Eventually consistent KV cannot promise immediate global enforcement.
+				</p>
+				<p class="links">
+					<a href="https://developers.cloudflare.com/kv/concepts/how-kv-works/">KV consistency</a
+					><a href="https://developers.cloudflare.com/d1/best-practices/use-indexes/">D1 indexes</a
+					><a href="https://developers.cloudflare.com/d1/platform/limits/">D1 limits</a
+					><a href="https://developers.cloudflare.com/workers/platform/storage-options/"
+						>Cloudflare storage choices</a
+					><a href="https://www.sqlite.org/rowvalue.html#scrolling_window_queries"
+						>SQLite pagination guidance</a
+					>
+				</p>
+			</section>
+			<section id="evidence" aria-labelledby="evidence-title">
+				<h2 id="evidence-title">Repository findings</h2>
+				<p class="muted">
+					Observations from the source review on 6 November 2026; source line numbers are reference
+					locations from that review.
+				</p>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Finding / Source / Observation"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Finding</th>
+								<th scope="col">Source</th>
+								<th scope="col">Observation</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Current scope</td>
+								<td><a href="../../morphi-plan-simple.md">morphi-plan-simple.md:3</a></td>
+								<td>
+									v1.3.4 admin/query Slice 0 is locally complete; Mahjong remains future planning.
+								</td>
+							</tr>
+							<tr>
+								<td>Registration</td>
+								<td><a href="../../src/lib/registry.ts">src/lib/registry.ts:7</a></td>
+								<td>
+									Only Block, Connect and Memory are registered: 12 named variants altogether.
+								</td>
+							</tr>
+							<tr>
+								<td>Admin UI</td>
+								<td>
+									<a href="../../src/routes/admin/[view]/+page.svelte"
+										>src/routes/admin/[view]/+page.svelte:1</a
+									>
+								</td>
+								<td>
+									2,346 lines across multiple admin concerns. Extract Games first; reuse existing
+									editors.
+								</td>
+							</tr>
+							<tr>
+								<td>Admin server</td>
+								<td>
+									<a href="../../src/routes/admin/[view]/+page.server.ts"
+										>src/routes/admin/[view]/+page.server.ts:1</a
+									>
+								</td>
+								<td>679 lines; selected-family detail also loads scoring data.</td>
+							</tr>
+							<tr>
+								<td>Statistics fan-out</td>
+								<td><a href="../../src/lib/server/games.ts">src/lib/server/games.ts:290</a></td>
+								<td>
+									gameStatistics issues a query per variant, including unopened drawer details.
+								</td>
+							</tr>
+							<tr>
+								<td>Generated metadata</td>
+								<td>
+									<a href="../../scripts/generate-registry.ts">scripts/generate-registry.ts:122</a>
+								</td>
+								<td>
+									Full variant metadata is serialized into a shared browser projection. Game
+									views/pools already load lazily.
+								</td>
+							</tr>
+							<tr>
+								<td>Existing D1/KV</td>
+								<td><a href="../../src/lib/server/config.ts">src/lib/server/config.ts:49</a></td>
+								<td>
+									D1 live pointers plus version-keyed cached immutable configuration already exist.
+								</td>
+							</tr>
+							<tr>
+								<td>Lifecycle</td>
+								<td>
+									<a href="../../src/lib/server/db/schema.ts">src/lib/server/db/schema.ts:336</a>
+								</td>
+								<td>D1 already stores enabled/disabled state per variant.</td>
+							</tr>
+							<tr>
+								<td>Replay identity</td>
+								<td><a href="../../src/lib/engine/contract.ts">src/lib/engine/contract.ts:6</a></td>
+								<td>Runs carry family, variant, seed, engine version and scoring version.</td>
+							</tr>
+							<tr>
+								<td>Recent improvement</td>
+								<td>
+									<a href="../../docs/work/V1.3.4_SLICE0_WORK.md"
+										>docs/work/V1.3.4_SLICE0_WORK.md:9</a
+									>
+								</td>
+								<td>
+									Activity mapping now uses one JSON bind; this does not eliminate other query or
+									payload limits.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<h3>Proposed acceptance evidence</h3>
+				<div
+					class="table-scroll"
+					role="region"
+					aria-label="Area / Evidence to collect before acceptance"
+					tabindex="0"
+				>
+					<table>
+						<thead>
+							<tr>
+								<th scope="col">Area</th>
+								<th scope="col">Evidence to collect before acceptance</th>
+							</tr>
+						</thead>
+						<tbody>
+							<tr>
+								<td>Behavior preservation</td>
+								<td>
+									Existing permission, audit, lifecycle, drawer/focus, scoring and test-play
+									regressions; unchanged routes/forms.
+								</td>
+							</tr>
+							<tr>
+								<td>Catalogue scale</td>
+								<td>
+									Synthetic fixtures up to the 100-total Memory cap; bounded list/detail responses;
+									query count bounded by requested page rather than total catalogue size.
+								</td>
+							</tr>
+							<tr>
+								<td>Performance</td>
+								<td>
+									Before/after query count, rows read, response bytes, browser payload, median/p95
+									timings on named device/network; run counts and cold/preloaded status. No speedup
+									is claimed today.
+								</td>
+							</tr>
+							<tr>
+								<td>Determinism and recovery</td>
+								<td>
+									Legacy vectors unchanged; selected new presets checked in required runtimes; saved
+									runs, checkpoints and in-flight sessions resolve exact rules.
+								</td>
+							</tr>
+							<tr>
+								<td>Generator validity</td>
+								<td>
+									Every enabled preset validates; bounded sampled-seed/property checks and known
+									vectors; solvability guarantees only where design requires them.
+								</td>
+							</tr>
+							<tr>
+								<td>Player experience</td>
+								<td>
+									Phone portrait/landscape and desktop review; owner finds each selected pilot
+									legible, fair and meaningfully different.
+								</td>
+							</tr>
+						</tbody>
+					</table>
+				</div>
+				<p>
+					Apply the owner-directed focused checks inside each selected milestone and to directly
+					affected shared-code behavior only. Do not run unrelated suites or full
+					<code>bun run verify</code>. Documentation and trivial-only changes need no tests. The
+					existing full-verification deferral remains recorded; scoped evidence is not a full pass
+					or an indefinite waiver.
+				</p>
+			</section>
+			<footer>
+				<p>
+					Source: the Morphi v1.3.5 direction canvas. Original review method: read-only
+					source/document inspection plus official Hello Games, GDC and Cloudflare research.
+					Graphify was attempted; no local graph or connected workspace was available. The research
+					made no application changes, builds, benchmarks, tests, commits or deployments. Counts are
+					observations or explicitly labeled reference estimates.
+				</p>
+				<p>
+					The <a href="V1.3.5_ROADMAP.md">editable master roadmap</a> records the current
+					Memory-only proposal and checkpoint boundaries. This static preview adds no application
+					behavior or implementation authorization.
+					<a href="#top" aria-label="Back to beginning">Back to beginning</a>
+				</p>
+			</footer>
+		</main>
+	</body>
 </html>

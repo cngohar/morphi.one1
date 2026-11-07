@@ -33,6 +33,19 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.2 accepted locally; source-only GitHub handoff authorized (2026-11-07):**
+The owner said “update the git repo and push to github”, accepting the completed
+bounded Games admin queries and pagination and authorizing this source-only
+commit/push to existing `origin/main`. This supersedes earlier .2 pending-review
+and commit/push limits for this handoff only. Existing scoped format/lint, Vitest
+(9/9), Slice 3 (8/8), and Playwright Chromium suites at all three sizes remain the
+verification evidence; no new checks or device/browser details were supplied.
+Preserve shared security/scoring, roadmap C1–C10, full-verification deferral,
+and the unauditioned-audio exclusion; unrelated local editor/MCP settings and palette
+timing changes remain local. No .3, future commit/push, deployment, or production
+change is authorized. See `docs/briefs/v1.3.5.2-bounded-games-brief.md` and
+`docs/work/V1.3.5.2_WORK.md`.
+
 **v1.3.5.1 accepted locally; source-only GitHub handoff authorized (2026-11-07):**
 The owner said “ok mark this accepted and push to github”, accepting the completed
 Games extraction and authorizing this source-only commit/push to existing

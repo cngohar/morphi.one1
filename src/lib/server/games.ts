@@ -314,31 +314,26 @@ export async function gameStatistics(
 				hidden: number;
 			}>()
 	).results;
-	const counts = summary?.variants ?? (await activityCounts(db, family));
-	const variants = await Promise.all(
-		(await variantOverview(db, family)).map(async (variant) => {
-			const definition = puzzleVariant(family, variant.id)!;
-			const groups = definition.leaderboardGroups;
-			const placeholders = groups.map(() => '?').join(',');
-			const variantRows = (
-				await db
-					.prepare(
-						`SELECT rules_group,score_config_version,count(*) completed,coalesce(sum(ranked),0) ranked,
- max(score) bestScore,avg(score) averageScore,avg(seconds) averageSeconds,coalesce(sum(hidden),0) hidden
- FROM completed_run WHERE family=? AND rules_group IN (${placeholders}) GROUP BY rules_group,score_config_version
- ORDER BY rules_group,score_config_version LIMIT 101`
-					)
-					.bind(family, ...groups)
-					.all<(typeof rows)[number]>()
-			).results;
-			return {
+	const baseVariants =
+		summary?.variants ??
+		(await (async () => {
+			const lifecycle = await variantOverview(db, family);
+			const counts = await activityCounts(db, family);
+			return lifecycle.map((variant) => ({
 				...variant,
-				...counts.find((row) => row.family === family && row.variant === variant.id)!,
-				rows: variantRows.slice(0, 100),
-				more: variantRows.length > 100
-			};
-		})
-	);
+				...counts.find((row) => row.family === family && row.variant === variant.id)!
+			}));
+		})());
+	const variants = baseVariants.map((variant) => {
+		const definition = puzzleVariant(family, variant.id);
+		const groups = definition?.leaderboardGroups ?? [];
+		const variantRows = rows.filter((r) => groups.includes(r.rules_group));
+		return {
+			...variant,
+			rows: variantRows.slice(0, 100),
+			more: variantRows.length > 100
+		};
+	});
 	return { rows: rows.slice(0, 100), more: rows.length > 100, variants };
 }
 

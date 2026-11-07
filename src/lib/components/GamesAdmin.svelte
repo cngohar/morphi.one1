@@ -37,10 +37,36 @@
 	let variantDrawer = $state<HTMLDialogElement>();
 	let variantTriggerEl = $state<HTMLButtonElement | null>(null);
 	let variantDrawerFailed = $state(false);
+
+	let historyPage = $state(0);
+	const historyPageSize = 10;
+	let pagedHistoryRows = $derived(
+		(data.gameStats.rows ?? []).slice(
+			historyPage * historyPageSize,
+			(historyPage + 1) * historyPageSize
+		)
+	);
+	let totalHistoryPages = $derived(
+		Math.max(1, Math.ceil((data.gameStats.rows ?? []).length / historyPageSize))
+	);
+
+	let drawerHistoryPage = $state(0);
+	const drawerHistoryPageSize = 10;
+	let pagedDrawerRows = $derived(
+		(inspectedVariant?.rows ?? []).slice(
+			drawerHistoryPage * drawerHistoryPageSize,
+			(drawerHistoryPage + 1) * drawerHistoryPageSize
+		)
+	);
+	let totalDrawerHistoryPages = $derived(
+		Math.max(1, Math.ceil((inspectedVariant?.rows ?? []).length / drawerHistoryPageSize))
+	);
+
 	async function openVariantDrawer(variant: VariantStat, event: MouseEvent) {
 		try {
 			variantDrawerFailed = false;
 			inspectedVariant = variant;
+			drawerHistoryPage = 0;
 			variantTriggerEl = event.currentTarget as HTMLButtonElement;
 			await tick();
 			variantDrawer?.showModal();
@@ -266,127 +292,252 @@
 				</p>
 				<div class="table-wrap game-stats-table">
 					<table>
-						<thead
-							><tr
-								><th>{t('v1.admin.games.rulesGroup')}</th><th>{t('v1.admin.games.version')}</th><th
-									>{t('v1.admin.games.completed')}</th
-								><th>{t('v1.admin.games.ranked')}</th><th>{t('v1.admin.games.solo')}</th><th
-									>{t('v1.admin.games.best')}</th
-								><th>{t('v1.admin.games.average')}</th><th>{t('v1.admin.games.duration')}</th><th
-									>{t('v1.admin.games.hidden')}</th
-								></tr
-							></thead
-						><tbody
-							>{#each data.gameStats.rows as row (`${row.rules_group}:${row.score_config_version}`)}<tr
-									><td>{row.rules_group}</td><td>{row.score_config_version}</td><td
-										>{row.completed}</td
-									><td>{row.ranked}</td><td>{row.completed - row.ranked}</td><td>{row.bestScore}</td
-									><td>{row.averageScore.toFixed(1)}</td><td>{row.averageSeconds.toFixed(1)}</td><td
-										>{row.hidden}</td
-									></tr
-								>{:else}<tr><td colspan="9">{t('v1.admin.empty')}</td></tr>{/each}</tbody
-						>
+						<thead>
+							<tr>
+								<th>{t('v1.admin.games.rulesGroup')}</th>
+								<th>{t('v1.admin.games.version')}</th>
+								<th>{t('v1.admin.games.completed')}</th>
+								<th>{t('v1.admin.games.ranked')}</th>
+								<th>{t('v1.admin.games.solo')}</th>
+								<th>{t('v1.admin.games.best')}</th>
+								<th>{t('v1.admin.games.average')}</th>
+								<th>{t('v1.admin.games.duration')}</th>
+								<th>{t('v1.admin.games.hidden')}</th>
+							</tr>
+						</thead>
+						<tbody>
+							{#each pagedHistoryRows as row (`${row.rules_group}:${row.score_config_version}`)}
+								<tr>
+									<td>{row.rules_group}</td>
+									<td>{row.score_config_version}</td>
+									<td>{row.completed}</td>
+									<td>{row.ranked}</td>
+									<td>{row.completed - row.ranked}</td>
+									<td>{row.bestScore}</td>
+									<td>{row.averageScore.toFixed(1)}</td>
+									<td>{row.averageSeconds.toFixed(1)}</td>
+									<td>{row.hidden}</td>
+								</tr>
+							{:else}
+								<tr><td colspan="9">{t('v1.admin.empty')}</td></tr>
+							{/each}
+						</tbody>
 					</table>
 				</div>
+				{#if (data.gameStats.rows ?? []).length > 0}
+					<nav class="pagination" aria-label={t('admin.variants.historyNav')}>
+						<span>
+							{t('admin.variants.historyStatus', {
+								current: historyPage + 1,
+								total: totalHistoryPages,
+								count: data.gameStats.rows.length
+							})}
+						</span>
+						<button
+							type="button"
+							class="btn"
+							disabled={historyPage === 0}
+							onclick={() => (historyPage = 0)}
+						>
+							{t('admin.variants.first')}
+						</button>
+						<button
+							type="button"
+							class="btn"
+							disabled={historyPage === 0}
+							onclick={() => (historyPage = Math.max(0, historyPage - 1))}
+						>
+							{t('admin.variants.previous')}
+						</button>
+						<button
+							type="button"
+							class="btn"
+							disabled={historyPage >= totalHistoryPages - 1}
+							onclick={() => (historyPage = Math.min(totalHistoryPages - 1, historyPage + 1))}
+						>
+							{t('admin.variants.next')}
+						</button>
+						<button
+							type="button"
+							class="btn"
+							disabled={historyPage >= totalHistoryPages - 1}
+							onclick={() => (historyPage = totalHistoryPages - 1)}
+						>
+							{t('admin.variants.last')}
+						</button>
+					</nav>
+				{/if}
 				{#if data.gameStats.more}<p>{t('v1.admin.games.limited')}</p>{/if}
 			{/if}
 		</section>
-		{#if data.gameStats.variants.length}
+		{#if data.gameStats.variants.length || (data.gameStats.totalVariants ?? 0) > 0}
 			<section class="admin-card variant-section">
 				<h2>{t('admin.variants.title')}</h2>
 				{#if data.subview === 'settings'}
 					<p>{t('admin.variants.registered')}</p>
 					<p>{t('admin.variants.reconcile')}</p>
 				{/if}
-				<div class="variant-list">
-					{#each data.gameStats.variants as variant (variant.id)}
-						{@const def = puzzleVariant(game.family, variant.id)}
-						{@const playRate =
-							variant.shown > 0 ? `${Math.round((variant.played / variant.shown) * 100)}%` : '—'}
-						<div class="variant-row" data-variant={variant.id}>
-							<div class="variant-row-header">
-								<div class="variant-name-group">
-									<span class="variant-title">{t(def!.name as MessageKey)}</span>
-									<code class="variant-slug">{variant.id}</code>
-									<span class="pill status-pill status-{variant.state}">
-										{t(`v1.admin.games.${variant.state}` as MessageKey)}
-									</span>
-								</div>
-								<div class="variant-row-stats">
-									<div class="stat-col">
-										<span class="stat-label">{t('admin.variants.shown')}</span>
-										<span class="stat-val">{variant.shown}</span>
+				{#if data.gameStats.variants.length === 0}
+					<div class="empty-variants" role="status">
+						<p>{t('admin.variants.emptyPage')}</p>
+						<a
+							class="btn"
+							href="{resolve('/admin/[view]', { view: 'games' })}?game={game.family}&variant_page=0"
+						>
+							{t('admin.variants.returnFirst')}
+						</a>
+					</div>
+				{:else}
+					<div class="variant-list">
+						{#each data.gameStats.variants as variant (variant.id)}
+							{@const def = puzzleVariant(game.family, variant.id)}
+							{@const playRate =
+								variant.shown > 0 ? `${Math.round((variant.played / variant.shown) * 100)}%` : '—'}
+							<div class="variant-row" data-variant={variant.id}>
+								<div class="variant-row-header">
+									<div class="variant-name-group">
+										<span class="variant-title">{t(def!.name as MessageKey)}</span>
+										<code class="variant-slug">{variant.id}</code>
+										<span class="pill status-pill status-{variant.state}">
+											{t(`v1.admin.games.${variant.state}` as MessageKey)}
+										</span>
 									</div>
-									<div class="stat-col">
-										<span class="stat-label">{t('admin.variants.played')}</span>
-										<span class="stat-val">{variant.played}</span>
+									<div class="variant-row-stats">
+										<div class="stat-col">
+											<span class="stat-label">{t('admin.variants.shown')}</span>
+											<span class="stat-val">{variant.shown}</span>
+										</div>
+										<div class="stat-col">
+											<span class="stat-label">{t('admin.variants.played')}</span>
+											<span class="stat-val">{variant.played}</span>
+										</div>
+										<div class="stat-col">
+											<span class="stat-label">{t('admin.variants.playRate')}</span>
+											<span class="stat-val">{playRate}</span>
+										</div>
+										<div class="stat-col">
+											<span class="stat-label">{t('admin.games.totalCompleted')}</span>
+											<span class="stat-val">{variant.totalCompleted}</span>
+										</div>
 									</div>
-									<div class="stat-col">
-										<span class="stat-label">{t('admin.variants.playRate')}</span>
-										<span class="stat-val">{playRate}</span>
-									</div>
-									<div class="stat-col">
-										<span class="stat-label">{t('admin.games.totalCompleted')}</span>
-										<span class="stat-val">{variant.totalCompleted}</span>
-									</div>
-								</div>
-								<div class="variant-actions">
-									<button
-										type="button"
-										class="btn inspect-btn"
-										aria-haspopup="dialog"
-										onclick={(e) => openVariantDrawer(variant, e)}
-									>
-										{t('admin.variants.inspect')}
-									</button>
-									{#if can(data.actor.role, variant.state === 'enabled' ? 'variant-disable' : 'variant-enable')}
-										<AccountForm>
-											{#snippet children(pending)}
-												<input type="hidden" name="target" value={game.family} />
-												<input type="hidden" name="variant" value={variant.id} />
-												<input
-													type="hidden"
-													name="action"
-													value={variant.state === 'enabled' ? 'variant-disable' : 'variant-enable'}
-												/>
-												{#if variant.state === 'enabled'}
-													<label class="reason-field">
-														{t('v1.operator.reason')}
-														<input
-															name="reason"
-															required
-															minlength="3"
-															maxlength="240"
-															placeholder={t('admin.variants.disableReason')}
-														/>
+									<div class="variant-actions">
+										<button
+											type="button"
+											class="btn inspect-btn"
+											aria-haspopup="dialog"
+											onclick={(e) => openVariantDrawer(variant, e)}
+										>
+											{t('admin.variants.inspect')}
+										</button>
+										{#if can(data.actor.role, variant.state === 'enabled' ? 'variant-disable' : 'variant-enable')}
+											<AccountForm>
+												{#snippet children(pending)}
+													<input type="hidden" name="target" value={game.family} />
+													<input type="hidden" name="variant" value={variant.id} />
+													<input
+														type="hidden"
+														name="action"
+														value={variant.state === 'enabled'
+															? 'variant-disable'
+															: 'variant-enable'}
+													/>
+													{#if variant.state === 'enabled'}
+														<label class="reason-field">
+															{t('v1.operator.reason')}
+															<input
+																name="reason"
+																required
+																minlength="3"
+																maxlength="240"
+																placeholder={t('admin.variants.disableReason')}
+															/>
+														</label>
+													{/if}
+													<label class="confirm">
+														<input type="checkbox" name="confirm" value="yes" required />
+														{t('admin.variants.confirm')}
 													</label>
-												{/if}
-												<label class="confirm">
-													<input type="checkbox" name="confirm" value="yes" required />
-													{t('admin.variants.confirm')}
-												</label>
-												<button class="btn" disabled={pending}>
-													{t(
-														variant.state === 'enabled'
-															? 'admin.variants.disable'
-															: 'admin.variants.enable'
-													)}
-												</button>
-											{/snippet}
-										</AccountForm>
-									{/if}
+													<button class="btn" disabled={pending}>
+														{t(
+															variant.state === 'enabled'
+																? 'admin.variants.disable'
+																: 'admin.variants.enable'
+														)}
+													</button>
+												{/snippet}
+											</AccountForm>
+										{/if}
+									</div>
 								</div>
+								<p class="reconciliation-line">
+									{t('admin.variants.completedTotal', {
+										total: variant.totalCompleted,
+										finished: variant.finished,
+										imported: variant.imported
+									})}
+								</p>
 							</div>
-							<p class="reconciliation-line">
-								{t('admin.variants.completedTotal', {
-									total: variant.totalCompleted,
-									finished: variant.finished,
-									imported: variant.imported
+						{/each}
+					</div>
+					{#if (data.gameStats.totalVariants ?? 0) > 0}
+						{@const currentPage = data.gameStats.variantPage ?? 0}
+						{@const totalPages = data.gameStats.totalVariantPages ?? 1}
+						{@const totalVariants = data.gameStats.totalVariants ?? data.gameStats.variants.length}
+						<nav class="pagination" aria-label={t('admin.variants.pageNav')}>
+							<span>
+								{t('admin.variants.pageStatus', {
+									current: currentPage + 1,
+									total: totalPages,
+									count: totalVariants
 								})}
-							</p>
-						</div>
-					{/each}
-				</div>
+							</span>
+							<a
+								class="btn"
+								class:disabled={currentPage === 0}
+								aria-disabled={currentPage === 0 ? 'true' : undefined}
+								tabindex={currentPage === 0 ? -1 : undefined}
+								href="{resolve('/admin/[view]', {
+									view: 'games'
+								})}?game={game.family}&variant_page=0"
+							>
+								{t('admin.variants.first')}
+							</a>
+							<a
+								class="btn"
+								class:disabled={currentPage === 0}
+								aria-disabled={currentPage === 0 ? 'true' : undefined}
+								tabindex={currentPage === 0 ? -1 : undefined}
+								href="{resolve('/admin/[view]', {
+									view: 'games'
+								})}?game={game.family}&variant_page={Math.max(0, currentPage - 1)}"
+							>
+								{t('admin.variants.previous')}
+							</a>
+							<a
+								class="btn"
+								class:disabled={currentPage >= totalPages - 1}
+								aria-disabled={currentPage >= totalPages - 1 ? 'true' : undefined}
+								tabindex={currentPage >= totalPages - 1 ? -1 : undefined}
+								href="{resolve('/admin/[view]', {
+									view: 'games'
+								})}?game={game.family}&variant_page={Math.min(totalPages - 1, currentPage + 1)}"
+							>
+								{t('admin.variants.next')}
+							</a>
+							<a
+								class="btn"
+								class:disabled={currentPage >= totalPages - 1}
+								aria-disabled={currentPage >= totalPages - 1 ? 'true' : undefined}
+								tabindex={currentPage >= totalPages - 1 ? -1 : undefined}
+								href="{resolve('/admin/[view]', {
+									view: 'games'
+								})}?game={game.family}&variant_page={totalPages - 1}"
+							>
+								{t('admin.variants.last')}
+							</a>
+						</nav>
+					{/if}
+				{/if}
 
 				{#if variantDrawerFailed}<p role="alert">{t('v1.admin.error')}</p>{/if}
 				<dialog
@@ -465,7 +616,7 @@
 										</tr>
 									</thead>
 									<tbody>
-										{#each inspectedVariant.rows as row (`${row.rules_group}:${row.score_config_version}`)}
+										{#each pagedDrawerRows as row (`${row.rules_group}:${row.score_config_version}`)}
 											<tr>
 												<td>{row.rules_group}</td>
 												<td>{row.score_config_version}</td>
@@ -482,6 +633,53 @@
 									</tbody>
 								</table>
 							</div>
+							{#if (inspectedVariant.rows ?? []).length > 0}
+								<nav class="pagination" aria-label={t('admin.variants.detailHistoryNav')}>
+									<span>
+										{t('admin.variants.historyStatus', {
+											current: drawerHistoryPage + 1,
+											total: totalDrawerHistoryPages,
+											count: inspectedVariant.rows.length
+										})}
+									</span>
+									<button
+										type="button"
+										class="btn"
+										disabled={drawerHistoryPage === 0}
+										onclick={() => (drawerHistoryPage = 0)}
+									>
+										{t('admin.variants.first')}
+									</button>
+									<button
+										type="button"
+										class="btn"
+										disabled={drawerHistoryPage === 0}
+										onclick={() => (drawerHistoryPage = Math.max(0, drawerHistoryPage - 1))}
+									>
+										{t('admin.variants.previous')}
+									</button>
+									<button
+										type="button"
+										class="btn"
+										disabled={drawerHistoryPage >= totalDrawerHistoryPages - 1}
+										onclick={() =>
+											(drawerHistoryPage = Math.min(
+												totalDrawerHistoryPages - 1,
+												drawerHistoryPage + 1
+											))}
+									>
+										{t('admin.variants.next')}
+									</button>
+									<button
+										type="button"
+										class="btn"
+										disabled={drawerHistoryPage >= totalDrawerHistoryPages - 1}
+										onclick={() => (drawerHistoryPage = totalDrawerHistoryPages - 1)}
+									>
+										{t('admin.variants.last')}
+									</button>
+								</nav>
+							{/if}
 							{#if inspectedVariant.more}
 								<p>{t('v1.admin.games.limited')}</p>
 							{/if}
@@ -862,6 +1060,33 @@
 	:focus-visible {
 		outline: 3px solid var(--focus);
 		outline-offset: 3px;
+	}
+	.pagination {
+		display: flex;
+		flex-wrap: wrap;
+		gap: 8px;
+		align-items: center;
+		margin: 18px 0;
+	}
+	.pagination span {
+		font-size: 13px;
+		color: var(--muted);
+		margin-right: auto;
+	}
+	.pagination .btn {
+		text-decoration: none;
+	}
+	.pagination .btn.disabled,
+	.pagination button:disabled {
+		opacity: 0.5;
+		pointer-events: none;
+		cursor: default;
+	}
+	.empty-variants {
+		padding: 22px;
+		background: var(--surface-2);
+		border-radius: 8px;
+		margin: 14px 0;
 	}
 	@media (max-width: 900px) {
 		.metric-grid {

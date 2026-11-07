@@ -1,5 +1,34 @@
 # DECISIONS.md
 
+## 2026-11-07 — v1.3.5.2 local acceptance and source-only GitHub handoff
+
+- Owner instruction: “update the git repo and push to github”. This accepts
+  the implemented .2 bounded Games queries, pagination, and lazy scoring version
+  hydration locally and authorizes this source-only commit/push to existing
+  `origin/main`, superseding earlier .2 pending-review and commit/push limits
+  for this handoff only.
+- Scoped Prettier, ESLint, Vitest (9/9), Vitest Slice 3 (8/8), and Playwright
+  Chromium suites at all three viewports remain the verification evidence.
+  All C1–C10 constraints and full-verification deferral preserved. Unauditioned
+  audio and unrelated local editor/MCP and palette timing changes remain local.
+  No .3, future commit/push, or deployment authorized.
+
+## 2026-11-07 — v1.3.5.2 visual acceptance and local implementation
+
+- Owner instruction: “mark the visual progress accepted and start the implementation while using the pony tail plugin for focused esditing”. Visual progress on `static/demo/v1.3.5.2-games.html` is accepted across 390×844, 844×390, and 1280×800.
+- Bounded Games queries, deterministic pagination (`variant_page`, 10 rows/page), lazy scoring version hydration, and grouped query optimization implemented under Ponytail minimalist guidelines (see [work record](work/V1.3.5.2_WORK.md)). All scoped checks pass; awaiting owner functional acceptance. No .3, commit, push, or deployment authorized.
+
+## 2026-11-07 — v1.3.5.2 brief acceptance and visual gate
+
+- Owner instruction: “accepted use ponytail plugin guidence to start implemention”.
+  The [bounded Games brief](briefs/v1.3.5.2-bounded-games-brief.md) is accepted
+  and local .2 work is selected. This does not resolve its page-size/detail
+  navigation choices or authorize a commit, push, deployment or .3.
+- The [fixture-only Games preview](../static/demo/v1.3.5.2-games.html) awaits
+  owner visual approval at 390×844, 844×390 and 1280×800 before app UI
+  integration. No app change, preview check, functional acceptance or full
+  verification is claimed; .1 acceptance/evidence remains separate.
+
 ## 2026-11-07 — v1.3.5.1 local acceptance and source-only GitHub handoff
 
 - Owner instruction: “ok mark this accepted and push to github”. This accepts
@@ -1278,7 +1307,6 @@ the palette stage changed timing fields only. Keep final evidence under
 - No-preview has a face-down arrival and zero game-opening allowance; the existing separately issued Card allowance remains. Trios caps at 18 flips/group, keeps its board and Home recovery, and emits no completion at an unfinished cap. Moving continues the same seeded stream and pins revealed/matched positions.
 - Test play is inline on the existing protected/noindex admin games page. The component uses generic family metadata; only Memory is allowed in v1.3. No player persistence/statistics APIs are called.
 - No dependency upgrades; TypeScript remains `~6.0.3` (installed 6.0.3). Existing D1 batch/conditional-write patterns retained; current Cloudflare D1 batch and local Wrangler migration documentation checked. See `docs/work/V1.3_WORK.md` for evidence and local scoring-test version effects.
-
 
 ## 2026-11-06 — v1.3.4 Slice 0 Games admin/query boundaries
 

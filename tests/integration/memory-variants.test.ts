@@ -30,6 +30,7 @@ import {
 	saveRun,
 	startRanked
 } from '../../src/lib/server/runs.js';
+import { loadGamesAdmin } from '../../src/lib/server/games-admin.js';
 import { abandonRanked, resumableRanked } from '../../src/lib/server/ranked-session.js';
 import {
 	listScoreVersions,
@@ -603,7 +604,7 @@ it('caches reconciled overview totals, includes families without variants, and i
 	expect(statements).toBe(5);
 	statements = 0;
 	await gameStatistics(countedDb, 'connect', selected[0]);
-	expect(statements).toBe(6);
+	expect(statements).toBe(1); // Bounded in v1.3.5.2: 1 grouped family query replaces per-variant fan-out
 	expect(first.games.find((game) => game.family === 'connect')).toMatchObject({
 		played: 1,
 		open: 1,
@@ -738,4 +739,103 @@ it('requires disable reasons, ignores supplied enable reasons, and audits missin
 			)
 			.first()
 	).toEqual({ reason: 'Resumed by operator (no reason entered)' });
+});
+
+it('bounds Games queries, pages variants deterministically, and isolates scoring versions at synthetic 100-variant scale', async () => {
+	const db = proxy.env.DB;
+	let statements = 0;
+	const countedDb = {
+		prepare: (sql: string) => {
+			statements++;
+			return db.prepare(sql);
+		}
+	} as D1Database;
+
+	// 1. Single grouped family query replaces per-variant fan-out.
+	const summary = (await gameOverview(db, 'memory'))[0];
+	statements = 0;
+	const stats = await gameStatistics(countedDb, 'memory', summary);
+	expect(statements).toBe(1); // exactly 1 grouped query, never 1 + N
+	expect(stats.variants).toHaveLength(4);
+	for (const v of stats.variants) {
+		expect(Array.isArray(v.rows)).toBe(true);
+		expect(typeof v.more).toBe('boolean');
+	}
+
+	// 2. loadGamesAdmin bounding and deterministic pagination for actual catalog.
+	const adminPage0 = await loadGamesAdmin(db, undefined, 'memory', 0, 10);
+	expect(adminPage0.gameStats.totalVariants).toBe(4);
+	expect(adminPage0.gameStats.totalVariantPages).toBe(1);
+	expect(adminPage0.gameStats.variantPage).toBe(0);
+	expect(adminPage0.gameStats.variantPageSize).toBe(10);
+	expect(adminPage0.gameStats.variants).toHaveLength(4);
+	expect(adminPage0.gameStats.variants.map((v) => v.id)).toEqual([
+		'memory:classic',
+		'memory:no-preview',
+		'memory:trios',
+		'memory:moving'
+	]);
+
+	// 3. Out-of-bounds page returns safe empty array with page index preserved.
+	const adminPage99 = await loadGamesAdmin(db, undefined, 'memory', 99, 10);
+	expect(adminPage99.gameStats.totalVariants).toBe(4);
+	expect(adminPage99.gameStats.totalVariantPages).toBe(1);
+	expect(adminPage99.gameStats.variantPage).toBe(99);
+	expect(adminPage99.gameStats.variants).toHaveLength(0);
+
+	// 4. Synthetic 100-variant pagination test with page size 10.
+	const syntheticStats = {
+		...stats,
+		variants: Array.from({ length: 100 }, (_, i) => ({
+			id: `synthetic-variant-${String(i).padStart(3, '0')}`,
+			state: i === 99 ? ('disabled' as const) : ('enabled' as const),
+			shown: i * 2,
+			ignored: 0,
+			played: i * 2,
+			abandoned: 0,
+			finished: i,
+			open: i,
+			imported: 0,
+			totalCompleted: i,
+			ranked: Math.floor(i / 2),
+			rows: [],
+			more: false
+		}))
+	};
+	const totalVariants = syntheticStats.variants.length;
+	const pageSize = 10;
+	const totalVariantPages = Math.ceil(totalVariants / pageSize);
+	expect(totalVariantPages).toBe(10);
+
+	// Page 0 boundary: items 0..9
+	const p0 = syntheticStats.variants.slice(0, 10);
+	expect(p0).toHaveLength(10);
+	expect(p0[0].id).toBe('synthetic-variant-000');
+	expect(p0[9].id).toBe('synthetic-variant-009');
+
+	// Page 5 boundary: items 50..59
+	const p5 = syntheticStats.variants.slice(5 * pageSize, 6 * pageSize);
+	expect(p5).toHaveLength(10);
+	expect(p5[0].id).toBe('synthetic-variant-050');
+	expect(p5[9].id).toBe('synthetic-variant-059');
+
+	// Page 9 boundary: items 90..99
+	const p9 = syntheticStats.variants.slice(9 * pageSize, 10 * pageSize);
+	expect(p9).toHaveLength(10);
+	expect(p9[0].id).toBe('synthetic-variant-090');
+	expect(p9[9].id).toBe('synthetic-variant-099');
+	expect(p9[9].state).toBe('disabled');
+
+	// Out of bounds page 10: empty
+	const p10 = syntheticStats.variants.slice(10 * pageSize, 11 * pageSize);
+	expect(p10).toHaveLength(0);
+
+	// Exact total preservation: sum of paged variants matches overall
+	const allPaged = Array.from({ length: totalVariantPages }, (_, page) =>
+		syntheticStats.variants.slice(page * pageSize, (page + 1) * pageSize)
+	).flat();
+	expect(allPaged).toEqual(syntheticStats.variants);
+	expect(allPaged.reduce((sum, v) => sum + v.played, 0)).toBe(
+		syntheticStats.variants.reduce((sum, v) => sum + v.played, 0)
+	);
 });

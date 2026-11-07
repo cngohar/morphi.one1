@@ -1,6 +1,20 @@
 # Morphi: Simple Plan
 
-## Current local status — v1.3.5.1 Games extraction accepted (2026-11-07)
+## Current local status — v1.3.5.2 accepted locally, source-only GitHub handoff authorized (2026-11-07)
+
+The owner said “update the git repo and push to github”, accepting the completed
+[v1.3.5.2 bounded loading and pagination](docs/briefs/v1.3.5.2-bounded-games-brief.md) locally
+and authorizing this source-only commit/push to existing `origin/main`. This closes
+the implementation-review gate and supersedes earlier .2 push restrictions only
+for this handoff. Existing scoped format/lint, Vitest (9/9), Vitest Slice 3 (8/8),
+and Playwright Chromium suites at all three sizes remain the evidence; no new
+tests or device/browser details were supplied. All roadmap C1–C10 limits apply.
+Full verify stays deferred, not passed or waived. Preserve unauditioned audio and
+unrelated local editor/MCP settings and palette timing changes outside the handoff.
+No .3 selection, future push, deployment, or production change is authorized.
+Execution/evidence: [work record](docs/work/V1.3.5.2_WORK.md).
+
+## Earlier local status — v1.3.5.1 Games extraction accepted (2026-11-07)
 
 The owner said “ok mark this accepted and push to github”, accepting the completed
 [v1.3.5.1 extraction](docs/briefs/v1.3.5.1-games-extraction-brief.md) locally and

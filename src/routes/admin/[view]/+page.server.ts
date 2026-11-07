@@ -161,10 +161,16 @@ export const load: PageServerLoad = async (event) => {
 			else usersOverview = await userOverview(env.DB, actor);
 		}
 		if (event.params.view === 'games') {
+			const variantPageParam = event.url.searchParams.get('variant_page');
+			const variantPage =
+				variantPageParam !== null && Number.isSafeInteger(Number(variantPageParam))
+					? Math.max(0, Number(variantPageParam))
+					: 0;
 			({ games, gamesOverview, gameStats } = await loadGamesAdmin(
 				env.DB,
 				env.CONFIG_CACHE,
-				selectedGame
+				selectedGame,
+				variantPage
 			));
 		}
 		if (event.params.view === 'scoring' || selectedGame)
@@ -197,7 +203,10 @@ export const load: PageServerLoad = async (event) => {
 									],
 							...config,
 							liveVersion,
-							versions: await listScoreVersions(env.DB, family, variant)
+							versions:
+								subview === 'scoring' || event.params.view === 'scoring'
+									? await listScoreVersions(env.DB, family, variant)
+									: []
 						};
 					})
 				)

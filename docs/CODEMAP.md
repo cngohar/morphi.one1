@@ -1,5 +1,16 @@
 # CODEMAP.md
 
+- **v1.3.5.2 bounded loading accepted locally (2026-11-07):** Owner said
+  “update the git repo and push to github”, accepting completed .2 bounded
+  Games queries, pagination, and lazy scoring version hydration and authorizing
+  this source-only commit/push to existing `origin/main`.
+  [bounded Games brief](briefs/v1.3.5.2-bounded-games-brief.md) and
+  [work record](work/V1.3.5.2_WORK.md) map changes across `server/{games,games-admin}.ts`,
+  `routes/admin/[view]/+page.server.ts`, `components/GamesAdmin.svelte`,
+  and `tests/integration/memory-variants.test.ts`. Scoped Prettier, ESLint,
+  Vitest, and Playwright Chromium checks pass. No .3, future commit/push,
+  or deployment is authorized.
+
 - **v1.3.5.1 Games extraction accepted locally (2026-11-07):** Owner said “ok
   mark this accepted and push to github”, accepting the completed .1 and
   authorizing this source-only commit/push to existing `origin/main`.
@@ -45,7 +56,6 @@
   remains separate. Eight focused D1 tests and six unique Chromium cases pass
   across retained runs; a separate broader Support timeout is recorded.
   Full verify remains deferred; no deployment or next feature is authorized.
-
 
 - **Mahjong variant research (2026-11-05):** `docs/references/puzzle-variants/Mahjong Solitaire Variants.html` follows the existing Memory research format, with 28 sourced examples across 18 variation dimensions, 21 linked sources, filters/comparison, a tile-freedom diagram and a configuration estimator. Direct Chromium review and screenshots: `docs/evidence/v1.3.4/research/`. Reference only; no expansion of v1.3.4 implementation scope.
 
