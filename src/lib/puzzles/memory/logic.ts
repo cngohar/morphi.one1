@@ -23,6 +23,10 @@ export interface MemoryCard {
 	isQuantum?: boolean;
 	isFirewall?: boolean;
 	tlsStage?: 'syn' | 'ack';
+	kvSyncing?: boolean;
+	vectorCluster?: 'ai' | 'db' | 'sec' | 'net';
+	clearanceTier?: 1 | 2 | 3;
+	isGlaciated?: boolean;
 }
 
 export const MEMORY_VARIANTS = [
@@ -65,7 +69,17 @@ export const MEMORY_VARIANTS = [
 	'memory:tls-handshake',
 	'memory:trace-route',
 	'memory:bit-rot',
-	'memory:burst-transmission'
+	'memory:burst-transmission',
+	'memory:kv-consistency',
+	'memory:durable-object',
+	'memory:vectorize-knn',
+	'memory:fifo-queue',
+	'memory:ai-tokens',
+	'memory:hyperdrive-pool',
+	'memory:turnstile-verify',
+	'memory:zero-trust',
+	'memory:argo-reroute',
+	'memory:r2-glacier'
 ] as const;
 export type MemoryVariant = (typeof MEMORY_VARIANTS)[number];
 
@@ -154,6 +168,24 @@ export interface MemoryRound {
 	/** Burst transmission only: consecutive streak and pinged card indices. */
 	burstStreak?: number;
 	burstPing?: number[];
+	/** KV consistency only: replica synchronization tracker. */
+	kvReplicas?: Record<number, boolean>;
+	/** Durable object only: active actor row coordinator mutex lock. */
+	lockedActorRow?: number | null;
+	/** FIFO queue only: dead-letter holding queue. */
+	dlqQueue?: number[];
+	/** Workers AI only: context window inference token budget. */
+	aiTokens?: number;
+	/** Hyperdrive only: connection pool score multiplier. */
+	hyperdriveMultiplier?: number;
+	/** Turnstile only: active human verification challenge flag. */
+	turnstileActive?: boolean;
+	/** Zero trust only: current unlocked clearance tier (1, 2, or 3). */
+	clearanceTier?: 1 | 2 | 3;
+	/** Argo route only: per-quadrant attempt counter for congestion bypass. */
+	quadrantHits?: Record<number, number>;
+	/** R2 glacier only: consecutive untouched turn counter per card. */
+	glacierUntouched?: Record<number, number>;
 	/** Group count: pairs (6/8/10), trios (6/8/10) or quads (4/5/6). */
 	pairs: number;
 	cards: MemoryCard[];
@@ -183,7 +215,8 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		selectedVariant === 'memory:gravitino-risk' ||
 		selectedVariant === 'memory:atlas-terminal' ||
 		selectedVariant === 'memory:anycast-route' ||
-		selectedVariant === 'memory:bit-rot'
+		selectedVariant === 'memory:bit-rot' ||
+		selectedVariant === 'memory:argo-reroute'
 	) {
 		const nextU64 = rng.nextU64;
 		rng.nextU64 = () => {
@@ -269,12 +302,64 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		const mid = Math.floor(deck.length / 2);
 		if (deck[mid - 1]) deck[mid - 1].isFirewall = true;
 		if (deck[mid]) deck[mid].isFirewall = true;
+	} else if (selectedVariant === 'memory:vectorize-knn') {
+		const clusters: ('ai' | 'db' | 'sec' | 'net')[] = ['ai', 'db', 'sec', 'net'];
+		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
+			const cluster = clusters[sIdx % clusters.length];
+			for (const c of deck) {
+				if (c.symbol === selected[sIdx].id) c.vectorCluster = cluster;
+			}
+		}
+	} else if (selectedVariant === 'memory:zero-trust') {
+		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
+			const tier = (sIdx < 2 ? 1 : sIdx < 5 ? 2 : 3) as 1 | 2 | 3;
+			for (const c of deck) {
+				if (c.symbol === selected[sIdx].id) c.clearanceTier = tier;
+			}
+		}
+	}
+
+	const roundCards = shuffle(rng, deck);
+	if (selectedVariant === 'memory:durable-object') {
+		const cols = 4;
+		let changed = true;
+		let attempts = 0;
+		while (changed && attempts < 50) {
+			changed = false;
+			attempts += 1;
+			for (let i = 0; i < roundCards.length; i++) {
+				for (let j = i + 1; j < roundCards.length; j++) {
+					if (
+						roundCards[i].symbol === roundCards[j].symbol &&
+						Math.floor(i / cols) === Math.floor(j / cols)
+					) {
+						for (let k = 0; k < roundCards.length; k++) {
+							const rowK = Math.floor(k / cols);
+							const rowJ = Math.floor(j / cols);
+							if (rowK !== rowJ) {
+								const partnerK = roundCards.findIndex(
+									(c, idx) => idx !== k && c.symbol === roundCards[k].symbol
+								);
+								const rowPartnerK = Math.floor(partnerK / cols);
+								if (rowPartnerK !== rowJ && rowK !== Math.floor(i / cols)) {
+									const tmp = roundCards[j];
+									roundCards[j] = roundCards[k];
+									roundCards[k] = tmp;
+									changed = true;
+									break;
+								}
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	const round: MemoryRound = {
 		seed,
 		pairs,
-		cards: shuffle(rng, deck),
+		cards: roundCards,
 		revealed: [],
 		matched: [],
 		mismatches: 0,
@@ -290,7 +375,8 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		selectedVariant === 'memory:gravitino-risk' ||
 		selectedVariant === 'memory:atlas-terminal' ||
 		selectedVariant === 'memory:anycast-route' ||
-		selectedVariant === 'memory:bit-rot'
+		selectedVariant === 'memory:bit-rot' ||
+		selectedVariant === 'memory:argo-reroute'
 	)
 		round.rngDraws = rngDraws;
 	if (selectedVariant === 'memory:lockout') round.lock = null;
@@ -323,6 +409,15 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		round.burstStreak = 0;
 		round.burstPing = [];
 	}
+	if (selectedVariant === 'memory:kv-consistency') round.kvReplicas = {};
+	if (selectedVariant === 'memory:durable-object') round.lockedActorRow = null;
+	if (selectedVariant === 'memory:fifo-queue') round.dlqQueue = [];
+	if (selectedVariant === 'memory:ai-tokens') round.aiTokens = 120;
+	if (selectedVariant === 'memory:hyperdrive-pool') round.hyperdriveMultiplier = 2;
+	if (selectedVariant === 'memory:turnstile-verify') round.turnstileActive = false;
+	if (selectedVariant === 'memory:zero-trust') round.clearanceTier = 1;
+	if (selectedVariant === 'memory:argo-reroute') round.quadrantHits = { 0: 0, 1: 0, 2: 0, 3: 0 };
+	if (selectedVariant === 'memory:r2-glacier') round.glacierUntouched = {};
 	return round;
 }
 
@@ -449,6 +544,37 @@ function shiftPerimeterClockwise(round: MemoryRound): MemoryRound {
 	return { ...round, cards };
 }
 
+function shiftQuadrantArgo(round: MemoryRound, qIdx: number): MemoryRound {
+	const cols = 4;
+	const oppositeQ = (qIdx + 2) % 4;
+	const qCardIndices = round.cards
+		.map((_, i) => i)
+		.filter((i) => {
+			const r = Math.floor(i / cols);
+			const c = i % cols;
+			const q = (r < 2 ? 0 : 2) + (c < 2 ? 0 : 1);
+			return q === qIdx && !isFaceUp(round, i);
+		});
+	const oppCardIndices = round.cards
+		.map((_, i) => i)
+		.filter((i) => {
+			const r = Math.floor(i / cols);
+			const c = i % cols;
+			const q = (r < 2 ? 0 : 2) + (c < 2 ? 0 : 1);
+			return q === oppositeQ && !isFaceUp(round, i);
+		});
+	if (qCardIndices.length > 0 && oppCardIndices.length > 0) {
+		const cards = round.cards.slice();
+		const i1 = qCardIndices[0];
+		const i2 = oppCardIndices[0];
+		const tmp = cards[i1];
+		cards[i1] = cards[i2];
+		cards[i2] = tmp;
+		return { ...round, cards };
+	}
+	return round;
+}
+
 export function flipCard(round: MemoryRound, index: number): FlipResult {
 	const matchSize = cardsPerMatch(round);
 	if (round.status !== 'playing' || round.revealed.length >= matchSize || memoryCapReached(round)) {
@@ -481,6 +607,20 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	if (variant === 'memory:trace-route' && round.quarantine?.includes(index)) {
 		return { round, effect: 'ignored' };
 	}
+	if (
+		variant === 'memory:zero-trust' &&
+		(round.cards[index]?.clearanceTier ?? 1) > (round.clearanceTier ?? 1)
+	) {
+		return { round, effect: 'ignored' };
+	}
+	if (
+		variant === 'memory:durable-object' &&
+		round.lockedActorRow !== null &&
+		round.lockedActorRow !== undefined &&
+		row === round.lockedActorRow
+	) {
+		return { round, effect: 'ignored' };
+	}
 
 	const card = round.cards[index];
 	if (!card) {
@@ -490,6 +630,22 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	let lifeSupport = round.lifeSupport;
 	if (variant === 'memory:life-support') {
 		lifeSupport = Math.max(0, (round.lifeSupport ?? 100) - 3);
+	}
+
+	let aiTokens = round.aiTokens;
+	if (variant === 'memory:ai-tokens') {
+		aiTokens = Math.max(0, (round.aiTokens ?? 120) - 4);
+		if (aiTokens <= 0) {
+			return {
+				round: {
+					...round,
+					aiTokens: 0,
+					moves: round.moves + 1,
+					status: 'lost'
+				},
+				effect: 'ignored'
+			};
+		}
 	}
 
 	let illuminated: number[] | undefined;
@@ -602,11 +758,17 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 			: round;
 
 	if (revealed.length < matchSize) {
+		let lockedActorRow = round.lockedActorRow;
+		if (variant === 'memory:durable-object') {
+			lockedActorRow = row;
+		}
 		return {
 			round: {
 				...base,
 				revealed,
 				...(lifeSupport !== undefined ? { lifeSupport } : {}),
+				...(aiTokens !== undefined ? { aiTokens } : {}),
+				...(lockedActorRow !== undefined ? { lockedActorRow } : {}),
 				...(illuminated ? { illuminated } : {})
 			},
 			effect: 'flip'
@@ -623,7 +785,9 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 			? true
 			: variant === 'memory:zebra'
 				? card.symbol === first.symbol && card.zebra !== first.zebra
-				: revealed.every((position) => round.cards[position]?.symbol === first.symbol);
+				: variant === 'memory:vectorize-knn'
+					? card.vectorCluster !== undefined && card.vectorCluster === first.vectorCluster
+					: revealed.every((position) => round.cards[position]?.symbol === first.symbol);
 
 	if (variant === 'memory:glyph-chain' && isMatch) {
 		if (first.tier !== (round.glyphTier ?? 1)) {
@@ -634,6 +798,13 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	if (variant === 'memory:tls-handshake' && isMatch) {
 		const stages = revealed.map((pos) => round.cards[pos].tlsStage);
 		if (!stages.includes('syn') || !stages.includes('ack')) {
+			isMatch = false;
+		}
+	}
+
+	if (variant === 'memory:durable-object' && isMatch) {
+		const rows = revealed.map((pos) => Math.floor(pos / cols));
+		if (new Set(rows).size < revealed.length) {
 			isMatch = false;
 		}
 	}
@@ -660,6 +831,26 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		if (variant === 'memory:life-support') {
 			lifeSupport = Math.min(100, (lifeSupport ?? 100) + 12);
 		}
+
+		if (variant === 'memory:ai-tokens') {
+			aiTokens = Math.min(140, (aiTokens ?? 120) + 12);
+		}
+
+		let clearanceTier = round.clearanceTier;
+		if (variant === 'memory:zero-trust') {
+			const activeT = round.clearanceTier ?? 1;
+			const allTierMatched = cards.every(
+				(c, idx) => (c.clearanceTier ?? 1) !== activeT || matched.includes(idx)
+			);
+			if (allTierMatched && activeT < 3) {
+				clearanceTier = (activeT + 1) as 1 | 2 | 3;
+			}
+		}
+
+		const hyperdriveMultiplier =
+			variant === 'memory:hyperdrive-pool'
+				? Math.min(3, (round.hyperdriveMultiplier ?? 2) + 1)
+				: round.hyperdriveMultiplier;
 
 		if (variant === 'memory:hyperdrive-warp' && (card.isAnomaly || first.isAnomaly)) {
 			cards = warpAnomalyCards({ ...round, cards, matched }).cards;
@@ -728,6 +919,10 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				...(sentinelHeat !== undefined ? { sentinelHeat } : {}),
 				...(pulseStreak !== undefined ? { pulseStreak } : {}),
 				...(lifeSupport !== undefined ? { lifeSupport } : {}),
+				...(aiTokens !== undefined ? { aiTokens } : {}),
+				...(clearanceTier !== undefined ? { clearanceTier } : {}),
+				...(hyperdriveMultiplier !== undefined ? { hyperdriveMultiplier } : {}),
+				...(variant === 'memory:durable-object' ? { lockedActorRow: null } : {}),
 				...(traceMeter !== undefined ? { traceMeter } : {}),
 				...(burstStreak !== undefined ? { burstStreak } : {}),
 				...(burstPing ? { burstPing } : {})
@@ -743,6 +938,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		moves,
 		...(variant === 'memory:combo' ? { combo: 1 } : {}),
 		...(variant === 'memory:pulse-drive' ? { pulseStreak: 1 } : {}),
+		...(variant === 'memory:hyperdrive-pool' ? { hyperdriveMultiplier: 1 } : {}),
 		...(lifeSupport !== undefined ? { lifeSupport } : {}),
 		...(illuminated ? { illuminated } : {})
 	};
@@ -804,6 +1000,33 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		mismatched.burstPing = [];
 	}
 
+	if (variant === 'memory:ai-tokens') {
+		const tokens = Math.max(0, (aiTokens ?? 120) - 8);
+		mismatched.aiTokens = tokens;
+		if (tokens <= 0) {
+			mismatched.aiTokens = 0;
+			mismatched.status = 'lost';
+		}
+	}
+
+	if (variant === 'memory:fifo-queue') {
+		mismatched.dlqQueue = [...(round.dlqQueue ?? []), index];
+	}
+
+	if (variant === 'memory:turnstile-verify') {
+		if ((round.mismatches + 1) % 4 === 0) {
+			mismatched.turnstileActive = true;
+		}
+	}
+
+	if (variant === 'memory:kv-consistency') {
+		const replicas: Record<number, boolean> = { ...(round.kvReplicas ?? {}) };
+		for (const pos of revealed) {
+			replicas[pos] = true;
+		}
+		mismatched.kvReplicas = replicas;
+	}
+
 	// Lock the last card only while two other unmatched cards keep a legal attempt open.
 	if (variant === 'memory:lockout')
 		mismatched.lock =
@@ -841,6 +1064,31 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 			}
 		}
 		finalRound = { ...finalRound, cards, bitRot: rot };
+	} else if (variant === 'memory:argo-reroute') {
+		const q = (Math.floor(index / cols) < 2 ? 0 : 2) + (index % cols < 2 ? 0 : 1);
+		const hits = { ...(round.quadrantHits ?? { 0: 0, 1: 0, 2: 0, 3: 0 }) };
+		hits[q] = (hits[q] ?? 0) + 1;
+		if (hits[q] >= 3) {
+			hits[q] = 0;
+			finalRound = shiftQuadrantArgo(finalRound, q);
+		}
+		finalRound = { ...finalRound, quadrantHits: hits };
+	} else if (variant === 'memory:r2-glacier') {
+		const untouched: Record<number, number> = { ...(round.glacierUntouched ?? {}) };
+		finalRound.cards.forEach((_, i) => {
+			if (!finalRound.matched.includes(i) && !revealed.includes(i)) {
+				untouched[i] = (untouched[i] ?? 0) + 1;
+			} else {
+				untouched[i] = 0;
+			}
+		});
+		const cards = finalRound.cards.map((c, i) => {
+			if ((untouched[i] ?? 0) >= 4) {
+				return { ...c, isGlaciated: true };
+			}
+			return c;
+		});
+		finalRound = { ...finalRound, cards, glacierUntouched: untouched };
 	}
 
 	return {
@@ -859,7 +1107,9 @@ export function resolveMismatch(round: MemoryRound): MemoryRound {
 		revealed: [],
 		...(round.illuminated?.length ? { illuminated: [] } : {}),
 		...(round.burstPing?.length ? { burstPing: [] } : {}),
-		...(round.quarantine?.length ? { quarantine: [] } : {})
+		...(round.quarantine?.length ? { quarantine: [] } : {}),
+		...(round.lockedActorRow !== undefined ? { lockedActorRow: null } : {}),
+		...(round.turnstileActive !== undefined ? { turnstileActive: false } : {})
 	};
 	if (round.edgeCache) {
 		const nextCache: Record<number, { symbol: SymbolId; turns: number }> = {};

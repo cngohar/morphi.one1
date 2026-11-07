@@ -1,0 +1,1082 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Morphi v1.3.5.11 — Batch D 10 Distributed Cloud & Edge Architecture Ruleset Variants (Fixture Preview with anime.js)</title>
+<style>
+:root {
+	font: 600 14px/1.4 'Nunito Variable', 'Nunito', system-ui, sans-serif;
+	color: #1b2433;
+	background: #eef2f7;
+	--board: #dfe9f5;
+	--edge: #8fa9c8;
+	--back: #a8bfde;
+	--focus: #f38020;
+	--cf-orange: #f38020;
+	--cf-dark: #1b2433;
+	--accent: #2563eb;
+	--kv: #f97316;
+	--durable: #8b5cf6;
+	--vector: #06b6d4;
+	--queue: #10b981;
+	--ai: #ec4899;
+	--hyper: #eab308;
+	--turnstile: #3b82f6;
+	--zerotrust: #ef4444;
+	--argo: #14b8a6;
+	--r2: #6366f1;
+}
+* { box-sizing: border-box; }
+body {
+	margin: 0;
+	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	background: #eef2f7;
+	color: #1b2433;
+	overflow-x: hidden;
+}
+button {
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+	border: 1px solid #c9d6e4;
+	border-radius: 8px;
+	background: #fff;
+	padding: 6px 12px;
+	transition: background-color 0.15s, border-color 0.15s;
+}
+button:hover { background: #f1f5f9; }
+button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.review-banner {
+	padding: 8px 14px;
+	background: #fff;
+	border-bottom: 1px solid #c9d6e4;
+	font-size: 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.review-banner strong { color: #ea580c; }
+.badge {
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	background: #e2e8f0;
+	color: #475569;
+	font-weight: 700;
+}
+.badge-motion {
+	background: #fef3c7;
+	color: #b45309;
+	border: 1px solid #fde68a;
+}
+
+.tabs-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 6px 14px;
+	background: #f8fafc;
+	border-bottom: 1px solid #c9d6e4;
+}
+.tabs-bar button {
+	font-size: 12px;
+	white-space: nowrap;
+	padding: 5px 9px;
+	background: #fff;
+	color: #334155;
+	border-color: #cbd5e1;
+}
+.tabs-bar button[aria-current="page"] {
+	background: #1b2433;
+	color: #fff;
+	font-weight: 800;
+	border-color: #1b2433;
+}
+
+.container {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 340px;
+	flex: 1;
+	min-height: 0;
+	background: var(--board);
+}
+@media (max-width: 900px) {
+	.container {
+		grid-template-columns: 1fr;
+		grid-template-rows: minmax(360px, 1fr) auto;
+	}
+}
+
+.stage-pane {
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 0;
+	position: relative;
+}
+
+.hud {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 14px;
+	flex-wrap: wrap;
+	font-size: 13px;
+	font-weight: 800;
+	background: #ffffffea;
+	padding: 6px 16px;
+	border-radius: 20px;
+	border: 1px solid #c9d6e4;
+	min-height: 36px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.board-container {
+	flex: 1;
+	display: grid;
+	place-items: center;
+	width: 100%;
+	min-height: 0;
+}
+.board {
+	display: grid;
+	gap: 6px;
+	justify-content: center;
+	align-content: center;
+	position: relative;
+}
+
+.card {
+	width: var(--size, 64px);
+	height: var(--size, 64px);
+	background: var(--back);
+	border: 2px solid var(--edge);
+	border-radius: 10px;
+	display: grid;
+	place-items: center;
+	position: relative;
+	user-select: none;
+	transform-origin: center;
+	transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.card.flipped {
+	background: #fff;
+	border-color: #f97316;
+	box-shadow: 0 4px 10px rgba(249, 115, 22, 0.25);
+}
+.card.matched {
+	background: #f1f5f9;
+	border-color: #cbd5e1;
+	opacity: 0.25;
+	pointer-events: none;
+}
+.card.locked {
+	background: #fee2e2;
+	border-color: #ef4444;
+	opacity: 0.6;
+	pointer-events: none;
+}
+.card.shielded {
+	background: #fef2f2;
+	border-color: #ef4444;
+	box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.35);
+	cursor: not-allowed;
+}
+.card.glaciated {
+	background: #e0f2fe;
+	border-color: #38bdf8;
+	box-shadow: inset 0 0 12px rgba(56, 189, 248, 0.5);
+}
+.card.actor-locked {
+	border-color: var(--durable);
+	background: #f5f3ff;
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+.card.syncing {
+	border-color: #f97316;
+	animation: pulseSync 0.6s infinite alternate;
+}
+@keyframes pulseSync {
+	from { box-shadow: 0 0 4px rgba(249, 115, 22, 0.4); }
+	to { box-shadow: 0 0 12px rgba(249, 115, 22, 0.8); }
+}
+
+.card-icon {
+	font-size: calc(var(--size, 64px) * 0.44);
+	line-height: 1;
+}
+
+.status-pill {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	font-size: 9px;
+	font-weight: 800;
+	padding: 1px 4px;
+	border-radius: 4px;
+	color: #fff;
+	z-index: 2;
+}
+.pill-sync { background: var(--kv); color: #fff; }
+.pill-do { background: var(--durable); color: #fff; }
+.pill-vec { background: var(--vector); color: #000; }
+.pill-tier { background: var(--zerotrust); color: #fff; }
+.pill-glacier { background: #0284c7; color: #fff; }
+
+.dlq-shelf {
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	background: #fef2f2;
+	border: 1px dashed #ef4444;
+	border-radius: 8px;
+	padding: 4px 12px;
+	font-size: 12px;
+	color: #991b1b;
+}
+
+.details-pane {
+	background: #fff;
+	border-left: 1px solid #c9d6e4;
+	padding: 16px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.details-pane h2 {
+	margin: 0;
+	font-size: 17px;
+	color: #0f172a;
+}
+.details-pane p {
+	margin: 0;
+	font-size: 13px;
+	color: #475569;
+	line-height: 1.5;
+}
+.rule-box {
+	background: #fff7ed;
+	border-left: 3px solid #f97316;
+	padding: 10px 12px;
+	border-radius: 0 6px 6px 0;
+	font-size: 13px;
+	color: #9a3412;
+	line-height: 1.45;
+}
+.meta-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+}
+.meta-table th, .meta-table td {
+	padding: 6px 8px;
+	border-bottom: 1px solid #f1f5f9;
+	text-align: left;
+}
+.meta-table th {
+	color: #64748b;
+	width: 38%;
+	font-weight: 700;
+}
+.meta-table td {
+	color: #1e293b;
+	font-weight: 600;
+}
+
+/* Modal Overlay for Turnstile Challenge */
+.modal-overlay {
+	position: absolute;
+	inset: 0;
+	background: rgba(15, 23, 42, 0.65);
+	backdrop-filter: blur(3px);
+	display: grid;
+	place-items: center;
+	z-index: 50;
+}
+.modal-card {
+	background: #fff;
+	border-radius: 14px;
+	padding: 20px;
+	box-shadow: 0 10px 25px rgba(0,0,0,0.25);
+	max-width: 320px;
+	text-align: center;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	border: 1px solid #e2e8f0;
+	transform-origin: center;
+}
+.turnstile-box {
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 10px;
+	background: #f8fafc;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	padding: 10px;
+	font-size: 13px;
+	font-weight: 700;
+	cursor: pointer;
+}
+.turnstile-box:hover {
+	background: #f1f5f9;
+	border-color: #94a3b8;
+}
+.turnstile-spinner {
+	width: 20px;
+	height: 20px;
+	border: 3px solid #cbd5e1;
+	border-top-color: #3b82f6;
+	border-radius: 50%;
+	animation: spin 0.8s linear infinite;
+}
+@keyframes spin { to { transform: rotate(360deg); } }
+</style>
+<script src="./anime.min.js"></script>
+</head>
+<body>
+
+<header class="review-banner">
+	<div>
+		<strong>v1.3.5.11 Memory Batch D Preview</strong> (10 Distributed Cloud & Edge Architecture Rulesets)
+	</div>
+	<div style="display:flex;gap:6px;align-items:center;">
+		<span class="badge badge-motion">anime.js 4.5.0</span>
+		<span class="badge">Visual Baseline Gate</span>
+		<span class="badge" id="viewport-label">Auto</span>
+	</div>
+</header>
+
+<nav class="tabs-bar" id="tabs" aria-label="Batch D 10 Cloud Architecture Ruleset Variants"></nav>
+
+<div class="container">
+	<div class="stage-pane" id="stage">
+		<div class="hud" id="hud"></div>
+		<div class="board-container">
+			<div class="board" id="board" role="grid" aria-label="Memory Card Board"></div>
+		</div>
+		<div style="font-size:12px;color:#64748b;display:flex;gap:12px;align-items:center;flex-wrap:wrap;justify-content:center;">
+			<span id="hint"></span>
+			<button type="button" id="reset-btn" style="padding:3px 8px;font-size:11px;">Reset Round</button>
+		</div>
+	</div>
+
+	<aside class="details-pane" id="details">
+		<h2 id="detail-title"></h2>
+		<p id="detail-desc"></p>
+		<div class="rule-box">
+			<strong>Brand New Gameplay Rule:</strong>
+			<span id="detail-rule"></span>
+		</div>
+		<table class="meta-table">
+			<tr><th>Mechanic</th><td id="detail-mechanic"></td></tr>
+			<tr><th>Baseline</th><td id="detail-baseline"></td></tr>
+			<tr><th>Win / Loss Condition</th><td id="detail-win-loss"></td></tr>
+			<tr><th>Scoring Model</th><td id="detail-scoring"></td></tr>
+			<tr><th>Leaderboard</th><td id="detail-groups"></td></tr>
+		</table>
+	</aside>
+</div>
+
+<script>
+const VARIANTS = [
+	{
+		id: 'memory:kv-consistency',
+		name: 'KV Consistency',
+		mechanic: '1-Turn Stale Replication Lag',
+		baseline: 'memory:classic',
+		rule: 'Cards replicate across distributed KV storage. First flip shows a syncing spinner (⟳ Syncing) due to replication lag; card commits true value on second flip or after turn settlement. Quick consensus matches earn a latency bonus!',
+		winLoss: 'Standard full board clear.',
+		scoring: 'Standard brief-v1 + consensus match bonus.',
+		groups: 'memory-1:kv-consistency:<6|8|10>',
+		desc: 'Workers KV eventual consistency: navigate temporary replication lag before data settles.'
+	},
+	{
+		id: 'memory:durable-object',
+		name: 'Durable Object',
+		mechanic: 'Single-Threaded Actor Zone Mutex Lock',
+		baseline: 'memory:classic',
+		rule: 'Each grid row is an isolated single-threaded Durable Object actor. Flipping a card locks its row under a coordinator mutex; its matching partner MUST be found in a DIFFERENT row. Flipping in the locked row returns a 409 Conflict!',
+		winLoss: 'Standard full board clear across cross-actor pairs.',
+		scoring: 'Standard brief-v1 + distributed coordination bonus.',
+		groups: 'memory-1:durable-object:<6|8|10>',
+		desc: 'Durable Objects coordination: enforce cross-actor transaction boundaries.'
+	},
+	{
+		id: 'memory:vectorize-knn',
+		name: 'Vectorize KNN',
+		mechanic: 'Semantic Vector Cosine Distance Matching',
+		baseline: 'memory:classic',
+		rule: 'Cards hold high-dimensional vector embeddings with semantic cluster tags (AI, Database, Security, Compute). A valid match pairs any two cards from the same semantic cluster (cosine distance <= 1.0) without needing identical symbols!',
+		winLoss: 'Clear all semantic embedding clusters.',
+		scoring: 'Similarity cluster accuracy multiplier.',
+		groups: 'memory-1:vectorize-knn:<6|8|10>',
+		desc: 'Vectorize similarity search: match cards by vector embedding proximity rather than exact identity.'
+	},
+	{
+		id: 'memory:fifo-queue',
+		name: 'FIFO Queue',
+		mechanic: '2-Message Consumer Batch & Dead-Letter Shelf',
+		baseline: 'memory:classic',
+		rule: 'Flips enter a 2-slot FIFO consumer pipeline. When 2 cards enter, consumer evaluates the batch: matches acknowledge and clear immediately; mismatches push 1 card to the Dead-Letter Queue (DLQ shelf) requiring retry recovery.',
+		winLoss: 'Clear grid and empty DLQ buffer.',
+		scoring: 'Queue throughput efficiency multiplier (penalties on DLQ overflow).',
+		groups: 'memory-1:fifo-queue:<6|8|10>',
+		desc: 'Cloudflare Queues: handle consumer batching and dead-letter message retry processing.'
+	},
+	{
+		id: 'memory:ai-tokens',
+		name: 'Workers AI',
+		mechanic: 'Context Window Inference Token Budget',
+		baseline: 'memory:classic',
+		rule: 'Player starts with a 120-token Context Window budget. Flips consume 4 input tokens. Matches award +12 completion tokens; mismatches burn 8 penalty tokens. Reaching 0 tokens triggers Context Window Overflow (round loss)!',
+		winLoss: 'Win: clear board before token exhaustion. Loss: 0 tokens (context overflow).',
+		scoring: 'Standard clear + remaining token bonus.',
+		groups: 'memory-1:ai-tokens:<6|8|10>',
+		desc: 'Workers AI inference limits: complete matching before exhausting model context window.'
+	},
+	{
+		id: 'memory:hyperdrive-pool',
+		name: 'Hyperdrive',
+		mechanic: 'Connection Pool Latency Hiding & Cold Starts',
+		baseline: 'memory:classic',
+		rule: 'Continuous fast play keeps the database connection pool HOT (granting 2x -> 3x score multipliers). Pausing or hesitating for > 2.5s cools connection down to COLD (1x) and incurs a 0.6s connection handshake latency delay.',
+		winLoss: 'Standard full board clear.',
+		scoring: 'Connection-velocity multiplier (base * poolMult).',
+		groups: 'memory-1:hyperdrive-pool:<6|8|10>',
+		desc: 'Hyperdrive connection pooling: maintain active pool throughput to hide latency.'
+	},
+	{
+		id: 'memory:turnstile-verify',
+		name: 'Turnstile',
+		mechanic: 'Managed Human Challenge Gate',
+		baseline: 'memory:classic',
+		rule: 'Every 4 cumulative mismatches triggers a Cloudflare Turnstile Managed Challenge: the board freezes and a verification glyph appears. Click the challenge token within 3.0s to prove human agency and resume play!',
+		winLoss: 'Standard full board clear.',
+		scoring: 'Human verification score multiplier.',
+		groups: 'memory-1:turnstile-verify:<6|8|10>',
+		desc: 'Cloudflare Turnstile bot verification: clear periodic challenges to resume grid access.'
+	},
+	{
+		id: 'memory:zero-trust',
+		name: 'Zero Trust',
+		mechanic: 'Role-Based Tiered Access RBAC Clearance',
+		baseline: 'memory:classic',
+		rule: 'Cards are segmented into Public (Tier 1), Confidential (Tier 2), and Secret (Tier 3). Higher-tier cards are locked behind Zero Trust Access shields and cannot be flipped until ALL lower-tier pairs are authenticated!',
+		winLoss: 'Sequentially authenticate all clearance tiers.',
+		scoring: 'Least-privilege compliance bonus.',
+		groups: 'memory-1:zero-trust:<6|8|10>',
+		desc: 'Zero Trust least-privilege: authenticate access tiers in strict hierarchical order.'
+	},
+	{
+		id: 'memory:argo-reroute',
+		name: 'Argo Route',
+		mechanic: 'Congested Hotspot Dynamic Path Reroute',
+		baseline: 'memory:classic',
+		rule: 'Repeated flips in the same quadrant (3 flips without a match) causes traffic congestion. Argo Smart Routing detects the hotspot and dynamically reroutes the cards, swapping them with the coldest, least-trafficked sector!',
+		winLoss: 'Standard full board clear across dynamic routing hops.',
+		scoring: 'Smart routing path optimization bonus.',
+		groups: 'memory-1:argo-reroute:<6|8|10>',
+		desc: 'Argo Smart Routing: dynamically bypass network congestion hotspots across the grid.'
+	},
+	{
+		id: 'memory:r2-glacier',
+		name: 'R2 Glacier',
+		mechanic: 'Infrequent Access Glacier Frost & Hydration',
+		baseline: 'memory:classic',
+		rule: 'Cards that remain untouched for 4 consecutive turns transition to the R2 Glacier Cold Tier (icy frost overlay). Touching a cold card initiates a 1-turn Object Hydration retrieval cycle before its true contents can be read.',
+		winLoss: 'Standard full board clear.',
+		scoring: 'Storage lifecycle efficiency bonus.',
+		groups: 'memory-1:r2-glacier:<6|8|10>',
+		desc: 'R2 Object Lifecycle: avoid cold storage retrieval delays with active memory planning.'
+	}
+];
+
+const ICONS = ['🌐', '🔒', '⚡', '💻', '🛰️', '📡', '🔑', '🛡️', '📦', '💾'];
+const VECTOR_CLUSTERS = [
+	{ tag: 'AI', icon: '🧠', label: 'Vector AI' },
+	{ tag: 'DB', icon: '💾', label: 'D1 / SQL' },
+	{ tag: 'SEC', icon: '🔒', label: 'Security' },
+	{ tag: 'NET', icon: '⚡', label: 'Edge Net' }
+];
+
+let activeIndex = 0;
+let state = null;
+let hyperdriveTimer = null;
+const prefersReduced = matchMedia('(prefers-reduced-motion: reduce)');
+
+function animateElement(target, params) {
+	if (prefersReduced.matches || !window.anime || !window.anime.animate) return;
+	try {
+		window.anime.animate(target, params);
+	} catch (e) {
+		console.warn('Anime error:', e);
+	}
+}
+
+function initTabs() {
+	const tabs = document.getElementById('tabs');
+	tabs.innerHTML = '';
+	VARIANTS.forEach((v, idx) => {
+		const btn = document.createElement('button');
+		btn.type = 'button';
+		btn.textContent = `${idx + 41}. ${v.name}`;
+		btn.setAttribute('aria-current', idx === activeIndex ? 'page' : 'false');
+		btn.onclick = () => selectVariant(idx);
+		tabs.appendChild(btn);
+	});
+}
+
+function selectVariant(idx) {
+	activeIndex = idx;
+	document.querySelectorAll('#tabs button').forEach((b, i) => {
+		b.setAttribute('aria-current', i === idx ? 'page' : 'false');
+	});
+	const v = VARIANTS[idx];
+	document.getElementById('detail-title').textContent = `${idx + 41}. ${v.name}`;
+	document.getElementById('detail-desc').textContent = v.desc;
+	document.getElementById('detail-rule').textContent = v.rule;
+	document.getElementById('detail-mechanic').textContent = v.mechanic;
+	document.getElementById('detail-baseline').textContent = v.baseline;
+	document.getElementById('detail-win-loss').textContent = v.winLoss;
+	document.getElementById('detail-scoring').textContent = v.scoring;
+	document.getElementById('detail-groups').textContent = v.groups;
+	resetRound();
+}
+
+function calculateCardSize() {
+	const stage = document.getElementById('stage');
+	const availW = (stage ? stage.clientWidth : window.innerWidth) - 24;
+	const availH = (stage ? stage.clientHeight : window.innerHeight) - 130;
+	const cols = 4;
+	const rows = 4;
+
+	const sizeByW = Math.floor((availW - (cols - 1) * 6) / cols);
+	const sizeByH = Math.floor((availH - (rows - 1) * 6) / rows);
+	const target = Math.max(38, Math.min(sizeByW, sizeByH, 74));
+	return target;
+}
+
+function resetRound() {
+	const v = VARIANTS[activeIndex];
+	clearInterval(hyperdriveTimer);
+
+	// Standard 4x4 board = 16 cards (8 pairs or clusters)
+	let deck = [];
+	if (v.id === 'memory:vectorize-knn') {
+		// 4 clusters of 4 cards each = 16 cards
+		VECTOR_CLUSTERS.forEach((cluster) => {
+			for (let i = 0; i < 4; i++) {
+				deck.push({
+					id: `${cluster.tag}-${i}`,
+					cluster: cluster.tag,
+					icon: cluster.icon,
+					label: cluster.label,
+					key: cluster.tag
+				});
+			}
+		});
+	} else if (v.id === 'memory:zero-trust') {
+		// Tier 1 (Public, 2 pairs = 4 cards), Tier 2 (Confidential, 3 pairs = 6 cards), Tier 3 (Secret, 3 pairs = 6 cards)
+		const tiers = [
+			{ tier: 1, pairs: 2, badge: 'T1' },
+			{ tier: 2, pairs: 3, badge: 'T2' },
+			{ tier: 3, pairs: 3, badge: 'T3' }
+		];
+		let iconIdx = 0;
+		tiers.forEach((t) => {
+			for (let p = 0; p < t.pairs; p++) {
+				const icon = ICONS[iconIdx % ICONS.length];
+				iconIdx++;
+				deck.push({ id: `t${t.tier}-p${p}-a`, key: `t${t.tier}-${p}`, icon, tier: t.tier, badge: t.badge });
+				deck.push({ id: `t${t.tier}-p${p}-b`, key: `t${t.tier}-${p}`, icon, tier: t.tier, badge: t.badge });
+			}
+		});
+	} else {
+		// Standard 8 pairs
+		for (let p = 0; p < 8; p++) {
+			const icon = ICONS[p % ICONS.length];
+			deck.push({ id: `p${p}-a`, key: `pair-${p}`, icon });
+			deck.push({ id: `p${p}-b`, key: `pair-${p}`, icon });
+		}
+	}
+
+	// Deterministic pseudo-shuffle for demo
+	deck.sort((a, b) => ((a.id.charCodeAt(0) * 17 + a.id.charCodeAt(1) * 31) % 100) - 50);
+
+	state = {
+		variantId: v.id,
+		deck: deck.map((c, i) => ({
+			...c,
+			index: i,
+			row: Math.floor(i / 4),
+			col: i % 4,
+			flipped: false,
+			matched: false,
+			replicaSyncing: false,
+			glaciated: false,
+			untouchedTurns: 0,
+			quadrant: (Math.floor(i / 4) < 2 ? 0 : 2) + (i % 4 < 2 ? 0 : 1)
+		})),
+		firstCard: null,
+		secondCard: null,
+		busy: false,
+		moves: 0,
+		matches: 0,
+		mismatches: 0,
+		tokens: 120,
+		poolStatus: 'WARM',
+		poolMultiplier: 2,
+		lastFlipTime: Date.now(),
+		dlqShelf: [],
+		challengeActive: false,
+		lockedActorRow: null,
+		unlockedTier: 1,
+		quadrantFlips: [0, 0, 0, 0]
+	};
+
+	if (v.id === 'memory:hyperdrive-pool') {
+		hyperdriveTimer = setInterval(() => {
+			if (Date.now() - state.lastFlipTime > 2500) {
+				if (state.poolStatus !== 'COLD') {
+					state.poolStatus = 'COLD';
+					state.poolMultiplier = 1;
+					updateHUD();
+				}
+			}
+		}, 500);
+	}
+
+	renderBoard(true); // true = animate stagger entrance
+	updateHUD();
+}
+
+function updateHUD() {
+	const v = VARIANTS[activeIndex];
+	const hud = document.getElementById('hud');
+	const hint = document.getElementById('hint');
+
+	let html = `<span>Matches: <strong>${state.matches} / 8</strong></span><span>Moves: <strong>${state.moves}</strong></span>`;
+
+	if (v.id === 'memory:kv-consistency') {
+		html += `<span style="color:#f97316;">KV Replicas: <strong>Online</strong></span>`;
+		hint.textContent = 'First flip triggers replication lag (Syncing). Match quickly for consensus bonus!';
+	} else if (v.id === 'memory:durable-object') {
+		html += `<span style="color:#8b5cf6;">Actor Lock: <strong>${state.lockedActorRow !== null ? `Row ${state.lockedActorRow + 1} Mutex` : 'Unlocked'}</strong></span>`;
+		hint.textContent = state.lockedActorRow !== null
+			? `Row ${state.lockedActorRow + 1} locked by DO mutex! Next card must be flipped in another row.`
+			: 'Grid rows are single-threaded actors. Matching pairs must span different rows.';
+	} else if (v.id === 'memory:vectorize-knn') {
+		html += `<span style="color:#06b6d4;">KNN Search: <strong>Cosine Dist &le; 1.0</strong></span>`;
+		hint.textContent = 'Vectorize search: pair cards from the same semantic cluster (AI, DB, SEC, NET).';
+	} else if (v.id === 'memory:fifo-queue') {
+		html += `<span style="color:#10b981;">Queue: <strong>${state.firstCard ? '1 / 2 Inflight' : 'Idle'}</strong></span>`;
+		hint.textContent = 'Consumer batches 2 cards. Mismatches route 1 message into Dead-Letter Queue (DLQ).';
+	} else if (v.id === 'memory:ai-tokens') {
+		const color = state.tokens < 30 ? '#ef4444' : state.tokens < 60 ? '#f59e0b' : '#10b981';
+		html += `<span id="token-badge" style="color:${color};">Context Window: <strong>${state.tokens} Tokens</strong></span>`;
+		hint.textContent = 'Each flip burns 4 tokens; matches award +12. Avoid Context Window Overflow!';
+	} else if (v.id === 'memory:hyperdrive-pool') {
+		const color = state.poolStatus === 'HOT' ? '#ef4444' : state.poolStatus === 'WARM' ? '#f59e0b' : '#64748b';
+		html += `<span style="color:${color};">Connection Pool: <strong>${state.poolStatus} (${state.poolMultiplier}x)</strong></span>`;
+		hint.textContent = 'Fast flips (<2.5s) keep connection HOT with 3x multiplier. Inactivity cools to COLD.';
+	} else if (v.id === 'memory:turnstile-verify') {
+		html += `<span style="color:#3b82f6;">Bot Score: <strong>${state.mismatches} / 4 Strikes</strong></span>`;
+		hint.textContent = '4 mismatches triggers a Cloudflare Turnstile human verification challenge.';
+	} else if (v.id === 'memory:zero-trust') {
+		html += `<span style="color:#ef4444;">Clearance: <strong>Tier ${state.unlockedTier} (${state.unlockedTier === 1 ? 'Public' : state.unlockedTier === 2 ? 'Confidential' : 'Top Secret'})</strong></span>`;
+		hint.textContent = `Zero Trust RBAC: Clear all Tier ${state.unlockedTier} pairs to authorize next clearance tier.`;
+	} else if (v.id === 'memory:argo-reroute') {
+		html += `<span style="color:#14b8a6;">Argo Route: <strong>Active</strong></span>`;
+		hint.textContent = 'Congesting a quadrant (3 flips without a match) dynamically reroutes cards to bypass latency.';
+	} else if (v.id === 'memory:r2-glacier') {
+		html += `<span style="color:#6366f1;">Storage Tier: <strong>R2 Standard</strong></span>`;
+		hint.textContent = 'Cards untouched for 4 turns freeze into Glacier Cold Archive requiring hydration.';
+	}
+
+	hud.innerHTML = html;
+}
+
+function renderBoard(isEntrance = false) {
+	const board = document.getElementById('board');
+	board.innerHTML = '';
+	const v = VARIANTS[activeIndex];
+	const size = calculateCardSize();
+	document.documentElement.style.setProperty('--size', `${size}px`);
+	board.style.gridTemplateColumns = `repeat(4, var(--size))`;
+
+	state.deck.forEach((card, idx) => {
+		const el = document.createElement('div');
+		el.className = 'card';
+		el.setAttribute('role', 'button');
+		el.setAttribute('tabindex', '0');
+		el.setAttribute('aria-label', `Card ${idx + 1}`);
+
+		if (card.matched) {
+			el.classList.add('matched');
+		} else if (card.flipped) {
+			el.classList.add('flipped');
+		}
+
+		// Durable Object mutex lock
+		if (v.id === 'memory:durable-object' && state.lockedActorRow !== null && card.row === state.lockedActorRow && !card.flipped && !card.matched) {
+			el.classList.add('actor-locked');
+			el.title = '409 Conflict: Row Mutex Locked';
+		}
+
+		// Zero Trust access policy lock
+		if (v.id === 'memory:zero-trust' && card.tier > state.unlockedTier && !card.matched) {
+			el.classList.add('shielded');
+			el.title = `Access Denied: Requires Tier ${card.tier} Clearance`;
+		}
+
+		// R2 Glacier frost
+		if (v.id === 'memory:r2-glacier' && card.glaciated && !card.matched && !card.flipped) {
+			el.classList.add('glaciated');
+			el.title = 'R2 Glacier: Cold Archive Data';
+		}
+
+		// Content display
+		if (card.flipped || card.matched) {
+			if (card.replicaSyncing) {
+				el.classList.add('syncing');
+				el.innerHTML = `<span style="font-size:10px;font-weight:800;color:#f97316;">⟳ Syncing</span>`;
+			} else if (v.id === 'memory:vectorize-knn') {
+				el.innerHTML = `<div style="text-align:center;"><div class="card-icon">${card.icon}</div><div style="font-size:9px;font-weight:800;color:#06b6d4;">${card.cluster}</div></div>`;
+			} else {
+				el.innerHTML = `<span class="card-icon">${card.icon}</span>`;
+			}
+		} else {
+			// Card back decorators
+			if (v.id === 'memory:zero-trust') {
+				el.innerHTML = `<span class="status-pill pill-tier">T${card.tier}</span><span style="font-size:12px;color:#94a3b8;">🔒</span>`;
+			} else if (v.id === 'memory:durable-object') {
+				el.innerHTML = `<span class="status-pill pill-do">R${card.row + 1}</span><span style="font-size:12px;color:#cbd5e1;">⬡</span>`;
+			} else if (v.id === 'memory:r2-glacier' && card.glaciated) {
+				el.innerHTML = `<span class="status-pill pill-glacier">COLD</span><span style="font-size:14px;">❄️</span>`;
+			} else {
+				el.innerHTML = `<span style="font-size:12px;color:#cbd5e1;">❖</span>`;
+			}
+		}
+
+		el.onclick = () => onCardClick(card, el);
+		board.appendChild(el);
+	});
+
+	// anime.js Staggered Entrance
+	if (isEntrance && window.anime && window.anime.animate && !prefersReduced.matches) {
+		try {
+			window.anime.animate('.card', {
+				scale: [0.6, 1],
+				opacity: [0, 1],
+				translateY: [12, 0],
+				delay: window.anime.stagger(30, { grid: [4, 4], from: 'center' }),
+				duration: 380,
+				ease: 'outBack'
+			});
+		} catch (e) {
+			console.warn('Anime entrance:', e);
+		}
+	}
+
+	// If FIFO Queue has DLQ items, show DLQ shelf
+	if (v.id === 'memory:fifo-queue' && state.dlqShelf.length > 0) {
+		const existingShelf = document.getElementById('dlq-shelf');
+		if (!existingShelf) {
+			const shelf = document.createElement('div');
+			shelf.id = 'dlq-shelf';
+			shelf.className = 'dlq-shelf';
+			shelf.innerHTML = `<strong>DLQ Shelf:</strong> ${state.dlqShelf.map(c => `<span>[${c.icon}]</span>`).join(' ')}`;
+			document.getElementById('stage').appendChild(shelf);
+		} else {
+			existingShelf.innerHTML = `<strong>DLQ Shelf:</strong> ${state.dlqShelf.map(c => `<span>[${c.icon}]</span>`).join(' ')}`;
+		}
+	} else {
+		const existingShelf = document.getElementById('dlq-shelf');
+		if (existingShelf) existingShelf.remove();
+	}
+}
+
+function onCardClick(card, el) {
+	if (state.busy || card.flipped || card.matched || state.challengeActive) return;
+
+	const v = VARIANTS[activeIndex];
+
+	// Zero Trust clearance check
+	if (v.id === 'memory:zero-trust' && card.tier > state.unlockedTier) {
+		animateElement(el, { translateX: [-5, 5, -3, 3, 0], duration: 250, ease: 'inOutSine' });
+		return;
+	}
+
+	// Durable Object actor lock check
+	if (v.id === 'memory:durable-object' && state.lockedActorRow !== null && card.row === state.lockedActorRow) {
+		animateElement(el, { translateX: [-5, 5, -3, 3, 0], duration: 250, ease: 'inOutSine' });
+		return;
+	}
+
+	// Workers AI token check
+	if (v.id === 'memory:ai-tokens') {
+		state.tokens -= 4;
+		animateElement('#token-badge', { scale: [1, 1.2, 1], duration: 200, ease: 'outQuad' });
+		if (state.tokens <= 0) {
+			state.tokens = 0;
+			updateHUD();
+			resetRound();
+			return;
+		}
+	}
+
+	// Hyperdrive latency simulation
+	if (v.id === 'memory:hyperdrive-pool') {
+		const now = Date.now();
+		const diff = now - state.lastFlipTime;
+		state.lastFlipTime = now;
+		if (diff < 2000) {
+			state.poolStatus = 'HOT';
+			state.poolMultiplier = 3;
+		} else if (diff < 3500) {
+			state.poolStatus = 'WARM';
+			state.poolMultiplier = 2;
+		} else {
+			state.poolStatus = 'COLD';
+			state.poolMultiplier = 1;
+		}
+	}
+
+	// KV Eventual Consistency: first inspection shows syncing
+	if (v.id === 'memory:kv-consistency' && !card.replicaSyncing && Math.random() < 0.35) {
+		card.replicaSyncing = true;
+		setTimeout(() => {
+			card.replicaSyncing = false;
+			renderBoard();
+		}, 800);
+	}
+
+	// R2 Glacier hydration
+	if (v.id === 'memory:r2-glacier' && card.glaciated) {
+		card.glaciated = false;
+	}
+
+	card.flipped = true;
+
+	// anime.js card flip scale accent
+	animateElement(el, { scale: [1, 1.08, 1.03], duration: 220, ease: 'outQuad' });
+
+	// Argo quadrant tracking
+	if (v.id === 'memory:argo-reroute') {
+		state.quadrantFlips[card.quadrant]++;
+		if (state.quadrantFlips[card.quadrant] >= 3) {
+			state.quadrantFlips[card.quadrant] = 0;
+			rerouteQuadrant(card.quadrant);
+		}
+	}
+
+	if (!state.firstCard) {
+		state.firstCard = card;
+		if (v.id === 'memory:durable-object') {
+			state.lockedActorRow = card.row;
+		}
+		renderBoard();
+		updateHUD();
+	} else {
+		state.secondCard = card;
+		state.moves++;
+		renderBoard();
+		updateHUD();
+		checkMatch();
+	}
+}
+
+function checkMatch() {
+	state.busy = true;
+	const v = VARIANTS[activeIndex];
+	const c1 = state.firstCard;
+	const c2 = state.secondCard;
+
+	let isMatch = false;
+	if (v.id === 'memory:vectorize-knn') {
+		isMatch = (c1.cluster === c2.cluster);
+	} else {
+		isMatch = (c1.key === c2.key);
+	}
+
+	setTimeout(() => {
+		const board = document.getElementById('board');
+		const cardEls = board ? board.children : [];
+		const el1 = cardEls[c1.index];
+		const el2 = cardEls[c2.index];
+
+		if (isMatch) {
+			c1.matched = true;
+			c2.matched = true;
+			state.matches++;
+
+			if (el1 && el2) {
+				animateElement([el1, el2], {
+					scale: [1, 1.15, 1],
+					duration: 380,
+					ease: 'outBack'
+				});
+			}
+
+			if (v.id === 'memory:ai-tokens') {
+				state.tokens = Math.min(140, state.tokens + 12);
+			}
+
+			// Zero Trust tier unlock check
+			if (v.id === 'memory:zero-trust') {
+				const activeTierCards = state.deck.filter(c => c.tier === state.unlockedTier);
+				const allCleared = activeTierCards.every(c => c.matched);
+				if (allCleared && state.unlockedTier < 3) {
+					state.unlockedTier++;
+				}
+			}
+		} else {
+			c1.flipped = false;
+			c2.flipped = false;
+			state.mismatches++;
+
+			if (el1 && el2) {
+				animateElement([el1, el2], {
+					translateX: [-6, 6, -4, 4, 0],
+					duration: 320,
+					ease: 'inOutSine'
+				});
+			}
+
+			if (v.id === 'memory:ai-tokens') {
+				state.tokens = Math.max(0, state.tokens - 8);
+			}
+
+			// FIFO Queue DLQ routing
+			if (v.id === 'memory:fifo-queue') {
+				state.dlqShelf.push(c2);
+			}
+
+			// Turnstile challenge trigger
+			if (v.id === 'memory:turnstile-verify' && state.mismatches % 4 === 0) {
+				triggerTurnstileChallenge();
+			}
+
+			// R2 Glacier untouched counter
+			if (v.id === 'memory:r2-glacier') {
+				state.deck.forEach(c => {
+					if (!c.flipped && !c.matched) {
+						c.untouchedTurns++;
+						if (c.untouchedTurns >= 4) {
+							c.glaciated = true;
+						}
+					}
+				});
+			}
+		}
+
+		state.firstCard = null;
+		state.secondCard = null;
+		state.lockedActorRow = null;
+		state.busy = false;
+		renderBoard();
+		updateHUD();
+	}, 700);
+}
+
+function triggerTurnstileChallenge() {
+	state.challengeActive = true;
+	const overlay = document.createElement('div');
+	overlay.id = 'turnstile-modal';
+	overlay.className = 'modal-overlay';
+	overlay.innerHTML = `
+		<div class="modal-card">
+			<div style="font-size:32px;">🛡️</div>
+			<h3 style="margin:0;">Cloudflare Turnstile</h3>
+			<p style="margin:0;font-size:12px;color:#64748b;">Bot detection threshold reached. Verify human presence to resume grid throughput.</p>
+			<div class="turnstile-box" id="turnstile-box">
+				<div class="turnstile-spinner" id="t-spinner"></div>
+				<span id="t-text">Verify you are human</span>
+			</div>
+		</div>
+	`;
+	document.body.appendChild(overlay);
+
+	animateElement('.modal-card', {
+		scale: [0.75, 1],
+		opacity: [0, 1],
+		translateY: [20, 0],
+		duration: 350,
+		ease: 'outBack'
+	});
+
+	document.getElementById('turnstile-box').onclick = () => {
+		document.getElementById('t-spinner').style.display = 'none';
+		document.getElementById('t-text').textContent = '✓ Verified Human';
+		setTimeout(() => {
+			overlay.remove();
+			state.challengeActive = false;
+			state.mismatches = 0;
+			updateHUD();
+		}, 600);
+	};
+}
+
+function rerouteQuadrant(qIdx) {
+	const oppositeQ = (qIdx + 2) % 4;
+	const qCards = state.deck.filter(c => c.quadrant === qIdx && !c.matched);
+	const oppCards = state.deck.filter(c => c.quadrant === oppositeQ && !c.matched);
+
+	if (qCards.length > 0 && oppCards.length > 0) {
+		const tempIdx = qCards[0].index;
+		qCards[0].index = oppCards[0].index;
+		oppCards[0].index = tempIdx;
+
+		qCards[0].row = Math.floor(qCards[0].index / 4);
+		qCards[0].col = qCards[0].index % 4;
+		oppCards[0].row = Math.floor(oppCards[0].index / 4);
+		oppCards[0].col = oppCards[0].index % 4;
+
+		state.deck.sort((a, b) => a.index - b.index);
+		renderBoard();
+
+		const board = document.getElementById('board');
+		if (board) {
+			const c1El = board.children[qCards[0].index];
+			const c2El = board.children[oppCards[0].index];
+			if (c1El && c2El) {
+				animateElement([c1El, c2El], {
+					scale: [1, 1.15, 1],
+					rotate: [0, 180, 360],
+					duration: 450,
+					ease: 'inOutCubic'
+				});
+			}
+		}
+	}
+}
+
+document.getElementById('reset-btn').onclick = resetRound;
+
+window.addEventListener('resize', () => {
+	const w = window.innerWidth;
+	const h = window.innerHeight;
+	document.getElementById('viewport-label').textContent = `${w}×${h}`;
+	renderBoard();
+});
+
+initTabs();
+selectVariant(0);
+document.getElementById('viewport-label').textContent = `${window.innerWidth}×${window.innerHeight}`;
+</script>
+</body>
+</html>

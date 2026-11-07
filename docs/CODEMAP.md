@@ -1,5 +1,14 @@
 # CODEMAP.md
 
+- **v1.3.5.11 Memory Batch D accepted and pushed (2026-11-07):**
+  10 genuine Memory distributed cloud and edge architecture rulesets implemented end-to-end under ponytail
+  principles in `src/lib/puzzles/memory/logic.ts`, dimensions in `dimensions.ts`, manifest entries with 30 new
+  immutable leaderboard groups in `manifest.ts`, localization in `messages.ts`/`i18n`, and regenerated
+  projections. Total catalog Memory variants are now 50 (150 leaderboard groups). Multi-runtime vectors (6/6
+  runtimes, fingerprint `a8be9d5f...`), workspace types (0 errors/0 warnings), unit tests (45/45), real-D1
+  integration suite (15/15), and Playwright Chromium admin suite (3/3 at one worker) pass.
+  [Brief](briefs/v1.3.5.11-batch-d-brief.md), [work/evidence](work/V1.3.5.11_WORK.md), [fixture](../static/demo/v1.3.5.11-batch-d.html).
+
 - **v1.3.5.7 Tier 2 Memory directory locally implemented (2026-11-07):**
   `server/memory-directory.ts` provides dual-source curated/observed union, keyset cursor
   pagination (`encodeCursor`/`decodeCursor`), dimension breakdown evaluation, and multi-filter

@@ -67,7 +67,17 @@ const NEW_PAIR_SUFFIXES = [
 	'tls-handshake',
 	'trace-route',
 	'bit-rot',
-	'burst-transmission'
+	'burst-transmission',
+	'kv-consistency',
+	'durable-object',
+	'vectorize-knn',
+	'fifo-queue',
+	'ai-tokens',
+	'hyperdrive-pool',
+	'turnstile-verify',
+	'zero-trust',
+	'argo-reroute',
+	'r2-glacier'
 ] as const;
 const NEW_GROUPS = [
 	...NEW_PAIR_SUFFIXES.flatMap((suffix) => groupIds(suffix, PAIR_COUNTS)),
@@ -367,6 +377,46 @@ export const manifest = {
 		pairVariant('burst-transmission', 120, {
 			steps: ['v1.game.memory.step1', 'memory.burstTransmission.step2', 'v1.game.memory.step3'],
 			tips: 'memory.burstTransmission.tips'
+		}),
+		pairVariant('kv-consistency', 120, {
+			steps: ['v1.game.memory.step1', 'memory.kvConsistency.step2', 'v1.game.memory.step3'],
+			tips: 'memory.kvConsistency.tips'
+		}),
+		pairVariant('durable-object', 120, {
+			steps: ['v1.game.memory.step1', 'memory.durableObject.step2', 'v1.game.memory.step3'],
+			tips: 'memory.durableObject.tips'
+		}),
+		pairVariant('vectorize-knn', 120, {
+			steps: ['v1.game.memory.step1', 'memory.vectorizeKnn.step2', 'v1.game.memory.step3'],
+			tips: 'memory.vectorizeKnn.tips'
+		}),
+		pairVariant('fifo-queue', 120, {
+			steps: ['v1.game.memory.step1', 'memory.fifoQueue.step2', 'v1.game.memory.step3'],
+			tips: 'memory.fifoQueue.tips'
+		}),
+		pairVariant('ai-tokens', 120, {
+			steps: ['v1.game.memory.step1', 'memory.aiTokens.step2', 'v1.game.memory.step3'],
+			tips: 'memory.aiTokens.tips'
+		}),
+		pairVariant('hyperdrive-pool', 120, {
+			steps: ['v1.game.memory.step1', 'memory.hyperdrivePool.step2', 'v1.game.memory.step3'],
+			tips: 'memory.hyperdrivePool.tips'
+		}),
+		pairVariant('turnstile-verify', 120, {
+			steps: ['v1.game.memory.step1', 'memory.turnstileVerify.step2', 'v1.game.memory.step3'],
+			tips: 'memory.turnstileVerify.tips'
+		}),
+		pairVariant('zero-trust', 120, {
+			steps: ['v1.game.memory.step1', 'memory.zeroTrust.step2', 'v1.game.memory.step3'],
+			tips: 'memory.zeroTrust.tips'
+		}),
+		pairVariant('argo-reroute', 120, {
+			steps: ['v1.game.memory.step1', 'memory.argoReroute.step2', 'v1.game.memory.step3'],
+			tips: 'memory.argoReroute.tips'
+		}),
+		pairVariant('r2-glacier', 120, {
+			steps: ['v1.game.memory.step1', 'memory.r2Glacier.step2', 'v1.game.memory.step3'],
+			tips: 'memory.r2Glacier.tips'
 		})
 	],
 	maxMoves: 180,

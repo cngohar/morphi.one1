@@ -39,6 +39,16 @@ export const messages = {
 	'variant.memory:trace-route': 'Security Trace',
 	'variant.memory:bit-rot': 'Bit-Rot',
 	'variant.memory:burst-transmission': 'Burst Uplink',
+	'variant.memory:kv-consistency': 'KV Consistency',
+	'variant.memory:durable-object': 'Durable Object',
+	'variant.memory:vectorize-knn': 'Vectorize KNN',
+	'variant.memory:fifo-queue': 'FIFO Queue',
+	'variant.memory:ai-tokens': 'Workers AI',
+	'variant.memory:hyperdrive-pool': 'Hyperdrive',
+	'variant.memory:turnstile-verify': 'Turnstile',
+	'variant.memory:zero-trust': 'Zero Trust',
+	'variant.memory:argo-reroute': 'Argo Route',
+	'variant.memory:r2-glacier': 'R2 Glacier',
 	'memory.countdown.step2':
 		'Clear the board before the countdown clock reaches zero. Running out of time ends the round with no score.',
 	'memory.countdown.tips': 'Maintain a brisk pace; hesitating too long costs the round.',
@@ -136,6 +146,43 @@ export const messages = {
 		'Chaining consecutive matches triggers a high-speed packet burst pinging hidden cards.',
 	'memory.burstTransmission.tips':
 		'Chain clean matches to trigger packet burst illumination pings.',
+	'memory.kvConsistency.step2':
+		'Inspected cards encounter replication lag before values settle. Quick consensus matches grant bonuses.',
+	'memory.kvConsistency.tips': 'Pair cards quickly before replica consistency completes.',
+	'memory.durableObject.step2':
+		'Each grid row is a single-threaded actor coordinator. Matches must be found in a different actor row.',
+	'memory.durableObject.tips':
+		'Avoid flipping in the same row twice; span cross-actor rows to find pairs.',
+	'memory.vectorizeKnn.step2':
+		'Cards hold semantic embedding tags. Pair any two cards from the same semantic cluster.',
+	'memory.vectorizeKnn.tips':
+		'Match cards sharing vector categories rather than identical duplicate icons.',
+	'memory.fifoQueue.step2':
+		'Flips buffer into a 2-slot consumer batch. Mismatches route messages to the Dead-Letter Queue shelf.',
+	'memory.fifoQueue.tips':
+		'Keep the consumer queue flowing and minimize dead-letter shelf overflows.',
+	'memory.aiTokens.step2':
+		'Flips burn context window tokens; matches reward tokens. Complete before context overflow occurs.',
+	'memory.aiTokens.tips': 'Conserve inference tokens; avoid wasteful hallucination mismatches.',
+	'memory.hyperdrivePool.step2':
+		'Rapid consecutive play maintains a HOT connection pool. Idling drops to COLD with latency delay.',
+	'memory.hyperdrivePool.tips':
+		'Maintain quick query pace to preserve the HOT connection multiplier.',
+	'memory.turnstileVerify.step2':
+		'Every four mismatches triggers a Turnstile bot challenge pause. Authenticate to resume play.',
+	'memory.turnstileVerify.tips':
+		'Avoid excessive mismatches to prevent managed challenge interruptions.',
+	'memory.zeroTrust.step2':
+		'Cards are partitioned into clearance tiers. Clear all lower-tier pairs to unlock higher tiers.',
+	'memory.zeroTrust.tips':
+		'Authenticate Public pairs first to authorize Confidential and Secret nodes.',
+	'memory.argoReroute.step2':
+		'Repeated flips in one quadrant cause traffic congestion. Argo dynamically reroutes cards to cold sectors.',
+	'memory.argoReroute.tips':
+		'Distribute flips across quadrants to avoid triggering dynamic traffic swaps.',
+	'memory.r2Glacier.step2':
+		'Cards untouched for four turns transition to Glacier Cold Archive, requiring a hydration cycle to thaw.',
+	'memory.r2Glacier.tips': 'Rotate your memory coverage to prevent cold data archiving.',
 	'scoring.memory.quad': 'Points per quad',
 	'memory.quads.label': 'Quads',
 	'memory.quads.hint': '{pairs} quads · Find four matching symbols',

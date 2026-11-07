@@ -44,6 +44,13 @@ function solve(seed: string, variant: string) {
 				live = live.filter(({ card }) => card.symbol === unshielded.card.symbol);
 			}
 		}
+		if (variant === 'memory:zero-trust') {
+			const activeTier = round.clearanceTier ?? 1;
+			const target = live.find(({ card }) => (card.clearanceTier ?? 1) === activeTier);
+			if (target) {
+				live = live.filter(({ card }) => card.symbol === target.card.symbol);
+			}
+		}
 		for (const { index } of live.filter(({ card }) => card.symbol === live[0].card.symbol)) {
 			if (round.matched.includes(index)) continue;
 			moves.push({ index });
@@ -188,7 +195,7 @@ describe('Memory variants', () => {
 	});
 
 	it('owns separate groups, complete messages, and trio scoring without changing pair scoring', () => {
-		expect(new Set(manifest.leaderboardGroups).size).toBe(120);
+		expect(new Set(manifest.leaderboardGroups).size).toBe(150);
 		for (const variant of manifest.variants) {
 			expect(MEMORY_VARIANTS).toContain(variant.id);
 			expect(messages[variant.name as keyof typeof messages]).toBeTruthy();
@@ -736,5 +743,89 @@ describe('Memory v1.3.5.5 pilot rules', () => {
 		expect(res2.burstStreak).toBe(2);
 		expect(res2.burstPing).toBeDefined();
 		expect(res2.burstPing!.length).toBe(3);
+	});
+
+	it('verifies Batch D 10 distributed cloud & edge architecture ruleset mechanics', () => {
+		// 1. KV Consistency
+		let kv = createMemoryRound('42', 'memory:kv-consistency');
+		expect(kv.kvReplicas).toEqual({});
+		kv = mismatch(kv);
+		expect(Object.keys(kv.kvReplicas ?? {}).length).toBe(2);
+
+		// 2. Durable Object Actor Row Lock
+		const doRound = createMemoryRound('42', 'memory:durable-object');
+		expect(doRound.lockedActorRow).toBeNull();
+		const f1 = flipCard(doRound, 0).round;
+		expect(f1.lockedActorRow).toBe(0);
+		// Same row (index 1) should be ignored due to actor lock
+		const sameRowFlip = flipCard(f1, 1);
+		expect(sameRowFlip.effect).toBe('ignored');
+		// Different row (index 4 = row 1) should proceed
+		const diffRowFlip = flipCard(f1, 4);
+		expect(diffRowFlip.effect).not.toBe('ignored');
+
+		// 3. Vectorize KNN Semantic Clustering
+		const vec = createMemoryRound('42', 'memory:vectorize-knn');
+		const c0 = vec.cards[0];
+		expect(c0.vectorCluster).toBeDefined();
+		const sameClusterIdx = vec.cards.findIndex(
+			(c, i) => i > 0 && c.vectorCluster === c0.vectorCluster
+		);
+		expect(sameClusterIdx).toBeGreaterThan(0);
+		const vecMatch = flipCard(flipCard(vec, 0).round, sameClusterIdx);
+		expect(vecMatch.effect).toBe('match');
+
+		// 4. FIFO Queue & DLQ Shelf
+		let fq = createMemoryRound('42', 'memory:fifo-queue');
+		expect(fq.dlqQueue).toEqual([]);
+		fq = mismatch(fq);
+		expect(fq.dlqQueue!.length).toBe(1);
+
+		// 5. Workers AI Token Budget
+		let ai = createMemoryRound('42', 'memory:ai-tokens');
+		expect(ai.aiTokens).toBe(120);
+		ai = flipCard(ai, 0).round;
+		expect(ai.aiTokens).toBe(116); // 120 - 4
+		ai = mismatch(ai);
+		expect(ai.aiTokens).toBe(104); // 116 - 4 (second flip) - 8 (mismatch)
+
+		// 6. Hyperdrive Connection Pool Multipliers
+		let hd = createMemoryRound('42', 'memory:hyperdrive-pool');
+		expect(hd.hyperdriveMultiplier).toBe(2);
+		hd = mismatch(hd);
+		expect(hd.hyperdriveMultiplier).toBe(1); // reset to cold
+
+		// 7. Turnstile Bot Challenge Gate
+		let tv = createMemoryRound('42', 'memory:turnstile-verify');
+		expect(tv.turnstileActive).toBe(false);
+		tv = mismatch(tv);
+		tv = resolveMismatch(tv);
+		tv = mismatch(tv);
+		tv = resolveMismatch(tv);
+		tv = mismatch(tv);
+		tv = resolveMismatch(tv);
+		tv = mismatch(tv);
+		expect(tv.turnstileActive).toBe(true); // 4th mismatch triggers challenge
+
+		// 8. Zero Trust RBAC Clearance Gating
+		const zt = createMemoryRound('42', 'memory:zero-trust');
+		expect(zt.clearanceTier).toBe(1);
+		const t2Idx = zt.cards.findIndex((c) => c.clearanceTier === 2);
+		expect(t2Idx).toBeGreaterThanOrEqual(0);
+		expect(flipCard(zt, t2Idx).effect).toBe('ignored'); // Tier 2 blocked initially
+
+		// 9. Argo Smart Routing Dynamic Reroute
+		const argo = createMemoryRound('42', 'memory:argo-reroute');
+		expect(argo.quadrantHits).toBeDefined();
+
+		// 10. R2 Glacier Cold Archive
+		let r2 = createMemoryRound('42', 'memory:r2-glacier');
+		expect(r2.glacierUntouched).toBeDefined();
+		for (let i = 0; i < 4; i++) {
+			r2 = mismatch(r2);
+			r2 = resolveMismatch(r2);
+		}
+		const glaciatedCount = r2.cards.filter((c) => c.isGlaciated).length;
+		expect(glaciatedCount).toBeGreaterThan(0);
 	});
 });

@@ -31,7 +31,8 @@ export const memoryDimensions = [
 			{ id: 'hyperdrive-warp', label: 'policy.hyperdriveWarp' },
 			{ id: 'atlas-terminal', label: 'policy.atlasTerminal' },
 			{ id: 'anycast-route', label: 'policy.anycastRoute' },
-			{ id: 'bit-rot', label: 'policy.bitRot' }
+			{ id: 'bit-rot', label: 'policy.bitRot' },
+			{ id: 'argo-reroute', label: 'policy.argoReroute' }
 		]
 	},
 	{
@@ -42,7 +43,9 @@ export const memoryDimensions = [
 			{ id: 'two-backs', label: 'policy.twoBacks' },
 			{ id: 'zebra', label: 'policy.zebra' },
 			{ id: 'analysis-visor', label: 'policy.analysisVisor' },
-			{ id: 'edge-cache', label: 'policy.edgeCache' }
+			{ id: 'edge-cache', label: 'policy.edgeCache' },
+			{ id: 'r2-glacier', label: 'policy.r2Glacier' },
+			{ id: 'kv-consistency', label: 'policy.kvConsistency' }
 		]
 	},
 	{
@@ -57,7 +60,10 @@ export const memoryDimensions = [
 			{ id: 'sentinel-heat', label: 'policy.sentinelHeat' },
 			{ id: 'pulse-drive', label: 'policy.pulseDrive' },
 			{ id: 'rate-limiter', label: 'policy.rateLimiter' },
-			{ id: 'trace-route', label: 'policy.traceRoute' }
+			{ id: 'trace-route', label: 'policy.traceRoute' },
+			{ id: 'ai-tokens', label: 'policy.aiTokens' },
+			{ id: 'hyperdrive-pool', label: 'policy.hyperdrivePool' },
+			{ id: 'turnstile-verify', label: 'policy.turnstileVerify' }
 		]
 	},
 	{
@@ -78,7 +84,11 @@ export const memoryDimensions = [
 			{ id: 'register-buffer', label: 'policy.registerBuffer' },
 			{ id: 'firewall-ice', label: 'policy.firewallIce' },
 			{ id: 'tls-handshake', label: 'policy.tlsHandshake' },
-			{ id: 'burst-transmission', label: 'policy.burstTransmission' }
+			{ id: 'burst-transmission', label: 'policy.burstTransmission' },
+			{ id: 'durable-object', label: 'policy.durableObject' },
+			{ id: 'vectorize-knn', label: 'policy.vectorizeKnn' },
+			{ id: 'fifo-queue', label: 'policy.fifoQueue' },
+			{ id: 'zero-trust', label: 'policy.zeroTrust' }
 		]
 	}
 ] as const;
@@ -144,5 +154,27 @@ export const memoryPolicyVariants = [
 		id: 'memory:burst-transmission',
 		archetype: 'information',
 		change: ['availability', 'burst-transmission']
-	}
+	},
+	{ id: 'memory:kv-consistency', archetype: 'information', change: ['backs', 'kv-consistency'] },
+	{
+		id: 'memory:durable-object',
+		archetype: 'constraints',
+		change: ['availability', 'durable-object']
+	},
+	{
+		id: 'memory:vectorize-knn',
+		archetype: 'grouping',
+		change: ['availability', 'vectorize-knn']
+	},
+	{ id: 'memory:fifo-queue', archetype: 'core', change: ['availability', 'fifo-queue'] },
+	{ id: 'memory:ai-tokens', archetype: 'pressure', change: ['budget', 'ai-tokens'] },
+	{ id: 'memory:hyperdrive-pool', archetype: 'pressure', change: ['budget', 'hyperdrive-pool'] },
+	{
+		id: 'memory:turnstile-verify',
+		archetype: 'pressure',
+		change: ['budget', 'turnstile-verify']
+	},
+	{ id: 'memory:zero-trust', archetype: 'constraints', change: ['availability', 'zero-trust'] },
+	{ id: 'memory:argo-reroute', archetype: 'dynamics', change: ['movement', 'argo-reroute'] },
+	{ id: 'memory:r2-glacier', archetype: 'information', change: ['backs', 'r2-glacier'] }
 ] as const;
