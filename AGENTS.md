@@ -33,6 +33,21 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.9 Batch B locally implemented & verified (2026-11-07):**
+The owner said “accepted and you can procced to implementaation”, selecting the standard light
+theme and authorizing local app implementation of the 10 genuine Memory exploration rulesets
+(Superstorm thermal hazard, Sentinel wanted level, Atlas glyph sequential matching, Analysis
+visor spectral backs, Exosuit life support power drain, Warp jump diagonal anomaly shift, Gravitino
+risk gamble, Pulse drive speed multiplier, Derelict freighter fog of war, and Atlas 16/16 loop).
+The 10 rulesets are implemented end-to-end under ponytail principles in `src/lib/puzzles/memory/logic.ts`,
+dimensions in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in
+`manifest.ts`, localization in `messages.ts`/`i18n`, and regenerated projections. Total catalog
+Memory variants are now 30 (90 leaderboard groups). Multi-runtime vectors (6/6 runtimes, fingerprint
+`a8be9d5f...`), workspace types (0 errors/0 warnings), unit tests (43/43), real-D1 integration
+suite (15/15), and Playwright Chromium admin suite (3/3 at one worker) pass. Full `bun run verify`
+remains deferred; unauditioned audio and editor exclusions preserved. Ready for owner functional review;
+no auto-commit or push performed. See `docs/briefs/v1.3.5.9-batch-b-brief.md` and `docs/work/V1.3.5.9_WORK.md`.
+
 **v1.3.5.8 Batch A accepted locally; source commit authorized (2026-11-07):**
 The owner said “done approved you now comit”, accepting the completed 10 genuine Memory
 ruleset variants (Countdown timer, Three strikes survival, Wild card, Sonar reveal, Zebra

@@ -28,9 +28,16 @@ function solve(seed: string, variant: string) {
 	let round = createMemoryRound(seed, variant);
 	const moves: { index: number }[] = [];
 	while (round.status === 'playing') {
-		const live = round.cards.flatMap((card, index) =>
+		let live = round.cards.flatMap((card, index) =>
 			round.matched.includes(index) ? [] : [{ card, index }]
 		);
+		if (variant === 'memory:glyph-chain') {
+			const activeTier = round.glyphTier ?? 1;
+			const target = live.find(({ card }) => card.tier === activeTier);
+			if (target) {
+				live = live.filter(({ card }) => card.symbol === target.card.symbol);
+			}
+		}
 		for (const { index } of live.filter(({ card }) => card.symbol === live[0].card.symbol)) {
 			moves.push({ index });
 			round = flipCard(round, index).round;
@@ -174,7 +181,7 @@ describe('Memory variants', () => {
 	});
 
 	it('owns separate groups, complete messages, and trio scoring without changing pair scoring', () => {
-		expect(new Set(manifest.leaderboardGroups).size).toBe(60);
+		expect(new Set(manifest.leaderboardGroups).size).toBe(90);
 		for (const variant of manifest.variants) {
 			expect(MEMORY_VARIANTS).toContain(variant.id);
 			expect(messages[variant.name as keyof typeof messages]).toBeTruthy();
@@ -553,5 +560,79 @@ describe('Memory v1.3.5.5 pilot rules', () => {
 		expect(otherHz).toBeGreaterThan(hzIdx);
 		const resHz = flipCard(flipCard(hz, hzIdx).round, otherHz);
 		expect(resHz.effect).toBe('match');
+	});
+
+	it('verifies Batch B 10 exploration ruleset mechanics', () => {
+		// 1. Superstorm
+		let ss = createMemoryRound('42', 'memory:superstorm');
+		for (let i = 0; i < 4; i++) {
+			ss = mismatch(ss);
+			ss = resolveMismatch(ss);
+		}
+		expect(ss.stormFrostedRow).toBeGreaterThanOrEqual(0);
+		const lockedCardIdx = ss.stormFrostedRow! * 4;
+		expect(flipCard(ss, lockedCardIdx).effect).toBe('ignored');
+
+		// 2. Sentinel Heat
+		let sh = createMemoryRound('42', 'memory:sentinel-heat');
+		expect(sh.sentinelHeat).toBe(0);
+		sh = mismatch(sh);
+		expect(sh.sentinelHeat).toBe(1);
+		sh = resolveMismatch(sh);
+		sh = mismatch(sh);
+		expect(sh.sentinelHeat).toBe(2);
+		sh = resolveMismatch(sh);
+		sh = mismatch(sh);
+		expect(sh.sentinelHeat).toBe(3);
+		expect(sh.lock).not.toBeNull();
+
+		// 3. Glyph Chain
+		const gc = createMemoryRound('42', 'memory:glyph-chain');
+		expect(gc.glyphTier).toBe(1);
+		const tier2Card = gc.cards.findIndex((c) => c.tier === 2);
+		const otherTier2 = gc.cards.findIndex(
+			(c, i) => i > tier2Card && c.symbol === gc.cards[tier2Card].symbol
+		);
+		if (tier2Card >= 0 && otherTier2 >= 0) {
+			const resGc = flipCard(flipCard(gc, tier2Card).round, otherTier2);
+			expect(resGc.effect).toBe('mismatch'); // out of tier order
+		}
+
+		// 4. Analysis Visor
+		const av = createMemoryRound('42', 'memory:analysis-visor');
+		expect(av.cards[0].spectral).toBeDefined();
+
+		// 5. Life Support
+		const ls = createMemoryRound('42', 'memory:life-support');
+		expect(ls.lifeSupport).toBe(100);
+		const resLs = flipCard(ls, 0);
+		expect(resLs.round.lifeSupport).toBe(97);
+
+		// 6. Hyperdrive Warp
+		const hw = createMemoryRound('42', 'memory:hyperdrive-warp');
+		const anomalyIdx = hw.cards.findIndex((c) => c.isAnomaly);
+		expect(anomalyIdx).toBeGreaterThanOrEqual(0);
+
+		// 7. Gravitino Risk
+		const gr = createMemoryRound('42', 'memory:gravitino-risk');
+		const gravIdx = gr.cards.findIndex((c) => c.isGravitino);
+		expect(gravIdx).toBeGreaterThanOrEqual(0);
+
+		// 8. Pulse Drive
+		const pd = createMemoryRound('42', 'memory:pulse-drive');
+		expect(pd.pulseStreak).toBe(1);
+		const pdPair = [0, pd.cards.findIndex((c, i) => i > 0 && c.symbol === pd.cards[0].symbol)];
+		const resPd = flipCard(flipCard(pd, pdPair[0]).round, pdPair[1]);
+		expect(resPd.round.pulseStreak).toBe(2);
+
+		// 9. Derelict Fog
+		const df = createMemoryRound('42', 'memory:derelict-fog');
+		const resDf = flipCard(df, 0);
+		expect(resDf.round.illuminated).toBeDefined();
+		expect(resDf.round.illuminated!.length).toBeGreaterThan(1);
+
+		// 10. Atlas Terminal
+		const at = createMemoryRound('42', 'memory:atlas-terminal');
+		expect(at.cards.length).toBeGreaterThanOrEqual(12);
 	});
 });

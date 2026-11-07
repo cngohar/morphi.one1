@@ -1,0 +1,784 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Morphi v1.3.5.9 — Batch B 10 Sci-Fi Exploration Ruleset Variants (Fixture Preview)</title>
+<style>
+:root {
+	font: 600 14px/1.4 'Nunito Variable', 'Nunito', system-ui, sans-serif;
+	color: #1b2433;
+	background: #eef2f7;
+	--board: #dfe9f5;
+	--edge: #8fa9c8;
+	--back: #a8bfde;
+	--focus: #2f6fed;
+	--accent: #2563eb;
+	--storm: #0284c7;
+	--sentinel: #ef4444;
+	--glyph: #8b5cf6;
+	--life: #10b981;
+	--gravitino: #f59e0b;
+	--warp: #ec4899;
+	--pulse: #f97316;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100dvh; display: flex; flex-direction: column; background: #eef2f7; color: #1b2433; }
+button {
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+	border: 1px solid #c9d6e4;
+	border-radius: 8px;
+	background: #fff;
+	padding: 6px 12px;
+	transition: background-color 0.15s, border-color 0.15s;
+}
+button:hover { background: #f1f5f9; }
+button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.review-banner {
+	padding: 8px 14px;
+	background: #fff;
+	border-bottom: 1px solid #c9d6e4;
+	font-size: 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.review-banner strong { color: #b42318; }
+.badge {
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	background: #e2e8f0;
+	color: #475569;
+	font-weight: 700;
+}
+
+.tabs-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 6px 14px;
+	background: #f8fafc;
+	border-bottom: 1px solid #c9d6e4;
+}
+.tabs-bar button {
+	font-size: 12px;
+	white-space: nowrap;
+	padding: 5px 9px;
+	background: #fff;
+	color: #334155;
+	border-color: #cbd5e1;
+}
+.tabs-bar button[aria-current="page"] {
+	background: #1b2433;
+	color: #fff;
+	font-weight: 800;
+	border-color: #1b2433;
+}
+
+.container {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 330px;
+	flex: 1;
+	min-height: 0;
+	background: var(--board);
+}
+@media (max-width: 900px) {
+	.container {
+		grid-template-columns: 1fr;
+		grid-template-rows: minmax(360px, 1fr) auto;
+	}
+}
+
+.stage-pane {
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 0;
+	position: relative;
+}
+
+.hud {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 14px;
+	flex-wrap: wrap;
+	font-size: 13px;
+	font-weight: 800;
+	background: #ffffffea;
+	padding: 6px 16px;
+	border-radius: 20px;
+	border: 1px solid #c9d6e4;
+	min-height: 36px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.board-container {
+	flex: 1;
+	display: grid;
+	place-items: center;
+	width: 100%;
+	min-height: 0;
+}
+.board {
+	display: grid;
+	gap: 6px;
+	justify-content: center;
+	align-content: center;
+	position: relative;
+}
+
+.card {
+	width: var(--size, 64px);
+	height: var(--size, 64px);
+	background: var(--back);
+	border: 2px solid var(--edge);
+	border-radius: 10px;
+	display: grid;
+	place-items: center;
+	position: relative;
+	user-select: none;
+	transition: transform 0.15s ease, background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.card.flipped {
+	background: #fff;
+	border-color: #3b82f6;
+	transform: scale(1.03);
+	box-shadow: 0 4px 10px rgba(59, 130, 246, 0.25);
+}
+.card.matched {
+	background: #f1f5f9;
+	border-color: #cbd5e1;
+	opacity: 0.25;
+	pointer-events: none;
+}
+.card.locked {
+	background: #fee2e2;
+	border-color: #ef4444;
+	opacity: 0.6;
+	pointer-events: none;
+}
+.card.storm-frost {
+	background: #e0f2fe;
+	border-color: #0284c7;
+	box-shadow: inset 0 0 8px #38bdf8;
+}
+.card.fogged:not(.flipped):not(.illuminated) {
+	background: #94a3b8;
+	border-color: #64748b;
+	color: transparent !important;
+}
+.card.illuminated {
+	background: #fff;
+	box-shadow: 0 0 12px #38bdf8;
+	border-color: #0284c7;
+}
+.card.gravitino {
+	border-color: var(--gravitino);
+	box-shadow: 0 0 10px rgba(245, 158, 11, 0.4);
+}
+
+.card-icon {
+	font-size: calc(var(--size, 64px) * 0.46);
+	line-height: 1;
+}
+
+.status-pill {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	font-size: 9px;
+	font-weight: 800;
+	padding: 1px 4px;
+	border-radius: 4px;
+	color: #fff;
+}
+.pill-sentinel { background: var(--sentinel); }
+.pill-glyph { background: var(--glyph); }
+.pill-gravitino { background: var(--gravitino); color: #000; }
+.pill-warp { background: var(--warp); }
+
+.spectral-back {
+	width: 100%;
+	height: 100%;
+	border-radius: 8px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	position: relative;
+	overflow: hidden;
+}
+.spectral-stripe {
+	position: absolute;
+	bottom: 0;
+	left: 0;
+	right: 0;
+	height: 5px;
+}
+
+.details-pane {
+	background: #fff;
+	border-left: 1px solid #c9d6e4;
+	padding: 16px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.details-pane h2 {
+	margin: 0;
+	font-size: 16px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+	color: #0f172a;
+}
+.details-pane p { margin: 0; font-size: 13px; color: #475569; }
+.meta-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+	margin-top: 4px;
+}
+.meta-table th, .meta-table td {
+	text-align: left;
+	padding: 5px 6px;
+	border-bottom: 1px solid #f1f5f9;
+}
+.meta-table th { color: #64748b; font-weight: 600; width: 40%; }
+.meta-table td { color: #1e293b; }
+.rule-box {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 10px;
+	font-size: 12px;
+}
+.rule-box strong { color: #0f172a; display: block; margin-bottom: 4px; }
+
+@media (max-height: 500px) {
+	.review-banner { display: none; }
+	.tabs-bar { padding: 4px 8px; }
+	.tabs-bar button { padding: 3px 6px; font-size: 11px; }
+	.hud { font-size: 11px; padding: 2px 8px; min-height: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	* { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="review-banner" id="banner">
+	<div><strong>FIXTURE ONLY (v1.3.5.9 Batch B)</strong> · 10 Sci-Fi Exploration Rulesets. Standard Morphi Theme.</div>
+	<div><span class="badge">Responsive Review: 390×844 · 844×390 · 1280×800</span></div>
+</div>
+
+<nav class="tabs-bar" id="tabs" aria-label="Batch B 10 Sci-Fi Exploration Ruleset Variants"></nav>
+
+<div class="container">
+	<div class="stage-pane" id="stage">
+		<div class="hud" id="hud"></div>
+		<div class="board-container">
+			<div class="board" id="board" role="grid" aria-label="Memory Card Board"></div>
+		</div>
+		<div style="font-size:12px;color:#64748b;display:flex;gap:12px;align-items:center;">
+			<span id="hint"></span>
+			<button type="button" id="reset-btn" style="padding:3px 8px;font-size:11px;">Reset Round</button>
+		</div>
+	</div>
+
+	<aside class="details-pane" id="details">
+		<h2 id="detail-title"></h2>
+		<p id="detail-desc"></p>
+		<div class="rule-box">
+			<strong>Brand New Gameplay Rule:</strong>
+			<span id="detail-rule"></span>
+		</div>
+		<table class="meta-table">
+			<tr><th>Mechanic</th><td id="detail-mechanic"></td></tr>
+			<tr><th>Baseline</th><td id="detail-baseline"></td></tr>
+			<tr><th>Win / Loss Condition</th><td id="detail-win-loss"></td></tr>
+			<tr><th>Scoring Model</th><td id="detail-scoring"></td></tr>
+			<tr><th>Leaderboard</th><td id="detail-groups"></td></tr>
+		</table>
+	</aside>
+</div>
+
+<script>
+const VARIANTS = [
+	{
+		id: 'memory:superstorm',
+		name: 'Superstorm',
+		mechanic: 'Extreme Thermal Weather Hazard',
+		baseline: 'memory:classic',
+		rule: 'Every 4 mismatches, an intense planetary storm sweeps across the board! The row containing the most recently flipped card is frosted over and locked for 1 full turn (cannot be flipped).',
+		winLoss: 'Standard full board clear under periodic environmental weather hazard.',
+		scoring: 'Standard brief-v1 + storm weathered clear bonus.',
+		groups: 'memory-1:superstorm:<6|8|10>',
+		desc: 'Survival hazard: navigate shifting planetary storms that frost over active sectors.'
+	},
+	{
+		id: 'memory:sentinel-heat',
+		name: 'Sentinel Heat',
+		mechanic: 'Escalating Wanted Level & Drone Lock',
+		baseline: 'memory:classic',
+		rule: 'Each mismatch raises your Sentinel Wanted Level (1 to 3 stars). At 3 stars, a Sentinel Drone locks the last flipped card face-down (cannot be flipped for 2 turns). A clean match cools heat down by 1 star.',
+		winLoss: 'Standard full board clear avoiding aggressive drone lockdown.',
+		scoring: 'Score multiplier tied to maintaining low alert levels.',
+		groups: 'memory-1:sentinel-heat:<6|8|10>',
+		desc: 'Escalating consequences: successive mistakes attract Sentinel patrols.'
+	},
+	{
+		id: 'memory:glyph-chain',
+		name: 'Atlas Glyph',
+		mechanic: 'Ascending Portal Sequence Matching',
+		baseline: 'memory:classic',
+		rule: 'Ancient Portal Glyphs must be activated in strictly ascending tier order (I → II → III → IV). You can flip any card to discover and remember its location, but matching pairs will ONLY clear if they belong to the currently active Glyph tier!',
+		winLoss: 'Clear all portal glyph tiers in sequential order.',
+		scoring: 'Base clear + sequence adherence combo multiplier.',
+		groups: 'memory-1:glyph-chain:<6|8|10>',
+		desc: 'Cryptographic ordering: flip freely to map the grid, then execute the exact portal sequence.'
+	},
+	{
+		id: 'memory:analysis-visor',
+		name: 'Analysis Visor',
+		mechanic: 'Spectral Back Clues',
+		baseline: 'memory:classic',
+		rule: 'Your Multi-tool Analysis Visor scans card backs, revealing subtle glowing spectral energy bands: Green (Flora), Orange (Fauna), Blue (Mineral), and Purple (Tech). Gives partial category intelligence before flipping.',
+		winLoss: 'Standard full board clear.',
+		scoring: 'Standard brief-v1 with analysis efficiency bonus.',
+		groups: 'memory-1:analysis-visor:<6|8|10>',
+		desc: 'Information asymmetry: read spectral signatures on card backs to deduce candidate pairs.'
+	},
+	{
+		id: 'memory:life-support',
+		name: 'Life Support',
+		mechanic: 'Exosuit Power Drain Survival',
+		baseline: 'memory:classic',
+		rule: 'Player begins with 100% Exosuit Life Support. Each flip drains 3% power. Each successful match recharges +12% power. Reaching 0% causes catastrophic Exosuit Power Failure (Loss).',
+		winLoss: 'Win: clear board with >0% power. Loss: 0% Life Support.',
+		scoring: 'Standard clear + remaining life support percentage bonus points.',
+		groups: 'memory-1:life-support:<6|8|10>',
+		desc: 'High-stakes resource management: maintain your oxygen buffer by scoring consistent matches.'
+	},
+	{
+		id: 'memory:hyperdrive-warp',
+		name: 'Warp Jump',
+		mechanic: 'Spatial Anomaly Transposition',
+		baseline: 'memory:classic',
+		rule: 'One pair is designated as the Space Anomaly (🌀). When successfully matched, space-time warps: all remaining unmatched cards cyclically transpose across diagonal quadrants!',
+		winLoss: 'Standard full board clear across dimensional shifts.',
+		scoring: 'Standard brief-v1 + warp navigation bonus.',
+		groups: 'memory-1:hyperdrive-warp:<6|8|10>',
+		desc: 'Board physics disruption: an intentional mid-round quadrant warp tests spatial adaptability.'
+	},
+	{
+		id: 'memory:gravitino-risk',
+		name: 'Gravitino Risk',
+		mechanic: 'High-Value Gamble Tile',
+		baseline: 'memory:classic',
+		rule: 'Contains 1 glowing Gravitino Orb (💎). Flipping it starts a high-stakes hazard: pairing it immediately on your next flip awards +1000 points. Mismatching triggers an alarm: -400 penalty points and scrambles that column!',
+		winLoss: 'Standard full board clear.',
+		scoring: 'High-variance risk/reward score model.',
+		groups: 'memory-1:gravitino-risk:<6|8|10>',
+		desc: 'Greed vs safety: gamble on instant Gravitino matching or risk column scrambles.'
+	},
+	{
+		id: 'memory:pulse-drive',
+		name: 'Pulse Drive',
+		mechanic: 'Rapid-Burn Speed Multiplier',
+		baseline: 'memory:classic',
+		rule: 'Scoring matches in rapid succession (within 3.0s of each other) engages Pulse Drive, multiplying match score: 2x → 3x → 4x! Taking longer than 3.0s drops speed back to 1x sub-light.',
+		winLoss: 'Standard full board clear.',
+		scoring: 'Velocity-scaled score (`pairBase * pulseMultiplier`).',
+		groups: 'memory-1:pulse-drive:<6|8|10>',
+		desc: 'Reflex and momentum: chain rapid-fire matches to maximize interstellar velocity.'
+	},
+	{
+		id: 'memory:derelict-fog',
+		name: 'Derelict Fog',
+		mechanic: 'Flashlight Cone Visibility',
+		baseline: 'memory:classic',
+		rule: 'The abandoned freighter corridor is pitch black (Fog of War). All cards are obscured. Flipping a card turns on your Exosuit flashlight, casting an illumination beam that reveals adjacent cards for 1.2s.',
+		winLoss: 'Standard clear under directional exploration visibility.',
+		scoring: 'Standard brief-v1.',
+		groups: 'memory-1:derelict-fog:<6|8|10>',
+		desc: 'Exploration in the dark: use your directional flashlight to chart hidden corridors.'
+	},
+	{
+		id: 'memory:atlas-terminal',
+		name: '16 / 16 Loop',
+		mechanic: 'Reality Pulse Counter & Memory Reset',
+		baseline: 'memory:classic',
+		rule: 'The Atlas simulation ticks down: a terminal loop counter counts down every 16 total flips. At flip 16, a reality reset pulse triggers, reshuffling any cards that have been flipped more than twice!',
+		winLoss: 'Clear the board before repeated reality reset pulses.',
+		scoring: 'Standard brief-v1.',
+		groups: 'memory-1:atlas-terminal:<6|8|10>',
+		desc: 'The cosmic cycle: solve before the 16-flip simulation pulse resets over-inspected sectors.'
+	}
+];
+
+const ICONS = ['🚀', '🪐', '🛸', '🛰️', '🌠', '☄️', '🌌', '⚡', '🌀', '💎'];
+const SPECTRAL_COLORS = ['#10b981', '#f97316', '#0284c7', '#a855f7'];
+
+let activeIndex = 0;
+let state = null;
+let pulseTimer = null;
+
+function initTabs() {
+	const tabs = document.getElementById('tabs');
+	tabs.innerHTML = '';
+	VARIANTS.forEach((v, idx) => {
+		const btn = document.createElement('button');
+		btn.type = 'button';
+		btn.textContent = `${idx + 21}. ${v.name}`;
+		if (idx === activeIndex) btn.setAttribute('aria-current', 'page');
+		btn.addEventListener('click', () => {
+			activeIndex = idx;
+			document.querySelectorAll('.tabs-bar button').forEach((b, i) => {
+				if (i === idx) b.setAttribute('aria-current', 'page');
+				else b.removeAttribute('aria-current');
+			});
+			loadVariant(v);
+		});
+		tabs.appendChild(btn);
+	});
+}
+
+function loadVariant(v) {
+	document.getElementById('detail-title').textContent = `${v.name} (${v.id})`;
+	document.getElementById('detail-desc').textContent = v.desc;
+	document.getElementById('detail-rule').textContent = v.rule;
+	document.getElementById('detail-mechanic').textContent = v.mechanic;
+	document.getElementById('detail-baseline').textContent = v.baseline;
+	document.getElementById('detail-win-loss').textContent = v.winLoss;
+	document.getElementById('detail-scoring').textContent = v.scoring;
+	document.getElementById('detail-groups').textContent = v.groups;
+
+	resetGame(v);
+}
+
+function resetGame(v) {
+	if (pulseTimer) clearInterval(pulseTimer);
+	const numPairs = 6;
+	const cards = [];
+	for (let i = 0; i < numPairs; i++) {
+		const symbol = ICONS[i];
+		const spectral = SPECTRAL_COLORS[i % SPECTRAL_COLORS.length];
+		cards.push({ id: i * 2, pairId: i, symbol, spectral, flipped: false, matched: false, tier: (i % 3) + 1, flipCount: 0 });
+		cards.push({ id: i * 2 + 1, pairId: i, symbol, spectral, flipped: false, matched: false, tier: (i % 3) + 1, flipCount: 0 });
+	}
+	// Deterministic seed shuffle
+	for (let i = cards.length - 1; i > 0; i--) {
+		const j = Math.floor((i * 13 + 7) % (i + 1));
+		[cards[i], cards[j]] = [cards[j], cards[i]];
+	}
+
+	state = {
+		variant: v,
+		cards,
+		flippedIndices: [],
+		matches: 0,
+		mismatches: 0,
+		totalFlips: 0,
+		isOver: false,
+		lockedIndices: new Set(),
+		// Mechanics state
+		stormFrostedRow: -1,
+		sentinelHeat: 0,
+		currentGlyphTier: 1,
+		lifeSupport: 100,
+		gravitinoActive: false,
+		pulseMultiplier: 1,
+		lastMatchTime: 0,
+		illuminatedIndices: new Set()
+	};
+
+	renderHUD();
+	renderBoard();
+}
+
+function renderHUD() {
+	const hud = document.getElementById('hud');
+	const v = state.variant;
+	let html = `<span>Pairs: ${state.matches}/6</span>`;
+
+	if (v.id === 'memory:superstorm') {
+		const nextStorm = 4 - (state.mismatches % 4);
+		html += `<span style="color:#0284c7;">Storm in: ${nextStorm} miss${nextStorm === 1 ? '' : 'es'}</span>`;
+		if (state.stormFrostedRow !== -1) html += `<span style="color:#0369a1;">❄️ Row ${state.stormFrostedRow + 1} Frosted!</span>`;
+	} else if (v.id === 'memory:sentinel-heat') {
+		const stars = '★'.repeat(state.sentinelHeat) + '☆'.repeat(3 - state.sentinelHeat);
+		html += `<span style="color:#dc2626;">Heat: ${stars}</span>`;
+	} else if (v.id === 'memory:glyph-chain') {
+		html += `<span style="color:#7c3aed;">Active Tier: Glyph ${state.currentGlyphTier}</span>`;
+	} else if (v.id === 'memory:analysis-visor') {
+		html += `<span style="color:#059669;">Visor: Spectral Bands Active</span>`;
+	} else if (v.id === 'memory:life-support') {
+		const col = state.lifeSupport > 40 ? '#059669' : (state.lifeSupport > 20 ? '#d97706' : '#dc2626');
+		html += `<span style="color:${col};">Life Support: ${state.lifeSupport}%</span>`;
+	} else if (v.id === 'memory:hyperdrive-warp') {
+		html += `<span style="color:#db2777;">🌀 Anomaly: Pair 5</span>`;
+	} else if (v.id === 'memory:gravitino-risk') {
+		html += `<span style="color:#d97706;">💎 Gravitino: Active</span>`;
+	} else if (v.id === 'memory:pulse-drive') {
+		html += `<span style="color:#ea580c;">Pulse Velocity: ${state.pulseMultiplier}x</span>`;
+	} else if (v.id === 'memory:derelict-fog') {
+		html += `<span style="color:#475569;">🔦 Flashlight Ready</span>`;
+	} else if (v.id === 'memory:atlas-terminal') {
+		const loopRem = 16 - (state.totalFlips % 16);
+		html += `<span style="color:#0284c7;">16/16 Reset in: ${loopRem}</span>`;
+	}
+
+	hud.innerHTML = html;
+}
+
+function renderBoard() {
+	const board = document.getElementById('board');
+	const v = state.variant;
+	const isLandscape = window.innerWidth > window.innerHeight && window.innerWidth < 900;
+	const cols = isLandscape ? 6 : (window.innerWidth >= 1200 ? 6 : 4);
+	const cardSize = isLandscape ? '42px' : (window.innerWidth >= 1200 ? '74px' : '56px');
+
+	board.style.gridTemplateColumns = `repeat(${cols}, ${cardSize})`;
+	board.style.setProperty('--size', cardSize);
+	board.innerHTML = '';
+
+	state.cards.forEach((card, idx) => {
+		const row = Math.floor(idx / cols);
+		const el = document.createElement('div');
+		el.className = 'card';
+		el.setAttribute('role', 'button');
+		el.setAttribute('tabindex', '0');
+		el.setAttribute('aria-label', `Card ${idx + 1}`);
+
+		if (card.matched) el.classList.add('matched');
+		if (card.flipped) el.classList.add('flipped');
+		if (state.lockedIndices.has(idx)) el.classList.add('locked');
+
+		// Variant visual behaviors
+		if (v.id === 'memory:superstorm' && row === state.stormFrostedRow && !card.matched) {
+			el.classList.add('storm-frost');
+		}
+		if (v.id === 'memory:derelict-fog') {
+			el.classList.add('fogged');
+			if (state.illuminatedIndices.has(idx)) el.classList.add('illuminated');
+		}
+		if (v.id === 'memory:gravitino-risk' && card.pairId === 0) {
+			el.classList.add('gravitino');
+		}
+
+		if (card.flipped || card.matched) {
+			const icon = document.createElement('div');
+			icon.className = 'card-icon';
+			icon.textContent = card.symbol;
+			el.appendChild(icon);
+
+			if (v.id === 'memory:glyph-chain') {
+				const pill = document.createElement('span');
+				pill.className = 'status-pill pill-glyph';
+				pill.textContent = `T${card.tier}`;
+				el.appendChild(pill);
+			}
+		} else {
+			if (v.id === 'memory:analysis-visor') {
+				const spec = document.createElement('div');
+				spec.className = 'spectral-back';
+				const stripe = document.createElement('div');
+				stripe.className = 'spectral-stripe';
+				stripe.style.background = card.spectral;
+				spec.appendChild(stripe);
+				el.appendChild(spec);
+			}
+		}
+
+		el.addEventListener('click', () => handleFlip(idx));
+		el.addEventListener('keydown', (e) => {
+			if (e.key === 'Enter' || e.key === ' ') {
+				e.preventDefault();
+				handleFlip(idx);
+			}
+		});
+
+		board.appendChild(el);
+	});
+}
+
+function handleFlip(idx) {
+	if (state.isOver) return;
+	const card = state.cards[idx];
+	if (card.flipped || card.matched) return;
+	if (state.lockedIndices.has(idx)) return;
+	if (state.flippedIndices.length >= 2) return;
+
+	const v = state.variant;
+	const cols = 4;
+	const row = Math.floor(idx / cols);
+
+	// Superstorm check
+	if (v.id === 'memory:superstorm' && row === state.stormFrostedRow) {
+		document.getElementById('hint').textContent = '⚠️ Sector frosted over by superstorm!';
+		return;
+	}
+
+	// Life support power drain
+	if (v.id === 'memory:life-support') {
+		state.lifeSupport = Math.max(0, state.lifeSupport - 3);
+		if (state.lifeSupport === 0) {
+			state.isOver = true;
+			document.getElementById('hint').textContent = '💀 Exosuit Life Support Failed! Round Lost.';
+			renderHUD();
+			renderBoard();
+			return;
+		}
+	}
+
+	card.flipped = true;
+	card.flipCount++;
+	state.totalFlips++;
+	state.flippedIndices.push(idx);
+
+	// Fog flashlight illumination
+	if (v.id === 'memory:derelict-fog') {
+		state.illuminatedIndices.clear();
+		state.illuminatedIndices.add(idx);
+		[-1, 1, -cols, cols].forEach(offset => {
+			const n = idx + offset;
+			if (n >= 0 && n < state.cards.length) state.illuminatedIndices.add(n);
+		});
+	}
+
+	renderHUD();
+	renderBoard();
+
+	if (state.flippedIndices.length === 2) {
+		const [idx1, idx2] = state.flippedIndices;
+		const c1 = state.cards[idx1];
+		const c2 = state.cards[idx2];
+
+		let isMatch = c1.pairId === c2.pairId;
+
+		// Glyph chain tier constraint
+		if (v.id === 'memory:glyph-chain' && isMatch) {
+			if (c1.tier !== state.currentGlyphTier) {
+				isMatch = false;
+				document.getElementById('hint').textContent = `Out of order! Unlock Tier ${state.currentGlyphTier} first.`;
+			}
+		}
+
+		if (isMatch) {
+			setTimeout(() => {
+				c1.matched = true;
+				c2.matched = true;
+				c1.flipped = false;
+				c2.flipped = false;
+				state.flippedIndices = [];
+				state.matches++;
+
+				// Pulse Drive multiplier check
+				if (v.id === 'memory:pulse-drive') {
+					const now = performance.now();
+					if (now - state.lastMatchTime < 3000) {
+						state.pulseMultiplier = Math.min(4, state.pulseMultiplier + 1);
+					} else {
+						state.pulseMultiplier = 1;
+					}
+					state.lastMatchTime = now;
+				}
+
+				// Life support recharge
+				if (v.id === 'memory:life-support') {
+					state.lifeSupport = Math.min(100, state.lifeSupport + 12);
+				}
+
+				// Sentinel cool down
+				if (v.id === 'memory:sentinel-heat') {
+					state.sentinelHeat = Math.max(0, state.sentinelHeat - 1);
+					state.lockedIndices.clear();
+				}
+
+				// Glyph tier progress
+				if (v.id === 'memory:glyph-chain') {
+					state.currentGlyphTier++;
+				}
+
+				// Warp anomaly
+				if (v.id === 'memory:hyperdrive-warp' && c1.pairId === 5) {
+					document.getElementById('hint').textContent = '🌀 Dimensional Warp! Grid shifted!';
+					const unmatched = state.cards.filter(c => !c.matched);
+					if (unmatched.length > 2) {
+						const last = unmatched.pop();
+						unmatched.unshift(last);
+					}
+				}
+
+				if (state.matches === 6) {
+					state.isOver = true;
+					document.getElementById('hint').textContent = '🎉 Mission Cleared! All pairs recovered.';
+				}
+
+				renderHUD();
+				renderBoard();
+			}, 600);
+		} else {
+			state.mismatches++;
+
+			// Sentinel heat escalation
+			if (v.id === 'memory:sentinel-heat') {
+				state.sentinelHeat = Math.min(3, state.sentinelHeat + 1);
+				if (state.sentinelHeat === 3) {
+					state.lockedIndices.add(idx2);
+					document.getElementById('hint').textContent = '🚨 Sentinel Drone locked sector!';
+				}
+			}
+
+			// Superstorm frost trigger
+			if (v.id === 'memory:superstorm' && state.mismatches % 4 === 0) {
+				state.stormFrostedRow = row;
+				document.getElementById('hint').textContent = `❄️ Superstorm hit Row ${row + 1}!`;
+			} else if (v.id === 'memory:superstorm') {
+				state.stormFrostedRow = -1;
+			}
+
+			// 16/16 Reality Pulse
+			if (v.id === 'memory:atlas-terminal' && state.totalFlips % 16 === 0) {
+				document.getElementById('hint').textContent = '⚡ 16/16 Reality Reset Pulse!';
+			}
+
+			setTimeout(() => {
+				c1.flipped = false;
+				c2.flipped = false;
+				state.flippedIndices = [];
+				if (v.id === 'memory:derelict-fog') state.illuminatedIndices.clear();
+				renderHUD();
+				renderBoard();
+			}, 900);
+		}
+	}
+}
+
+document.getElementById('reset-btn').addEventListener('click', () => {
+	resetGame(VARIANTS[activeIndex]);
+});
+
+window.addEventListener('resize', () => {
+	if (state) renderBoard();
+});
+
+initTabs();
+loadVariant(VARIANTS[0]);
+</script>
+
+</body>
+</html>

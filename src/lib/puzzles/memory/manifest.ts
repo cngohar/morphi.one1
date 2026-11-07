@@ -47,7 +47,17 @@ const NEW_PAIR_SUFFIXES = [
 	'decay',
 	'one-flip',
 	'combo',
-	'hazard'
+	'hazard',
+	'superstorm',
+	'sentinel-heat',
+	'glyph-chain',
+	'analysis-visor',
+	'life-support',
+	'hyperdrive-warp',
+	'gravitino-risk',
+	'pulse-drive',
+	'derelict-fog',
+	'atlas-terminal'
 ] as const;
 const NEW_GROUPS = [
 	...NEW_PAIR_SUFFIXES.flatMap((suffix) => groupIds(suffix, PAIR_COUNTS)),
@@ -267,6 +277,46 @@ export const manifest = {
 		pairVariant('hazard', 120, {
 			steps: ['v1.game.memory.step1', 'memory.hazard.step2', 'v1.game.memory.step3'],
 			tips: 'memory.hazard.tips'
+		}),
+		pairVariant('superstorm', 120, {
+			steps: ['v1.game.memory.step1', 'memory.superstorm.step2', 'v1.game.memory.step3'],
+			tips: 'memory.superstorm.tips'
+		}),
+		pairVariant('sentinel-heat', 120, {
+			steps: ['v1.game.memory.step1', 'memory.sentinelHeat.step2', 'v1.game.memory.step3'],
+			tips: 'memory.sentinelHeat.tips'
+		}),
+		pairVariant('glyph-chain', 120, {
+			steps: ['v1.game.memory.step1', 'memory.glyphChain.step2', 'v1.game.memory.step3'],
+			tips: 'memory.glyphChain.tips'
+		}),
+		pairVariant('analysis-visor', 120, {
+			steps: ['v1.game.memory.step1', 'memory.analysisVisor.step2', 'v1.game.memory.step3'],
+			tips: 'memory.analysisVisor.tips'
+		}),
+		pairVariant('life-support', 120, {
+			steps: ['v1.game.memory.step1', 'memory.lifeSupport.step2', 'v1.game.memory.step3'],
+			tips: 'memory.lifeSupport.tips'
+		}),
+		pairVariant('hyperdrive-warp', 120, {
+			steps: ['v1.game.memory.step1', 'memory.hyperdriveWarp.step2', 'v1.game.memory.step3'],
+			tips: 'memory.hyperdriveWarp.tips'
+		}),
+		pairVariant('gravitino-risk', 120, {
+			steps: ['v1.game.memory.step1', 'memory.gravitinoRisk.step2', 'v1.game.memory.step3'],
+			tips: 'memory.gravitinoRisk.tips'
+		}),
+		pairVariant('pulse-drive', 120, {
+			steps: ['v1.game.memory.step1', 'memory.pulseDrive.step2', 'v1.game.memory.step3'],
+			tips: 'memory.pulseDrive.tips'
+		}),
+		pairVariant('derelict-fog', 120, {
+			steps: ['v1.game.memory.step1', 'memory.derelictFog.step2', 'v1.game.memory.step3'],
+			tips: 'memory.derelictFog.tips'
+		}),
+		pairVariant('atlas-terminal', 120, {
+			steps: ['v1.game.memory.step1', 'memory.atlasTerminal.step2', 'v1.game.memory.step3'],
+			tips: 'memory.atlasTerminal.tips'
 		})
 	],
 	maxMoves: 180,

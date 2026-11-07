@@ -19,6 +19,16 @@ export const messages = {
 	'variant.memory:one-flip': 'One Flip',
 	'variant.memory:combo': 'Combo Multiplier',
 	'variant.memory:hazard': 'Hazard Trap',
+	'variant.memory:superstorm': 'Superstorm',
+	'variant.memory:sentinel-heat': 'Sentinel Heat',
+	'variant.memory:glyph-chain': 'Atlas Glyph',
+	'variant.memory:analysis-visor': 'Analysis Visor',
+	'variant.memory:life-support': 'Life Support',
+	'variant.memory:hyperdrive-warp': 'Warp Jump',
+	'variant.memory:gravitino-risk': 'Gravitino Risk',
+	'variant.memory:pulse-drive': 'Pulse Drive',
+	'variant.memory:derelict-fog': 'Derelict Fog',
+	'variant.memory:atlas-terminal': '16 / 16 Loop',
 	'memory.countdown.step2':
 		'Clear the board before the countdown clock reaches zero. Running out of time ends the round with no score.',
 	'memory.countdown.tips': 'Maintain a brisk pace; hesitating too long costs the round.',
@@ -49,6 +59,38 @@ export const messages = {
 	'memory.combo.tips': 'Protect your streak; a miss resets the multiplier to 1x.',
 	'memory.hazard.step2': 'Avoid the Trap card. Flipping it reshuffles all face-down cards.',
 	'memory.hazard.tips': 'Remember where the Trap card is and steer clear of it.',
+	'memory.superstorm.step2':
+		'Every four misses triggers an extreme storm, frosting over and locking the active row for one turn.',
+	'memory.superstorm.tips':
+		'Work around frosted rows while waiting for weather conditions to clear.',
+	'memory.sentinelHeat.step2':
+		'Misses raise Sentinel alert levels. Reaching three stars triggers a drone lock on the revealed card.',
+	'memory.sentinelHeat.tips': 'Score clean matches to cool down heat before patrols intervene.',
+	'memory.glyphChain.step2':
+		'Portal glyphs must be matched in ascending sequence tiers. You can flip ahead, but pairs only clear in order.',
+	'memory.glyphChain.tips': 'Scout locations freely, then solve in strict tier sequence.',
+	'memory.analysisVisor.step2':
+		'Your visor displays spectral category bands on card backs to provide clues before flipping.',
+	'memory.analysisVisor.tips': 'Match cards that share matching category bands.',
+	'memory.lifeSupport.step2':
+		'Flips consume Exosuit life support power. Successful matches recharge power; reaching zero percent fails the round.',
+	'memory.lifeSupport.tips': 'Keep an eye on suit reserves and prioritize high-confidence matches.',
+	'memory.hyperdriveWarp.step2':
+		'Matching the Space Anomaly pair warps space-time, shifting remaining unmatched cards diagonally.',
+	'memory.hyperdriveWarp.tips': 'Prepare for the grid to transpose once the Anomaly is discovered.',
+	'memory.gravitinoRisk.step2':
+		'The deck has a high-value Gravitino Orb. Matching it immediately awards bonus score; a miss scrambles its column.',
+	'memory.gravitinoRisk.tips': 'Only flip the Gravitino Orb when you know where its partner is.',
+	'memory.pulseDrive.step2':
+		'Chaining matches in rapid succession engages pulse speed multipliers up to four times.',
+	'memory.pulseDrive.tips': 'Maintain momentum for maximum navigation bonuses.',
+	'memory.derelictFog.step2':
+		'The board is in deep darkness. Flipping a card casts a flashlight beam illuminating adjacent cards.',
+	'memory.derelictFog.tips': 'Use each flip to map out surrounding corridors.',
+	'memory.atlasTerminal.step2':
+		'Every sixteen flips, the Atlas simulation reality pulse triggers, reshuffling frequently flipped cards.',
+	'memory.atlasTerminal.tips':
+		'Solve before the cosmic reset cycle scrambles over-inspected sectors.',
 	'scoring.memory.quad': 'Points per quad',
 	'memory.quads.label': 'Quads',
 	'memory.quads.hint': '{pairs} quads · Find four matching symbols',

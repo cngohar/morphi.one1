@@ -14,7 +14,8 @@ export const memoryDimensions = [
 		label: 'policy.opening',
 		values: [
 			{ id: 'preview', label: 'policy.preview' },
-			{ id: 'no-preview', label: 'policy.noPreview' }
+			{ id: 'no-preview', label: 'policy.noPreview' },
+			{ id: 'derelict-fog', label: 'policy.derelictFog' }
 		]
 	},
 	{
@@ -26,7 +27,9 @@ export const memoryDimensions = [
 			{ id: 'swaps', label: 'policy.swaps' },
 			{ id: 'collapse', label: 'policy.collapse' },
 			{ id: 'drift', label: 'policy.drift' },
-			{ id: 'decay', label: 'policy.decay' }
+			{ id: 'decay', label: 'policy.decay' },
+			{ id: 'hyperdrive-warp', label: 'policy.hyperdriveWarp' },
+			{ id: 'atlas-terminal', label: 'policy.atlasTerminal' }
 		]
 	},
 	{
@@ -35,7 +38,8 @@ export const memoryDimensions = [
 		values: [
 			{ id: 'uniform', label: 'policy.uniform' },
 			{ id: 'two-backs', label: 'policy.twoBacks' },
-			{ id: 'zebra', label: 'policy.zebra' }
+			{ id: 'zebra', label: 'policy.zebra' },
+			{ id: 'analysis-visor', label: 'policy.analysisVisor' }
 		]
 	},
 	{
@@ -45,7 +49,10 @@ export const memoryDimensions = [
 			{ id: 'standard', label: 'policy.standard' },
 			{ id: 'strict', label: 'policy.strict' },
 			{ id: 'countdown', label: 'policy.countdown' },
-			{ id: 'three-strikes', label: 'policy.threeStrikes' }
+			{ id: 'three-strikes', label: 'policy.threeStrikes' },
+			{ id: 'life-support', label: 'policy.lifeSupport' },
+			{ id: 'sentinel-heat', label: 'policy.sentinelHeat' },
+			{ id: 'pulse-drive', label: 'policy.pulseDrive' }
 		]
 	},
 	{
@@ -58,7 +65,10 @@ export const memoryDimensions = [
 			{ id: 'sonar', label: 'policy.sonar' },
 			{ id: 'one-flip', label: 'policy.oneFlip' },
 			{ id: 'combo', label: 'policy.combo' },
-			{ id: 'hazard', label: 'policy.hazard' }
+			{ id: 'hazard', label: 'policy.hazard' },
+			{ id: 'superstorm', label: 'policy.superstorm' },
+			{ id: 'glyph-chain', label: 'policy.glyphChain' },
+			{ id: 'gravitino-risk', label: 'policy.gravitinoRisk' }
 		]
 	}
 ] as const;
@@ -92,5 +102,19 @@ export const memoryPolicyVariants = [
 	{ id: 'memory:decay', archetype: 'dynamics', change: ['movement', 'decay'] },
 	{ id: 'memory:one-flip', archetype: 'core', change: ['availability', 'one-flip'] },
 	{ id: 'memory:combo', archetype: 'pressure', change: ['availability', 'combo'] },
-	{ id: 'memory:hazard', archetype: 'constraints', change: ['availability', 'hazard'] }
+	{ id: 'memory:hazard', archetype: 'constraints', change: ['availability', 'hazard'] },
+	{ id: 'memory:superstorm', archetype: 'pressure', change: ['availability', 'superstorm'] },
+	{ id: 'memory:sentinel-heat', archetype: 'pressure', change: ['budget', 'sentinel-heat'] },
+	{ id: 'memory:glyph-chain', archetype: 'constraints', change: ['availability', 'glyph-chain'] },
+	{ id: 'memory:analysis-visor', archetype: 'information', change: ['backs', 'analysis-visor'] },
+	{ id: 'memory:life-support', archetype: 'pressure', change: ['budget', 'life-support'] },
+	{ id: 'memory:hyperdrive-warp', archetype: 'dynamics', change: ['movement', 'hyperdrive-warp'] },
+	{
+		id: 'memory:gravitino-risk',
+		archetype: 'constraints',
+		change: ['availability', 'gravitino-risk']
+	},
+	{ id: 'memory:pulse-drive', archetype: 'pressure', change: ['budget', 'pulse-drive'] },
+	{ id: 'memory:derelict-fog', archetype: 'information', change: ['opening', 'derelict-fog'] },
+	{ id: 'memory:atlas-terminal', archetype: 'dynamics', change: ['movement', 'atlas-terminal'] }
 ] as const;
