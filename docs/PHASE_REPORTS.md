@@ -17,6 +17,31 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.5.10 — Memory Expansion Batch C (10 Network & Cybernetic Protocol Rulesets) implemented locally (2026-11-07)
+
+- **Built:** Following owner approval of the visual review fixture (`static/demo/v1.3.5.10-batch-c.html`), design brief (`docs/briefs/v1.3.5.10-batch-c-brief.md`), and the direction “done accepted , you can start the implementation”, 10 genuine Memory network and cybernetic protocol rulesets were implemented under ponytail principles: CDN edge cache ghost imprint (`memory:edge-cache`), Quantum entangled twin node reveal (`memory:quantum-entangle`), 429 rate limiter cooldown backoff (`memory:rate-limiter`), Data buffer register stash (`memory:register-buffer`), ICE firewall barrier unblock (`memory:firewall-ice`), Anycast perimeter re-route shift (`memory:anycast-route`), 3-way TLS cryptographic handshake (`memory:tls-handshake`), Security trace quarantine lockdown (`memory:trace-route`), Bit-rot data transposition (`memory:bit-rot`), and Packet burst uplink flash (`memory:burst-transmission`). Implemented stateful turn/deck mechanics in `src/lib/puzzles/memory/logic.ts`, dimension values in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`, localization in `messages.ts` and `i18n/messages.ts`, and regenerated catalog projections. Total catalog Memory variants expanded from 30 to 40 (120 leaderboard groups). [Brief](briefs/v1.3.5.10-batch-c-brief.md), [work/evidence](work/V1.3.5.10_WORK.md).
+- **Skipped (and why):** Further expansion batches (Batches D–I) remain scheduled for subsequent milestones; non-Memory matrices unchanged; unauditioned audio and local editor exclusions preserved; full `bun run verify` deferred per standing instructions.
+- **Known issues:** No physical device review; browser testing performed via Chromium responsive emulation across 390×844, 844×390, and 1280×800. Full verify deferred.
+- **Decisions and pinned versions:** Owner approved the visual preview and authorized local implementation. Preserved standard integer-only deterministic RNG, zero schema migrations. Direct parent execution utilized due to unavailable `gpt-6.1-sol`/`gpt-6-luna` models.
+- **Questions for the owner:** None; ready for owner functional review of Batch C.
+
+| Acceptance item                                     | Evidence type and location                                                                 | Result                                        |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------- |
+| Visual preview fixture at three sizes               | `static/demo/v1.3.5.10-batch-c.html`, captures in `build/v1.3.5.10/preview-rulesets-*.png` | ACCEPTED by owner                             |
+| 10 genuine ruleset mechanics & deterministic state  | `src/lib/puzzles/memory/logic.ts`, [unit tests](src/lib/puzzles/memory/variants.test.ts)   | PASS 44/44                                    |
+| Multi-runtime vector parity (6 runtimes)            | `bun scripts/check-vectors.ts --memory` (Node, Bun, Chromium, Firefox, WebKit, workerd)    | PASS (fingerprint `e11e8733...`)              |
+| Real-D1 integration suite (15 tests)                | `tests/integration/memory-variants.test.ts`                                                | PASS 15/15                                    |
+| Playwright Chromium admin, directory & policy suite | `tests/e2e/memory-variants-admin.spec.ts`                                                  | PASS 3/3 at one worker                        |
+| Responsive layout (390×844, 844×390, 1280×800)      | Zero horizontal scroll overflow (`scrollWidth <= innerWidth`)                              | PASS at all 3 sizes                           |
+| Format, lint and types                              | Scoped Prettier/ESLint; `bun run check`                                                    | PASS; 0 lint warnings, 0 type errors/warnings |
+| Full `bun run verify`                               | Standing owner deferral                                                                    | NOT RUN; deferred, not passed/waived          |
+
+- **Measurements:** Checked in local Linux Chromium responsive emulation at 390×844, 844×390, and 1280×800 (one worker). Directory queries and policy lookups remain bounded O(1) single-bind SQL.
+- **Waivers:** None.
+- **Owner responsibilities:** Owner functional review of Batch C rulesets.
+- **CODEMAP updated:** yes.
+
+
 ## v1.3.5.9 — Memory Expansion Batch B (10 Sci-Fi Exploration Rulesets) accepted locally & pushed (2026-11-07)
 
 - **Built:** Following owner approval of the visual review fixture (`static/demo/v1.3.5.9-batch-b.html`), standard light theme selection, and brief (`docs/briefs/v1.3.5.9-batch-b-brief.md`), and the direction “accepted and you can procced to implementaation”, 10 genuine Memory exploration rulesets were implemented under ponytail principles: Extreme thermal storm (`memory:superstorm`), Sentinel wanted level & drone lock (`memory:sentinel-heat`), Atlas glyph sequential tier matching (`memory:glyph-chain`), Analysis visor spectral category backs (`memory:analysis-visor`), Exosuit life support power drain (`memory:life-support`), Warp jump diagonal anomaly shift (`memory:hyperdrive-warp`), Gravitino risk gamble (`memory:gravitino-risk`), Pulse drive rapid speed multiplier (`memory:pulse-drive`), Derelict freighter fog of war flashlight beam (`memory:derelict-fog`), and Atlas 16/16 loop reality reset pulse (`memory:atlas-terminal`). Implemented stateful turn/deck mechanics in `src/lib/puzzles/memory/logic.ts`, dimension values in `dimensions.ts`, manifest entries with 30 immutable leaderboard groups in `manifest.ts`, localization in `messages.ts` and `i18n/messages.ts`, and regenerated catalog projections. Total catalog Memory variants expanded from 20 to 30 (90 leaderboard groups). [Brief](briefs/v1.3.5.9-batch-b-brief.md), [work/evidence](work/V1.3.5.9_WORK.md).

@@ -1,15 +1,24 @@
 # Morphi: Simple Plan
 
-## Current local status — v1.3.5.9 Batch B implemented & verified locally (2026-11-07)
+## Current local status — v1.3.5.10 Batch C implemented & verified locally (2026-11-07)
 
-The owner authorized local implementation of the 10 genuine Memory exploration rulesets (Superstorm thermal
+The owner authorized local implementation of the 10 genuine Memory network and cybernetic protocol rulesets (Edge
+cache ghost imprint, Quantum entangle twin node, 429 rate limiter cooldown backoff, Data buffer register, ICE
+firewall barrier unblock, Anycast perimeter re-route shift, 3-way TLS cryptographic handshake, Security trace
+quarantine lockdown, Bit-rot data transposition, and Packet burst uplink flash). All 10 rulesets are implemented
+end-to-end under ponytail principles with multi-runtime vectors (6/6 runtimes, fingerprint `e11e8733...`), workspace
+types (0 errors/warnings), unit tests (44/44), real D1 integration (15/15), and Playwright Chromium admin suite
+(3/3) passing. Total Memory catalogue is now 40 variants (120 leaderboard groups). Full `bun run verify` remains
+deferred; unauditioned audio and editor exclusions preserved. Ready for owner functional review. No commit or push performed.
+
+## Earlier local status — v1.3.5.9 Batch B accepted and committed (2026-11-07)
+
+The owner reviewed and authorized local implementation of the 10 genuine Memory exploration rulesets (Superstorm thermal
 hazard, Sentinel wanted level, Atlas glyph sequential matching, Analysis visor spectral backs, Exosuit life
 support power drain, Warp jump diagonal anomaly shift, Gravitino risk gamble, Pulse drive speed multiplier,
-Derelict freighter fog of war, and Atlas 16/16 loop). All 10 rulesets are implemented end-to-end under ponytail
-principles with multi-runtime vectors (6/6 runtimes, fingerprint `a8be9d5f...`), workspace types (0 errors/warnings),
-unit tests (43/43), real D1 integration (15/15), and Playwright Chromium admin suite (3/3) passing. Total Memory
-catalogue is now 30 variants (90 leaderboard groups). Full `bun run verify` remains deferred; unauditioned audio
-and editor exclusions preserved. Ready for owner functional review. No commit or push performed.
+Derelict freighter fog of war, and Atlas 16/16 loop). All 10 rulesets were implemented end-to-end under ponytail
+principles with multi-runtime vectors, unit tests, real D1 integration, and Playwright Chromium admin suite passing.
+Committed to main (`6e56989`). Total Memory catalogue expanded from 20 to 30 variants (90 leaderboard groups).
 
 ## Earlier local status — v1.3.5.8 Batch A accepted locally and committed (2026-11-07)
 

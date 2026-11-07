@@ -29,6 +29,16 @@ export const messages = {
 	'variant.memory:pulse-drive': 'Pulse Drive',
 	'variant.memory:derelict-fog': 'Derelict Fog',
 	'variant.memory:atlas-terminal': '16 / 16 Loop',
+	'variant.memory:edge-cache': 'Edge Cache',
+	'variant.memory:quantum-entangle': 'Quantum Entangle',
+	'variant.memory:rate-limiter': 'Rate Limiter',
+	'variant.memory:register-buffer': 'Register Buffer',
+	'variant.memory:firewall-ice': 'Firewall ICE',
+	'variant.memory:anycast-route': 'Anycast Route',
+	'variant.memory:tls-handshake': 'TLS Handshake',
+	'variant.memory:trace-route': 'Security Trace',
+	'variant.memory:bit-rot': 'Bit-Rot',
+	'variant.memory:burst-transmission': 'Burst Uplink',
 	'memory.countdown.step2':
 		'Clear the board before the countdown clock reaches zero. Running out of time ends the round with no score.',
 	'memory.countdown.tips': 'Maintain a brisk pace; hesitating too long costs the round.',
@@ -91,6 +101,41 @@ export const messages = {
 		'Every sixteen flips, the Atlas simulation reality pulse triggers, reshuffling frequently flipped cards.',
 	'memory.atlasTerminal.tips':
 		'Solve before the cosmic reset cycle scrambles over-inspected sectors.',
+	'memory.edgeCache.step2':
+		'Inspected cards leave a temporary cached ghost preview on their card back for two turns.',
+	'memory.edgeCache.tips': 'Match cards quickly before their edge cache TTL expires.',
+	'memory.quantumEntangle.step2':
+		'Entangled quantum nodes reveal together simultaneously when either card is flipped.',
+	'memory.quantumEntangle.tips':
+		'Look for entangled twin pairs to reveal two nodes for the cost of one flip.',
+	'memory.rateLimiter.step2':
+		'Consecutive rapid mismatches trigger a 429 rate limit cooldown lockout on the board.',
+	'memory.rateLimiter.tips': 'Pace your moves deliberately to keep throughput high.',
+	'memory.registerBuffer.step2':
+		'Stash a revealed card into your dedicated 1-card buffer and pair with it later.',
+	'memory.registerBuffer.tips':
+		'Hold an isolated card in the buffer register until its matching symbol is found.',
+	'memory.firewallIce.step2':
+		'Central firewall cells are shielded. Matching adjacent neighbor cards breaches the shield.',
+	'memory.firewallIce.tips':
+		'Clear perimeter nodes adjacent to the firewall to unlock inner cells.',
+	'memory.anycastRoute.step2':
+		'Every three mismatches triggers an anycast route rebalance, shifting perimeter cards clockwise.',
+	'memory.anycastRoute.tips': 'Track the perimeter rotation sequence as outer cards circulate.',
+	'memory.tlsHandshake.step2':
+		'Establish cryptographic handshakes by pairing Client Hello (SYN) and Server Hello (ACK) cards.',
+	'memory.tlsHandshake.tips': 'Match cards sharing matching cryptographic cipher suites.',
+	'memory.traceRoute.step2':
+		'Mismatches escalate network trace. Reaching 100 percent quarantines cards into lockdown.',
+	'memory.traceRoute.tips':
+		'Score clean matches to reduce trace levels before quarantine triggers.',
+	'memory.bitRot.step2':
+		'Unmatched inspected cards suffer bit-rot data corruption after three turns and swap places.',
+	'memory.bitRot.tips': 'Prioritize inspected cards before bit-rot corruption displaces them.',
+	'memory.burstTransmission.step2':
+		'Chaining consecutive matches triggers a high-speed packet burst pinging hidden cards.',
+	'memory.burstTransmission.tips':
+		'Chain clean matches to trigger packet burst illumination pings.',
 	'scoring.memory.quad': 'Points per quad',
 	'memory.quads.label': 'Quads',
 	'memory.quads.hint': '{pairs} quads · Find four matching symbols',

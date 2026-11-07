@@ -29,7 +29,9 @@ export const memoryDimensions = [
 			{ id: 'drift', label: 'policy.drift' },
 			{ id: 'decay', label: 'policy.decay' },
 			{ id: 'hyperdrive-warp', label: 'policy.hyperdriveWarp' },
-			{ id: 'atlas-terminal', label: 'policy.atlasTerminal' }
+			{ id: 'atlas-terminal', label: 'policy.atlasTerminal' },
+			{ id: 'anycast-route', label: 'policy.anycastRoute' },
+			{ id: 'bit-rot', label: 'policy.bitRot' }
 		]
 	},
 	{
@@ -39,7 +41,8 @@ export const memoryDimensions = [
 			{ id: 'uniform', label: 'policy.uniform' },
 			{ id: 'two-backs', label: 'policy.twoBacks' },
 			{ id: 'zebra', label: 'policy.zebra' },
-			{ id: 'analysis-visor', label: 'policy.analysisVisor' }
+			{ id: 'analysis-visor', label: 'policy.analysisVisor' },
+			{ id: 'edge-cache', label: 'policy.edgeCache' }
 		]
 	},
 	{
@@ -52,7 +55,9 @@ export const memoryDimensions = [
 			{ id: 'three-strikes', label: 'policy.threeStrikes' },
 			{ id: 'life-support', label: 'policy.lifeSupport' },
 			{ id: 'sentinel-heat', label: 'policy.sentinelHeat' },
-			{ id: 'pulse-drive', label: 'policy.pulseDrive' }
+			{ id: 'pulse-drive', label: 'policy.pulseDrive' },
+			{ id: 'rate-limiter', label: 'policy.rateLimiter' },
+			{ id: 'trace-route', label: 'policy.traceRoute' }
 		]
 	},
 	{
@@ -68,7 +73,12 @@ export const memoryDimensions = [
 			{ id: 'hazard', label: 'policy.hazard' },
 			{ id: 'superstorm', label: 'policy.superstorm' },
 			{ id: 'glyph-chain', label: 'policy.glyphChain' },
-			{ id: 'gravitino-risk', label: 'policy.gravitinoRisk' }
+			{ id: 'gravitino-risk', label: 'policy.gravitinoRisk' },
+			{ id: 'quantum-entangle', label: 'policy.quantumEntangle' },
+			{ id: 'register-buffer', label: 'policy.registerBuffer' },
+			{ id: 'firewall-ice', label: 'policy.firewallIce' },
+			{ id: 'tls-handshake', label: 'policy.tlsHandshake' },
+			{ id: 'burst-transmission', label: 'policy.burstTransmission' }
 		]
 	}
 ] as const;
@@ -116,5 +126,23 @@ export const memoryPolicyVariants = [
 	},
 	{ id: 'memory:pulse-drive', archetype: 'pressure', change: ['budget', 'pulse-drive'] },
 	{ id: 'memory:derelict-fog', archetype: 'information', change: ['opening', 'derelict-fog'] },
-	{ id: 'memory:atlas-terminal', archetype: 'dynamics', change: ['movement', 'atlas-terminal'] }
+	{ id: 'memory:atlas-terminal', archetype: 'dynamics', change: ['movement', 'atlas-terminal'] },
+	{ id: 'memory:edge-cache', archetype: 'information', change: ['backs', 'edge-cache'] },
+	{
+		id: 'memory:quantum-entangle',
+		archetype: 'information',
+		change: ['availability', 'quantum-entangle']
+	},
+	{ id: 'memory:rate-limiter', archetype: 'pressure', change: ['budget', 'rate-limiter'] },
+	{ id: 'memory:register-buffer', archetype: 'core', change: ['availability', 'register-buffer'] },
+	{ id: 'memory:firewall-ice', archetype: 'constraints', change: ['availability', 'firewall-ice'] },
+	{ id: 'memory:anycast-route', archetype: 'dynamics', change: ['movement', 'anycast-route'] },
+	{ id: 'memory:tls-handshake', archetype: 'grouping', change: ['availability', 'tls-handshake'] },
+	{ id: 'memory:trace-route', archetype: 'pressure', change: ['budget', 'trace-route'] },
+	{ id: 'memory:bit-rot', archetype: 'dynamics', change: ['movement', 'bit-rot'] },
+	{
+		id: 'memory:burst-transmission',
+		archetype: 'information',
+		change: ['availability', 'burst-transmission']
+	}
 ] as const;

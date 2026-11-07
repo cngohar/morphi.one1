@@ -38,7 +38,14 @@ function solve(seed: string, variant: string) {
 				live = live.filter(({ card }) => card.symbol === target.card.symbol);
 			}
 		}
+		if (variant === 'memory:firewall-ice') {
+			const unshielded = live.find(({ card }) => !card.isFirewall);
+			if (unshielded) {
+				live = live.filter(({ card }) => card.symbol === unshielded.card.symbol);
+			}
+		}
 		for (const { index } of live.filter(({ card }) => card.symbol === live[0].card.symbol)) {
+			if (round.matched.includes(index)) continue;
 			moves.push({ index });
 			round = flipCard(round, index).round;
 		}
@@ -181,7 +188,7 @@ describe('Memory variants', () => {
 	});
 
 	it('owns separate groups, complete messages, and trio scoring without changing pair scoring', () => {
-		expect(new Set(manifest.leaderboardGroups).size).toBe(90);
+		expect(new Set(manifest.leaderboardGroups).size).toBe(120);
 		for (const variant of manifest.variants) {
 			expect(MEMORY_VARIANTS).toContain(variant.id);
 			expect(messages[variant.name as keyof typeof messages]).toBeTruthy();
@@ -634,5 +641,100 @@ describe('Memory v1.3.5.5 pilot rules', () => {
 		// 10. Atlas Terminal
 		const at = createMemoryRound('42', 'memory:atlas-terminal');
 		expect(at.cards.length).toBeGreaterThanOrEqual(12);
+	});
+
+	it('verifies Batch C 10 network & cybernetic protocol ruleset mechanics', () => {
+		// 1. Edge Cache
+		let ec = createMemoryRound('42', 'memory:edge-cache');
+		expect(ec.edgeCache).toEqual({});
+		ec = mismatch(ec);
+		expect(Object.keys(ec.edgeCache ?? {}).length).toBe(2);
+		ec = resolveMismatch(ec);
+		expect(Object.keys(ec.edgeCache ?? {}).length).toBe(2);
+
+		// 2. Quantum Entangle
+		const qe = createMemoryRound('42', 'memory:quantum-entangle');
+		const qIdx = qe.cards.findIndex((c) => c.isQuantum);
+		expect(qIdx).toBeGreaterThanOrEqual(0);
+		const resQe = flipCard(qe, qIdx);
+		expect(resQe.effect).toBe('match'); // twin flipped together
+
+		// 3. Rate Limiter
+		let rl = createMemoryRound('42', 'memory:rate-limiter');
+		expect(rl.rateLimited).toBe(false);
+		rl = mismatch(rl);
+		rl = resolveMismatch(rl);
+		rl = mismatch(rl);
+		rl = resolveMismatch(rl);
+		rl = mismatch(rl);
+		expect(rl.rateLimited).toBe(true);
+
+		// 4. Register Buffer
+		const rb = createMemoryRound('42', 'memory:register-buffer');
+		const card0 = rb.cards[0];
+		const partnerIdx = rb.cards.findIndex((c, i) => i > 0 && c.symbol === card0.symbol);
+		// Flip card 0, then flip card 0 again to stash in buffer
+		const f1 = flipCard(rb, 0).round;
+		const fStash = flipCard(f1, 0).round;
+		expect(fStash.bufferCard?.symbol).toBe(card0.symbol);
+		expect(fStash.matched).toContain(0);
+		// Later flip partner -> matches directly with buffer!
+		const fMatch = flipCard(fStash, partnerIdx);
+		expect(fMatch.effect).toBe('match');
+		expect(fMatch.round.bufferCard).toBeNull();
+
+		// 5. Firewall ICE
+		const fi = createMemoryRound('42', 'memory:firewall-ice');
+		const fwIdx = fi.cards.findIndex((c) => c.isFirewall);
+		expect(fwIdx).toBeGreaterThanOrEqual(0);
+		expect(flipCard(fi, fwIdx).effect).toBe('ignored');
+
+		// 6. Anycast Route
+		let ar = createMemoryRound('42', 'memory:anycast-route');
+		const initialFirst = ar.cards[0].id;
+		ar = mismatch(ar);
+		ar = resolveMismatch(ar);
+		ar = mismatch(ar);
+		ar = resolveMismatch(ar);
+		ar = mismatch(ar);
+		expect(ar.cards[0].id).not.toBe(initialFirst);
+
+		// 7. TLS Handshake
+		const tls = createMemoryRound('42', 'memory:tls-handshake');
+		const synCard = tls.cards.find((c) => c.tlsStage === 'syn');
+		const ackCard = tls.cards.find((c) => c.tlsStage === 'ack');
+		expect(synCard).toBeDefined();
+		expect(ackCard).toBeDefined();
+
+		// 8. Trace Route
+		let tr = createMemoryRound('42', 'memory:trace-route');
+		expect(tr.traceMeter).toBe(0);
+		tr = mismatch(tr);
+		expect(tr.traceMeter).toBe(15);
+
+		// 9. Bit Rot
+		let br = createMemoryRound('42', 'memory:bit-rot');
+		expect(br.bitRot).toEqual({});
+		br = mismatch(br);
+		expect(Object.keys(br.bitRot ?? {}).length).toBe(2);
+
+		// 10. Burst Transmission
+		const bt = createMemoryRound('42', 'memory:burst-transmission');
+		expect(bt.burstStreak).toBe(0);
+		const p1 = [0, bt.cards.findIndex((c, i) => i > 0 && c.symbol === bt.cards[0].symbol)];
+		const res1 = flipCard(flipCard(bt, p1[0]).round, p1[1]).round;
+		expect(res1.burstStreak).toBe(1);
+		const remaining = res1.cards.findIndex((c, i) => !res1.matched.includes(i));
+		const p2 = [
+			remaining,
+			res1.cards.findIndex(
+				(c, i) =>
+					i !== remaining && !res1.matched.includes(i) && c.symbol === res1.cards[remaining].symbol
+			)
+		];
+		const res2 = flipCard(flipCard(res1, p2[0]).round, p2[1]).round;
+		expect(res2.burstStreak).toBe(2);
+		expect(res2.burstPing).toBeDefined();
+		expect(res2.burstPing!.length).toBe(3);
 	});
 });

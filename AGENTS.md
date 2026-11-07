@@ -33,6 +33,21 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.10 Batch C locally implemented & verified (2026-11-07):**
+The owner said “done accepted , you can start the implementation”, authorizing local app implementation
+of the 10 genuine Memory network and cybernetic protocol rulesets (CDN edge cache ghost imprint, Quantum
+entangled twin node, 429 rate limiter cooldown backoff, Data buffer register, ICE firewall barrier unblock,
+Anycast perimeter re-route shift, 3-way TLS cryptographic handshake, Security trace quarantine lockdown,
+Bit-rot data transposition, and Packet burst uplink flash).
+The 10 rulesets are implemented end-to-end under ponytail principles in `src/lib/puzzles/memory/logic.ts`,
+dimensions in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`,
+localization in `messages.ts`/`i18n`, and regenerated projections. Total catalog Memory variants are now
+40 (120 leaderboard groups). Multi-runtime vectors (6/6 runtimes, fingerprint `e11e8733...`), workspace types
+(0 errors/0 warnings), unit tests (44/44), real-D1 integration suite (15/15), and Playwright Chromium admin
+suite (3/3 at one worker) pass. Full `bun run verify` remains deferred; unauditioned audio and editor
+exclusions preserved. Ready for owner functional review; no auto-commit or push performed.
+See `docs/briefs/v1.3.5.10-batch-c-brief.md` and `docs/work/V1.3.5.10_WORK.md`.
+
 **v1.3.5.9 Batch B locally implemented & verified (2026-11-07):**
 The owner said “accepted and you can procced to implementaation”, selecting the standard light
 theme and authorizing local app implementation of the 10 genuine Memory exploration rulesets

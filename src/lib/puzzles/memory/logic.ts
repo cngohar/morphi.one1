@@ -20,6 +20,9 @@ export interface MemoryCard {
 	tier?: number;
 	isGravitino?: boolean;
 	isAnomaly?: boolean;
+	isQuantum?: boolean;
+	isFirewall?: boolean;
+	tlsStage?: 'syn' | 'ack';
 }
 
 export const MEMORY_VARIANTS = [
@@ -52,7 +55,17 @@ export const MEMORY_VARIANTS = [
 	'memory:gravitino-risk',
 	'memory:pulse-drive',
 	'memory:derelict-fog',
-	'memory:atlas-terminal'
+	'memory:atlas-terminal',
+	'memory:edge-cache',
+	'memory:quantum-entangle',
+	'memory:rate-limiter',
+	'memory:register-buffer',
+	'memory:firewall-ice',
+	'memory:anycast-route',
+	'memory:tls-handshake',
+	'memory:trace-route',
+	'memory:bit-rot',
+	'memory:burst-transmission'
 ] as const;
 export type MemoryVariant = (typeof MEMORY_VARIANTS)[number];
 
@@ -126,6 +139,21 @@ export interface MemoryRound {
 	pulseStreak?: number;
 	/** Derelict fog only: orthogonally illuminated card indices. */
 	illuminated?: number[];
+	/** Edge cache only: ghost imprint of recently inspected cards. */
+	edgeCache?: Record<number, { symbol: SymbolId; turns: number }>;
+	/** Rate limiter only: penalty cooldown and rate limit flag. */
+	rateLimited?: boolean;
+	rateLimitPenalty?: number;
+	/** Register buffer only: stashed 1-card buffer. */
+	bufferCard?: MemoryCard | null;
+	/** Trace route only: security trace percentage and quarantined card indices. */
+	traceMeter?: number;
+	quarantine?: number[];
+	/** Bit rot only: stale attempt tracking. */
+	bitRot?: Record<number, number>;
+	/** Burst transmission only: consecutive streak and pinged card indices. */
+	burstStreak?: number;
+	burstPing?: number[];
 	/** Group count: pairs (6/8/10), trios (6/8/10) or quads (4/5/6). */
 	pairs: number;
 	cards: MemoryCard[];
@@ -153,7 +181,9 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		selectedVariant === 'memory:hazard' ||
 		selectedVariant === 'memory:hyperdrive-warp' ||
 		selectedVariant === 'memory:gravitino-risk' ||
-		selectedVariant === 'memory:atlas-terminal'
+		selectedVariant === 'memory:atlas-terminal' ||
+		selectedVariant === 'memory:anycast-route' ||
+		selectedVariant === 'memory:bit-rot'
 	) {
 		const nextU64 = rng.nextU64;
 		rng.nextU64 = () => {
@@ -224,6 +254,21 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		for (const c of deck) {
 			if (c.symbol === gravSymbol.id) c.isGravitino = true;
 		}
+	} else if (selectedVariant === 'memory:quantum-entangle') {
+		const qSymbol = selected[0];
+		for (const c of deck) {
+			if (c.symbol === qSymbol.id) c.isQuantum = true;
+		}
+	} else if (selectedVariant === 'memory:tls-handshake') {
+		for (const symbol of selected) {
+			const cards = deck.filter((c) => c.symbol === symbol.id);
+			if (cards[0]) cards[0].tlsStage = 'syn';
+			if (cards[1]) cards[1].tlsStage = 'ack';
+		}
+	} else if (selectedVariant === 'memory:firewall-ice') {
+		const mid = Math.floor(deck.length / 2);
+		if (deck[mid - 1]) deck[mid - 1].isFirewall = true;
+		if (deck[mid]) deck[mid].isFirewall = true;
 	}
 
 	const round: MemoryRound = {
@@ -243,7 +288,9 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		selectedVariant === 'memory:hazard' ||
 		selectedVariant === 'memory:hyperdrive-warp' ||
 		selectedVariant === 'memory:gravitino-risk' ||
-		selectedVariant === 'memory:atlas-terminal'
+		selectedVariant === 'memory:atlas-terminal' ||
+		selectedVariant === 'memory:anycast-route' ||
+		selectedVariant === 'memory:bit-rot'
 	)
 		round.rngDraws = rngDraws;
 	if (selectedVariant === 'memory:lockout') round.lock = null;
@@ -261,6 +308,21 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 	if (selectedVariant === 'memory:life-support') round.lifeSupport = 100;
 	if (selectedVariant === 'memory:pulse-drive') round.pulseStreak = 1;
 	if (selectedVariant === 'memory:derelict-fog') round.illuminated = [];
+	if (selectedVariant === 'memory:edge-cache') round.edgeCache = {};
+	if (selectedVariant === 'memory:rate-limiter') {
+		round.rateLimited = false;
+		round.rateLimitPenalty = 0;
+	}
+	if (selectedVariant === 'memory:register-buffer') round.bufferCard = null;
+	if (selectedVariant === 'memory:trace-route') {
+		round.traceMeter = 0;
+		round.quarantine = [];
+	}
+	if (selectedVariant === 'memory:bit-rot') round.bitRot = {};
+	if (selectedVariant === 'memory:burst-transmission') {
+		round.burstStreak = 0;
+		round.burstPing = [];
+	}
 	return round;
 }
 
@@ -369,21 +431,54 @@ function warpAnomalyCards(round: MemoryRound): MemoryRound {
 	return { ...round, cards };
 }
 
+function shiftPerimeterClockwise(round: MemoryRound): MemoryRound {
+	const cols = 4;
+	const rows = Math.floor(round.cards.length / cols);
+	const perimeter: number[] = [];
+	for (let c = 0; c < cols; c++) perimeter.push(c);
+	for (let r = 1; r < rows; r++) perimeter.push(r * cols + (cols - 1));
+	for (let c = cols - 2; c >= 0; c--) perimeter.push((rows - 1) * cols + c);
+	for (let r = rows - 2; r >= 1; r--) perimeter.push(r * cols);
+
+	const cards = round.cards.slice();
+	const firstCard = cards[perimeter[perimeter.length - 1]];
+	for (let i = perimeter.length - 1; i > 0; i--) {
+		cards[perimeter[i]] = cards[perimeter[i - 1]];
+	}
+	cards[perimeter[0]] = firstCard;
+	return { ...round, cards };
+}
+
 export function flipCard(round: MemoryRound, index: number): FlipResult {
 	const matchSize = cardsPerMatch(round);
 	if (round.status !== 'playing' || round.revealed.length >= matchSize || memoryCapReached(round)) {
 		return { round, effect: 'ignored' };
 	}
 
-	if (round.matched.includes(index) || round.revealed.includes(index) || index === round.lock) {
+	const variant = memoryVariant(round);
+	const isBufferStash =
+		variant === 'memory:register-buffer' &&
+		round.revealed.length === 1 &&
+		round.revealed[0] === index;
+
+	if (
+		round.matched.includes(index) ||
+		(round.revealed.includes(index) && !isBufferStash) ||
+		index === round.lock
+	) {
 		return { round, effect: 'ignored' };
 	}
 
 	const cols = 4;
 	const row = Math.floor(index / cols);
-	const variant = memoryVariant(round);
 
 	if (variant === 'memory:superstorm' && row === round.stormFrostedRow) {
+		return { round, effect: 'ignored' };
+	}
+	if (variant === 'memory:firewall-ice' && round.cards[index]?.isFirewall) {
+		return { round, effect: 'ignored' };
+	}
+	if (variant === 'memory:trace-route' && round.quarantine?.includes(index)) {
 		return { round, effect: 'ignored' };
 	}
 
@@ -406,6 +501,50 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		if (r < Math.floor(round.cards.length / cols) - 1) illuminated.push(index + cols);
 		if (c > 0) illuminated.push(index - 1);
 		if (c < cols - 1) illuminated.push(index + 1);
+	}
+
+	// Register buffer mechanics
+	if (variant === 'memory:register-buffer') {
+		const base = round.marked?.length ? { ...round, marked: [] } : round;
+		if (round.bufferCard) {
+			const moves = round.moves + 1;
+			if (card.symbol === round.bufferCard.symbol) {
+				const matched = [...round.matched, index].sort((a, b) => a - b);
+				const won = matched.length === round.cards.length;
+				return {
+					round: {
+						...base,
+						revealed: [],
+						matched,
+						bufferCard: null,
+						moves,
+						status: won ? 'won' : 'playing'
+					},
+					effect: won ? 'win' : 'match'
+				};
+			} else {
+				return {
+					round: {
+						...base,
+						revealed: [index],
+						mismatches: round.mismatches + 1,
+						moves
+					},
+					effect: 'mismatch'
+				};
+			}
+		} else if (round.revealed.length === 1 && round.revealed[0] === index) {
+			return {
+				round: {
+					...base,
+					bufferCard: card,
+					matched: [...round.matched, index].sort((a, b) => a - b),
+					revealed: [],
+					moves: round.moves + 1
+				},
+				effect: 'flip'
+			};
+		}
 	}
 
 	// Single-flip continuity
@@ -447,6 +586,15 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	}
 
 	const revealed = [...round.revealed, index];
+	if (variant === 'memory:quantum-entangle' && card.isQuantum && round.revealed.length === 0) {
+		const twin = round.cards.findIndex(
+			(c, i) => i !== index && c.symbol === card.symbol && !round.matched.includes(i)
+		);
+		if (twin >= 0) {
+			revealed.push(twin);
+		}
+	}
+
 	// Any accepted flip ends the marked-swap highlight, clears sonar flash and illuminated cone.
 	const base =
 		round.marked?.length || round.sonar?.length || round.illuminated?.length
@@ -483,6 +631,13 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		}
 	}
 
+	if (variant === 'memory:tls-handshake' && isMatch) {
+		const stages = revealed.map((pos) => round.cards[pos].tlsStage);
+		if (!stages.includes('syn') || !stages.includes('ack')) {
+			isMatch = false;
+		}
+	}
+
 	if (isMatch) {
 		const collapse = variant === 'memory:collapse';
 		const matched = collapse ? [] : [...round.matched, ...revealed].sort((a, b) => a - b);
@@ -508,6 +663,35 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 
 		if (variant === 'memory:hyperdrive-warp' && (card.isAnomaly || first.isAnomaly)) {
 			cards = warpAnomalyCards({ ...round, cards, matched }).cards;
+		}
+
+		if (variant === 'memory:firewall-ice') {
+			cards = cards.map((c, i) => {
+				if (!c.isFirewall) return c;
+				const isAdj = revealed.some((pos) => {
+					const r1 = Math.floor(pos / cols);
+					const c1 = pos % cols;
+					const r2 = Math.floor(i / cols);
+					const c2 = i % cols;
+					return Math.abs(r1 - r2) + Math.abs(c1 - c2) === 1;
+				});
+				return isAdj ? { ...c, isFirewall: false } : c;
+			});
+		}
+
+		const traceMeter =
+			variant === 'memory:trace-route'
+				? Math.max(0, (round.traceMeter ?? 0) - 10)
+				: round.traceMeter;
+
+		let burstPing: number[] | undefined;
+		const burstStreak =
+			variant === 'memory:burst-transmission' ? (round.burstStreak ?? 0) + 1 : round.burstStreak;
+		if (variant === 'memory:burst-transmission' && (burstStreak ?? 0) >= 2) {
+			burstPing = cards
+				.map((_, i) => i)
+				.filter((i) => !matched.includes(i))
+				.slice(0, 3);
 		}
 
 		let sonar: number[] | undefined;
@@ -543,7 +727,10 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				...(glyphTier !== undefined ? { glyphTier } : {}),
 				...(sentinelHeat !== undefined ? { sentinelHeat } : {}),
 				...(pulseStreak !== undefined ? { pulseStreak } : {}),
-				...(lifeSupport !== undefined ? { lifeSupport } : {})
+				...(lifeSupport !== undefined ? { lifeSupport } : {}),
+				...(traceMeter !== undefined ? { traceMeter } : {}),
+				...(burstStreak !== undefined ? { burstStreak } : {}),
+				...(burstPing ? { burstPing } : {})
 			},
 			effect: won ? 'win' : 'match'
 		};
@@ -583,6 +770,40 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		mismatched.stormFrostedRow = -1;
 	}
 
+	if (variant === 'memory:rate-limiter') {
+		const penalty = (round.rateLimitPenalty ?? 0) + 1;
+		mismatched.rateLimitPenalty = penalty;
+		if ((round.mismatches + 1) % 3 === 0) {
+			mismatched.rateLimited = true;
+		}
+	}
+
+	if (variant === 'memory:trace-route') {
+		const trace = Math.min(100, (round.traceMeter ?? 0) + 15);
+		mismatched.traceMeter = trace;
+		if (trace === 100) {
+			const unrevealed = round.cards
+				.map((_, i) => i)
+				.filter((i) => !round.matched.includes(i) && !revealed.includes(i));
+			mismatched.quarantine = unrevealed.slice(0, 2);
+		}
+	}
+
+	if (variant === 'memory:edge-cache') {
+		const cache: Record<number, { symbol: SymbolId; turns: number }> = {
+			...(round.edgeCache ?? {})
+		};
+		for (const pos of revealed) {
+			cache[pos] = { symbol: round.cards[pos].symbol, turns: 2 };
+		}
+		mismatched.edgeCache = cache;
+	}
+
+	if (variant === 'memory:burst-transmission') {
+		mismatched.burstStreak = 0;
+		mismatched.burstPing = [];
+	}
+
 	// Lock the last card only while two other unmatched cards keep a legal attempt open.
 	if (variant === 'memory:lockout')
 		mismatched.lock =
@@ -598,6 +819,28 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		finalRound = moveFaceDownCards(finalRound);
 	} else if (isGravitinoMismatch) {
 		finalRound = scrambleColumn(finalRound, index % cols);
+	} else if (variant === 'memory:anycast-route' && (round.mismatches + 1) % 3 === 0) {
+		finalRound = shiftPerimeterClockwise(finalRound);
+	} else if (variant === 'memory:bit-rot') {
+		const rot: Record<number, number> = { ...(round.bitRot ?? {}) };
+		for (const pos of revealed) {
+			rot[pos] = (rot[pos] ?? 0) + 1;
+		}
+		const cards = [...finalRound.cards];
+		for (const [posStr, count] of Object.entries(rot)) {
+			const pos = Number(posStr);
+			if (count >= 3 && !round.matched.includes(pos)) {
+				const swapTarget = (pos + 1) % cards.length;
+				if (!round.matched.includes(swapTarget)) {
+					const tmp = cards[pos];
+					cards[pos] = cards[swapTarget];
+					cards[swapTarget] = tmp;
+					rot[pos] = 0;
+					rot[swapTarget] = 0;
+				}
+			}
+		}
+		finalRound = { ...finalRound, cards, bitRot: rot };
 	}
 
 	return {
@@ -611,11 +854,22 @@ export function resolveMismatch(round: MemoryRound): MemoryRound {
 		return round;
 	}
 
-	const hidden = {
+	let hidden: MemoryRound = {
 		...round,
 		revealed: [],
-		...(round.illuminated?.length ? { illuminated: [] } : {})
+		...(round.illuminated?.length ? { illuminated: [] } : {}),
+		...(round.burstPing?.length ? { burstPing: [] } : {}),
+		...(round.quarantine?.length ? { quarantine: [] } : {})
 	};
+	if (round.edgeCache) {
+		const nextCache: Record<number, { symbol: SymbolId; turns: number }> = {};
+		for (const [posStr, entry] of Object.entries(round.edgeCache)) {
+			if (entry.turns > 1) {
+				nextCache[Number(posStr)] = { symbol: entry.symbol, turns: entry.turns - 1 };
+			}
+		}
+		hidden = { ...hidden, edgeCache: nextCache };
+	}
 	const variant = memoryVariant(round);
 	if (variant === 'memory:swaps') return swapHiddenCards(hidden);
 	if (variant === 'memory:drift') return driftRow(hidden, round.revealed[0]);

@@ -971,6 +971,222 @@ const metadata = {
 					note: 'v1.game.memory.scoringNote',
 					tips: 'memory.atlasTerminal.tips'
 				}
+			},
+			{
+				id: 'memory:edge-cache',
+				name: 'variant.memory:edge-cache',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:edge-cache:6',
+					'memory-1:edge-cache:8',
+					'memory-1:edge-cache:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.edgeCache.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.edgeCache.tips'
+				}
+			},
+			{
+				id: 'memory:quantum-entangle',
+				name: 'variant.memory:quantum-entangle',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:quantum-entangle:6',
+					'memory-1:quantum-entangle:8',
+					'memory-1:quantum-entangle:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.quantumEntangle.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.quantumEntangle.tips'
+				}
+			},
+			{
+				id: 'memory:rate-limiter',
+				name: 'variant.memory:rate-limiter',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:rate-limiter:6',
+					'memory-1:rate-limiter:8',
+					'memory-1:rate-limiter:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.rateLimiter.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.rateLimiter.tips'
+				}
+			},
+			{
+				id: 'memory:register-buffer',
+				name: 'variant.memory:register-buffer',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:register-buffer:6',
+					'memory-1:register-buffer:8',
+					'memory-1:register-buffer:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.registerBuffer.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.registerBuffer.tips'
+				}
+			},
+			{
+				id: 'memory:firewall-ice',
+				name: 'variant.memory:firewall-ice',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:firewall-ice:6',
+					'memory-1:firewall-ice:8',
+					'memory-1:firewall-ice:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.firewallIce.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.firewallIce.tips'
+				}
+			},
+			{
+				id: 'memory:anycast-route',
+				name: 'variant.memory:anycast-route',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:anycast-route:6',
+					'memory-1:anycast-route:8',
+					'memory-1:anycast-route:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.anycastRoute.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.anycastRoute.tips'
+				}
+			},
+			{
+				id: 'memory:tls-handshake',
+				name: 'variant.memory:tls-handshake',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:tls-handshake:6',
+					'memory-1:tls-handshake:8',
+					'memory-1:tls-handshake:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.tlsHandshake.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.tlsHandshake.tips'
+				}
+			},
+			{
+				id: 'memory:trace-route',
+				name: 'variant.memory:trace-route',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:trace-route:6',
+					'memory-1:trace-route:8',
+					'memory-1:trace-route:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.traceRoute.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.traceRoute.tips'
+				}
+			},
+			{
+				id: 'memory:bit-rot',
+				name: 'variant.memory:bit-rot',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: ['memory-1:bit-rot:6', 'memory-1:bit-rot:8', 'memory-1:bit-rot:10'],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.bitRot.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.bitRot.tips'
+				}
+			},
+			{
+				id: 'memory:burst-transmission',
+				name: 'variant.memory:burst-transmission',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:burst-transmission:6',
+					'memory-1:burst-transmission:8',
+					'memory-1:burst-transmission:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.burstTransmission.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.burstTransmission.tips'
+				}
 			}
 		],
 		ending: {
@@ -1078,6 +1294,36 @@ const metadata = {
 				'memory-1:atlas-terminal:6': 'leaderboard.memory.atlas-terminal.6',
 				'memory-1:atlas-terminal:8': 'leaderboard.memory.atlas-terminal.8',
 				'memory-1:atlas-terminal:10': 'leaderboard.memory.atlas-terminal.10',
+				'memory-1:edge-cache:6': 'leaderboard.memory.edge-cache.6',
+				'memory-1:edge-cache:8': 'leaderboard.memory.edge-cache.8',
+				'memory-1:edge-cache:10': 'leaderboard.memory.edge-cache.10',
+				'memory-1:quantum-entangle:6': 'leaderboard.memory.quantum-entangle.6',
+				'memory-1:quantum-entangle:8': 'leaderboard.memory.quantum-entangle.8',
+				'memory-1:quantum-entangle:10': 'leaderboard.memory.quantum-entangle.10',
+				'memory-1:rate-limiter:6': 'leaderboard.memory.rate-limiter.6',
+				'memory-1:rate-limiter:8': 'leaderboard.memory.rate-limiter.8',
+				'memory-1:rate-limiter:10': 'leaderboard.memory.rate-limiter.10',
+				'memory-1:register-buffer:6': 'leaderboard.memory.register-buffer.6',
+				'memory-1:register-buffer:8': 'leaderboard.memory.register-buffer.8',
+				'memory-1:register-buffer:10': 'leaderboard.memory.register-buffer.10',
+				'memory-1:firewall-ice:6': 'leaderboard.memory.firewall-ice.6',
+				'memory-1:firewall-ice:8': 'leaderboard.memory.firewall-ice.8',
+				'memory-1:firewall-ice:10': 'leaderboard.memory.firewall-ice.10',
+				'memory-1:anycast-route:6': 'leaderboard.memory.anycast-route.6',
+				'memory-1:anycast-route:8': 'leaderboard.memory.anycast-route.8',
+				'memory-1:anycast-route:10': 'leaderboard.memory.anycast-route.10',
+				'memory-1:tls-handshake:6': 'leaderboard.memory.tls-handshake.6',
+				'memory-1:tls-handshake:8': 'leaderboard.memory.tls-handshake.8',
+				'memory-1:tls-handshake:10': 'leaderboard.memory.tls-handshake.10',
+				'memory-1:trace-route:6': 'leaderboard.memory.trace-route.6',
+				'memory-1:trace-route:8': 'leaderboard.memory.trace-route.8',
+				'memory-1:trace-route:10': 'leaderboard.memory.trace-route.10',
+				'memory-1:bit-rot:6': 'leaderboard.memory.bit-rot.6',
+				'memory-1:bit-rot:8': 'leaderboard.memory.bit-rot.8',
+				'memory-1:bit-rot:10': 'leaderboard.memory.bit-rot.10',
+				'memory-1:burst-transmission:6': 'leaderboard.memory.burst-transmission.6',
+				'memory-1:burst-transmission:8': 'leaderboard.memory.burst-transmission.8',
+				'memory-1:burst-transmission:10': 'leaderboard.memory.burst-transmission.10',
 				'memory-1:quads:4': 'leaderboard.memory.quads.4',
 				'memory-1:quads:5': 'leaderboard.memory.quads.5',
 				'memory-1:quads:6': 'leaderboard.memory.quads.6'

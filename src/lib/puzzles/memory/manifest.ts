@@ -57,7 +57,17 @@ const NEW_PAIR_SUFFIXES = [
 	'gravitino-risk',
 	'pulse-drive',
 	'derelict-fog',
-	'atlas-terminal'
+	'atlas-terminal',
+	'edge-cache',
+	'quantum-entangle',
+	'rate-limiter',
+	'register-buffer',
+	'firewall-ice',
+	'anycast-route',
+	'tls-handshake',
+	'trace-route',
+	'bit-rot',
+	'burst-transmission'
 ] as const;
 const NEW_GROUPS = [
 	...NEW_PAIR_SUFFIXES.flatMap((suffix) => groupIds(suffix, PAIR_COUNTS)),
@@ -317,6 +327,46 @@ export const manifest = {
 		pairVariant('atlas-terminal', 120, {
 			steps: ['v1.game.memory.step1', 'memory.atlasTerminal.step2', 'v1.game.memory.step3'],
 			tips: 'memory.atlasTerminal.tips'
+		}),
+		pairVariant('edge-cache', 120, {
+			steps: ['v1.game.memory.step1', 'memory.edgeCache.step2', 'v1.game.memory.step3'],
+			tips: 'memory.edgeCache.tips'
+		}),
+		pairVariant('quantum-entangle', 120, {
+			steps: ['v1.game.memory.step1', 'memory.quantumEntangle.step2', 'v1.game.memory.step3'],
+			tips: 'memory.quantumEntangle.tips'
+		}),
+		pairVariant('rate-limiter', 120, {
+			steps: ['v1.game.memory.step1', 'memory.rateLimiter.step2', 'v1.game.memory.step3'],
+			tips: 'memory.rateLimiter.tips'
+		}),
+		pairVariant('register-buffer', 120, {
+			steps: ['v1.game.memory.step1', 'memory.registerBuffer.step2', 'v1.game.memory.step3'],
+			tips: 'memory.registerBuffer.tips'
+		}),
+		pairVariant('firewall-ice', 120, {
+			steps: ['v1.game.memory.step1', 'memory.firewallIce.step2', 'v1.game.memory.step3'],
+			tips: 'memory.firewallIce.tips'
+		}),
+		pairVariant('anycast-route', 120, {
+			steps: ['v1.game.memory.step1', 'memory.anycastRoute.step2', 'v1.game.memory.step3'],
+			tips: 'memory.anycastRoute.tips'
+		}),
+		pairVariant('tls-handshake', 120, {
+			steps: ['v1.game.memory.step1', 'memory.tlsHandshake.step2', 'v1.game.memory.step3'],
+			tips: 'memory.tlsHandshake.tips'
+		}),
+		pairVariant('trace-route', 120, {
+			steps: ['v1.game.memory.step1', 'memory.traceRoute.step2', 'v1.game.memory.step3'],
+			tips: 'memory.traceRoute.tips'
+		}),
+		pairVariant('bit-rot', 120, {
+			steps: ['v1.game.memory.step1', 'memory.bitRot.step2', 'v1.game.memory.step3'],
+			tips: 'memory.bitRot.tips'
+		}),
+		pairVariant('burst-transmission', 120, {
+			steps: ['v1.game.memory.step1', 'memory.burstTransmission.step2', 'v1.game.memory.step3'],
+			tips: 'memory.burstTransmission.tips'
 		})
 	],
 	maxMoves: 180,
