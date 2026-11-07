@@ -1,5 +1,45 @@
 # DECISIONS.md
 
+## 2026-11-07 — v1.3.5.1 local acceptance and source-only GitHub handoff
+
+- Owner instruction: “ok mark this accepted and push to github”. This accepts
+  the implemented .1 Games extraction locally and authorizes this source-only
+  commit/push to existing `origin/main`, superseding earlier .1 pending-review
+  notes and push restrictions for this handoff only.
+- Retain the 2026-11-06 scoped verification and unchanged-UI comparison evidence.
+  No new automated results or device/browser details were supplied. Full
+  `bun run verify` remains deferred, not passed or waived; no version changed.
+- Exclude the three unauditioned MP3s, unrelated local editor/MCP settings,
+  pre-existing palette timings and ignored credentials/runtime artifacts.
+  No .2 selection, future commit/push, deployment or production change is inferred.
+
+## 2026-11-06 — v1.3.5.1 brief accepted, local extraction selected
+
+- Owner accepted the fresh .1 brief and said “accepted, you can continue”. Use
+  the current Games UI as an unchanged reference and the proposed single shared
+  `bun run check` compatibility check. This is brief/scope acceptance, not a
+  claim of size-specific device review or completed implementation acceptance.
+- Extract Games UI and admin server responsibilities; preserve shared route
+  guards/scoring, services, SQL/cache, actions, recovery and existing identities.
+  No new variant, dependency/version, schema, endpoint or policy change.
+- Only .1 is authorized. Stop after focused evidence/report; no .2, automatic
+  commit/push, deployment or production change. Full verify remains deferred.
+
+## 2026-11-06 — Standing definition of a puzzle variant
+
+- Owner direction applies to all coming updates and future puzzle families: a
+  variant requires a meaningful gameplay rule or rule-setting difference. Each
+  candidate must state its baseline and concrete difference in its matrix/brief.
+- Colors, palettes, symbol artwork, themes, animation, purely visual layouts and
+  a different seed/deal are cosmetic or instance changes, not new variants. Board
+  size/layout qualifies only when it changes gameplay rules or rule settings;
+  duplicate gameplay configurations must not inflate catalogue counts.
+- This records a standing design rule in `AGENTS.md` and the puzzle brief
+  template. It does not remove/rename accepted variants or alter old replay.
+  The current draft remains Memory-only, capped at 100 total including the
+  existing four; theoretical products are not verified variant counts. No app
+  implementation is authorized by this documentation update.
+
 ## 2026-11-05 — v1.3.3 Member Support local acceptance
 
 - The owner confirmed they already reviewed and accepted Member Support. This supersedes earlier pending-review notes. Remaining improvements are deferred to later stages; details and scope were not supplied.

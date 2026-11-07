@@ -44,7 +44,7 @@ async function inspectDrawer(page: Page, row: Locator) {
 	expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport.height);
 	expect(await drawer.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
 	await page.screenshot({
-		path: `build/v1.3.4-slice0/drawer-${viewport.width}x${viewport.height}.png`
+		path: `build/v1.3.5.1/drawer-${viewport.width}x${viewport.height}.png`
 	});
 	for (const key of ['Tab', 'Shift+Tab']) {
 		await close.focus();
@@ -68,7 +68,7 @@ async function inspectDrawer(page: Page, row: Locator) {
 		table.getByRole('columnheader', { name: 'Average duration (seconds)' })
 	).toBeInViewport();
 	if (viewport.height === 390)
-		await page.screenshot({ path: 'build/v1.3.4-slice0/drawer-landscape-scrolled.png' });
+		await page.screenshot({ path: 'build/v1.3.5.1/drawer-landscape-scrolled.png' });
 	await drawer.evaluate((node) => {
 		node.scrollTop = 0;
 	});
@@ -198,6 +198,22 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		await page.keyboard.press('Escape');
 		await expect(drawer).not.toBeVisible();
 		const movingState = await moving.locator('input[name=action]').inputValue();
+		for (const [path, variant] of [
+			['/admin/games?game=memory', 'memory:unknown'],
+			['/admin/users', 'memory:moving']
+		] as const) {
+			const rejected = await context.request.post(path, {
+				headers: { Origin: 'http://localhost:5173' },
+				form: {
+					action: 'variant-disable',
+					target: 'memory',
+					variant,
+					reason: 'CASE-EXTRACTION-REJECT',
+					confirm: 'yes'
+				}
+			});
+			expect(rejected.status()).toBe(400);
+		}
 		if (movingState === 'variant-enable') {
 			await expect(moving.locator('input[name=reason]')).toHaveCount(0);
 			await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-ENABLE');
@@ -389,9 +405,24 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			{ width: 1280, height: 800 }
 		]) {
 			await page.setViewportSize(viewport);
-			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
-				false
-			);
+			for (const [state, query] of [
+				['overview', ''],
+				['statistics', '?game=memory'],
+				['scoring', '?game=memory&subview=scoring'],
+				['settings', '?game=memory&subview=settings']
+			]) {
+				await page.goto(`/admin/games${query}`);
+				await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
+				await expect(page.getByRole('alert')).toHaveCount(0);
+				await expect(page.locator('.scoring-card')).toHaveCount(state === 'scoring' ? 2 : 0);
+				expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
+					false
+				);
+				await page.screenshot({
+					path: `build/v1.3.5.1/games-${state}-${viewport.width}x${viewport.height}.png`,
+					fullPage: true
+				});
+			}
 			await inspectDrawer(page, moving);
 		}
 		await page.locator('dialog.variant-drawer').evaluate((node: HTMLDialogElement) => {

@@ -14,6 +14,13 @@ Files under `references/` are reference material, not authorization to implement
 
 ## Planning
 
+- [V1.3.5 Memory roadmap and AI handoff](planning/V1.3.5_ROADMAP.md) — draft;
+  shared entry point for Gemini, Codex and other coding agents. One selected
+  milestone at a time; Memory-only cap of 100 total. Completed .1 is accepted
+  locally on 2026-11-07 with this source-only GitHub handoff authorized; later
+  milestones remain unselected.
+- [V1.3.5 browser preview](planning/v1.3.5-preview.html) — human summary;
+  the editable roadmap holds the execution instructions.
 - [IDEAS](planning/IDEAS.md)
 - [LAUNCH_CHECKLIST](planning/LAUNCH_CHECKLIST.md)
 - [PROTOTYPE_NOTES](planning/PROTOTYPE_NOTES.md)
@@ -23,6 +30,7 @@ Files under `references/` are reference material, not authorization to implement
 
 ## Implementation briefs
 
+- [v1.3.5.1-games-extraction-brief](briefs/v1.3.5.1-games-extraction-brief.md) — brief and completed local extraction accepted; source-only GitHub handoff authorized 2026-11-07.
 - [morphi-engine-refactor-brief](briefs/morphi-engine-refactor-brief.md)
 - [morphi-v1.3-memory-variants-codex-brief](briefs/morphi-v1.3-memory-variants-codex-brief.md)
 - [morphi-v1.3.1-codex-brief](briefs/morphi-v1.3.1-codex-brief.md)
@@ -30,6 +38,7 @@ Files under `references/` are reference material, not authorization to implement
 
 ## Work records
 
+- [V1.3.5.1_WORK](work/V1.3.5.1_WORK.md) — accepted local Games extraction; retained focused evidence and source-only handoff boundary.
 - [V1.3.4_SLICE0_WORK](work/V1.3.4_SLICE0_WORK.md) — admin/query only; Mahjong excluded and deferred to later plans.
 
 - [STEP6_WORK](work/STEP6_WORK.md)

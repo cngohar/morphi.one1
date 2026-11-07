@@ -8,7 +8,7 @@
 
 # AGENTS.md (Morphi)
 
-Instructions for coding agents (Codex, OpenCode, Claude Code, etc.) working in this repo.
+Instructions for coding agents (Codex, Gemini, OpenCode, Claude Code, etc.) working in this repo.
 
 ## Subagent policy
 
@@ -32,6 +32,27 @@ For testing and verification:
 `morphi-plan-simple.md` is the active day-to-day plan: games first, architecture second. The owner reaffirmed this on 2026-10-23. `docs/PLAN.md` is reference only; pull in relevant sections when the simple plan calls for them. The simple plan and explicit owner instructions take precedence over the full-plan phase requirements below; do not introduce the full platform architecture as a prerequisite to game work. `docs/DECISIONS.md` lists decisions already made. Use `docs/CODEMAP.md` to find code before running broad searches. Report unresolved conflicts to the owner.
 
 ## Current phase
+
+**v1.3.5.1 accepted locally; source-only GitHub handoff authorized (2026-11-07):**
+The owner said “ok mark this accepted and push to github”, accepting the completed
+Games extraction and authorizing this source-only commit/push to existing
+`origin/main`. This supersedes earlier .1 pending-review and commit/push limits
+for this handoff only. Existing scoped format/lint/types, four D1 cases, two
+Chromium cases and source/capture comparisons at all three sizes remain the
+verification evidence; no new checks or device/browser details were supplied.
+Preserve shared security/scoring, roadmap C1–C10, full-verification deferral and
+the unauditioned-audio exclusion; unrelated local editor/MCP settings and palette
+timing changes remain local. No .2, future commit/push, deployment or production
+change is authorized. See `docs/work/V1.3.5.1_WORK.md`.
+
+**v1.3.5 planning handoff (2026-11-06):**
+`docs/planning/V1.3.5_ROADMAP.md` is the shared, model-independent entry point
+for the draft Memory-only roadmap. Read its START HERE instructions before
+preparing or resuming a selected milestone; the HTML preview is a human summary.
+This planning handoff does not authorize implementation or replace the active
+simple plan. A later explicit owner instruction may authorize one selected
+milestone; preserve its visual gates, focused-check limits and complete stopping
+point. Do not infer approval of all provisional batches or an automatic commit.
 
 **Source-only GitHub handoff authorized (2026-11-05).** The owner explicitly requested committing the current source handoff and pushing to the existing `origin/main`. Include accepted v1.3.2 changes, local v1.3.3 support and reorganized documentation. This supersedes the commit/push restrictions below only for this handoff. Preserve full-verification deferral and the unauditioned-audio exclusion; v1.3.3 local acceptance is recorded below; no deployment or production change is authorized.
 
@@ -206,6 +227,7 @@ a best-effort diagnostic; no numeric target was supplied.
 6. **Engine rules.** `packages/engine` is TypeScript, deterministic, and headless, split into `core` (integer-only, banned-math lint) and `theme` (fixed-point or float color math allowed, never `Date.now` or `Math.random`): SplitMix64 seeded RNG, integer-only logic, no `Math.random`, `Date.now`, or approximated Math functions (sin, cos, tan, exp, log, pow, sqrt) in engine core code (a lint rule enforces this), no unordered-map iteration in output, canonical serialized output, 64-bit seeds as decimal strings. Every puzzle needs the tests in the plan plus known test vectors, run in Node, Bun, Chromium, Firefox, WebKit, and the Worker. The vectors are the spec for any later Rust/WASM port.
 7. **Never trust the client.** The server replays moves and computes scores. The client never submits a score or picks a ranked seed.
 8. **Themes are cosmetic only** and never affect solvability, difficulty, validation, or score. Puzzle palettes come from curated recipes (data), verified by `scripts/check-palettes` with a safety margin. Never raw random colors, never gradients, never rely on color alone.
+   **Variant identity (owner, 2026-11-06):** applies to every current/future update and puzzle family. A new variant must make a meaningful gameplay rule or rule-setting change: for example matching requirements, legal moves, information available to the player, movement after a miss, time/move limits or win conditions. Colors, palettes, symbol artwork, themes, animation, purely visual layouts and different seeds/deals do not create variants. A layout or board-size change qualifies only when it changes gameplay rules or rule settings. Every proposed variant's matrix/brief must name its baseline and concrete rule difference; do not assign separate variant identities or inflate counts for the same gameplay rules with different cosmetics or seeds. This standing definition does not authorize retroactive removal, renaming or replay changes to accepted variants.
 9. **UI:** mobile first, light first, full-screen and minimal. Colors only from the tokens in section 11.1a. Follow the anti-slop checklist in section 11.1 (flat fills, no gradients, no glows, no shadows or bevels on game objects, no emoji icons), typography in section 11.8, and motion in section 11.9 (anime.js is approved for sequencing, only through the `motion` wrapper; animation never drives game logic). All user-facing text goes through the message catalog (section 11.7), with no text inside SVG. Wireframes in all three sizes (phone portrait 390x844, phone landscape 844x390, desktop 1280x800) are approved before the first screen set and each new puzzle's screen are built. Chrome controls (menu, sound, fullscreen) anchor to the viewport corners and never sit inside the puzzle container. Layout comes from viewport and container size (layout profiles, container queries), never from user-agent sniffing, and boards use the space on large screens (section 11.1).
 10. **Puzzle types are packages** with a manifest and the Stage and layout contract (section 11.11). Recipes, styles, and difficulty bands are data, not hard-coded lists.
 11. **Failure behavior is part of every feature** (section 11.4): never a white screen, never a lost result, always a logged event.

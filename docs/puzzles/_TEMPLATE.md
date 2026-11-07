@@ -22,6 +22,19 @@ Copy this file to `docs/puzzles/<id>.md` before building a puzzle. The owner app
 - Score formula, "so close" threshold, and the minimum human time:
 - Move cap and abandonment rules:
 
+## Variants and rule differences (standing owner rule, 2026-11-06)
+
+- For each proposed variant: baseline, concrete gameplay rule/rule-setting
+  difference, supported combinations and any invalid combinations.
+- A variant must change gameplay: matching, legal moves, available information,
+  movement, limits or win conditions, for example. Board size/layout qualifies
+  only when it changes gameplay rules or rule settings.
+- Colors, artwork, themes, animation, purely visual layouts and new seeds/deals
+  are not variants. Do not give duplicate gameplay rules separate variant
+  identities or inflate the catalogue with cosmetic/instance changes.
+- Apply this definition to every new family and subsequent update. Preserve
+  accepted identities and replay compatibility unless separately authorized.
+
 ## Layout and style
 
 - Layout profiles (compact, medium, expanded) and the stage mode for each (`centered`, `wide`, `full`):

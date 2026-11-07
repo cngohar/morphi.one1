@@ -7,13 +7,7 @@ import {
 	publishThemeDraft,
 	rollbackThemeConfig
 } from '#lib/server/theme-admin.js';
-import {
-	gameOverview,
-	cachedGameOverview,
-	gameStatistics,
-	changeGame,
-	changeVariant
-} from '#lib/server/games.js';
+import { loadGamesAdmin, changeGamesAdmin } from '#lib/server/games-admin.js';
 import { readAudit, exportAuditYear } from '#lib/server/audit.js';
 import { softDeleteUser, restoreDeletedUser } from '#lib/server/user-lifecycle.js';
 import { userDirectory, userDetail, userOverview } from '#lib/server/admin-users.js';
@@ -120,9 +114,10 @@ export const load: PageServerLoad = async (event) => {
 		drafts: Awaited<ReturnType<typeof listThemeDrafts>>;
 		versions: Awaited<ReturnType<typeof listThemeVersions>>;
 	} | null = null;
-	let games: Awaited<ReturnType<typeof gameOverview>> = [];
-	let gamesOverview: Awaited<ReturnType<typeof cachedGameOverview>> | null = null;
-	let gameStats: Awaited<ReturnType<typeof gameStatistics>> = {
+	type GamesAdminData = Awaited<ReturnType<typeof loadGamesAdmin>>;
+	let games: GamesAdminData['games'] = [];
+	let gamesOverview: GamesAdminData['gamesOverview'] = null;
+	let gameStats: GamesAdminData['gameStats'] = {
 		rows: [],
 		more: false,
 		variants: []
@@ -166,13 +161,11 @@ export const load: PageServerLoad = async (event) => {
 			else usersOverview = await userOverview(env.DB, actor);
 		}
 		if (event.params.view === 'games') {
-			if (selectedGame) {
-				games = await gameOverview(env.DB, selectedGame);
-				gameStats = await gameStatistics(env.DB, selectedGame, games[0]);
-			} else {
-				gamesOverview = await cachedGameOverview(env.DB, env.CONFIG_CACHE);
-				games = gamesOverview.games;
-			}
+			({ games, gamesOverview, gameStats } = await loadGamesAdmin(
+				env.DB,
+				env.CONFIG_CACHE,
+				selectedGame
+			));
 		}
 		if (event.params.view === 'scoring' || selectedGame)
 			scoring = await Promise.all(
@@ -493,36 +486,16 @@ export const actions: Actions = {
 				}
 				return { success: true };
 			}
-			if (action.startsWith('variant-')) {
-				if (event.params.view !== 'games' || !Object.hasOwn(catalog, target))
-					return fail(400, { code: 'input' });
-				await changeVariant(
-					env.DB,
-					actor.id,
+			if (action.startsWith('variant-') || action.startsWith('game-'))
+				return await changeGamesAdmin(env.DB, env.CONFIG_CACHE, {
+					actor: actor.id,
+					view: event.params.view,
+					action,
 					target,
-					String(body.get('variant') ?? ''),
-					action as 'variant-enable' | 'variant-disable',
 					reason,
-					undefined,
-					env.CONFIG_CACHE
-				);
-				return { success: true };
-			}
-			if (action.startsWith('game-')) {
-				if (!Object.hasOwn(catalog, target)) return fail(400, { code: 'input' });
-				const days = action === 'game-delete' ? Number(body.get('duration')) : 7;
-				await changeGame(
-					env.DB,
-					actor.id,
-					target as PuzzleId,
-					action as Parameters<typeof changeGame>[3],
-					reason,
-					days,
-					undefined,
-					env.CONFIG_CACHE
-				);
-				return { success: true };
-			}
+					variant: String(body.get('variant') ?? ''),
+					days: action === 'game-delete' ? Number(body.get('duration')) : 7
+				});
 			if (action === 'user-delete' || action === 'user-restore') {
 				if (action === 'user-delete') {
 					const duration = Number(body.get('duration'));

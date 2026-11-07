@@ -26,6 +26,6 @@ bun run build
 
 ## Project direction
 
-[The simple plan](morphi-plan-simple.md) is the active plan: games first, architecture second. The full plan in `docs/PLAN.md` is reference only. Step 5 public testing is complete per the owner's report; the next implementation scope awaits direction. See [the code map](docs/CODEMAP.md), [decisions](docs/DECISIONS.md), and [reports](docs/PHASE_REPORTS.md).
+[The simple plan](morphi-plan-simple.md) is the active plan: games first, architecture second. The full plan in `docs/PLAN.md` is reference only. The completed v1.3.5.1 Games extraction is accepted locally (2026-11-07); the owner authorized its source-only GitHub handoff. Full verification remains deferred, and later implementation and deployment await separate authorization. See [the code map](docs/CODEMAP.md), [decisions](docs/DECISIONS.md), and [reports](docs/PHASE_REPORTS.md).
 
 Local `.env*`, `.dev.vars*`, credential directories, dependencies, and build/test output are excluded from Git. An optional `ELEVENLABS_API_KEY` is used only by an unused server stub; it is not needed to play or develop the games.

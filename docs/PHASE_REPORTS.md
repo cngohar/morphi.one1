@@ -17,6 +17,145 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.5.1 — Owner local acceptance and source-only GitHub handoff (2026-11-07)
+
+- **Built:** Recorded owner acceptance of the completed local Games extraction.
+  Owner instruction: “ok mark this accepted and push to github”. This closes the
+  .1 implementation-review gate and authorizes this source-only commit/push to
+  existing `origin/main`. Current guidance, roadmap/preview, brief, work/handoff,
+  decisions, indexes and separate evidence acceptance record now agree. The
+  2026-11-06 report and automated results below remain historical evidence.
+- **Skipped (and why):** No source/test changes or new checks for this acceptance
+  documentation. Full verify remains explicitly deferred. .2/later work, future
+  pushes, deployment and production changes are not authorized. Unauditioned MP3s,
+  unrelated local editor/MCP settings, pre-existing palette timings and ignored
+  credentials/runtime output are excluded from the source handoff.
+- **Known issues:** Existing evidence uses Chromium responsive emulation and
+  source/capture comparisons, with no complete old full-page reference gallery.
+  No new device/browser details were supplied. The earlier broader Support quota
+  timeout and local immutable scoring rollback/version limits remain recorded;
+  acceptance adds no regression or physical-device evidence.
+- **Decisions and pinned versions:** Separate completed-implementation acceptance
+  on 2026-11-07 supersedes pending .1 review notes and commit/push restrictions for
+  this handoff only. No version/dependency, schema or permission change. No new
+  variants; the existing four Memory identities are preserved.
+- **Questions for the owner:** None for this acceptance/source handoff. Later
+  scope and full-verification timing remain separate owner decisions.
+
+| Acceptance item | Evidence type and location | Result |
+| --- | --- | --- |
+| Complete local Games UI/server extraction | Existing source review and [work record](work/V1.3.5.1_WORK.md); 2026-11-06 scoped results | Implemented; accepted locally 2026-11-07 |
+| Format/lint and shared type compatibility | Existing `build/v1.3.5.1/{format,lint,types}.log`; [verification JSON](evidence/v1.3.5/v1.3.5.1-verification.json) | Pass retained; 0 lint warnings, 0 type errors/warnings; not rerun |
+| Cohorts, single bind, lifecycle/cache, reason/audit | Existing `integration.log`, exact four-case D1 filter | 4 passed, 4 unrelated skipped; not rerun |
+| Memory admin and Games lifecycle/scoring/history | Existing `browser-memory.log` and `browser-operator.log` | 2 Chromium cases passed; not rerun |
+| Unchanged UI at three required sizes | Existing twelve full-page captures and drawer/source comparisons | No material difference observed; emulation only |
+| Owner acceptance of implemented .1 | Explicit 2026-11-07 owner quote above; separate `ownerAcceptance` JSON record | Accepted locally; no new device/browser evidence |
+| Source-only commit/push to existing `origin/main` | Same explicit owner instruction; work handoff | Authorized for this handoff only; completion not claimed here |
+| Full verification | Standing explicit owner deferral | NOT RUN; neither passed nor waived |
+
+- **Measurements:** No new measurements for documentation-only acceptance. Prior
+  local Linux/Chromium emulation, one browser worker, no network shaping and
+  diagnostic suite-duration limits remain; no product median/p95 or physical
+  device measurements are added.
+- **Waivers:** None added. Owner acceptance does not waive full verification.
+- **Owner responsibilities:** Select any later milestone separately and direct
+  full-verification timing. Device-specific review and every deployment remain
+  separate; this handoff does not authorize production operations.
+- **CODEMAP updated:** Yes. This report records acceptance and source-handoff
+  authorization; actual Git commit/push completion is reported after execution.
+
+## v1.3.5.1 — Games extraction locally complete (2026-11-06)
+
+- **Built:** Owner-accepted brief implemented locally. Extracted Games overview,
+  rows, inspection drawer and settings into `GamesAdmin.svelte`, and Games data
+  assembly/lifecycle dispatch into `server/games-admin.ts`. Existing route keeps
+  shell, shared security/scoring, audit/error mapping and reason snippet. Existing
+  services/SQL/cache, player behavior and four Memory identities are unchanged.
+  The affected browser case adds rejected-request coverage and twelve page
+  captures across the three required sizes. [Work record](work/V1.3.5.1_WORK.md).
+- **Skipped (and why):** .2/later briefs or implementation, new variants,
+  migrations/dependencies, unrelated suites, Worker build, commit/push/deployment:
+  outside selected .1. Full verify remains explicitly deferred, not waived.
+- **Known issues:** No extraction regression found in scoped checks. No old
+  full-page gallery exists for all four states; comparison uses source/styles,
+  retained drawer references and new captures. No physical-device evidence.
+  Local scoring rollback restores values while minting immutable versions.
+- **Decisions and pinned versions:** Brief/reference and proposed shared type
+  check accepted by owner on 2026-11-06 (“accepted, you can continue”). No version,
+  schema or permission-policy change. Implementation acceptance remains separate.
+- **Questions for the owner:** Review the implemented local .1 result; no .2
+  preparation or implementation is selected automatically.
+
+| Acceptance item | Evidence type and location | Result |
+| --- | --- | --- |
+| Complete Games UI/server extraction with existing route/action/security behavior | Source review plus focused browser/D1 evidence; work record | Locally implemented |
+| Touched formatting/lint and shared type compatibility | `build/v1.3.5.1/{format,lint,types}.log` | Pass; 0 lint warnings, 0 type errors/warnings |
+| Cohorts, one JSON bind, lifecycle/cache and reason/audit | Exact four-case D1 filter; `integration.log` | 4 passed, 4 unrelated cases skipped |
+| Variant actions, rejected POSTs, scoring/history, ephemeral test play, drawer failure/recovery | Exact Memory admin Chromium case; `browser-memory.log` | 1 passed |
+| Family switch, deletion/restore, scoring and saved history | Exact Games operator Chromium case; `browser-operator.log` | 1 passed |
+| Unchanged UI and responsive access | Twelve full-page captures and drawer comparisons at 390×844, 844×390, 1280×800 | No material difference observed; emulation only |
+| Owner acceptance of implemented result | Separate owner review | Pending; brief acceptance alone does not accept implementation |
+| Full verification | Standing explicit owner deferral | NOT RUN; neither passed nor waived |
+
+- **Measurements:** Local Linux/Chromium emulation, one browser worker, no network
+  shaping. No new product performance gate; cold/preloaded load, run count,
+  median/p95 not measured. D1 10.25s, Memory browser 2.5m and operator invocation
+  51.5s are diagnostic suite durations only.
+- **Corrections and cleanup:** Initial lint found an unused helper initializer;
+  checks stopped, it was removed, scoped format/lint reran successfully. Initial
+  Playwright invocation collected no tests; corrected quoting/filter ran exactly
+  one case per spec. Failures remain logged, not counted as passes. An apparent
+  batch image-display concern was resolved by inspecting individual captures;
+  no CSS fix was needed. Final lifecycle/variant overrides and score values are
+  restored; immutable Memory versions advanced as expected. Port 5173 is free,
+  test-owned servers exited and no verification processes remain active.
+- **Waivers:** None added. No owner/device acceptance inferred.
+- **Owner responsibilities:** Review .1 and separately select any later work or
+  commit/push. No deployment or production change authorized.
+- **CODEMAP updated:** Yes. Permanent evidence:
+  [verification JSON](evidence/v1.3.5/v1.3.5.1-verification.json); detailed logs and
+  captures under `build/v1.3.5.1/`.
+
+## v1.3.5.1 — Fresh planning brief, stopped for review (2026-11-06)
+
+- **Built:** Rewrote the [Games extraction brief](briefs/v1.3.5.1-games-extraction-brief.md)
+  from source after the owner clarified to start afresh for v1.3.5, not v1.3.4.
+  Read AGENTS, simple-plan current status, CODEMAP and the whole roadmap/START HERE;
+  inspected route/components, callers, decisions/edge cases, scripts/configs,
+  exact test names and retained evidence. Defined a complete .1 extraction,
+  compatibility/failure contract, conditional unchanged-UI reference, proposed
+  filtered checks, open decisions and fresh-session handoff. Earlier source is
+  only a compatibility reference; no earlier work is counted as v1.3.5 delivery.
+- **Skipped (and why):** App changes, new demos, later briefs/milestones, tests,
+  builds, installs, migrations, commits, pushes and deployment: planning only.
+- **Known issues:** Prior draft incorrectly called the latest Games UI accepted;
+  retained evidence records owner visual review pending. The roadmap's accepted-UI
+  wording cannot supply missing approval. App-wide type analysis is not file
+  filtered; resolve the stated scope limitation before execution. Future browser
+  runs must use a separate screenshot destination and preserve local fixture state.
+- **Decisions and pinned versions:** No new owner decisions or version changes.
+  Proposed smallest seam: Games component plus server helper, retaining shared
+  security/scoring in the existing route. All C1–C10 constraints preserved.
+- **Questions for the owner:** Review the current UI as the unchanged reference,
+  select/authorize .1 implementation if desired, and resolve type-check scope.
+
+| Planning acceptance item | Evidence type and location | Result |
+| --- | --- | --- |
+| Fresh v1.3.5.1 brief only; source-based scope, callers and non-goals | Read-only source/config inspection; brief sections 1–4 | Prepared for owner review |
+| UI provenance and unresolved decisions explicit | Retained evidence references; brief sections 1 and 5 | Pending owner decision; no approval inferred |
+| Filtered future checks, setup/serialization and evidence limits | Actual scripts/configs/test names; brief section 6 | Proposed only; NOT RUN |
+| Complete stop boundary and resumable handoff | Brief section 7 | Planning complete; implementation NOT READY |
+| Functional checks, owner acceptance and full verification | No new execution evidence | NOT RUN; no acceptance; full verify remains deferred, not waived |
+
+- **Measurements:** Not applicable to text-only planning. Existing screenshots
+  were inspected, not recaptured. No product benchmark, network profile, run
+  count, median/p95 or physical-device evidence is claimed.
+- **Waivers:** None. Earlier full-verification deferral remains unchanged.
+- **Owner responsibilities:** Review the brief/open decisions; separately authorize
+  implementation and record visual/functional decisions. No later stage selected.
+- **CODEMAP updated:** Yes, brief link/status only; unrelated working-tree changes
+  preserved. No app code changed.
+
 ## Source-only GitHub update — owner authorization (2026-11-06)
 
 - **Scope:** The owner requested updating the local Git repository and pushing to

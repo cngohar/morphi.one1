@@ -1,6 +1,37 @@
 # CODEMAP.md
 
-- **Current v1.3.4 Slice 0 admin/query (2026-11-06):** Owner-authorized local
+- **v1.3.5.1 Games extraction accepted locally (2026-11-07):** Owner said “ok
+  mark this accepted and push to github”, accepting the completed .1 and
+  authorizing this source-only commit/push to existing `origin/main`.
+  `components/GamesAdmin.svelte` owns the Games UI and drawer;
+  `server/games-admin.ts` owns data assembly/lifecycle dispatch. Existing admin
+  route retains shell, shared guards/scoring, audit/error boundaries and the
+  reason snippet. `games.ts` services/SQL/cache and player behavior are unchanged.
+  Scoped format/lint/types, four D1 cases and two Chromium cases pass. Twelve page
+  captures and drawer comparisons cover the three required viewports. Local
+  implementation is owner-accepted; no new automated or device/browser evidence
+  was supplied. See [work/evidence](work/V1.3.5.1_WORK.md) and the
+  [accepted brief](briefs/v1.3.5.1-games-extraction-brief.md). Full verify remains
+  deferred; unauditioned audio and unrelated local settings/palette changes remain
+  excluded. No .2, future push, deployment or production change is authorized.
+
+- **v1.3.5 AI handoff (2026-11-06):** begin at START HERE in
+  `docs/planning/V1.3.5_ROADMAP.md` for selected-milestone scope, owner constraints,
+  visual gates, focused-check selection, completion and fresh-session handoff.
+  `docs/planning/v1.3.5-preview.html` is the linked human summary. Model-independent
+  draft for later milestones; completed .1 is accepted locally on 2026-11-07.
+  Only its current source-only GitHub handoff is authorized; no later selection.
+
+- **Standing variant definition (owner, 2026-11-06):** `AGENTS.md`,
+  `docs/DECISIONS.md` and `docs/puzzles/_TEMPLATE.md` require a meaningful gameplay
+  rule/rule-setting difference for every new variant across all updates and
+  future families. Cosmetics and new seeds/deals do not count. Draft Memory-only
+  scope and provisional checkpoints: `docs/planning/V1.3.5_ROADMAP.md` and
+  `docs/planning/v1.3.5-preview.html`; cap 100 total including the existing four.
+  Documentation only; no accepted identities, replay behavior or implementation
+  authorization changes.
+
+- **Earlier v1.3.4 Slice 0 admin/query baseline (2026-11-06):** Owner-authorized local
   completion of Games admin/query review gaps. Mahjong is explicitly excluded;
   it belongs to later plans. `server/games.ts` owns `ActivityMappingEntry`,
   `buildActivityMapping` and the single-bind `queryActivityCounts` runner.
@@ -35,9 +66,9 @@ Read this map before searching. Types and implementation live in code; decisions
 ## Current scope
 
 - v1.3.1 is implemented locally from the v1.3 source baseline `f053fc39e5bb9e3daa3cba747761cf9e81c5c914`. Targeted automated checks pass; S5 sound audition and owner local review remain pending. The refactor stays closed; this does not infer v1.3 functional acceptance. The owner subsequently authorized a source-only GitHub handoff; unauditioned MP3s remain excluded, with no deployment or next phase authorized. See `docs/work/V1.3.1_WORK.md` and `docs/evidence/v1.3.1/verification.json`.
-- v1.3.3 Member Support is accepted locally on the owner-accepted v1.3.2 baseline; remaining improvements are deferred to later stages. Current local work is the v1.3.4 admin/query Slice 0. Mahjong is excluded and deferred to later plans; its proposal and puzzle brief remain drafts without game implementation authorization. Preserve earlier game, admin and sound changes and their acceptance/evidence boundaries. The three new v1.3.1 MP3s remain uncommitted pending owner audition.
+- v1.3.3 Member Support is accepted locally on the owner-accepted v1.3.2 baseline; remaining improvements are deferred to later stages. The v1.3.4 admin/query Slice 0 is the earlier baseline; current .1 extraction evidence is linked above. Mahjong is excluded and deferred to later plans; its proposal and puzzle brief remain drafts without game implementation authorization. Preserve earlier game, admin and sound changes and their acceptance/evidence boundaries. The three new v1.3.1 MP3s remain uncommitted pending owner audition.
 - v1.1 and combined next-phase work are accepted locally. Owner PC review and mobile responsive emulation were reported; physical mobile review was not. See `docs/reviews/NEXT_PHASE_REVIEW.md`, `docs/work/V1.1_WORK.md` and `docs/PHASE_REPORTS.md`.
-- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The current owner-authorized scope is the admin/query Slice 0 work recorded in `docs/work/V1.3.4_SLICE0_WORK.md`; accepted Member Support and registered-start/imported-completion cohorts remain unchanged. The owner authorized committing/pushing the source handoff on 2026-11-05, while the three new MP3s remain local pending audition. No deployment, production provisioning, secret installation, DNS/Google changes or next phase is authorized.
+- Active day-to-day plan: `morphi-plan-simple.md`; `docs/PLAN.md` is reference. The current v1.3.5.1 Games extraction is accepted locally in `docs/work/V1.3.5.1_WORK.md`; accepted Member Support and registered-start/imported-completion cohorts remain unchanged. The owner authorized this source-only commit/push on 2026-11-07, while the three new MP3s and unrelated local settings/palette changes remain local. No deployment, production provisioning, secret installation, DNS/Google changes or next phase is authorized.
 - The published guest/privacy version remains `b50a7a18-2e85-4406-bd40-77f27c4b3da3` at `https://morphi.one` and `https://morphi-one.electrasincng.workers.dev`. Cloudflare injects its intentional analytics beacon at delivery. Source repository: `https://github.com/cngohar/morphi.one1`; pushing does not authorize deployment.
 
 ## Engine and registration

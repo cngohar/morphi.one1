@@ -1,6 +1,20 @@
 # Morphi: Simple Plan
 
-## Current local work — v1.3.4 Slice 0 admin/query (2026-11-06)
+## Current local status — v1.3.5.1 Games extraction accepted (2026-11-07)
+
+The owner said “ok mark this accepted and push to github”, accepting the completed
+[v1.3.5.1 extraction](docs/briefs/v1.3.5.1-games-extraction-brief.md) locally and
+authorizing this source-only commit/push to existing `origin/main`. This closes
+the implementation-review gate and supersedes earlier .1 push restrictions only
+for this handoff. Existing scoped format/lint/types, four D1 cases, two Chromium
+cases and unchanged-UI comparisons at all three sizes remain the evidence; no new
+tests or device/browser details were supplied. All roadmap C1–C10 limits apply.
+Full verify stays deferred, not passed or waived. Preserve unauditioned audio and
+unrelated local editor/MCP settings and palette timing changes outside the handoff.
+No new variants, .2 selection, future push, deployment or production change is
+authorized. Execution/acceptance: [work record](docs/work/V1.3.5.1_WORK.md).
+
+## Earlier local baseline — v1.3.4 Slice 0 admin/query (2026-11-06)
 
 The owner authorized completing the reviewed Games admin/query gaps locally.
 Scope: single-bind activity mapping, exact-count regression coverage, responsive

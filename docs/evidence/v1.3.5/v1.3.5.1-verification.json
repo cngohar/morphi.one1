@@ -1,0 +1,208 @@
+{
+  "milestone": "v1.3.5.1 Games extraction",
+  "asOfUtc": "2026-11-06 16:50:37 UTC",
+  "authorizedScope": "Local .1 extraction only; unchanged-UI reference; one shared bun run check. No .2, commit, push, or deployment.",
+  "touchedFiles": [
+    "src/routes/admin/[view]/+page.svelte",
+    "src/routes/admin/[view]/+page.server.ts",
+    "src/lib/components/GamesAdmin.svelte",
+    "src/lib/server/games-admin.ts",
+    "tests/e2e/memory-variants-admin.spec.ts"
+  ],
+  "checks": {
+    "format": {
+      "status": "pass",
+      "commands": [
+        "./node_modules/.bin/prettier --write 'src/routes/admin/[view]/+page.svelte' 'src/routes/admin/[view]/+page.server.ts' src/lib/components/GamesAdmin.svelte src/lib/server/games-admin.ts tests/e2e/memory-variants-admin.spec.ts",
+        "./node_modules/.bin/prettier --check 'src/routes/admin/[view]/+page.svelte' 'src/routes/admin/[view]/+page.server.ts' src/lib/components/GamesAdmin.svelte src/lib/server/games-admin.ts tests/e2e/memory-variants-admin.spec.ts",
+        "./node_modules/.bin/prettier --check src/lib/server/games-admin.ts"
+      ],
+      "note": "Prettier wrote only GamesAdmin.svelte; all scoped checks passed.",
+      "log": "build/v1.3.5.1/format.log"
+    },
+    "eslint": {
+      "status": "pass after correction",
+      "initialRun": "Failed once on games-admin.ts:17 no-useless-assignment; root coding agent removed unused initializer.",
+      "finalCommand": "./node_modules/.bin/eslint --max-warnings 0 'src/routes/admin/[view]/+page.svelte' 'src/routes/admin/[view]/+page.server.ts' src/lib/components/GamesAdmin.svelte src/lib/server/games-admin.ts tests/e2e/memory-variants-admin.spec.ts",
+      "finalResult": "Exit 0; zero errors and warnings.",
+      "log": "build/v1.3.5.1/lint.log"
+    },
+    "types": {
+      "status": "pass",
+      "command": "bun run check",
+      "result": "svelte-check found 0 errors and 0 warnings.",
+      "log": "build/v1.3.5.1/types.log"
+    },
+    "d1Integration": {
+      "status": "pass",
+      "command": "./node_modules/.bin/vitest run --config vitest.accounts.config.ts tests/integration/memory-variants.test.ts -t '^(reconciles ignored, played, abandoned, finished and open independently of imported guest completions|binds 40 synthetic groups in one parameter and reconciles exact counts across boundaries|caches reconciled overview totals, includes families without variants, and invalidates every lifecycle write|requires disable reasons, ignores supplied enable reasons, and audits missing enable reasons for families and variants)$'",
+      "passed": 4,
+      "skipped": 4,
+      "durationSeconds": 10.25,
+      "log": "build/v1.3.5.1/integration.log"
+    },
+    "browserMemory": {
+      "status": "pass",
+      "correctedCommand": "./node_modules/.bin/playwright test tests/e2e/memory-variants-admin.spec.ts --project=chromium --workers=1 --grep 'Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds$'",
+      "passed": 1,
+      "runnerDuration": "2.5m",
+      "priorInvocation": "Initial incorrectly passed/start-anchored grep collected no tests and ran none; corrected quoting and title-suffix filter collected exactly one. Initial attempt preserved in the log.",
+      "expectedInjectedEvents": [
+        "Two invalid POSTs returned 400.",
+        "Two scoring conflict POSTs returned 409.",
+        "Injected drawer open failure logged morphi:variant_drawer_dialog_failed and recovered."
+      ],
+      "log": "build/v1.3.5.1/browser-memory.log"
+    },
+    "browserOperator": {
+      "status": "pass",
+      "command": "./node_modules/.bin/playwright test tests/e2e/operator.spec.ts --project=chromium --workers=1 --grep 'games admin manages availability and restores scoring without losing saved history'",
+      "passed": 1,
+      "runnerDuration": "51.5s",
+      "log": "build/v1.3.5.1/browser-operator.log"
+    },
+    "diffCheck": {
+      "status": "pass",
+      "command": "git diff --check -- 'src/routes/admin/[view]/+page.svelte' 'src/routes/admin/[view]/+page.server.ts' tests/e2e/memory-variants-admin.spec.ts",
+      "note": "New component/helper files were untracked and were covered by scoped Prettier, ESLint, and bun run check."
+    }
+  },
+  "visualReview": {
+    "status": "reviewed; no material UI difference observed",
+    "method": "Chromium responsive emulation and manual screenshot inspection; no pixel equality claim.",
+    "viewports": [
+      "390x844",
+      "844x390",
+      "1280x800"
+    ],
+    "fullPageStates": [
+      "overview",
+      "statistics",
+      "scoring",
+      "settings"
+    ],
+    "fullPageCaptureCount": 12,
+    "drawerCaptures": [
+      "drawer-390x844.png",
+      "drawer-844x390.png",
+      "drawer-1280x800.png",
+      "drawer-landscape-scrolled.png"
+    ],
+    "referenceDirectory": "build/v1.3.5.1/reference/",
+    "result": "All 12 full-page states reviewed. New drawer captures show the full content and match retained references at all three sizes and landscape-scrolled state. Tables use internal horizontal scroll; no horizontal document overflow observed. Dynamic counts/timestamps differ. Temporary Moving-cards disabled state is from the test fixture and was restored.",
+    "screenshotsDirectory": "build/v1.3.5.1/",
+    "acceptanceLimit": "This is emulated evidence only; no owner visual/functional acceptance or physical-device review is inferred."
+  },
+  "localFixture": {
+    "authSecret": "Configured; presence checked only, value not read or logged.",
+    "initialBeforeBrowser": {
+      "gameLifecycle": {
+        "block": "enabled",
+        "memory": "enabled"
+      },
+      "variantOverrides": [],
+      "scores": {
+        "block": {
+          "version": "2b9e14a6-0119-4d50-97d5-9d30da67c0da",
+          "values": {
+            "line": 50,
+            "extraLine": 25,
+            "combo": 15
+          }
+        },
+        "memory": {
+          "version": "52bfdc5f-a11e-4ef4-aac3-4ba11139ab63",
+          "values": {
+            "pair": 1000,
+            "mismatch": 150,
+            "second": 5
+          }
+        }
+      }
+    },
+    "afterMemoryCase": {
+      "gameLifecycle": {
+        "block": "enabled",
+        "memory": "enabled"
+      },
+      "variantOverrides": [],
+      "memoryScore": {
+        "version": "2c31ab4f-f74e-487e-b4d6-6cf3e0ac47a5",
+        "values": {
+          "pair": 1000,
+          "mismatch": 150,
+          "second": 5
+        }
+      }
+    },
+    "finalAfterOperatorCase": {
+      "gameLifecycle": {
+        "block": "enabled",
+        "memory": "enabled"
+      },
+      "variantOverrides": [],
+      "scores": {
+        "block": {
+          "version": "2b9e14a6-0119-4d50-97d5-9d30da67c0da",
+          "values": {
+            "line": 50,
+            "extraLine": 25,
+            "combo": 15
+          }
+        },
+        "memory": {
+          "version": "c8af5cc4-54bc-4ee7-9384-cc2b2723ffb6",
+          "values": {
+            "pair": 1000,
+            "mismatch": 150,
+            "second": 5
+          }
+        }
+      }
+    },
+    "note": "Lifecycle and score values restored. Rollback creates new immutable Memory scoring versions, so version identity advanced while values returned to their initial state. The Memory case asserts prior completed-run score rows unchanged; the operator case passed its saved-history assertion."
+  },
+  "processes": {
+    "127.0.0.1:5173": "No listener before first browser run, after Memory case, or after operator case; Playwright-started Vite servers exited."
+  },
+  "limitations": [
+    "Full bun run verify, other test suites, migration wrapper, Worker build, and physical-device checks were not run.",
+    "No owner acceptance, commit, push, deployment, or production change is inferred.",
+    "The initial no-tests-found Playwright invocation and initial ESLint failure are retained in their logs; corrected checks passed."
+  ],
+  "logs": {
+    "format": "build/v1.3.5.1/format.log",
+    "lint": "build/v1.3.5.1/lint.log",
+    "types": "build/v1.3.5.1/types.log",
+    "integration": "build/v1.3.5.1/integration.log",
+    "browserMemory": "build/v1.3.5.1/browser-memory.log",
+    "browserOperator": "build/v1.3.5.1/browser-operator.log",
+    "diffCheck": "build/v1.3.5.1/diff-check.log"
+  },
+  "ownerAcceptance": {
+    "date": "2026-11-07",
+    "status": "accepted locally",
+    "source": "Explicit owner instruction in this conversation",
+    "quote": "ok mark this accepted and push to github",
+    "scope": "Completed v1.3.5.1 Games extraction only; separate from the 2026-11-06 brief acceptance.",
+    "sourceHandoff": {
+      "authorized": true,
+      "target": "existing origin/main",
+      "scope": "This source-only commit/push only; completion is not claimed by this record.",
+      "exclusions": [
+        "Three unauditioned MP3s",
+        "Unrelated local editor/MCP settings",
+        "Pre-existing palette timing changes",
+        "Ignored credentials and runtime artifacts"
+      ]
+    },
+    "evidenceLimit": "The asOfUtc, authorizedScope, checks, visualReview and limitations above describe the original 2026-11-06 verification. No new automated results or device/browser details were supplied with acceptance; earlier pending-acceptance wording is superseded only by this owner record.",
+    "fullVerification": "Still deferred, neither passed nor waived.",
+    "notAuthorized": [
+      "v1.3.5.2 or later milestone selection/preparation/implementation",
+      "Future commit/push",
+      "Deployment",
+      "Production changes"
+    ]
+  }
+}
