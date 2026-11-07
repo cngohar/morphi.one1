@@ -174,7 +174,7 @@ describe('Memory variants', () => {
 	});
 
 	it('owns separate groups, complete messages, and trio scoring without changing pair scoring', () => {
-		expect(new Set(manifest.leaderboardGroups).size).toBe(30);
+		expect(new Set(manifest.leaderboardGroups).size).toBe(60);
 		for (const variant of manifest.variants) {
 			expect(MEMORY_VARIANTS).toContain(variant.id);
 			expect(messages[variant.name as keyof typeof messages]).toBeTruthy();
@@ -469,5 +469,89 @@ describe('Memory v1.3.5.5 pilot rules', () => {
 				).toEqual(JSON.parse(JSON.stringify(round)));
 			}
 		}
+	});
+
+	it('correctly implements the 10 Batch A ruleset mechanics', () => {
+		// 1. Countdown
+		const cd = createMemoryRound('42', 'memory:countdown');
+		expect(cd.timeLimit).toBeGreaterThanOrEqual(60);
+
+		// 2. Three Strikes
+		let ts = createMemoryRound('42', 'memory:three-strikes');
+		expect(ts.lives).toBe(3);
+		ts = mismatch(ts);
+		expect(ts.lives).toBe(2);
+		ts = resolveMismatch(ts);
+		ts = mismatch(ts);
+		expect(ts.lives).toBe(1);
+		ts = resolveMismatch(ts);
+		ts = mismatch(ts);
+		expect(ts.lives).toBe(0);
+		expect(ts.status).toBe('lost');
+
+		// 3. Wild Card
+		const wc = createMemoryRound('42', 'memory:wild-card');
+		const wildIdx = wc.cards.findIndex((c) => c.isWild);
+		expect(wildIdx).toBeGreaterThanOrEqual(0);
+		const nonWildIdx = wc.cards.findIndex((c, i) => i !== wildIdx);
+		const resWc = flipCard(flipCard(wc, wildIdx).round, nonWildIdx);
+		expect(resWc.effect).toBe('match');
+
+		// 4. Sonar
+		const sn = createMemoryRound('42', 'memory:sonar');
+		const snPair = [0, sn.cards.findIndex((c, i) => i > 0 && c.symbol === sn.cards[0].symbol)];
+		const resSn = flipCard(flipCard(sn, snPair[0]).round, snPair[1]);
+		expect(resSn.effect).toBe('match');
+		expect(Array.isArray(resSn.round.sonar)).toBe(true);
+
+		// 5. Zebra
+		const zb = createMemoryRound('42', 'memory:zebra');
+		const zb0 = zb.cards[0];
+		const sameColor = zb.cards.findIndex(
+			(c, i) => i > 0 && c.symbol === zb0.symbol && c.zebra === zb0.zebra
+		);
+		expect(sameColor).toBe(-1); // no duplicate colors for same symbol
+		const diffColor = zb.cards.findIndex(
+			(c, i) => i > 0 && c.symbol === zb0.symbol && c.zebra !== zb0.zebra
+		);
+		expect(diffColor).toBeGreaterThan(0);
+		const resZb = flipCard(flipCard(zb, 0).round, diffColor);
+		expect(resZb.effect).toBe('match');
+
+		// 6. Drift
+		let df = createMemoryRound('42', 'memory:drift');
+		const card0 = df.cards[0];
+		df = mismatch(df);
+		df = resolveMismatch(df);
+		// Row 0 shifted right
+		expect(df.cards[1].id).toBe(card0.id);
+
+		// 7. Decay
+		let dc = createMemoryRound('42', 'memory:decay');
+		dc = mismatch(dc);
+		dc = resolveMismatch(dc);
+		expect(Object.keys(dc.decay ?? {}).length).toBe(2);
+
+		// 8. One Flip
+		const of = createMemoryRound('42', 'memory:one-flip');
+		const resOf1 = flipCard(of, 0);
+		expect(resOf1.effect).toBe('flip');
+		expect(resOf1.round.revealed).toEqual([0]);
+
+		// 9. Combo
+		const cb = createMemoryRound('42', 'memory:combo');
+		expect(cb.combo).toBe(1);
+		const cbPair = [0, cb.cards.findIndex((c, i) => i > 0 && c.symbol === cb.cards[0].symbol)];
+		const resCb = flipCard(flipCard(cb, cbPair[0]).round, cbPair[1]);
+		expect(resCb.round.combo).toBe(2);
+
+		// 10. Hazard
+		const hz = createMemoryRound('42', 'memory:hazard');
+		const hzIdx = hz.cards.findIndex((c) => c.isHazard);
+		expect(hzIdx).toBeGreaterThanOrEqual(0);
+		const otherHz = hz.cards.findIndex((c, i) => i > hzIdx && c.isHazard);
+		expect(otherHz).toBeGreaterThan(hzIdx);
+		const resHz = flipCard(flipCard(hz, hzIdx).round, otherHz);
+		expect(resHz.effect).toBe('match');
 	});
 });

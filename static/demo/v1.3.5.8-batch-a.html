@@ -1,0 +1,700 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Morphi v1.3.5.8 — Batch A 10 Genuine Ruleset Variants (Fixture Preview)</title>
+<style>
+:root {
+	font: 600 14px/1.4 'Nunito Variable', 'Nunito', system-ui, sans-serif;
+	color: #1b2433;
+	background: #eef2f7;
+	--board: #dfe9f5;
+	--edge: #8fa9c8;
+	--back: #a8bfde;
+	--focus: #2f6fed;
+	--accent: #2563eb;
+	--wild: #f59e0b;
+	--sonar: #10b981;
+	--hazard: #ef4444;
+	--zebra-light: #f8fafc;
+	--zebra-dark: #334155;
+}
+* { box-sizing: border-box; }
+body { margin: 0; min-height: 100dvh; display: flex; flex-direction: column; }
+button {
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+	border: 1px solid #c9d6e4;
+	border-radius: 8px;
+	background: #fff;
+	padding: 6px 12px;
+}
+button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.review-banner {
+	padding: 8px 14px;
+	background: #fff;
+	border-bottom: 1px solid #c9d6e4;
+	font-size: 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.review-banner strong { color: #b42318; }
+.badge {
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	background: #e2e8f0;
+	font-weight: 700;
+}
+
+.tabs-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 6px 14px;
+	background: #f8fafc;
+	border-bottom: 1px solid #c9d6e4;
+}
+.tabs-bar button {
+	font-size: 12px;
+	white-space: nowrap;
+	padding: 5px 9px;
+}
+.tabs-bar button[aria-current="page"] {
+	background: #1b2433;
+	color: #fff;
+	border-color: #1b2433;
+}
+
+.container {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 320px;
+	flex: 1;
+	min-height: 0;
+	background: var(--board);
+}
+@media (max-width: 900px) {
+	.container {
+		grid-template-columns: 1fr;
+		grid-template-rows: minmax(360px, 1fr) auto;
+	}
+}
+
+.stage-pane {
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 0;
+	position: relative;
+}
+
+.hud {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 14px;
+	flex-wrap: wrap;
+	font-size: 13px;
+	font-weight: 800;
+	background: #ffffffd0;
+	padding: 6px 16px;
+	border-radius: 20px;
+	border: 1px solid #c9d6e4;
+	min-height: 36px;
+}
+
+.board-container {
+	flex: 1;
+	display: grid;
+	place-items: center;
+	width: 100%;
+	min-height: 0;
+}
+.board {
+	display: grid;
+	gap: 6px;
+	justify-content: center;
+	align-content: center;
+}
+
+.card {
+	width: var(--size, 64px);
+	height: var(--size, 64px);
+	background: var(--back);
+	border: 2px solid var(--edge);
+	border-radius: 10px;
+	display: grid;
+	place-items: center;
+	position: relative;
+	user-select: none;
+	transition: transform 0.15s ease, background-color 0.15s ease, box-shadow 0.15s ease;
+}
+.card.flipped {
+	background: #fff;
+	border-color: #3b82f6;
+	transform: scale(1.02);
+}
+.card.matched {
+	background: #f1f5f9;
+	border-color: #cbd5e1;
+	opacity: 0.3;
+	pointer-events: none;
+}
+.card.sonar-flash {
+	background: #d1fae5;
+	border-color: #10b981;
+	box-shadow: 0 0 10px #10b981;
+}
+.card.wild {
+	background: #fffbeb;
+	border-color: var(--wild);
+}
+.card.hazard {
+	background: #fef2f2;
+	border-color: var(--hazard);
+}
+.card.zebra-light { background: #f8fafc; color: #0f172a; border-color: #cbd5e1; }
+.card.zebra-dark { background: #1e293b; color: #f8fafc; border-color: #0f172a; }
+
+.card-icon {
+	font-size: calc(var(--size, 64px) * 0.45);
+	line-height: 1;
+}
+
+.status-pill {
+	position: absolute;
+	top: -6px;
+	right: -6px;
+	font-size: 9px;
+	font-weight: 800;
+	padding: 1px 4px;
+	border-radius: 4px;
+	color: #fff;
+}
+.pill-wild { background: var(--wild); color: #000; }
+.pill-hazard { background: var(--hazard); }
+.pill-decay { background: #6366f1; }
+.pill-zebra { background: #475569; font-size: 8px; }
+
+.details-pane {
+	background: #fff;
+	border-left: 1px solid #c9d6e4;
+	padding: 16px;
+	overflow-y: auto;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+}
+.details-pane h2 {
+	margin: 0;
+	font-size: 16px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.details-pane p { margin: 0; font-size: 13px; color: #475569; }
+.meta-table {
+	width: 100%;
+	border-collapse: collapse;
+	font-size: 12px;
+	margin-top: 4px;
+}
+.meta-table th, .meta-table td {
+	text-align: left;
+	padding: 5px 6px;
+	border-bottom: 1px solid #f1f5f9;
+}
+.meta-table th { color: #64748b; font-weight: 600; width: 40%; }
+.rule-box {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 10px;
+	font-size: 12px;
+}
+.rule-box strong { color: #0f172a; display: block; margin-bottom: 4px; }
+
+@media (max-height: 500px) {
+	.review-banner { display: none; }
+	.tabs-bar { padding: 4px 8px; }
+	.tabs-bar button { padding: 3px 6px; font-size: 11px; }
+	.hud { font-size: 11px; padding: 2px 8px; min-height: 28px; }
+}
+@media (prefers-reduced-motion: reduce) {
+	* { transition: none !important; animation: none !important; }
+}
+</style>
+</head>
+<body>
+
+<div class="review-banner" id="banner">
+	<div><strong>FIXTURE ONLY (v1.3.5.8 Batch A)</strong> · 10 Genuine Ruleset Variants. Zero cosmetic skins or duplicate toggles.</div>
+	<div><span class="badge">Responsive Review: 390×844 · 844×390 · 1280×800</span></div>
+</div>
+
+<nav class="tabs-bar" id="tabs" aria-label="Batch A 10 Genuine Ruleset Variants"></nav>
+
+<div class="container">
+	<div class="stage-pane" id="stage">
+		<div class="hud" id="hud"></div>
+		<div class="board-container">
+			<div class="board" id="board" role="grid" aria-label="Memory Card Board"></div>
+		</div>
+		<div style="font-size:12px;color:#64748b;display:flex;gap:12px;align-items:center;">
+			<span id="hint"></span>
+			<button type="button" id="reset-btn" style="padding:3px 8px;font-size:11px;">Reset Round</button>
+		</div>
+	</div>
+
+	<aside class="details-pane" id="details">
+		<h2 id="detail-title"></h2>
+		<p id="detail-desc"></p>
+		<div class="rule-box">
+			<strong>Brand New Gameplay Rule:</strong>
+			<span id="detail-rule"></span>
+		</div>
+		<table class="meta-table">
+			<tr><th>Mechanic</th><td id="detail-mechanic"></td></tr>
+			<tr><th>Baseline</th><td id="detail-baseline"></td></tr>
+			<tr><th>Win / Loss Condition</th><td id="detail-win-loss"></td></tr>
+			<tr><th>Scoring Model</th><td id="detail-scoring"></td></tr>
+			<tr><th>Leaderboard</th><td id="detail-groups"></td></tr>
+		</table>
+	</aside>
+</div>
+
+<script>
+const VARIANTS = [
+	{
+		id: 'memory:countdown',
+		name: 'Countdown',
+		mechanic: 'Hard Countdown Time Limit',
+		baseline: 'memory:classic',
+		rule: 'A visible countdown clock starts at 60s (for 6 pairs). If the timer reaches 0:00 before clearing the board, the round immediately ends in a Timeout Loss (no score saved).',
+		winLoss: 'Win: clear all pairs before 0:00. Loss: clock reaches 0.',
+		scoring: 'Standard brief-v1 + remaining time bonus.',
+		groups: 'memory-1:countdown:<6|8|10>',
+		desc: 'High-tension race against the clock. Adds an authentic timeout loss condition.'
+	},
+	{
+		id: 'memory:three-strikes',
+		name: 'Three Strikes',
+		mechanic: '3 Lives Survival',
+		baseline: 'memory:classic',
+		rule: 'Player starts with 3 lives (strikes). Every mismatch removes 1 life. 3 mismatches = immediate Game Over / Loss.',
+		winLoss: 'Win: clear board with >= 1 life remaining. Loss: 3 strikes.',
+		scoring: 'Base clear + remaining life bonus points.',
+		groups: 'memory-1:three-strikes:<6|8|10>',
+		desc: 'Sudden-death survival mode. Every single miss has severe stakes.'
+	},
+	{
+		id: 'memory:wild-card',
+		name: 'Wild Card',
+		mechanic: 'Universal Match Partner',
+		baseline: 'memory:classic',
+		rule: 'Deck includes 1 Wild Card (★). Flipping the Wild card matches with WHATEVER the second flipped card is, clearing that pair automatically.',
+		winLoss: 'Clear all pairs using the Wild card as an accelerator.',
+		scoring: 'Standard pair scoring; Wild match grants 500 bonus points.',
+		groups: 'memory-1:wild-card:<6|8|10>',
+		desc: 'Classic game-show helper card that alters the matching relation.'
+	},
+	{
+		id: 'memory:sonar',
+		name: 'Sonar Ping',
+		mechanic: 'Spatial Intel on Match',
+		baseline: 'memory:classic',
+		rule: 'When you successfully match a pair, all cards orthogonally adjacent (up, down, left, right) to the matched slots are briefly pulsed face-up for 800ms.',
+		winLoss: 'Standard full board clear.',
+		scoring: 'Standard brief-v1.',
+		groups: 'memory-1:sonar:<6|8|10>',
+		desc: 'Information cascade: finding a match rewards you with nearby clues.'
+	},
+	{
+		id: 'memory:zebra',
+		name: 'Zebra Bicolor',
+		mechanic: 'Contrasting Color Matching',
+		baseline: 'memory:classic',
+		rule: 'Each symbol exists in Light and Dark cards. A legal match requires 1 Light + 1 Dark of the same symbol. Two Light cards of the same symbol do NOT match!',
+		winLoss: 'Standard full board clear under bicolor matching constraint.',
+		scoring: 'Standard brief-v1.',
+		groups: 'memory-1:zebra:<6|8|10>',
+		desc: 'Inverted matching invariant requiring opposite color pairing.'
+	},
+	{
+		id: 'memory:drift',
+		name: 'Row Drift',
+		mechanic: 'Horizontal Row Shifting',
+		baseline: 'memory:classic',
+		rule: 'On each mismatch, the entire row containing the first flipped card shifts horizontally to the right by 1 position (wrapping around).',
+		winLoss: 'Standard clear on a dynamic, shifting grid.',
+		scoring: 'Standard brief-v1.',
+		groups: 'memory-1:drift:<6|8|10>',
+		desc: 'Deterministic spatial transformation: memory must track moving rows.'
+	},
+	{
+		id: 'memory:decay',
+		name: 'Fading Clue',
+		mechanic: 'Expiring Discovered Positions',
+		baseline: 'memory:classic',
+		rule: 'When a card is seen in a miss, it gets an expiration counter of 3 attempts. If not matched within 3 attempts, it relocates to an empty spot.',
+		winLoss: 'Standard full board clear.',
+		scoring: 'Standard brief-v1.',
+		groups: 'memory-1:decay:<6|8|10>',
+		desc: 'Temporal memory pressure: discovered cards don\'t stay known forever.'
+	},
+	{
+		id: 'memory:one-flip',
+		name: 'One Flip Flow',
+		mechanic: 'Single-Flip Continuity',
+		baseline: 'memory:classic',
+		rule: 'Player flips 1 card at a time. It remains face-up until the next flip. If the next flip matches, pair clears; if not, the old card flips down and the new one stays up.',
+		winLoss: 'Clear all pairs with rolling continuity.',
+		scoring: 'Standard brief-v1.',
+		groups: 'memory-1:one-flip:<6|8|10>',
+		desc: 'Completely changes turn structure from 2-card batches to continuous chain.'
+	},
+	{
+		id: 'memory:combo',
+		name: 'Combo Multiplier',
+		mechanic: 'Consecutive Streak Multipliers',
+		baseline: 'memory:classic',
+		rule: 'Matching pairs consecutively without a miss escalates score multiplier (1x -> 2x -> 3x -> 4x). A miss resets multiplier back to 1x.',
+		winLoss: 'Standard clear; goal is maximizing streak score.',
+		scoring: 'Multiplier-scaled pair points (1000 * streak).',
+		groups: 'memory-1:combo:<6|8|10>',
+		desc: 'Rewards disciplined unbroken streaks over brute-force discovery.'
+	},
+	{
+		id: 'memory:hazard',
+		name: 'Hazard Trap',
+		mechanic: 'Obstacle / Trap Card',
+		baseline: 'memory:classic',
+		rule: 'Grid includes 1 Trap Card (💀). Flipping it immediately hides it and triggers a full shuffle of all face-down cards.',
+		winLoss: 'Clear all pairs while avoiding the disruptive trap card.',
+		scoring: 'Standard brief-v1 (-500 penalty if trap flipped).',
+		groups: 'memory-1:hazard:<6|8|10>',
+		desc: 'Active board hazard that punishes reckless blind clicking.'
+	}
+];
+
+const ICONS = ['⭐', '🔷', '🌸', '⚡', '🌙', '🍀', '🍎', '🔥'];
+
+let currentVariant = VARIANTS[0];
+let deck = [];
+let revealed = [];
+let matched = [];
+let misses = 0;
+let lives = 3;
+let timerSeconds = 60;
+let timerInterval = null;
+let combo = 1;
+let decayMap = {}; // index -> remaining attempts
+let sonarIndices = [];
+
+function initRound() {
+	clearInterval(timerInterval);
+	revealed = [];
+	matched = [];
+	misses = 0;
+	lives = 3;
+	timerSeconds = 60;
+	combo = 1;
+	decayMap = {};
+	sonarIndices = [];
+
+	const pairsCount = 6;
+	deck = [];
+
+	if (currentVariant.id === 'memory:wild-card') {
+		// 5 normal pairs + 1 single + 1 wild = 12 cards
+		for (let g = 0; g < 5; g++) {
+			deck.push({ id: `${g}-0`, groupId: g, icon: ICONS[g] });
+			deck.push({ id: `${g}-1`, groupId: g, icon: ICONS[g] });
+		}
+		deck.push({ id: 'wild-target', groupId: 99, icon: ICONS[5] });
+		deck.push({ id: 'wild-card', groupId: 'WILD', icon: '★', isWild: true });
+	} else if (currentVariant.id === 'memory:hazard') {
+		// 5 pairs + 1 single + 1 trap = 12 cards
+		for (let g = 0; g < 5; g++) {
+			deck.push({ id: `${g}-0`, groupId: g, icon: ICONS[g] });
+			deck.push({ id: `${g}-1`, groupId: g, icon: ICONS[g] });
+		}
+		deck.push({ id: 'extra', groupId: 5, icon: ICONS[5] });
+		deck.push({ id: 'trap', groupId: 'TRAP', icon: '💀', isHazard: true });
+	} else if (currentVariant.id === 'memory:zebra') {
+		for (let g = 0; g < pairsCount; g++) {
+			deck.push({ id: `${g}-0`, groupId: g, icon: ICONS[g], zebra: 'light' });
+			deck.push({ id: `${g}-1`, groupId: g, icon: ICONS[g], zebra: 'dark' });
+		}
+	} else {
+		for (let g = 0; g < pairsCount; g++) {
+			deck.push({ id: `${g}-0`, groupId: g, icon: ICONS[g] });
+			deck.push({ id: `${g}-1`, groupId: g, icon: ICONS[g] });
+		}
+	}
+
+	deck.sort(() => 0.5 - Math.random());
+
+	if (currentVariant.id === 'memory:countdown') {
+		timerInterval = setInterval(() => {
+			if (timerSeconds > 0) {
+				timerSeconds--;
+				renderHud();
+				if (timerSeconds === 0) {
+					clearInterval(timerInterval);
+					alert('TIME OUT! Round ended with 0 score.');
+				}
+			}
+		}, 1000);
+	}
+
+	render();
+}
+
+function handleCardClick(idx) {
+	if (matched.includes(idx) || revealed.includes(idx)) return;
+
+	if (currentVariant.id === 'memory:one-flip') {
+		// Single flip continuity
+		if (revealed.length === 1) {
+			const prevIdx = revealed[0];
+			const isMatch = deck[prevIdx].groupId === deck[idx].groupId;
+			if (isMatch) {
+				matched.push(prevIdx, idx);
+				revealed = [];
+			} else {
+				revealed = [idx]; // new card stays up, previous hides
+				misses++;
+			}
+		} else {
+			revealed = [idx];
+		}
+		render();
+		return;
+	}
+
+	// Hazard check
+	if (deck[idx].isHazard) {
+		revealed = [idx];
+		render();
+		setTimeout(() => {
+			alert('TRAP CARD FLIPPED! Shuffling face-down cards.');
+			const unrevealed = deck.map((_, i) => i).filter(i => !matched.includes(i));
+			const shuffled = unrevealed.slice().sort(() => 0.5 - Math.random());
+			const copy = deck.slice();
+			unrevealed.forEach((pos, i) => { deck[pos] = copy[shuffled[i]]; });
+			revealed = [];
+			render();
+		}, 600);
+		return;
+	}
+
+	revealed.push(idx);
+	render();
+
+	if (revealed.length === 2) {
+		const [a, b] = revealed;
+		const cardA = deck[a];
+		const cardB = deck[b];
+
+		let isMatch = false;
+		if (cardA.isWild || cardB.isWild) {
+			isMatch = true;
+		} else if (currentVariant.id === 'memory:zebra') {
+			isMatch = cardA.groupId === cardB.groupId && cardA.zebra !== cardB.zebra;
+		} else {
+			isMatch = cardA.groupId === cardB.groupId;
+		}
+
+		setTimeout(() => {
+			if (isMatch) {
+				matched.push(a, b);
+				combo++;
+
+				if (currentVariant.id === 'memory:sonar') {
+					// Pulse orthogonal neighbors
+					const cols = getCols();
+					sonarIndices = [];
+					[a, b].forEach(pos => {
+						const row = Math.floor(pos / cols);
+						const col = pos % cols;
+						if (row > 0) sonarIndices.push(pos - cols);
+						if (row < Math.floor(deck.length / cols) - 1) sonarIndices.push(pos + cols);
+						if (col > 0) sonarIndices.push(pos - 1);
+						if (col < cols - 1) sonarIndices.push(pos + 1);
+					});
+					sonarIndices = sonarIndices.filter(i => !matched.includes(i));
+					setTimeout(() => { sonarIndices = []; render(); }, 800);
+				}
+			} else {
+				misses++;
+				combo = 1;
+
+				if (currentVariant.id === 'memory:three-strikes') {
+					lives--;
+					if (lives === 0) {
+						alert('THREE STRIKES! Game Over.');
+						initRound();
+						return;
+					}
+				}
+
+				if (currentVariant.id === 'memory:drift') {
+					// Shift row of first card horizontally by 1
+					const cols = getCols();
+					const targetRow = Math.floor(a / cols);
+					const rowIndices = Array.from({ length: cols }, (_, c) => targetRow * cols + c);
+					const lastCard = deck[rowIndices[cols - 1]];
+					for (let c = cols - 1; c > 0; c--) {
+						deck[rowIndices[c]] = deck[rowIndices[c - 1]];
+					}
+					deck[rowIndices[0]] = lastCard;
+				}
+
+				if (currentVariant.id === 'memory:decay') {
+					// Tag seen cards with 3 attempts
+					[a, b].forEach(pos => {
+						if (!decayMap[pos]) decayMap[pos] = 3;
+						else decayMap[pos]--;
+						if (decayMap[pos] <= 0) {
+							// Relocate
+							const emptySlots = deck.map((_, i) => i).filter(i => !matched.includes(i) && i !== a && i !== b);
+							if (emptySlots.length > 0) {
+								const target = emptySlots[0];
+								const temp = deck[pos];
+								deck[pos] = deck[target];
+								deck[target] = temp;
+								delete decayMap[pos];
+							}
+						}
+					});
+				}
+			}
+			revealed = [];
+			render();
+		}, 700);
+	}
+}
+
+function getCols() {
+	const total = deck.length;
+	if (window.innerHeight <= 500) return 6;
+	if (window.innerWidth >= 1000) return 6;
+	return 4;
+}
+
+function renderHud() {
+	let custom = '';
+	if (currentVariant.id === 'memory:countdown') {
+		custom = `<span style="color:${timerSeconds <= 15 ? 'red' : 'inherit'}">⏳ Time: ${timerSeconds}s</span>`;
+	} else if (currentVariant.id === 'memory:three-strikes') {
+		custom = `<span>Lives: ${'❤️'.repeat(lives)}${'🖤'.repeat(3 - lives)}</span>`;
+	} else if (currentVariant.id === 'memory:combo') {
+		custom = `<span style="color:#2563eb">🔥 Multiplier: ${combo}x</span>`;
+	}
+
+	const pairsFound = Math.floor(matched.length / 2);
+	document.getElementById('hud').innerHTML = `
+		<span>Pairs: ${pairsFound} / 6</span>
+		<span>Misses: ${misses}</span>
+		${custom}
+	`;
+}
+
+function render() {
+	renderHud();
+	const stage = document.getElementById('stage');
+	const board = document.getElementById('board');
+	const totalCards = deck.length;
+	const cols = getCols();
+	const rows = Math.ceil(totalCards / cols);
+
+	const availableW = stage.clientWidth - 32;
+	const availableH = stage.clientHeight - 90;
+	const cardW = Math.floor((availableW - (cols - 1) * 6) / cols);
+	const cardH = Math.floor((availableH - (rows - 1) * 6) / rows);
+	const size = Math.max(38, Math.min(84, Math.min(cardW, cardH)));
+
+	board.style.gridTemplateColumns = `repeat(${cols}, ${size}px)`;
+	board.style.setProperty('--size', `${size}px`);
+
+	board.innerHTML = '';
+	deck.forEach((card, idx) => {
+		const isRevealed = revealed.includes(idx);
+		const isMatched = matched.includes(idx);
+		const isSonar = sonarIndices.includes(idx);
+
+		const el = document.createElement('button');
+		el.type = 'button';
+		el.className = 'card';
+		if (card.isWild) el.classList.add('wild');
+		if (card.isHazard) el.classList.add('hazard');
+		if (card.zebra === 'light') el.classList.add('zebra-light');
+		if (card.zebra === 'dark') el.classList.add('zebra-dark');
+		if (isRevealed || isSonar) el.classList.add('flipped');
+		if (isSonar) el.classList.add('sonar-flash');
+		if (isMatched) el.classList.add('matched');
+
+		if (isRevealed || isSonar) {
+			el.innerHTML = `<span class="card-icon">${card.icon}</span>`;
+		}
+
+		if (card.isWild) {
+			el.innerHTML += `<span class="status-pill pill-wild">WILD</span>`;
+		} else if (card.isHazard) {
+			el.innerHTML += `<span class="status-pill pill-hazard">TRAP</span>`;
+		} else if (card.zebra) {
+			el.innerHTML += `<span class="status-pill pill-zebra">${card.zebra.toUpperCase()}</span>`;
+		} else if (decayMap[idx]) {
+			el.innerHTML += `<span class="status-pill pill-decay">${decayMap[idx]}</span>`;
+		}
+
+		el.onclick = () => handleCardClick(idx);
+		board.appendChild(el);
+	});
+
+	document.getElementById('hint').textContent = `${currentVariant.name}: ${currentVariant.rule}`;
+
+	// Details Pane
+	document.getElementById('detail-title').textContent = currentVariant.name;
+	document.getElementById('detail-desc').textContent = currentVariant.desc;
+	document.getElementById('detail-rule').textContent = currentVariant.rule;
+	document.getElementById('detail-mechanic').textContent = currentVariant.mechanic;
+	document.getElementById('detail-baseline').textContent = currentVariant.baseline;
+	document.getElementById('detail-win-loss').textContent = currentVariant.winLoss;
+	document.getElementById('detail-scoring').textContent = currentVariant.scoring;
+	document.getElementById('detail-groups').textContent = currentVariant.groups;
+}
+
+// Setup tabs
+const tabsNav = document.getElementById('tabs');
+VARIANTS.forEach((v, i) => {
+	const btn = document.createElement('button');
+	btn.type = 'button';
+	btn.textContent = v.name;
+	if (i === 0) btn.setAttribute('aria-current', 'page');
+	btn.onclick = () => {
+		for (const b of tabsNav.children) b.removeAttribute('aria-current');
+		btn.setAttribute('aria-current', 'page');
+		currentVariant = v;
+		initRound();
+	};
+	tabsNav.appendChild(btn);
+});
+
+document.getElementById('reset-btn').onclick = initRound;
+window.addEventListener('resize', render);
+initRound();
+</script>
+</body>
+</html>

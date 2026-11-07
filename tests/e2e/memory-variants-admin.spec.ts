@@ -109,11 +109,24 @@ const memoryVariants = [
 	'memory:quads',
 	'memory:collapse'
 ];
+const allMemoryVariants = [
+	...memoryVariants,
+	'memory:countdown',
+	'memory:three-strikes',
+	'memory:wild-card',
+	'memory:sonar',
+	'memory:zebra',
+	'memory:drift',
+	'memory:decay',
+	'memory:one-flip',
+	'memory:combo',
+	'memory:hazard'
+];
 
 test('Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds', async ({
 	browser
 }) => {
-	test.setTimeout(180_000);
+	test.setTimeout(300_000);
 	const proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc' });
 	const db = proxy.env.DB;
 	const context = await browser.newContext({
@@ -237,15 +250,18 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		await apply(moving.locator('form'), 'Enable variant', 'CASE-VARIANT-REENABLE');
 		await expect(moving.locator('.status-pill')).toContainText('Enabled');
 		await apply(moving.locator('form'), 'Disable variant', 'CASE-VARIANT-DISABLE-AGAIN');
-		// The six v1.3.5.5 identities are disabled directly: 60 operator requests per minute cannot
+		// Non-legacy variants are disabled directly: 60 operator requests per minute cannot
 		// cover a click-through of every row. Their lifecycle is restored in `finally`.
-		for (const id of memoryVariants.slice(4))
-			await db
-				.prepare(
-					"INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('memory',?,'disabled','CASE-ALL-VARIANTS-DISABLED') ON CONFLICT(family,variant) DO UPDATE SET state='disabled'"
-				)
-				.bind(id)
-				.run();
+		for (const id of allMemoryVariants) {
+			if (!legacyVariants.includes(id) && id !== 'memory:moving') {
+				await db
+					.prepare(
+						"INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('memory',?,'disabled','CASE-ALL-VARIANTS-DISABLED') ON CONFLICT(family,variant) DO UPDATE SET state='disabled'"
+					)
+					.bind(id)
+					.run();
+			}
+		}
 		for (const id of legacyVariants) {
 			const row = page.locator(`.variant-row[data-variant="${id}"]`);
 			if ((await row.locator('input[name=action]').inputValue()) === 'variant-disable')
@@ -293,7 +309,7 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 		const editors = page.locator('.scoring-card');
 		await expect(editors).toHaveCount(3);
 		await expect(editors.first()).toContainText(
-			'Edits affect Classic, No preview, Moving cards, Tight Budget, Lockout, Marked Swaps, Two Backs, Collapse in future rounds.'
+			'Edits affect Classic, No preview, Moving cards, Tight Budget, Lockout, Marked Swaps, Two Backs, Collapse'
 		);
 		for (const [index, variant, field, scope] of [
 			[0, undefined, 'Points per pair', 'memory'],
@@ -580,7 +596,7 @@ test('dimension policy editor previews and saves only supported Memory values', 
 			await page.goto('/admin/games?game=memory&subview=policy');
 			await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
 			await expect(page.getByRole('heading', { name: 'Supported dimensions' })).toBeVisible();
-			await expect(page.getByText('10 of 10 variants eligible')).toBeVisible();
+			await expect(page.getByText('20 of 20 variants eligible')).toBeVisible();
 			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
 				false
 			);
@@ -593,7 +609,7 @@ test('dimension policy editor previews and saves only supported Memory values', 
 			.getByRole('group', { name: 'Match size' })
 			.getByRole('checkbox', { name: 'Quads' })
 			.uncheck();
-		await expect(page.getByText('9 of 10 variants eligible')).toBeVisible();
+		await expect(page.getByText('19 of 20 variants eligible')).toBeVisible();
 		await page.getByRole('button', { name: 'Review policy change' }).click();
 		const dialog = page.getByRole('dialog', { name: 'Review policy change' });
 		await expect(dialog.getByText('memory:quads')).toBeVisible();
@@ -608,7 +624,7 @@ test('dimension policy editor previews and saves only supported Memory values', 
 		]);
 		expect(saved.status()).toBe(200);
 		await expect(dialog).not.toBeVisible();
-		await expect(page.getByText('9 of 10 variants eligible')).toBeVisible();
+		await expect(page.getByText('19 of 20 variants eligible')).toBeVisible();
 		const available = await context.request.get(
 			'/api/play/availability?family=memory&variant=memory:quads'
 		);

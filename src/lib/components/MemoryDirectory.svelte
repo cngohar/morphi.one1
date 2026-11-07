@@ -29,11 +29,7 @@
 	let inspectedVariant = $state<DirectoryVariant | null>(null);
 	let drawer = $state<HTMLDialogElement>();
 	let triggerEl = $state<HTMLButtonElement | null>(null);
-	let searchQuery = $state(filterParams.q);
-
-	$effect(() => {
-		searchQuery = filterParams.q;
-	});
+	let searchQuery = $derived(filterParams.q);
 
 	async function openDrawer(variant: DirectoryVariant, event: MouseEvent) {
 		inspectedVariant = variant;

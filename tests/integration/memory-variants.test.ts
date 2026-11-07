@@ -959,18 +959,22 @@ it('bounds Games queries, pages variants deterministically, and isolates scoring
 	// 2. loadGamesAdmin bounding and deterministic pagination for actual catalog.
 	const adminPage0 = await loadGamesAdmin(db, undefined, 'memory', 0, 10);
 	expect(adminPage0.gameStats.totalVariants).toBe(catalog.memory.variants!.length);
-	expect(adminPage0.gameStats.totalVariantPages).toBe(1);
+	expect(adminPage0.gameStats.totalVariantPages).toBe(
+		Math.ceil(catalog.memory.variants!.length / 10)
+	);
 	expect(adminPage0.gameStats.variantPage).toBe(0);
 	expect(adminPage0.gameStats.variantPageSize).toBe(10);
-	expect(adminPage0.gameStats.variants).toHaveLength(catalog.memory.variants!.length);
+	expect(adminPage0.gameStats.variants).toHaveLength(10);
 	expect(adminPage0.gameStats.variants.map((v) => v.id)).toEqual(
-		catalog.memory.variants!.map((variant) => variant.id)
+		catalog.memory.variants!.slice(0, 10).map((variant) => variant.id)
 	);
 
 	// 3. Out-of-bounds page returns safe empty array with page index preserved.
 	const adminPage99 = await loadGamesAdmin(db, undefined, 'memory', 99, 10);
 	expect(adminPage99.gameStats.totalVariants).toBe(catalog.memory.variants!.length);
-	expect(adminPage99.gameStats.totalVariantPages).toBe(1);
+	expect(adminPage99.gameStats.totalVariantPages).toBe(
+		Math.ceil(catalog.memory.variants!.length / 10)
+	);
 	expect(adminPage99.gameStats.variantPage).toBe(99);
 	expect(adminPage99.gameStats.variants).toHaveLength(0);
 
@@ -1145,10 +1149,10 @@ it('rejects an exhausted or over-long budget payload and releases the session by
 it('loads Memory directory, filters by search/status/archetype, supports keyset cursor pagination and discovers observed variants', async () => {
 	const db = proxy.env.DB;
 
-	// 1. Default directory load returns all 10 curated pilot variants.
+	// 1. Default directory load returns all curated variants.
 	const initial = await loadMemoryDirectory(db);
-	expect(initial.curatedCount).toBe(10);
-	expect(initial.total).toBeGreaterThanOrEqual(10);
+	expect(initial.curatedCount).toBe(catalog.memory.variants!.length);
+	expect(initial.total).toBeGreaterThanOrEqual(catalog.memory.variants!.length);
 	expect(initial.items.length).toBeLessThanOrEqual(10);
 
 	const classic = initial.items.find((v) => v.id === 'memory:classic');
@@ -1157,7 +1161,9 @@ it('loads Memory directory, filters by search/status/archetype, supports keyset 
 	expect(classic?.archetype).toBe('core');
 	expect(classic?.dims.length).toBe(6);
 
-	const quads = initial.items.find((v) => v.id === 'memory:quads');
+	// Quads is on page 2 in default sort (id ASC, limit 10), so verify via grouping query
+	const quadsResult = await loadMemoryDirectory(db, { archetype: 'grouping' });
+	const quads = quadsResult.items.find((v) => v.id === 'memory:quads');
 	expect(quads).toBeDefined();
 	expect(quads?.archetype).toBe('grouping');
 	expect(quads?.dims.find((d) => d.key === 'matchSize')?.valueId).toBe('4');

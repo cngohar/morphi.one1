@@ -24,7 +24,9 @@ export const memoryDimensions = [
 			{ id: 'static', label: 'policy.static' },
 			{ id: 'moving', label: 'policy.moving' },
 			{ id: 'swaps', label: 'policy.swaps' },
-			{ id: 'collapse', label: 'policy.collapse' }
+			{ id: 'collapse', label: 'policy.collapse' },
+			{ id: 'drift', label: 'policy.drift' },
+			{ id: 'decay', label: 'policy.decay' }
 		]
 	},
 	{
@@ -32,7 +34,8 @@ export const memoryDimensions = [
 		label: 'policy.backs',
 		values: [
 			{ id: 'uniform', label: 'policy.uniform' },
-			{ id: 'two-backs', label: 'policy.twoBacks' }
+			{ id: 'two-backs', label: 'policy.twoBacks' },
+			{ id: 'zebra', label: 'policy.zebra' }
 		]
 	},
 	{
@@ -40,7 +43,9 @@ export const memoryDimensions = [
 		label: 'policy.budget',
 		values: [
 			{ id: 'standard', label: 'policy.standard' },
-			{ id: 'strict', label: 'policy.strict' }
+			{ id: 'strict', label: 'policy.strict' },
+			{ id: 'countdown', label: 'policy.countdown' },
+			{ id: 'three-strikes', label: 'policy.threeStrikes' }
 		]
 	},
 	{
@@ -48,7 +53,12 @@ export const memoryDimensions = [
 		label: 'policy.availability',
 		values: [
 			{ id: 'standard', label: 'policy.standard' },
-			{ id: 'lockout', label: 'policy.lockout' }
+			{ id: 'lockout', label: 'policy.lockout' },
+			{ id: 'wild', label: 'policy.wild' },
+			{ id: 'sonar', label: 'policy.sonar' },
+			{ id: 'one-flip', label: 'policy.oneFlip' },
+			{ id: 'combo', label: 'policy.combo' },
+			{ id: 'hazard', label: 'policy.hazard' }
 		]
 	}
 ] as const;
@@ -72,5 +82,15 @@ export const memoryPolicyVariants = [
 	{ id: 'memory:swaps', archetype: 'dynamics', change: ['movement', 'swaps'] },
 	{ id: 'memory:two-backs', archetype: 'information', change: ['backs', 'two-backs'] },
 	{ id: 'memory:quads', archetype: 'grouping', change: ['matchSize', '4'] },
-	{ id: 'memory:collapse', archetype: 'dynamics', change: ['movement', 'collapse'] }
+	{ id: 'memory:collapse', archetype: 'dynamics', change: ['movement', 'collapse'] },
+	{ id: 'memory:countdown', archetype: 'pressure', change: ['budget', 'countdown'] },
+	{ id: 'memory:three-strikes', archetype: 'pressure', change: ['budget', 'three-strikes'] },
+	{ id: 'memory:wild-card', archetype: 'core', change: ['availability', 'wild'] },
+	{ id: 'memory:sonar', archetype: 'information', change: ['availability', 'sonar'] },
+	{ id: 'memory:zebra', archetype: 'information', change: ['backs', 'zebra'] },
+	{ id: 'memory:drift', archetype: 'dynamics', change: ['movement', 'drift'] },
+	{ id: 'memory:decay', archetype: 'dynamics', change: ['movement', 'decay'] },
+	{ id: 'memory:one-flip', archetype: 'core', change: ['availability', 'one-flip'] },
+	{ id: 'memory:combo', archetype: 'pressure', change: ['availability', 'combo'] },
+	{ id: 'memory:hazard', archetype: 'constraints', change: ['availability', 'hazard'] }
 ] as const;

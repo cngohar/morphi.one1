@@ -32,7 +32,23 @@ const pairHelp = {
 /** Leaderboard groups for one variant suffix; every identity keeps its own cohorts. */
 const groupIds = (suffix: string, counts: readonly number[]) =>
 	counts.map((count) => `memory-1:${suffix}:${count}`);
-const NEW_PAIR_SUFFIXES = ['budget', 'lockout', 'swaps', 'two-backs', 'collapse'] as const;
+const NEW_PAIR_SUFFIXES = [
+	'budget',
+	'lockout',
+	'swaps',
+	'two-backs',
+	'collapse',
+	'countdown',
+	'three-strikes',
+	'wild-card',
+	'sonar',
+	'zebra',
+	'drift',
+	'decay',
+	'one-flip',
+	'combo',
+	'hazard'
+] as const;
 const NEW_GROUPS = [
 	...NEW_PAIR_SUFFIXES.flatMap((suffix) => groupIds(suffix, PAIR_COUNTS)),
 	...groupIds('quads', QUAD_COUNTS)
@@ -211,6 +227,46 @@ export const manifest = {
 		pairVariant('collapse', 120, {
 			steps: ['v1.game.memory.step1', 'memory.collapse.step2', 'v1.game.memory.step3'],
 			tips: 'memory.collapse.tips'
+		}),
+		pairVariant('countdown', 120, {
+			steps: ['v1.game.memory.step1', 'memory.countdown.step2', 'v1.game.memory.step3'],
+			tips: 'memory.countdown.tips'
+		}),
+		pairVariant('three-strikes', 120, {
+			steps: ['v1.game.memory.step1', 'memory.threeStrikes.step2', 'v1.game.memory.step3'],
+			tips: 'memory.threeStrikes.tips'
+		}),
+		pairVariant('wild-card', 120, {
+			steps: ['v1.game.memory.step1', 'memory.wildCard.step2', 'v1.game.memory.step3'],
+			tips: 'memory.wildCard.tips'
+		}),
+		pairVariant('sonar', 120, {
+			steps: ['v1.game.memory.step1', 'memory.sonar.step2', 'v1.game.memory.step3'],
+			tips: 'memory.sonar.tips'
+		}),
+		pairVariant('zebra', 120, {
+			steps: ['v1.game.memory.step1', 'memory.zebra.step2', 'v1.game.memory.step3'],
+			tips: 'memory.zebra.tips'
+		}),
+		pairVariant('drift', 120, {
+			steps: ['v1.game.memory.step1', 'memory.drift.step2', 'v1.game.memory.step3'],
+			tips: 'memory.drift.tips'
+		}),
+		pairVariant('decay', 120, {
+			steps: ['v1.game.memory.step1', 'memory.decay.step2', 'v1.game.memory.step3'],
+			tips: 'memory.decay.tips'
+		}),
+		pairVariant('one-flip', 120, {
+			steps: ['v1.game.memory.step1', 'memory.oneFlip.step2', 'v1.game.memory.step3'],
+			tips: 'memory.oneFlip.tips'
+		}),
+		pairVariant('combo', 120, {
+			steps: ['v1.game.memory.step1', 'memory.combo.step2', 'v1.game.memory.step3'],
+			tips: 'memory.combo.tips'
+		}),
+		pairVariant('hazard', 120, {
+			steps: ['v1.game.memory.step1', 'memory.hazard.step2', 'v1.game.memory.step3'],
+			tips: 'memory.hazard.tips'
 		})
 	],
 	maxMoves: 180,

@@ -1,18 +1,23 @@
 # Morphi: Simple Plan
 
-## Current local status — .6 policy implemented; owner functional review pending (2026-11-07)
+## Current local status — v1.3.5.8 Batch A accepted locally and committed (2026-11-07)
 
-The owner locally accepted the six-rule .5 Memory pilot (ten variants total),
-then approved the [fixture-only .6 visual baseline](static/demo/v1.3.5.6-tier1.html)
-at the three required sizes and explicitly authorized local .6 implementation.
-They permitted direct parent work because the specified delegated models are
-unavailable. The [selected .6 brief](docs/briefs/v1.3.5.6-tier1-policy-brief.md)
-and [work/evidence](docs/work/V1.3.5.6_WORK.md) record Memory-only dimension
-controls, audited immutable policy snapshots and server new-round enforcement.
-Scoped types, lint, D1, Chromium and Memory six-runtime vectors pass; owner
-functional acceptance, physical-device review and full `bun run verify` are
-not claimed. No .7, commit/push, deployment or production change is authorized.
-Preserve C1–C10 and unrelated palette/editor/MCP/unauditioned audio.
+The owner reviewed and approved the 10 genuine Memory ruleset variants (Countdown timer, Three strikes survival,
+Wild card, Sonar reveal, Zebra bicolor constraint, Row drift, Seen card decay, Single-flip continuity,
+Streak multiplier combo, and Hazard trap card) and directed: “done approved you now comit”. All 10
+rulesets are implemented end-to-end under ponytail principles with multi-runtime vectors (6/6 runtimes,
+fingerprint `e11e8733...`), workspace types (0 errors/warnings), unit tests (20/20), real D1 integration (15/15),
+and Playwright Chromium admin suite (3/3) passing. Total Memory catalogue is now 20 variants. Full `bun run verify`
+remains deferred; unauditioned audio and editor exclusions preserved. No deployment authorized. Preserve C1–C10.
+
+## Earlier local status — .7 directory accepted locally and pushed to GitHub (2026-11-07)
+
+The owner approved the completed Tier 2 Memory directory and authorized committing and pushing
+to GitHub (`db18127 Accept v1.3.5.7 Memory Tier 2 directory, Tier 1 policy and pilot variants`).
+Scoped format, lint, type checks, real-D1 integration suite (15/15), and Playwright Chromium suite
+(3/3 at single worker) passed. Ten Memory variants remain the accepted catalogue.
+
+## Earlier local status — .6 policy implemented (2026-11-07)
 
 ## Earlier local status — v1.3.5.4 Memory identity accepted (2026-11-07)
 

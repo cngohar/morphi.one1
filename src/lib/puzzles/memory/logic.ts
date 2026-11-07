@@ -13,6 +13,9 @@ export interface MemoryCard {
 	color: string;
 	/** Two-backs only: 0 is dotted, 1 is striped; a partner always has the other. */
 	back?: 0 | 1;
+	isWild?: boolean;
+	isHazard?: boolean;
+	zebra?: 'light' | 'dark';
 }
 
 export const MEMORY_VARIANTS = [
@@ -25,7 +28,17 @@ export const MEMORY_VARIANTS = [
 	'memory:swaps',
 	'memory:two-backs',
 	'memory:quads',
-	'memory:collapse'
+	'memory:collapse',
+	'memory:countdown',
+	'memory:three-strikes',
+	'memory:wild-card',
+	'memory:sonar',
+	'memory:zebra',
+	'memory:drift',
+	'memory:decay',
+	'memory:one-flip',
+	'memory:combo',
+	'memory:hazard'
 ] as const;
 export type MemoryVariant = (typeof MEMORY_VARIANTS)[number];
 
@@ -64,12 +77,12 @@ export function memoryCapReached(round: MemoryRound): boolean {
 	);
 }
 
-export type MemoryStatus = 'playing' | 'won';
+export type MemoryStatus = 'playing' | 'won' | 'lost';
 
 export interface MemoryRound {
 	seed: string;
 	variant?: MemoryVariant;
-	/** Only moving and swaps rounds persist the number of actual logic-stream draws. */
+	/** Only moving, swaps and hazard rounds persist the number of actual logic-stream draws. */
 	rngDraws?: number;
 	/** Lockout only: the card that cannot be flipped on the next completed attempt. */
 	lock?: number | null;
@@ -77,6 +90,16 @@ export interface MemoryRound {
 	marked?: number[];
 	/** Collapse only: cards already removed from `cards`. */
 	cleared?: number;
+	/** Three strikes only: remaining lives (out of 3). */
+	lives?: number;
+	/** Combo only: current streak multiplier. */
+	combo?: number;
+	/** Decay only: mapping of seen card index -> attempts remaining. */
+	decay?: Record<number, number>;
+	/** Sonar only: orthogonally adjacent card indices to pulse. */
+	sonar?: number[];
+	/** Countdown only: total allowed seconds (60, 80, 100). */
+	timeLimit?: number;
 	/** Group count: pairs (6/8/10), trios (6/8/10) or quads (4/5/6). */
 	pairs: number;
 	cards: MemoryCard[];
@@ -98,7 +121,11 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 	const selectedVariant = parseMemoryVariant(variant);
 	const rng = createRng(seed);
 	let rngDraws = 0;
-	if (selectedVariant === 'memory:moving' || selectedVariant === 'memory:swaps') {
+	if (
+		selectedVariant === 'memory:moving' ||
+		selectedVariant === 'memory:swaps' ||
+		selectedVariant === 'memory:hazard'
+	) {
 		const nextU64 = rng.nextU64;
 		rng.nextU64 = () => {
 			rngDraws += 1;
@@ -117,8 +144,28 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 				id: `${symbol.id}:${copy}`,
 				symbol: symbol.id,
 				color: symbol.color,
-				...(selectedVariant === 'memory:two-backs' ? { back: copy as 0 | 1 } : {})
+				...(selectedVariant === 'memory:two-backs' ? { back: copy as 0 | 1 } : {}),
+				...(selectedVariant === 'memory:zebra'
+					? { zebra: (copy === 0 ? 'light' : 'dark') as 'light' | 'dark' }
+					: {})
 			});
+
+	if (selectedVariant === 'memory:wild-card') {
+		const lastSymbol = selected[selected.length - 1];
+		const wildCard = deck.find((c) => c.id === `${lastSymbol.id}:1`);
+		if (wildCard) {
+			wildCard.isWild = true;
+			wildCard.color = '#f59e0b';
+		}
+	} else if (selectedVariant === 'memory:hazard') {
+		const lastSymbol = selected[selected.length - 1];
+		for (const card of deck) {
+			if (card.symbol === lastSymbol.id) {
+				card.isHazard = true;
+				card.color = '#ef4444';
+			}
+		}
+	}
 
 	const round: MemoryRound = {
 		seed,
@@ -131,11 +178,21 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		status: 'playing'
 	};
 	if (selectedVariant !== 'memory:classic') round.variant = selectedVariant;
-	if (selectedVariant === 'memory:moving' || selectedVariant === 'memory:swaps')
+	if (
+		selectedVariant === 'memory:moving' ||
+		selectedVariant === 'memory:swaps' ||
+		selectedVariant === 'memory:hazard'
+	)
 		round.rngDraws = rngDraws;
 	if (selectedVariant === 'memory:lockout') round.lock = null;
 	if (selectedVariant === 'memory:swaps') round.marked = [];
 	if (selectedVariant === 'memory:collapse') round.cleared = 0;
+	if (selectedVariant === 'memory:countdown')
+		round.timeLimit = pairs === 10 ? 100 : pairs === 8 ? 80 : 60;
+	if (selectedVariant === 'memory:three-strikes') round.lives = 3;
+	if (selectedVariant === 'memory:combo') round.combo = 1;
+	if (selectedVariant === 'memory:decay') round.decay = {};
+	if (selectedVariant === 'memory:sonar') round.sonar = [];
 	return round;
 }
 
@@ -187,6 +244,35 @@ function moveFaceDownCards(round: MemoryRound): MemoryRound {
 	return { ...round, cards, rngDraws: draws() };
 }
 
+function driftRow(round: MemoryRound, cardIndex: number): MemoryRound {
+	const cols = 4;
+	const row = Math.floor(cardIndex / cols);
+	const rowStart = row * cols;
+	if (rowStart + cols > round.cards.length) return round;
+	const cards = round.cards.slice();
+	const last = cards[rowStart + cols - 1];
+	for (let c = cols - 1; c > 0; c--) {
+		cards[rowStart + c] = cards[rowStart + c - 1];
+	}
+	cards[rowStart] = last;
+	return { ...round, cards };
+}
+
+function updateDecay(round: MemoryRound, revealedIndices: number[]): MemoryRound {
+	const decay = { ...(round.decay ?? {}) };
+	revealedIndices.forEach((pos) => {
+		decay[pos] = 3;
+	});
+	for (const key of Object.keys(decay)) {
+		const pos = Number(key);
+		decay[pos] -= 1;
+		if (decay[pos] <= 0) {
+			delete decay[pos];
+		}
+	}
+	return { ...round, decay };
+}
+
 export function flipCard(round: MemoryRound, index: number): FlipResult {
 	const matchSize = cardsPerMatch(round);
 	if (round.status !== 'playing' || round.revealed.length >= matchSize || memoryCapReached(round)) {
@@ -202,9 +288,50 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		return { round, effect: 'ignored' };
 	}
 
+	const variant = memoryVariant(round);
+
+	// Single-flip continuity
+	if (variant === 'memory:one-flip') {
+		const base = round.marked?.length ? { ...round, marked: [] } : round;
+		if (round.revealed.length === 1) {
+			const prevIdx = round.revealed[0];
+			const prevCard = round.cards[prevIdx];
+			const moves = round.moves + 1;
+			if (prevCard && (prevCard.symbol === card.symbol || prevCard.isWild || card.isWild)) {
+				const matched = [...round.matched, prevIdx, index].sort((a, b) => a - b);
+				const won = matched.length === round.cards.length;
+				return {
+					round: {
+						...base,
+						revealed: [],
+						matched,
+						moves,
+						status: won ? 'won' : 'playing'
+					},
+					effect: won ? 'win' : 'match'
+				};
+			} else {
+				return {
+					round: {
+						...base,
+						revealed: [index],
+						mismatches: round.mismatches + 1,
+						moves
+					},
+					effect: 'mismatch'
+				};
+			}
+		}
+		return {
+			round: { ...base, revealed: [index] },
+			effect: 'flip'
+		};
+	}
+
 	const revealed = [...round.revealed, index];
-	// Any accepted flip ends the marked-swap highlight.
-	const base = round.marked?.length ? { ...round, marked: [] } : round;
+	// Any accepted flip ends the marked-swap highlight and clears sonar flash.
+	const base =
+		round.marked?.length || round.sonar?.length ? { ...round, marked: [], sonar: [] } : round;
 
 	if (revealed.length < matchSize) {
 		return {
@@ -218,14 +345,38 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	const first = round.cards[revealed[0]];
 	if (!first) return { round, effect: 'ignored' };
 
-	const variant = memoryVariant(round);
-	if (revealed.every((position) => round.cards[position]?.symbol === first.symbol)) {
+	const isMatch =
+		card.isWild || first.isWild
+			? true
+			: variant === 'memory:zebra'
+				? card.symbol === first.symbol && card.zebra !== first.zebra
+				: revealed.every((position) => round.cards[position]?.symbol === first.symbol);
+
+	if (isMatch) {
 		const collapse = variant === 'memory:collapse';
 		const matched = collapse ? [] : [...round.matched, ...revealed].sort((a, b) => a - b);
 		const cards = collapse
 			? round.cards.filter((_, position) => !revealed.includes(position))
 			: round.cards;
 		const won = collapse ? cards.length === 0 : matched.length === cards.length;
+		const combo = variant === 'memory:combo' ? (round.combo ?? 1) + 1 : round.combo;
+
+		let sonar: number[] | undefined;
+		if (variant === 'memory:sonar') {
+			const cols = 4;
+			sonar = revealed
+				.flatMap((pos) => {
+					const r = Math.floor(pos / cols);
+					const c = pos % cols;
+					const neighbors: number[] = [];
+					if (r > 0) neighbors.push(pos - cols);
+					if (r < Math.floor(round.cards.length / cols) - 1) neighbors.push(pos + cols);
+					if (c > 0) neighbors.push(pos - 1);
+					if (c < cols - 1) neighbors.push(pos + 1);
+					return neighbors;
+				})
+				.filter((pos) => !matched.includes(pos) && !revealed.includes(pos));
+		}
 
 		return {
 			round: {
@@ -236,7 +387,9 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				moves,
 				status: won ? 'won' : 'playing',
 				...(collapse ? { cleared: round.cleared! + matchSize } : {}),
-				...(variant === 'memory:lockout' ? { lock: null } : {})
+				...(variant === 'memory:lockout' ? { lock: null } : {}),
+				...(combo !== undefined ? { combo } : {}),
+				...(sonar ? { sonar } : {})
 			},
 			effect: won ? 'win' : 'match'
 		};
@@ -246,14 +399,25 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		...base,
 		revealed,
 		mismatches: round.mismatches + 1,
-		moves
+		moves,
+		...(variant === 'memory:combo' ? { combo: 1 } : {})
 	};
+
+	if (variant === 'memory:three-strikes') {
+		const lives = (round.lives ?? 3) - 1;
+		mismatched.lives = lives;
+		if (lives <= 0) mismatched.status = 'lost';
+	}
+
 	// Lock the last card only while two other unmatched cards keep a legal attempt open.
 	if (variant === 'memory:lockout')
 		mismatched.lock =
 			round.cards.length - round.matched.length - 1 >= 2 ? revealed[matchSize - 1] : null;
+
+	const isHazardMismatch = variant === 'memory:hazard' && (card.isHazard || first.isHazard);
 	return {
-		round: variant === 'memory:moving' ? moveFaceDownCards(mismatched) : mismatched,
+		round:
+			variant === 'memory:moving' || isHazardMismatch ? moveFaceDownCards(mismatched) : mismatched,
 		effect: 'mismatch'
 	};
 }
@@ -264,7 +428,11 @@ export function resolveMismatch(round: MemoryRound): MemoryRound {
 	}
 
 	const hidden = { ...round, revealed: [] };
-	return memoryVariant(round) === 'memory:swaps' ? swapHiddenCards(hidden) : hidden;
+	const variant = memoryVariant(round);
+	if (variant === 'memory:swaps') return swapHiddenCards(hidden);
+	if (variant === 'memory:drift') return driftRow(hidden, round.revealed[0]);
+	if (variant === 'memory:decay') return updateDecay(hidden, round.revealed);
+	return hidden;
 }
 
 /** Cards matched so far, including collapsed ones that left the board. */
@@ -314,6 +482,9 @@ export function scoreRound(
 	scoring: ScoreValues = defaultScoring(round)
 ): number {
 	if (round.status !== 'won') {
+		return 0;
+	}
+	if (round.variant === 'memory:countdown' && elapsedSeconds > (round.timeLimit ?? 60)) {
 		return 0;
 	}
 

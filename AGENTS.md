@@ -33,6 +33,20 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.8 Batch A accepted locally; source commit authorized (2026-11-07):**
+The owner said “done approved you now comit”, accepting the completed 10 genuine Memory
+ruleset variants (Countdown timer, Three strikes survival, Wild card, Sonar reveal, Zebra
+bicolor constraint, Row drift, Seen card decay, Single-flip continuity, Streak multiplier combo,
+and Hazard trap card) and authorizing this source commit. The 10 rulesets are implemented end-to-end
+under ponytail principles: stateful mechanics in `src/lib/puzzles/memory/logic.ts`, dimensions in
+`dimensions.ts`, manifest entries with 30 immutable leaderboard groups in `manifest.ts`, localization
+in `messages.ts`/`i18n`, and dynamic policy counting. Total catalog Memory variants are now 20.
+Multi-runtime vectors (6/6 runtimes, fingerprint `e11e8733...`), workspace types (0 errors/0 warnings),
+unit tests (20/20), real-D1 integration suite (15/15), and Playwright Chromium admin suite (3/3 at one
+worker) pass. Full `bun run verify` remains deferred; unauditioned audio and editor exclusions preserved.
+No push, deployment, or Batch B implementation is authorized. See `docs/briefs/v1.3.5.8-batch-a-brief.md`
+and `docs/work/V1.3.5.8_WORK.md`.
+
 **v1.3.5.7 accepted locally; source-only GitHub handoff authorized (2026-11-07):**
 The owner said “got them, approved and now comit and push to github”, accepting the
 completed Tier 2 Memory directory and authorizing this source-only commit/push to

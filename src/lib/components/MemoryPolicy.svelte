@@ -78,7 +78,9 @@
 		<h2>{t('policy.controls')}</h2>
 		<p>{t('policy.intro')}</p>
 		<p class:invalid={!valid} role="status" aria-live="polite">
-			{valid ? t('policy.active', { count: remaining }) : t('policy.empty')}
+			{valid
+				? t('policy.active', { count: remaining, total: policy.variants.length })
+				: t('policy.empty')}
 		</p>
 		<div class="policy-controls">
 			{#each policy.dimensions as dimension (dimension.key)}

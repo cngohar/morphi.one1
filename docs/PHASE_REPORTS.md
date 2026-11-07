@@ -17,6 +17,30 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.5.8 — Memory Expansion Batch A (10 Functional Rulesets) accepted locally (2026-11-07)
+
+- **Built:** Following owner approval of the visual review fixture (`static/demo/v1.3.5.8-batch-a.html`), brief (`docs/briefs/v1.3.5.8-batch-a-brief.md`), and the direction “accepted, you can now continue implementing”, 10 genuine Memory ruleset variants were implemented under ponytail principles: Countdown timer (`memory:countdown`), Three strikes survival (`memory:three-strikes`), Wild card (`memory:wild-card`), Sonar reveal (`memory:sonar`), Zebra bicolor constraint (`memory:zebra`), Row drift (`memory:drift`), Seen card decay (`memory:decay`), Single-flip continuity (`memory:one-flip`), Streak multiplier combo (`memory:combo`), and Hazard trap card (`memory:hazard`). Implemented stateful turn/deck mechanics in `src/lib/puzzles/memory/logic.ts`, dimension values in `dimensions.ts`, manifest entries with 30 immutable leaderboard groups in `manifest.ts`, localization in `messages.ts` and `i18n/messages.ts`, and dynamic policy active count in `MemoryPolicy.svelte`. Total catalog variants expanded from 10 to 20. [Brief](briefs/v1.3.5.8-batch-a-brief.md), [work/evidence](work/V1.3.5.8_WORK.md).
+- **Skipped (and why):** Further expansion batches (Batches B–H) remain scheduled for subsequent milestones; non-Memory matrices unchanged; unauditioned audio and local editor exclusions preserved; full `bun run verify` deferred per standing instructions.
+- **Known issues:** No physical device review; browser testing performed via Chromium responsive emulation across 390×844, 844×390, and 1280×800. Full verify deferred.
+- **Decisions and pinned versions:** Owner approved the 10 genuine rulesets over composite re-skins. Preserved standard integer-only deterministic RNG, no schema migration. Direct parent execution utilized due to unavailable `gpt-6.1-sol`/`gpt-6-luna` models.
+- **Questions for the owner:** None; source commit authorized. Proceed to Batch B selection when directed.
+
+| Acceptance item                                     | Evidence type and location                                                               | Result                                        |
+| --------------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Visual preview fixture at three sizes               | `static/demo/v1.3.5.8-batch-a.html`, captures in `build/v1.3.5.8/preview-rulesets-*.png` | ACCEPTED by owner                             |
+| 10 genuine ruleset mechanics & deterministic state  | `src/lib/puzzles/memory/logic.ts`, [unit tests](src/lib/puzzles/memory/variants.test.ts) | PASS 19/19                                    |
+| Multi-runtime vector parity (6 runtimes)            | `bun scripts/check-vectors.ts --memory` (Node, Bun, Chromium, Firefox, WebKit, workerd)  | PASS (fingerprint `e11e8733...`)              |
+| Real-D1 integration suite (15 tests)                | `tests/integration/memory-variants.test.ts`                                              | PASS 15/15                                    |
+| Playwright Chromium admin, directory & policy suite | `tests/e2e/memory-variants-admin.spec.ts`                                                | PASS 3/3 at one worker                        |
+| Responsive layout (390×844, 844×390, 1280×800)      | Zero horizontal scroll overflow (`scrollWidth <= innerWidth`)                            | PASS at all 3 sizes                           |
+| Format, lint and types                              | Scoped Prettier/ESLint; `bun run check`                                                  | PASS; 0 lint warnings, 0 type errors/warnings |
+| Full `bun run verify`                               | Standing owner deferral                                                                  | NOT RUN; deferred, not passed/waived          |
+
+- **Measurements:** Checked in local Linux Chromium responsive emulation at 390×844, 844×390, and 1280×800 (one worker). Directory queries and policy lookups remain bounded O(1) single-bind SQL.
+- **Waivers:** None.
+- **Owner responsibilities:** Owner reviews local functional implementation and decides on acceptance.
+- **CODEMAP updated:** Not required; file locations unchanged.
+
 ## v1.3.5.7 — Memory Tier 2 directory accepted locally (2026-11-07)
 
 - **Built:** After the owner approved the preview fixture (`static/demo/v1.3.5.7-tier2.html`) and brief, the Tier 2 curated and observed Memory directory was implemented under ponytail principles. Delivers dual-source curated/observed union (`src/lib/server/memory-directory.ts`), keyset cursor pagination (`encodeCursor`/`decodeCursor`), multi-filter toolbar (`q`, `status`, `archetype`, `source`), dimension breakdown evaluator, and accessible inspection drawer (`dialog.drawer`) with direct rules-group scoring editor links. Wired into `/admin/games?game=memory&subview=directory` via `MemoryDirectory.svelte`, `GamesAdmin.svelte`, and `+page.server.ts`. [Brief](briefs/v1.3.5.7-tier2-directory-brief.md), [work/evidence](work/V1.3.5.7_WORK.md).
@@ -25,15 +49,15 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 - **Decisions and pinned versions:** Owner approved recommended options (1A dedicated Directory tab, 2A base64 cursor token, 3A multi-filter toolbar, preview first) and accepted implementation. Direct parent execution utilized due to unavailable `gpt-6.1-sol`/`gpt-6-luna` models.
 - **Questions for the owner:** None; source-only commit and push to GitHub authorized.
 
-| Acceptance item | Evidence type and location | Result |
-| --- | --- | --- |
-| Visual preview fixture at three sizes | `static/demo/v1.3.5.7-tier2.html`, Chromium captures in `build/v1.3.5.7/tier2-*.png` | ACCEPTED by owner |
-| Dual-source union, keyset pagination, multi-filtering & observed variant discovery | `src/lib/server/memory-directory.ts`, [real-D1 tests](tests/integration/memory-variants.test.ts) | PASS 15/15 |
-| Real Games Directory tab, filters, inspection drawer & scoring links across 3 viewports | [Chromium admin spec](tests/e2e/memory-variants-admin.spec.ts), captures in `build/v1.3.5.7/real-directory-*.png` | PASS 3/3 at one worker |
-| Responsive layout (390×844, 844×390, 1280×800) | Zero horizontal scroll overflow (`scrollWidth <= innerWidth`) | PASS at all 3 sizes |
-| Format, lint and types | Scoped Prettier/ESLint; `bun run check` | PASS; 0 lint warnings, 0 type errors/warnings |
-| Owner functional acceptance & push authorization | Owner: “got them, approved and now comit and push to github” | ACCEPTED locally; source handoff authorized |
-| Full `bun run verify` | Standing owner deferral | NOT RUN; deferred, not passed/waived |
+| Acceptance item                                                                         | Evidence type and location                                                                                        | Result                                        |
+| --------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------- | --------------------------------------------- |
+| Visual preview fixture at three sizes                                                   | `static/demo/v1.3.5.7-tier2.html`, Chromium captures in `build/v1.3.5.7/tier2-*.png`                              | ACCEPTED by owner                             |
+| Dual-source union, keyset pagination, multi-filtering & observed variant discovery      | `src/lib/server/memory-directory.ts`, [real-D1 tests](tests/integration/memory-variants.test.ts)                  | PASS 15/15                                    |
+| Real Games Directory tab, filters, inspection drawer & scoring links across 3 viewports | [Chromium admin spec](tests/e2e/memory-variants-admin.spec.ts), captures in `build/v1.3.5.7/real-directory-*.png` | PASS 3/3 at one worker                        |
+| Responsive layout (390×844, 844×390, 1280×800)                                          | Zero horizontal scroll overflow (`scrollWidth <= innerWidth`)                                                     | PASS at all 3 sizes                           |
+| Format, lint and types                                                                  | Scoped Prettier/ESLint; `bun run check`                                                                           | PASS; 0 lint warnings, 0 type errors/warnings |
+| Owner functional acceptance & push authorization                                        | Owner: “got them, approved and now comit and push to github”                                                      | ACCEPTED locally; source handoff authorized   |
+| Full `bun run verify`                                                                   | Standing owner deferral                                                                                           | NOT RUN; deferred, not passed/waived          |
 
 - **Measurements:** Checked in local Linux Chromium responsive emulation at 390×844, 844×390, and 1280×800 (one worker). Directory queries are bounded O(1) single-bind SQL.
 - **Waivers:** None.
@@ -48,17 +72,17 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 - **Decisions and pinned versions:** Owner-selected 1A/2A/3A/4A and preview-first. Preserve weight-only config, existing variants, `memory-1`, replay and scoring; new policy values are immutable with a D1 live pointer and CAS/audit. KV may cache immutable snapshots but never govern issuance. No dependency or runtime version changed. Required delegated models unavailable; owner allowed direct parent work and verification, without substitute agent claims.
 - **Questions for the owner:** Review the integrated .6 Memory Policy flow locally and confirm functional acceptance or changes. This does not itself authorize .7 or a source handoff.
 
-| Acceptance item | Evidence type and location | Result |
-| --- | --- | --- |
-| Owner visual baseline at three sizes | Owner “accept as a base”, [fixture](../static/demo/v1.3.5.6-tier1.html) and earlier fixture-focused Chromium evidence | ACCEPTED as functional visual baseline; later polish deferred |
-| Finite rules, validated strict policy values and unchanged ten Memory identities | [family unit](../src/lib/puzzles/memory/dimensions.test.ts), [work record](work/V1.3.5.6_WORK.md) | PASS 1/1; no new variant |
-| D1 policy CAS, permission/audit, zero guard, authoritative issuance, in-flight and invalid live snapshot | [real-D1 tests](../tests/integration/memory-variants.test.ts), [work record](work/V1.3.5.6_WORK.md) | PASS 14/14 |
-| Real Games Policy editor/action and three-size responsive UI | [Chromium admin spec](../tests/e2e/memory-variants-admin.spec.ts); ignored `build/v1.3.5.6/real-policy-*.png` | PASS 2/2 at one worker; policy case at all three sizes |
-| Shared non-Memory ranked/config behavior | Four filtered Slice 3 cases, [work record](work/V1.3.5.6_WORK.md) | PASS 4/4 (4 unrelated skipped) |
-| Memory engine/replay fingerprint | `bun scripts/check-vectors.ts --memory`, six runtimes, 38 vectors | PASS, identical fingerprint |
-| Format, lint and types | Scoped Prettier/ESLint; `bun run check` | PASS; 0 lint warnings, 0 type errors/warnings |
-| Owner functional acceptance of .6 | Awaiting owner integrated-app review | PENDING; no acceptance inferred from checks |
-| Full `bun run verify` | Standing owner deferral | NOT RUN; deferred, not passed/waived |
+| Acceptance item                                                                                          | Evidence type and location                                                                                            | Result                                                        |
+| -------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------- |
+| Owner visual baseline at three sizes                                                                     | Owner “accept as a base”, [fixture](../static/demo/v1.3.5.6-tier1.html) and earlier fixture-focused Chromium evidence | ACCEPTED as functional visual baseline; later polish deferred |
+| Finite rules, validated strict policy values and unchanged ten Memory identities                         | [family unit](../src/lib/puzzles/memory/dimensions.test.ts), [work record](work/V1.3.5.6_WORK.md)                     | PASS 1/1; no new variant                                      |
+| D1 policy CAS, permission/audit, zero guard, authoritative issuance, in-flight and invalid live snapshot | [real-D1 tests](../tests/integration/memory-variants.test.ts), [work record](work/V1.3.5.6_WORK.md)                   | PASS 14/14                                                    |
+| Real Games Policy editor/action and three-size responsive UI                                             | [Chromium admin spec](../tests/e2e/memory-variants-admin.spec.ts); ignored `build/v1.3.5.6/real-policy-*.png`         | PASS 2/2 at one worker; policy case at all three sizes        |
+| Shared non-Memory ranked/config behavior                                                                 | Four filtered Slice 3 cases, [work record](work/V1.3.5.6_WORK.md)                                                     | PASS 4/4 (4 unrelated skipped)                                |
+| Memory engine/replay fingerprint                                                                         | `bun scripts/check-vectors.ts --memory`, six runtimes, 38 vectors                                                     | PASS, identical fingerprint                                   |
+| Format, lint and types                                                                                   | Scoped Prettier/ESLint; `bun run check`                                                                               | PASS; 0 lint warnings, 0 type errors/warnings                 |
+| Owner functional acceptance of .6                                                                        | Awaiting owner integrated-app review                                                                                  | PENDING; no acceptance inferred from checks                   |
+| Full `bun run verify`                                                                                    | Standing owner deferral                                                                                               | NOT RUN; deferred, not passed/waived                          |
 
 - **Measurements:** No new product performance target; layout was checked in local Linux Chromium responsive emulation at 390×844, 844×390 and 1280×800 (one worker), no physical device or network shaping. No cold/preloaded product-load run, median/p95 or gate/goal applies. Admin overview adds one bounded D1 live-pointer read; no speedup is claimed.
 - **Waivers:** None. Earlier full-verification deferral and pre-existing unrelated unit failure are recorded, not waived. Intermediate focused test failures were corrected and affected checks rerun.
@@ -73,12 +97,12 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 - **Decisions and pinned versions:** Existing `memory-1` serialization preserved; `memory-quads-v1` scoring scope for Quads. Six additions are now locally accepted, not merely candidates. No new package version pinned.
 - **Questions for the owner:** None for .5 acceptance; .6 fixture is separately selected for visual review.
 
-| Acceptance item | Evidence type and location | Result |
-| --- | --- | --- |
+| Acceptance item                                               | Evidence type and location                                                                 | Result                                                           |
+| ------------------------------------------------------------- | ------------------------------------------------------------------------------------------ | ---------------------------------------------------------------- |
 | Six rules, existing four, scoring, replay and ranked recovery | [pilot work](work/V1.3.5.5_WORK.md): Memory units, six-runtime vectors (38), real D1 12/12 | PASS, scoped; one unrelated pre-existing slice6 failure recorded |
-| Player and operator/browser flows | Chromium Memory 21/21, admin 1/1 and resume 13/13; local screenshots in `build/v1.3.5.5/` | PASS, scoped Chromium emulation |
-| Owner .5 visual and functional acceptance | “Yes, fixture approved” at three sizes; “accepte .5 locally and do the next step” | ACCEPTED locally, not physical-device review |
-| Full `bun run verify` | Standing owner deferral | NOT RUN; not waived or passed |
+| Player and operator/browser flows                             | Chromium Memory 21/21, admin 1/1 and resume 13/13; local screenshots in `build/v1.3.5.5/`  | PASS, scoped Chromium emulation                                  |
+| Owner .5 visual and functional acceptance                     | “Yes, fixture approved” at three sizes; “accepte .5 locally and do the next step”          | ACCEPTED locally, not physical-device review                     |
+| Full `bun run verify`                                         | Standing owner deferral                                                                    | NOT RUN; not waived or passed                                    |
 
 - **Measurements:** No .5 product performance target was introduced; Chromium viewport evidence is emulation, not a cold/preloaded load or latency gate. Device/network profile, runs and median/p95 are not applicable.
 - **Waivers:** None. Existing full-verification deferral and pre-existing failure are recorded, not waived.
@@ -118,14 +142,14 @@ scoped results and limitations below remain unchanged.
 - **Questions for the owner:** None for .4 acceptance. .5 is separately selected;
   any future source handoff still requires explicit owner direction.
 
-| Acceptance item | Evidence type and location | Result |
-| --- | --- | --- |
-| Four legacy Memory identities and omitted classic preserve replay | Existing code plus [work record](work/V1.3.5.4_WORK.md), units and Memory-only six-runtime vectors | PASS; 15/15 units, six runtimes |
-| Exact ranked issuance/checkpoint recovery, wrong tuple and score rejection | `checkpoint.test.ts`, `tests/e2e/resume.spec.ts`; `build/v1.3.5.4/{unit,browser,browser-final}.log` | PASS; 3/3 initial and 2/2 final Chromium cases (four unique) |
-| Historical NULL-classic, invalid ranked variants/version/theme, scoring/lifecycle | Real isolated D1 `tests/integration/memory-variants.test.ts`; `integration.log` | PASS 10/10 |
-| Type/format/lint compatibility, bounded admin default correction | `types.log` failure, owner approval, `types-final.log`, touched-file Prettier/ESLint | PASS after fix; 0 type errors/warnings, 0 lint warnings |
-| Owner .4 functional acceptance | Explicit 2026-11-07 choice “Accept .4; start .5” | ACCEPTED locally; no new check or device claim |
-| Full `bun run verify` | Standing owner deferral | NOT RUN; not waived or passed |
+| Acceptance item                                                                   | Evidence type and location                                                                          | Result                                                       |
+| --------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------------------- | ------------------------------------------------------------ |
+| Four legacy Memory identities and omitted classic preserve replay                 | Existing code plus [work record](work/V1.3.5.4_WORK.md), units and Memory-only six-runtime vectors  | PASS; 15/15 units, six runtimes                              |
+| Exact ranked issuance/checkpoint recovery, wrong tuple and score rejection        | `checkpoint.test.ts`, `tests/e2e/resume.spec.ts`; `build/v1.3.5.4/{unit,browser,browser-final}.log` | PASS; 3/3 initial and 2/2 final Chromium cases (four unique) |
+| Historical NULL-classic, invalid ranked variants/version/theme, scoring/lifecycle | Real isolated D1 `tests/integration/memory-variants.test.ts`; `integration.log`                     | PASS 10/10                                                   |
+| Type/format/lint compatibility, bounded admin default correction                  | `types.log` failure, owner approval, `types-final.log`, touched-file Prettier/ESLint                | PASS after fix; 0 type errors/warnings, 0 lint warnings      |
+| Owner .4 functional acceptance                                                    | Explicit 2026-11-07 choice “Accept .4; start .5”                                                    | ACCEPTED locally; no new check or device claim               |
+| Full `bun run verify`                                                             | Standing owner deferral                                                                             | NOT RUN; not waived or passed                                |
 
 - **Measurements:** Identity-only behavior has no new performance target; device
   class, network shaping, cold/preloaded status, runs, median/p95 and gate/goal
@@ -214,16 +238,16 @@ scoped results and limitations below remain unchanged.
 - **Questions for the owner:** None for this acceptance/source handoff. Later
   scope and full-verification timing remain separate owner decisions.
 
-| Acceptance item | Evidence type and location | Result |
-| --- | --- | --- |
-| Complete local Games UI/server extraction | Existing source review and [work record](work/V1.3.5.1_WORK.md); 2026-11-06 scoped results | Implemented; accepted locally 2026-11-07 |
-| Format/lint and shared type compatibility | Existing `build/v1.3.5.1/{format,lint,types}.log`; [verification JSON](evidence/v1.3.5/v1.3.5.1-verification.json) | Pass retained; 0 lint warnings, 0 type errors/warnings; not rerun |
-| Cohorts, single bind, lifecycle/cache, reason/audit | Existing `integration.log`, exact four-case D1 filter | 4 passed, 4 unrelated skipped; not rerun |
-| Memory admin and Games lifecycle/scoring/history | Existing `browser-memory.log` and `browser-operator.log` | 2 Chromium cases passed; not rerun |
-| Unchanged UI at three required sizes | Existing twelve full-page captures and drawer/source comparisons | No material difference observed; emulation only |
-| Owner acceptance of implemented .1 | Explicit 2026-11-07 owner quote above; separate `ownerAcceptance` JSON record | Accepted locally; no new device/browser evidence |
-| Source-only commit/push to existing `origin/main` | Same explicit owner instruction; work handoff | Authorized for this handoff only; completion not claimed here |
-| Full verification | Standing explicit owner deferral | NOT RUN; neither passed nor waived |
+| Acceptance item                                     | Evidence type and location                                                                                         | Result                                                            |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------------- |
+| Complete local Games UI/server extraction           | Existing source review and [work record](work/V1.3.5.1_WORK.md); 2026-11-06 scoped results                         | Implemented; accepted locally 2026-11-07                          |
+| Format/lint and shared type compatibility           | Existing `build/v1.3.5.1/{format,lint,types}.log`; [verification JSON](evidence/v1.3.5/v1.3.5.1-verification.json) | Pass retained; 0 lint warnings, 0 type errors/warnings; not rerun |
+| Cohorts, single bind, lifecycle/cache, reason/audit | Existing `integration.log`, exact four-case D1 filter                                                              | 4 passed, 4 unrelated skipped; not rerun                          |
+| Memory admin and Games lifecycle/scoring/history    | Existing `browser-memory.log` and `browser-operator.log`                                                           | 2 Chromium cases passed; not rerun                                |
+| Unchanged UI at three required sizes                | Existing twelve full-page captures and drawer/source comparisons                                                   | No material difference observed; emulation only                   |
+| Owner acceptance of implemented .1                  | Explicit 2026-11-07 owner quote above; separate `ownerAcceptance` JSON record                                      | Accepted locally; no new device/browser evidence                  |
+| Source-only commit/push to existing `origin/main`   | Same explicit owner instruction; work handoff                                                                      | Authorized for this handoff only; completion not claimed here     |
+| Full verification                                   | Standing explicit owner deferral                                                                                   | NOT RUN; neither passed nor waived                                |
 
 - **Measurements:** No new measurements for documentation-only acceptance. Prior
   local Linux/Chromium emulation, one browser worker, no network shaping and
@@ -258,16 +282,16 @@ scoped results and limitations below remain unchanged.
 - **Questions for the owner:** Review the implemented local .1 result; no .2
   preparation or implementation is selected automatically.
 
-| Acceptance item | Evidence type and location | Result |
-| --- | --- | --- |
-| Complete Games UI/server extraction with existing route/action/security behavior | Source review plus focused browser/D1 evidence; work record | Locally implemented |
-| Touched formatting/lint and shared type compatibility | `build/v1.3.5.1/{format,lint,types}.log` | Pass; 0 lint warnings, 0 type errors/warnings |
-| Cohorts, one JSON bind, lifecycle/cache and reason/audit | Exact four-case D1 filter; `integration.log` | 4 passed, 4 unrelated cases skipped |
-| Variant actions, rejected POSTs, scoring/history, ephemeral test play, drawer failure/recovery | Exact Memory admin Chromium case; `browser-memory.log` | 1 passed |
-| Family switch, deletion/restore, scoring and saved history | Exact Games operator Chromium case; `browser-operator.log` | 1 passed |
-| Unchanged UI and responsive access | Twelve full-page captures and drawer comparisons at 390×844, 844×390, 1280×800 | No material difference observed; emulation only |
-| Owner acceptance of implemented result | Separate owner review | Pending; brief acceptance alone does not accept implementation |
-| Full verification | Standing explicit owner deferral | NOT RUN; neither passed nor waived |
+| Acceptance item                                                                                | Evidence type and location                                                     | Result                                                         |
+| ---------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------ | -------------------------------------------------------------- |
+| Complete Games UI/server extraction with existing route/action/security behavior               | Source review plus focused browser/D1 evidence; work record                    | Locally implemented                                            |
+| Touched formatting/lint and shared type compatibility                                          | `build/v1.3.5.1/{format,lint,types}.log`                                       | Pass; 0 lint warnings, 0 type errors/warnings                  |
+| Cohorts, one JSON bind, lifecycle/cache and reason/audit                                       | Exact four-case D1 filter; `integration.log`                                   | 4 passed, 4 unrelated cases skipped                            |
+| Variant actions, rejected POSTs, scoring/history, ephemeral test play, drawer failure/recovery | Exact Memory admin Chromium case; `browser-memory.log`                         | 1 passed                                                       |
+| Family switch, deletion/restore, scoring and saved history                                     | Exact Games operator Chromium case; `browser-operator.log`                     | 1 passed                                                       |
+| Unchanged UI and responsive access                                                             | Twelve full-page captures and drawer comparisons at 390×844, 844×390, 1280×800 | No material difference observed; emulation only                |
+| Owner acceptance of implemented result                                                         | Separate owner review                                                          | Pending; brief acceptance alone does not accept implementation |
+| Full verification                                                                              | Standing explicit owner deferral                                               | NOT RUN; neither passed nor waived                             |
 
 - **Measurements:** Local Linux/Chromium emulation, one browser worker, no network
   shaping. No new product performance gate; cold/preloaded load, run count,
@@ -311,13 +335,13 @@ scoped results and limitations below remain unchanged.
 - **Questions for the owner:** Review the current UI as the unchanged reference,
   select/authorize .1 implementation if desired, and resolve type-check scope.
 
-| Planning acceptance item | Evidence type and location | Result |
-| --- | --- | --- |
-| Fresh v1.3.5.1 brief only; source-based scope, callers and non-goals | Read-only source/config inspection; brief sections 1–4 | Prepared for owner review |
-| UI provenance and unresolved decisions explicit | Retained evidence references; brief sections 1 and 5 | Pending owner decision; no approval inferred |
-| Filtered future checks, setup/serialization and evidence limits | Actual scripts/configs/test names; brief section 6 | Proposed only; NOT RUN |
-| Complete stop boundary and resumable handoff | Brief section 7 | Planning complete; implementation NOT READY |
-| Functional checks, owner acceptance and full verification | No new execution evidence | NOT RUN; no acceptance; full verify remains deferred, not waived |
+| Planning acceptance item                                             | Evidence type and location                             | Result                                                           |
+| -------------------------------------------------------------------- | ------------------------------------------------------ | ---------------------------------------------------------------- |
+| Fresh v1.3.5.1 brief only; source-based scope, callers and non-goals | Read-only source/config inspection; brief sections 1–4 | Prepared for owner review                                        |
+| UI provenance and unresolved decisions explicit                      | Retained evidence references; brief sections 1 and 5   | Pending owner decision; no approval inferred                     |
+| Filtered future checks, setup/serialization and evidence limits      | Actual scripts/configs/test names; brief section 6     | Proposed only; NOT RUN                                           |
+| Complete stop boundary and resumable handoff                         | Brief section 7                                        | Planning complete; implementation NOT READY                      |
+| Functional checks, owner acceptance and full verification            | No new execution evidence                              | NOT RUN; no acceptance; full verify remains deferred, not waived |
 
 - **Measurements:** Not applicable to text-only planning. Existing screenshots
   were inspected, not recaptured. No product benchmark, network profile, run
@@ -351,17 +375,17 @@ scoped results and limitations below remain unchanged.
 - **Decisions and pinned versions:** No dependency/version changes. One JSON bind removes the activity mapping parameter ceiling, not every D1 limit. Preserve registered/imported cohorts, audit/permission/cache behavior, existing family help and gesture helper. Details: `docs/DECISIONS.md`, `docs/work/V1.3.4_SLICE0_WORK.md`.
 - **Questions for the owner:** Review the completed local admin slice; next feature scope remains separate.
 
-| Acceptance item | Evidence type and location | Result |
-| --- | --- | --- |
-| Single bind, 40 groups, exact totals, legacy NULL fallback and duplicate starts | Real local D1/Workerd via focused Vitest; `build/v1.3.4-slice0/focused-integration.log` | Pass: 8/8 integration tests |
-| Responsive single rows, reconciliation text and audited per-variant actions | Memory admin Chromium and operator reconciliation/lifecycle coverage; `browser-recovered.log`, `browser-operator-closeout.log` | Pass |
-| Translated labels, family/help content and readable approved status tokens | Source review, browser accessible-name/help checks and screenshots; `docs/evidence/v1.3.4/slice0/verification.json` | Pass; default contrast 12.94:1 enabled / 6.57:1 disabled |
-| Drawer Tab/Shift+Tab, Escape/Close, focus return, backdrop/inside/drag behavior, failed-open retry and scrolling | Corrected Memory admin test; `build/v1.3.4-slice0/browser-recovered.log`; drawer screenshots in the same folder | Pass at 390×844, 844×390 and 1280×800; emulation only |
-| Scoring tab, game disable/delete/restore and saved-history preservation | Final filtered operator case; `build/v1.3.4-slice0/browser-operator-closeout.log` | Pass: 1/1 final case |
-| Other selected operator authentication/permission/audit cases | Four passing cases in `build/v1.3.4-slice0/browser.log` | Pass; six unique passing browser cases across retained runs |
-| Format, lint and types | Scoped `format*.log`, `lint*.log`; `types-closeout.log` under `build/v1.3.4-slice0/` | Pass; 0 type errors / 0 warnings |
-| Full verification | Earlier explicit owner deferral; no `bun run verify` run in this slice | Deferred, not passed or waived |
-| Owner visual/device acceptance | Owner review | Pending; no acceptance inferred |
+| Acceptance item                                                                                                  | Evidence type and location                                                                                                     | Result                                                      |
+| ---------------------------------------------------------------------------------------------------------------- | ------------------------------------------------------------------------------------------------------------------------------ | ----------------------------------------------------------- |
+| Single bind, 40 groups, exact totals, legacy NULL fallback and duplicate starts                                  | Real local D1/Workerd via focused Vitest; `build/v1.3.4-slice0/focused-integration.log`                                        | Pass: 8/8 integration tests                                 |
+| Responsive single rows, reconciliation text and audited per-variant actions                                      | Memory admin Chromium and operator reconciliation/lifecycle coverage; `browser-recovered.log`, `browser-operator-closeout.log` | Pass                                                        |
+| Translated labels, family/help content and readable approved status tokens                                       | Source review, browser accessible-name/help checks and screenshots; `docs/evidence/v1.3.4/slice0/verification.json`            | Pass; default contrast 12.94:1 enabled / 6.57:1 disabled    |
+| Drawer Tab/Shift+Tab, Escape/Close, focus return, backdrop/inside/drag behavior, failed-open retry and scrolling | Corrected Memory admin test; `build/v1.3.4-slice0/browser-recovered.log`; drawer screenshots in the same folder                | Pass at 390×844, 844×390 and 1280×800; emulation only       |
+| Scoring tab, game disable/delete/restore and saved-history preservation                                          | Final filtered operator case; `build/v1.3.4-slice0/browser-operator-closeout.log`                                              | Pass: 1/1 final case                                        |
+| Other selected operator authentication/permission/audit cases                                                    | Four passing cases in `build/v1.3.4-slice0/browser.log`                                                                        | Pass; six unique passing browser cases across retained runs |
+| Format, lint and types                                                                                           | Scoped `format*.log`, `lint*.log`; `types-closeout.log` under `build/v1.3.4-slice0/`                                           | Pass; 0 type errors / 0 warnings                            |
+| Full verification                                                                                                | Earlier explicit owner deferral; no `bun run verify` run in this slice                                                         | Deferred, not passed or waived                              |
+| Owner visual/device acceptance                                                                                   | Owner review                                                                                                                   | Pending; no acceptance inferred                             |
 
 - **Measurements:** Local Linux development server, Chromium emulation at the three listed sizes, one worker, no network shaping. No performance target introduced, no timed gameplay benchmark, median or p95 claimed. Focused D1 suite 22.99 s and final operator case 43.8 s are diagnostic suite durations, not product performance gates. Parent visually inspected phone/desktop and scrolled-landscape screenshots.
 - **Corrections and local state:** Browser checks found native Tab wrap leakage and a test-only same-URL navigation racing deletion invalidation. Both were corrected and affected cases rerun. A timed-out operator cleanup left Memory disabled; its recorded enabled starting state was restored through existing audited `changeGame` using a temporary test actor, removed afterwards. Final read-only check: Memory enabled, no restore deadline; Playwright-owned servers exited.
@@ -377,12 +401,12 @@ scoped results and limitations below remain unchanged.
 - **Decisions:** Reuse the existing research-page visual system. Keep layouts, modes, policies and cosmetic changes distinguishable; configuration products are illustrative, not verified variant counts. No dependency/version change.
 - **Questions for the owner:** None to deliver this research; v1.3.4 design acceptance remains separate.
 
-| Acceptance item | Evidence | Result |
-| --- | --- | --- |
-| Web research with direct sources and evidence labels | Source registry and per-entry evidence in the HTML | 21 sources; 28 curated examples |
-| Same report format and broader variation factors | Memory report CSS reused; 18 dimension cards | Implemented |
-| Search, filters, compare/uncompare, rule lab, estimator | Direct Chromium review; `docs/evidence/v1.3.4/research/review.json` | Pass for this artifact |
-| Responsive light/dark presentation | Captured and inspected desktop, phone, landscape and interaction screenshots in the same evidence folder | No observed overflow; emulation only |
+| Acceptance item                                         | Evidence                                                                                                 | Result                               |
+| ------------------------------------------------------- | -------------------------------------------------------------------------------------------------------- | ------------------------------------ |
+| Web research with direct sources and evidence labels    | Source registry and per-entry evidence in the HTML                                                       | 21 sources; 28 curated examples      |
+| Same report format and broader variation factors        | Memory report CSS reused; 18 dimension cards                                                             | Implemented                          |
+| Search, filters, compare/uncompare, rule lab, estimator | Direct Chromium review; `docs/evidence/v1.3.4/research/review.json`                                      | Pass for this artifact               |
+| Responsive light/dark presentation                      | Captured and inspected desktop, phone, landscape and interaction screenshots in the same evidence folder | No observed overflow; emulation only |
 
 - **Measurements:** Viewports 1440×1000, 390×844 and 844×390; local standalone Chromium, no network shaping. No performance target or median/p95 claimed.
 - **Waivers:** None. Required gpt-6-luna/max verification agent hit its usage limit before browser checks; this was disclosed and the parent completed direct scoped browser review. No agent verification pass is claimed.
