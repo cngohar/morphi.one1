@@ -207,7 +207,7 @@ describe('Memory variants', () => {
 	});
 
 	it('owns separate groups, complete messages, and trio scoring without changing pair scoring', () => {
-		expect(new Set(manifest.leaderboardGroups).size).toBe(180);
+		expect(new Set(manifest.leaderboardGroups).size).toBe(210);
 		for (const variant of manifest.variants) {
 			expect(MEMORY_VARIANTS).toContain(variant.id);
 			expect(messages[variant.name as keyof typeof messages]).toBeTruthy();
@@ -920,5 +920,76 @@ describe('Memory v1.3.5.5 pilot rules', () => {
 		// 10. Botanical Graft Biodiversity Combos
 		const graft = createMemoryRound('42', 'memory:botanical-graft');
 		expect(graft.graftMultiplier).toBe(1);
+	});
+
+	it('verifies Batch F 10 Cloudflare platform & edge primitives ruleset mechanics', () => {
+		// 1. Workflows Step Retry
+		const wf = createMemoryRound('42', 'memory:workflows-step');
+		expect(wf.workflowStep).toBe(1);
+		const wfFlip1 = flipCard(wf, 0).round;
+		expect(wfFlip1.workflowStep).toBe(2);
+		// Find mismatch card
+		const mismatchIdx = wfFlip1.cards.findIndex((c) => c.symbol !== wfFlip1.cards[0].symbol);
+		const wfMismatch = flipCard(wfFlip1, mismatchIdx);
+		expect(wfMismatch.effect).toBe('flip'); // Step 2 retry granted!
+		expect(wfMismatch.round.workflowStep).toBe(3);
+		expect(wfMismatch.round.revealed).toEqual([0]);
+
+		// 2. Browser Rendering DOM Snapshots
+		let br = createMemoryRound('42', 'memory:browser-rendering');
+		expect(br.renderScanCountdown).toBe(4);
+		br = flipCard(br, 0).round;
+		expect(br.renderScanCountdown).toBe(3);
+
+		// 3. AI Gateway Semantic Cache
+		let gw = createMemoryRound('42', 'memory:ai-gateway');
+		expect(gw.cacheKnown).toEqual([]);
+		gw = flipCard(gw, 0).round;
+		expect(gw.cacheKnown).toContain(0);
+
+		// 4. K2 Streams Event Cursor
+		const k2 = createMemoryRound('42', 'memory:k2-streams');
+		expect(k2.streamTarget).toBeDefined();
+
+		// 5. Basin Columnar Partition Pruning
+		const basin = createMemoryRound('42', 'memory:basin-catalog');
+		for (const card of basin.cards) {
+			expect([0, 1, 2]).toContain(card.partition);
+		}
+		const bFlip1 = flipCard(basin, 0).round;
+		expect(bFlip1.partitionFilter).toBe(basin.cards[0].partition);
+		// Flip a card in a different partition should be ignored
+		const diffPartIdx = basin.cards.findIndex(
+			(c, i) => i !== 0 && c.partition !== bFlip1.partitionFilter
+		);
+		if (diffPartIdx >= 0) {
+			expect(flipCard(bFlip1, diffPartIdx).effect).toBe('ignored');
+		}
+
+		// 6. Edge Snippets Header Transforms
+		const snip = createMemoryRound('42', 'memory:edge-snippets');
+		expect(snip.activeHeader).toBeNull();
+
+		// 7. Images Dynamic Progressive Sharpness
+		let img = createMemoryRound('42', 'memory:images-transform');
+		expect(img.cards[0].blurLevel).toBe(5);
+		img = flipCard(img, 0).round;
+		expect(img.cards[0].blurLevel).toBe(0);
+
+		// 8. Waiting Room Concurrency Throttling
+		let wr = createMemoryRound('42', 'memory:waiting-room');
+		expect(wr.waitingTokens).toBe(3);
+		wr = flipCard(wr, 0).round;
+		expect(wr.waitingTokens).toBe(2);
+		wr.waitingTokens = 0;
+		expect(flipCard(wr, 1).effect).toBe('ignored'); // Throttled!
+
+		// 9. Privacy Pass Cryptographic Tokens
+		const pp = createMemoryRound('42', 'memory:privacy-pass');
+		expect(pp.privacyTokens).toBe(3);
+
+		// 10. Agents SDK Tool Assist
+		const ag = createMemoryRound('42', 'memory:agents-sdk');
+		expect(ag.agentCycles).toBe(0);
 	});
 });

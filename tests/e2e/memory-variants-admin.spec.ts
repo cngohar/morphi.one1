@@ -160,7 +160,17 @@ const allMemoryVariants = [
 	'memory:carnivorous-briar',
 	'memory:chlorophyll-meter',
 	'memory:bioluminescent',
-	'memory:botanical-graft'
+	'memory:botanical-graft',
+	'memory:workflows-step',
+	'memory:browser-rendering',
+	'memory:ai-gateway',
+	'memory:k2-streams',
+	'memory:basin-catalog',
+	'memory:edge-snippets',
+	'memory:images-transform',
+	'memory:waiting-room',
+	'memory:privacy-pass',
+	'memory:agents-sdk'
 ];
 
 test('Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds', async ({
@@ -636,7 +646,7 @@ test('dimension policy editor previews and saves only supported Memory values', 
 			await page.goto('/admin/games?game=memory&subview=policy');
 			await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
 			await expect(page.getByRole('heading', { name: 'Supported dimensions' })).toBeVisible();
-			await expect(page.getByText('60 of 60 variants eligible')).toBeVisible();
+			await expect(page.getByText('70 of 70 variants eligible')).toBeVisible();
 			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
 				false
 			);
@@ -649,7 +659,7 @@ test('dimension policy editor previews and saves only supported Memory values', 
 			.getByRole('group', { name: 'Match size' })
 			.getByRole('checkbox', { name: 'Quads' })
 			.uncheck();
-		await expect(page.getByText('59 of 60 variants eligible')).toBeVisible();
+		await expect(page.getByText('69 of 70 variants eligible')).toBeVisible();
 		await page.getByRole('button', { name: 'Review policy change' }).click();
 		const dialog = page.getByRole('dialog', { name: 'Review policy change' });
 		await expect(dialog.getByText('memory:quads')).toBeVisible();
@@ -664,7 +674,7 @@ test('dimension policy editor previews and saves only supported Memory values', 
 		]);
 		expect(saved.status()).toBe(200);
 		await expect(dialog).not.toBeVisible();
-		await expect(page.getByText('59 of 60 variants eligible')).toBeVisible();
+		await expect(page.getByText('69 of 70 variants eligible')).toBeVisible();
 		const available = await context.request.get(
 			'/api/play/availability?family=memory&variant=memory:quads'
 		);

@@ -33,6 +33,21 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.13 Batch F accepted; source commit and push authorized (2026-11-08):**
+The owner said “update the git repo and then push to github”, accepting the completed 10
+genuine Memory Cloudflare Next-Gen Developer Platform & Edge Primitives rulesets
+(`memory:workflows-step`, `memory:browser-rendering`, `memory:ai-gateway`, `memory:k2-streams`,
+`memory:basin-catalog`, `memory:edge-snippets`, `memory:images-transform`, `memory:waiting-room`,
+`memory:privacy-pass`, and `memory:agents-sdk`) and authorizing this source commit and push.
+The 10 rulesets are implemented end-to-end under ponytail principles in `src/lib/puzzles/memory/logic.ts`,
+dimensions in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`,
+localization in `messages.ts`/`i18n`, and regenerated projections. Total catalog Memory variants are now
+70 (210 leaderboard groups). Multi-runtime vectors (6/6 runtimes, fingerprint `a8be9d5f...` and memory vector
+fingerprint `e11e8733...`), workspace types (0 errors/0 warnings), unit tests (47/47), real-D1 integration
+suite (15/15), and Playwright Chromium admin suite (3/3 at one worker) pass. Full `bun run verify` remains
+deferred; unauditioned audio and editor exclusions preserved. No production deployment authorized.
+See `docs/briefs/v1.3.5.13-batch-f-brief.md` and `docs/work/V1.3.5.13_WORK.md`.
+
 **v1.3.5.12 Batch E accepted; source commit and push authorized (2026-11-08):**
 The owner said “update the git repo and push to github”, accepting the completed 10
 genuine Memory botanical and nature rulesets under the new Split Dual-Garden Baseline

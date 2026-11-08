@@ -1627,6 +1627,226 @@ const metadata = {
 					note: 'v1.game.memory.scoringNote',
 					tips: 'memory.botanicalGraft.tips'
 				}
+			},
+			{
+				id: 'memory:workflows-step',
+				name: 'variant.memory:workflows-step',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:workflows-step:6',
+					'memory-1:workflows-step:8',
+					'memory-1:workflows-step:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.workflowsStep.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.workflowsStep.tips'
+				}
+			},
+			{
+				id: 'memory:browser-rendering',
+				name: 'variant.memory:browser-rendering',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:browser-rendering:6',
+					'memory-1:browser-rendering:8',
+					'memory-1:browser-rendering:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.browserRendering.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.browserRendering.tips'
+				}
+			},
+			{
+				id: 'memory:ai-gateway',
+				name: 'variant.memory:ai-gateway',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:ai-gateway:6',
+					'memory-1:ai-gateway:8',
+					'memory-1:ai-gateway:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.aiGateway.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.aiGateway.tips'
+				}
+			},
+			{
+				id: 'memory:k2-streams',
+				name: 'variant.memory:k2-streams',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:k2-streams:6',
+					'memory-1:k2-streams:8',
+					'memory-1:k2-streams:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.k2Streams.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.k2Streams.tips'
+				}
+			},
+			{
+				id: 'memory:basin-catalog',
+				name: 'variant.memory:basin-catalog',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:basin-catalog:6',
+					'memory-1:basin-catalog:8',
+					'memory-1:basin-catalog:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.basinCatalog.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.basinCatalog.tips'
+				}
+			},
+			{
+				id: 'memory:edge-snippets',
+				name: 'variant.memory:edge-snippets',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:edge-snippets:6',
+					'memory-1:edge-snippets:8',
+					'memory-1:edge-snippets:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.edgeSnippets.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.edgeSnippets.tips'
+				}
+			},
+			{
+				id: 'memory:images-transform',
+				name: 'variant.memory:images-transform',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:images-transform:6',
+					'memory-1:images-transform:8',
+					'memory-1:images-transform:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.imagesTransform.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.imagesTransform.tips'
+				}
+			},
+			{
+				id: 'memory:waiting-room',
+				name: 'variant.memory:waiting-room',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:waiting-room:6',
+					'memory-1:waiting-room:8',
+					'memory-1:waiting-room:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.waitingRoom.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.waitingRoom.tips'
+				}
+			},
+			{
+				id: 'memory:privacy-pass',
+				name: 'variant.memory:privacy-pass',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:privacy-pass:6',
+					'memory-1:privacy-pass:8',
+					'memory-1:privacy-pass:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.privacyPass.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.privacyPass.tips'
+				}
+			},
+			{
+				id: 'memory:agents-sdk',
+				name: 'variant.memory:agents-sdk',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:agents-sdk:6',
+					'memory-1:agents-sdk:8',
+					'memory-1:agents-sdk:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.agentsSdk.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.agentsSdk.tips'
+				}
 			}
 		],
 		ending: {
@@ -1824,6 +2044,36 @@ const metadata = {
 				'memory-1:botanical-graft:6': 'leaderboard.memory.botanical-graft.6',
 				'memory-1:botanical-graft:8': 'leaderboard.memory.botanical-graft.8',
 				'memory-1:botanical-graft:10': 'leaderboard.memory.botanical-graft.10',
+				'memory-1:workflows-step:6': 'leaderboard.memory.workflows-step.6',
+				'memory-1:workflows-step:8': 'leaderboard.memory.workflows-step.8',
+				'memory-1:workflows-step:10': 'leaderboard.memory.workflows-step.10',
+				'memory-1:browser-rendering:6': 'leaderboard.memory.browser-rendering.6',
+				'memory-1:browser-rendering:8': 'leaderboard.memory.browser-rendering.8',
+				'memory-1:browser-rendering:10': 'leaderboard.memory.browser-rendering.10',
+				'memory-1:ai-gateway:6': 'leaderboard.memory.ai-gateway.6',
+				'memory-1:ai-gateway:8': 'leaderboard.memory.ai-gateway.8',
+				'memory-1:ai-gateway:10': 'leaderboard.memory.ai-gateway.10',
+				'memory-1:k2-streams:6': 'leaderboard.memory.k2-streams.6',
+				'memory-1:k2-streams:8': 'leaderboard.memory.k2-streams.8',
+				'memory-1:k2-streams:10': 'leaderboard.memory.k2-streams.10',
+				'memory-1:basin-catalog:6': 'leaderboard.memory.basin-catalog.6',
+				'memory-1:basin-catalog:8': 'leaderboard.memory.basin-catalog.8',
+				'memory-1:basin-catalog:10': 'leaderboard.memory.basin-catalog.10',
+				'memory-1:edge-snippets:6': 'leaderboard.memory.edge-snippets.6',
+				'memory-1:edge-snippets:8': 'leaderboard.memory.edge-snippets.8',
+				'memory-1:edge-snippets:10': 'leaderboard.memory.edge-snippets.10',
+				'memory-1:images-transform:6': 'leaderboard.memory.images-transform.6',
+				'memory-1:images-transform:8': 'leaderboard.memory.images-transform.8',
+				'memory-1:images-transform:10': 'leaderboard.memory.images-transform.10',
+				'memory-1:waiting-room:6': 'leaderboard.memory.waiting-room.6',
+				'memory-1:waiting-room:8': 'leaderboard.memory.waiting-room.8',
+				'memory-1:waiting-room:10': 'leaderboard.memory.waiting-room.10',
+				'memory-1:privacy-pass:6': 'leaderboard.memory.privacy-pass.6',
+				'memory-1:privacy-pass:8': 'leaderboard.memory.privacy-pass.8',
+				'memory-1:privacy-pass:10': 'leaderboard.memory.privacy-pass.10',
+				'memory-1:agents-sdk:6': 'leaderboard.memory.agents-sdk.6',
+				'memory-1:agents-sdk:8': 'leaderboard.memory.agents-sdk.8',
+				'memory-1:agents-sdk:10': 'leaderboard.memory.agents-sdk.10',
 				'memory-1:quads:4': 'leaderboard.memory.quads.4',
 				'memory-1:quads:5': 'leaderboard.memory.quads.5',
 				'memory-1:quads:6': 'leaderboard.memory.quads.6'

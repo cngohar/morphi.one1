@@ -1,0 +1,915 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Morphi v1.3.5.13 — Batch F 10 Cloudflare Next-Gen Platform & Edge Primitives Ruleset Variants (Fixture Preview with anime.js)</title>
+<style>
+:root {
+	font: 600 14px/1.4 'Nunito Variable', 'Nunito', system-ui, sans-serif;
+	color: #1b2433;
+	background: #f0f4f8;
+	--board: #e2e8f0;
+	--edge: #94a3b8;
+	--back: #cbd5e1;
+	--focus: #f38020;
+	--cf-orange: #f38020;
+	--cf-dark: #1b2433;
+	--workflows: #9333ea;
+	--browser: #2563eb;
+	--gateway: #059669;
+	--k2: #0284c7;
+	--basin: #0891b2;
+	--snippets: #d97706;
+	--images: #ec4899;
+	--waiting: #dc2626;
+	--privacy: #4f46e5;
+	--agents: #7c3aed;
+}
+* { box-sizing: border-box; }
+body {
+	margin: 0;
+	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	background: #f0f4f8;
+	color: #1b2433;
+	overflow-x: hidden;
+}
+button {
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+	border: 1px solid #cbd5e1;
+	border-radius: 8px;
+	background: #fff;
+	padding: 6px 12px;
+	transition: background-color 0.15s, border-color 0.15s;
+}
+button:hover { background: #f8fafc; }
+button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.review-banner {
+	padding: 8px 14px;
+	background: #fff;
+	border-bottom: 1px solid #cbd5e1;
+	font-size: 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.review-banner strong { color: #ea580c; }
+.badge {
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	background: #e2e8f0;
+	color: #475569;
+	font-weight: 700;
+}
+.badge-motion {
+	background: #fef3c7;
+	color: #b45309;
+	border: 1px solid #fde68a;
+}
+.badge-edge {
+	background: #fff7ed;
+	color: #ea580c;
+	border: 1px solid #ffedd5;
+	font-weight: 800;
+}
+
+.tabs-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 6px 14px;
+	background: #f8fafc;
+	border-bottom: 1px solid #cbd5e1;
+}
+.tabs-bar button {
+	font-size: 12px;
+	white-space: nowrap;
+	padding: 5px 9px;
+	background: #fff;
+	color: #334155;
+	border-color: #cbd5e1;
+}
+.tabs-bar button[aria-current="page"] {
+	background: #1b2433;
+	color: #fff;
+	font-weight: 800;
+	border-color: #1b2433;
+}
+
+.container {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 350px;
+	flex: 1;
+	min-height: 0;
+	background: var(--board);
+}
+@media (max-width: 900px) {
+	.container {
+		grid-template-columns: 1fr;
+		grid-template-rows: minmax(360px, 1fr) auto;
+	}
+}
+
+.stage-pane {
+	padding: 12px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 0;
+	position: relative;
+}
+
+.hud {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	font-size: 13px;
+	font-weight: 800;
+	background: #ffffffea;
+	padding: 6px 14px;
+	border-radius: 20px;
+	border: 1px solid #cbd5e1;
+	min-height: 36px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.06);
+}
+
+.hud-tag {
+	padding: 3px 8px;
+	border-radius: 6px;
+	font-size: 11px;
+	background: #e2e8f0;
+	color: #334155;
+}
+
+.alert-toast {
+	position: absolute;
+	top: 50px;
+	background: #1b2433;
+	color: #fff;
+	font-weight: 800;
+	font-size: 12px;
+	padding: 6px 14px;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(27, 36, 51, 0.3);
+	z-index: 40;
+	pointer-events: none;
+	opacity: 0;
+	transform: translateY(-8px);
+	transition: opacity 0.2s, transform 0.2s;
+}
+.alert-toast.visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.board-container {
+	flex: 1;
+	display: grid;
+	place-items: center;
+	width: 100%;
+	min-height: 0;
+}
+.board {
+	display: grid;
+	gap: 8px;
+	justify-content: center;
+	align-content: center;
+	position: relative;
+}
+
+.card {
+	width: var(--size, 64px);
+	height: var(--size, 64px);
+	background: var(--back);
+	border: 2px solid var(--edge);
+	border-radius: 10px;
+	display: grid;
+	place-items: center;
+	position: relative;
+	user-select: none;
+	transform-origin: center;
+	transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease, filter 0.2s ease;
+}
+.card.flipped {
+	background: #fff;
+	border-color: #f38020;
+	box-shadow: 0 4px 10px rgba(243, 128, 32, 0.25);
+}
+.card.matched {
+	background: #f1f5f9;
+	border-color: #cbd5e1;
+	opacity: 0.25;
+	pointer-events: none;
+}
+.card.retry-pinned {
+	background: #faf5ff;
+	border-color: var(--workflows);
+	box-shadow: 0 0 10px rgba(147, 51, 234, 0.4);
+}
+.card.snapshot-highlight {
+	border-color: var(--browser);
+	box-shadow: 0 0 12px rgba(37, 99, 235, 0.6);
+	animation: pulseBlue 0.8s infinite alternate;
+}
+.card.rate-limited {
+	background: #fee2e2;
+	border-color: #ef4444;
+	opacity: 0.5;
+	cursor: not-allowed;
+}
+.card.partition-pruned {
+	opacity: 0.35;
+	background: #e2e8f0;
+	cursor: not-allowed;
+}
+.card.blurred-5 {
+	filter: blur(5px);
+}
+.card.blurred-2 {
+	filter: blur(2px);
+}
+.card.blurred-0 {
+	filter: blur(0px);
+}
+.card.agent-suggest {
+	border-color: var(--agents);
+	box-shadow: 0 0 14px rgba(124, 58, 237, 0.7);
+	animation: pulseAgent 0.7s infinite alternate;
+}
+
+@keyframes pulseBlue {
+	from { box-shadow: 0 0 4px rgba(37, 99, 235, 0.3); }
+	to { box-shadow: 0 0 14px rgba(37, 99, 235, 0.8); }
+}
+@keyframes pulseAgent {
+	from { transform: scale(1); box-shadow: 0 0 6px rgba(124, 58, 237, 0.4); }
+	to { transform: scale(1.05); box-shadow: 0 0 16px rgba(124, 58, 237, 0.9); }
+}
+
+.card-icon {
+	font-size: calc(var(--size, 64px) * 0.44);
+	line-height: 1;
+}
+
+.card-badge {
+	position: absolute;
+	top: 2px;
+	left: 2px;
+	font-size: 9px;
+	font-weight: 800;
+	padding: 1px 4px;
+	border-radius: 4px;
+	background: rgba(255,255,255,0.85);
+	color: #1e293b;
+	line-height: 1.1;
+	pointer-events: none;
+}
+
+.controls {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+
+.details-pane {
+	background: #fff;
+	border-left: 1px solid #cbd5e1;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	overflow-y: auto;
+}
+.details-pane h2 {
+	margin: 0;
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.meta-box {
+	background: #f8fafc;
+	border: 1px solid #e2e8f0;
+	border-radius: 8px;
+	padding: 8px 10px;
+	font-size: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+.meta-box strong { color: #0f172a; }
+.rule-box {
+	background: #eff6ff;
+	border-left: 3px solid #3b82f6;
+	padding: 8px 12px;
+	font-size: 12px;
+	color: #1e3a8a;
+	line-height: 1.5;
+}
+.score-box {
+	background: #fefce8;
+	border-left: 3px solid #eab308;
+	padding: 8px 12px;
+	font-size: 12px;
+	color: #713f12;
+	line-height: 1.5;
+}
+
+/* Responsive card sizing */
+@media (max-width: 480px) {
+	:root { --size: 54px; }
+	.board { gap: 6px; }
+	.hud { font-size: 11px; gap: 8px; padding: 4px 10px; }
+}
+@media (min-width: 481px) and (max-width: 899px) {
+	:root { --size: 46px; }
+	.board { gap: 5px; }
+}
+@media (min-width: 900px) {
+	:root { --size: 72px; }
+	.board { gap: 8px; }
+}
+</style>
+</head>
+<body>
+
+<header class="review-banner">
+	<div>
+		<strong>v1.3.5.13 Memory Batch F Preview</strong>: 10 Cloudflare Next-Gen Platform & Edge Primitives Rulesets
+		<span class="badge badge-edge">CLOUDFLARE EDGE</span>
+		<span class="badge badge-motion">anime.js 4.5.0</span>
+	</div>
+	<div>
+		Viewports: <strong>390×844</strong> (mobile-p), <strong>844×390</strong> (mobile-l), <strong>1280×800</strong> (desktop)
+	</div>
+</header>
+
+<nav class="tabs-bar" id="tabsBar">
+	<!-- Dynamically generated 10 variant buttons -->
+</nav>
+
+<main class="container">
+	<section class="stage-pane">
+		<div class="hud" id="hudBar">
+			<!-- HUD State -->
+		</div>
+
+		<div id="alertToast" class="alert-toast">
+			⚡ Cloudflare Edge Hook Fired
+		</div>
+
+		<div class="board-container">
+			<div class="board" id="board" style="grid-template-columns: repeat(4, var(--size, 64px));">
+				<!-- 16 cards dynamically injected -->
+			</div>
+		</div>
+
+		<div class="controls">
+			<button id="btnReset">Reset Edge Session</button>
+			<button id="btnSimulate">Simulate Action</button>
+			<button id="btnAnimate" style="background:#fef3c7;border-color:#fde68a;font-weight:700;">▶ anime.js Edge Wave</button>
+		</div>
+	</section>
+
+	<aside class="details-pane" id="detailsPane">
+		<!-- Detailed variant inspector -->
+	</aside>
+</main>
+
+<script src="anime.min.js"></script>
+<script>
+const VARIANTS = [
+	{
+		id: 'memory:workflows-step',
+		name: 'Workflows Step Retry',
+		primitive: 'Cloudflare Workflows',
+		badge: 'DURABLE WORKFLOW',
+		badgeColor: '#9333ea',
+		rule: 'Turns execute in 3-step transactional workflows. On a mismatch, Step 2 provides 1 contiguous row retry before state rollback, preventing immediate double-flip penalty!',
+		win: 'Clear all pairs within workflow step budgets.',
+		scoring: 'Step retry efficiency bonus for direct 1-step commits.',
+		group: 'memory-1:workflows-step:<6|8|10>',
+		hudText: 'Workflow: Step 1 (Checkpoint)'
+	},
+	{
+		id: 'memory:browser-rendering',
+		name: 'Browser Run Snapshot',
+		primitive: 'Cloudflare Browser Run',
+		badge: 'HEADLESS RENDER',
+		badgeColor: '#2563eb',
+		rule: 'Every 4 flips, a headless browser render snapshot scans DOM coordinates, briefly illuminating the borders of the least-visited unrevealed quadrant.',
+		win: 'Clear all pairs guided by headless viewport snapshots.',
+		scoring: 'Headless rendering precision multiplier.',
+		group: 'memory-1:browser-rendering:<6|8|10>',
+		hudText: 'DOM Snapshot: 3 Flips to Next Scan'
+	},
+	{
+		id: 'memory:ai-gateway',
+		name: 'AI Gateway Semantic Cache',
+		primitive: 'Cloudflare AI Gateway',
+		badge: 'SEMANTIC GATEWAY',
+		badgeColor: '#059669',
+		rule: 'Revisiting a known card triggers an instant Cache HIT (0 mismatch cost); rapid blind flips (< 350ms) trigger an HTTP 429 backoff pause (1.2s lock).',
+		win: 'Clear board avoiding excessive rate-limit backoffs.',
+		scoring: 'Semantic cache hit ratio multiplier.',
+		group: 'memory-1:ai-gateway:<6|8|10>',
+		hudText: 'AI Gateway: Cache Ready (0 Backoffs)'
+	},
+	{
+		id: 'memory:k2-streams',
+		name: 'K2 Streams Cursor',
+		primitive: 'Cloudflare K2 Streams',
+		badge: 'DURABLE LOG',
+		badgeColor: '#0284c7',
+		rule: 'Flips append to a continuous stream tape. An independent reader cursor advances: pairing the active cursor target symbol awards a 2.5x Stream Burst bonus.',
+		win: 'Clear all stream partitions.',
+		scoring: 'Event stream cursor throughput bonus.',
+		group: 'memory-1:k2-streams:<6|8|10>',
+		hudText: 'K2 Cursor: Target ⚡ Active'
+	},
+	{
+		id: 'memory:basin-catalog',
+		name: 'Basin Columnar Pruning',
+		primitive: 'Cloudflare Basin Catalog',
+		badge: 'ICEBERG PARTITIONS',
+		badgeColor: '#0891b2',
+		rule: 'Board is partitioned into Iceberg metadata columns. Flipping card 1 prunes the catalog: candidate 2 must reside in the indexed partition or scan fails.',
+		win: 'Clear all Iceberg partition columns.',
+		scoring: 'Columnar pruning query optimization bonus.',
+		group: 'memory-1:basin-catalog:<6|8|10>',
+		hudText: 'Catalog: Partition Pruning Active'
+	},
+	{
+		id: 'memory:edge-snippets',
+		name: 'Snippets Header Transform',
+		primitive: 'Cloudflare Snippets',
+		badge: 'MICRO-TRANSFORM',
+		badgeColor: '#d97706',
+		rule: 'Successful matches trigger a Snippet sub-ms hook that injects a dynamic modifier header (e.g. X-Transform: Swap-Adjacent or Flash-Symbol).',
+		win: 'Clear board adapting to dynamic snippet transforms.',
+		scoring: 'Edge snippet agility multiplier.',
+		group: 'memory-1:edge-snippets:<6|8|10>',
+		hudText: 'Snippet: X-Transform: None'
+	},
+	{
+		id: 'memory:images-transform',
+		name: 'Images Progressive Sharpness',
+		primitive: 'Cloudflare Images',
+		badge: 'DYNAMIC TRANSFORM',
+		badgeColor: '#ec4899',
+		rule: 'Cards start under high edge blur (5px). Each inspection or nearby match progressively sharpens the visual resolution (5px → 2px → 0px SVG crisp).',
+		win: 'Clear board through progressive visual sharpening.',
+		scoring: 'Asset resolution delivery bonus.',
+		group: 'memory-1:images-transform:<6|8|10>',
+		hudText: 'Images: Asset Resolution 5px'
+	},
+	{
+		id: 'memory:waiting-room',
+		name: 'Waiting Room Queue',
+		primitive: 'Cloudflare Waiting Room',
+		badge: 'TRAFFIC SURGE',
+		badgeColor: '#dc2626',
+		rule: 'Limited capacity of 3 concurrent flip tokens. Depleting tokens enters the Waiting Room queue (0.75s FIFO delay) until tokens replenish on matches.',
+		win: 'Clear board before traffic surge exhaustion.',
+		scoring: 'Queue throughput & admission optimization bonus.',
+		group: 'memory-1:waiting-room:<6|8|10>',
+		hudText: 'Admission Tokens: 3 / 3'
+	},
+	{
+		id: 'memory:privacy-pass',
+		name: 'Privacy Pass Zero-Knowledge',
+		primitive: 'Cloudflare Privacy Pass',
+		badge: 'CRYPTOGRAPHIC TOKEN',
+		badgeColor: '#4f46e5',
+		rule: 'Start with 3 blind cryptographic tokens. Spend a token to execute an anonymous zero-knowledge peek without incrementing turn counter or penalty.',
+		win: 'Clear board optimizing cryptographic token allocations.',
+		scoring: 'Cryptographic token conservation bonus.',
+		group: 'memory-1:privacy-pass:<6|8|10>',
+		hudText: 'Privacy Tokens: 3 Blind Tokens'
+	},
+	{
+		id: 'memory:agents-sdk',
+		name: 'Agents SDK Tool Assist',
+		primitive: 'Cloudflare Agents SDK',
+		badge: 'AGENT CO-PILOT',
+		badgeColor: '#7c3aed',
+		rule: 'An embedded agent observes turn entropy. Every 3 matches, the agent completes a tool-calling cycle (tool: locate_coordinate()) illuminating a candidate pair.',
+		win: 'Clear board in synergy with the edge agent.',
+		scoring: 'Autonomous agent orchestration multiplier.',
+		group: 'memory-1:agents-sdk:<6|8|10>',
+		hudText: 'Agent: Reasoning Cycle (0 / 3)'
+	}
+];
+
+const ICONS = ['⚡', '🔒', '🌐', '📊', '🚀', '🛡️', '⚙️', '📦'];
+
+let activeVariantIndex = 0;
+let cards = [];
+let flippedIndices = [];
+let matchedIndices = new Set();
+let turns = 0;
+let score = 1000;
+let mechanicState = {};
+
+function initDeck() {
+	const deck = [];
+	for (let i = 0; i < 8; i++) {
+		deck.push({ id: i, symbol: ICONS[i], pairId: i, partition: i % 3 });
+		deck.push({ id: i + 8, symbol: ICONS[i], pairId: i, partition: (i + 1) % 3 });
+	}
+	// Simple deterministic shuffle
+	for (let i = deck.length - 1; i > 0; i--) {
+		const j = (i * 7 + 3) % (i + 1);
+		[deck[i], deck[j]] = [deck[j], deck[i]];
+	}
+	cards = deck;
+	flippedIndices = [];
+	matchedIndices = new Set();
+	turns = 0;
+	score = 1000;
+	initMechanicState();
+}
+
+function initMechanicState() {
+	mechanicState = {
+		stepPhase: 1, // for workflows
+		snapshotCountdown: 3, // for browser run
+		cacheKnown: new Set(), // for ai gateway
+		rateLimited: false,
+		streamTarget: ICONS[0], // for k2 streams
+		currentPartition: null, // for basin
+		activeSnippet: 'None', // for edge snippets
+		sharpnessLevels: new Array(16).fill(5), // for images transform
+		waitingTokens: 3, // for waiting room
+		privacyTokens: 3, // for privacy pass
+		agentMatches: 0, // for agents sdk
+		agentSuggestedIdx: null
+	};
+}
+
+function showToast(msg) {
+	const t = document.getElementById('alertToast');
+	t.textContent = msg;
+	t.classList.add('visible');
+	setTimeout(() => t.classList.remove('visible'), 2200);
+}
+
+function renderTabs() {
+	const bar = document.getElementById('tabsBar');
+	bar.innerHTML = '';
+	VARIANTS.forEach((v, idx) => {
+		const b = document.createElement('button');
+		b.textContent = `${idx + 1}. ${v.name}`;
+		if (idx === activeVariantIndex) b.setAttribute('aria-current', 'page');
+		b.onclick = () => selectVariant(idx);
+		bar.appendChild(b);
+	});
+}
+
+function selectVariant(idx) {
+	activeVariantIndex = idx;
+	initDeck();
+	renderTabs();
+	renderDetails();
+	renderBoard();
+	updateHud();
+	showToast(`Switched to: ${VARIANTS[idx].name}`);
+}
+
+function renderDetails() {
+	const v = VARIANTS[activeVariantIndex];
+	const p = document.getElementById('detailsPane');
+	p.innerHTML = `
+		<h2>
+			<span>${v.name}</span>
+			<span class="badge" style="background:${v.badgeColor}22;color:${v.badgeColor};border:1px solid ${v.badgeColor}44;">
+				${v.badge}
+			</span>
+		</h2>
+		<div class="meta-box">
+			<div><strong>Variant ID:</strong> <code>${v.id}</code></div>
+			<div><strong>Platform Primitive:</strong> ${v.primitive}</div>
+			<div><strong>Leaderboard Group:</strong> <code>${v.group}</code></div>
+		</div>
+		<div class="rule-box">
+			<strong>⚡ Gameplay Rule:</strong><br>${v.rule}
+		</div>
+		<div class="score-box">
+			<strong>🏆 Win & Scoring:</strong><br>
+			<strong>Win:</strong> ${v.win}<br>
+			<strong>Scoring:</strong> ${v.scoring}
+		</div>
+	`;
+}
+
+function updateHud() {
+	const v = VARIANTS[activeVariantIndex];
+	const hud = document.getElementById('hudBar');
+	let customStat = '';
+
+	switch (v.id) {
+		case 'memory:workflows-step':
+			customStat = `Step: ${mechanicState.stepPhase === 1 ? '1 (Init)' : mechanicState.stepPhase === 2 ? '2 (Retry Active)' : '3 (Commit)'}`;
+			break;
+		case 'memory:browser-rendering':
+			customStat = `DOM Scan in: ${mechanicState.snapshotCountdown} flips`;
+			break;
+		case 'memory:ai-gateway':
+			customStat = mechanicState.rateLimited ? '⛔ 429 RATE-LIMITED' : `Cache: ${mechanicState.cacheKnown.size} keys`;
+			break;
+		case 'memory:k2-streams':
+			customStat = `K2 Target: ${mechanicState.streamTarget} (2.5x)`;
+			break;
+		case 'memory:basin-catalog':
+			customStat = mechanicState.currentPartition !== null ? `Partition Filter: P${mechanicState.currentPartition}` : 'Catalog: All Partitions';
+			break;
+		case 'memory:edge-snippets':
+			customStat = `Header: ${mechanicState.activeSnippet}`;
+			break;
+		case 'memory:images-transform':
+			const avgSharp = Math.round(mechanicState.sharpnessLevels.reduce((a,b)=>a+b,0) / 16);
+			customStat = `Blur: ~${avgSharp}px`;
+			break;
+		case 'memory:waiting-room':
+			customStat = `Tokens: ${mechanicState.waitingTokens}/3`;
+			break;
+		case 'memory:privacy-pass':
+			customStat = `Blind Tokens: ${mechanicState.privacyTokens}`;
+			break;
+		case 'memory:agents-sdk':
+			customStat = `Agent Reasoning: ${mechanicState.agentMatches}/3`;
+			break;
+	}
+
+	hud.innerHTML = `
+		<span><strong>${v.name}</strong></span>
+		<span class="hud-tag">Turns: ${turns}</span>
+		<span class="hud-tag">Score: ${score}</span>
+		<span class="hud-tag" style="background:${v.badgeColor}22;color:${v.badgeColor};font-weight:800;">
+			${customStat}
+		</span>
+	`;
+}
+
+function renderBoard() {
+	const board = document.getElementById('board');
+	board.innerHTML = '';
+	const v = VARIANTS[activeVariantIndex];
+
+	cards.forEach((card, idx) => {
+		const div = document.createElement('div');
+		div.className = 'card';
+		div.dataset.index = idx;
+
+		const isFlipped = flippedIndices.includes(idx);
+		const isMatched = matchedIndices.has(idx);
+
+		if (isMatched) div.classList.add('matched');
+		if (isFlipped) div.classList.add('flipped');
+
+		// Mechanic-specific styling
+		if (v.id === 'memory:workflows-step' && mechanicState.stepPhase === 2 && flippedIndices.includes(idx)) {
+			div.classList.add('retry-pinned');
+		}
+		if (v.id === 'memory:browser-rendering' && mechanicState.snapshotCountdown === 0 && (idx < 4)) {
+			div.classList.add('snapshot-highlight');
+		}
+		if (v.id === 'memory:ai-gateway' && mechanicState.rateLimited) {
+			div.classList.add('rate-limited');
+		}
+		if (v.id === 'memory:basin-catalog' && mechanicState.currentPartition !== null && card.partition !== mechanicState.currentPartition && !isMatched && !isFlipped) {
+			div.classList.add('partition-pruned');
+		}
+		if (v.id === 'memory:images-transform') {
+			const b = mechanicState.sharpnessLevels[idx];
+			div.classList.add(`blurred-${b}`);
+		}
+		if (v.id === 'memory:agents-sdk' && mechanicState.agentSuggestedIdx === idx) {
+			div.classList.add('agent-suggest');
+		}
+
+		// Partition badge for basin
+		if (v.id === 'memory:basin-catalog') {
+			const b = document.createElement('span');
+			b.className = 'card-badge';
+			b.textContent = `P${card.partition}`;
+			div.appendChild(b);
+		}
+
+		if (isFlipped || isMatched) {
+			const icon = document.createElement('span');
+			icon.className = 'card-icon';
+			icon.textContent = card.symbol;
+			div.appendChild(icon);
+		} else {
+			const backDot = document.createElement('span');
+			backDot.style.fontSize = '18px';
+			backDot.style.opacity = '0.4';
+			backDot.textContent = '❖';
+			div.appendChild(backDot);
+		}
+
+		div.onclick = () => onCardClick(idx);
+		board.appendChild(div);
+	});
+}
+
+function onCardClick(idx) {
+	if (matchedIndices.has(idx) || flippedIndices.includes(idx)) return;
+	const v = VARIANTS[activeVariantIndex];
+
+	// Mechanic: Waiting Room token throttle
+	if (v.id === 'memory:waiting-room') {
+		if (mechanicState.waitingTokens <= 0) {
+			showToast('⏳ Waiting Room: Queue full! 0.75s admission delay...');
+			setTimeout(() => {
+				mechanicState.waitingTokens = 2;
+				updateHud();
+				onCardClick(idx);
+			}, 750);
+			return;
+		}
+		mechanicState.waitingTokens--;
+	}
+
+	// Mechanic: Basin Catalog Partition Pruning
+	if (v.id === 'memory:basin-catalog' && mechanicState.currentPartition !== null) {
+		if (cards[idx].partition !== mechanicState.currentPartition) {
+			showToast(`❌ Partition Pruning: Candidate must be in Partition P${mechanicState.currentPartition}!`);
+			return;
+		}
+	}
+
+	// Mechanic: AI Gateway Cache & Rate Limiting
+	if (v.id === 'memory:ai-gateway') {
+		if (mechanicState.rateLimited) {
+			showToast('⛔ AI Gateway: 429 Rate-Limit cooldown active!');
+			return;
+		}
+		if (mechanicState.cacheKnown.has(cards[idx].pairId)) {
+			showToast('⚡ AI Gateway: Cache HIT! Zero latency.');
+		}
+		mechanicState.cacheKnown.add(cards[idx].pairId);
+	}
+
+	// Mechanic: Images Transform Sharpening
+	if (v.id === 'memory:images-transform') {
+		mechanicState.sharpnessLevels[idx] = 0;
+	}
+
+	// Flip card
+	flippedIndices.push(idx);
+
+	// Mechanic: Browser Rendering countdown
+	if (v.id === 'memory:browser-rendering') {
+		mechanicState.snapshotCountdown--;
+		if (mechanicState.snapshotCountdown <= 0) {
+			mechanicState.snapshotCountdown = 4;
+			showToast('📸 Browser Run: DOM Snapshot rendered for top quadrant!');
+		}
+	}
+
+	// Mechanic: Basin catalog lock on first flip
+	if (v.id === 'memory:basin-catalog' && flippedIndices.length === 1) {
+		mechanicState.currentPartition = cards[idx].partition;
+	}
+
+	if (flippedIndices.length === 1) {
+		if (v.id === 'memory:workflows-step') {
+			mechanicState.stepPhase = 2;
+		}
+		renderBoard();
+		updateHud();
+		return;
+	}
+
+	// Two cards flipped
+	turns++;
+	const [firstIdx, secondIdx] = flippedIndices;
+	const match = cards[firstIdx].pairId === cards[secondIdx].pairId;
+
+	if (match) {
+		matchedIndices.add(firstIdx);
+		matchedIndices.add(secondIdx);
+		score += 150;
+		showToast(`✨ Match: ${cards[firstIdx].symbol}!`);
+
+		// Cloudflare Mechanic Trigger on Match:
+		if (v.id === 'memory:k2-streams') {
+			if (cards[firstIdx].symbol === mechanicState.streamTarget) {
+				score += 250;
+				showToast('🚀 K2 Streams: Cursor Target Matched! 2.5x Stream Burst!');
+				// Pick next target
+				mechanicState.streamTarget = ICONS[(ICONS.indexOf(mechanicState.streamTarget) + 1) % ICONS.length];
+			}
+		}
+		if (v.id === 'memory:waiting-room') {
+			mechanicState.waitingTokens = Math.min(3, mechanicState.waitingTokens + 2);
+		}
+		if (v.id === 'memory:edge-snippets') {
+			mechanicState.activeSnippet = 'X-Transform: Swap-Adjacent-Pair';
+			showToast('⚡ Snippets: Micro-transform injected header!');
+		}
+		if (v.id === 'memory:agents-sdk') {
+			mechanicState.agentMatches++;
+			if (mechanicState.agentMatches >= 3) {
+				mechanicState.agentMatches = 0;
+				// Find an unmatched card to highlight
+				const un = cards.findIndex((c, i) => !matchedIndices.has(i));
+				mechanicState.agentSuggestedIdx = un;
+				showToast('🤖 Agents SDK: tool:locate_coordinate() executed!');
+			}
+		}
+
+		flippedIndices = [];
+		mechanicState.stepPhase = 1;
+		mechanicState.currentPartition = null;
+		renderBoard();
+		updateHud();
+	} else {
+		score = Math.max(0, score - 20);
+
+		// Mechanic: Workflows Step Retry
+		if (v.id === 'memory:workflows-step' && mechanicState.stepPhase === 2) {
+			showToast('🔁 Workflows: Step 2 Retry available for contiguous card!');
+			// Only unflip second card, keeping first card open
+			setTimeout(() => {
+				flippedIndices = [firstIdx];
+				mechanicState.stepPhase = 3;
+				renderBoard();
+				updateHud();
+			}, 700);
+			return;
+		}
+
+		showToast('❌ Mismatch');
+		setTimeout(() => {
+			flippedIndices = [];
+			mechanicState.stepPhase = 1;
+			mechanicState.currentPartition = null;
+			renderBoard();
+			updateHud();
+		}, 800);
+	}
+	renderBoard();
+	updateHud();
+}
+
+document.getElementById('btnReset').onclick = () => {
+	initDeck();
+	renderBoard();
+	updateHud();
+	showToast('Edge session reset.');
+};
+
+document.getElementById('btnSimulate').onclick = () => {
+	const v = VARIANTS[activeVariantIndex];
+	if (v.id === 'memory:privacy-pass') {
+		if (mechanicState.privacyTokens > 0) {
+			mechanicState.privacyTokens--;
+			showToast('🛡️ Privacy Pass: Spent blind token! Zero-knowledge probe.');
+			updateHud();
+		} else {
+			showToast('No cryptographic tokens remaining.');
+		}
+		return;
+	}
+	// Simulate an edge action
+	showToast(`Simulated: ${v.name} Edge Event`);
+	score += 50;
+	updateHud();
+};
+
+document.getElementById('btnAnimate').onclick = () => {
+	if (window.anime) {
+		anime({
+			targets: '.card',
+			scale: [
+				{ value: 0.9, duration: 150, easing: 'easeOutQuad' },
+				{ value: 1.05, duration: 250, easing: 'easeOutElastic(1, .8)' },
+				{ value: 1.0, duration: 150, easing: 'easeInOutQuad' }
+			],
+			delay: anime.stagger(30, { grid: [4, 4], from: 'center' })
+		});
+		showToast('▶ anime.js Edge Wave Triggered!');
+	}
+};
+
+// Initial boot
+selectVariant(0);
+</script>
+</body>
+</html>

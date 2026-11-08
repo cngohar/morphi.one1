@@ -16,7 +16,8 @@ export const memoryDimensions = [
 			{ id: 'preview', label: 'policy.preview' },
 			{ id: 'no-preview', label: 'policy.noPreview' },
 			{ id: 'derelict-fog', label: 'policy.derelictFog' },
-			{ id: 'photosynthesis', label: 'policy.photosynthesis' }
+			{ id: 'photosynthesis', label: 'policy.photosynthesis' },
+			{ id: 'browser-rendering', label: 'policy.browserRendering' }
 		]
 	},
 	{
@@ -34,7 +35,8 @@ export const memoryDimensions = [
 			{ id: 'anycast-route', label: 'policy.anycastRoute' },
 			{ id: 'bit-rot', label: 'policy.bitRot' },
 			{ id: 'argo-reroute', label: 'policy.argoReroute' },
-			{ id: 'seed-dispersal', label: 'policy.seedDispersal' }
+			{ id: 'seed-dispersal', label: 'policy.seedDispersal' },
+			{ id: 'k2-streams', label: 'policy.k2Streams' }
 		]
 	},
 	{
@@ -49,7 +51,8 @@ export const memoryDimensions = [
 			{ id: 'r2-glacier', label: 'policy.r2Glacier' },
 			{ id: 'kv-consistency', label: 'policy.kvConsistency' },
 			{ id: 'seasonal-bloom', label: 'policy.seasonalBloom' },
-			{ id: 'bioluminescent', label: 'policy.bioluminescent' }
+			{ id: 'bioluminescent', label: 'policy.bioluminescent' },
+			{ id: 'images-transform', label: 'policy.imagesTransform' }
 		]
 	},
 	{
@@ -69,7 +72,10 @@ export const memoryDimensions = [
 			{ id: 'hyperdrive-pool', label: 'policy.hyperdrivePool' },
 			{ id: 'turnstile-verify', label: 'policy.turnstileVerify' },
 			{ id: 'chlorophyll-meter', label: 'policy.chlorophyllMeter' },
-			{ id: 'botanical-graft', label: 'policy.botanicalGraft' }
+			{ id: 'botanical-graft', label: 'policy.botanicalGraft' },
+			{ id: 'ai-gateway', label: 'policy.aiGateway' },
+			{ id: 'waiting-room', label: 'policy.waitingRoom' },
+			{ id: 'privacy-pass', label: 'policy.privacyPass' }
 		]
 	},
 	{
@@ -98,7 +104,11 @@ export const memoryDimensions = [
 			{ id: 'cross-pollination', label: 'policy.crossPollination' },
 			{ id: 'mycelium-network', label: 'policy.myceliumNetwork' },
 			{ id: 'bee-waggle', label: 'policy.beeWaggle' },
-			{ id: 'carnivorous-briar', label: 'policy.carnivorousBriar' }
+			{ id: 'carnivorous-briar', label: 'policy.carnivorousBriar' },
+			{ id: 'workflows-step', label: 'policy.workflowsStep' },
+			{ id: 'basin-catalog', label: 'policy.basinCatalog' },
+			{ id: 'edge-snippets', label: 'policy.edgeSnippets' },
+			{ id: 'agents-sdk', label: 'policy.agentsSdk' }
 		]
 	}
 ] as const;
@@ -236,5 +246,55 @@ export const memoryPolicyVariants = [
 		id: 'memory:botanical-graft',
 		archetype: 'pressure',
 		change: ['budget', 'botanical-graft']
+	},
+	{
+		id: 'memory:workflows-step',
+		archetype: 'core',
+		change: ['availability', 'workflows-step']
+	},
+	{
+		id: 'memory:browser-rendering',
+		archetype: 'information',
+		change: ['opening', 'browser-rendering']
+	},
+	{
+		id: 'memory:ai-gateway',
+		archetype: 'pressure',
+		change: ['budget', 'ai-gateway']
+	},
+	{
+		id: 'memory:k2-streams',
+		archetype: 'dynamics',
+		change: ['movement', 'k2-streams']
+	},
+	{
+		id: 'memory:basin-catalog',
+		archetype: 'constraints',
+		change: ['availability', 'basin-catalog']
+	},
+	{
+		id: 'memory:edge-snippets',
+		archetype: 'dynamics',
+		change: ['availability', 'edge-snippets']
+	},
+	{
+		id: 'memory:images-transform',
+		archetype: 'information',
+		change: ['backs', 'images-transform']
+	},
+	{
+		id: 'memory:waiting-room',
+		archetype: 'pressure',
+		change: ['budget', 'waiting-room']
+	},
+	{
+		id: 'memory:privacy-pass',
+		archetype: 'core',
+		change: ['budget', 'privacy-pass']
+	},
+	{
+		id: 'memory:agents-sdk',
+		archetype: 'information',
+		change: ['availability', 'agents-sdk']
 	}
 ] as const;

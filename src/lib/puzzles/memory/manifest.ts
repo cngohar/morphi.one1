@@ -87,7 +87,17 @@ const NEW_PAIR_SUFFIXES = [
 	'carnivorous-briar',
 	'chlorophyll-meter',
 	'bioluminescent',
-	'botanical-graft'
+	'botanical-graft',
+	'workflows-step',
+	'browser-rendering',
+	'ai-gateway',
+	'k2-streams',
+	'basin-catalog',
+	'edge-snippets',
+	'images-transform',
+	'waiting-room',
+	'privacy-pass',
+	'agents-sdk'
 ] as const;
 const NEW_GROUPS = [
 	...NEW_PAIR_SUFFIXES.flatMap((suffix) => groupIds(suffix, PAIR_COUNTS)),
@@ -467,6 +477,46 @@ export const manifest = {
 		pairVariant('botanical-graft', 120, {
 			steps: ['v1.game.memory.step1', 'memory.botanicalGraft.step2', 'v1.game.memory.step3'],
 			tips: 'memory.botanicalGraft.tips'
+		}),
+		pairVariant('workflows-step', 120, {
+			steps: ['v1.game.memory.step1', 'memory.workflowsStep.step2', 'v1.game.memory.step3'],
+			tips: 'memory.workflowsStep.tips'
+		}),
+		pairVariant('browser-rendering', 120, {
+			steps: ['v1.game.memory.step1', 'memory.browserRendering.step2', 'v1.game.memory.step3'],
+			tips: 'memory.browserRendering.tips'
+		}),
+		pairVariant('ai-gateway', 120, {
+			steps: ['v1.game.memory.step1', 'memory.aiGateway.step2', 'v1.game.memory.step3'],
+			tips: 'memory.aiGateway.tips'
+		}),
+		pairVariant('k2-streams', 120, {
+			steps: ['v1.game.memory.step1', 'memory.k2Streams.step2', 'v1.game.memory.step3'],
+			tips: 'memory.k2Streams.tips'
+		}),
+		pairVariant('basin-catalog', 120, {
+			steps: ['v1.game.memory.step1', 'memory.basinCatalog.step2', 'v1.game.memory.step3'],
+			tips: 'memory.basinCatalog.tips'
+		}),
+		pairVariant('edge-snippets', 120, {
+			steps: ['v1.game.memory.step1', 'memory.edgeSnippets.step2', 'v1.game.memory.step3'],
+			tips: 'memory.edgeSnippets.tips'
+		}),
+		pairVariant('images-transform', 120, {
+			steps: ['v1.game.memory.step1', 'memory.imagesTransform.step2', 'v1.game.memory.step3'],
+			tips: 'memory.imagesTransform.tips'
+		}),
+		pairVariant('waiting-room', 120, {
+			steps: ['v1.game.memory.step1', 'memory.waitingRoom.step2', 'v1.game.memory.step3'],
+			tips: 'memory.waitingRoom.tips'
+		}),
+		pairVariant('privacy-pass', 120, {
+			steps: ['v1.game.memory.step1', 'memory.privacyPass.step2', 'v1.game.memory.step3'],
+			tips: 'memory.privacyPass.tips'
+		}),
+		pairVariant('agents-sdk', 120, {
+			steps: ['v1.game.memory.step1', 'memory.agentsSdk.step2', 'v1.game.memory.step3'],
+			tips: 'memory.agentsSdk.tips'
 		})
 	],
 	maxMoves: 180,

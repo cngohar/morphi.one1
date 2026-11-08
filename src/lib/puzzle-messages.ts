@@ -221,6 +221,16 @@ export const puzzleMessages = {
 	'variant.memory:chlorophyll-meter': 'Chlorophyll Meter',
 	'variant.memory:bioluminescent': 'Bioluminescent Spores',
 	'variant.memory:botanical-graft': 'Botanical Graft',
+	'variant.memory:workflows-step': 'Workflows Step',
+	'variant.memory:browser-rendering': 'Browser Run Snapshot',
+	'variant.memory:ai-gateway': 'AI Gateway',
+	'variant.memory:k2-streams': 'K2 Streams',
+	'variant.memory:basin-catalog': 'Basin Catalog',
+	'variant.memory:edge-snippets': 'Edge Snippets',
+	'variant.memory:images-transform': 'Images Transform',
+	'variant.memory:waiting-room': 'Waiting Room',
+	'variant.memory:privacy-pass': 'Privacy Pass',
+	'variant.memory:agents-sdk': 'Agents SDK',
 	'memory.countdown.step2':
 		'Clear the board before the countdown clock reaches zero. Running out of time ends the round with no score.',
 	'memory.countdown.tips': 'Maintain a brisk pace; hesitating too long costs the round.',
@@ -395,6 +405,37 @@ export const puzzleMessages = {
 		'Consecutive cross-pollinations trigger orchard grafting, escalating a biodiversity combo multiplier.',
 	'memory.botanicalGraft.tips':
 		'Chain unbroken cross-pollinations to harvest champion hybrid graft bonuses.',
+	'memory.workflowsStep.step2':
+		'Turns execute in durable workflows. On a mismatch, Step 2 gives you one row retry before state rollback.',
+	'memory.workflowsStep.tips': 'Use the step retry wisely to find matching adjacent candidates.',
+	'memory.browserRendering.step2':
+		'Every four flips, a headless browser snapshot scans DOM coordinates to illuminate unrevealed sectors.',
+	'memory.browserRendering.tips': 'Pay attention to illuminated borders after the scan pulses.',
+	'memory.aiGateway.step2':
+		'Revisiting known cards triggers a fast Cache HIT. Rapid blind flips under 350ms trigger a 429 rate-limit backoff.',
+	'memory.aiGateway.tips': 'Rely on semantic cache hits and pace your exploration deliberately.',
+	'memory.k2Streams.step2':
+		'Flips append to a continuous stream log. Pairing the symbol targeted by the reader cursor awards a 2.5x burst bonus.',
+	'memory.k2Streams.tips': 'Time your matches to hit the stream cursor target for big multipliers.',
+	'memory.basinCatalog.step2':
+		'Cards are grouped into Iceberg partition columns. Flipping card one restricts the second flip to that partition.',
+	'memory.basinCatalog.tips':
+		'Identify which partition column a card belongs to before committing candidate flips.',
+	'memory.edgeSnippets.step2':
+		'Matches execute an edge snippet micro-transform that injects dynamic modifier headers into the next turn.',
+	'memory.edgeSnippets.tips': 'Adapt your strategy to the active injected snippet modifier.',
+	'memory.imagesTransform.step2':
+		'Card symbols start under heavy blur and progressively sharpen to crystal clarity as nearby cards pair.',
+	'memory.imagesTransform.tips': 'Clear adjacent pairs to bring blurry icons into sharp focus.',
+	'memory.waitingRoom.step2':
+		'You have three concurrent admission tokens. Rapid mismatches exhaust tokens and trigger an admission queue delay.',
+	'memory.waitingRoom.tips': 'Preserve admission tokens with high-confidence matches.',
+	'memory.privacyPass.step2':
+		'You start with three blind cryptographic tokens. Spend a token to execute a private zero-knowledge peek.',
+	'memory.privacyPass.tips': 'Spend blind tokens strategically on high-uncertainty cards.',
+	'memory.agentsSdk.step2':
+		'An autonomous edge agent observes turn entropy. Every three matches, the agent executes a tool call to highlight a pair.',
+	'memory.agentsSdk.tips': 'Coordinate with your agent co-pilot when tool assistance activates.',
 	'scoring.memory.quad': 'Points per quad',
 	'memory.quads.label': 'Quads',
 	'memory.quads.hint': '{pairs} quads · Find four matching symbols',

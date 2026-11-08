@@ -32,6 +32,8 @@ export interface MemoryCard {
 	isDewdrop?: boolean;
 	isWilted?: boolean;
 	sporeSymmetry?: 'even' | 'odd';
+	partition?: 0 | 1 | 2;
+	blurLevel?: number;
 }
 
 export const MEMORY_VARIANTS = [
@@ -94,7 +96,17 @@ export const MEMORY_VARIANTS = [
 	'memory:carnivorous-briar',
 	'memory:chlorophyll-meter',
 	'memory:bioluminescent',
-	'memory:botanical-graft'
+	'memory:botanical-graft',
+	'memory:workflows-step',
+	'memory:browser-rendering',
+	'memory:ai-gateway',
+	'memory:k2-streams',
+	'memory:basin-catalog',
+	'memory:edge-snippets',
+	'memory:images-transform',
+	'memory:waiting-room',
+	'memory:privacy-pass',
+	'memory:agents-sdk'
 ] as const;
 export type MemoryVariant = (typeof MEMORY_VARIANTS)[number];
 
@@ -210,6 +222,21 @@ export interface MemoryRound {
 	sap?: number;
 	graftMultiplier?: number;
 	seedBreezeSwapped?: [number, number];
+	/** Cloudflare developer platform properties */
+	workflowStep?: 1 | 2 | 3;
+	workflowRetryUsed?: boolean;
+	renderScanCountdown?: number;
+	snapshotQuad?: number[];
+	cacheKnown?: number[];
+	streamTarget?: SymbolId;
+	streamBurst?: boolean;
+	partitionFilter?: number | null;
+	activeHeader?: string | null;
+	sharpness?: Record<number, number>;
+	waitingTokens?: number;
+	privacyTokens?: number;
+	agentCycles?: number;
+	agentHint?: number | null;
 	/** Group count: pairs (6/8/10), trios (6/8/10) or quads (4/5/6). */
 	pairs: number;
 	cards: MemoryCard[];
@@ -374,6 +401,17 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 			const meadowCards = deck.filter((c) => c.zone === 'meadow');
 			if (meadowCards[0]) meadowCards[0].isDewdrop = true;
 		}
+	} else if (selectedVariant === 'memory:basin-catalog') {
+		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
+			const part = (sIdx % 3) as 0 | 1 | 2;
+			for (const c of deck) {
+				if (c.symbol === selected[sIdx].id) c.partition = part;
+			}
+		}
+	} else if (selectedVariant === 'memory:images-transform') {
+		for (const c of deck) {
+			c.blurLevel = 5;
+		}
 	}
 
 	const roundCards = isBotanical(selectedVariant)
@@ -491,6 +529,18 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 	if (selectedVariant === 'memory:zero-trust') round.clearanceTier = 1;
 	if (selectedVariant === 'memory:argo-reroute') round.quadrantHits = { 0: 0, 1: 0, 2: 0, 3: 0 };
 	if (selectedVariant === 'memory:r2-glacier') round.glacierUntouched = {};
+	if (selectedVariant === 'memory:workflows-step') {
+		round.workflowStep = 1;
+		round.workflowRetryUsed = false;
+	}
+	if (selectedVariant === 'memory:browser-rendering') round.renderScanCountdown = 4;
+	if (selectedVariant === 'memory:ai-gateway') round.cacheKnown = [];
+	if (selectedVariant === 'memory:k2-streams') round.streamTarget = selected[0]?.id;
+	if (selectedVariant === 'memory:basin-catalog') round.partitionFilter = null;
+	if (selectedVariant === 'memory:edge-snippets') round.activeHeader = null;
+	if (selectedVariant === 'memory:waiting-room') round.waitingTokens = 3;
+	if (selectedVariant === 'memory:privacy-pass') round.privacyTokens = 3;
+	if (selectedVariant === 'memory:agents-sdk') round.agentCycles = 0;
 	return round;
 }
 
@@ -709,6 +759,22 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	) {
 		return { round, effect: 'ignored' };
 	}
+	if (
+		variant === 'memory:waiting-room' &&
+		round.waitingTokens !== undefined &&
+		round.waitingTokens <= 0
+	) {
+		return { round, effect: 'ignored' };
+	}
+	if (
+		variant === 'memory:basin-catalog' &&
+		round.revealed.length === 1 &&
+		round.partitionFilter !== null &&
+		round.partitionFilter !== undefined &&
+		round.cards[index]?.partition !== round.partitionFilter
+	) {
+		return { round, effect: 'ignored' };
+	}
 
 	const card = round.cards[index];
 	if (!card) {
@@ -717,6 +783,27 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 
 	if (card.isWilted) {
 		card.isWilted = false;
+	}
+	if (variant === 'memory:images-transform') {
+		card.blurLevel = 0;
+	}
+
+	let waitingTokens = round.waitingTokens;
+	if (variant === 'memory:waiting-room' && waitingTokens !== undefined) {
+		waitingTokens = Math.max(0, waitingTokens - 1);
+	}
+	let renderScanCountdown = round.renderScanCountdown;
+	let snapshotQuad = round.snapshotQuad;
+	if (variant === 'memory:browser-rendering') {
+		renderScanCountdown = (renderScanCountdown ?? 4) - 1;
+		if (renderScanCountdown <= 0) {
+			renderScanCountdown = 4;
+			snapshotQuad = [0, 1, cols, cols + 1];
+		}
+	}
+	let cacheKnown = round.cacheKnown;
+	if (variant === 'memory:ai-gateway') {
+		cacheKnown = cacheKnown ? [...cacheKnown, index] : [index];
 	}
 
 	let lifeSupport = round.lifeSupport;
@@ -886,6 +973,14 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		}
 		const briarsCleared =
 			variant === 'memory:carnivorous-briar' && card.isDewdrop ? true : round.briarsCleared;
+		let partitionFilter = round.partitionFilter;
+		if (variant === 'memory:basin-catalog') {
+			partitionFilter = card.partition ?? 0;
+		}
+		let workflowStep = round.workflowStep;
+		if (variant === 'memory:workflows-step') {
+			workflowStep = 2;
+		}
 		return {
 			round: {
 				...base,
@@ -897,7 +992,13 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				...(myceliumPulse !== undefined ? { myceliumPulse } : {}),
 				...(beeWaggleRow !== undefined ? { beeWaggleRow } : {}),
 				...(briarsCleared !== undefined ? { briarsCleared } : {}),
-				...(illuminated ? { illuminated } : {})
+				...(illuminated ? { illuminated } : {}),
+				...(partitionFilter !== undefined ? { partitionFilter } : {}),
+				...(workflowStep !== undefined ? { workflowStep } : {}),
+				...(waitingTokens !== undefined ? { waitingTokens } : {}),
+				...(renderScanCountdown !== undefined ? { renderScanCountdown } : {}),
+				...(snapshotQuad ? { snapshotQuad } : {}),
+				...(cacheKnown ? { cacheKnown } : {})
 			},
 			effect: 'flip'
 		};
@@ -1041,6 +1142,31 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				.filter((pos) => !matched.includes(pos) && !revealed.includes(pos));
 		}
 
+		let streamBurst = round.streamBurst;
+		let streamTarget = round.streamTarget;
+		if (variant === 'memory:k2-streams') {
+			if (card.symbol === round.streamTarget) {
+				streamBurst = true;
+				const symIdx = SYMBOLS.findIndex((s) => s.id === round.streamTarget);
+				streamTarget = SYMBOLS[(symIdx + 1) % SYMBOLS.length]?.id;
+			}
+		}
+		if (variant === 'memory:waiting-room') {
+			waitingTokens = Math.min(3, (waitingTokens ?? 1) + 2);
+		}
+		const activeHeader =
+			variant === 'memory:edge-snippets' ? 'X-Transform: Swap-Adjacent' : round.activeHeader;
+		let agentCycles = round.agentCycles;
+		let agentHint = round.agentHint;
+		if (variant === 'memory:agents-sdk') {
+			agentCycles = (round.agentCycles ?? 0) + 1;
+			if (agentCycles >= 3) {
+				agentCycles = 0;
+				const un = cards.findIndex((_, i) => !matched.includes(i));
+				agentHint = un >= 0 ? un : null;
+			}
+		}
+
 		return {
 			round: {
 				...base,
@@ -1068,9 +1194,36 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				...(variant === 'memory:durable-object' ? { lockedActorRow: null } : {}),
 				...(traceMeter !== undefined ? { traceMeter } : {}),
 				...(burstStreak !== undefined ? { burstStreak } : {}),
-				...(burstPing ? { burstPing } : {})
+				...(burstPing ? { burstPing } : {}),
+				...(streamBurst !== undefined ? { streamBurst } : {}),
+				...(streamTarget !== undefined ? { streamTarget } : {}),
+				...(activeHeader !== undefined ? { activeHeader } : {}),
+				...(agentCycles !== undefined ? { agentCycles } : {}),
+				...(agentHint !== undefined ? { agentHint } : {}),
+				...(waitingTokens !== undefined ? { waitingTokens } : {}),
+				...(variant === 'memory:basin-catalog' ? { partitionFilter: null } : {}),
+				...(variant === 'memory:workflows-step'
+					? { workflowStep: 1, workflowRetryUsed: false }
+					: {})
 			},
 			effect: won ? 'win' : 'match'
+		};
+	}
+
+	if (
+		variant === 'memory:workflows-step' &&
+		(round.workflowStep ?? 1) === 2 &&
+		!round.workflowRetryUsed
+	) {
+		return {
+			round: {
+				...base,
+				revealed: [revealed[0]],
+				workflowStep: 3,
+				workflowRetryUsed: true,
+				moves
+			},
+			effect: 'flip'
 		};
 	}
 
@@ -1083,7 +1236,11 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		...(variant === 'memory:pulse-drive' ? { pulseStreak: 1 } : {}),
 		...(variant === 'memory:hyperdrive-pool' ? { hyperdriveMultiplier: 1 } : {}),
 		...(lifeSupport !== undefined ? { lifeSupport } : {}),
-		...(illuminated ? { illuminated } : {})
+		...(illuminated ? { illuminated } : {}),
+		...(waitingTokens !== undefined ? { waitingTokens } : {}),
+		...(renderScanCountdown !== undefined ? { renderScanCountdown } : {}),
+		...(snapshotQuad ? { snapshotQuad } : {}),
+		...(cacheKnown ? { cacheKnown } : {})
 	};
 
 	if (variant === 'memory:three-strikes') {
@@ -1288,7 +1445,12 @@ export function resolveMismatch(round: MemoryRound): MemoryRound {
 		...(round.lockedActorRow !== undefined ? { lockedActorRow: null } : {}),
 		...(round.turnstileActive !== undefined ? { turnstileActive: false } : {}),
 		...(round.myceliumPulse !== undefined ? { myceliumPulse: null } : {}),
-		...(round.beeWaggleRow !== undefined ? { beeWaggleRow: null } : {})
+		...(round.beeWaggleRow !== undefined ? { beeWaggleRow: null } : {}),
+		...(round.snapshotQuad ? { snapshotQuad: [] } : {}),
+		...(round.partitionFilter !== undefined ? { partitionFilter: null } : {}),
+		...(round.agentHint !== undefined ? { agentHint: null } : {}),
+		...(round.workflowStep !== undefined ? { workflowStep: 1, workflowRetryUsed: false } : {}),
+		...(round.activeHeader ? { activeHeader: null } : {})
 	};
 	if (round.edgeCache) {
 		const nextCache: Record<number, { symbol: SymbolId; turns: number }> = {};

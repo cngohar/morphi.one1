@@ -1,6 +1,22 @@
 # Morphi: Simple Plan
 
-## Current local status — v1.3.5.12 Batch E accepted and committed (2026-11-08)
+## Active status — v1.3.5.13 Batch F locally implemented & verified (2026-11-08)
+
+The owner instructed “duh... skip the above asking.. i just reviewed it i accepted it, you can now impleent it”,
+accepting the visual preview and authorizing local app implementation of milestone v1.3.5.13 Batch F (10 Cloudflare
+Next-Gen Developer Platform & Edge Primitives rulesets: `memory:workflows-step`, `memory:browser-rendering`,
+`memory:ai-gateway`, `memory:k2-streams`, `memory:basin-catalog`, `memory:edge-snippets`, `memory:images-transform`,
+`memory:waiting-room`, `memory:privacy-pass`, and `memory:agents-sdk`).
+The 10 rulesets are implemented end-to-end under ponytail principles in `src/lib/puzzles/memory/logic.ts`,
+dimensions in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`,
+localization in `messages.ts`/`i18n`, and regenerated projections. Total catalog Memory variants are now 70
+(210 leaderboard groups). Multi-runtime vectors (6/6 runtimes, fingerprint `a8be9d5f...` and memory vector
+fingerprint `e11e8733...`), workspace types (0 errors/0 warnings), unit tests (47/47), real-D1 integration suite (15/15),
+and Playwright Chromium admin suite (3/3 at one worker) pass. Full `bun run verify` remains deferred; unauditioned
+audio and editor exclusions preserved. Ready for owner functional review; no auto-commit or push performed.
+See `docs/briefs/v1.3.5.13-batch-f-brief.md` and `docs/work/V1.3.5.13_WORK.md`.
+
+## Earlier local status — v1.3.5.12 Batch E accepted and committed (2026-11-08)
 
 The owner instructed “update the git repo and push to github”, accepting the 10 genuine Memory botanical & nature
 rulesets under the new Split Dual-Garden Baseline (`memory:cross-pollination`, `memory:mycelium-network`,
