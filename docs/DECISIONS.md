@@ -1,5 +1,97 @@
 # DECISIONS.md
 
+## 2026-11-08 — Batch H accepted; source commit and push authorized
+
+The owner said “the last work was done, but comit and pushed to github, so comit now and then push to github”,
+accepting the completed Time Strata baseline (v1.3.5.14) and 10 Time Strata ruleset variants
+(v1.3.5.15 Batch H) and authorizing source commit and push to GitHub. Total catalog Memory variants
+are now 81 (243 leaderboard groups). All scoped checks pass; full verify remains deferred; unauditioned
+audio and editor exclusions preserved.
+
+## 2026-11-08 — Batch H locally implemented and verified with Ponytail
+
+The owner requested “continue the progress of batch h which was in middle of
+implementation”, then “using the ponytail plugin for implementation”. This
+authorizes local app integration of all ten prepared Time Strata rules and
+supersedes the earlier preparation-only scope. No separate owner acceptance or
+new device/browser review is inferred. Reuse `memory-1`, pair `brief-v1` scoring,
+existing numeric Move controls and thirty isolated groups. The six policy
+dimensions gain ten rule values; old immutable snapshots may omit only these
+explicit new values and the earlier top-only value. New writes stay strict.
+
+Implemented Memory now totals 81 / 243; accepted remains 71 / 213. Two required
+`gpt-6.1-sol/high` coding agents authored engine/UI; `gpt-6-luna/max` verification
+returned 503, so the parent owns focused checks under the recorded takeover
+authorization. Full verify remains deferred; no commit/push, deployment, next
+batch or unrelated audio/editor change is authorized. Scoped checks pass: types
+(0/0), format/lint, 65 units/checkpoints, four D1 cases, 72 vectors in six runtimes
+and 105 unique Chromium cases across serial one-worker runs. Glimpse/Order received
+only short-landscape spacing fixes; utility controls respect the existing replay
+cap. Source stayed stable during checks. Owner functional/visual acceptance remains
+pending; the preparation-only record below is historical.
+[App work and evidence](work/V1.3.5.15_WORK.md).
+
+## 2026-11-08 — Time Strata accepted; ten Time Strata variants selected for preparation with Ponytail
+
+The owner said “ok, mark that accepted, and perpare the next 10 varient based of
+latest board which i think is time stratra”, followed by “with ponytail plugin”.
+
+- The integrated .14 Time Strata baseline is owner-accepted locally. Accepted
+  and implemented Memory now both total 71 presets / 213 leaderboard groups.
+  Existing focused .14 evidence is retained; no new device/browser details or
+  automated results were supplied with acceptance. Source remains uncommitted.
+- Select .15 Batch H preparation: exactly ten genuine gameplay candidates based
+  on Time Strata's four-stack, top-only board, with the Ponytail plugin active.
+  Prepare a playable local rules/visual preview before app integration.
+- Candidates remain outside the accepted catalogue. A later fully approved,
+  implemented and accepted batch would bring the total to 81 / 243.
+- Preserve accepted .14 rules, replay/scoring identity, legacy runs, C1–C10,
+  full-verification deferral, unauditioned audio and unrelated editor/MCP work.
+  No new app integration, commit/push, deployment or .16 is authorized.
+- The owner separately said “if agent are unavailable the do a takeover and do
+  all the work yourself”. The required `gpt-6-luna/max` tester returned 503;
+  direct parent .15 verification is authorized. Available planning/coding agents
+  use the required routing; no substitute tester or missing-check waiver is claimed.
+- The ten-mode fixture and focused runner are complete: 90 native Chromium
+  full-round flows, 30 mode/size contrasts, 240 generated-deal witnesses and six
+  supplemental checks pass. All three layouts retain ≥44px targets without
+  overflow. Fixed preview pairing schedules establish rule examples/solvability;
+  production diversity/fairness and .15 app integration remain later decisions.
+  These results do not approve or accept the ten candidate rules.
+- [Next brief](briefs/v1.3.5.15-batch-h-brief.md),
+  [work](work/V1.3.5.15_WORK.md),
+  [accepted .14 evidence](work/V1.3.5.14_WORK.md).
+
+## 2026-11-08 — Time Strata preview approved; one baseline local integration authorized
+
+The owner said “v1.3.5.14 is now approved, you can start the implementation with ponytail skill” on 2026-11-08. This approves the retained Time Strata preview and authorizes this one baseline’s local app integration. No new device/browser details were supplied; no physical-device review is inferred.
+
+- Reuse `memory-1`, pair `brief-v1`, existing RNG and three isolated Time Strata groups.
+- Numeric cancel/Continue actions preserve the existing wire contract and readable checkpoints.
+- Policy maps no-preview plus top-only; prior immutable policy snapshots remain readable.
+- Directory search uses catalogue display names as well as IDs. The Time Strata browser case exposed the previous raw-ID-only name lookup.
+- Local implementation and required focused checks are complete: 71 implemented / 213 groups, with 70 / 210 owner-accepted. App functional acceptance remains separate.
+- Portrait 2×2 and landscape/desktop four-stack layouts retain 44px controls; landscape spacing was reduced to keep controls inside the game frame.
+- Coding agents use the mandated routing; testing model returned 503. Owner explicitly authorized parent takeover until done. Full verify remains deferred; no commit/push/deployment.
+
+## 2026-11-08 — Batch G baseline direction selected; fixture review only
+
+- The owner corrected Batch G to a new baseline instead of new variants and chose
+  a layered board with only the top card of each stack playable. **Time Strata** is
+  one proposed four-stack Memory foundation; the ten-modifier draft is superseded.
+- The fixture proposes equal-top matching, matched-pair removal to reveal deeper
+  layers, free single-reveal cancellation and reader-controlled Continue after
+  each attempt. These interaction/layout details still need owner visual approval.
+- Fixture construction balances 6/8/10 pairs across four stacks and guarantees a
+  reverse-insertion removal path. This is a design reference, not approved engine
+  code or production scoring/difficulty evidence. No live IDs/counts were added;
+  accepted Batch F remains 70 variants / 210 groups at `7eadc3b`.
+- The required testing model was unavailable. The owner explicitly authorized
+  direct work in this conversation through completion; parent fixture code and
+  focused verification are recorded without substitute-model claims. Permanent
+  model routing and existing dependency versions remain as configured.
+- [Brief](briefs/v1.3.5.14-batch-g-brief.md), [work/evidence](work/V1.3.5.14_WORK.md).
+
 ## 2026-11-07 — .7 Memory Tier 2 directory accepted; source-only GitHub handoff authorized
 
 - The owner said “got them, approved and now comit and push to github”, accepting the

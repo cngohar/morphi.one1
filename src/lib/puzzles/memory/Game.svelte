@@ -6,6 +6,7 @@
 	import { memoryEntranceMs, MEMORY_PREVIEW_MS, MEMORY_HIDE_MS } from '#lib/round-timing.js';
 	import Confetti from '#lib/puzzles/memory/Confetti.svelte';
 	import MemoryCard from '#lib/puzzles/memory/Card.svelte';
+	import TimeStrata from '#lib/puzzles/memory/TimeStrata.svelte';
 	import SoundToggle from '#lib/components/SoundToggle.svelte';
 	import {
 		flipCard,
@@ -19,6 +20,11 @@
 		memoryMoveLimit,
 		memoryCapReached,
 		matchedCount,
+		applyMemoryMove,
+		timeStrataTops,
+		timeStrataOutcome,
+		isTimeStrata,
+		type MemoryMove,
 		type MemoryRound
 	} from '#lib/puzzles/memory/logic.js';
 	import { SYMBOL_COLORS } from '#lib/puzzles/memory/symbols.js';
@@ -27,7 +33,7 @@
 	import { formatDuration, formatNumber } from '#lib/ui/format.js';
 	import { memoryThemeForSeed, memoryThemeStyle } from '#lib/puzzles/memory/themes.js';
 	import { sound } from '#lib/ui/sound.js';
-	import { SYMBOLS } from '#lib/puzzles/memory/symbols.js';
+	import { SYMBOLS, symbolLabel } from '#lib/puzzles/memory/symbols.js';
 	import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 	import { themeStyle as proceduralStyle } from '#lib/engine/theme/style.js';
 	import { memoryThemeFromResolved } from '#lib/puzzles/memory/themes.js';
@@ -64,7 +70,7 @@
 		/** Budget run-over: abandon this round and start the next puzzle. */
 		ontryanother?: () => void;
 		oncomplete?: (score: number, seconds: number) => void;
-		onmove?: (move: { index: number }) => void;
+		onmove?: (move: MemoryMove) => void;
 		paused?: boolean;
 		rankedRound?: boolean;
 		entranceReady?: boolean;
@@ -155,7 +161,8 @@
 	const swaps = $derived(variant === 'memory:swaps');
 	const collapse = $derived(variant === 'memory:collapse');
 	const budget = $derived(variant === 'memory:budget');
-	const noPreview = $derived(variant === 'memory:no-preview');
+	const timeStrata = $derived(isTimeStrata(variant));
+	const noPreview = $derived(variant === 'memory:no-preview' || timeStrata);
 	const matchSize = $derived(cardsPerMatch(game));
 	const capped = $derived(memoryCapReached(game));
 	// Budget shows its run-over choice once the final miss has turned back down.
@@ -201,6 +208,7 @@
 			capped ||
 			phase !== 'playing' ||
 			game.revealed.length >= matchSize ||
+			(timeStrata && (game.echo?.length ?? 0) > 0) ||
 			game.status === 'won'
 	);
 
@@ -340,7 +348,7 @@
 	function beginPlay(): void {
 		phase = 'playing';
 		onready?.();
-		announcement = t('status.go');
+		announcement = t(timeStrata ? 'memory.timeStrata.ready' : 'status.go');
 
 		if (!(document.hidden || paused)) {
 			startClock();
@@ -399,6 +407,10 @@
 
 	function acceptFlip(index: number): void {
 		if (document.hidden || paused || phase !== 'playing' || game.status !== 'playing' || locked) {
+			return;
+		}
+		if (timeStrata) {
+			acceptTimeStrataMove(game.revealed.includes(index) ? { cancel: 1 } : { index });
 			return;
 		}
 
@@ -474,9 +486,130 @@
 			return;
 		}
 
-		matchStreak += 1;
+		finishWin();
+	}
+
+	async function focusTimeStrataTop(): Promise<void> {
+		await tick();
+		boardEl
+			.querySelector<HTMLElement>(
+				'[data-strata-top]:not(:disabled), [data-strata-shelf]:not(:disabled)'
+			)
+			?.focus();
+	}
+
+	function timeStrataSelectionMessage(index: number): string {
+		const card = game.cards[index];
+		const glyph = resolvedTheme?.symbols[SYMBOLS.findIndex((symbol) => symbol.id === card.symbol)];
+		return t(
+			game.shelf?.index === index ? 'memory.strataShelf.selected' : 'memory.timeStrata.selected',
+			{
+				symbol: t(glyph ? `symbol.${glyph.label}` : symbolLabel(card.symbol)),
+				stack: ['I', 'II', 'III', 'IV'][timeStrataTops(game).indexOf(index)]
+			}
+		);
+	}
+
+	function timeStrataStatus(): string {
+		if ((game.echo?.length ?? 0) > 0) return t('memory.strataEcho.held');
+		const outcome = timeStrataOutcome(game);
+		if (outcome === 'order-blocked') return t('memory.strataOrder.blocked');
+		if (outcome === 'match')
+			return t(
+				game.chain
+					? 'memory.strataChain.held'
+					: game.shelf && game.revealed.includes(game.shelf.index)
+						? 'memory.strataShelf.match'
+						: 'memory.timeStrata.match'
+			);
+		if (outcome === 'mismatch')
+			return t(
+				variant === 'memory:strata-slip'
+					? 'memory.strataSlip.mismatch'
+					: game.shelf && game.revealed.includes(game.shelf.index)
+						? 'memory.strataShelf.mismatch'
+						: 'memory.timeStrata.mismatch'
+			);
+		return game.revealed.length === 1
+			? timeStrataSelectionMessage(game.revealed[0])
+			: t('memory.timeStrata.ready');
+	}
+
+	function acceptTimeStrataMove(move: MemoryMove): void {
+		if (document.hidden || paused || failed || phase !== 'playing' || game.status !== 'playing')
+			return;
+		const previousOutcome = timeStrataOutcome(game);
+		const hadEcho = (game.echo?.length ?? 0) > 0;
+		const selectedSample = game.shelf && game.revealed.includes(game.shelf.index);
+		const result = applyMemoryMove(game, move);
+		if (result.effect === 'ignored') return;
+		game = result.round;
+		onmove?.(move);
+		if ('cancel' in move) {
+			announcement = t('memory.timeStrata.cancelled');
+			void focusTimeStrataTop();
+		} else if ('continue' in move) {
+			if (result.effect === 'win') finishWin();
+			else if ((game.echo?.length ?? 0) > 0 || game.revealed.length === 2) {
+				announcement = timeStrataStatus();
+				if (game.chain) {
+					matchStreak += 1;
+					sound.play('match', matchStreak - 1);
+				}
+			} else {
+				announcement = t(
+					hadEcho
+						? 'memory.strataEcho.closed'
+						: previousOutcome === 'order-blocked'
+							? 'memory.strataOrder.closed'
+							: previousOutcome === 'match'
+								? selectedSample
+									? 'memory.strataShelf.matched'
+									: 'memory.timeStrata.lifted'
+								: selectedSample
+									? 'memory.strataShelf.closed'
+									: variant === 'memory:strata-slip'
+										? 'memory.strataSlip.sunk'
+										: 'memory.timeStrata.closed'
+				);
+				void focusTimeStrataTop();
+			}
+		} else if ('index' in move) {
+			if (result.effect === 'flip') sound.play('flip');
+			else if (result.effect === 'match') {
+				matchStreak += 1;
+				sound.play('match', matchStreak - 1);
+			} else {
+				matchStreak = 0;
+				sound.play('mismatch');
+			}
+			announcement = timeStrataStatus();
+		} else {
+			announcement = t(
+				'lift' in move
+					? 'memory.strataShelf.lifted'
+					: 'return' in move
+						? 'memory.strataShelf.returned'
+						: 'cycle' in move
+							? 'memory.strataCycle.cycled'
+							: 'memory.strataEmptyWell.moved'
+			);
+			void focusTimeStrataTop();
+		}
+	}
+
+	function finishWin(): void {
+		if (!timeStrata) matchStreak += 1;
 		sound.play('win');
-		announcement = t(trios ? 'memory.trios.won' : quads ? 'memory.quads.won' : 'status.won');
+		announcement = t(
+			timeStrata
+				? 'memory.timeStrata.won'
+				: trios
+					? 'memory.trios.won'
+					: quads
+						? 'memory.quads.won'
+						: 'status.won'
+		);
 		clearTimer(celebrateTimer);
 		celebrating = [];
 		winWave = false;
@@ -524,11 +657,12 @@
 						hideDelay.start(resume.pending.hide ?? MEMORY_HIDE_MS, document.hidden || paused);
 					} else {
 						phase = 'playing';
-						if (game.revealed.length === matchSize) {
+						if (!timeStrata && game.revealed.length === matchSize) {
 							if (resume.pending.mismatch === undefined) game = resolveMismatch(game);
 							else mismatchDelay.start(resume.pending.mismatch, document.hidden || paused);
 						}
 						onready?.();
+						if (timeStrata) announcement = timeStrataStatus();
 						if (game.status === 'won') {
 							oncomplete?.(scoreRound(game, elapsed, scoring), elapsed);
 							finishDelay.start(0, document.hidden || paused);
@@ -541,7 +675,9 @@
 					resume?.pending.entrance ??
 					(motion.reduced() && !rankedRound ? 0 : memoryEntranceMs(game.pairs));
 				entrance = motion.deal(
-					Array.from(boardEl.querySelectorAll<HTMLElement>('.memory-card')),
+					Array.from(
+						boardEl.querySelectorAll<HTMLElement>(timeStrata ? '.strata-top' : '.memory-card')
+					),
 					duration
 				);
 				announcement = t('v1.game.arriving');
@@ -715,37 +851,52 @@
 
 	<main class="stage">
 		<div
-			class="board"
+			class={timeStrata ? 'strata-board' : 'board'}
 			bind:this={boardEl}
 			data-pairs={game.pairs}
 			data-columns={columns}
 			data-cap={capped}
 		>
-			{#each game.cards as card, index (card.id)}
-				<MemoryCard
-					{card}
-					{index}
-					symbolColor={symbolColors.get(card.color) ?? card.color}
-					glyph={resolvedTheme?.symbols[SYMBOLS.findIndex((symbol) => symbol.id === card.symbol)]}
-					fillMode={resolvedTheme?.style.fill}
-					faceUp={showAll || isFaceUp(game, index)}
-					matched={game.matched.includes(index)}
-					shaking={shake.includes(index)}
-					selected={phase === 'playing' &&
-						game.revealed.length < matchSize &&
-						game.revealed.includes(index)}
-					delayedFlip={delayedFlip === index}
-					celebrating={celebrating.includes(index)}
-					winWave={winWave && game.matched.includes(index)}
-					{locked}
-					lockedOut={index === game.lock}
-					marked={game.marked?.includes(index) ?? false}
-					dealDelay={Math.floor(index / columns) * 20}
-					matchDelay={celebrating[1] === index ? 40 : 0}
-					waveDelay={(Math.floor(index / columns) + (index % columns)) * 20}
+			{#if timeStrata}
+				<TimeStrata
+					{game}
+					locked={locked || paused}
+					controlsLocked={failed || paused || phase !== 'playing' || game.status !== 'playing'}
+					status={announcement}
+					{symbolColors}
+					{resolvedTheme}
 					onflip={handleFlip}
+					oncancel={() => guard(() => acceptTimeStrataMove({ cancel: 1 }))}
+					oncontinue={() => guard(() => acceptTimeStrataMove({ continue: 1 }))}
+					onutility={(move) => guard(() => acceptTimeStrataMove(move))}
 				/>
-			{/each}
+			{:else}
+				{#each game.cards as card, index (card.id)}
+					<MemoryCard
+						{card}
+						{index}
+						symbolColor={symbolColors.get(card.color) ?? card.color}
+						glyph={resolvedTheme?.symbols[SYMBOLS.findIndex((symbol) => symbol.id === card.symbol)]}
+						fillMode={resolvedTheme?.style.fill}
+						faceUp={showAll || isFaceUp(game, index)}
+						matched={game.matched.includes(index)}
+						shaking={shake.includes(index)}
+						selected={phase === 'playing' &&
+							game.revealed.length < matchSize &&
+							game.revealed.includes(index)}
+						delayedFlip={delayedFlip === index}
+						celebrating={celebrating.includes(index)}
+						winWave={winWave && game.matched.includes(index)}
+						{locked}
+						lockedOut={index === game.lock}
+						marked={game.marked?.includes(index) ?? false}
+						dealDelay={Math.floor(index / columns) * 20}
+						matchDelay={celebrating[1] === index ? 40 : 0}
+						waveDelay={(Math.floor(index / columns) + (index % columns)) * 20}
+						onflip={handleFlip}
+					/>
+				{/each}
+			{/if}
 		</div>
 		{#if runOver}
 			<div class="run-over" role="dialog" aria-modal="true" aria-labelledby="run-over-title">
@@ -767,9 +918,20 @@
 
 	<footer class="hint">
 		<span
-			>{t(trios ? 'memory.trios.hint' : quads ? 'memory.quads.hint' : 'game.hint', {
-				pairs: game.pairs
-			})}</span
+			>{t(
+				timeStrata
+					? variant === 'memory:strata-shelf'
+						? 'memory.strataShelf.hint'
+						: 'memory.timeStrata.hint'
+					: trios
+						? 'memory.trios.hint'
+						: quads
+							? 'memory.quads.hint'
+							: 'game.hint',
+				{
+					pairs: game.pairs
+				}
+			)}</span
 		>
 		{#if trios || quads}<span>
 				· {t('memory.trios.flips', {
@@ -947,6 +1109,10 @@
 		grid-template-columns: repeat(var(--cols), minmax(0, 1fr));
 		gap: clamp(5px, 1.5vmin, var(--theme-gap, 12px));
 		width: min(92vw, 720px, calc((100dvh - 100px) * var(--cols) * 0.72 / var(--rows)));
+	}
+
+	.strata-board {
+		width: min(100%, 620px);
 	}
 
 	.run-over {

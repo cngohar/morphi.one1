@@ -9,6 +9,11 @@ import {
 	QUAD_COUNTS,
 	cardsPerMatch,
 	createMemoryRound,
+	applyMemoryMove,
+	MEMORY_TIME_STRATA_MAX_ACTIONS,
+	MEMORY_STRATA_VARIANTS,
+	isTimeStrata,
+	type MemoryMove,
 	flipCard,
 	memoryMoveLimit,
 	memoryVariant,
@@ -97,7 +102,18 @@ const NEW_PAIR_SUFFIXES = [
 	'images-transform',
 	'waiting-room',
 	'privacy-pass',
-	'agents-sdk'
+	'agents-sdk',
+	'time-strata',
+	'strata-linked',
+	'strata-sweep',
+	'strata-shelf',
+	'strata-cycle',
+	'strata-empty-well',
+	'strata-glimpse',
+	'strata-chain',
+	'strata-echo',
+	'strata-slip',
+	'strata-order'
 ] as const;
 const NEW_GROUPS = [
 	...NEW_PAIR_SUFFIXES.flatMap((suffix) => groupIds(suffix, PAIR_COUNTS)),
@@ -121,6 +137,53 @@ const pairVariant = (
 	leaderboardGroups: groupIds(suffix, PAIR_COUNTS),
 	help: { ...pairHelp, ...help }
 });
+
+function parseMemoryMove(move: import('#lib/engine/contract.js').Move): MemoryMove {
+	const keys = Object.keys(move);
+	if (keys.length === 1 && keys[0] === 'index' && Number.isSafeInteger(move.index))
+		return { index: move.index! };
+	if (keys.length === 1 && keys[0] === 'cancel' && move.cancel === 1) return { cancel: 1 };
+	if (keys.length === 1 && keys[0] === 'continue' && move.continue === 1) return { continue: 1 };
+	for (const key of ['lift', 'cycle'] as const) {
+		if (
+			keys.length === 1 &&
+			keys[0] === key &&
+			Number.isSafeInteger(move[key]) &&
+			move[key]! >= 0 &&
+			move[key]! < 4
+		)
+			return key === 'lift' ? { lift: move.lift! } : { cycle: move.cycle! };
+	}
+	if (keys.length === 1 && keys[0] === 'return' && move.return === 1) return { return: 1 };
+	if (
+		keys.length === 2 &&
+		keys.includes('from') &&
+		keys.includes('to') &&
+		Number.isSafeInteger(move.from) &&
+		Number.isSafeInteger(move.to) &&
+		move.from! >= 0 &&
+		move.from! < 4 &&
+		move.to! >= 0 &&
+		move.to! < 4
+	)
+		return { from: move.from!, to: move.to! };
+	throw new RangeError('move');
+}
+
+function resumeTimeStrata(
+	seed: string,
+	moves: readonly import('#lib/engine/contract.js').Move[],
+	variant: string
+) {
+	let round = createMemoryRound(seed, variant);
+	if (moves.length > memoryMoveLimit(round)) throw new RangeError('move_limit');
+	for (const move of moves) {
+		const result = applyMemoryMove(round, parseMemoryMove(move));
+		if (result.effect === 'ignored') throw new RangeError('move');
+		round = result.round;
+	}
+	return round;
+}
 
 export const manifest = {
 	id: 'memory',
@@ -517,13 +580,46 @@ export const manifest = {
 		pairVariant('agents-sdk', 120, {
 			steps: ['v1.game.memory.step1', 'memory.agentsSdk.step2', 'v1.game.memory.step3'],
 			tips: 'memory.agentsSdk.tips'
+		}),
+		{
+			...pairVariant('time-strata', MEMORY_TIME_STRATA_MAX_ACTIONS, {
+				steps: ['memory.timeStrata.step1', 'memory.timeStrata.step2', 'memory.timeStrata.step3'],
+				note: 'memory.noPreview.scoringNote',
+				tips: 'memory.timeStrata.tips'
+			}),
+			ending: {
+				kind: 'completion',
+				headlines: { default: 'memory.timeStrata.won' },
+				subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+				animation: 'fade-rise',
+				continue: 'auto_500ms',
+				condition: 'Every stack is empty after confirming the final matching tops.'
+			}
+		},
+		...MEMORY_STRATA_VARIANTS.map((variant) => {
+			const suffix = variant.slice('memory:'.length) as (typeof NEW_PAIR_SUFFIXES)[number];
+			const prefix =
+				'memory.' + suffix.replace(/-([a-z])/g, (_, letter: string) => letter.toUpperCase());
+			return {
+				...pairVariant(suffix, MEMORY_TIME_STRATA_MAX_ACTIONS, {
+					steps: [`${prefix}.step1`, `${prefix}.step2`, `${prefix}.step3`],
+					note: 'memory.noPreview.scoringNote',
+					tips: `${prefix}.tips`
+				}),
+				ending: {
+					kind: 'completion' as const,
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise' as const,
+					continue: 'auto_500ms' as const,
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			};
 		})
 	],
-	maxMoves: 180,
-	parseMove(move) {
-		if (Object.keys(move).sort().join(',') !== 'index') throw new RangeError('move');
-		return { index: move.index };
-	},
+	maxMoves: MEMORY_TIME_STRATA_MAX_ACTIONS,
+	parseMove: parseMemoryMove,
 	leaderboardGroups: [
 		'memory-1:6',
 		'memory-1:8',
@@ -541,7 +637,9 @@ export const manifest = {
 	],
 	rankedTiming: {
 		openingMs: (result, variant?: string) =>
-			parseMemoryVariant(variant) === 'memory:no-preview' ? 0 : memoryOpeningMs(result.pairs!),
+			parseMemoryVariant(variant) === 'memory:no-preview' || isTimeStrata(variant)
+				? 0
+				: memoryOpeningMs(result.pairs!),
 		minimumSeconds: (result, variant?: string) =>
 			result.pairs! *
 			(({ 'memory:trios': 0.6, 'memory:quads': 0.8 } as Record<string, number>)[
@@ -551,6 +649,7 @@ export const manifest = {
 	messages,
 	createRound: createMemoryRound,
 	resumeRound(seed, moves, _scoring?: ScoreValues, variant?: string) {
+		if (isTimeStrata(parseMemoryVariant(variant))) return resumeTimeStrata(seed, moves, variant!);
 		let round = createMemoryRound(seed, variant);
 		if (moves.length > memoryMoveLimit(round)) throw new RangeError('move_limit');
 		for (const move of moves) {
@@ -574,13 +673,15 @@ export const manifest = {
 	replay(seed, moves, seconds, scoring?: ScoreValues, variant?: string) {
 		let round = createMemoryRound(seed, variant);
 		if (moves.length > memoryMoveLimit(round)) throw new RangeError('move_limit');
-		for (const move of moves) {
-			if (Object.keys(move).length !== 1 || !Number.isInteger(move.index))
-				throw new RangeError('move');
-			const result = flipCard(round, move.index!);
-			if (result.effect === 'ignored') throw new RangeError('move');
-			round = result.effect === 'mismatch' ? resolveMismatch(result.round) : result.round;
-		}
+		if (isTimeStrata(memoryVariant(round))) round = resumeTimeStrata(seed, moves, variant!);
+		else
+			for (const move of moves) {
+				if (Object.keys(move).length !== 1 || !Number.isInteger(move.index))
+					throw new RangeError('move');
+				const result = flipCard(round, move.index!);
+				if (result.effect === 'ignored') throw new RangeError('move');
+				round = result.effect === 'mismatch' ? resolveMismatch(result.round) : result.round;
+			}
 		if (round.status !== 'won') throw new RangeError('incomplete');
 		return {
 			score: scoreRound(round, seconds, scoring),

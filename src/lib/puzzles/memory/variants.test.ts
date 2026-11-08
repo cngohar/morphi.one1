@@ -3,6 +3,9 @@ import { createRng, shuffle } from '#lib/engine/rng.js';
 import { validateScoreValues } from '#lib/engine/scoring.js';
 import {
 	MEMORY_VARIANTS,
+	applyMemoryMove,
+	timeStrataTops,
+	type MemoryMove,
 	cardsPerMatch,
 	createMemoryRound,
 	currentScore,
@@ -17,6 +20,7 @@ import {
 import { manifest } from './manifest.js';
 import { messages } from './messages.js';
 import { quadsScoring, triosScoring } from './scoring.js';
+import batchHVectors from '../../../../tests/vectors/memory-batch-h.json';
 
 function matchingMoves(round: MemoryRound) {
 	return [...new Set(round.cards.map((card) => card.symbol))].flatMap((symbol) =>
@@ -27,8 +31,24 @@ function matchingMoves(round: MemoryRound) {
 /** Plays a miss-free game on the live board, so collapse positions stay correct. */
 function solve(seed: string, variant: string) {
 	let round = createMemoryRound(seed, variant);
-	const moves: { index: number }[] = [];
+	const moves: MemoryMove[] = [];
 	while (round.status === 'playing') {
+		if (variant === 'memory:time-strata') {
+			const tops = timeStrataTops(round).filter((index) => index >= 0);
+			const first = tops.find((index) =>
+				tops.some(
+					(other) => other !== index && round.cards[other].symbol === round.cards[index].symbol
+				)
+			)!;
+			const second = tops.find(
+				(index) => index !== first && round.cards[index].symbol === round.cards[first].symbol
+			)!;
+			for (const move of [{ index: first }, { index: second }, { continue: 1 }] as MemoryMove[]) {
+				moves.push(move);
+				round = applyMemoryMove(round, move).round;
+			}
+			continue;
+		}
 		let live = round.cards.flatMap((card, index) =>
 			round.matched.includes(index) ? [] : [{ card, index }]
 		);
@@ -207,23 +227,25 @@ describe('Memory variants', () => {
 	});
 
 	it('owns separate groups, complete messages, and trio scoring without changing pair scoring', () => {
-		expect(new Set(manifest.leaderboardGroups).size).toBe(210);
+		expect(new Set(manifest.leaderboardGroups).size).toBe(243);
 		for (const variant of manifest.variants) {
 			expect(MEMORY_VARIANTS).toContain(variant.id);
 			expect(messages[variant.name as keyof typeof messages]).toBeTruthy();
 			for (const group of variant.leaderboardGroups)
 				expect(manifest.leaderboardGroups).toContain(group);
-			const round = createMemoryRound('42', variant.id);
+			const reference = batchHVectors.find((vector) => vector.variant === variant.id);
+			const round = createMemoryRound(reference?.seed ?? '42', variant.id);
 			const replay = manifest.replay(
 				round.seed,
-				solve(round.seed, variant.id),
+				reference ? (reference.moves as MemoryMove[]) : solve(round.seed, variant.id),
 				10,
 				undefined,
 				variant.id
 			);
 			expect(variant.leaderboardGroups).toContain(replay.group);
 			expect(replay.score).toBe(
-				round.pairs * ({ 'memory:trios': 1500, 'memory:quads': 2000 }[variant.id] ?? 1000) - 50
+				reference?.result.score ??
+					round.pairs * ({ 'memory:trios': 1500, 'memory:quads': 2000 }[variant.id] ?? 1000) - 50
 			);
 		}
 		expect(triosScoring.version).toBe('memory-trios-v1');

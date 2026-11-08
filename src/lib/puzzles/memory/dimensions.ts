@@ -36,7 +36,11 @@ export const memoryDimensions = [
 			{ id: 'bit-rot', label: 'policy.bitRot' },
 			{ id: 'argo-reroute', label: 'policy.argoReroute' },
 			{ id: 'seed-dispersal', label: 'policy.seedDispersal' },
-			{ id: 'k2-streams', label: 'policy.k2Streams' }
+			{ id: 'k2-streams', label: 'policy.k2Streams' },
+			{ id: 'strata-shelf', label: 'policy.strataShelf' },
+			{ id: 'strata-cycle', label: 'policy.strataCycle' },
+			{ id: 'strata-empty-well', label: 'policy.strataEmptyWell' },
+			{ id: 'strata-slip', label: 'policy.strataSlip' }
 		]
 	},
 	{
@@ -52,7 +56,9 @@ export const memoryDimensions = [
 			{ id: 'kv-consistency', label: 'policy.kvConsistency' },
 			{ id: 'seasonal-bloom', label: 'policy.seasonalBloom' },
 			{ id: 'bioluminescent', label: 'policy.bioluminescent' },
-			{ id: 'images-transform', label: 'policy.imagesTransform' }
+			{ id: 'images-transform', label: 'policy.imagesTransform' },
+			{ id: 'strata-glimpse', label: 'policy.strataGlimpse' },
+			{ id: 'strata-echo', label: 'policy.strataEcho' }
 		]
 	},
 	{
@@ -84,6 +90,7 @@ export const memoryDimensions = [
 		values: [
 			{ id: 'standard', label: 'policy.standard' },
 			{ id: 'lockout', label: 'policy.lockout' },
+			{ id: 'top-only', label: 'policy.topOnly' },
 			{ id: 'wild', label: 'policy.wild' },
 			{ id: 'sonar', label: 'policy.sonar' },
 			{ id: 'one-flip', label: 'policy.oneFlip' },
@@ -108,7 +115,11 @@ export const memoryDimensions = [
 			{ id: 'workflows-step', label: 'policy.workflowsStep' },
 			{ id: 'basin-catalog', label: 'policy.basinCatalog' },
 			{ id: 'edge-snippets', label: 'policy.edgeSnippets' },
-			{ id: 'agents-sdk', label: 'policy.agentsSdk' }
+			{ id: 'agents-sdk', label: 'policy.agentsSdk' },
+			{ id: 'strata-linked', label: 'policy.strataLinked' },
+			{ id: 'strata-sweep', label: 'policy.strataSweep' },
+			{ id: 'strata-chain', label: 'policy.strataChain' },
+			{ id: 'strata-order', label: 'policy.strataOrder' }
 		]
 	}
 ] as const;
@@ -296,5 +307,99 @@ export const memoryPolicyVariants = [
 		id: 'memory:agents-sdk',
 		archetype: 'information',
 		change: ['availability', 'agents-sdk']
+	},
+	{
+		id: 'memory:time-strata',
+		archetype: 'constraints',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'top-only']
+		]
+	},
+	{
+		id: 'memory:strata-linked',
+		archetype: 'constraints',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'strata-linked']
+		]
+	},
+	{
+		id: 'memory:strata-sweep',
+		archetype: 'constraints',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'strata-sweep']
+		]
+	},
+	{
+		id: 'memory:strata-shelf',
+		archetype: 'dynamics',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'top-only'],
+			['movement', 'strata-shelf']
+		]
+	},
+	{
+		id: 'memory:strata-cycle',
+		archetype: 'dynamics',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'top-only'],
+			['movement', 'strata-cycle']
+		]
+	},
+	{
+		id: 'memory:strata-empty-well',
+		archetype: 'dynamics',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'top-only'],
+			['movement', 'strata-empty-well']
+		]
+	},
+	{
+		id: 'memory:strata-glimpse',
+		archetype: 'information',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'top-only'],
+			['backs', 'strata-glimpse']
+		]
+	},
+	{
+		id: 'memory:strata-chain',
+		archetype: 'core',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'strata-chain']
+		]
+	},
+	{
+		id: 'memory:strata-echo',
+		archetype: 'information',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'top-only'],
+			['backs', 'strata-echo']
+		]
+	},
+	{
+		id: 'memory:strata-slip',
+		archetype: 'dynamics',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'top-only'],
+			['movement', 'strata-slip']
+		]
+	},
+	{
+		id: 'memory:strata-order',
+		archetype: 'constraints',
+		changes: [
+			['opening', 'no-preview'],
+			['availability', 'strata-order']
+		]
 	}
 ] as const;

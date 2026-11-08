@@ -17,6 +17,215 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.5.15 — Batch H accepted; source commit and push authorized (2026-11-08)
+
+The owner instructed “the last work was done, but comit and pushed to github, so comit now and then push to github”,
+accepting the completed Time Strata baseline (v1.3.5.14) and 10 Time Strata ruleset variants (v1.3.5.15 Batch H)
+and authorizing source commit and push to GitHub. Total catalog Memory variants are now 81 (243 leaderboard groups).
+All scoped checks pass; full verify remains deferred; unauditioned audio and editor exclusions preserved.
+
+## Earlier v1.3.5.15 — Batch H locally implemented and verified; owner review pending (2026-11-08)
+
+- **Built:** Ten Time Strata variants integrated with Ponytail: Linked Tops,
+  Level Sweep, Sample Shelf, Layer Cycle, Empty Well, Deep Glimpse, Chain Reaction,
+  Layer Echo, Slipping Tops and Excavation Order. Reuses the accepted four-stack
+  board, `memory-1`, pair `brief-v1` scoring and thirty isolated groups. Numeric
+  utilities and held phases replay through authoritative ranked save and checkpoint
+  recovery; help/HUD, selector/admin testing, policy and directory are connected.
+  Implemented Memory is 81 presets / 243 groups; owner-accepted remains 71 / 213.
+  [Brief](briefs/v1.3.5.15-batch-h-brief.md),
+  [work and evidence](work/V1.3.5.15_WORK.md).
+- **Skipped (and why):** Full `bun run verify` remains explicitly deferred. No
+  schema/dependency/version changes, other-family expansion or later batch.
+  Unauditioned audio and unrelated editor/MCP work remain excluded. No commit,
+  push or production operation was authorized.
+- **Known issues:** No unresolved defect found in focused behavior. Owner
+  functional/visual review remains pending. Browser evidence combines serial
+  runs after Glimpse/Order short-landscape spacing fixes and one SIGTERM; no
+  uninterrupted full-suite pass is claimed. Finite generated deals/vectors do
+  not measure production difficulty/fairness or physical-device behavior.
+- **Decisions and pinned versions:** The owner requested continuing implementation
+  and reaffirmed the Ponytail plugin. This supersedes preparation-only scope,
+  without accepting the ten variants. Six existing finite policy dimensions gain
+  ten rule values; historical snapshots may omit only explicit new values, while
+  new writes stay strict. Legacy/baseline RNG, replay and scoring identities remain
+  frozen. Bun 1.4.2, Node 24.14.1, TypeScript 6.0.3, Playwright 1.64.1 and anime.js
+  4.5.0 remain recorded; no dependency upgrades. Two required `gpt-6.1-sol/high`
+  coding agents authored engine/UI. Required `gpt-6-luna/max` returned 503;
+  parent verification used the owner's explicit takeover authorization.
+- **Questions for the owner:** Functional/visual review of the ten integrated
+  modes at the three required sizes remains pending.
+
+| Acceptance item                                                                         | Evidence                                                             | Result                                                                    |
+| --------------------------------------------------------------------------------------- | -------------------------------------------------------------------- | ------------------------------------------------------------------------- |
+| Local implementation authority                                                          | Owner resume/Ponytail messages, active decisions                     | AUTHORIZED; owner acceptance separate                                     |
+| Ten rules, thirty groups and shared pair scoring                                        | Memory logic/manifest, generated projections, unit/vector/D1 sources | PASS; implemented 81 / 243, accepted 71 / 213                             |
+| Engine invariants, utilities, held phases, checkpoint recovery and policy compatibility | `build/v1.3.5.15/app/unit.log`                                       | PASS; 65/65 cases, five files                                             |
+| Issuance, live policy, immutable rules and isolated authoritative saves                 | `app/d1.log`, `db-setup.log`                                         | PASS; four focused real-D1 cases, all ten H modes; no migrations to apply |
+| Legacy/baseline preservation and new deterministic replay                               | `app/vectors.log`, 30 independently authored H vectors               | PASS; 38 legacy + four baseline + 30 H, all six runtimes                  |
+| Full H gameplay at 6/8/10 pairs and three sizes                                         | Serial `app/gameplay-*.log`, `verification.json`                     | PASS; 90 unique full rounds plus one keyboard/rotation/motion case        |
+| Baseline and admin/policy/directory regressions                                         | `app/baseline-regression.log`, `admin-regression.log`                | PASS; 11 baseline + three admin cases                                     |
+| Controls inside the frame/viewport and accessible target sizes                          | 181 bounds snapshots and 271 gameplay PNGs in `app/`                 | PASS; minimum measured 65×44px, 1px geometry tolerance                    |
+| Owned formatting/lint, generated registry and workspace types                           | Scoped commands and `app/types.log`, `lint.log`                      | PASS; 0 errors / 0 warnings after final source change                     |
+| Batch H owner functional/visual acceptance                                              | Integrated app ready for review                                      | AWAITING OWNER; no acceptance inferred                                    |
+| Full verify, physical-device/performance and production checks                          | Standing deferral and local scope                                    | NOT RUN; no pass or waiver inferred                                       |
+
+- **Measurements:** Local Chromium 156.0.8078.4 responsive emulation at 390×844,
+  844×390 and 1280×800; Playwright uses one worker. Minimum measured target is
+  65×44px with 1px rounding tolerance and no checked horizontal overflow.
+  Glimpse/Order landscape cards remain 76×76px, Order glyphs 24px, controls ≥44px.
+  No network-profile/load benchmark, median/p95 or physical-device claim.
+- **Waivers:** None. Parent takeover is model fallback authorization, not a
+  missing-check waiver. Full verification remains a recorded deferral.
+- **Owner responsibilities:** Review/accept or revise all ten integrated modes
+  at the three required sizes. Acceptance, a future batch and any source
+  commit/push or deployment remain separate decisions.
+- **CODEMAP updated:** yes.
+
+## Historical v1.3.5.15 — Ten Time Strata variants: preview ready for review (2026-11-08)
+
+The current implementation report above supersedes this earlier preparation-only
+scope. Preview-only counts and unchanged-source evidence below describe that
+completed stage; they are retained separately from app verification.
+
+- **Built:** Recorded .14 local app acceptance, bringing accepted and implemented
+  Memory to 71 presets / 213 groups. Prepared ten genuine Time Strata gameplay
+  variants with Ponytail in one [interactive preview](../static/demo/v1.3.5.15-batch-h.html):
+  Linked Tops, Level Sweep, Sample Shelf, Layer Cycle, Empty Well, Deep Glimpse,
+  Chain Reaction, Layer Echo, Slipping Tops and Excavation Order. Includes native
+  controls, 6/8/10-pair solvable deals, complete held outcomes/utilities, reset/new
+  deal, guides and completion. [Brief](briefs/v1.3.5.15-batch-h-brief.md),
+  [exact work/evidence](work/V1.3.5.15_WORK.md).
+- **Skipped (and why):** App integration/catalogue/groups, D1, engine vectors,
+  workspace sync/build, schema/dependency changes and later batches are outside
+  preparation. Full verify remains deferred. Preserve unauditioned audio and
+  unrelated editor/MCP work. No commit, push or production operations.
+- **Known issues:** None found in focused preview behavior. Owner rule/visual
+  review remains pending. Fixed preview schedules are not an approved production
+  diversity/difficulty or fairness contract; no physical-device review is inferred.
+- **Decisions and pinned versions:** Owner accepted .14 and requested ten variants
+  based on Time Strata with the Ponytail plugin. Candidate IDs remain outside the
+  accepted count; later approved implementation/acceptance would bring 81 / 243.
+  Existing light stack presentation, local font/anime assets and simple numeric
+  fixture state are reused. Bun 1.4.2, Node 24.14.1, TypeScript 6.0.3, Playwright
+  1.64.1 and anime.js 4.5.0; no dependency changes. Required `gpt-6.1-sol/high`
+  agents planned/authored the fixture. Required `gpt-6-luna/max` returned 503;
+  the owner explicitly authorized parent takeover, so parent owns actual checks.
+- **Questions for the owner:** Review the ten rules and preview at all three sizes.
+
+| Acceptance item                                                                | Evidence                                                      | Result                                                                   |
+| ------------------------------------------------------------------------------ | ------------------------------------------------------------- | ------------------------------------------------------------------------ |
+| .14 local app acceptance and .15 preparation authority                         | Owner messages 2026-11-08, acceptance/decision records        | .14 OWNER ACCEPTED; .15 PREPARATION SELECTED                             |
+| Ten genuine baseline-relative rules and complete fixture turns                 | .15 brief/HTML, native Chromium rule model and UI witnesses   | PASS; ten candidates, no app additions                                   |
+| Generated solvability, conservation, held outcomes and full completion         | `verification.json`, `gameplay.log`                           | PASS; 240 generated deals, 90 full flows, 30 contrasts, 3,749 UI actions |
+| 390×844 / 844×390 / 1280×800 controls and gameplay bounds                      | 306 snapshots and 150 captures in `build/v1.3.5.15/preview/`  | PASS; ≥44px targets, zero overflow, inside game/viewport                 |
+| Guides, keyboard/focus, rotation and reduced/missing motion                    | Main focused runner                                           | PASS; included in 14,357 assertions, with repeated geometry checks       |
+| Shelf recovery, held-phase reset, final-layer clue and injected motion failure | `extra-interactions.json`, log and retained runnable artifact | PASS; six supplemental interaction checks                                |
+| Owned formatting/lint and standalone runner TypeScript                         | Exact commands in .15 work record                             | PASS; runner lint corrected before final rerun                           |
+| Preservation of accepted .14 app/test/fixture source                           | 24 recorded source fingerprints                               | PASS; all 24 unchanged                                                   |
+| New variant owner rule/visual acceptance                                       | Ten-mode preview ready for review                             | AWAITING OWNER; no candidate acceptance inferred                         |
+| App/D1/six-runtime, full verify, device and production/performance checks      | Preview-only scope and standing full-verification deferral    | NOT RUN; no pass or waiver inferred                                      |
+
+- **Measurements:** Local Chromium 156.0.8078.4 responsive emulation, one browser
+  at a time. Top cards measure 108×108, 76×88 and 132×164px at the three respective
+  sizes; all visible play targets are ≥44px and fit the game frame/viewport.
+  Help/example reading may scroll on small screens. No performance benchmark.
+- **Waivers:** None. Explicit parent takeover is model fallback authorization,
+  not a missing-check waiver.
+- **Owner responsibilities:** Approve or revise the ten rules and their three-size
+  visual/interaction preview; separately select app integration when ready.
+  No .16, source commit/push or deployment follows automatically.
+- **CODEMAP updated:** yes.
+
+## v1.3.5.14 — Time Strata accepted locally (2026-11-08)
+
+- **Built:** One owner-approved four-stack Memory baseline, `memory:time-strata`, with
+  top-only access, face-down opening, free cancellation, readable replayed Continue
+  outcomes, empty wells and final confirmation. Real selector, ranked replay/scoring,
+  checkpoint recovery, result/Next, history, isolated groups and admin test/policy/directory
+  are connected. [Brief](briefs/v1.3.5.14-batch-g-brief.md),
+  [exact work/evidence](work/V1.3.5.14_WORK.md).
+- **Skipped:** Later batches, additional modifiers, schema/dependency changes and full
+  verify; preserve unauditioned audio and unrelated editor/MCP files. No commit/push or
+  production changes. Existing pair scoring and `memory-1` identities are retained.
+- **Known issues:** None found in scoped behavior. Owner local acceptance is recorded;
+  no new device/browser evidence was supplied. Full verify stays deferred.
+- **Decisions:** Owner approved the preview and authorized implementation with Ponytail.
+  The later “mark that accepted” accepts the app baseline: 71 implemented and
+  accepted presets / 213 groups. The owner also selected .15 preparation of ten
+  variants based on Time Strata and explicitly requested the Ponytail plugin.
+  Reuse seeded integer generation and numeric Move wire fields. Multi-change policy maps
+  no-preview plus top-only; old immutable snapshots remain readable. Directory lookup
+  uses catalogue names. Required `gpt-6-luna/max` failed with 503; owner authorized direct
+  parent takeover; two `gpt-6.1-sol/high` coding agents authored engine/UI. No substitutions.
+- **Questions for the owner:** None for .14; .15 rules/preview preparation is selected.
+
+| Acceptance item                                                                                   | Evidence                                                                               | Result                                                            |
+| ------------------------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------- | ----------------------------------------------------------------- |
+| Preview/design approval; local implementation authority                                           | Owner message 2026-11-08, retained fixture                                             | OWNER APPROVED; app acceptance separate                           |
+| Local app functional acceptance                                                                   | Later owner message “mark that accepted”, 2026-11-08; .14 work acceptance record       | OWNER ACCEPTED; no new checks or device/browser evidence          |
+| Deterministic stack rules, controls, forged replay/recovery and compatibility                     | 5 focused unit files; 32 seeded all-exposed-path samples                               | PASS, 56/56 unit/checkpoint tests; dimension 2/2 rechecked        |
+| Frozen legacy parity plus independent new rule vectors                                            | Memory-only harness, `build/v1.3.5.14/app/vectors.log`                                 | PASS, 38 legacy + 4 new vectors, 6/6 runtimes                     |
+| Real D1 old snapshot, issued identity, policy denial, resume/save/group/history/name search       | Filtered Memory integration, `time-strata-d1.log` and `policy-d1.log`                  | PASS, 3/3 selected cases                                          |
+| 6/8/10 pairs × 3 sizes, held/reloaded outcomes, keyboard, rotation, motion failure, result/Next   | `tests/e2e/time-strata.spec.ts`, app gameplay log, 37 player captures / 28 bounds JSON | PASS, 11/11 Chromium cases                                        |
+| Protected admin test play without player writes; policy preview and name-search/dimensions drawer | Filtered admin runs; new app directory capture                                         | PASS, 3/3 admin cases across corrected runs                       |
+| Existing 10 Memory presets and no-preview reload                                                  | Filtered `memory-variants.spec.ts`, `directory-legacy.log`                             | PASS, 11/11 legacy player cases; 25 distinct Chromium cases total |
+| Owned formatting/lint and workspace Svelte/TS                                                     | Scoped commands and `types.log`                                                        | PASS, zero errors/warnings                                        |
+| Full `bun run verify`, production/device/performance checks                                       | Standing scope/owner deferral                                                          | NOT RUN; no pass or waiver inferred                               |
+
+- **Measurements:** Local Chromium emulation, one browser owner / one worker. Tops:
+  108×108 at 390×844, 76×88 at 844×390, 128×160 at 1280×800; controls ≥44px.
+  Final bounds are within the game and viewport, with zero horizontal overflow.
+  Landscape gap correction and name-search failure/rerun are documented. No performance benchmark.
+- **Waivers:** None. Parent takeover is authorized model fallback, not a missing-check waiver.
+- **Owner responsibilities:** Review the next .15 rules/preview once prepared.
+  Acceptance authorizes neither source commit/push nor deployment; .15 app
+  integration remains a separate selection after its visual/rule review.
+- **CODEMAP updated:** yes.
+
+## Earlier v1.3.5.14 fixture evidence — ready for review before later owner approval (2026-11-08)
+
+- **Built:** One playable four-stack Memory foundation after the owner chose preview
+  review, requested a new baseline instead of variants, and selected top-only layered
+  access. Includes solvable 6/8/10-pair deals, readable Continue outcomes, cancellation,
+  next layers, empty stacks, completion, repeatable/reset deals, guided example and
+  accessible controls. [Brief](briefs/v1.3.5.14-batch-g-brief.md),
+  [work/evidence](work/V1.3.5.14_WORK.md),
+  [fixture](../static/demo/v1.3.5.14-batch-g.html).
+- **Skipped (and why):** The earlier ten-variant expansion was superseded by owner
+  direction. App integration, live identity/scoring/policy, D1, generated projections,
+  later batches and full verify are outside this preview scope. Unrelated editor/MCP
+  files and unauditioned audio remain excluded.
+- **Known issues:** Owner visual approval of the completed new baseline is pending.
+  Checks use responsive Chromium emulation, not physical devices. Production deal
+  difficulty/fairness and authoritative integration are separate future decisions.
+- **Decisions and pinned versions:** Four stacks with top-only access; equal tops lift
+  after Continue, mismatches retain layers. Reuse light tokens/Nunito and existing
+  anime.js 4.5.0 behind a fixture motion wrapper. No dependency change. Required
+  `gpt-6-luna/max` failed with 503; the owner authorized direct parent completion.
+  [Decision record](DECISIONS.md). Accepted catalogue remains 70 / 210 at `7eadc3b`.
+- **Questions for the owner:** Review the baseline/Continue flow at the three sizes;
+  accept it or supply revisions before selecting app integration.
+
+| Acceptance item                                                         | Evidence                                                                              | Result                              |
+| ----------------------------------------------------------------------- | ------------------------------------------------------------------------------------- | ----------------------------------- |
+| Layered-baseline direction                                              | Owner selection in this conversation, 2026-11-08                                      | SELECTED; visual acceptance pending |
+| Complete playable fixture, reset/guide/accessibility                    | `scripts/check-batch-g-baseline.ts`, `build/v1.3.5.14/new-baseline/verification.json` | PASS; 742 assertions                |
+| Solvable 6/8/10-pair fixtures                                           | Constructive design and 32 generated deals per count                                  | PASS; 96 samples                    |
+| 390×844, 844×390, 1280×800 layouts                                      | Nine count/viewport flows, all outcome bounds and 19 retained captures                | PASS; zero horizontal overflow      |
+| Scoped formatting, runner/extracted-script lint and strict runner types | Exact commands in work record                                                         | PASS                                |
+| Owner visual review                                                     | New-baseline fixture and captures                                                     | AWAITING OWNER                      |
+| App, D1, engine vectors and full `bun run verify`                       | Fixture-only scope and standing full-verification deferral                            | NOT RUN; no pass/waiver inferred    |
+
+- **Measurements:** Local Linux Chromium 156.0.8078.4, one browser, serial checks.
+  Cards measured 108×108 portrait, 76×88 landscape, 132×164 desktop; all top/play
+  controls are at least 44px and fit each viewport. No load/performance benchmark.
+- **Waivers:** None. Direct parent execution is an explicit owner fallback, not a
+  missing-check waiver.
+- **Owner responsibilities:** New-baseline visual acceptance and separate selection
+  of local app integration; no commit, push or deployment follows automatically.
+- **CODEMAP updated:** yes.
+
 ## v1.3.5.12 — Memory Expansion Batch E (10 Botanical & Nature Rulesets under Split Dual-Garden Baseline) accepted & pushed (2026-11-08)
 
 - **Built:** Following owner approval of the visual review fixture (`static/demo/v1.3.5.12-batch-e.html`) with anime.js 4.5.0 motion integration, design brief (`docs/briefs/v1.3.5.12-batch-e-brief.md`), and the direction “update the git repo and push to github”, 10 genuine Memory botanical & nature rulesets under the new Split Dual-Garden Baseline (`memory:cross-pollination`) were implemented under ponytail principles and Constraint C2: Split Dual-Garden Baseline (`memory:cross-pollination`), Underground Spore Symbiosis (`memory:mycelium-network`), Sunlight Absorption & Sunbeam Rotation (`memory:photosynthesis`), Autumn Wind Breeze Scatter (`memory:seed-dispersal`), Perennial Wilt Dormancy (`memory:seasonal-bloom`), Honeybee Hive Waggle Dance (`memory:bee-waggle`), Thorn Entanglement & Dewdrop Release (`memory:carnivorous-briar`), Sap & Dewdrop Energy Budget (`memory:chlorophyll-meter`), Moonlight Phosphor Spore Symmetry (`memory:bioluminescent`), and Biodiversity Cross-Grafting Combos (`memory:botanical-graft`). Implemented stateful turn/deck mechanics in `src/lib/puzzles/memory/logic.ts`, dimension values in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`, localization in `messages.ts` and `i18n/messages.ts`, and regenerated catalog projections. Total catalog Memory variants expanded from 50 to 60 (180 leaderboard groups). [Brief](briefs/v1.3.5.12-batch-e-brief.md), [work/evidence](work/V1.3.5.12_WORK.md).

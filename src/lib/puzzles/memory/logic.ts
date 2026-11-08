@@ -6,6 +6,20 @@ import { SYMBOLS, type SymbolId } from '#lib/puzzles/memory/symbols.js';
 export const PAIR_COUNTS = [6, 8, 10] as const;
 export type PairCount = (typeof PAIR_COUNTS)[number];
 export const QUAD_COUNTS = [4, 5, 6] as const;
+/** Transport/checkpoint ceiling, not an attempt or survival rule. */
+export const MEMORY_TIME_STRATA_MAX_ACTIONS = 10000;
+export const MEMORY_STRATA_VARIANTS = [
+	'memory:strata-linked',
+	'memory:strata-sweep',
+	'memory:strata-shelf',
+	'memory:strata-cycle',
+	'memory:strata-empty-well',
+	'memory:strata-glimpse',
+	'memory:strata-chain',
+	'memory:strata-echo',
+	'memory:strata-slip',
+	'memory:strata-order'
+] as const;
 
 export interface MemoryCard {
 	id: string;
@@ -106,7 +120,9 @@ export const MEMORY_VARIANTS = [
 	'memory:images-transform',
 	'memory:waiting-room',
 	'memory:privacy-pass',
-	'memory:agents-sdk'
+	'memory:agents-sdk',
+	'memory:time-strata',
+	...MEMORY_STRATA_VARIANTS
 ] as const;
 export type MemoryVariant = (typeof MEMORY_VARIANTS)[number];
 
@@ -124,18 +140,40 @@ export function memoryVariantName(variant?: string): `variant.${MemoryVariant}` 
 	return `variant.${parseMemoryVariant(variant)}`;
 }
 
+export function isTimeStrata(variant?: string): boolean {
+	return (
+		variant === 'memory:time-strata' ||
+		MEMORY_STRATA_VARIANTS.includes(variant as (typeof MEMORY_STRATA_VARIANTS)[number])
+	);
+}
+
 export function cardsPerMatch(round: { variant?: string }): number {
 	const variant = memoryVariant(round);
 	return variant === 'memory:quads' ? 4 : variant === 'memory:trios' ? 3 : 2;
 }
 
-/** Attempts allowed per group: budget is strict, everything else keeps six. */
+/** Replay payload ceiling; Time Strata counts its explicit controls too. */
 export function memoryMoveLimit(round: MemoryRound): number {
-	return round.pairs * cardsPerMatch(round) * (memoryVariant(round) === 'memory:budget' ? 2 : 6);
+	const variant = memoryVariant(round);
+	return isTimeStrata(variant)
+		? MEMORY_TIME_STRATA_MAX_ACTIONS
+		: round.pairs * cardsPerMatch(round) * (variant === 'memory:budget' ? 2 : 6);
 }
 
-/** Trios, quads and budget stop accepting flips at their attempt cap; a final-attempt win still counts. */
+/** A final-attempt win counts; Time Strata reserves room to resolve every accepted attempt. */
 export function memoryCapReached(round: MemoryRound): boolean {
+	if (memoryVariant(round) === 'memory:time-strata') {
+		return (
+			round.status !== 'won' &&
+			(round.actions ?? 0) + 3 - round.revealed.length > MEMORY_TIME_STRATA_MAX_ACTIONS
+		);
+	}
+	if (isTimeStrata(memoryVariant(round))) {
+		return (
+			round.status !== 'won' &&
+			(round.actions ?? 0) + strataResolutionRoom(round) > MEMORY_TIME_STRATA_MAX_ACTIONS
+		);
+	}
 	const size = cardsPerMatch(round);
 	return (
 		['memory:trios', 'memory:quads', 'memory:budget'].includes(memoryVariant(round)) &&
@@ -150,6 +188,19 @@ export type MemoryStatus = 'playing' | 'won' | 'lost';
 export interface MemoryRound {
 	seed: string;
 	variant?: MemoryVariant;
+	/** Time Strata only: four bottom-to-top lists of stable card indices. */
+	stacks?: number[][];
+	/** Time Strata only: accepted flips and explicit controls in the replay log. */
+	actions?: number;
+	/** Sample Shelf: one lifted card and its original well. */
+	shelf?: { index: number; stack: number } | null;
+	/** Layer Echo: read-only exposed tops awaiting their own Continue. */
+	echo?: number[];
+	/** Chain Reaction: the current revealed pair came from the preceding removal. */
+	chain?: boolean;
+	/** Excavation Order: immutable target sequence and completed-target cursor. */
+	excavationOrder?: SymbolId[];
+	orderCursor?: number;
 	/** Only moving, swaps and hazard rounds persist the number of actual logic-stream draws. */
 	rngDraws?: number;
 	/** Lockout only: the card that cannot be flipped on the next completed attempt. */
@@ -247,7 +298,16 @@ export interface MemoryRound {
 	status: MemoryStatus;
 }
 
-export type FlipEffect = 'ignored' | 'flip' | 'match' | 'mismatch' | 'win';
+export type MemoryMove =
+	| { index: number }
+	| { cancel: 1 }
+	| { continue: 1 }
+	| { lift: number }
+	| { return: 1 }
+	| { cycle: number }
+	| { from: number; to: number };
+
+export type FlipEffect = 'ignored' | 'flip' | 'match' | 'mismatch' | 'win' | 'cancel' | 'continue';
 
 export interface FlipResult {
 	round: MemoryRound;
@@ -308,6 +368,60 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 					? { zebra: (copy === 0 ? 'light' : 'dark') as 'light' | 'dark' }
 					: {})
 			});
+
+	if (isTimeStrata(selectedVariant)) {
+		const stacks: number[][] = [[], [], [], []];
+		const schedule =
+			selectedVariant === 'memory:strata-linked'
+				? [
+						[0, 1],
+						[2, 3],
+						[1, 2],
+						[3, 0]
+					]
+				: ['memory:strata-sweep', 'memory:strata-empty-well', 'memory:strata-chain'].includes(
+							selectedVariant
+					  )
+					? [
+							[0, 1],
+							[2, 3]
+						]
+					: [
+							[0, 1],
+							[2, 3],
+							[0, 2],
+							[1, 3]
+						];
+		// Reverse insertion always exposes a pair; removing any exposed pair preserves that order.
+		for (let pair = 0; pair < pairs; pair += 1) {
+			const [first, second] = schedule[pair % schedule.length];
+			stacks[first].push(pair * 2);
+			stacks[second].push(pair * 2 + 1);
+		}
+		if (selectedVariant === 'memory:strata-cycle' || selectedVariant === 'memory:strata-slip') {
+			for (let stack = 0; stack < stacks.length; stack += 1)
+				stacks[stack] = shuffle(rng, stacks[stack]);
+		}
+		return {
+			seed,
+			variant: selectedVariant,
+			stacks,
+			actions: 0,
+			pairs,
+			cards: deck,
+			revealed: [],
+			matched: [],
+			mismatches: 0,
+			moves: 0,
+			status: 'playing',
+			...(selectedVariant === 'memory:strata-shelf' ? { shelf: null } : {}),
+			...(selectedVariant === 'memory:strata-echo' ? { echo: [] } : {}),
+			...(selectedVariant === 'memory:strata-chain' ? { chain: false } : {}),
+			...(selectedVariant === 'memory:strata-order'
+				? { excavationOrder: selected.map((symbol) => symbol.id).reverse(), orderCursor: 0 }
+				: {})
+		};
+	}
 
 	if (selectedVariant === 'memory:wild-card') {
 		const lastSymbol = selected[selected.length - 1];
@@ -698,6 +812,222 @@ function shiftQuadrantArgo(round: MemoryRound, qIdx: number): MemoryRound {
 	return round;
 }
 
+/** One slot per stack; empty wells have no legal card. */
+export function timeStrataTops(round: MemoryRound): number[] {
+	return round.stacks?.map((stack) => stack.at(-1) ?? -1) ?? [];
+}
+
+/** Glimpse and Echo disclose cards without adding playable targets. */
+export function timeStrataClues(round: MemoryRound): number[] {
+	if (round.echo?.length) return round.echo;
+	if (memoryVariant(round) !== 'memory:strata-glimpse' || round.revealed.length !== 1) return [];
+	const stack = round.stacks?.find((well) => well.at(-1) === round.revealed[0]);
+	const clue = stack?.at(-2);
+	return clue === undefined ? [] : [clue];
+}
+
+export function timeStrataCanSelect(round: MemoryRound, index: number): boolean {
+	if (
+		!isTimeStrata(memoryVariant(round)) ||
+		round.status !== 'playing' ||
+		round.echo?.length ||
+		round.revealed.length >= 2 ||
+		memoryCapReached(round) ||
+		!Number.isInteger(index) ||
+		index < 0 ||
+		round.revealed.includes(index)
+	)
+		return false;
+	const tops = timeStrataTops(round);
+	if (!tops.includes(index) && round.shelf?.index !== index) return false;
+	const stack = tops.indexOf(index);
+	if (
+		memoryVariant(round) === 'memory:strata-sweep' &&
+		round.stacks![stack].length !== Math.max(...round.stacks!.map((well) => well.length))
+	)
+		return false;
+	if (memoryVariant(round) === 'memory:strata-linked' && round.revealed.length === 1) {
+		const first = tops.indexOf(round.revealed[0]);
+		if ((stack - first + 4) % 4 !== 1 && (first - stack + 4) % 4 !== 1) return false;
+	}
+	return true;
+}
+
+export function timeStrataOutcome(
+	round: MemoryRound
+): 'match' | 'mismatch' | 'order-blocked' | null {
+	if (!isTimeStrata(memoryVariant(round)) || round.revealed.length !== 2) return null;
+	const symbol = round.cards[round.revealed[0]].symbol;
+	if (symbol !== round.cards[round.revealed[1]].symbol) return 'mismatch';
+	return memoryVariant(round) === 'memory:strata-order' &&
+		symbol !== round.excavationOrder?.[round.orderCursor ?? 0]
+		? 'order-blocked'
+		: 'match';
+}
+
+/** Enough wire slots for every confirmation already promised by a selection. */
+function strataResolutionRoom(round: MemoryRound): number {
+	if (round.echo?.length) return 1;
+	const variant = memoryVariant(round);
+	if (round.revealed.length === 2) {
+		if (timeStrataOutcome(round) !== 'match') return 1;
+		const wells = round.stacks!.filter((well) => round.revealed.includes(well.at(-1) ?? -1));
+		if (variant === 'memory:strata-echo') return wells.some((well) => well.length > 1) ? 2 : 1;
+		if (variant === 'memory:strata-chain') {
+			let confirmations = 1;
+			while (
+				wells.length === 2 &&
+				wells[0].length > confirmations &&
+				wells[1].length > confirmations &&
+				round.cards[wells[0].at(-1 - confirmations)!].symbol ===
+					round.cards[wells[1].at(-1 - confirmations)!].symbol
+			)
+				confirmations += 1;
+			return confirmations;
+		}
+		return 1;
+	}
+	const extra =
+		variant === 'memory:strata-chain'
+			? Math.max(...round.stacks!.map((well) => well.length)) - 1
+			: variant === 'memory:strata-echo' && round.matched.length < round.cards.length - 2
+				? 1
+				: 0;
+	return 3 - round.revealed.length + extra;
+}
+
+/** Control actions stay numeric to preserve the shared Move wire contract. */
+export function applyMemoryMove(round: MemoryRound, move: MemoryMove): FlipResult {
+	if ('index' in move) return flipCard(round, move.index);
+	if (
+		!isTimeStrata(memoryVariant(round)) ||
+		round.status !== 'playing' ||
+		memoryCapReached(round)
+	) {
+		return { round, effect: 'ignored' };
+	}
+	const actions = (round.actions ?? 0) + 1;
+	if ('cancel' in move && move.cancel === 1 && round.revealed.length === 1 && !round.echo?.length) {
+		return { round: { ...round, revealed: [], actions }, effect: 'cancel' };
+	}
+	if ('continue' in move && move.continue === 1) {
+		if (round.echo?.length) return { round: { ...round, echo: [], actions }, effect: 'continue' };
+		const outcome = timeStrataOutcome(round);
+		if (outcome === null) return { round, effect: 'ignored' };
+		if (outcome !== 'match') {
+			const stacks =
+				memoryVariant(round) === 'memory:strata-slip'
+					? round.stacks!.map((well) =>
+							round.revealed.includes(well.at(-1) ?? -1)
+								? [well.at(-1)!, ...well.slice(0, -1)]
+								: well
+						)
+					: round.stacks;
+			return { round: { ...round, revealed: [], stacks, actions }, effect: 'continue' };
+		}
+		const affected = round.stacks!.flatMap((well, stack) =>
+			round.revealed.includes(well.at(-1) ?? -1) ? [stack] : []
+		);
+		const matched = [...round.matched, ...round.revealed].sort((a, b) => a - b);
+		const won = matched.length === round.cards.length;
+		let next: MemoryRound = {
+			...round,
+			actions,
+			stacks: round.stacks!.map((well, stack) =>
+				affected.includes(stack) ? well.slice(0, -1) : well
+			),
+			revealed: [],
+			matched,
+			status: won ? 'won' : 'playing',
+			...(round.shelf && round.revealed.includes(round.shelf.index) ? { shelf: null } : {}),
+			...(round.orderCursor !== undefined ? { orderCursor: round.orderCursor + 1 } : {}),
+			...(round.chain !== undefined ? { chain: false } : {})
+		};
+		const exposed = affected.flatMap((stack) => {
+			const top = next.stacks![stack].at(-1);
+			return top === undefined ? [] : [top];
+		});
+		if (
+			!won &&
+			memoryVariant(round) === 'memory:strata-chain' &&
+			exposed.length === 2 &&
+			next.cards[exposed[0]].symbol === next.cards[exposed[1]].symbol
+		) {
+			next = { ...next, revealed: exposed, chain: true, moves: next.moves + 1 };
+		}
+		if (!won && memoryVariant(round) === 'memory:strata-echo' && exposed.length)
+			next = { ...next, echo: exposed };
+		return { round: next, effect: won ? 'win' : 'match' };
+	}
+	if (round.revealed.length || round.echo?.length) return { round, effect: 'ignored' };
+	const variant = memoryVariant(round);
+	const validStack = (stack: number) => Number.isInteger(stack) && stack >= 0 && stack < 4;
+	let next: MemoryRound | null = null;
+	if (
+		'lift' in move &&
+		variant === 'memory:strata-shelf' &&
+		validStack(move.lift) &&
+		!round.shelf
+	) {
+		const index = round.stacks![move.lift].at(-1);
+		if (index !== undefined)
+			next = {
+				...round,
+				actions,
+				shelf: { index, stack: move.lift },
+				stacks: round.stacks!.map((well, stack) => (stack === move.lift ? well.slice(0, -1) : well))
+			};
+	} else if (
+		'return' in move &&
+		move.return === 1 &&
+		variant === 'memory:strata-shelf' &&
+		round.shelf
+	) {
+		next = {
+			...round,
+			actions,
+			shelf: null,
+			stacks: round.stacks!.map((well, stack) =>
+				stack === round.shelf!.stack ? [...well, round.shelf!.index] : well
+			)
+		};
+	} else if (
+		'cycle' in move &&
+		['memory:strata-cycle', 'memory:strata-slip'].includes(variant) &&
+		validStack(move.cycle) &&
+		round.stacks![move.cycle].length
+	) {
+		next = {
+			...round,
+			actions,
+			stacks: round.stacks!.map((well, stack) =>
+				stack === move.cycle ? [well.at(-1)!, ...well.slice(0, -1)] : well
+			)
+		};
+	} else if (
+		'from' in move &&
+		variant === 'memory:strata-empty-well' &&
+		validStack(move.from) &&
+		validStack(move.to) &&
+		move.from !== move.to &&
+		round.stacks![move.from].length &&
+		!round.stacks![move.to].length
+	) {
+		const index = round.stacks![move.from].at(-1)!;
+		next = {
+			...round,
+			actions,
+			stacks: round.stacks!.map((well, stack) =>
+				stack === move.from ? well.slice(0, -1) : stack === move.to ? [index] : well
+			)
+		};
+	}
+	// Utilities leave enough room to begin and confirm an ordinary attempt.
+	return next && !memoryCapReached(next)
+		? { round: next, effect: 'continue' }
+		: { round, effect: 'ignored' };
+}
+
 export function flipCard(round: MemoryRound, index: number): FlipResult {
 	const matchSize = cardsPerMatch(round);
 	if (round.status !== 'playing' || round.revealed.length >= matchSize || memoryCapReached(round)) {
@@ -705,6 +1035,23 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	}
 
 	const variant = memoryVariant(round);
+	if (isTimeStrata(variant)) {
+		if (!timeStrataCanSelect(round, index)) return { round, effect: 'ignored' };
+		const revealed = [...round.revealed, index];
+		if (revealed.length === 1)
+			return { round: { ...round, revealed, actions: (round.actions ?? 0) + 1 }, effect: 'flip' };
+		const pending = { ...round, revealed };
+		const isMatch = timeStrataOutcome(pending) === 'match';
+		return {
+			round: {
+				...pending,
+				actions: (round.actions ?? 0) + 1,
+				moves: round.moves + 1,
+				mismatches: round.mismatches + (isMatch ? 0 : 1)
+			},
+			effect: isMatch ? 'match' : 'mismatch'
+		};
+	}
 	const isBufferStash =
 		variant === 'memory:register-buffer' &&
 		round.revealed.length === 1 &&
@@ -1432,6 +1779,8 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 }
 
 export function resolveMismatch(round: MemoryRound): MemoryRound {
+	// Time Strata outcomes can only be resolved by a replayed Continue action.
+	if (isTimeStrata(memoryVariant(round))) return round;
 	if (round.revealed.length !== cardsPerMatch(round)) {
 		return round;
 	}
@@ -1475,7 +1824,12 @@ export function matchedCount(round: MemoryRound): number {
 }
 
 export function isFaceUp(round: MemoryRound, index: number): boolean {
-	return round.matched.includes(index) || round.revealed.includes(index);
+	return (
+		round.matched.includes(index) ||
+		round.revealed.includes(index) ||
+		round.shelf?.index === index ||
+		timeStrataClues(round).includes(index)
+	);
 }
 
 export function scoreFor(

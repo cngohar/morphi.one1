@@ -1,0 +1,604 @@
+[
+	{
+		"seed": "0",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12],
+			[1, 6, 9, 14],
+			[2, 5, 10, 13],
+			[3, 7, 11, 15]
+		],
+		"checkpointMoves": [
+			{
+				"index": 12
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 14
+			}
+		],
+		"checkpoint": {
+			"revealed": [12, 14],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing"
+		},
+		"moves": [
+			{
+				"index": 12
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 14
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7800,
+			"group": "memory-1:time-strata:8",
+			"pairs": 8,
+			"moves": 9
+		}
+	},
+	{
+		"seed": "1",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 6, 9, 14, 17],
+			[2, 5, 10, 13, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 16
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 18
+			}
+		],
+		"checkpoint": {
+			"revealed": [16, 18],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing"
+		},
+		"moves": [
+			{
+				"index": 16
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 18
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9800,
+			"group": "memory-1:time-strata:10",
+			"pairs": 10,
+			"moves": 11
+		}
+	},
+	{
+		"seed": "3",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8],
+			[1, 6, 9],
+			[2, 5, 10],
+			[3, 7, 11]
+		],
+		"checkpointMoves": [
+			{
+				"index": 8
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 10
+			}
+		],
+		"checkpoint": {
+			"revealed": [8, 10],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing"
+		},
+		"moves": [
+			{
+				"index": 8
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 10
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5800,
+			"group": "memory-1:time-strata:6",
+			"pairs": 6,
+			"moves": 7
+		}
+	},
+	{
+		"seed": "18446744073709551615",
+		"pairs": 10,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"ring:0",
+			"ring:1",
+			"diamond:0",
+			"diamond:1",
+			"pentagon:0",
+			"pentagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"triangle:0",
+			"triangle:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 6, 9, 14, 17],
+			[2, 5, 10, 13, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 16
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 18
+			}
+		],
+		"checkpoint": {
+			"revealed": [16, 18],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing"
+		},
+		"moves": [
+			{
+				"index": 16
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 18
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9800,
+			"group": "memory-1:time-strata:10",
+			"pairs": 10,
+			"moves": 11
+		}
+	}
+]

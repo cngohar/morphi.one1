@@ -1,4 +1,5 @@
 import { catalog } from '#lib/catalog.js';
+import { dimensionChange } from '#lib/engine/contract.js';
 import { defaultGameConfig, validateGameConfig } from './config.js';
 import { RunError } from './runs.js';
 
@@ -24,9 +25,8 @@ export function validateMemoryPolicy(value: unknown): Record<string, boolean> {
 export function memoryVariantKeys(id: string) {
 	const variant = policy.variants.find((entry) => entry.id === id);
 	if (!variant) throw new RunError('input');
-	const change = 'change' in variant ? variant.change : undefined;
 	return policy.dimensions.map((dimension) => {
-		const value = change?.[0] === dimension.key ? change[1] : dimension.values[0].id;
+		const value = dimensionChange(variant, dimension.key) ?? dimension.values[0].id;
 		if (!dimension.values.some((item) => item.id === value))
 			throw new RangeError('dimension_policy');
 		return `${dimension.key}:${value}`;

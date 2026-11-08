@@ -521,7 +521,6 @@ Evidence: `src/lib/puzzles/block-placement/{logic,variants}.test.ts`, `src/lib/b
 - Network failure, duplicate submit and expired session retain drafts only in the current page. Leaving/reloading/closing discards drafts; no conversation content enters browser persistence, audit metadata, analytics or URLs.
 - Account deletion removes owned conversations and every staff/member message in them; lifecycle restoration timing and audit retention remain unchanged. Explicit maintenance prunes expired limiter state, without implying a scheduler.
 
-
 ## v1.3.4 Slice 0 Games admin/query
 
 - More than 25 rules groups: pass the whole mapping through one JSON bind;
@@ -540,3 +539,14 @@ Evidence: `src/lib/puzzles/block-placement/{logic,variants}.test.ts`, `src/lib/b
 Evidence: `tests/integration/memory-variants.test.ts`,
 `tests/e2e/memory-variants-admin.spec.ts`, `tests/e2e/operator.spec.ts`;
 results and limits in `docs/work/V1.3.4_SLICE0_WORK.md`.
+
+## v1.3.5.15 Time Strata Batch H
+
+- Covered layers remain noninteractive. Linked Tops uses the logical I–II–III–IV ring through rotation; Level Sweep blocks lower tops until all taller tops clear. A blocked flip spends no attempt.
+- Sample Shelf holds one visible top and its original well. A mismatch or free cancellation preserves the sample; return after deeper removals restores it above the remaining layers. The shelf cannot be overwritten.
+- Cycle and slipping mismatch reorders preserve separate-stack pair membership. Empty Well transfers require a distinct empty destination and never cover a remaining card. Utilities are replayed, spend no attempt, and are blocked during a selection or held phase.
+- Glimpse and Echo clues remain read-only. Echo closes with its own free Continue. Chain Reaction counts each held pair separately and requires a Continue for each, including the final pair. Equal off-target Order pairs spend one attempt/miss without removal or cursor advance.
+- Checkpoints recover utility order, shelf origin, clue/chain phases and Order cursor solely from authoritative numeric replay. Transport caps reserve every promised confirmation; utilities cannot consume that room. Forged/mixed-field controls and wrong-mode actions reject.
+- Old immutable policy snapshots may omit only the explicitly new Time Strata values; malformed values and missing older keys fail closed. Live policy denies future issuance while issued rounds retain their rules and isolated groups.
+
+Evidence: `memory/time-strata.test.ts`, `dimensions.test.ts`, `tests/vectors/memory-batch-h.json`, focused D1 and Chromium sources; current results in `docs/work/V1.3.5.15_WORK.md`.

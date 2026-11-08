@@ -1,6 +1,8 @@
 import { catalog } from '../../src/lib/catalog.js';
 import classic from './reference.json';
 import expected from './memory-variants.json';
+import strataExpected from './memory-time-strata.json';
+import batchHExpected from './memory-batch-h.json';
 
 const manifest = catalog.memory;
 const createMemoryRound = manifest.createRound;
@@ -122,10 +124,112 @@ export async function verifyVectors() {
 			new TextEncoder().encode(JSON.stringify({ baseline, ...vectors }))
 		)
 	);
+	const strata = strataExpected.map((vector) => {
+		const variant = 'memory:time-strata';
+		const round = createMemoryRound(vector.seed, variant);
+		const checkpoint = manifest.resumeRound(
+			vector.seed,
+			vector.checkpointMoves,
+			undefined,
+			variant
+		);
+		const actual = {
+			seed: round.seed,
+			pairs: round.pairs,
+			deck: round.cards.map((card) => card.id),
+			stacks: round.stacks,
+			checkpointMoves: vector.checkpointMoves,
+			checkpoint: {
+				revealed: checkpoint.revealed,
+				matched: checkpoint.matched,
+				mismatches: checkpoint.mismatches,
+				moves: checkpoint.moves,
+				actions: checkpoint.actions,
+				status: checkpoint.status
+			},
+			moves: vector.moves,
+			result: manifest.replay(vector.seed, vector.moves, 10, undefined, variant)
+		};
+		if (JSON.stringify(actual) !== JSON.stringify(vector))
+			throw new Error('Time Strata generation/control/replay vector mismatch');
+		const final = manifest.resumeRound(vector.seed, vector.moves, undefined, variant);
+		if (final.status !== 'won' || final.stacks?.some((stack) => stack.length))
+			throw new Error('Time Strata final stacks not empty');
+		try {
+			manifest.replay(vector.seed, vector.moves.slice(0, -1), 10, undefined, variant);
+			throw new Error('Time Strata accepted an unconfirmed final pair');
+		} catch (error) {
+			if (!(error instanceof RangeError) || error.message !== 'incomplete') throw error;
+		}
+		return actual;
+	});
+	const strataBytes = new Uint8Array(
+		await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(strata)))
+	);
+	const batchH = batchHExpected.map((vector) => {
+		const initial = createMemoryRound(vector.seed, vector.variant);
+		const checkpoint = manifest.resumeRound(
+			vector.seed,
+			vector.checkpointMoves,
+			undefined,
+			vector.variant
+		);
+		const actual = {
+			seed: initial.seed,
+			variant: initial.variant,
+			pairs: initial.pairs,
+			deck: initial.cards.map((card) => card.id),
+			stacks: initial.stacks,
+			checkpointMoves: vector.checkpointMoves,
+			checkpoint: {
+				stacks: checkpoint.stacks,
+				revealed: checkpoint.revealed,
+				matched: checkpoint.matched,
+				mismatches: checkpoint.mismatches,
+				moves: checkpoint.moves,
+				actions: checkpoint.actions,
+				status: checkpoint.status,
+				shelf: checkpoint.shelf ?? null,
+				echo: checkpoint.echo ?? null,
+				chain: checkpoint.chain ?? null,
+				excavationOrder: checkpoint.excavationOrder ?? null,
+				orderCursor: checkpoint.orderCursor ?? null
+			},
+			moves: vector.moves,
+			result: manifest.replay(vector.seed, vector.moves, 10, undefined, vector.variant)
+		};
+		if (JSON.stringify(actual) !== JSON.stringify(vector))
+			throw new Error('Batch H generation/phase/replay vector mismatch');
+		const final = manifest.resumeRound(vector.seed, vector.moves, undefined, vector.variant);
+		if (
+			final.status !== 'won' ||
+			final.stacks?.some((well) => well.length) ||
+			final.shelf ||
+			final.echo?.length
+		)
+			throw new Error('Batch H final board or held phase not empty');
+		try {
+			manifest.replay(vector.seed, vector.moves.slice(0, -1), 10, undefined, vector.variant);
+			throw new Error('Batch H accepted an unconfirmed final pair');
+		} catch (error) {
+			if (!(error instanceof RangeError) || error.message !== 'incomplete') throw error;
+		}
+		return actual;
+	});
+	const batchHBytes = new Uint8Array(
+		await crypto.subtle.digest('SHA-256', new TextEncoder().encode(JSON.stringify(batchH)))
+	);
+
 	return {
 		passed: true,
 		fingerprint: [...bytes].map((byte) => byte.toString(16).padStart(2, '0')).join(''),
 		vectors: baseline.length + generation.length + 1 + pilotReplay.length,
-		themeVectors: 0
+		themeVectors: 0,
+		batchHVectors: batchH.length,
+		batchHFingerprint: [...batchHBytes].map((byte) => byte.toString(16).padStart(2, '0')).join(''),
+		timeStrataVectors: strata.length,
+		timeStrataFingerprint: [...strataBytes]
+			.map((byte) => byte.toString(16).padStart(2, '0'))
+			.join('')
 	};
 }

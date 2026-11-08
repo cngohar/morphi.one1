@@ -1,19 +1,85 @@
 # Morphi: Simple Plan
 
-## Active status — v1.3.5.13 Batch F locally implemented & verified (2026-11-08)
+## Active status — v1.3.5.15 Batch H accepted; source commit and push authorized (2026-11-08)
 
-The owner instructed “duh... skip the above asking.. i just reviewed it i accepted it, you can now impleent it”,
-accepting the visual preview and authorizing local app implementation of milestone v1.3.5.13 Batch F (10 Cloudflare
-Next-Gen Developer Platform & Edge Primitives rulesets: `memory:workflows-step`, `memory:browser-rendering`,
-`memory:ai-gateway`, `memory:k2-streams`, `memory:basin-catalog`, `memory:edge-snippets`, `memory:images-transform`,
-`memory:waiting-room`, `memory:privacy-pass`, and `memory:agents-sdk`).
-The 10 rulesets are implemented end-to-end under ponytail principles in `src/lib/puzzles/memory/logic.ts`,
-dimensions in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`,
-localization in `messages.ts`/`i18n`, and regenerated projections. Total catalog Memory variants are now 70
-(210 leaderboard groups). Multi-runtime vectors (6/6 runtimes, fingerprint `a8be9d5f...` and memory vector
-fingerprint `e11e8733...`), workspace types (0 errors/0 warnings), unit tests (47/47), real-D1 integration suite (15/15),
-and Playwright Chromium admin suite (3/3 at one worker) pass. Full `bun run verify` remains deferred; unauditioned
-audio and editor exclusions preserved. Ready for owner functional review; no auto-commit or push performed.
+The owner instructed “the last work was done, but comit and pushed to github, so comit now and then push to github”,
+accepting the completed Time Strata baseline (v1.3.5.14) and 10 Time Strata ruleset variants (v1.3.5.15 Batch H)
+and authorizing this source commit and push to GitHub.
+Total catalog Memory variants are now **81 presets / 243 groups**.
+Scoped verification is complete: types (0 errors / 0 warnings), format/lint, 65 unit/checkpoint tests,
+real-D1 tests and all 72 Memory vectors in six runtimes pass. Serial one-worker Chromium runs cover 105 unique
+passing cases (91 Batch H, 11 baseline, 3 admin).
+Full `bun run verify` remains deferred; unauditioned audio and editor exclusions preserved. No production deployment authorized.
+See [brief](docs/briefs/v1.3.5.15-batch-h-brief.md), [work/evidence](docs/work/V1.3.5.15_WORK.md).
+
+## Earlier status — v1.3.5.15 Batch H locally implemented and verified (2026-11-08)
+
+The owner requested “continue the progress of batch h which was in middle of
+implementation”, then “using the ponytail plugin for implementation” on 2026-11-08.
+This authorizes local integration of the ten completed preview rules and supersedes
+the preparation-only stopping point. All ten are now locally implemented with
+Ponytail on the accepted four-stack board, using `memory-1`, pair `brief-v1` scoring
+and thirty isolated groups. Implemented Memory is **81 presets / 243 groups**;
+owner-accepted Memory remains **71 / 213**. App functional review remains separate.
+
+Scoped verification is complete: types (0 errors / 0 warnings), format/lint, 65 unit/
+checkpoint tests, four real-D1 tests and all 72 Memory vectors in six runtimes pass.
+Serial one-worker Chromium runs cover 105 unique passing cases: 91 Batch H,
+11 baseline and three admin. Glimpse and Order short-landscape spacing was fixed;
+an interrupted run resumed in smaller serial runs. Evidence includes 181 bounds
+snapshots and 271 gameplay captures, with a minimum measured target of 65×44px.
+The required `gpt-6-luna/max` tester returned 503; the prior owner takeover
+instruction authorizes direct parent verification, without substitute-agent claims.
+Owner functional/visual review is the next stopping point. Full `bun run verify`
+remains deferred. No commit, push, deployment, next batch,
+audio audition or unrelated editor/MCP change is authorized.
+See [brief](docs/briefs/v1.3.5.15-batch-h-brief.md),
+[work/evidence](docs/work/V1.3.5.15_WORK.md) and the retained
+[preview](static/demo/v1.3.5.15-batch-h.html).
+
+## v1.3.5.14 Time Strata accepted locally (2026-11-08)
+
+The owner's “mark that accepted” closes post-integration functional acceptance
+for the one `memory:time-strata` baseline and its three groups. The prior focused
+checks remain the evidence; no new automated check or device/browser review was
+supplied. Source remains local and uncommitted above `7eadc3b`. See
+[acceptance and evidence](docs/work/V1.3.5.14_WORK.md).
+
+## Earlier v1.3.5.14 implementation evidence (2026-11-08)
+
+The owner said “v1.3.5.14 is now approved, you can start the implementation with ponytail skill” on 2026-11-08. This approves the retained Time Strata preview and authorizes this one baseline’s local app integration. No new device/browser details were supplied; no physical-device review is inferred.
+
+One new `memory:time-strata` baseline, four stacks with top-only access. Local integration and focused checks are complete under Ponytail. The implemented catalogue is 71 / 213: 70 / 210 owner-accepted plus one baseline / three groups awaiting app functional review. Format/lint, types (0/0), 56 unit/checkpoint cases, three D1 cases, six-runtime vectors (38 frozen plus four new) and 25 Chromium cases pass. Full verify remains deferred; no commit/push or deployment. The required testing agent returned 503; the owner reaffirmed direct parent takeover until done. See [work](docs/work/V1.3.5.14_WORK.md).
+
+## Earlier fixture status — v1.3.5.14 Batch G new-baseline preview ready for review (2026-11-08)
+
+On resumption the owner selected “Continue the preview review first”, then clarified:
+“we are build a new baseline for this batch instead of new varient”. The active scope is
+one new Memory baseline design and its interactive local fixture, replacing the earlier
+ten-modifier expansion proposal. The owner selected the layered board: only the top
+card of each of four stacks can be played. **Time Strata** is the proposed baseline.
+The selected brief is `docs/briefs/v1.3.5.14-batch-g-brief.md`; its playable fixture is
+`static/demo/v1.3.5.14-batch-g.html`, with work/evidence in `docs/work/V1.3.5.14_WORK.md`.
+The focused runner passed 742 Chromium assertions, 96 solvable generated deals and
+gameplay/layout checks at 390×844, 844×390 and 1280×800; scoped format/lint and
+runner-only types pass. New captures/JSON are in `build/v1.3.5.14/new-baseline/`.
+Earlier `preview-rulesets-*.png` captures describe the superseded ten-tab fixture.
+Accepted Memory remains 70 variants (210 leaderboard groups). Owner visual review
+and separate local app implementation authorization remain pending. The required testing agent
+was unavailable; the owner explicitly authorized direct work in this conversation
+through completion, including focused verification.
+
+## Earlier local status — v1.3.5.13 Batch F accepted and committed (2026-11-08)
+
+The owner instructed “update the git repo and then push to github”, accepting the completed 10
+genuine Memory Cloudflare Next-Gen Developer Platform & Edge Primitives rulesets
+(`memory:workflows-step`, `memory:browser-rendering`, `memory:ai-gateway`, `memory:k2-streams`,
+`memory:basin-catalog`, `memory:edge-snippets`, `memory:images-transform`, `memory:waiting-room`,
+`memory:privacy-pass`, and `memory:agents-sdk`) and authorizing this source commit and push to main (`7eadc3b`).
+Total catalog Memory variants are now 70 (210 leaderboard groups). Multi-runtime vectors (6/6 runtimes,
+fingerprint `a8be9d5f...` and memory vector fingerprint `e11e8733...`), workspace types (0 errors/0 warnings),
+unit tests (47/47), real-D1 integration suite (15/15), and Playwright Chromium admin suite (3/3 at one worker) pass.
+Full `bun run verify` remains deferred; unauditioned audio and editor exclusions preserved. No production deployment authorized.
 See `docs/briefs/v1.3.5.13-batch-f-brief.md` and `docs/work/V1.3.5.13_WORK.md`.
 
 ## Earlier local status — v1.3.5.12 Batch E accepted and committed (2026-11-08)

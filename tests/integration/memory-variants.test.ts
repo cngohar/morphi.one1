@@ -5,7 +5,12 @@ import { catalog } from '../../src/lib/catalog.js';
 import type { CompletedRun, PuzzleId } from '../../src/lib/engine/contract.js';
 import { defaultScoreConfig, scoreScope } from '../../src/lib/scoring.js';
 import { CARD_RANKED_OPENING_MS } from '../../src/lib/round-timing.js';
-import { createMemoryRound } from '../../src/lib/puzzles/memory/logic.js';
+import {
+	createMemoryRound,
+	applyMemoryMove,
+	timeStrataTops,
+	type MemoryMove
+} from '../../src/lib/puzzles/memory/logic.js';
 import { generateTheme } from '../../src/lib/engine/theme/generator.js';
 import {
 	parseRoundActivity,
@@ -1259,3 +1264,365 @@ it('loads Memory directory, filters by search/status/archetype, supports keyset 
 			.run();
 	}
 });
+
+it('Time Strata preserves historical policy, issued identity and explicit controls through ranked save', async () => {
+	const db = proxy.env.DB,
+		variant = 'memory:time-strata';
+	const player = crypto.randomUUID();
+	await db.batch([
+		db
+			.prepare(
+				'INSERT INTO user(id,name,email,email_verified,created_at,updated_at) VALUES(?,?,?,?,?,?)'
+			)
+			.bind(player, 'Strata', `${player}@example.test`, 1, now, now),
+		db
+			.prepare('INSERT INTO player(user_id,name,normalized_name,updated_at) VALUES(?,?,?,?)')
+			.bind(player, 'strataplayer', 'strataplayer', now)
+	]);
+	const original = await db
+		.prepare("SELECT version FROM config_live WHERE key='game:memory'")
+		.first<{ version: string }>();
+	const legacyVersion = crypto.randomUUID();
+	const historical = defaultMemoryPolicy();
+	delete historical['availability:top-only'];
+	try {
+		await db.batch([
+			db
+				.prepare(
+					'INSERT INTO game_config(version,parent,family,values_json,created_at) VALUES(?,?,?,?,?)'
+				)
+				.bind(
+					legacyVersion,
+					'catalog-v1',
+					'memory',
+					JSON.stringify({ weight: 1, dimensions: historical }),
+					now
+				),
+			db
+				.prepare(
+					"INSERT INTO config_live(key,version) VALUES('game:memory',?) ON CONFLICT(key) DO UPDATE SET version=excluded.version"
+				)
+				.bind(legacyVersion)
+		]);
+		expect((await readMemoryPolicy(db)).values['availability:top-only']).toBe(true);
+		const issued = await startRanked(
+			db,
+			player,
+			'memory',
+			'strata-ip',
+			now + 1000,
+			null,
+			undefined,
+			variant
+		);
+		expect(issued.scoring.version).toBe('brief-v1');
+		const narrowed = { ...defaultMemoryPolicy(), 'availability:top-only': false };
+		await changeMemoryPolicy(
+			db,
+			'operator',
+			legacyVersion,
+			narrowed,
+			'Disable layered access',
+			now + 1001
+		);
+		expect(await enabledVariants(db, 'memory')).not.toContain(variant);
+		expect(await variantAvailable(db, 'memory', 'memory:classic')).toBe(true);
+		await expect(
+			startRanked(db, player, 'memory', 'strata-ip', now + 1002, issued.id, undefined, variant)
+		).rejects.toMatchObject({ code: 'game_disabled' });
+		expect(await resumableRanked(db, player, now + 1003)).toMatchObject({
+			id: issued.id,
+			variant,
+			scoring: issued.scoring
+		});
+		const initial = createMemoryRound(issued.seed, variant);
+		const first = timeStrataTops(initial)[0];
+		const moves: MemoryMove[] = [{ index: first }, { cancel: 1 }];
+		let round = initial;
+		for (const move of moves) round = applyMemoryMove(round, move).round;
+		while (round.status === 'playing') {
+			const tops = timeStrataTops(round).filter((index) => index >= 0);
+			const a = tops.find((index) =>
+				tops.some(
+					(other) => other !== index && round.cards[other].symbol === round.cards[index].symbol
+				)
+			)!;
+			const b = tops.find(
+				(index) => index !== a && round.cards[index].symbol === round.cards[a].symbol
+			)!;
+			for (const move of [{ index: a }, { index: b }, { continue: 1 }] as MemoryMove[]) {
+				moves.push(move);
+				round = applyMemoryMove(round, move).round;
+			}
+		}
+		const run: CompletedRun = {
+			version: 1,
+			id: issued.id,
+			family: 'memory',
+			engineVersion: 'memory-1',
+			variant,
+			seed: issued.seed,
+			moves,
+			elapsedSeconds: 10,
+			rankedSession: issued.id,
+			scoreConfigVersion: issued.scoring.version
+		};
+		expect(parseRun(run).moves).toEqual(moves);
+		await expect(
+			saveRun(
+				db,
+				player,
+				{ ...run, id: crypto.randomUUID(), rankedSession: null, moves: moves.slice(0, -1) },
+				issued.startedAt + CARD_RANKED_OPENING_MS + 10000
+			)
+		).rejects.toMatchObject({ code: 'invalid_replay' });
+		await expect(
+			saveRun(
+				db,
+				player,
+				{
+					...run,
+					id: crypto.randomUUID(),
+					rankedSession: null,
+					moves: [{ index: initial.stacks![0][0] }]
+				},
+				issued.startedAt + CARD_RANKED_OPENING_MS + 10000
+			)
+		).rejects.toMatchObject({ code: 'invalid_replay' });
+		const saved = await saveRun(db, player, run, issued.startedAt + CARD_RANKED_OPENING_MS + 10000);
+		expect(saved.group).toBe(`memory-1:time-strata:${initial.pairs}`);
+		expect(saved.score).toBe(initial.pairs * 1000 - 45);
+		expect((await accountHistory(db, player)).bests.some((row) => row.group === saved.group)).toBe(
+			true
+		);
+		expect((await leaderboard(db, saved.group, 0, player)).rows[0]?.score).toBe(saved.score);
+		const directory = await loadMemoryDirectory(db, { q: 'Time Strata' });
+		expect(directory.items.map((row) => row.id)).toEqual([variant]);
+		expect(directory.items[0].name).toBe('Time Strata');
+		expect(
+			(await saveRun(db, player, run, issued.startedAt + CARD_RANKED_OPENING_MS + 11000)).score
+		).toBe(saved.score);
+	} finally {
+		if (original)
+			await db
+				.prepare("UPDATE config_live SET version=? WHERE key='game:memory'")
+				.bind(original.version)
+				.run();
+		else await db.prepare("DELETE FROM config_live WHERE key='game:memory'").run();
+	}
+});
+
+it('Batch H issues immutable rules, enforces live policy and saves isolated replayed results', async () => {
+	const db = proxy.env.DB;
+	const modes = [
+		['linked', 'availability', 'Linked Tops'],
+		['sweep', 'availability', 'Level Sweep'],
+		['shelf', 'movement', 'Sample Shelf'],
+		['cycle', 'movement', 'Layer Cycle'],
+		['empty-well', 'movement', 'Empty Well'],
+		['glimpse', 'backs', 'Deep Glimpse'],
+		['chain', 'availability', 'Chain Reaction'],
+		['echo', 'backs', 'Layer Echo'],
+		['slip', 'movement', 'Slipping Tops'],
+		['order', 'availability', 'Excavation Order']
+	];
+	const original = await db
+		.prepare("SELECT version FROM config_live WHERE key='game:memory'")
+		.first<{ version: string }>();
+	const legacyVersion = crypto.randomUUID();
+	const historical = defaultMemoryPolicy();
+	for (const [mode, dimension] of modes) delete historical[`${dimension}:strata-${mode}`];
+	try {
+		await db.batch([
+			db
+				.prepare(
+					'INSERT INTO game_config(version,parent,family,values_json,created_at) VALUES(?,?,?,?,?)'
+				)
+				.bind(
+					legacyVersion,
+					'catalog-v1',
+					'memory',
+					JSON.stringify({ weight: 1, dimensions: historical }),
+					now
+				),
+			db
+				.prepare(
+					"INSERT INTO config_live(key,version) VALUES('game:memory',?) ON CONFLICT(key) DO UPDATE SET version=excluded.version"
+				)
+				.bind(legacyVersion)
+		]);
+		for (const [offset, [mode, dimension, name]] of modes.entries()) {
+			const variant = `memory:strata-${mode}`;
+			const player = crypto.randomUUID();
+			await db.batch([
+				db
+					.prepare(
+						'INSERT INTO user(id,name,email,email_verified,created_at,updated_at) VALUES(?,?,?,?,?,?)'
+					)
+					.bind(player, 'Batch H', `${player}@example.test`, 1, now, now),
+				db
+					.prepare('INSERT INTO player(user_id,name,normalized_name,updated_at) VALUES(?,?,?,?)')
+					.bind(player, `batchh${offset}`, `batchh${offset}`, now)
+			]);
+			const before = await readMemoryPolicy(db);
+			expect(before.values[`${dimension}:strata-${mode}`]).toBe(true);
+			const issued = await startRanked(
+				db,
+				player,
+				'memory',
+				`batch-h-${offset}`,
+				now + 200_000,
+				null,
+				undefined,
+				variant
+			);
+			expect(issued.scoring.version).toBe('brief-v1');
+			await changeMemoryPolicy(
+				db,
+				'operator',
+				before.version,
+				{ ...defaultMemoryPolicy(), [`${dimension}:strata-${mode}`]: false },
+				`Hold Batch H ${mode}`,
+				now + 200_001
+			);
+			expect(await enabledVariants(db, 'memory')).not.toContain(variant);
+			await expect(
+				startRanked(
+					db,
+					player,
+					'memory',
+					`batch-h-${offset}`,
+					now + 200_002,
+					issued.id,
+					undefined,
+					variant
+				)
+			).rejects.toMatchObject({ code: 'game_disabled' });
+			expect(await resumableRanked(db, player, now + 200_003)).toMatchObject({
+				id: issued.id,
+				variant,
+				scoring: issued.scoring
+			});
+			let round = createMemoryRound(issued.seed, variant);
+			const initial = round;
+			const moves: MemoryMove[] = [];
+			function action(move: MemoryMove) {
+				const next = applyMemoryMove(round, move);
+				expect(next.effect).not.toBe('ignored');
+				round = next.round;
+				moves.push(move);
+			}
+			if (mode === 'shelf') {
+				action({ lift: 0 });
+				action({ return: 1 });
+			}
+			if (mode === 'cycle' || mode === 'slip') action({ cycle: 0 });
+			let transferred = false;
+			while (round.status === 'playing') {
+				if (round.revealed.length === 2 || round.echo?.length) {
+					action({ continue: 1 });
+					continue;
+				}
+				if (mode === 'empty-well' && !transferred && round.stacks!.some((stack) => !stack.length)) {
+					const from = round.stacks!.findIndex((stack) => stack.length > 1);
+					const to = round.stacks!.findIndex((stack) => !stack.length);
+					if (from >= 0) {
+						action({ from, to });
+						transferred = true;
+					}
+				}
+				if (mode === 'cycle' || mode === 'slip') {
+					const target = round.cards.findIndex((_, index) => !round.matched.includes(index));
+					const copies = round.cards.flatMap((card, index) =>
+						!round.matched.includes(index) && card.symbol === round.cards[target].symbol
+							? [index]
+							: []
+					);
+					for (const index of copies) {
+						const stack = round.stacks!.findIndex((stack) => stack.includes(index));
+						while (round.stacks![stack].at(-1) !== index) action({ cycle: stack });
+					}
+				}
+				const tops = timeStrataTops(round).filter((index) => index >= 0);
+				let pair: number[] | undefined;
+				for (const first of tops)
+					for (const second of tops) {
+						if (first >= second || round.cards[first].symbol !== round.cards[second].symbol)
+							continue;
+						const one = applyMemoryMove(round, { index: first });
+						if (one.effect === 'ignored') continue;
+						if (applyMemoryMove(one.round, { index: second }).effect === 'match')
+							pair = [first, second];
+					}
+				expect(pair).toBeDefined();
+				action({ index: pair![0] });
+				action({ index: pair![1] });
+			}
+			const run: CompletedRun = {
+				version: 1,
+				id: issued.id,
+				family: 'memory',
+				engineVersion: 'memory-1',
+				variant,
+				seed: issued.seed,
+				moves,
+				elapsedSeconds: 10,
+				rankedSession: issued.id,
+				scoreConfigVersion: issued.scoring.version
+			};
+			expect(parseRun(run).moves).toEqual(moves);
+			await expect(
+				saveRun(
+					db,
+					player,
+					{ ...run, id: crypto.randomUUID(), rankedSession: null, moves: moves.slice(0, -1) },
+					issued.startedAt + CARD_RANKED_OPENING_MS + 10000
+				)
+			).rejects.toMatchObject({ code: 'invalid_replay' });
+			await expect(
+				saveRun(
+					db,
+					player,
+					{ ...run, id: crypto.randomUUID(), rankedSession: null, moves: [{ lift: 0, index: 0 }] },
+					issued.startedAt + CARD_RANKED_OPENING_MS + 10000
+				)
+			).rejects.toMatchObject({ code: 'move' });
+			const saved = await saveRun(
+				db,
+				player,
+				run,
+				issued.startedAt + CARD_RANKED_OPENING_MS + 10000
+			);
+			expect(saved.group).toBe(`memory-1:strata-${mode}:${initial.pairs}`);
+			expect(saved.score).toBeGreaterThan(0);
+			expect(
+				(await accountHistory(db, player)).bests.some((row) => row.group === saved.group)
+			).toBe(true);
+			expect((await leaderboard(db, saved.group, 0, player)).rows[0]?.score).toBe(saved.score);
+			const directory = await loadMemoryDirectory(db, { q: name });
+			expect(
+				directory.items.some(
+					(row) => row.id === variant && row.name === name && row.state === 'blocked'
+				)
+			).toBe(true);
+			expect(
+				(await saveRun(db, player, run, issued.startedAt + CARD_RANKED_OPENING_MS + 11000)).score
+			).toBe(saved.score);
+			await changeMemoryPolicy(
+				db,
+				'operator',
+				(await readMemoryPolicy(db)).version,
+				defaultMemoryPolicy(),
+				`Restore Batch H ${mode}`,
+				now + 200_004
+			);
+		}
+	} finally {
+		if (original)
+			await db
+				.prepare("UPDATE config_live SET version=? WHERE key='game:memory'")
+				.bind(original.version)
+				.run();
+		else await db.prepare("DELETE FROM config_live WHERE key='game:memory'").run();
+	}
+}, 60_000);

@@ -54,13 +54,32 @@ export function validateGameConfig(value: unknown): GameConfig {
 			!config.dimensions ||
 			typeof config.dimensions !== 'object' ||
 			Array.isArray(config.dimensions) ||
-			Object.keys(config.dimensions).length !== keys.length ||
-			keys.some((key) => typeof config.dimensions![key] !== 'boolean')
+			Object.keys(config.dimensions).some((key) => !keys.includes(key)) ||
+			keys.some(
+				(key) =>
+					typeof config.dimensions![key] !== 'boolean' &&
+					!(
+						[
+							'availability:top-only',
+							'availability:strata-linked',
+							'availability:strata-sweep',
+							'availability:strata-chain',
+							'availability:strata-order',
+							'movement:strata-shelf',
+							'movement:strata-cycle',
+							'movement:strata-empty-well',
+							'movement:strata-slip',
+							'backs:strata-glimpse',
+							'backs:strata-echo'
+						].includes(key) && !Object.hasOwn(config.dimensions!, key)
+					)
+			)
 		)
 			throw new RangeError('game_config');
 		return {
 			weight: config.weight,
-			dimensions: Object.fromEntries(keys.map((key) => [key, config.dimensions![key]]))
+			// Earlier immutable snapshots implicitly allow only these new Time Strata rule values.
+			dimensions: Object.fromEntries(keys.map((key) => [key, config.dimensions![key] ?? true]))
 		};
 	}
 	return { weight: config.weight };

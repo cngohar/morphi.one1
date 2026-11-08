@@ -33,6 +33,96 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.15 Batch H accepted; source commit and push authorized (2026-11-08):**
+The owner said “the last work was done, but comit and pushed to github, so comit now and then push to github”,
+accepting the completed Time Strata baseline (v1.3.5.14) and 10 Time Strata ruleset variants
+(v1.3.5.15 Batch H: `memory:strata-linked`, `memory:strata-sweep`, `memory:strata-shelf`,
+`memory:strata-cycle`, `memory:strata-empty-well`, `memory:strata-glimpse`, `memory:strata-chain`,
+`memory:strata-echo`, `memory:strata-slip`, and `memory:strata-order`) and authorizing this source commit
+and push to GitHub.
+The Time Strata baseline and 10 rulesets are implemented end-to-end under Ponytail principles in
+`src/lib/puzzles/memory/logic.ts`, `TimeStrata.svelte`, `Game.svelte`, dimensions in `dimensions.ts`,
+manifest entries with 33 new immutable leaderboard groups in `manifest.ts`, localization in
+`messages.ts`/`i18n`, and regenerated projections. Total catalog Memory variants are now 81 (243 leaderboard groups).
+Multi-runtime vectors (6/6 runtimes), workspace types (0 errors/0 warnings), unit tests (62/62),
+real-D1 integration suite, and Playwright Chromium suites pass. Full `bun run verify` remains deferred;
+unauditioned audio and editor exclusions preserved. No production deployment authorized.
+See `docs/briefs/v1.3.5.15-batch-h-brief.md` and `docs/work/V1.3.5.15_WORK.md`.
+
+**Earlier v1.3.5.15 local implementation evidence (2026-11-08):**
+The owner requested “continue the progress of batch h which was in middle of
+implementation”, then reaffirmed “using the ponytail plugin for implementation”.
+This selected local app integration of the ten completed Time Strata previews
+and superseded the preparation-only stopping point below. Reuse the accepted
+four-stack baseline, `memory-1`, pair `brief-v1` scoring and thirty distinct groups.
+All ten rules are integrated with replayed utilities, shelf/clue/chain/order
+recovery, policy/help/directory visibility and thirty isolated groups. Implemented
+Memory totals 81 presets / 243 groups.
+Scoped format/lint, types (0 errors/warnings), 65 unit/checkpoint cases, four real-D1
+cases and 72 Memory vectors across six runtimes pass. Serial one-worker Chromium
+runs cover 91 unique Batch H cases, 11 baseline cases and three admin cases, all
+passing after scoped Glimpse/Order landscape corrections. Evidence
+in `build/v1.3.5.15/app/` includes 181 bounds snapshots and 271 gameplay captures;
+minimum measured target is 65×44px. Required `gpt-6.1-sol/high` agents authored
+engine/UI; `gpt-6-luna/max` returned 503, so the parent performed verification under
+the owner's recorded takeover authorization. Full verify
+remains deferred; audio/editor exclusions persist.
+See `docs/briefs/v1.3.5.15-batch-h-brief.md` and `docs/work/V1.3.5.15_WORK.md`.
+
+**Historical preparation — v1.3.5.14 accepted; .15 preview ready for review (2026-11-08):**
+The implementation entry above supersedes this earlier preparation-only scope.
+The owner said “ok, mark that accepted, and perpare the next 10 varient based of
+latest board which i think is time stratra”, followed by “with ponytail plugin”.
+This accepts the integrated Time Strata baseline and selects preparation of ten
+genuine variants based on its four-stack, top-only board under Ponytail. Accepted
+and implemented Memory now both total 71 presets / 213 leaderboard groups.
+The .14 focused evidence below is retained; no new checks or device/browser
+details were supplied by this acceptance. The ten-mode .15 rules/interactive
+preview and focused runner are complete under Ponytail: scoped format/lint,
+runner-only types, 90 Chromium gameplay flows, 240 generated-deal witnesses,
+30 mode/size contrasts and 306 bounds snapshots pass; 150 captures are retained.
+Six supplemental checks cover shelf recovery, held-phase reset, last-layer clues
+and injected motion failure. Owner rules/visual review remains pending before
+app integration. No new app additions,
+commit, push, deployment or .16 selection is authorized. Full verify remains
+deferred; unauditioned audio and unrelated editor/MCP files remain excluded.
+For this preparation the owner separately said “if agent are unavailable the do
+a takeover and do all the work yourself”. The required `gpt-6-luna/max` testing
+agent returned 503; direct parent verification is authorized for .15, without
+substitute-agent claims. Available planning/coding agents retain the required routing.
+See `docs/briefs/v1.3.5.15-batch-h-brief.md` and `docs/work/V1.3.5.15_WORK.md`.
+
+**Earlier v1.3.5.14 local implementation evidence (2026-11-08):**
+The owner approved the .14 fixture and authorized implementation with Ponytail.
+One new `memory:time-strata` baseline integrates four-stack top-only access,
+face-down opening, free cancellation and replayed Continue outcomes. Existing
+`memory-1`, pair `brief-v1`, legacy RNG streams and issued identities are preserved.
+The implemented catalogue is 71 presets / 213 groups: 70 owner-accepted presets /
+210 groups plus one locally implemented baseline / 3 groups awaiting app functional
+review. Scoped formatting/lint, types (0 errors/warnings), 56 unit/checkpoint cases,
+three real-D1 cases, 38 frozen Memory plus four new vectors across six runtimes,
+and 25 Chromium cases (11 Time Strata, 3 admin, 11 legacy player) pass. Landscape
+controls were fitted inside the game frame; directory search now uses catalogue
+names. The required `gpt-6-luna/max` agent returned 503; the owner explicitly
+instructed parent takeover, so the parent performed checks without substitute-agent
+claims. Full verify remains deferred. No commit, push, deployment or next batch.
+See `docs/briefs/v1.3.5.14-batch-g-brief.md` and `docs/work/V1.3.5.14_WORK.md`.
+
+**Earlier v1.3.5.14 fixture evidence — new-baseline ready for review (2026-11-08):**
+The owner selected “Continue the preview review first”, then corrected “we are build
+a new baseline for this batch instead of new varient” and chose the layered board
+with only the top card of each stack playable. **Time Strata** is one proposed Memory
+baseline, with four stacks and 6/8/10-pair solvable fixture deals, not a ten-variant
+expansion. The fixture and focused runner are complete; 742 Chromium assertions,
+96 generated-deal samples, three-size gameplay/layout checks, scoped lint/format
+and runner-only types pass. Owner visual approval remains pending. The required
+`gpt-6-luna/max` agent was unavailable; the owner explicitly authorized direct work
+in this conversation through completion. The parent performed code/checks; no
+substitute-model evidence is claimed. Accepted Memory remains 70 variants / 210
+groups at `7eadc3b`. No app integration, catalogue additions, commit/push or
+deployment follows. Full verify remains deferred; audio/editor exclusions persist.
+See `docs/briefs/v1.3.5.14-batch-g-brief.md` and `docs/work/V1.3.5.14_WORK.md`.
+
 **v1.3.5.13 Batch F accepted; source commit and push authorized (2026-11-08):**
 The owner said “update the git repo and then push to github”, accepting the completed 10
 genuine Memory Cloudflare Next-Gen Developer Platform & Edge Primitives rulesets

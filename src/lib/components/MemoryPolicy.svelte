@@ -1,6 +1,7 @@
 <script lang="ts">
 	import { tick } from 'svelte';
 	import { can } from '#lib/operator-permissions.js';
+	import { dimensionChange } from '#lib/engine/contract.js';
 	import { t, type MessageKey } from '#lib/i18n/messages.js';
 	import AccountForm from './account/AccountForm.svelte';
 	import type { PageData } from '../../routes/admin/[view]/$types';
@@ -23,10 +24,9 @@
 	const editable = $derived(can(role, 'games'));
 	const rows = $derived(
 		policy.variants.map((variant) => {
-			const change = 'change' in variant ? variant.change : undefined;
 			const keys = policy.dimensions.map(
 				(dimension) =>
-					`${dimension.key}:${change?.[0] === dimension.key ? change[1] : dimension.values[0].id}`
+					`${dimension.key}:${dimensionChange(variant, dimension.key) ?? dimension.values[0].id}`
 			);
 			return {
 				id: variant.id,

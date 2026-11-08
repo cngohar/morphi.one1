@@ -1,0 +1,1612 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex" />
+		<title>Morphi — Batch H · Ten Time Strata variants</title>
+		<style>
+			@font-face {
+				font-family: Nunito;
+				src: url('/demo/nunito-latin-wght-normal.woff2') format('woff2');
+				font-weight: 200 1000;
+				font-display: swap;
+			}
+			:root {
+				color-scheme: light;
+				--bg: #eef2f7;
+				--surface: #fff;
+				--surface-2: #e5edf7;
+				--border: #c9d6e4;
+				--ink: #1b2433;
+				--ink-2: #344257;
+				--muted: #5a6b82;
+				--accent: #2f6fed;
+				--success: #009a86;
+				--danger: #b42318;
+				--focus: #2f6fed;
+				--memory-bg: #dfe9f5;
+				--memory-back: #a9bfdf;
+				--memory-edge: #90aac9;
+				--card-w: 132px;
+				--card-h: 164px;
+				--step: 7px;
+				font:
+					600 15px/1.4 Nunito,
+					system-ui,
+					sans-serif;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html {
+				height: 100%;
+			}
+			body {
+				min-height: 100%;
+				margin: 0;
+				background: var(--bg);
+				color: var(--ink);
+				display: flex;
+				flex-direction: column;
+			}
+			button,
+			select {
+				font: inherit;
+				color: inherit;
+			}
+			button {
+				cursor: pointer;
+			}
+			button:disabled {
+				cursor: default;
+			}
+			:focus-visible {
+				outline: 3px solid var(--focus);
+				outline-offset: 3px;
+			}
+			[hidden] {
+				display: none !important;
+			}
+			.review {
+				padding: 8px 18px;
+				display: flex;
+				justify-content: space-between;
+				gap: 8px;
+				flex-wrap: wrap;
+				background: var(--surface);
+				border-bottom: 1px solid var(--border);
+				font-size: 12px;
+			}
+			.review span {
+				color: var(--muted);
+			}
+			.layout {
+				width: 100%;
+				max-width: 1280px;
+				margin: auto;
+				flex: 1;
+				min-height: 0;
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 270px;
+				gap: 18px;
+				padding: 18px;
+			}
+			.play {
+				min-width: 0;
+				min-height: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+				padding: 22px;
+				background: var(--memory-bg);
+				border: 1px solid var(--border);
+				border-radius: 18px;
+			}
+			.heading {
+				display: flex;
+				justify-content: space-between;
+				align-items: start;
+				gap: 14px;
+			}
+			h1 {
+				font-size: 34px;
+				letter-spacing: -0.8px;
+				line-height: 1.15;
+				margin: 0;
+			}
+			.subtitle {
+				font-size: 14px;
+				color: var(--ink-2);
+				margin: 5px 0 0;
+			}
+			.deal-size {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				font-size: 12px;
+				white-space: nowrap;
+			}
+			select {
+				min-height: 44px;
+				padding: 5px 10px;
+				background: var(--surface);
+				border: 1px solid var(--memory-edge);
+				border-radius: 8px;
+			}
+			.hud {
+				display: flex;
+				gap: 24px;
+				align-items: center;
+				font-size: 13px;
+			}
+			.hud b {
+				font-size: 20px;
+				display: block;
+				font-weight: 900;
+			}
+			.hud span {
+				color: var(--ink-2);
+			}
+			.deal-label {
+				margin-left: auto;
+				font-size: 12px;
+			}
+			.board {
+				flex: 1;
+				min-height: 0;
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 16px;
+				align-content: center;
+				padding: 12px 0;
+			}
+			.pile {
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 10px;
+			}
+			.well {
+				position: relative;
+				width: var(--card-w);
+				height: calc(var(--card-h) + 4 * var(--step));
+			}
+			.buried,
+			.top-card,
+			.empty-well {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: var(--card-w);
+				height: var(--card-h);
+				border: 2px solid var(--memory-edge);
+				border-radius: 12px;
+			}
+			.buried {
+				background: var(--memory-back);
+				pointer-events: none;
+			}
+			.top-card {
+				padding: 12px;
+				background: var(--memory-back);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				z-index: 10;
+				touch-action: manipulation;
+			}
+			.top-card[aria-pressed='true'] {
+				background: var(--surface);
+				border-color: var(--ink);
+			}
+			.top-card:disabled:not([aria-pressed='true']) {
+				border-style: dashed;
+			}
+			.top-card[data-result='match'] {
+				border-color: var(--success);
+			}
+			.top-card[data-result='mismatch'] {
+				border-color: var(--danger);
+			}
+			.back-mark {
+				width: 36px;
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+			.back-mark i {
+				display: block;
+				height: 3px;
+				background: var(--ink-2);
+				border-radius: 2px;
+			}
+			.back-mark i:nth-child(2) {
+				width: 26px;
+				align-self: center;
+			}
+			.back-mark i:nth-child(3) {
+				width: 16px;
+				align-self: center;
+			}
+			.top-label {
+				font-size: 11px;
+				font-weight: 800;
+				color: var(--ink-2);
+			}
+			.face-symbol {
+				width: 64px;
+				height: 64px;
+				color: var(--ink);
+			}
+			.face-symbol svg {
+				display: block;
+				width: 100%;
+				height: 100%;
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 4;
+				stroke-linecap: round;
+				stroke-linejoin: round;
+			}
+			.face-name {
+				font-size: 12px;
+				font-weight: 900;
+			}
+			.empty-well {
+				display: grid;
+				place-items: center;
+				background: transparent;
+				border-style: dashed;
+				color: var(--muted);
+				font-size: 13px;
+			}
+			.play[data-finished='true'] .well,
+			.play[data-finished='true'] .empty-well {
+				height: 64px;
+			}
+			.pile-label {
+				text-align: center;
+				font-size: 12px;
+				line-height: 1.5;
+			}
+			.pile-label strong {
+				display: block;
+				font-size: 14px;
+			}
+			.pile-label span {
+				color: var(--ink-2);
+			}
+			.status {
+				margin: 0;
+				min-height: 42px;
+				font-size: 14px;
+				font-weight: 800;
+				max-width: 640px;
+			}
+			.status[data-kind='mismatch'],
+			.status[data-kind='error'] {
+				color: var(--danger);
+			}
+			.controls {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+				align-items: center;
+			}
+			.btn {
+				min-height: 44px;
+				padding: 8px 13px;
+				border: 1px solid var(--memory-edge);
+				border-radius: 8px;
+				background: var(--surface);
+				font-size: 13px;
+				font-weight: 800;
+			}
+			.btn:disabled {
+				opacity: 0.45;
+			}
+			.btn.primary {
+				background: var(--ink);
+				color: var(--surface);
+				border-color: var(--ink);
+			}
+			.controls .secondary {
+				margin-left: auto;
+			}
+			.completion {
+				padding: 14px 16px;
+				background: var(--surface);
+				border: 1px solid var(--memory-edge);
+				border-radius: 10px;
+			}
+			.completion strong {
+				font-size: 20px;
+				display: block;
+			}
+			.completion p {
+				margin: 4px 0 0;
+				font-size: 13px;
+			}
+			.rules {
+				align-self: start;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 14px;
+				padding: 16px;
+				font-size: 13px;
+				line-height: 1.6;
+			}
+			.rules summary {
+				font-size: 16px;
+				font-weight: 900;
+				cursor: pointer;
+				min-height: 28px;
+			}
+			.rules ol {
+				padding-left: 20px;
+				margin: 14px 0;
+			}
+			.rules li + li {
+				margin-top: 9px;
+			}
+			.rules h2 {
+				font-size: 14px;
+				margin: 18px 0 5px;
+			}
+			.rules p {
+				margin: 0 0 12px;
+				color: var(--ink-2);
+			}
+			.rules .btn {
+				width: 100%;
+			}
+			.guide {
+				margin-top: 12px;
+				padding: 12px;
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				background: var(--surface-2);
+			}
+			.guide p {
+				margin: 0 0 10px;
+			}
+			.scope-note {
+				border-top: 1px solid var(--border);
+				padding-top: 14px;
+				margin-top: 18px !important;
+				font-size: 12px;
+				color: var(--muted) !important;
+			}
+			@media (max-width: 1100px) {
+				:root {
+					--card-w: 108px;
+					--card-h: 136px;
+					--step: 6px;
+				}
+				.layout {
+					grid-template-columns: 1fr;
+					max-width: 900px;
+				}
+				.rules {
+					width: 100%;
+				}
+				.play {
+					padding: 18px;
+				}
+			}
+			@media (max-width: 600px) {
+				:root {
+					--card-w: 108px;
+					--card-h: 108px;
+					--step: 4px;
+				}
+				.review {
+					padding: 7px 12px;
+					font-size: 11px;
+				}
+				.review span {
+					font-size: 10px;
+				}
+				.layout {
+					padding: 12px;
+					gap: 10px;
+					flex: 0;
+				}
+				.play {
+					padding: 14px;
+					gap: 10px;
+				}
+				.heading {
+					gap: 8px;
+				}
+				h1 {
+					font-size: 28px;
+				}
+				.subtitle {
+					font-size: 12px;
+					max-width: 205px;
+				}
+				.deal-size {
+					font-size: 11px;
+				}
+				select {
+					min-height: 44px;
+					padding: 5px 7px;
+				}
+				.hud {
+					gap: 16px;
+				}
+				.hud b {
+					font-size: 18px;
+				}
+				.deal-label {
+					font-size: 10px;
+				}
+				.board {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+					gap: 12px 16px;
+					padding: 4px 0;
+				}
+				.well {
+					height: calc(var(--card-h) + 4 * var(--step));
+				}
+				.pile {
+					gap: 3px;
+				}
+				.pile-label {
+					font-size: 11px;
+					line-height: 1.35;
+				}
+				.pile-label strong {
+					font-size: 12px;
+				}
+				.status {
+					font-size: 12px;
+					min-height: 38px;
+				}
+				.controls {
+					gap: 6px;
+				}
+				.btn {
+					padding: 7px 10px;
+					font-size: 12px;
+				}
+				.controls .secondary {
+					margin-left: 0;
+				}
+				.rules {
+					padding: 12px;
+				}
+				.rules summary {
+					font-size: 14px;
+					min-height: 22px;
+				}
+			}
+			@media (orientation: landscape) and (max-height: 560px) {
+				:root {
+					--card-w: 76px;
+					--card-h: 88px;
+					--step: 3px;
+				}
+				.review {
+					padding: 4px 12px;
+					font-size: 10px;
+				}
+				.layout {
+					padding: 8px 12px;
+					gap: 8px;
+					flex: 0;
+					max-width: 1100px;
+				}
+				.play {
+					padding: 8px 14px;
+					gap: 5px;
+					border-radius: 12px;
+				}
+				.heading {
+					align-items: center;
+				}
+				h1 {
+					font-size: 24px;
+					letter-spacing: -0.4px;
+				}
+				.subtitle {
+					font-size: 11px;
+					margin-top: 2px;
+				}
+				.deal-size {
+					flex-direction: row;
+					align-items: center;
+					font-size: 11px;
+				}
+				select {
+					min-height: 44px;
+					padding: 4px 8px;
+				}
+				.hud {
+					gap: 20px;
+					font-size: 11px;
+				}
+				.hud b {
+					font-size: 14px;
+					display: inline;
+					margin-right: 4px;
+				}
+				.board {
+					grid-template-columns: repeat(4, minmax(0, 1fr));
+					padding: 3px 0;
+					gap: 14px;
+				}
+				.pile {
+					gap: 0;
+				}
+				.pile-label {
+					font-size: 10px;
+				}
+				.pile-label strong {
+					font-size: 11px;
+				}
+				.face-symbol {
+					width: 42px;
+					height: 42px;
+				}
+				.face-name,
+				.top-label {
+					font-size: 9px;
+				}
+				.top-card {
+					padding: 5px;
+					gap: 3px;
+				}
+				.back-mark {
+					width: 26px;
+					gap: 4px;
+				}
+				.status {
+					font-size: 11px;
+					min-height: 28px;
+					max-width: none;
+				}
+				.btn {
+					padding: 6px 11px;
+					font-size: 11px;
+					min-height: 44px;
+				}
+				.rules {
+					padding: 7px 12px;
+				}
+				.rules summary {
+					font-size: 12px;
+					min-height: 18px;
+				}
+				.completion {
+					padding: 5px 10px;
+				}
+				.completion strong {
+					font-size: 15px;
+				}
+				.completion p {
+					font-size: 11px;
+					margin: 0;
+				}
+			}
+			@media (prefers-reduced-motion: reduce) {
+				* {
+					scroll-behavior: auto !important;
+				}
+			}
+
+			.selectors {
+				display: flex;
+				gap: 8px;
+				align-items: end;
+			}
+			#variant {
+				max-width: 190px;
+			}
+			.rule-state {
+				font-size: 12px;
+				font-weight: 800;
+				color: var(--ink-2);
+			}
+			.clue {
+				display: block;
+				min-height: 18px;
+				font-size: 11px;
+				color: var(--ink);
+				font-weight: 900;
+			}
+			.utilities {
+				display: flex;
+				gap: 6px;
+				align-items: center;
+			}
+			.utilities select {
+				min-width: 72px;
+			}
+			.top-card[data-result='echo'] {
+				border-color: var(--accent);
+			}
+			@media (max-width: 600px) {
+				.heading {
+					flex-wrap: wrap;
+				}
+				.heading > div:first-child {
+					width: 100%;
+				}
+				.subtitle {
+					max-width: none;
+				}
+				.pile-label strong {
+					display: inline;
+					margin-right: 5px;
+				}
+				.clue:empty {
+					display: none;
+				}
+				.controls .secondary {
+					margin-left: 0;
+				}
+				.selectors {
+					width: 100%;
+				}
+				.selectors .deal-size:first-child {
+					flex: 1;
+				}
+				#variant {
+					max-width: none;
+					width: 100%;
+				}
+				.hud {
+					flex-wrap: wrap;
+					gap: 8px 16px;
+				}
+				.rule-state {
+					width: 100%;
+					font-size: 11px;
+				}
+				.clue {
+					font-size: 10px;
+					min-height: 15px;
+				}
+			}
+			@media (orientation: landscape) and (max-height: 560px) {
+				.play {
+					gap: 3px;
+					padding: 6px 12px;
+				}
+				.heading {
+					gap: 8px;
+				}
+				h1 {
+					font-size: 22px;
+				}
+				.subtitle {
+					max-width: 340px;
+				}
+				.selectors {
+					gap: 6px;
+				}
+				.selectors label {
+					font-size: 10px;
+				}
+				#variant {
+					max-width: 168px;
+					font-size: 11px;
+				}
+				.hud {
+					flex-wrap: nowrap;
+					gap: 12px;
+				}
+				.rule-state {
+					font-size: 10px;
+					margin-left: auto;
+					max-width: 330px;
+				}
+				.board {
+					padding: 0;
+				}
+				.clue {
+					font-size: 9px;
+					min-height: 14px;
+				}
+				.status {
+					min-height: 26px;
+					font-size: 10px;
+				}
+				.controls {
+					gap: 5px;
+					flex-wrap: nowrap;
+				}
+				.controls .secondary {
+					margin-left: auto;
+				}
+				.btn {
+					padding: 5px 8px;
+					font-size: 10px;
+				}
+				.utilities {
+					gap: 4px;
+				}
+				.utilities select {
+					font-size: 10px;
+					padding: 4px;
+					min-width: 56px;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header class="review">
+			<strong>Batch H · Time Strata variants</strong
+			><span>71 accepted presets · 10 candidates for review</span>
+		</header>
+		<div class="layout">
+			<main class="play" aria-labelledby="title">
+				<div class="heading">
+					<div>
+						<h1 id="title">Linked Tops</h1>
+						<p class="subtitle" id="subtitle"></p>
+					</div>
+					<div class="selectors">
+						<label class="deal-size" for="variant">Variant<select id="variant"></select></label>
+						<label class="deal-size" for="pairCount"
+							>Depth<select id="pairCount">
+								<option value="6">6 pairs · 3 layers</option>
+								<option value="8">8 pairs · 4 layers</option>
+								<option value="10">10 pairs · 5 layers</option>
+							</select></label
+						>
+					</div>
+				</div>
+				<div class="hud" aria-label="Round progress">
+					<div><b id="cleared">0 / 6</b><span>pairs cleared</span></div>
+					<div><b id="attempts">0</b><span>attempts</span></div>
+					<div><b id="misses">0</b><span>mismatches</span></div>
+					<span class="deal-label" id="dealLabel">Deal 1</span
+					><output class="rule-state" id="ruleState"></output>
+				</div>
+				<div class="board" id="board" aria-label="Four stacks of hidden cards"></div>
+				<p class="status" id="status" role="status" aria-live="polite" aria-atomic="true"></p>
+				<div class="completion" id="completion" hidden>
+					<strong>All layers cleared</strong>
+					<p id="completionStats"></p>
+				</div>
+				<div class="controls">
+					<button class="btn primary" id="continue" disabled>Continue</button>
+					<button class="btn" id="cancel" disabled>Cancel selection</button>
+					<div class="utilities" id="utilities" hidden>
+						<select id="source" aria-label="Source stack">
+							<option value="0">Stack I</option>
+							<option value="1">Stack II</option>
+							<option value="2">Stack III</option>
+							<option value="3">Stack IV</option>
+						</select>
+						<select id="destination" aria-label="Empty destination well" hidden>
+							<option value="0">Well I</option>
+							<option value="1">Well II</option>
+							<option value="2">Well III</option>
+							<option value="3">Well IV</option>
+						</select>
+						<button class="btn" id="utility">Cycle top</button>
+					</div>
+					<button class="btn" id="shelf" hidden></button>
+					<button class="btn secondary" id="reset">Reset deal</button
+					><button class="btn" id="newDeal">New deal</button>
+				</div>
+			</main>
+			<details class="rules" id="rules">
+				<summary>How this variant plays</summary>
+				<p id="ruleText"></p>
+				<ol>
+					<li>Only each stack's top is playable. Every deal opens face down.</li>
+					<li>Reveal two eligible cards. Press <strong>Continue</strong> to resolve them.</li>
+					<li>Cancel one reveal freely. Reset repeats this deal; New deal changes it.</li>
+					<li>Clear every card from all four stacks and any sample shelf to finish.</li>
+				</ol>
+				<h2>Try the rule change</h2>
+				<p id="contrastText"></p>
+				<button class="btn" id="example">Show playable example</button>
+				<div class="guide" id="guide" hidden>
+					<p id="guideText"></p>
+					<button class="btn" id="exampleNext">Next example step</button>
+				</div>
+				<p class="scope-note">
+					Ten Time Strata rule previews. Play each variant before deciding which rules to approve.
+				</p>
+			</details>
+		</div>
+		<script src="/demo/anime.min.js"></script>
+		<script>
+			(() => {
+				'use strict';
+				// Fixture presentation and repeatable review deals only; never the production engine.
+				const SYMBOLS = [
+					{
+						name: 'Orbit',
+						drawing: '<circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="5"/>'
+					},
+					{ name: 'Diamond', drawing: '<path d="M32 8 54 32 32 56 10 32Z"/>' },
+					{ name: 'Triangle', drawing: '<path d="m32 9 23 44H9Z"/>' },
+					{ name: 'Cross', drawing: '<path d="M32 9v46M9 32h46"/>' },
+					{ name: 'Square', drawing: '<rect x="12" y="12" width="40" height="40" rx="3"/>' },
+					{
+						name: 'Wave',
+						drawing: '<path d="M8 25c8-18 16 18 24 0s16 18 24 0M8 42c8-18 16 18 24 0s16 18 24 0"/>'
+					},
+					{ name: 'Arch', drawing: '<path d="M12 52V30a20 20 0 0 1 40 0v22"/>' },
+					{ name: 'Hourglass', drawing: '<path d="M14 9h36L14 55h36Z"/>' },
+					{ name: 'Fork', drawing: '<path d="M32 55V30M13 10v10c0 13 38 13 38 0V10M32 10v20"/>' },
+					{
+						name: 'Star',
+						drawing: '<path d="m32 7 7 16 18 2-14 12 4 19-15-10-15 10 4-19L7 25l18-2Z"/>'
+					}
+				];
+				const MODES = [
+					{
+						id: 'strata-linked',
+						name: 'Linked Tops',
+						subtitle: 'Match neighboring stacks on the ring I–II–III–IV–I.',
+						rule: 'The second stack must be next to the first on the logical ring I–II–III–IV–I. The ring stays the same when the board reflows. Opposite stacks cannot form an attempt.',
+						contrast:
+							'Reveal Stack I: Stack III stays unavailable, while II and IV remain eligible.'
+					},
+					{
+						id: 'strata-sweep',
+						name: 'Level Sweep',
+						subtitle: 'Clear the tallest stacks before reaching lower layers.',
+						rule: 'Both selected tops must come from stacks at the greatest remaining height. A lower matching pair waits until every higher top has been cleared.',
+						contrast:
+							'Lift one exposed pair. Its next equal tops are lower, so clear the other taller pair first.'
+					},
+					{
+						id: 'strata-shelf',
+						name: 'Sample Shelf',
+						subtitle: 'Park one top to reach the layer beneath it.',
+						rule: 'While idle, lift one top into the face-up sample shelf. The shelf is a fifth eligible card, and matching it removes that sample. Return sample always puts it back on its original stack while idle. Cancellation and mismatches keep the sample.',
+						contrast:
+							'Park the top of Stack I: its covered card becomes playable while the sample stays visible.'
+					},
+					{
+						id: 'strata-cycle',
+						name: 'Layer Cycle',
+						subtitle: 'Cycle a top to the bottom to uncover another card.',
+						rule: 'While idle, Cycle top moves the chosen stack’s top to its bottom without spending an attempt. Each pair starts in two different stacks. Cycle either stack to bring a remembered pair to the surface.',
+						contrast:
+							'Cycle Stack I: its top sinks to the bottom, exposing another face-down card without removing one.'
+					},
+					{
+						id: 'strata-empty-well',
+						name: 'Empty Well',
+						subtitle: 'Use an empty stack as space for one top.',
+						rule: 'While idle, Move top transfers one top into a different empty well. It stays face down; the source uncovers its next card. A destination holding any card cannot receive another.',
+						contrast:
+							'Clear I and II first, then move a top from III into I to expose the next layer.'
+					},
+					{
+						id: 'strata-glimpse',
+						name: 'Deep Glimpse',
+						subtitle: 'A single reveal gives a clue to the card directly below.',
+						rule: 'Your first reveal also shows the immediately covered card in that same stack as a read-only clue. It cannot be selected. The clue disappears on cancellation or the second reveal.',
+						contrast:
+							'Reveal one top: a Below clue names its next covered card, without adding a playable button.'
+					},
+					{
+						id: 'strata-chain',
+						name: 'Chain Reaction',
+						subtitle: 'Equal new tops continue the match, one lift at a time.',
+						rule: 'After lifting a pair, equal newly exposed tops in those same two wells become another held match. Each extra pair spends one attempt and needs its own Continue. Nothing is removed automatically.',
+						contrast:
+							'Lift the first I/II pair: their next equal tops are revealed as the next held match.'
+					},
+					{
+						id: 'strata-echo',
+						name: 'Layer Echo',
+						subtitle: 'Read the new tops before closing their echo.',
+						rule: 'After lifting a pair, the newly exposed tops in those wells appear as read-only echoes. Press Continue again to close them before any play or utility action. Closing echoes spends no attempt. Empty affected wells need no echo.',
+						contrast:
+							'Lift a pair: new tops appear face up but cannot be chosen until the extra Continue closes them.'
+					},
+					{
+						id: 'strata-slip',
+						name: 'Slipping Tops',
+						subtitle: 'Mismatched tops sink to the bottom of their stacks.',
+						rule: 'A mismatch stays visible until Continue, then both selected tops move to their own stack bottoms. Matches lift normally. While idle, Cycle top lets you recover any buried pair without spending an attempt.',
+						contrast:
+							'Try two different symbols and Continue: both revealed cards sink; the next tops stay face down.'
+					},
+					{
+						id: 'strata-order',
+						name: 'Excavation Order',
+						subtitle: 'Clear symbols in the displayed excavation order.',
+						rule: 'Only the required symbol can be cleared. Equal tops of another symbol produce a blocked attempt: Continue closes them without moving cards or advancing the order. It counts as one mismatch. Ordinary unequal attempts also count as mismatches.',
+						contrast:
+							'Two pairs are exposed. Reveal the pair that comes later in the order: it stays held and then closes.'
+					}
+				];
+				const LABELS = ['I', 'II', 'III', 'IV'];
+				const BASE_SCHEDULE = [
+					[0, 1],
+					[2, 3],
+					[0, 2],
+					[1, 3]
+				];
+				const LINK_SCHEDULE = [
+					[0, 1],
+					[2, 3],
+					[1, 2],
+					[3, 0]
+				];
+				const byId = (id) => document.getElementById(id);
+				const preference = matchMedia('(prefers-reduced-motion: reduce)');
+				const running = new Set();
+				const motion = {
+					clear() {
+						for (const animation of running) animation.revert();
+						running.clear();
+					},
+					reveal(element) {
+						if (preference.matches || typeof window.anime?.animate !== 'function') return;
+						try {
+							const animation = window.anime.animate(element, {
+								scale: [0.96, 1],
+								duration: 180,
+								ease: 'outQuad',
+								onComplete: (self) => running.delete(self)
+							});
+							running.add(animation);
+						} catch {
+							element.style.transform = '';
+						}
+					}
+				};
+				preference.addEventListener('change', () => motion.clear());
+				let mode = MODES[0].id,
+					pairCount = 6,
+					deal = 1,
+					stacks = [],
+					selected = [],
+					outcome = null;
+				let attempts = 0,
+					misses = 0,
+					cleared = 0,
+					shelf = null,
+					clues = [],
+					order = [],
+					guideStep = null;
+				let guideActions = [];
+				const buttons = [],
+					wells = [],
+					depthLabels = [],
+					clueLabels = [];
+				const current = () => MODES.find((item) => item.id === mode);
+				const idle = () => selected.length === 0 && outcome === null;
+				const finished = () => cleared === pairCount;
+				const top = (stack) => (stack === 4 ? shelf?.symbol : stacks[stack]?.at(-1));
+				function announce(message, kind = '') {
+					byId('status').textContent = message;
+					byId('status').dataset.kind = kind;
+				}
+				function guard(action) {
+					try {
+						action();
+					} catch (error) {
+						console.error('Batch H preview action failed', error);
+						announce('This action could not finish. Reset this deal to try again.', 'error');
+					}
+				}
+				for (const item of MODES) {
+					const option = document.createElement('option');
+					option.value = item.id;
+					option.textContent = item.name;
+					byId('variant').append(option);
+				}
+				for (let stack = 0; stack < 4; stack++) {
+					const pile = document.createElement('section');
+					pile.className = 'pile';
+					pile.setAttribute('aria-label', 'Stack ' + LABELS[stack]);
+					const well = document.createElement('div');
+					well.className = 'well';
+					const button = document.createElement('button');
+					button.className = 'top-card';
+					button.type = 'button';
+					button.dataset.stack = stack;
+					button.addEventListener('click', () =>
+						guard(() => {
+							endExample();
+							chooseTop(stack);
+						})
+					);
+					well.append(button);
+					const label = document.createElement('div');
+					label.className = 'pile-label';
+					const name = document.createElement('strong');
+					name.textContent = 'Stack ' + LABELS[stack];
+					const depth = document.createElement('span'),
+						clue = document.createElement('span');
+					clue.className = 'clue';
+					label.append(name, depth, clue);
+					pile.append(well, label);
+					byId('board').append(pile);
+					buttons.push(button);
+					wells.push(well);
+					depthLabels.push(depth);
+					clueLabels.push(clue);
+				}
+				function makeDeal() {
+					// ponytail: fixed preview schedules prove these rules; broaden deals and assess fairness during approved app integration.
+					const symbols = Array.from({ length: pairCount }, (_, index) => index);
+					let seed = deal >>> 0 || 1;
+					const next = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0);
+					const shuffle = (items) => {
+						for (let index = items.length - 1; index > 0; index--) {
+							const other = next() % (index + 1);
+							[items[index], items[other]] = [items[other], items[index]];
+						}
+					};
+					shuffle(symbols);
+					stacks = [[], [], [], []];
+					order = symbols.slice().reverse();
+					for (let index = 0; index < pairCount; index++) {
+						let pair = BASE_SCHEDULE[index % 4];
+						if (mode === 'strata-linked') pair = LINK_SCHEDULE[index % 4];
+						if (['strata-chain', 'strata-empty-well', 'strata-sweep'].includes(mode))
+							pair = index % 2 === 0 ? [0, 1] : [2, 3];
+						for (const stack of pair) stacks[stack].push(symbols[index]);
+					}
+					if (['strata-cycle', 'strata-slip'].includes(mode)) stacks.forEach(shuffle);
+				}
+				function eligible(stack) {
+					if (outcome !== null || finished() || top(stack) === undefined) return false;
+					if (stack === 4) return mode === 'strata-shelf';
+					if (
+						mode === 'strata-sweep' &&
+						stacks[stack].length < Math.max(...stacks.map((pile) => pile.length))
+					)
+						return false;
+					if (mode === 'strata-linked' && selected.length === 1 && !selected.includes(stack))
+						return [1, 3].includes((stack - selected[0] + 4) % 4);
+					return true;
+				}
+				function render() {
+					document.querySelector('.play').dataset.finished = finished();
+					for (let stack = 0; stack < 4; stack++) {
+						const depth = stacks[stack].length,
+							button = buttons[stack],
+							well = wells[stack];
+						well.querySelectorAll('.buried,.empty-well').forEach((element) => element.remove());
+						for (let layer = depth - 1; layer > 0; layer--) {
+							const back = document.createElement('span');
+							back.className = 'buried';
+							back.setAttribute('aria-hidden', 'true');
+							back.style.top = 'calc(' + layer + ' * var(--step))';
+							well.insertBefore(back, button);
+						}
+						const faceUp =
+							selected.includes(stack) || (outcome === 'echo' && clues.includes(stack));
+						button.hidden = depth === 0;
+						button.disabled = !eligible(stack);
+						button.dataset.depth = depth;
+						button.setAttribute('aria-pressed', String(faceUp));
+						delete button.dataset.pair;
+						delete button.dataset.result;
+						if (!depth) {
+							const empty = document.createElement('span');
+							empty.className = 'empty-well';
+							empty.textContent = 'Empty';
+							empty.setAttribute('aria-hidden', 'true');
+							well.append(empty);
+							button.textContent = '';
+							button.setAttribute('aria-label', 'Stack ' + LABELS[stack] + ', empty');
+						} else if (faceUp) {
+							const symbol = SYMBOLS[top(stack)];
+							button.dataset.pair = top(stack);
+							if (outcome) button.dataset.result = outcome;
+							button.innerHTML =
+								'<span class="face-symbol" aria-hidden="true"><svg viewBox="0 0 64 64">' +
+								symbol.drawing +
+								'</svg></span><span class="face-name">' +
+								symbol.name +
+								'</span>';
+							button.setAttribute(
+								'aria-label',
+								'Stack ' +
+									LABELS[stack] +
+									', ' +
+									symbol.name +
+									', ' +
+									depth +
+									' cards remain' +
+									(outcome === 'echo' ? ', read-only echo' : '')
+							);
+						} else {
+							button.innerHTML =
+								'<span class="back-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="top-label">TOP CARD</span>';
+							button.setAttribute(
+								'aria-label',
+								'Stack ' +
+									LABELS[stack] +
+									', face down, ' +
+									depth +
+									' cards remain' +
+									(!eligible(stack) ? ', unavailable' : '')
+							);
+						}
+						depthLabels[stack].textContent = depth
+							? depth + ' cards · ' + (depth - 1) + ' covered'
+							: 'Cleared';
+						clueLabels[stack].textContent =
+							mode === 'strata-glimpse' &&
+							selected.length === 1 &&
+							selected[0] === stack &&
+							depth > 1
+								? 'Below: ' + SYMBOLS[stacks[stack].at(-2)].name
+								: '';
+					}
+					byId('variant').value = mode;
+					byId('pairCount').value = pairCount;
+					byId('title').textContent = current().name;
+					byId('subtitle').textContent = current().subtitle;
+					byId('ruleText').textContent = current().rule;
+					byId('contrastText').textContent = current().contrast;
+					byId('cleared').textContent = cleared + ' / ' + pairCount;
+					byId('attempts').textContent = attempts;
+					byId('misses').textContent = misses;
+					byId('dealLabel').textContent = 'Deal ' + deal;
+					let ruleState = '';
+					if (mode === 'strata-linked') ruleState = 'Ring: I–II–III–IV–I';
+					if (mode === 'strata-sweep')
+						ruleState = 'Tallest: ' + Math.max(...stacks.map((pile) => pile.length)) + ' cards';
+					if (mode === 'strata-shelf')
+						ruleState = shelf ? 'Sample from ' + LABELS[shelf.origin] : 'Sample shelf empty';
+					if (mode === 'strata-echo')
+						ruleState =
+							outcome === 'echo'
+								? 'Read-only echo · Continue to close'
+								: 'An extra Continue closes new-top echoes';
+					if (mode === 'strata-chain')
+						ruleState =
+							outcome === 'match'
+								? 'Held pair · each lift needs Continue'
+								: 'New equal tops keep the chain going';
+					if (mode === 'strata-order')
+						ruleState = finished() ? 'Order complete' : 'Required: ' + SYMBOLS[order[cleared]].name;
+					byId('ruleState').textContent = ruleState;
+					byId('cancel').disabled = selected.length !== 1 || outcome !== null;
+					byId('continue').disabled = outcome === null;
+					byId('continue').textContent =
+						outcome === 'match'
+							? 'Continue · Lift pair'
+							: outcome === 'echo'
+								? 'Continue · Close echo'
+								: outcome
+									? 'Continue · Close cards'
+									: 'Continue';
+					const utilityMode = [
+						'strata-shelf',
+						'strata-cycle',
+						'strata-empty-well',
+						'strata-slip'
+					].includes(mode);
+					byId('utilities').hidden = !utilityMode;
+					byId('destination').hidden = mode !== 'strata-empty-well';
+					byId('source').hidden = mode === 'strata-shelf' && shelf !== null;
+					byId('utility').textContent =
+						mode === 'strata-shelf'
+							? shelf
+								? 'Return sample'
+								: 'Lift to shelf'
+							: mode === 'strata-empty-well'
+								? 'Move top'
+								: 'Cycle top';
+					for (const option of byId('source').options)
+						option.disabled = stacks[Number(option.value)].length === 0;
+					for (const option of byId('destination').options)
+						option.disabled = stacks[Number(option.value)].length > 0;
+					if (!byId('source').selectedOptions[0] || byId('source').selectedOptions[0].disabled)
+						byId('source').value = String(stacks.findIndex((pile) => pile.length));
+					if (
+						!byId('destination').selectedOptions[0] ||
+						byId('destination').selectedOptions[0].disabled
+					)
+						byId('destination').value = String(stacks.findIndex((pile) => !pile.length));
+					byId('source').disabled = !idle() || finished();
+					byId('destination').disabled = !idle() || finished();
+					byId('utility').disabled =
+						!idle() ||
+						finished() ||
+						(!shelf && !stacks[Number(byId('source').value)]?.length) ||
+						(mode === 'strata-empty-well' && !stacks.some((pile) => !pile.length));
+					byId('shelf').hidden = shelf === null;
+					byId('shelf').disabled = !eligible(4);
+					byId('shelf').setAttribute('aria-pressed', String(selected.includes(4)));
+					byId('shelf').textContent = shelf ? 'Shelf: ' + SYMBOLS[shelf.symbol].name : '';
+					byId('completion').hidden = !finished();
+					byId('completionStats').textContent =
+						attempts + ' attempts · ' + misses + ' mismatches. All four stacks are empty.';
+					byId('guide').hidden = guideStep === null;
+					if (mode === 'strata-order')
+						byId('contrastText').textContent =
+							current().contrast +
+							' Order: ' +
+							order.map((symbol) => SYMBOLS[symbol].name).join(' → ') +
+							'.';
+				}
+				function focusTop(preferred = 0) {
+					if (preferred === 4 && eligible(4)) {
+						byId('shelf').focus({ preventScroll: true });
+						return;
+					}
+					const index =
+						preferred < 4 && eligible(preferred)
+							? preferred
+							: stacks.findIndex((_, stack) => eligible(stack));
+					if (index >= 0) buttons[index].focus({ preventScroll: true });
+					else if (eligible(4)) byId('shelf').focus({ preventScroll: true });
+					else byId('reset').focus({ preventScroll: true });
+				}
+				function endExample() {
+					guideStep = null;
+					byId('guide').hidden = true;
+				}
+				function reset() {
+					motion.clear();
+					selected = [];
+					outcome = null;
+					attempts = 0;
+					misses = 0;
+					cleared = 0;
+					shelf = null;
+					clues = [];
+					endExample();
+					makeDeal();
+					render();
+					announce(current().subtitle + ' Choose an eligible top.');
+				}
+				function cancelSelection() {
+					if (selected.length !== 1 || outcome !== null) return;
+					const stack = selected[0];
+					motion.clear();
+					selected = [];
+					render();
+					announce('Selection cancelled. No attempt spent.');
+					focusTop(stack);
+				}
+				function chooseTop(stack) {
+					if (!eligible(stack)) return;
+					if (selected.includes(stack)) {
+						cancelSelection();
+						return;
+					}
+					motion.clear();
+					selected.push(stack);
+					if (selected.length === 2) {
+						attempts++;
+						const equal = top(selected[0]) === top(selected[1]);
+						outcome = equal ? 'match' : 'mismatch';
+						if (equal && mode === 'strata-order' && top(selected[0]) !== order[cleared])
+							outcome = 'order-blocked';
+						if (outcome !== 'match') misses++;
+						render();
+						announce(
+							outcome === 'match'
+								? 'Pair found. Continue to lift both cards.'
+								: outcome === 'order-blocked'
+									? 'Equal tops, but this symbol comes later. Continue closes them without lifting.'
+									: 'Different symbols. Continue to close these cards' +
+										(mode === 'strata-slip' ? ' and sink both tops.' : '.'),
+							outcome
+						);
+						byId('continue').focus({ preventScroll: true });
+					} else {
+						render();
+						announce(
+							SYMBOLS[top(stack)].name + ' revealed. Choose another eligible card, or cancel.'
+						);
+					}
+					motion.reveal(stack === 4 ? byId('shelf') : buttons[stack]);
+				}
+				function cycle(stack) {
+					if (stacks[stack]?.length) stacks[stack].unshift(stacks[stack].pop());
+				}
+				function utility(
+					source = Number(byId('source').value),
+					destination = Number(byId('destination').value)
+				) {
+					if (!idle() || finished()) return;
+					motion.clear();
+					if (mode === 'strata-shelf') {
+						if (shelf) {
+							stacks[shelf.origin].push(shelf.symbol);
+							shelf = null;
+							announce('Sample returned to its original stack top.');
+						} else if (stacks[source]?.length) {
+							shelf = { symbol: stacks[source].pop(), origin: source };
+							announce('Top parked face up. Its next layer is now a playable top.');
+						}
+					} else if (['strata-cycle', 'strata-slip'].includes(mode)) {
+						cycle(source);
+						announce('Top cycled to the bottom. No attempt spent.');
+					} else if (
+						mode === 'strata-empty-well' &&
+						source !== destination &&
+						stacks[source]?.length &&
+						stacks[destination]?.length === 0
+					) {
+						stacks[destination].push(stacks[source].pop());
+						announce('One top moved into the empty well. The source uncovered its next layer.');
+					}
+					render();
+					focusTop(source);
+				}
+				function continueTurn() {
+					if (outcome === null) return;
+					motion.clear();
+					const previous = outcome,
+						affected = selected.slice();
+					if (previous === 'match') {
+						for (const stack of affected) {
+							if (stack === 4) shelf = null;
+							else stacks[stack].pop();
+						}
+						cleared++;
+					} else if (previous === 'mismatch' && mode === 'strata-slip') affected.forEach(cycle);
+					selected = [];
+					outcome = null;
+					clues = [];
+					if (
+						previous === 'match' &&
+						!finished() &&
+						mode === 'strata-chain' &&
+						affected.every((stack) => stacks[stack]?.length) &&
+						top(affected[0]) === top(affected[1])
+					) {
+						selected = affected;
+						outcome = 'match';
+						attempts++;
+					}
+					if (previous === 'match' && !finished() && mode === 'strata-echo') {
+						clues = affected.filter((stack) => stacks[stack]?.length);
+						if (clues.length) outcome = 'echo';
+					}
+					render();
+					if (finished()) announce('All layers cleared. You finished this deal.');
+					else if (outcome === 'match')
+						announce(
+							'Chain pair revealed in the same wells. Press Continue for this next lift.',
+							'match'
+						);
+					else if (outcome === 'echo')
+						announce(
+							'Read the newly exposed echoes. Continue closes them without spending an attempt.'
+						);
+					else if (previous === 'echo')
+						announce('Echoes closed. The tops are ready for normal play.');
+					else if (previous === 'match')
+						announce('Pair lifted. Newly playable layers are face down.');
+					else if (previous === 'order-blocked')
+						announce('Later symbol closed. Required symbol and stack depths stayed the same.');
+					else
+						announce(
+							mode === 'strata-slip'
+								? 'Both mismatched tops sank to their bottoms. New tops are face down.'
+								: 'Both cards closed. Stack depths stayed the same.'
+						);
+					if (outcome !== null) byId('continue').focus({ preventScroll: true });
+					else focusTop(affected[0]);
+				}
+				function findTops(equal, required = false) {
+					for (let first = 0; first < 4; first++)
+						for (let second = first + 1; second < 4; second++)
+							if (
+								top(first) !== undefined &&
+								top(second) !== undefined &&
+								(top(first) === top(second)) === equal &&
+								(!required || top(first) === order[cleared])
+							)
+								return [first, second];
+					throw new Error('No suitable exposed example pair.');
+				}
+				function playPair(pair) {
+					for (const stack of pair) chooseTop(stack);
+				}
+				function prepareExample() {
+					pairCount = 6;
+					deal = 1;
+					reset();
+					guideActions = [];
+					const step = (text, action) => guideActions.push({ text, action });
+					if (mode === 'strata-linked') {
+						step(
+							'Reveal I. III is opposite on the logical ring and cannot supply the second card.',
+							() => chooseTop(0)
+						);
+						step('Cancel freely; the stacks and attempts stay unchanged.', cancelSelection);
+						step('An eligible neighboring pair can still clear.', () => playPair(findTops(true)));
+						step('Lift the legal pair with Continue.', continueTurn);
+					} else if (mode === 'strata-sweep') {
+						step('Reveal the equal I/II tops at the greatest height.', () => playPair([0, 1]));
+						step('Lift them. Their next equal tops are lower and unavailable.', continueTurn);
+						step('Reveal the remaining taller III/IV pair.', () => playPair([2, 3]));
+						step('Lift it. All four next tops now share the greatest height.', continueTurn);
+					} else if (mode === 'strata-shelf') {
+						step('Park the top of I. Its next card is exposed; the shelf stays face up.', () =>
+							utility(0)
+						);
+						step('Reveal the sample. It is eligible, but cannot match itself.', () => chooseTop(4));
+						step('Cancel without moving the parked sample.', cancelSelection);
+						step('Return the sample to its original I top.', () => utility());
+					} else if (['strata-cycle', 'strata-slip'].includes(mode)) {
+						if (mode === 'strata-slip') {
+							step('Reveal two different tops; nothing moves until Continue.', () =>
+								playPair(findTops(false))
+							);
+							step('Continue sinks both revealed tops to their own bottoms.', continueTurn);
+						}
+						step('Cycle I while idle. No cards are removed and no attempt is spent.', () =>
+							utility(0)
+						);
+						step('Reveal the new I top through normal play.', () => chooseTop(0));
+						step(
+							'Cancel freely. Cycling remains available to recover remembered pairs.',
+							cancelSelection
+						);
+					} else if (mode === 'strata-empty-well') {
+						for (let layer = 0; layer < 3; layer++) {
+							step('Reveal the next equal I/II tops.', () => playPair([0, 1]));
+							step('Lift one layer from I/II; III and IV remain deep.', continueTurn);
+						}
+						step('I is empty. Move one III top into I; it stays face down.', () => utility(2, 0));
+						step('The moved I top can now match IV.', () => playPair([0, 3]));
+						step('Lift the moved pair through Continue.', continueTurn);
+					} else if (mode === 'strata-glimpse') {
+						step('Reveal I. Its immediately covered card is named in a read-only Below clue.', () =>
+							chooseTop(0)
+						);
+						step(
+							'Cancel: both the face and the covered-card clue hide, with no attempt.',
+							cancelSelection
+						);
+						step('A normal matching pair still uses only top buttons.', () =>
+							playPair(findTops(true))
+						);
+						step('Continue lifts that pair.', continueTurn);
+					} else if (mode === 'strata-chain') {
+						step('Reveal equal I/II tops.', () => playPair([0, 1]));
+						step(
+							'Lift one pair. Equal next tops are a new held match, not yet removed.',
+							continueTurn
+						);
+						step('Continue lifts exactly the next pair; another pair remains held.', continueTurn);
+						step('Continue lifts the last I/II layer. Other wells remain playable.', continueTurn);
+					} else if (mode === 'strata-echo') {
+						step('Reveal an exposed matching pair.', () => playPair(findTops(true)));
+						step(
+							'Lift it. New tops become read-only echoes and every play button is unavailable.',
+							continueTurn
+						);
+						step('Continue again hides only the echoes, spending no attempt.', continueTurn);
+						step('Manual top play is available again.', () => chooseTop(0));
+						step('Cancel freely.', cancelSelection);
+					} else if (mode === 'strata-order') {
+						step(
+							'Reveal the equal I/II pair: its symbol comes after the required III/IV symbol.',
+							() => playPair([0, 1])
+						);
+						step(
+							'Continue closes the blocked pair without removing it or advancing the order.',
+							continueTurn
+						);
+						step('Reveal the required pair in III/IV.', () => playPair(findTops(true, true)));
+						step(
+							'Continue clears the required pair and advances the displayed order.',
+							continueTurn
+						);
+					}
+					guideStep = -1;
+				}
+				function exampleNext() {
+					if (guideStep === null) prepareExample();
+					guideStep++;
+					if (guideStep >= guideActions.length) {
+						endExample();
+						render();
+						announce('Example complete. Keep playing this deal, or Reset to repeat it.');
+						return;
+					}
+					const action = guideActions[guideStep];
+					action.action();
+					byId('guideText').textContent =
+						guideStep + 1 + ' / ' + guideActions.length + ' — ' + action.text;
+					render();
+					byId('exampleNext').focus({ preventScroll: true });
+				}
+				byId('continue').addEventListener('click', () =>
+					guard(() => {
+						endExample();
+						continueTurn();
+					})
+				);
+				byId('cancel').addEventListener('click', () =>
+					guard(() => {
+						endExample();
+						cancelSelection();
+					})
+				);
+				byId('shelf').addEventListener('click', () =>
+					guard(() => {
+						endExample();
+						chooseTop(4);
+					})
+				);
+				byId('utility').addEventListener('click', () =>
+					guard(() => {
+						endExample();
+						utility();
+					})
+				);
+				byId('source').addEventListener('change', render);
+				byId('destination').addEventListener('change', render);
+				byId('reset').addEventListener('click', () =>
+					guard(() => {
+						reset();
+						focusTop();
+					})
+				);
+				byId('newDeal').addEventListener('click', () =>
+					guard(() => {
+						deal++;
+						reset();
+						focusTop();
+					})
+				);
+				byId('pairCount').addEventListener('change', (event) =>
+					guard(() => {
+						pairCount = Number(event.target.value);
+						reset();
+					})
+				);
+				byId('variant').addEventListener('change', (event) =>
+					guard(() => {
+						mode = event.target.value;
+						deal = 1;
+						reset();
+					})
+				);
+				byId('example').addEventListener('click', () =>
+					guard(() => {
+						endExample();
+						byId('rules').open = true;
+						exampleNext();
+					})
+				);
+				byId('exampleNext').addEventListener('click', () => guard(exampleNext));
+				byId('rules').open = innerWidth > 1100 && innerHeight > 560;
+				// Read-only snapshot: the runner constructs and performs all witnesses through ordinary buttons.
+				window.BatchHPreview = Object.freeze({
+					getState: () => ({
+						mode,
+						pairCount,
+						deal,
+						stacks: stacks.map((pile) => pile.slice()),
+						selected: selected.slice(),
+						outcome,
+						attempts,
+						misses,
+						cleared,
+						shelf: shelf ? { ...shelf } : null,
+						clues: clues.slice(),
+						order: order.slice(),
+						guideStep,
+						finished: finished()
+					})
+				});
+				reset();
+			})();
+		</script>
+	</body>
+</html>

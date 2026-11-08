@@ -1,0 +1,4612 @@
+[
+	{
+		"seed": "3",
+		"variant": "memory:strata-linked",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 7, 8],
+			[1, 4, 9],
+			[2, 5, 10],
+			[3, 6, 11]
+		],
+		"checkpointMoves": [
+			{
+				"index": 8
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 7, 8],
+				[1, 4, 9],
+				[2, 5, 10],
+				[3, 6, 11]
+			],
+			"revealed": [8, 9],
+			"matched": [],
+			"mismatches": 0,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 8
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 7
+			},
+			{
+				"index": 6
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5950,
+			"group": "memory-1:strata-linked:6",
+			"pairs": 6,
+			"moves": 6
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-linked",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 7, 8, 15],
+			[1, 4, 9, 12],
+			[2, 5, 10, 13],
+			[3, 6, 11, 14]
+		],
+		"checkpointMoves": [
+			{
+				"index": 15
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 15
+			},
+			{
+				"index": 12
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 7, 8, 15],
+				[1, 4, 9, 12],
+				[2, 5, 10, 13],
+				[3, 6, 11, 14]
+			],
+			"revealed": [15, 12],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 15
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 15
+			},
+			{
+				"index": 12
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 15
+			},
+			{
+				"index": 14
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 7
+			},
+			{
+				"index": 6
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7800,
+			"group": "memory-1:strata-linked:8",
+			"pairs": 8,
+			"moves": 9
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-linked",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 7, 8, 15, 16],
+			[1, 4, 9, 12, 17],
+			[2, 5, 10, 13, 18],
+			[3, 6, 11, 14, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 16
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 7, 8, 15, 16],
+				[1, 4, 9, 12, 17],
+				[2, 5, 10, 13, 18],
+				[3, 6, 11, 14, 19]
+			],
+			"revealed": [16, 17],
+			"matched": [],
+			"mismatches": 0,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 16
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 15
+			},
+			{
+				"index": 14
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 7
+			},
+			{
+				"index": 6
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9950,
+			"group": "memory-1:strata-linked:10",
+			"pairs": 10,
+			"moves": 10
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-sweep",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8],
+			[1, 5, 9],
+			[2, 6, 10],
+			[3, 7, 11]
+		],
+		"checkpointMoves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4],
+				[1, 5],
+				[2, 6, 10],
+				[3, 7, 11]
+			],
+			"revealed": [10],
+			"matched": [8, 9],
+			"mismatches": 0,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5950,
+			"group": "memory-1:strata-sweep:6",
+			"pairs": 6,
+			"moves": 6
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-sweep",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12],
+			[1, 5, 9, 13],
+			[2, 6, 10, 14],
+			[3, 7, 11, 15]
+		],
+		"checkpointMoves": [
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8],
+				[1, 5, 9],
+				[2, 6, 10, 14],
+				[3, 7, 11, 15]
+			],
+			"revealed": [14],
+			"matched": [12, 13],
+			"mismatches": 0,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7950,
+			"group": "memory-1:strata-sweep:8",
+			"pairs": 8,
+			"moves": 8
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-sweep",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 5, 9, 13, 17],
+			[2, 6, 10, 14, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 18
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12],
+				[1, 5, 9, 13],
+				[2, 6, 10, 14, 18],
+				[3, 7, 11, 15, 19]
+			],
+			"revealed": [18],
+			"matched": [16, 17],
+			"mismatches": 0,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9950,
+			"group": "memory-1:strata-sweep:10",
+			"pairs": 10,
+			"moves": 10
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-shelf",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8],
+			[1, 6, 9],
+			[2, 5, 10],
+			[3, 7, 11]
+		],
+		"checkpointMoves": [
+			{
+				"lift": 0
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 4
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4],
+				[1, 6, 9],
+				[2, 5, 10],
+				[3, 7, 11]
+			],
+			"revealed": [],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": {
+				"index": 8,
+				"stack": 0
+			},
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"lift": 0
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 4
+			},
+			{
+				"continue": 1
+			},
+			{
+				"return": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5800,
+			"group": "memory-1:strata-shelf:6",
+			"pairs": 6,
+			"moves": 7
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-shelf",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12],
+			[1, 6, 9, 14],
+			[2, 5, 10, 13],
+			[3, 7, 11, 15]
+		],
+		"checkpointMoves": [
+			{
+				"lift": 0
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 8
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8],
+				[1, 6, 9, 14],
+				[2, 5, 10, 13],
+				[3, 7, 11, 15]
+			],
+			"revealed": [],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": {
+				"index": 12,
+				"stack": 0
+			},
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"lift": 0
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 8
+			},
+			{
+				"continue": 1
+			},
+			{
+				"return": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7800,
+			"group": "memory-1:strata-shelf:8",
+			"pairs": 8,
+			"moves": 9
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-shelf",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 6, 9, 14, 17],
+			[2, 5, 10, 13, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"lift": 0
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 12
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12],
+				[1, 6, 9, 14, 17],
+				[2, 5, 10, 13, 18],
+				[3, 7, 11, 15, 19]
+			],
+			"revealed": [],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 4,
+			"status": "playing",
+			"shelf": {
+				"index": 16,
+				"stack": 0
+			},
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"lift": 0
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 12
+			},
+			{
+				"continue": 1
+			},
+			{
+				"return": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9800,
+			"group": "memory-1:strata-shelf:10",
+			"pairs": 10,
+			"moves": 11
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-cycle",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[8, 4, 0],
+			[1, 9, 6],
+			[10, 2, 5],
+			[3, 11, 7]
+		],
+		"checkpointMoves": [
+			{
+				"cycle": 0
+			},
+			{
+				"index": 4
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 8, 4],
+				[1, 9, 6],
+				[10, 2, 5],
+				[3, 11, 7]
+			],
+			"revealed": [4],
+			"matched": [],
+			"mismatches": 0,
+			"moves": 0,
+			"actions": 2,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"cycle": 0
+			},
+			{
+				"index": 4
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5950,
+			"group": "memory-1:strata-cycle:6",
+			"pairs": 6,
+			"moves": 6
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-cycle",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 8, 12, 4],
+			[1, 6, 9, 14],
+			[13, 2, 10, 5],
+			[11, 7, 15, 3]
+		],
+		"checkpointMoves": [
+			{
+				"cycle": 0
+			},
+			{
+				"index": 12
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[4, 0, 8, 12],
+				[1, 6, 9, 14],
+				[13, 2, 10, 5],
+				[11, 7, 15, 3]
+			],
+			"revealed": [12],
+			"matched": [],
+			"mismatches": 0,
+			"moves": 0,
+			"actions": 2,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"cycle": 0
+			},
+			{
+				"index": 12
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7950,
+			"group": "memory-1:strata-cycle:8",
+			"pairs": 8,
+			"moves": 8
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-cycle",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[4, 0, 12, 16, 8],
+			[9, 17, 1, 14, 6],
+			[10, 13, 5, 2, 18],
+			[11, 7, 15, 19, 3]
+		],
+		"checkpointMoves": [
+			{
+				"cycle": 0
+			},
+			{
+				"index": 16
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[8, 4, 0, 12, 16],
+				[9, 17, 1, 14, 6],
+				[10, 13, 5, 2, 18],
+				[11, 7, 15, 19, 3]
+			],
+			"revealed": [16],
+			"matched": [],
+			"mismatches": 0,
+			"moves": 0,
+			"actions": 2,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"cycle": 0
+			},
+			{
+				"index": 16
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9950,
+			"group": "memory-1:strata-cycle:10",
+			"pairs": 10,
+			"moves": 10
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-empty-well",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8],
+			[1, 5, 9],
+			[2, 6, 10],
+			[3, 7, 11]
+		],
+		"checkpointMoves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"from": 2,
+				"to": 0
+			}
+		],
+		"checkpoint": {
+			"stacks": [[10], [], [2, 6], [3, 7, 11]],
+			"revealed": [],
+			"matched": [0, 1, 4, 5, 8, 9],
+			"mismatches": 0,
+			"moves": 3,
+			"actions": 10,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"from": 2,
+				"to": 0
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5950,
+			"group": "memory-1:strata-empty-well:6",
+			"pairs": 6,
+			"moves": 6
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-empty-well",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12],
+			[1, 5, 9, 13],
+			[2, 6, 10, 14],
+			[3, 7, 11, 15]
+		],
+		"checkpointMoves": [
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"from": 2,
+				"to": 0
+			}
+		],
+		"checkpoint": {
+			"stacks": [[14], [], [2, 6, 10], [3, 7, 11, 15]],
+			"revealed": [],
+			"matched": [0, 1, 4, 5, 8, 9, 12, 13],
+			"mismatches": 0,
+			"moves": 4,
+			"actions": 13,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"from": 2,
+				"to": 0
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7950,
+			"group": "memory-1:strata-empty-well:8",
+			"pairs": 8,
+			"moves": 8
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-empty-well",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 5, 9, 13, 17],
+			[2, 6, 10, 14, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"from": 2,
+				"to": 0
+			}
+		],
+		"checkpoint": {
+			"stacks": [[18], [], [2, 6, 10, 14], [3, 7, 11, 15, 19]],
+			"revealed": [],
+			"matched": [0, 1, 4, 5, 8, 9, 12, 13, 16, 17],
+			"mismatches": 0,
+			"moves": 5,
+			"actions": 16,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"from": 2,
+				"to": 0
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9950,
+			"group": "memory-1:strata-empty-well:10",
+			"pairs": 10,
+			"moves": 10
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-glimpse",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8],
+			[1, 6, 9],
+			[2, 5, 10],
+			[3, 7, 11]
+		],
+		"checkpointMoves": [
+			{
+				"index": 8
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8],
+				[1, 6, 9],
+				[2, 5, 10],
+				[3, 7, 11]
+			],
+			"revealed": [8],
+			"matched": [],
+			"mismatches": 0,
+			"moves": 0,
+			"actions": 1,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 8
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5950,
+			"group": "memory-1:strata-glimpse:6",
+			"pairs": 6,
+			"moves": 6
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-glimpse",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12],
+			[1, 6, 9, 14],
+			[2, 5, 10, 13],
+			[3, 7, 11, 15]
+		],
+		"checkpointMoves": [
+			{
+				"index": 12
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12],
+				[1, 6, 9, 14],
+				[2, 5, 10, 13],
+				[3, 7, 11, 15]
+			],
+			"revealed": [12],
+			"matched": [],
+			"mismatches": 0,
+			"moves": 0,
+			"actions": 1,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 12
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7950,
+			"group": "memory-1:strata-glimpse:8",
+			"pairs": 8,
+			"moves": 8
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-glimpse",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 6, 9, 14, 17],
+			[2, 5, 10, 13, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 16
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12, 16],
+				[1, 6, 9, 14, 17],
+				[2, 5, 10, 13, 18],
+				[3, 7, 11, 15, 19]
+			],
+			"revealed": [16],
+			"matched": [],
+			"mismatches": 0,
+			"moves": 0,
+			"actions": 1,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 16
+			},
+			{
+				"cancel": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9950,
+			"group": "memory-1:strata-glimpse:10",
+			"pairs": 10,
+			"moves": 10
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-chain",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8],
+			[1, 5, 9],
+			[2, 6, 10],
+			[3, 7, 11]
+		],
+		"checkpointMoves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4],
+				[1, 5],
+				[2, 6, 10],
+				[3, 7, 11]
+			],
+			"revealed": [4, 5],
+			"matched": [8, 9],
+			"mismatches": 0,
+			"moves": 2,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": true,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5950,
+			"group": "memory-1:strata-chain:6",
+			"pairs": 6,
+			"moves": 6
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-chain",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12],
+			[1, 5, 9, 13],
+			[2, 6, 10, 14],
+			[3, 7, 11, 15]
+		],
+		"checkpointMoves": [
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8],
+				[1, 5, 9],
+				[2, 6, 10, 14],
+				[3, 7, 11, 15]
+			],
+			"revealed": [8, 9],
+			"matched": [12, 13],
+			"mismatches": 0,
+			"moves": 2,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": true,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7950,
+			"group": "memory-1:strata-chain:8",
+			"pairs": 8,
+			"moves": 8
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-chain",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 5, 9, 13, 17],
+			[2, 6, 10, 14, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12],
+				[1, 5, 9, 13],
+				[2, 6, 10, 14, 18],
+				[3, 7, 11, 15, 19]
+			],
+			"revealed": [12, 13],
+			"matched": [16, 17],
+			"mismatches": 0,
+			"moves": 2,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": true,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9950,
+			"group": "memory-1:strata-chain:10",
+			"pairs": 10,
+			"moves": 10
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-echo",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8],
+			[1, 6, 9],
+			[2, 5, 10],
+			[3, 7, 11]
+		],
+		"checkpointMoves": [
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8],
+				[1, 6, 9],
+				[2, 5],
+				[3, 7]
+			],
+			"revealed": [],
+			"matched": [10, 11],
+			"mismatches": 0,
+			"moves": 1,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": [5, 7],
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5950,
+			"group": "memory-1:strata-echo:6",
+			"pairs": 6,
+			"moves": 6
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-echo",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12],
+			[1, 6, 9, 14],
+			[2, 5, 10, 13],
+			[3, 7, 11, 15]
+		],
+		"checkpointMoves": [
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12],
+				[1, 6, 9],
+				[2, 5, 10, 13],
+				[3, 7, 11]
+			],
+			"revealed": [],
+			"matched": [14, 15],
+			"mismatches": 0,
+			"moves": 1,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": [9, 11],
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7950,
+			"group": "memory-1:strata-echo:8",
+			"pairs": 8,
+			"moves": 8
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-echo",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 6, 9, 14, 17],
+			[2, 5, 10, 13, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12, 16],
+				[1, 6, 9, 14, 17],
+				[2, 5, 10, 13],
+				[3, 7, 11, 15]
+			],
+			"revealed": [],
+			"matched": [18, 19],
+			"mismatches": 0,
+			"moves": 1,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": [13, 15],
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9950,
+			"group": "memory-1:strata-echo:10",
+			"pairs": 10,
+			"moves": 10
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-slip",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[8, 4, 0],
+			[1, 9, 6],
+			[10, 2, 5],
+			[3, 11, 7]
+		],
+		"checkpointMoves": [
+			{
+				"index": 0
+			},
+			{
+				"index": 6
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 8, 4],
+				[6, 1, 9],
+				[10, 2, 5],
+				[3, 11, 7]
+			],
+			"revealed": [],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 0
+			},
+			{
+				"index": 6
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5800,
+			"group": "memory-1:strata-slip:6",
+			"pairs": 6,
+			"moves": 7
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-slip",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 8, 12, 4],
+			[1, 6, 9, 14],
+			[13, 2, 10, 5],
+			[11, 7, 15, 3]
+		],
+		"checkpointMoves": [
+			{
+				"index": 4
+			},
+			{
+				"index": 14
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[4, 0, 8, 12],
+				[14, 1, 6, 9],
+				[13, 2, 10, 5],
+				[11, 7, 15, 3]
+			],
+			"revealed": [],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 4
+			},
+			{
+				"index": 14
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7800,
+			"group": "memory-1:strata-slip:8",
+			"pairs": 8,
+			"moves": 9
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-slip",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[4, 0, 12, 16, 8],
+			[9, 17, 1, 14, 6],
+			[10, 13, 5, 2, 18],
+			[11, 7, 15, 19, 3]
+		],
+		"checkpointMoves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 6
+			},
+			{
+				"continue": 1
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[8, 4, 0, 12, 16],
+				[6, 9, 17, 1, 14],
+				[10, 13, 5, 2, 18],
+				[11, 7, 15, 19, 3]
+			],
+			"revealed": [],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 3,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": null,
+			"orderCursor": null
+		},
+		"moves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 6
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 3
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"cycle": 0
+			},
+			{
+				"cycle": 2
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9800,
+			"group": "memory-1:strata-slip:10",
+			"pairs": 10,
+			"moves": 11
+		}
+	},
+	{
+		"seed": "3",
+		"variant": "memory:strata-order",
+		"pairs": 6,
+		"deck": [
+			"hexagon:0",
+			"hexagon:1",
+			"circle:0",
+			"circle:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"square:0",
+			"square:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8],
+			[1, 6, 9],
+			[2, 5, 10],
+			[3, 7, 11]
+		],
+		"checkpointMoves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8],
+				[1, 6, 9],
+				[2, 5, 10],
+				[3, 7, 11]
+			],
+			"revealed": [8, 9],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 2,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": ["heart", "square", "star", "cross", "circle", "hexagon"],
+			"orderCursor": 0
+		},
+		"moves": [
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 5800,
+			"group": "memory-1:strata-order:6",
+			"pairs": 6,
+			"moves": 7
+		}
+	},
+	{
+		"seed": "0",
+		"variant": "memory:strata-order",
+		"pairs": 8,
+		"deck": [
+			"pentagon:0",
+			"pentagon:1",
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"hexagon:0",
+			"hexagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1",
+			"square:0",
+			"square:1",
+			"star:0",
+			"star:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12],
+			[1, 6, 9, 14],
+			[2, 5, 10, 13],
+			[3, 7, 11, 15]
+		],
+		"checkpointMoves": [
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12],
+				[1, 6, 9, 14],
+				[2, 5, 10, 13],
+				[3, 7, 11, 15]
+			],
+			"revealed": [12, 13],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 2,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": [
+				"star",
+				"square",
+				"heart",
+				"diamond",
+				"hexagon",
+				"cross",
+				"ring",
+				"pentagon"
+			],
+			"orderCursor": 0
+		},
+		"moves": [
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 7800,
+			"group": "memory-1:strata-order:8",
+			"pairs": 8,
+			"moves": 9
+		}
+	},
+	{
+		"seed": "1",
+		"variant": "memory:strata-order",
+		"pairs": 10,
+		"deck": [
+			"ring:0",
+			"ring:1",
+			"cross:0",
+			"cross:1",
+			"star:0",
+			"star:1",
+			"triangle:0",
+			"triangle:1",
+			"circle:0",
+			"circle:1",
+			"square:0",
+			"square:1",
+			"hexagon:0",
+			"hexagon:1",
+			"pentagon:0",
+			"pentagon:1",
+			"diamond:0",
+			"diamond:1",
+			"heart:0",
+			"heart:1"
+		],
+		"stacks": [
+			[0, 4, 8, 12, 16],
+			[1, 6, 9, 14, 17],
+			[2, 5, 10, 13, 18],
+			[3, 7, 11, 15, 19]
+		],
+		"checkpointMoves": [
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			}
+		],
+		"checkpoint": {
+			"stacks": [
+				[0, 4, 8, 12, 16],
+				[1, 6, 9, 14, 17],
+				[2, 5, 10, 13, 18],
+				[3, 7, 11, 15, 19]
+			],
+			"revealed": [16, 17],
+			"matched": [],
+			"mismatches": 1,
+			"moves": 1,
+			"actions": 2,
+			"status": "playing",
+			"shelf": null,
+			"echo": null,
+			"chain": null,
+			"excavationOrder": [
+				"heart",
+				"diamond",
+				"pentagon",
+				"hexagon",
+				"square",
+				"circle",
+				"triangle",
+				"star",
+				"cross",
+				"ring"
+			],
+			"orderCursor": 0
+		},
+		"moves": [
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 18
+			},
+			{
+				"index": 19
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 16
+			},
+			{
+				"index": 17
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 14
+			},
+			{
+				"index": 15
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 12
+			},
+			{
+				"index": 13
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 10
+			},
+			{
+				"index": 11
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 8
+			},
+			{
+				"index": 9
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 6
+			},
+			{
+				"index": 7
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 4
+			},
+			{
+				"index": 5
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 2
+			},
+			{
+				"index": 3
+			},
+			{
+				"continue": 1
+			},
+			{
+				"index": 0
+			},
+			{
+				"index": 1
+			},
+			{
+				"continue": 1
+			}
+		],
+		"result": {
+			"score": 9800,
+			"group": "memory-1:strata-order:10",
+			"pairs": 10,
+			"moves": 11
+		}
+	}
+]

@@ -1847,6 +1847,378 @@ const metadata = {
 					note: 'v1.game.memory.scoringNote',
 					tips: 'memory.agentsSdk.tips'
 				}
+			},
+			{
+				id: 'memory:time-strata',
+				name: 'variant.memory:time-strata',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:time-strata:6',
+					'memory-1:time-strata:8',
+					'memory-1:time-strata:10'
+				],
+				help: {
+					steps: ['memory.timeStrata.step1', 'memory.timeStrata.step2', 'memory.timeStrata.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.timeStrata.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition: 'Every stack is empty after confirming the final matching tops.'
+				}
+			},
+			{
+				id: 'memory:strata-linked',
+				name: 'variant.memory:strata-linked',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-linked:6',
+					'memory-1:strata-linked:8',
+					'memory-1:strata-linked:10'
+				],
+				help: {
+					steps: [
+						'memory.strataLinked.step1',
+						'memory.strataLinked.step2',
+						'memory.strataLinked.step3'
+					],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataLinked.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-sweep',
+				name: 'variant.memory:strata-sweep',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-sweep:6',
+					'memory-1:strata-sweep:8',
+					'memory-1:strata-sweep:10'
+				],
+				help: {
+					steps: [
+						'memory.strataSweep.step1',
+						'memory.strataSweep.step2',
+						'memory.strataSweep.step3'
+					],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataSweep.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-shelf',
+				name: 'variant.memory:strata-shelf',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-shelf:6',
+					'memory-1:strata-shelf:8',
+					'memory-1:strata-shelf:10'
+				],
+				help: {
+					steps: [
+						'memory.strataShelf.step1',
+						'memory.strataShelf.step2',
+						'memory.strataShelf.step3'
+					],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataShelf.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-cycle',
+				name: 'variant.memory:strata-cycle',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-cycle:6',
+					'memory-1:strata-cycle:8',
+					'memory-1:strata-cycle:10'
+				],
+				help: {
+					steps: [
+						'memory.strataCycle.step1',
+						'memory.strataCycle.step2',
+						'memory.strataCycle.step3'
+					],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataCycle.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-empty-well',
+				name: 'variant.memory:strata-empty-well',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-empty-well:6',
+					'memory-1:strata-empty-well:8',
+					'memory-1:strata-empty-well:10'
+				],
+				help: {
+					steps: [
+						'memory.strataEmptyWell.step1',
+						'memory.strataEmptyWell.step2',
+						'memory.strataEmptyWell.step3'
+					],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataEmptyWell.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-glimpse',
+				name: 'variant.memory:strata-glimpse',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-glimpse:6',
+					'memory-1:strata-glimpse:8',
+					'memory-1:strata-glimpse:10'
+				],
+				help: {
+					steps: [
+						'memory.strataGlimpse.step1',
+						'memory.strataGlimpse.step2',
+						'memory.strataGlimpse.step3'
+					],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataGlimpse.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-chain',
+				name: 'variant.memory:strata-chain',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-chain:6',
+					'memory-1:strata-chain:8',
+					'memory-1:strata-chain:10'
+				],
+				help: {
+					steps: [
+						'memory.strataChain.step1',
+						'memory.strataChain.step2',
+						'memory.strataChain.step3'
+					],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataChain.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-echo',
+				name: 'variant.memory:strata-echo',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-echo:6',
+					'memory-1:strata-echo:8',
+					'memory-1:strata-echo:10'
+				],
+				help: {
+					steps: ['memory.strataEcho.step1', 'memory.strataEcho.step2', 'memory.strataEcho.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataEcho.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-slip',
+				name: 'variant.memory:strata-slip',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-slip:6',
+					'memory-1:strata-slip:8',
+					'memory-1:strata-slip:10'
+				],
+				help: {
+					steps: ['memory.strataSlip.step1', 'memory.strataSlip.step2', 'memory.strataSlip.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataSlip.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
+			},
+			{
+				id: 'memory:strata-order',
+				name: 'variant.memory:strata-order',
+				weight: 1,
+				maxMoves: 10000,
+				leaderboardGroups: [
+					'memory-1:strata-order:6',
+					'memory-1:strata-order:8',
+					'memory-1:strata-order:10'
+				],
+				help: {
+					steps: [
+						'memory.strataOrder.step1',
+						'memory.strataOrder.step2',
+						'memory.strataOrder.step3'
+					],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'memory.noPreview.scoringNote',
+					tips: 'memory.strataOrder.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'memory.timeStrata.won' },
+					subline: { key: 'ending.memory.subline', values: ['pairs', 'time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Every stack and sample shelf is empty after confirming the final matching pair.'
+				}
 			}
 		],
 		ending: {
@@ -2074,6 +2446,39 @@ const metadata = {
 				'memory-1:agents-sdk:6': 'leaderboard.memory.agents-sdk.6',
 				'memory-1:agents-sdk:8': 'leaderboard.memory.agents-sdk.8',
 				'memory-1:agents-sdk:10': 'leaderboard.memory.agents-sdk.10',
+				'memory-1:time-strata:6': 'leaderboard.memory.time-strata.6',
+				'memory-1:time-strata:8': 'leaderboard.memory.time-strata.8',
+				'memory-1:time-strata:10': 'leaderboard.memory.time-strata.10',
+				'memory-1:strata-linked:6': 'leaderboard.memory.strata-linked.6',
+				'memory-1:strata-linked:8': 'leaderboard.memory.strata-linked.8',
+				'memory-1:strata-linked:10': 'leaderboard.memory.strata-linked.10',
+				'memory-1:strata-sweep:6': 'leaderboard.memory.strata-sweep.6',
+				'memory-1:strata-sweep:8': 'leaderboard.memory.strata-sweep.8',
+				'memory-1:strata-sweep:10': 'leaderboard.memory.strata-sweep.10',
+				'memory-1:strata-shelf:6': 'leaderboard.memory.strata-shelf.6',
+				'memory-1:strata-shelf:8': 'leaderboard.memory.strata-shelf.8',
+				'memory-1:strata-shelf:10': 'leaderboard.memory.strata-shelf.10',
+				'memory-1:strata-cycle:6': 'leaderboard.memory.strata-cycle.6',
+				'memory-1:strata-cycle:8': 'leaderboard.memory.strata-cycle.8',
+				'memory-1:strata-cycle:10': 'leaderboard.memory.strata-cycle.10',
+				'memory-1:strata-empty-well:6': 'leaderboard.memory.strata-empty-well.6',
+				'memory-1:strata-empty-well:8': 'leaderboard.memory.strata-empty-well.8',
+				'memory-1:strata-empty-well:10': 'leaderboard.memory.strata-empty-well.10',
+				'memory-1:strata-glimpse:6': 'leaderboard.memory.strata-glimpse.6',
+				'memory-1:strata-glimpse:8': 'leaderboard.memory.strata-glimpse.8',
+				'memory-1:strata-glimpse:10': 'leaderboard.memory.strata-glimpse.10',
+				'memory-1:strata-chain:6': 'leaderboard.memory.strata-chain.6',
+				'memory-1:strata-chain:8': 'leaderboard.memory.strata-chain.8',
+				'memory-1:strata-chain:10': 'leaderboard.memory.strata-chain.10',
+				'memory-1:strata-echo:6': 'leaderboard.memory.strata-echo.6',
+				'memory-1:strata-echo:8': 'leaderboard.memory.strata-echo.8',
+				'memory-1:strata-echo:10': 'leaderboard.memory.strata-echo.10',
+				'memory-1:strata-slip:6': 'leaderboard.memory.strata-slip.6',
+				'memory-1:strata-slip:8': 'leaderboard.memory.strata-slip.8',
+				'memory-1:strata-slip:10': 'leaderboard.memory.strata-slip.10',
+				'memory-1:strata-order:6': 'leaderboard.memory.strata-order.6',
+				'memory-1:strata-order:8': 'leaderboard.memory.strata-order.8',
+				'memory-1:strata-order:10': 'leaderboard.memory.strata-order.10',
 				'memory-1:quads:4': 'leaderboard.memory.quads.4',
 				'memory-1:quads:5': 'leaderboard.memory.quads.5',
 				'memory-1:quads:6': 'leaderboard.memory.quads.6'

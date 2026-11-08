@@ -82,7 +82,12 @@ export interface PuzzleManifest {
 			values: readonly { id: string; label: string }[];
 		}[];
 		archetypes: readonly { id: string; label: string }[];
-		variants: readonly { id: string; archetype: string; change?: readonly [string, string] }[];
+		variants: readonly {
+			id: string;
+			archetype: string;
+			change?: readonly [string, string];
+			changes?: readonly (readonly [string, string])[];
+		}[];
 	};
 	id: PuzzleId;
 	presentation: PuzzlePresentation;
@@ -128,4 +133,21 @@ export interface PuzzleManifest {
 		scoring?: import('./scoring.js').ScoreValues,
 		variant?: string
 	): ReplayedResult;
+}
+
+/** Read single-rule and multi-rule policy mappings through the same metadata contract. */
+export function dimensionChange(
+	variant:
+		| {
+				id: string;
+				change?: readonly [string, string];
+				changes?: readonly (readonly [string, string])[];
+		  }
+		| undefined,
+	key: string
+): string | undefined {
+	return (
+		variant?.changes?.find(([dimension]) => dimension === key)?.[1] ??
+		(variant?.change?.[0] === key ? variant.change[1] : undefined)
+	);
 }

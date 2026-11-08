@@ -1,4 +1,5 @@
 import { catalog } from '#lib/catalog.js';
+import { dimensionChange } from '#lib/engine/contract.js';
 import { puzzleVariant } from '#lib/scoring.js';
 import { readMemoryPolicy, memoryBlockers } from './memory-policy.js';
 import { queryActivityCounts, type ActivityMappingEntry } from './games.js';
@@ -96,9 +97,8 @@ export function memoryVariantDimensions(
 ): DimensionItem[] {
 	const policy = catalog.memory.dimensionPolicy;
 	const variant = policy.variants.find((entry) => entry.id === id);
-	const change = variant && 'change' in variant ? variant.change : undefined;
 	return policy.dimensions.map((dimension) => {
-		const valueId = change?.[0] === dimension.key ? change[1] : dimension.values[0].id;
+		const valueId = dimensionChange(variant, dimension.key) ?? dimension.values[0].id;
 		const valDef = dimension.values.find((item) => item.id === valueId);
 		const isBlocked = policyValues[`${dimension.key}:${valueId}`] !== true;
 		return {
@@ -237,7 +237,10 @@ export async function loadMemoryDirectory(
 		return {
 			id,
 			nameKey: def?.name,
-			name: def ? id.replace(/^memory:/, '') : id,
+			name: def
+				? (catalog.memory.messages[def.name as keyof typeof catalog.memory.messages] ??
+					id.replace(/^memory:/, ''))
+				: id,
 			archetype,
 			archetypeKey: archetypeDef?.label ?? 'policy.core',
 			source: isCurated ? 'curated' : 'observed',

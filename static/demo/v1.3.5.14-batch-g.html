@@ -1,0 +1,1069 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<meta name="robots" content="noindex" />
+		<title>Morphi — Batch G · Time Strata baseline review</title>
+		<style>
+			@font-face {
+				font-family: Nunito;
+				src: url('/demo/nunito-latin-wght-normal.woff2') format('woff2');
+				font-weight: 200 1000;
+				font-display: swap;
+			}
+			:root {
+				color-scheme: light;
+				--bg: #eef2f7;
+				--surface: #fff;
+				--surface-2: #e5edf7;
+				--border: #c9d6e4;
+				--ink: #1b2433;
+				--ink-2: #344257;
+				--muted: #5a6b82;
+				--accent: #2f6fed;
+				--success: #009a86;
+				--danger: #b42318;
+				--focus: #2f6fed;
+				--memory-bg: #dfe9f5;
+				--memory-back: #a9bfdf;
+				--memory-edge: #90aac9;
+				--card-w: 132px;
+				--card-h: 164px;
+				--step: 7px;
+				font:
+					600 15px/1.4 Nunito,
+					system-ui,
+					sans-serif;
+			}
+			* {
+				box-sizing: border-box;
+			}
+			html {
+				height: 100%;
+			}
+			body {
+				min-height: 100%;
+				margin: 0;
+				background: var(--bg);
+				color: var(--ink);
+				display: flex;
+				flex-direction: column;
+			}
+			button,
+			select {
+				font: inherit;
+				color: inherit;
+			}
+			button {
+				cursor: pointer;
+			}
+			button:disabled {
+				cursor: default;
+			}
+			:focus-visible {
+				outline: 3px solid var(--focus);
+				outline-offset: 3px;
+			}
+			[hidden] {
+				display: none !important;
+			}
+			.review {
+				padding: 8px 18px;
+				display: flex;
+				justify-content: space-between;
+				gap: 8px;
+				flex-wrap: wrap;
+				background: var(--surface);
+				border-bottom: 1px solid var(--border);
+				font-size: 12px;
+			}
+			.review span {
+				color: var(--muted);
+			}
+			.layout {
+				width: 100%;
+				max-width: 1280px;
+				margin: auto;
+				flex: 1;
+				min-height: 0;
+				display: grid;
+				grid-template-columns: minmax(0, 1fr) 270px;
+				gap: 18px;
+				padding: 18px;
+			}
+			.play {
+				min-width: 0;
+				min-height: 0;
+				display: flex;
+				flex-direction: column;
+				gap: 16px;
+				padding: 22px;
+				background: var(--memory-bg);
+				border: 1px solid var(--border);
+				border-radius: 18px;
+			}
+			.heading {
+				display: flex;
+				justify-content: space-between;
+				align-items: start;
+				gap: 14px;
+			}
+			h1 {
+				font-size: 34px;
+				letter-spacing: -0.8px;
+				line-height: 1.15;
+				margin: 0;
+			}
+			.subtitle {
+				font-size: 14px;
+				color: var(--ink-2);
+				margin: 5px 0 0;
+			}
+			.deal-size {
+				display: flex;
+				flex-direction: column;
+				gap: 4px;
+				font-size: 12px;
+				white-space: nowrap;
+			}
+			select {
+				min-height: 40px;
+				padding: 5px 10px;
+				background: var(--surface);
+				border: 1px solid var(--memory-edge);
+				border-radius: 8px;
+			}
+			.hud {
+				display: flex;
+				gap: 24px;
+				align-items: center;
+				font-size: 13px;
+			}
+			.hud b {
+				font-size: 20px;
+				display: block;
+				font-weight: 900;
+			}
+			.hud span {
+				color: var(--ink-2);
+			}
+			.deal-label {
+				margin-left: auto;
+				font-size: 12px;
+			}
+			.board {
+				flex: 1;
+				min-height: 0;
+				display: grid;
+				grid-template-columns: repeat(4, minmax(0, 1fr));
+				gap: 16px;
+				align-content: center;
+				padding: 12px 0;
+			}
+			.pile {
+				min-width: 0;
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				gap: 10px;
+			}
+			.well {
+				position: relative;
+				width: var(--card-w);
+				height: calc(var(--card-h) + 4 * var(--step));
+			}
+			.buried,
+			.top-card,
+			.empty-well {
+				position: absolute;
+				left: 0;
+				top: 0;
+				width: var(--card-w);
+				height: var(--card-h);
+				border: 2px solid var(--memory-edge);
+				border-radius: 12px;
+			}
+			.buried {
+				background: var(--memory-back);
+				pointer-events: none;
+			}
+			.top-card {
+				padding: 12px;
+				background: var(--memory-back);
+				display: flex;
+				flex-direction: column;
+				align-items: center;
+				justify-content: center;
+				gap: 8px;
+				z-index: 10;
+				touch-action: manipulation;
+			}
+			.top-card[aria-pressed='true'] {
+				background: var(--surface);
+				border-color: var(--ink);
+			}
+			.top-card:disabled:not([aria-pressed='true']) {
+				border-style: dashed;
+			}
+			.top-card[data-result='match'] {
+				border-color: var(--success);
+			}
+			.top-card[data-result='mismatch'] {
+				border-color: var(--danger);
+			}
+			.back-mark {
+				width: 36px;
+				display: flex;
+				flex-direction: column;
+				gap: 6px;
+			}
+			.back-mark i {
+				display: block;
+				height: 3px;
+				background: var(--ink-2);
+				border-radius: 2px;
+			}
+			.back-mark i:nth-child(2) {
+				width: 26px;
+				align-self: center;
+			}
+			.back-mark i:nth-child(3) {
+				width: 16px;
+				align-self: center;
+			}
+			.top-label {
+				font-size: 11px;
+				font-weight: 800;
+				color: var(--ink-2);
+			}
+			.face-symbol {
+				width: 64px;
+				height: 64px;
+				color: var(--ink);
+			}
+			.face-symbol svg {
+				display: block;
+				width: 100%;
+				height: 100%;
+				fill: none;
+				stroke: currentColor;
+				stroke-width: 4;
+				stroke-linecap: round;
+				stroke-linejoin: round;
+			}
+			.face-name {
+				font-size: 12px;
+				font-weight: 900;
+			}
+			.empty-well {
+				display: grid;
+				place-items: center;
+				background: transparent;
+				border-style: dashed;
+				color: var(--muted);
+				font-size: 13px;
+			}
+			.play[data-finished='true'] .well,
+			.play[data-finished='true'] .empty-well {
+				height: 64px;
+			}
+			.pile-label {
+				text-align: center;
+				font-size: 12px;
+				line-height: 1.5;
+			}
+			.pile-label strong {
+				display: block;
+				font-size: 14px;
+			}
+			.pile-label span {
+				color: var(--ink-2);
+			}
+			.status {
+				margin: 0;
+				min-height: 42px;
+				font-size: 14px;
+				font-weight: 800;
+				max-width: 640px;
+			}
+			.status[data-kind='mismatch'],
+			.status[data-kind='error'] {
+				color: var(--danger);
+			}
+			.controls {
+				display: flex;
+				gap: 8px;
+				flex-wrap: wrap;
+				align-items: center;
+			}
+			.btn {
+				min-height: 44px;
+				padding: 8px 13px;
+				border: 1px solid var(--memory-edge);
+				border-radius: 8px;
+				background: var(--surface);
+				font-size: 13px;
+				font-weight: 800;
+			}
+			.btn:disabled {
+				opacity: 0.45;
+			}
+			.btn.primary {
+				background: var(--ink);
+				color: var(--surface);
+				border-color: var(--ink);
+			}
+			.controls .secondary {
+				margin-left: auto;
+			}
+			.completion {
+				padding: 14px 16px;
+				background: var(--surface);
+				border: 1px solid var(--memory-edge);
+				border-radius: 10px;
+			}
+			.completion strong {
+				font-size: 20px;
+				display: block;
+			}
+			.completion p {
+				margin: 4px 0 0;
+				font-size: 13px;
+			}
+			.rules {
+				align-self: start;
+				background: var(--surface);
+				border: 1px solid var(--border);
+				border-radius: 14px;
+				padding: 16px;
+				font-size: 13px;
+				line-height: 1.6;
+			}
+			.rules summary {
+				font-size: 16px;
+				font-weight: 900;
+				cursor: pointer;
+				min-height: 28px;
+			}
+			.rules ol {
+				padding-left: 20px;
+				margin: 14px 0;
+			}
+			.rules li + li {
+				margin-top: 9px;
+			}
+			.rules h2 {
+				font-size: 14px;
+				margin: 18px 0 5px;
+			}
+			.rules p {
+				margin: 0 0 12px;
+				color: var(--ink-2);
+			}
+			.rules .btn {
+				width: 100%;
+			}
+			.guide {
+				margin-top: 12px;
+				padding: 12px;
+				border: 1px solid var(--border);
+				border-radius: 8px;
+				background: var(--surface-2);
+			}
+			.guide p {
+				margin: 0 0 10px;
+			}
+			.scope-note {
+				border-top: 1px solid var(--border);
+				padding-top: 14px;
+				margin-top: 18px !important;
+				font-size: 12px;
+				color: var(--muted) !important;
+			}
+			@media (max-width: 1100px) {
+				:root {
+					--card-w: 108px;
+					--card-h: 136px;
+					--step: 6px;
+				}
+				.layout {
+					grid-template-columns: 1fr;
+					max-width: 900px;
+				}
+				.rules {
+					width: 100%;
+				}
+				.play {
+					padding: 18px;
+				}
+			}
+			@media (max-width: 600px) {
+				:root {
+					--card-w: 108px;
+					--card-h: 108px;
+					--step: 4px;
+				}
+				.review {
+					padding: 7px 12px;
+					font-size: 11px;
+				}
+				.review span {
+					font-size: 10px;
+				}
+				.layout {
+					padding: 12px;
+					gap: 10px;
+					flex: 0;
+				}
+				.play {
+					padding: 14px;
+					gap: 10px;
+				}
+				.heading {
+					gap: 8px;
+				}
+				h1 {
+					font-size: 28px;
+				}
+				.subtitle {
+					font-size: 12px;
+					max-width: 205px;
+				}
+				.deal-size {
+					font-size: 11px;
+				}
+				select {
+					min-height: 40px;
+					padding: 5px 7px;
+				}
+				.hud {
+					gap: 16px;
+				}
+				.hud b {
+					font-size: 18px;
+				}
+				.deal-label {
+					font-size: 10px;
+				}
+				.board {
+					grid-template-columns: repeat(2, minmax(0, 1fr));
+					gap: 12px 16px;
+					padding: 4px 0;
+				}
+				.well {
+					height: calc(var(--card-h) + 4 * var(--step));
+				}
+				.pile {
+					gap: 3px;
+				}
+				.pile-label {
+					font-size: 11px;
+					line-height: 1.35;
+				}
+				.pile-label strong {
+					font-size: 12px;
+				}
+				.status {
+					font-size: 12px;
+					min-height: 38px;
+				}
+				.controls {
+					gap: 6px;
+				}
+				.btn {
+					padding: 7px 10px;
+					font-size: 12px;
+				}
+				.controls .secondary {
+					margin-left: 0;
+				}
+				.rules {
+					padding: 12px;
+				}
+				.rules summary {
+					font-size: 14px;
+					min-height: 22px;
+				}
+			}
+			@media (orientation: landscape) and (max-height: 560px) {
+				:root {
+					--card-w: 76px;
+					--card-h: 88px;
+					--step: 3px;
+				}
+				.review {
+					padding: 4px 12px;
+					font-size: 10px;
+				}
+				.layout {
+					padding: 8px 12px;
+					gap: 8px;
+					flex: 0;
+					max-width: 1100px;
+				}
+				.play {
+					padding: 8px 14px;
+					gap: 5px;
+					border-radius: 12px;
+				}
+				.heading {
+					align-items: center;
+				}
+				h1 {
+					font-size: 24px;
+					letter-spacing: -0.4px;
+				}
+				.subtitle {
+					font-size: 11px;
+					margin-top: 2px;
+				}
+				.deal-size {
+					flex-direction: row;
+					align-items: center;
+					font-size: 11px;
+				}
+				select {
+					min-height: 34px;
+					padding: 4px 8px;
+				}
+				.hud {
+					gap: 20px;
+					font-size: 11px;
+				}
+				.hud b {
+					font-size: 14px;
+					display: inline;
+					margin-right: 4px;
+				}
+				.board {
+					grid-template-columns: repeat(4, minmax(0, 1fr));
+					padding: 3px 0;
+					gap: 14px;
+				}
+				.pile {
+					gap: 0;
+				}
+				.pile-label {
+					font-size: 10px;
+				}
+				.pile-label strong {
+					font-size: 11px;
+				}
+				.face-symbol {
+					width: 42px;
+					height: 42px;
+				}
+				.face-name,
+				.top-label {
+					font-size: 9px;
+				}
+				.top-card {
+					padding: 5px;
+					gap: 3px;
+				}
+				.back-mark {
+					width: 26px;
+					gap: 4px;
+				}
+				.status {
+					font-size: 11px;
+					min-height: 28px;
+					max-width: none;
+				}
+				.btn {
+					padding: 6px 11px;
+					font-size: 11px;
+					min-height: 44px;
+				}
+				.rules {
+					padding: 7px 12px;
+				}
+				.rules summary {
+					font-size: 12px;
+					min-height: 18px;
+				}
+				.completion {
+					padding: 5px 10px;
+				}
+				.completion strong {
+					font-size: 15px;
+				}
+				.completion p {
+					font-size: 11px;
+					margin: 0;
+				}
+			}
+			@media (prefers-reduced-motion: reduce) {
+				* {
+					scroll-behavior: auto !important;
+				}
+			}
+		</style>
+	</head>
+	<body>
+		<header class="review">
+			<strong>Batch G · New baseline preview</strong
+			><span>70 accepted Memory variants · Design review</span>
+		</header>
+		<div class="layout">
+			<main class="play" aria-labelledby="title">
+				<div class="heading">
+					<div>
+						<h1 id="title">Time Strata</h1>
+						<p class="subtitle">Match two tops to uncover the cards beneath.</p>
+					</div>
+					<label class="deal-size" for="pairCount"
+						>Depth
+						<select id="pairCount">
+							<option value="6">6 pairs · 3 layers</option>
+							<option value="8">8 pairs · 4 layers</option>
+							<option value="10">10 pairs · 5 layers</option>
+						</select></label
+					>
+				</div>
+				<div class="hud" aria-label="Round progress">
+					<div><b id="cleared">0 / 6</b><span>pairs cleared</span></div>
+					<div><b id="attempts">0</b><span>attempts</span></div>
+					<div><b id="misses">0</b><span>mismatches</span></div>
+					<span class="deal-label" id="dealLabel">Deal 1</span>
+				</div>
+				<div class="board" id="board" aria-label="Four stacks of hidden cards"></div>
+				<p class="status" id="status" role="status" aria-live="polite" aria-atomic="true">
+					Choose the top card of any stack.
+				</p>
+				<div class="completion" id="completion" hidden>
+					<strong>All layers cleared</strong>
+					<p id="completionStats"></p>
+				</div>
+				<div class="controls">
+					<button class="btn primary" id="continue" disabled>Continue</button>
+					<button class="btn" id="cancel" disabled>Cancel selection</button>
+					<button class="btn secondary" id="reset">Reset deal</button>
+					<button class="btn" id="newDeal">New deal</button>
+				</div>
+			</main>
+			<details class="rules" id="rules">
+				<summary>How this baseline plays</summary>
+				<ol>
+					<li>
+						Only the <strong>top card</strong> of each stack can be played. The layers underneath
+						stay covered.
+					</li>
+					<li>
+						Reveal tops from <strong>two different stacks</strong>. Equal symbols form a pair.
+					</li>
+					<li>
+						Press <strong>Continue</strong> to lift a match and uncover the next layer. A mismatch
+						closes without moving either stack.
+					</li>
+					<li>Cancel a single reveal freely. Clear all four stacks to finish.</li>
+				</ol>
+				<h2>Try the layer change</h2>
+				<p>
+					The example walks through a match, the newly exposed layer, and a mismatch. You control
+					each step.
+				</p>
+				<button class="btn" id="example">Show example</button>
+				<div class="guide" id="guide" hidden>
+					<p id="guideText"></p>
+					<button class="btn" id="exampleNext">Next example step</button>
+				</div>
+				<p class="scope-note">
+					One proposed Memory baseline. Catalogue additions and scoring remain for a later,
+					separately approved implementation.
+				</p>
+			</details>
+		</div>
+		<script src="/demo/anime.min.js"></script>
+		<script>
+			(() => {
+				'use strict';
+				// Fixture presentation and repeatable review deals only; never the production engine.
+				const SYMBOLS = [
+					{
+						name: 'Orbit',
+						drawing: '<circle cx="32" cy="32" r="20"/><circle cx="32" cy="32" r="5"/>'
+					},
+					{ name: 'Diamond', drawing: '<path d="M32 8 54 32 32 56 10 32Z"/>' },
+					{ name: 'Triangle', drawing: '<path d="m32 9 23 44H9Z"/>' },
+					{ name: 'Cross', drawing: '<path d="M32 9v46M9 32h46"/>' },
+					{ name: 'Square', drawing: '<rect x="12" y="12" width="40" height="40" rx="3"/>' },
+					{
+						name: 'Wave',
+						drawing: '<path d="M8 25c8-18 16 18 24 0s16 18 24 0M8 42c8-18 16 18 24 0s16 18 24 0"/>'
+					},
+					{ name: 'Arch', drawing: '<path d="M12 52V30a20 20 0 0 1 40 0v22"/>' },
+					{ name: 'Hourglass', drawing: '<path d="M14 9h36L14 55h36Z"/>' },
+					{ name: 'Fork', drawing: '<path d="M32 55V30M13 10v10c0 13 38 13 38 0V10M32 10v20"/>' },
+					{
+						name: 'Star',
+						drawing: '<path d="m32 7 7 16 18 2-14 12 4 19-15-10-15 10 4-19L7 25l18-2Z"/>'
+					}
+				];
+				const LABELS = ['I', 'II', 'III', 'IV'];
+				const SCHEDULE = [
+					[0, 1],
+					[2, 3],
+					[0, 2],
+					[1, 3]
+				];
+				const byId = (id) => document.getElementById(id);
+				const board = byId('board');
+				const preference = matchMedia('(prefers-reduced-motion: reduce)');
+				const running = new Set();
+				const motion = {
+					clear() {
+						for (const animation of running) animation.revert();
+						running.clear();
+					},
+					reveal(element, lift = false) {
+						if (preference.matches || typeof window.anime?.animate !== 'function') return;
+						try {
+							const animation = window.anime.animate(element, {
+								...(lift ? { y: [-6, 0] } : { scale: [0.96, 1] }),
+								duration: 180,
+								ease: 'outQuad',
+								onComplete: (self) => running.delete(self)
+							});
+							running.add(animation);
+						} catch (error) {
+							console.error('Preview motion unavailable', error);
+							element.style.transform = '';
+						}
+					}
+				};
+				preference.addEventListener('change', () => motion.clear());
+				let pairCount = 6,
+					deal = 1,
+					stacks = [],
+					selected = [],
+					outcome = null;
+				let attempts = 0,
+					misses = 0,
+					cleared = 0,
+					guideStep = null;
+				const buttons = [],
+					wells = [],
+					depthLabels = [];
+
+				function announce(message, kind = '') {
+					byId('status').textContent = message;
+					byId('status').dataset.kind = kind;
+				}
+				function guard(action) {
+					try {
+						action();
+					} catch (error) {
+						console.error('Time Strata preview action failed', error);
+						announce('This action could not finish. Reset the deal to try again.', 'error');
+					}
+				}
+				for (let stack = 0; stack < 4; stack++) {
+					const pile = document.createElement('section');
+					pile.className = 'pile';
+					pile.setAttribute('aria-label', 'Stack ' + LABELS[stack]);
+					const well = document.createElement('div');
+					well.className = 'well';
+					const button = document.createElement('button');
+					button.className = 'top-card';
+					button.type = 'button';
+					button.dataset.stack = stack;
+					button.addEventListener('click', () =>
+						guard(() => {
+							endExample();
+							chooseTop(stack);
+						})
+					);
+					well.appendChild(button);
+					const label = document.createElement('div');
+					label.className = 'pile-label';
+					const name = document.createElement('strong');
+					name.textContent = 'Stack ' + LABELS[stack];
+					const depth = document.createElement('span');
+					label.append(name, depth);
+					pile.append(well, label);
+					board.appendChild(pile);
+					buttons.push(button);
+					wells.push(well);
+					depthLabels.push(depth);
+				}
+				function makeDeal() {
+					const symbols = Array.from({ length: pairCount }, (_, index) => index);
+					let seed = deal >>> 0 || 1;
+					const next = () => (seed = (Math.imul(seed, 1664525) + 1013904223) >>> 0);
+					for (let index = symbols.length - 1; index > 0; index--) {
+						const other = next() % (index + 1);
+						[symbols[index], symbols[other]] = [symbols[other], symbols[index]];
+					}
+					stacks = [[], [], [], []];
+					// Reverse insertion order always gives a legal removal sequence.
+					symbols.forEach((symbol, index) => {
+						for (const stack of SCHEDULE[index % SCHEDULE.length]) stacks[stack].push(symbol);
+					});
+				}
+				function render() {
+					document.querySelector('.play').dataset.finished = cleared === pairCount;
+					for (let stack = 0; stack < 4; stack++) {
+						const depth = stacks[stack].length;
+						const button = buttons[stack],
+							well = wells[stack];
+						well.querySelectorAll('.buried,.empty-well').forEach((element) => element.remove());
+						for (let layer = depth - 1; layer > 0; layer--) {
+							const back = document.createElement('span');
+							back.className = 'buried';
+							back.setAttribute('aria-hidden', 'true');
+							back.style.top = 'calc(' + layer + ' * var(--step))';
+							well.insertBefore(back, button);
+						}
+						const faceUp = selected.includes(stack);
+						button.hidden = depth === 0;
+						button.disabled = depth === 0 || outcome !== null;
+						button.dataset.depth = depth;
+						button.setAttribute('aria-pressed', String(faceUp));
+						delete button.dataset.pair;
+						delete button.dataset.result;
+						if (depth === 0) {
+							const empty = document.createElement('span');
+							empty.className = 'empty-well';
+							empty.textContent = 'Empty';
+							empty.setAttribute('aria-hidden', 'true');
+							well.appendChild(empty);
+							button.textContent = '';
+							button.setAttribute('aria-label', 'Stack ' + LABELS[stack] + ', empty');
+						} else if (faceUp) {
+							const pair = stacks[stack][depth - 1],
+								symbol = SYMBOLS[pair];
+							button.dataset.pair = pair;
+							if (outcome) button.dataset.result = outcome;
+							button.innerHTML =
+								'<span class="face-symbol" aria-hidden="true"><svg viewBox="0 0 64 64">' +
+								symbol.drawing +
+								'</svg></span><span class="face-name">' +
+								symbol.name +
+								'</span>';
+							button.setAttribute(
+								'aria-label',
+								'Stack ' + LABELS[stack] + ', ' + symbol.name + ', ' + depth + ' cards remain'
+							);
+						} else {
+							button.innerHTML =
+								'<span class="back-mark" aria-hidden="true"><i></i><i></i><i></i></span><span class="top-label">TOP CARD</span>';
+							button.setAttribute(
+								'aria-label',
+								'Stack ' + LABELS[stack] + ', face down, ' + depth + ' cards remain'
+							);
+						}
+						depthLabels[stack].textContent =
+							depth === 0 ? 'Cleared' : depth + ' cards · ' + (depth - 1) + ' covered';
+					}
+					byId('pairCount').value = pairCount;
+					byId('cleared').textContent = cleared + ' / ' + pairCount;
+					byId('attempts').textContent = attempts;
+					byId('misses').textContent = misses;
+					byId('dealLabel').textContent = 'Deal ' + deal;
+					byId('cancel').disabled = selected.length !== 1 || outcome !== null;
+					byId('continue').disabled = outcome === null;
+					byId('continue').textContent =
+						outcome === 'match'
+							? 'Continue · Lift pair'
+							: outcome === 'mismatch'
+								? 'Continue · Close cards'
+								: 'Continue';
+					byId('completion').hidden = cleared !== pairCount;
+					byId('completionStats').textContent =
+						attempts + ' attempts · ' + misses + ' mismatches. All four stacks are empty.';
+					byId('guide').hidden = guideStep === null;
+				}
+				function focusTop(preferred = 0) {
+					const index = stacks[preferred]?.length
+						? preferred
+						: stacks.findIndex((stack) => stack.length);
+					if (index >= 0) buttons[index].focus({ preventScroll: true });
+					else byId('reset').focus({ preventScroll: true });
+				}
+				function endExample() {
+					guideStep = null;
+					byId('guide').hidden = true;
+				}
+				function reset() {
+					motion.clear();
+					selected = [];
+					outcome = null;
+					attempts = 0;
+					misses = 0;
+					cleared = 0;
+					endExample();
+					makeDeal();
+					render();
+					announce('Choose the top card of any stack. The layers beneath stay covered.');
+				}
+				function cancelSelection() {
+					if (selected.length !== 1 || outcome !== null) return;
+					const stack = selected[0];
+					motion.clear();
+					selected = [];
+					render();
+					announce('Selection cancelled. No attempt spent.');
+					focusTop(stack);
+				}
+				function chooseTop(stack) {
+					if (outcome !== null || !stacks[stack]?.length) return;
+					if (selected.includes(stack)) {
+						cancelSelection();
+						return;
+					}
+					motion.clear();
+					selected.push(stack);
+					if (selected.length === 2) {
+						attempts++;
+						outcome =
+							stacks[selected[0]].at(-1) === stacks[selected[1]].at(-1) ? 'match' : 'mismatch';
+						if (outcome === 'mismatch') misses++;
+						render();
+						announce(
+							outcome === 'match'
+								? 'Pair found. Continue to lift both tops and uncover the next layers.'
+								: 'Different symbols. Continue to close these tops. Their layers will stay in place.',
+							outcome
+						);
+						byId('continue').focus({ preventScroll: true });
+					} else {
+						render();
+						announce(
+							SYMBOLS[stacks[stack].at(-1)].name +
+								' revealed in Stack ' +
+								LABELS[stack] +
+								'. Choose a different top, or cancel.'
+						);
+					}
+					motion.reveal(buttons[stack]);
+				}
+				function continueTurn() {
+					if (outcome === null) return;
+					motion.clear();
+					const affected = selected.slice(),
+						matched = outcome === 'match';
+					if (matched) {
+						for (const stack of affected) stacks[stack].pop();
+						cleared++;
+					}
+					selected = [];
+					outcome = null;
+					render();
+					if (cleared === pairCount) announce('All layers cleared. You finished this deal.');
+					else if (matched)
+						announce(
+							'Pair lifted from Stacks ' +
+								affected.map((stack) => LABELS[stack]).join(' and ') +
+								'. Their next cards are still face down.'
+						);
+					else announce('Both cards closed. The layers stayed in place. Try another two tops.');
+					focusTop(affected[0]);
+					if (matched)
+						for (const stack of affected)
+							if (stacks[stack].length) motion.reveal(buttons[stack], true);
+				}
+				function findTops(matching) {
+					for (let first = 0; first < 4; first++)
+						for (let second = first + 1; second < 4; second++) {
+							if (
+								stacks[first].length &&
+								stacks[second].length &&
+								(stacks[first].at(-1) === stacks[second].at(-1)) === matching
+							)
+								return [first, second];
+						}
+					throw new Error('The review example has no suitable top pair.');
+				}
+				function exampleNext() {
+					if (guideStep === null) {
+						pairCount = 6;
+						deal = 1;
+						reset();
+						guideStep = 0;
+						for (const stack of findTops(true)) chooseTop(stack);
+						byId('guideText').textContent =
+							'1 / 4 — These two tops match. The cards underneath are still covered.';
+					} else if (guideStep === 0) {
+						continueTurn();
+						guideStep = 1;
+						byId('guideText').textContent =
+							'2 / 4 — The pair lifted. Both stacks now expose their next layer, face down.';
+					} else if (guideStep === 1) {
+						for (const stack of findTops(false)) chooseTop(stack);
+						guideStep = 2;
+						byId('guideText').textContent =
+							'3 / 4 — These tops differ. A mismatch will leave both stack depths unchanged.';
+					} else if (guideStep === 2) {
+						continueTurn();
+						guideStep = 3;
+						byId('guideText').textContent =
+							'4 / 4 — The mismatch closed. No cards were removed. Continue playing to clear the older layers.';
+					} else {
+						endExample();
+						announce('Example complete. Keep matching the available tops to clear every layer.');
+					}
+					render();
+					if (guideStep !== null) byId('exampleNext').focus({ preventScroll: true });
+				}
+				byId('continue').addEventListener('click', () =>
+					guard(() => {
+						endExample();
+						continueTurn();
+					})
+				);
+				byId('cancel').addEventListener('click', () =>
+					guard(() => {
+						endExample();
+						cancelSelection();
+					})
+				);
+				byId('reset').addEventListener('click', () =>
+					guard(() => {
+						reset();
+						focusTop();
+					})
+				);
+				byId('newDeal').addEventListener('click', () =>
+					guard(() => {
+						deal++;
+						reset();
+						focusTop();
+					})
+				);
+				byId('pairCount').addEventListener('change', (event) =>
+					guard(() => {
+						pairCount = Number(event.target.value);
+						reset();
+					})
+				);
+				byId('example').addEventListener('click', () =>
+					guard(() => {
+						endExample();
+						byId('rules').open = true;
+						exampleNext();
+					})
+				);
+				byId('exampleNext').addEventListener('click', () => guard(exampleNext));
+				byId('rules').open = innerWidth > 1100 && innerHeight > 560;
+				// Read-only fixture inspection for focused browser checks; no live gameplay identity.
+				window.TimeStrataPreview = Object.freeze({
+					getState: () => ({
+						pairCount,
+						deal,
+						stacks: stacks.map((stack) => stack.slice()),
+						selected: selected.slice(),
+						outcome,
+						attempts,
+						misses,
+						cleared,
+						guideStep,
+						finished: cleared === pairCount
+					})
+				});
+				reset();
+			})();
+		</script>
+	</body>
+</html>

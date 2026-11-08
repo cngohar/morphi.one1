@@ -1,4 +1,211 @@
 export const messages = {
+	'variant.memory:strata-linked': 'Linked Tops',
+	'memory.strataLinked.step1':
+		'Flip two tops from neighboring stacks on the fixed ring I–II–III–IV–I. Opposite stacks cannot supply the second card.',
+	'memory.strataLinked.step2':
+		'Read the held outcome, then Continue. Equal tops lift away; different symbols close without moving layers.',
+	'memory.strataLinked.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataLinked.tips': 'The logical ring stays the same when the board reflows.',
+	'leaderboard.memory.strata-linked.6': 'Memory · Linked Tops · 6 pairs',
+	'leaderboard.memory.strata-linked.8': 'Memory · Linked Tops · 8 pairs',
+	'leaderboard.memory.strata-linked.10': 'Memory · Linked Tops · 10 pairs',
+	'variant.memory:strata-sweep': 'Level Sweep',
+	'memory.strataSweep.step1':
+		'Only tops at the greatest remaining stack height are playable. Choose two of those tops.',
+	'memory.strataSweep.step2':
+		'Continue lifts equal tops or closes a mismatch. Lower tops stay unavailable until the taller stacks catch up.',
+	'memory.strataSweep.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataSweep.tips':
+		'Clear the other taller pair before playing the lower layers you just exposed.',
+	'leaderboard.memory.strata-sweep.6': 'Memory · Level Sweep · 6 pairs',
+	'leaderboard.memory.strata-sweep.8': 'Memory · Level Sweep · 8 pairs',
+	'leaderboard.memory.strata-sweep.10': 'Memory · Level Sweep · 10 pairs',
+	'variant.memory:strata-shelf': 'Sample Shelf',
+	'memory.strataShelf.step1':
+		'At idle, choose a Source stack and Lift to shelf. One top stays face up on the shelf, exposing its next layer.',
+	'memory.strataShelf.step2':
+		'Select the sample and any exposed top, or two ordinary tops. Continue lifts equal cards; a mismatch keeps the sample visible.',
+	'memory.strataShelf.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack and any sample to finish; the final pair needs Continue.',
+	'memory.strataShelf.tips':
+		'Return sample at idle restores it to its original stack top, even after deeper layers have been cleared.',
+	'leaderboard.memory.strata-shelf.6': 'Memory · Sample Shelf · 6 pairs',
+	'leaderboard.memory.strata-shelf.8': 'Memory · Sample Shelf · 8 pairs',
+	'leaderboard.memory.strata-shelf.10': 'Memory · Sample Shelf · 10 pairs',
+	'variant.memory:strata-cycle': 'Layer Cycle',
+	'memory.strataCycle.step1':
+		'At idle, choose a Source stack and Cycle top to move its top to the bottom. Cycling spends no attempt.',
+	'memory.strataCycle.step2':
+		'Flip two exposed tops from different stacks. Read the outcome, then Continue to lift a match or close a mismatch.',
+	'memory.strataCycle.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataCycle.tips':
+		'Each pair lives in two stacks. Cycle those stacks until both remembered copies are exposed.',
+	'leaderboard.memory.strata-cycle.6': 'Memory · Layer Cycle · 6 pairs',
+	'leaderboard.memory.strata-cycle.8': 'Memory · Layer Cycle · 8 pairs',
+	'leaderboard.memory.strata-cycle.10': 'Memory · Layer Cycle · 10 pairs',
+	'variant.memory:strata-empty-well': 'Empty Well',
+	'memory.strataEmptyWell.step1':
+		'At idle, choose a Source stack and an Empty destination. Move top transfers one face-down top and uncovers its next layer.',
+	'memory.strataEmptyWell.step2':
+		'Only a different empty well can receive a top. Flip exposed tops, then Continue to lift equal cards or close a mismatch.',
+	'memory.strataEmptyWell.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataEmptyWell.tips':
+		'Clear a well to make space. Moving into it cannot cover an existing card.',
+	'leaderboard.memory.strata-empty-well.6': 'Memory · Empty Well · 6 pairs',
+	'leaderboard.memory.strata-empty-well.8': 'Memory · Empty Well · 8 pairs',
+	'leaderboard.memory.strata-empty-well.10': 'Memory · Empty Well · 10 pairs',
+	'variant.memory:strata-glimpse': 'Deep Glimpse',
+	'memory.strataGlimpse.step1':
+		'Flip one top to reveal it and a read-only Below clue naming the immediately covered card in that stack.',
+	'memory.strataGlimpse.step2':
+		'The clue cannot be selected. It hides on cancellation or the second flip; Continue resolves the two playable tops normally.',
+	'memory.strataGlimpse.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataGlimpse.tips':
+		'A one-card stack has no Below clue. Remember the clue for when its layer becomes exposed.',
+	'leaderboard.memory.strata-glimpse.6': 'Memory · Deep Glimpse · 6 pairs',
+	'leaderboard.memory.strata-glimpse.8': 'Memory · Deep Glimpse · 8 pairs',
+	'leaderboard.memory.strata-glimpse.10': 'Memory · Deep Glimpse · 10 pairs',
+	'variant.memory:strata-chain': 'Chain Reaction',
+	'memory.strataChain.step1':
+		'Flip two exposed tops from different stacks. Equal tops remain held until Continue.',
+	'memory.strataChain.step2':
+		'After a lift, equal new tops in those same wells become another held pair. Each pair spends one attempt and needs its own Continue.',
+	'memory.strataChain.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataChain.tips':
+		'Read each new pair before lifting it. Unequal next tops stay face down, and the final pair still needs Continue.',
+	'leaderboard.memory.strata-chain.6': 'Memory · Chain Reaction · 6 pairs',
+	'leaderboard.memory.strata-chain.8': 'Memory · Chain Reaction · 8 pairs',
+	'leaderboard.memory.strata-chain.10': 'Memory · Chain Reaction · 10 pairs',
+	'variant.memory:strata-echo': 'Layer Echo',
+	'memory.strataEcho.step1':
+		'Flip two exposed tops from different stacks. Read the outcome, then Continue to lift a match or close a mismatch.',
+	'memory.strataEcho.step2':
+		'After a lift, new tops in those wells show as read-only echoes. Play is held until another Continue closes them without an attempt.',
+	'memory.strataEcho.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataEcho.tips':
+		'Empty affected wells produce no echo. Read the clues before closing them and returning to ordinary play.',
+	'leaderboard.memory.strata-echo.6': 'Memory · Layer Echo · 6 pairs',
+	'leaderboard.memory.strata-echo.8': 'Memory · Layer Echo · 8 pairs',
+	'leaderboard.memory.strata-echo.10': 'Memory · Layer Echo · 10 pairs',
+	'variant.memory:strata-slip': 'Slipping Tops',
+	'memory.strataSlip.step1':
+		'Flip two exposed tops from different stacks. Both stay in place while the outcome is held.',
+	'memory.strataSlip.step2':
+		'Mismatch Continue sinks both tops to the bottoms of their own stacks. Matches lift normally. At idle, Cycle top spends no attempt.',
+	'memory.strataSlip.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataSlip.tips':
+		'Recover buried pairs by cycling their two stacks. A one-card stack keeps the same top when cycled.',
+	'leaderboard.memory.strata-slip.6': 'Memory · Slipping Tops · 6 pairs',
+	'leaderboard.memory.strata-slip.8': 'Memory · Slipping Tops · 8 pairs',
+	'leaderboard.memory.strata-slip.10': 'Memory · Slipping Tops · 10 pairs',
+	'variant.memory:strata-order': 'Excavation Order',
+	'memory.strataOrder.step1':
+		'Follow the displayed symbol sequence. Only an equal pair of the current required symbol can clear.',
+	'memory.strataOrder.step2':
+		'An equal later pair counts as one attempt and one miss. Continue closes it without moving layers or advancing the order.',
+	'memory.strataOrder.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish; the final pair needs Continue.',
+	'memory.strataOrder.tips':
+		'Scout tops freely, then clear the required exposed pair. Each confirmed pair advances the sequence.',
+	'leaderboard.memory.strata-order.6': 'Memory · Excavation Order · 6 pairs',
+	'leaderboard.memory.strata-order.8': 'Memory · Excavation Order · 8 pairs',
+	'leaderboard.memory.strata-order.10': 'Memory · Excavation Order · 10 pairs',
+	'memory.strataUtility.source': 'Source stack',
+	'memory.strataUtility.destination': 'Empty destination',
+	'memory.strataUtility.sourceStack': 'Source {stack}',
+	'memory.strataUtility.emptyStack': 'Empty {stack}',
+	'memory.strataLinked.ring': 'Ring: I–II–III–IV–I',
+	'memory.strataSweep.height': 'Tallest stacks: {count} cards',
+	'memory.strataShelf.empty': 'Sample shelf empty',
+	'memory.strataShelf.origin': 'Sample from Stack {stack}',
+	'memory.strataShelf.match': 'Pair found. Continue lifts the sample and the matching top.',
+	'memory.strataShelf.mismatch':
+		'Different symbols. Continue closes the top; the sample stays face up.',
+	'memory.strataShelf.matched': 'Sample pair lifted. The newly exposed top is face down.',
+	'memory.strataShelf.closed': 'Top closed. The sample stays face up and no layer moved.',
+	'memory.strataShelf.selected':
+		'{symbol} selected from the shelf. Choose an exposed top, or cancel.',
+	'memory.strataShelf.sample': 'Shelf sample, {symbol}, from Stack {stack}',
+	'memory.strataShelf.face': 'Shelf: {symbol}',
+	'memory.strataShelf.lift': 'Lift to shelf',
+	'memory.strataShelf.return': 'Return sample',
+	'memory.strataShelf.lifted':
+		'Top parked face up. Its next layer is now playable. No attempt spent.',
+	'memory.strataShelf.returned': 'Sample returned to its original stack top. No attempt spent.',
+	'memory.strataShelf.hint': '{pairs} pairs · Play exposed tops or the face-up sample',
+	'memory.strataCycle.state': 'Cycle a top to uncover its next layer',
+	'memory.strataCycle.cycle': 'Cycle top',
+	'memory.strataCycle.cycled': 'Top cycled to its stack bottom. No attempt spent.',
+	'memory.strataEmptyWell.state': 'Move a top into a different empty well',
+	'memory.strataEmptyWell.move': 'Move top',
+	'memory.strataEmptyWell.moved':
+		'One top moved into the empty well. The source uncovered its next layer. No attempt spent.',
+	'memory.strataGlimpse.state': 'One reveal gives a read-only Below clue',
+	'memory.strataGlimpse.below': 'Below: {symbol} · clue only',
+	'memory.strataChain.state': 'Each new equal pair needs its own Continue',
+	'memory.strataChain.active': 'Chain pair held · Continue to lift',
+	'memory.strataChain.held':
+		'New equal tops form a counted chain pair. Continue lifts exactly this pair.',
+	'memory.strataEcho.state': 'New-top echoes need an extra Continue',
+	'memory.strataEcho.active': 'Read-only echoes · Continue to close',
+	'memory.strataEcho.held':
+		'Read the newly exposed echoes. Continue closes them without spending an attempt.',
+	'memory.strataEcho.closed': 'Echoes closed. The tops are ready for normal play.',
+	'memory.strataEcho.continue': 'Close echo',
+	'memory.strataEcho.clue': 'Stack {stack}, {symbol}, read-only echo',
+	'memory.strataEcho.readOnly': 'Read-only echo',
+	'memory.strataSlip.state': 'A mismatch sinks both tops on Continue',
+	'memory.strataSlip.mismatch':
+		'Different symbols. Continue sinks both tops to their own stack bottoms.',
+	'memory.strataSlip.sunk':
+		'Both mismatched tops sank to their stack bottoms. New tops are face down.',
+	'memory.strataOrder.required': 'Required: {symbol}',
+	'memory.strataOrder.sequence': 'Required symbol sequence',
+	'memory.strataOrder.position': '{number}: {symbol}',
+	'memory.strataOrder.complete': 'Excavation order complete',
+	'memory.strataOrder.blocked':
+		'Equal tops, but this symbol comes later. Continue closes them without lifting. One miss counted.',
+	'memory.strataOrder.closed':
+		'Later symbol closed. The required symbol and stack depths stayed the same.',
+	'variant.memory:time-strata': 'Time Strata',
+	'memory.timeStrata.stack': 'Stack {stack}',
+	'memory.timeStrata.cards': 'Cards left: {count}',
+	'memory.timeStrata.empty': 'Empty',
+	'memory.timeStrata.top': 'Top card',
+	'memory.timeStrata.topDown': 'Stack {stack}, top card, face down',
+	'memory.timeStrata.topUp': 'Stack {stack}, {symbol}, top card',
+	'memory.timeStrata.ready': 'Choose two tops from different stacks.',
+	'memory.timeStrata.selected':
+		'{symbol} revealed in Stack {stack}. Choose a different top, or cancel.',
+	'memory.timeStrata.match': 'Pair found. Continue to lift both tops and uncover the next layers.',
+	'memory.timeStrata.mismatch':
+		'Different symbols. Continue to close these tops. Their layers will stay in place.',
+	'memory.timeStrata.cancel': 'Cancel selection',
+	'memory.timeStrata.continue': 'Continue',
+	'memory.timeStrata.cancelled': 'Selection cancelled. No attempt spent.',
+	'memory.timeStrata.lifted': 'Pair lifted. Newly exposed tops are still face down.',
+	'memory.timeStrata.closed': 'Both cards closed. The layers stayed in place.',
+	'memory.timeStrata.won': 'All layers cleared',
+	'memory.timeStrata.hint': '{pairs} pairs · Only the top card of each stack is playable',
+	'memory.timeStrata.step1':
+		'Only each stack’s top card is playable. Flip two tops from different stacks.',
+	'memory.timeStrata.step2':
+		'Read the outcome, then Continue. Equal tops lift away; different symbols close without moving layers.',
+	'memory.timeStrata.step3':
+		'Cards start face down. Cancel a single reveal for free. Clear every stack to finish.',
+	'memory.timeStrata.tips':
+		'Remember the exposed tops. Each lifted pair reveals a new layer, still face down.',
+	'leaderboard.memory.time-strata.6': 'Memory · Time Strata · 6 pairs',
+	'leaderboard.memory.time-strata.8': 'Memory · Time Strata · 8 pairs',
+	'leaderboard.memory.time-strata.10': 'Memory · Time Strata · 10 pairs',
 	'variant.memory:classic': 'Classic',
 	'variant.memory:no-preview': 'No preview',
 	'variant.memory:trios': 'Trios',

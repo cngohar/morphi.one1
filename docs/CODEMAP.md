@@ -1,5 +1,53 @@
 # CODEMAP.md
 
+- **v1.3.5.15 Batch H locally implemented and verified (2026-11-08):** Ten Time Strata rules
+  in `memory/logic.ts`, identities/replay/help/groups in `manifest.ts`, shared
+  stack/shelf/clue/order UI in `Game.svelte` / `TimeStrata.svelte`, help and labels
+  in `messages.ts`. `dimensions.ts`, global policy labels and `server/config.ts`
+  support the six finite policy dimensions and explicitly compatible historical
+  snapshots. Generated `puzzle-metadata.ts` / `puzzle-messages.ts` expose 81
+  implemented presets / 243 groups; accepted remains 71 / 213. Focused sources:
+  `memory/time-strata.test.ts`, `variants.test.ts`, `dimensions.test.ts`,
+  `tests/vectors/memory-batch-h.json` / `memory-runner.ts`,
+  `tests/integration/memory-variants.test.ts`,
+  `tests/e2e/time-strata-batch-h.spec.ts` / `memory-variants-admin.spec.ts`.
+  Format/lint/types, 65 units/checkpoints, four D1 cases and 72 vectors across six
+  runtimes pass. Serial one-worker Chromium runs cover 105 unique passing cases
+  (91 H, 11 baseline, three admin), after scoped Glimpse/Order landscape fixes.
+  Retained evidence includes 181 bounds snapshots and 271 gameplay captures.
+  App evidence: `build/v1.3.5.15/app/`; earlier preview evidence remains in
+  `build/v1.3.5.15/preview/`. Owner review is separate, full verify deferred;
+  no commit/push, deployment or next batch. [Brief](briefs/v1.3.5.15-batch-h-brief.md),
+  [work](work/V1.3.5.15_WORK.md).
+
+- **v1.3.5.14 Time Strata accepted locally (2026-11-08):** The owner's
+  “mark that accepted” closes app functional review; 71 presets / 213 groups are
+  now accepted. No new check/device evidence, commit or push is inferred.
+  `memory/logic.ts`
+  owns balanced stacks, top-only moves and numeric cancel/Continue; `Game.svelte` plus
+  `TimeStrata.svelte` render the approved layered board and preserve pending outcomes
+  on reload. `manifest.ts` owns its identity, replay, timing and three groups;
+  `dimensions.ts` records both no-preview and top-only policy changes. Existing
+  `server/{config,memory-policy,memory-directory}` and `components/MemoryPolicy.svelte`
+  preserve earlier policy snapshots and show/enforce both changes. Tests: Memory
+  `time-strata.test.ts`, `dimensions.test.ts`, `variants.test.ts`,
+  `tests/vectors/memory-time-strata.json` and `memory-runner.ts`,
+  `tests/integration/memory-variants.test.ts`, `tests/e2e/time-strata.spec.ts`.
+  Catalogue-name search in `memory-directory.ts` includes the new baseline’s displayed name.
+  Checks pass: 56 units/checkpoints, 3 D1, 6 runtimes, 25 Chromium cases, format/lint/types.
+  App captures in `build/v1.3.5.14/app/`; [work/evidence](work/V1.3.5.14_WORK.md).
+
+- **v1.3.5.14 Memory Batch G new-baseline preview (2026-11-08):**
+  [Time Strata fixture](../static/demo/v1.3.5.14-batch-g.html) implements one
+  four-stack, top-only-access design with solvable 6/8/10-pair deals. No app rules,
+  manifest, dimensions or registry changes; accepted Batch F remains 70 variants /
+  210 groups at `7eadc3b`. [Focused runner](../scripts/check-batch-g-baseline.ts)
+  checks real gameplay, cancellation/reset/completion, solvability, guide, keyboard,
+  reduced/missing motion and three viewports in one serial Chromium browser.
+  [Brief](briefs/v1.3.5.14-batch-g-brief.md),
+  [work/evidence](work/V1.3.5.14_WORK.md); captures and JSON in
+  `build/v1.3.5.14/new-baseline/`. Checks pass; owner visual approval pending.
+
 - **v1.3.5.12 Memory Batch E accepted and pushed (2026-11-08):**
   10 genuine Memory botanical & nature rulesets implemented end-to-end under ponytail
   principles and Constraint C2 (Split Dual-Garden Baseline `memory:cross-pollination`, `memory:mycelium-network`,

@@ -170,7 +170,18 @@ const allMemoryVariants = [
 	'memory:images-transform',
 	'memory:waiting-room',
 	'memory:privacy-pass',
-	'memory:agents-sdk'
+	'memory:agents-sdk',
+	'memory:time-strata',
+	'memory:strata-linked',
+	'memory:strata-sweep',
+	'memory:strata-shelf',
+	'memory:strata-cycle',
+	'memory:strata-empty-well',
+	'memory:strata-glimpse',
+	'memory:strata-chain',
+	'memory:strata-echo',
+	'memory:strata-slip',
+	'memory:strata-order'
 ];
 
 test('Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds', async ({
@@ -443,6 +454,48 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			await expect(testPlay.getByText(/^Test score:/)).toBeVisible({ timeout: 12000 });
 			await expect(testPlay.getByRole('alert')).toHaveCount(0);
 		}
+		await testPlay
+			.getByRole('combobox', { name: 'Variant', exact: true })
+			.selectOption('memory:time-strata');
+		await testPlay.getByRole('button', { name: 'Next test round', exact: true }).click();
+		await expect(testPlay.locator('.game')).toHaveAttribute('data-phase', 'playing');
+		for (
+			let attempt = 0;
+			attempt < 10 && !(await testPlay.getByText(/^Test score:/).count());
+			attempt++
+		) {
+			const tops = await testPlay
+				.locator('.strata-top')
+				.evaluateAll((cards) => cards.map((card) => card.getAttribute('data-card-index')!));
+			const seen = new Map<string, string>();
+			for (const index of tops) {
+				const top = testPlay.locator(`[data-card-index="${index}"]`);
+				await top.click();
+				seen.set(index, (await top.locator('.face-name').textContent())!);
+				await testPlay.getByRole('button', { name: 'Cancel selection', exact: true }).click();
+			}
+			const first = tops.find((index) =>
+				tops.some((other) => index !== other && seen.get(index) === seen.get(other))
+			)!;
+			const second = tops.find((index) => index !== first && seen.get(index) === seen.get(first))!;
+			expect(first).toBeDefined();
+			await testPlay.locator(`[data-card-index="${first}"]`).click();
+			await testPlay.locator(`[data-card-index="${second}"]`).click();
+			await testPlay.getByRole('button', { name: 'Continue', exact: true }).click();
+			if ((await testPlay.locator('.strata-top').count()) === 0)
+				await expect(testPlay.getByText(/^Test score:/)).toBeVisible({ timeout: 12000 });
+		}
+		await expect(testPlay.getByText(/^Test score:/)).toBeVisible();
+		await testPlay
+			.getByRole('combobox', { name: 'Variant', exact: true })
+			.selectOption('memory:strata-shelf');
+		await testPlay.getByRole('button', { name: 'Next test round', exact: true }).click();
+		await expect(testPlay.locator('.game')).toHaveAttribute('data-phase', 'playing');
+		await testPlay.locator('[data-strata-utility="lift"]').click();
+		await expect(testPlay.locator('[data-strata-shelf]')).toBeVisible();
+		await testPlay.locator('[data-strata-utility="return"]').click();
+		await expect(testPlay.locator('[data-strata-shelf]')).toHaveCount(0);
+		await expect(testPlay.getByRole('alert')).toHaveCount(0);
 		expect(playerWrites).toEqual([]);
 		expect(await counts()).toEqual(beforeCounts);
 		// Block uses the same protected test harness even when its rush variant is disabled.
@@ -646,7 +699,7 @@ test('dimension policy editor previews and saves only supported Memory values', 
 			await page.goto('/admin/games?game=memory&subview=policy');
 			await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
 			await expect(page.getByRole('heading', { name: 'Supported dimensions' })).toBeVisible();
-			await expect(page.getByText('70 of 70 variants eligible')).toBeVisible();
+			await expect(page.getByText('81 of 81 variants eligible')).toBeVisible();
 			expect(await page.evaluate(() => document.documentElement.scrollWidth > innerWidth)).toBe(
 				false
 			);
@@ -655,11 +708,31 @@ test('dimension policy editor previews and saves only supported Memory values', 
 				fullPage: true
 			});
 		}
+
+		const linked = page.getByRole('checkbox', { name: 'Linked tops', exact: true });
+		await linked.uncheck();
+		await expect(page.getByText('80 of 81 variants eligible')).toBeVisible();
+		await page.getByRole('button', { name: 'Review policy change' }).click();
+		await expect(page.getByRole('dialog', { name: 'Review policy change' })).toContainText(
+			'memory:strata-linked'
+		);
+		await page.keyboard.press('Escape');
+		await linked.check();
+		const topOnly = page.getByRole('checkbox', { name: 'Top cards only', exact: true });
+		await topOnly.uncheck();
+		await expect(page.getByText('74 of 81 variants eligible')).toBeVisible();
+		await page.getByRole('button', { name: 'Review policy change' }).click();
+		await expect(page.getByRole('dialog', { name: 'Review policy change' })).toContainText(
+			'memory:time-strata'
+		);
+		await page.keyboard.press('Escape');
+		await topOnly.check();
+		await expect(page.getByText('81 of 81 variants eligible')).toBeVisible();
 		await page
 			.getByRole('group', { name: 'Match size' })
 			.getByRole('checkbox', { name: 'Quads' })
 			.uncheck();
-		await expect(page.getByText('69 of 70 variants eligible')).toBeVisible();
+		await expect(page.getByText('80 of 81 variants eligible')).toBeVisible();
 		await page.getByRole('button', { name: 'Review policy change' }).click();
 		const dialog = page.getByRole('dialog', { name: 'Review policy change' });
 		await expect(dialog.getByText('memory:quads')).toBeVisible();
@@ -674,7 +747,7 @@ test('dimension policy editor previews and saves only supported Memory values', 
 		]);
 		expect(saved.status()).toBe(200);
 		await expect(dialog).not.toBeVisible();
-		await expect(page.getByText('69 of 70 variants eligible')).toBeVisible();
+		await expect(page.getByText('80 of 81 variants eligible')).toBeVisible();
 		const available = await context.request.get(
 			'/api/play/availability?family=memory&variant=memory:quads'
 		);
@@ -844,6 +917,17 @@ test('memory directory tab filters variants, inspects dimensions breakdown, and 
 		// Close drawer
 		await drawer.getByRole('button', { name: 'Close variant details' }).click();
 		await expect(drawer).not.toBeVisible();
+		await page.locator('input[name="q"]').fill('Time Strata');
+		await page.locator('form.filter-bar button[type="submit"]').click();
+		await page.waitForURL((url) => url.searchParams.get('q') === 'Time Strata');
+		await expect(page.locator('.variant-row')).toHaveCount(1);
+		await page
+			.locator('.variant-row[data-id="memory:time-strata"]')
+			.getByRole('button', { name: 'Inspect' })
+			.click();
+		await expect(drawer.locator('.dim-grid')).toContainText('No preview');
+		await expect(drawer.locator('.dim-grid')).toContainText('Top cards only');
+		await page.screenshot({ path: 'build/v1.3.5.14/app/admin-time-strata-directory.png' });
 	} finally {
 		if (original)
 			await db
