@@ -33,6 +33,30 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.17 Memory closeout accepted; audio approved; source commit and push authorized (2026-11-08):**
+The owner said “closeout is now done, you can comit and then push to github, also i review the audio file and approved it,you can include in comit too”.
+This accepts the completed v1.3.5.17 focused Memory integration and closeout, approves the three audio files
+(`static/audio/reshuffle.mp3`, `static/audio/timer-tick.mp3`, and `static/audio/trio-match.mp3`), and authorizes
+source commit and push to GitHub.
+Memory expansion concludes at 81 accepted/implemented presets and 243 immutable leaderboard groups.
+The shared per-preset score-history query selects groups before its 100-cohort bound, preserving Games
+family limits and Directory exact history. Scoped lint/types (0/0), 81 unit/selector/checkpoint cases, 18 real-D1
+cases, 72 vectors in six runtimes and 15 unique Chromium cases across serial runs pass.
+Full `bun run verify` remains deferred; editor exclusions persist. No production deployment authorized.
+See `docs/briefs/v1.3.5.17-memory-closeout-brief.md` and `docs/work/V1.3.5.17_WORK.md`.
+
+**Earlier v1.3.5.17 local verification evidence (2026-11-08):**
+The owner selected stopping Memory expansion and starting .17 with Ponytail.
+Omit .16 Batch I; preserve 81 accepted/implemented presets and 243 immutable
+leaderboard groups at pushed baseline `9372b99`. Complete focused cross-feature
+selection/start/replay/resume/scoring, Tier 1 policy, Tier 2 inspection and bounded
+admin checks with necessary root corrections only. Reuse accepted UI; no new
+variants or redesign. Required `gpt-6-luna/max` returned 503; the owner separately said “Yes, take
+over .17 verification”, authorizing direct parent checks for this milestone.
+Available planning/coding agents retain required routing. Full verify remains
+deferred.
+See `docs/briefs/v1.3.5.17-memory-closeout-brief.md` and `docs/work/V1.3.5.17_WORK.md`.
+
 **v1.3.5.15 Batch H accepted; source commit and push authorized (2026-11-08):**
 The owner said “the last work was done, but comit and pushed to github, so comit now and then push to github”,
 accepting the completed Time Strata baseline (v1.3.5.14) and 10 Time Strata ruleset variants

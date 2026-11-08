@@ -1,6 +1,34 @@
 # Morphi: Simple Plan
 
-## Active status — v1.3.5.15 Batch H accepted; source commit and push authorized (2026-11-08)
+## Active status — v1.3.5.17 Memory closeout accepted; audio approved; source commit and push authorized (2026-11-08)
+
+The owner instructed “closeout is now done, you can comit and then push to github, also i review the audio file and approved it,you can include in comit too”.
+This accepts the completed v1.3.5.17 focused Memory integration and closeout, approves the three audio files
+(`static/audio/reshuffle.mp3`, `static/audio/timer-tick.mp3`, and `static/audio/trio-match.mp3`), and authorizes
+source commit and push to GitHub.
+Memory expansion concludes at **81 accepted and implemented Memory presets / 243 leaderboard groups**; .16 Batch I is omitted.
+Scoped verification is complete: types (0 errors / 0 warnings), format/lint, 81 unit/checkpoint tests,
+18 real-D1 cases and all 72 Memory vectors in six runtimes pass. Serial one-worker Chromium runs cover 15 unique passing cases.
+Full `bun run verify` remains deferred; editor exclusions preserved. No production deployment authorized.
+See [brief](docs/briefs/v1.3.5.17-memory-closeout-brief.md), [work/evidence](docs/work/V1.3.5.17_WORK.md).
+
+## Earlier status — v1.3.5.17 locally verified; ready for closeout review (2026-11-08)
+
+The owner said “ok i chose the stop expending and chose the 1.3.5.17 focuse
+integration , you can use the pony tail to start this”. Stop expansion at
+**81 accepted and implemented Memory presets / 243 leaderboard groups**; omit
+v1.3.5.16 Batch I. The accepted .14/.15 source is committed and pushed at
+`9372b99`. This selects local focused integration and necessary bounded
+corrections under Ponytail. Final .17 acceptance and any future commit/push,
+deployment or next phase remain separate owner decisions.
+Local .17 history correction and focused checks pass: 81 units/checkpoints/selector,
+18 D1 cases, 72 vectors in six runtimes and 15 unique Chromium cases across serial
+runs; types are 0 errors/warnings. Owner .17 acceptance remains pending.
+Full verify remains deferred; audio/editor exclusions persist.
+See [selected brief](docs/briefs/v1.3.5.17-memory-closeout-brief.md) and
+[work/evidence](docs/work/V1.3.5.17_WORK.md).
+
+## Earlier status — v1.3.5.15 Batch H accepted; source commit and push authorized (2026-11-08)
 
 The owner instructed “the last work was done, but comit and pushed to github, so comit now and then push to github”,
 accepting the completed Time Strata baseline (v1.3.5.14) and 10 Time Strata ruleset variants (v1.3.5.15 Batch H)

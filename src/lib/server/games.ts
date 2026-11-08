@@ -295,23 +295,37 @@ export async function invalidateOverview(cache?: KVNamespace) {
 		}
 }
 
-export async function gameStatistics(
+/** Group selection precedes the 100-row bound, so unrelated cohorts cannot hide a preset. */
+export async function queryScoreHistory(
 	db: D1Database,
 	family: PuzzleId,
-	summary?: Awaited<ReturnType<typeof gameOverview>>[number]
+	variants: { id: string; leaderboardGroups: readonly string[] }[],
+	includeFamily = false
 ) {
-	if (summary && summary.family !== family) throw new RunError('input');
-	if (!Object.hasOwn(catalog, family)) throw new RunError('input');
-	const rows = (
+	const mapping: { variant: string | null; rulesGroup: string | null }[] = variants.flatMap(
+		(variant) =>
+			variant.leaderboardGroups.map((rulesGroup) => ({ variant: variant.id, rulesGroup }))
+	);
+	if (includeFamily) mapping.push({ variant: null, rulesGroup: null });
+	if (!mapping.length) return [];
+	return (
 		await db
 			.prepare(
-				`SELECT rules_group,score_config_version,count(*) completed,coalesce(sum(ranked),0) ranked,
-			max(score) bestScore,avg(score) averageScore,avg(seconds) averageSeconds,coalesce(sum(hidden),0) hidden
-			FROM completed_run WHERE family=? GROUP BY rules_group,score_config_version
-			ORDER BY rules_group,score_config_version LIMIT 101`
+				`WITH mapping(variant,rules_group) AS (
+			SELECT value ->> 'variant',value ->> 'rulesGroup' FROM json_each(?)
+			), cohorts AS (
+			SELECT m.variant,r.rules_group,r.score_config_version,count(*) completed,coalesce(sum(r.ranked),0) ranked,
+			max(r.score) bestScore,avg(r.score) averageScore,avg(r.seconds) averageSeconds,coalesce(sum(r.hidden),0) hidden
+			FROM completed_run r JOIN mapping m ON m.rules_group IS NULL OR m.rules_group=r.rules_group
+			WHERE r.family=? GROUP BY m.variant,r.rules_group,r.score_config_version
+			), bounded AS (
+			SELECT *,row_number() OVER (PARTITION BY variant ORDER BY rules_group,score_config_version) ordinal FROM cohorts
+			) SELECT variant,rules_group,score_config_version,completed,ranked,bestScore,averageScore,averageSeconds,hidden
+			FROM bounded WHERE ordinal<=101 ORDER BY variant,rules_group,score_config_version`
 			)
-			.bind(family)
+			.bind(JSON.stringify(mapping), family)
 			.all<{
+				variant: string | null;
 				rules_group: string;
 				score_config_version: string;
 				completed: number;
@@ -322,6 +336,15 @@ export async function gameStatistics(
 				hidden: number;
 			}>()
 	).results;
+}
+
+export async function gameStatistics(
+	db: D1Database,
+	family: PuzzleId,
+	summary?: Awaited<ReturnType<typeof gameOverview>>[number]
+) {
+	if (summary && summary.family !== family) throw new RunError('input');
+	if (!Object.hasOwn(catalog, family)) throw new RunError('input');
 	const baseVariants =
 		summary?.variants ??
 		(await (async () => {
@@ -332,10 +355,28 @@ export async function gameStatistics(
 				...counts.find((row) => row.family === family && row.variant === variant.id)!
 			}));
 		})());
+	const history = await queryScoreHistory(
+		db,
+		family,
+		baseVariants.map((variant) => ({
+			id: variant.id,
+			leaderboardGroups: puzzleVariant(family, variant.id)?.leaderboardGroups ?? []
+		})),
+		true
+	);
+	const rows = history
+		.filter((row) => row.variant === null)
+		.map(({ variant, ...row }) => {
+			void variant;
+			return row;
+		});
 	const variants = baseVariants.map((variant) => {
-		const definition = puzzleVariant(family, variant.id);
-		const groups = definition?.leaderboardGroups ?? [];
-		const variantRows = rows.filter((r) => groups.includes(r.rules_group));
+		const variantRows = history
+			.filter((row) => row.variant === variant.id)
+			.map(({ variant, ...row }) => {
+				void variant;
+				return row;
+			});
 		return {
 			...variant,
 			rows: variantRows.slice(0, 100),

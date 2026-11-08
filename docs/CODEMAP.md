@@ -1,12 +1,26 @@
 # CODEMAP.md
 
-- **v1.3.5.15 Batch H locally implemented and verified (2026-11-08):** Ten Time Strata rules
+- **v1.3.5.17 locally verified; ready for owner closeout review (2026-11-08):** .16 omitted;
+  81 accepted/implemented presets and 243 groups at pushed `9372b99`.
+  `server/games.ts` owns bounded score-cohort queries; `games-admin.ts` selects
+  variant pages before loading their history; `memory-directory.ts` shares the
+  history query after filtering/paging. `components/MemoryDirectory.svelte`
+  reuses the Games drawer truncation notice. Regression scope:
+  `tests/integration/memory-variants.test.ts` and
+  `tests/e2e/memory-variants-admin.spec.ts`.
+  [Selected brief](briefs/v1.3.5.17-memory-closeout-brief.md),
+  [work/evidence](work/V1.3.5.17_WORK.md). Focused checks pass: 81 units, 18 D1, 72 vectors/six runtimes, 15 Chromium
+  cases across serial runs and lint/types (0/0). Six new Directory captures in
+  `build/v1.3.5.17/browser/`; query/payload measurements in `integration/`.
+  Owner .17 acceptance pending; full verify deferred; no auto-commit/push/deploy.
+
+- **v1.3.5.15 Batch H accepted and pushed at `9372b99` (2026-11-08):** Ten Time Strata rules
   in `memory/logic.ts`, identities/replay/help/groups in `manifest.ts`, shared
   stack/shelf/clue/order UI in `Game.svelte` / `TimeStrata.svelte`, help and labels
   in `messages.ts`. `dimensions.ts`, global policy labels and `server/config.ts`
   support the six finite policy dimensions and explicitly compatible historical
   snapshots. Generated `puzzle-metadata.ts` / `puzzle-messages.ts` expose 81
-  implemented presets / 243 groups; accepted remains 71 / 213. Focused sources:
+  accepted and implemented presets / 243 groups. Focused sources:
   `memory/time-strata.test.ts`, `variants.test.ts`, `dimensions.test.ts`,
   `tests/vectors/memory-batch-h.json` / `memory-runner.ts`,
   `tests/integration/memory-variants.test.ts`,
@@ -16,8 +30,8 @@
   (91 H, 11 baseline, three admin), after scoped Glimpse/Order landscape fixes.
   Retained evidence includes 181 bounds snapshots and 271 gameplay captures.
   App evidence: `build/v1.3.5.15/app/`; earlier preview evidence remains in
-  `build/v1.3.5.15/preview/`. Owner review is separate, full verify deferred;
-  no commit/push, deployment or next batch. [Brief](briefs/v1.3.5.15-batch-h-brief.md),
+  `build/v1.3.5.15/preview/`. Owner acceptance is recorded in the latest .15 work entry; full verify deferred.
+  Source is pushed; deployment remains separate. [Brief](briefs/v1.3.5.15-batch-h-brief.md),
   [work](work/V1.3.5.15_WORK.md).
 
 - **v1.3.5.14 Time Strata accepted locally (2026-11-08):** The owner's

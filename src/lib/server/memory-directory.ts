@@ -2,7 +2,7 @@ import { catalog } from '#lib/catalog.js';
 import { dimensionChange } from '#lib/engine/contract.js';
 import { puzzleVariant } from '#lib/scoring.js';
 import { readMemoryPolicy, memoryBlockers } from './memory-policy.js';
-import { queryActivityCounts, type ActivityMappingEntry } from './games.js';
+import { queryActivityCounts, queryScoreHistory, type ActivityMappingEntry } from './games.js';
 
 export type DirectoryFilter = {
 	q?: string;
@@ -41,6 +41,7 @@ export type DirectoryVariant = {
 	totalCompleted: number;
 	ranked: number;
 	rulesGroup: string;
+	more: boolean;
 	rows: Array<{
 		rules_group: string;
 		score_config_version: string;
@@ -164,27 +165,7 @@ export async function loadMemoryDirectory(
 	});
 	const counts = await queryActivityCounts(db, activityMapping);
 
-	// 6. Query completed run statistics for scoring rules groups.
-	const historyRows = (
-		await db
-			.prepare(
-				`SELECT rules_group, score_config_version, count(*) completed, coalesce(sum(ranked),0) ranked,
-				max(score) bestScore, avg(score) averageScore, avg(seconds) averageSeconds
-				FROM completed_run WHERE family='memory' GROUP BY rules_group, score_config_version
-				ORDER BY rules_group, score_config_version LIMIT 101`
-			)
-			.all<{
-				rules_group: string;
-				score_config_version: string;
-				completed: number;
-				ranked: number;
-				bestScore: number;
-				averageScore: number;
-				averageSeconds: number;
-			}>()
-	).results;
-
-	// 7. Assemble full variant directory items.
+	// 6. Assemble directory metadata; selected score cohorts load after filtering/pagination.
 	const allVariants: DirectoryVariant[] = allVariantIds.map((id) => {
 		const isCurated = curatedDefs.some((v) => v.id === id);
 		const def = isCurated ? puzzleVariant('memory', id) : undefined;
@@ -230,9 +211,6 @@ export async function loadMemoryDirectory(
 				}));
 
 		const rulesGroup = def?.leaderboardGroups?.[0] ?? 'memory-1';
-		const matchingHistory = historyRows.filter(
-			(r) => def?.leaderboardGroups?.includes(r.rules_group) ?? r.rules_group === rulesGroup
-		);
 
 		return {
 			id,
@@ -257,7 +235,8 @@ export async function loadMemoryDirectory(
 			totalCompleted: countRow?.totalCompleted ?? 0,
 			ranked: countRow?.ranked ?? 0,
 			rulesGroup,
-			rows: matchingHistory
+			more: false,
+			rows: [] as DirectoryVariant['rows']
 		};
 	});
 
@@ -313,6 +292,24 @@ export async function loadMemoryDirectory(
 	const start = pageIndex * pageSize;
 	const end = Math.min(start + pageSize, total);
 	const pagedItems = filtered.slice(start, end);
+	const history = await queryScoreHistory(
+		db,
+		'memory',
+		pagedItems.map((item) => ({
+			id: item.id,
+			leaderboardGroups: curatedDefs.find((variant) => variant.id === item.id)
+				?.leaderboardGroups ?? [item.rulesGroup]
+		}))
+	);
+	for (const item of pagedItems) {
+		const rows = history.filter((row) => row.variant === item.id);
+		item.rows = rows.slice(0, 100).map(({ variant, hidden, ...row }) => {
+			void variant;
+			void hidden;
+			return row;
+		});
+		item.more = rows.length > 100;
+	}
 
 	const currentFirst = pagedItems[0];
 	const cursorToken = currentFirst ? encodeCursor({ after: currentFirst.id, page: pageIndex }) : '';

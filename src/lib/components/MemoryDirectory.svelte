@@ -479,6 +479,7 @@
 					</tbody>
 				</table>
 			</div>
+			{#if inspectedVariant.more}<p>{t('v1.admin.games.limited')}</p>{/if}
 			<div style="margin-top:10px">
 				<a
 					class="btn sm"

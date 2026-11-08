@@ -17,6 +17,68 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.5.17 — Memory closeout accepted; audio approved; source commit and push authorized (2026-11-08)
+
+The owner instructed “closeout is now done, you can comit and then push to github, also i review the audio file and approved it,you can include in comit too”,
+accepting the completed v1.3.5.17 focused Memory integration and closeout, approving the three audio files
+(`static/audio/reshuffle.mp3`, `static/audio/timer-tick.mp3`, and `static/audio/trio-match.mp3`), and authorizing
+source commit and push to GitHub.
+Memory expansion concludes at 81 accepted/implemented presets and 243 immutable leaderboard groups; .16 Batch I is omitted.
+All scoped checks pass; full verify remains deferred; editor exclusions preserved.
+
+## Earlier v1.3.5.17 — Focused Memory integration ready for owner closeout (2026-11-08)
+
+- **Built:** Corrected score history hidden by a global 101-cohort bound. Games
+  and Directory now query selected preset groups with a separate 100-row limit
+  and truthful overflow detection. Directory reuses the approved Games notice.
+  Added real-D1 and three-size browser regressions; reconciled the active plan,
+  agent handoff, human preview and CODEMAP. Expansion stops at **81 accepted
+  presets / 243 groups**; .16 is omitted. [Brief](briefs/v1.3.5.17-memory-closeout-brief.md),
+  [work/evidence](work/V1.3.5.17_WORK.md).
+- **Skipped (and why):** Full verify remains owner-deferred. No new variants,
+  engine/scoring identities, schema/dependency changes, redesign or other-family
+  work. Comprehensive unchanged per-rule .14/.15 evidence is reused. Audio/editor
+  exclusions persist; no source handoff or production operation is authorized.
+- **Known issues:** No unresolved defect in required focused scope. Final .17
+  owner acceptance remains pending. Combined D1 initially exposed shared-fixture
+  contamination; later issuance tests now use fresh migrated D1. Browser collection
+  and bunx launcher issues were corrected without app/config changes. One SIGTERM
+  after the new browser case required serial resumption; no full uninterrupted
+  admin-suite pass is claimed. No new physical-device or production evidence.
+- **Decisions and pinned versions:** Owner stopped expansion, selected .17 with
+  Ponytail and explicitly authorized parent verification after `gpt-6-luna/max`
+  returned 503. Required `gpt-6.1-sol/high` authored source/tests. Installed Bun
+  1.4.2, Node 24.14.1, TypeScript 6.0.3, Vitest 4.1.12, Playwright 1.64.1 and
+  Wrangler 4.151.3 are unchanged. Native SQLite window functions/JSON mapping
+  supply the bounded query; immutable groups and existing UI remain authoritative.
+- **Questions for the owner:** Review and accept or revise the .17 closeout.
+
+| Acceptance item                                              | Evidence under `build/v1.3.5.17/`                       | Result                                |
+| ------------------------------------------------------------ | ------------------------------------------------------- | ------------------------------------- |
+| Exact catalogue and stop decision                            | Owner instruction, D1 regression, updated roadmap       | 81 accepted / 243 groups; .16 omitted |
+| Rules, selector, checkpoint preservation                     | `unit.log`                                              | PASS, 81/81                           |
+| Replay/scoring/policy/history/pagination integration         | `d1.log`, `integration/score-history-scale.json`        | PASS, 18/18                           |
+| Retained Memory vectors in six runtimes                      | `vectors.log`                                           | PASS, 72 per runtime                  |
+| Admin, player, recovery and approved-reference layout checks | Serial browser logs and `browser/directory-bounds.json` | PASS, 15 unique Chromium cases        |
+| Scoped source format/lint/types                              | `format-final.log`, `lint*.log`, `types-final.log`      | PASS, 0 errors/warnings               |
+| Final owner closeout acceptance                              | Brief/report and owner review                           | READY FOR OWNER REVIEW                |
+| Full verify, physical-device and production checks           | Standing deferral/local scope                           | NOT RUN; no waiver                    |
+
+- **Measurements:** Five sequential seeded local D1 query samples over IPC per
+  mapping: actual 81/243 median/p95 **251.30/255.49 ms**, synthetic 100/300
+  **347.80/349.31 ms**, each one statement/two binds including one JSON mapping.
+  Returned row JSON is 77,611/80,141 bytes respectively. Actual Games page 8
+  (one selected preset/four history rows) service JSON is 34,980 bytes; filtered
+  Directory JSON is 2,108 bytes. Correct cohorts/bounds are gates; query time is
+  diagnostic, with no page-load, worst-case, production or before/after claim.
+  Six new Directory bounds/captures at 390×844, 844×390 and 1280×800 fit without
+  horizontal overflow; Quads also checks all three sizes. Latest board reuses
+  accepted .14/.15 references with three focused landscape recovery/completion cases.
+- **Waivers:** None requested. Full verification remains deferred, not waived.
+- **Owner responsibilities:** Final .17 review/acceptance; any future source
+  handoff, deployment or next phase remains a separate selection.
+- **CODEMAP updated:** Yes.
+
 ## v1.3.5.15 — Batch H accepted; source commit and push authorized (2026-11-08)
 
 The owner instructed “the last work was done, but comit and pushed to github, so comit now and then push to github”,

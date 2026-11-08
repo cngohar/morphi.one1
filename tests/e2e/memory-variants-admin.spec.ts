@@ -3,6 +3,8 @@ import { createCipheriv, createHash, randomBytes } from 'node:crypto';
 import { betterAuth } from 'better-auth';
 import { testUtils } from 'better-auth/plugins';
 import { getPlatformProxy } from 'wrangler';
+import { mkdir, writeFile } from 'node:fs/promises';
+import { messages } from '../../src/lib/i18n/messages.js';
 import { createAuth } from '../../src/lib/server/auth.js';
 import { totp } from '../../src/lib/server/admin-totp.js';
 
@@ -183,6 +185,158 @@ const allMemoryVariants = [
 	'memory:strata-slip',
 	'memory:strata-order'
 ];
+
+test('closeout Directory retains late preset cohorts and reports bounded score history across three viewports', async ({
+	browser
+}) => {
+	const proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc' });
+	const db = proxy.env.DB;
+	const context = await browser.newContext({
+		baseURL: 'http://localhost:5173',
+		reducedMotion: 'reduce'
+	});
+	let userId: string | undefined;
+	const target = {
+		id: 'memory:strata-order',
+		leaderboardGroups: [
+			'memory-1:strata-order:6',
+			'memory-1:strata-order:8',
+			'memory-1:strata-order:10'
+		]
+	};
+	const prefix = `closeout-${crypto.randomUUID()}`;
+	const samples: unknown[] = [];
+	try {
+		const helpers = (
+			await betterAuth({
+				...createAuth(db, {
+					baseURL: 'http://localhost:5173',
+					secret: proxy.env.BETTER_AUTH_SECRET,
+					googleClientId: '',
+					googleClientSecret: ''
+				}).options,
+				plugins: [testUtils()]
+			}).$context
+		).test;
+		const user = await helpers.saveUser(
+			helpers.createUser({ email: `${prefix}@example.test`, name: 'Closeout directory operator' })
+		);
+		userId = user.id;
+		await context.addCookies((await helpers.login({ userId })).cookies);
+		const secret = new Uint8Array(20).fill(29),
+			iv = randomBytes(12);
+		const cipher = createCipheriv(
+			'aes-256-gcm',
+			createHash('sha256').update(`operator-v1:${proxy.env.BETTER_AUTH_SECRET}`).digest(),
+			iv
+		);
+		const data = Buffer.concat([cipher.update(secret), cipher.final(), cipher.getAuthTag()]);
+		await db.batch([
+			db.prepare("INSERT INTO admin_actor(id,role) VALUES(?,'admin')").bind(userId),
+			db
+				.prepare('INSERT INTO admin_web_operator(user_id,secret_cipher) VALUES(?,?)')
+				.bind(userId, JSON.stringify({ iv: Array.from(iv), data: Array.from(data) }))
+		]);
+		const insert = (group: string, version: string) =>
+			db
+				.prepare(
+					`INSERT INTO completed_run(id,user_id,family,engine_version,rules_group,score,moves,seconds,seed,move_log,payload_hash,ranked,hidden,created_at,score_config_version)
+			VALUES(?,?,'memory','memory-1',?,1234,2,10,'42','[]',?,0,0,?,?)`
+				)
+				.bind(crypto.randomUUID(), userId, group, crypto.randomUUID(), Date.now(), version);
+		await db.batch([
+			...Array.from({ length: 102 }, (_, index) =>
+				insert('memory-1:6', `${prefix}-earlier-${index.toString().padStart(3, '0')}`)
+			),
+			...target.leaderboardGroups.map((group) => insert(group, `${prefix}-selected`))
+		]);
+		const page = await context.newPage();
+		await page.goto('/admin/sign-in');
+		await page.getByRole('textbox').fill(totp(secret, Date.now()));
+		await page.getByRole('button', { name: 'Verify and continue', exact: true }).click();
+		await expect(page).toHaveURL(/\/admin\/dashboard$/);
+		await mkdir('build/v1.3.5.17/browser', { recursive: true });
+		for (const overflow of [false, true]) {
+			if (overflow)
+				await db.batch(
+					Array.from({ length: 102 }, (_, index) =>
+						insert(
+							[...target.leaderboardGroups].sort()[0],
+							`${prefix}-overflow-${index.toString().padStart(3, '0')}`
+						)
+					)
+				);
+			for (const viewport of [
+				{ width: 390, height: 844 },
+				{ width: 844, height: 390 },
+				{ width: 1280, height: 800 }
+			]) {
+				await page.setViewportSize(viewport);
+				await page.goto(
+					`/admin/games?game=memory&subview=directory&q=${encodeURIComponent(target.id)}`
+				);
+				await expect(page.locator('.operator-shell')).toHaveAttribute('data-ready', 'true');
+				const trigger = page
+					.locator(`.variant-row[data-id="${target.id}"]`)
+					.getByRole('button', { name: 'Inspect', exact: true });
+				await trigger.click();
+				const drawer = page.locator('dialog.drawer');
+				await expect(drawer).toBeVisible();
+				await expect(drawer.locator('#drawer-title')).toHaveText('Excavation Order');
+				const selectedRows = drawer.locator('.drawer-table tbody tr');
+				if (overflow) {
+					await expect(selectedRows).toHaveCount(100);
+					await expect(drawer.getByText(messages['v1.admin.games.limited'])).toBeVisible();
+				} else {
+					for (const group of target.leaderboardGroups)
+						await expect(
+							selectedRows.filter({ hasText: group }).filter({ hasText: `${prefix}-selected` })
+						).toHaveCount(1);
+				}
+				const displayedGroups = await selectedRows.locator('td:first-child').allTextContents();
+				expect(displayedGroups.every((group) => target.leaderboardGroups.includes(group))).toBe(
+					true
+				);
+				await expect(drawer).not.toContainText(`${prefix}-earlier-`);
+				const scoringLink = drawer.getByRole('link', { name: /Scoring Editor/i });
+				await scoringLink.scrollIntoViewIfNeeded();
+				await expect(scoringLink).toBeInViewport();
+				expect(await scoringLink.getAttribute('href')).toContain('game=memory&subview=scoring');
+				expect(await page.evaluate(() => document.documentElement.scrollWidth <= innerWidth)).toBe(
+					true
+				);
+				expect(await drawer.evaluate((node) => node.scrollWidth <= node.clientWidth)).toBe(true);
+				const bounds = await drawer.boundingBox();
+				expect(bounds).not.toBeNull();
+				expect(bounds!.x).toBeGreaterThanOrEqual(0);
+				expect(bounds!.y).toBeGreaterThanOrEqual(0);
+				expect(bounds!.x + bounds!.width).toBeLessThanOrEqual(viewport.width + 1);
+				expect(bounds!.y + bounds!.height).toBeLessThanOrEqual(viewport.height + 1);
+				await page.screenshot({
+					path: `build/v1.3.5.17/browser/directory-${overflow ? 'overflow' : 'late'}-${viewport.width}x${viewport.height}.png`
+				});
+				samples.push({ viewport, overflow, bounds, displayedRows: displayedGroups.length });
+				await page.keyboard.press('Escape');
+				await expect(drawer).not.toBeVisible();
+				await expect(trigger).toBeFocused();
+			}
+		}
+		await writeFile(
+			'build/v1.3.5.17/browser/directory-bounds.json',
+			JSON.stringify(samples, null, 2)
+		);
+	} finally {
+		if (userId)
+			await db.batch([
+				db.prepare('DELETE FROM completed_run WHERE user_id=?').bind(userId),
+				db.prepare('DELETE FROM admin_web_operator WHERE user_id=?').bind(userId),
+				db.prepare('DELETE FROM admin_actor WHERE id=?').bind(userId),
+				db.prepare('DELETE FROM user WHERE id=?').bind(userId)
+			]);
+		await context.close();
+		await proxy.dispose();
+	}
+});
 
 test('Memory games detail gates test play, edits independent scores, and plays disabled variants without recording rounds', async ({
 	browser

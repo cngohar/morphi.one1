@@ -1,5 +1,36 @@
 # DECISIONS.md
 
+## 2026-11-08 — v1.3.5.17 closeout accepted; audio files approved; source commit and push authorized
+
+The owner said “closeout is now done, you can comit and then push to github, also i review the audio file and approved it,you can include in comit too”.
+This accepts the completed v1.3.5.17 focused Memory integration and closeout, approves the three audio files
+(`static/audio/reshuffle.mp3`, `static/audio/timer-tick.mp3`, and `static/audio/trio-match.mp3`), and authorizes
+source commit and push to GitHub. Memory expansion ends at 81 presets / 243 groups; .16 Batch I is omitted.
+All scoped checks pass; full verify remains deferred; editor exclusions preserved.
+
+## 2026-11-08 — Stop Memory expansion; select v1.3.5.17 with Ponytail
+
+Local .17 work is now verified and ready for owner closeout review. The root
+history truncation defect is corrected through a shared native SQLite per-preset
+bound and selected-page group mapping; Games family limits and exact aggregate
+counts are preserved. Directory reuses the approved overflow notice. Real-D1
+boundary and three-size browser regressions pass. Later issuance tests receive
+fresh migrated fixtures to avoid older shared lifecycle/scoring contamination.
+No rules/identity/schema/dependency changes or speedup claim. The work record
+contains scoped results, diagnostic scale/payload data and interrupted-run limits.
+
+The owner said “ok i chose the stop expending and chose the 1.3.5.17 focuse
+integration , you can use the pony tail to start this”. Expansion stops at
+81 accepted and implemented presets / 243 leaderboard groups. Batch I (.16)
+is omitted; 100 remains a ceiling, not a delivery target. Baseline .14/.15 is
+accepted and pushed as `9372b99`. Select local focused integration and necessary
+bounded root corrections, using accepted UI and existing infrastructure. The required `gpt-6-luna/max` verifier returned 503; the owner separately
+authorized “Yes, take over .17 verification”. Parent verification for .17 is
+explicitly authorized without substitute-model evidence. Final
+.17 acceptance is pending its evidence/report and owner review. Full verify
+remains deferred; audio/editor exclusions and separate commit/push/deploy gates
+persist. [Selected brief](briefs/v1.3.5.17-memory-closeout-brief.md).
+
 ## 2026-11-08 — Batch H accepted; source commit and push authorized
 
 The owner said “the last work was done, but comit and pushed to github, so comit now and then push to github”,

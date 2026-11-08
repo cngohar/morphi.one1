@@ -1,5 +1,5 @@
 import { afterAll, beforeAll, expect, it } from 'vitest';
-import { readFile, readdir } from 'node:fs/promises';
+import { mkdir, readFile, readdir, writeFile } from 'node:fs/promises';
 import { getPlatformProxy } from 'wrangler';
 import { catalog } from '../../src/lib/catalog.js';
 import type { CompletedRun, PuzzleId } from '../../src/lib/engine/contract.js';
@@ -27,6 +27,7 @@ import {
 	gameAvailable,
 	variantAvailable,
 	gameStatistics,
+	queryScoreHistory,
 	queryActivityCounts,
 	type ActivityMappingEntry
 } from '../../src/lib/server/games.js';
@@ -71,16 +72,23 @@ function completion(variant?: string, seed = '42', id = crypto.randomUUID()): Co
 		rankedSession: null
 	};
 }
-beforeAll(async () => {
-	proxy = await getPlatformProxy<Cloudflare.Env>({ configPath: 'wrangler.jsonc', persist: false });
+async function migratedProxy() {
+	const fixture = await getPlatformProxy<Cloudflare.Env>({
+		configPath: 'wrangler.jsonc',
+		persist: false
+	});
 	for (const file of (await readdir('migrations')).filter((file) => file.endsWith('.sql')).sort()) {
-		await proxy.env.DB.batch(
+		await fixture.env.DB.batch(
 			(await readFile(`migrations/${file}`, 'utf8'))
 				.split('--> statement-breakpoint')
 				.filter((part) => part.trim())
-				.map((part) => proxy.env.DB.prepare(part))
+				.map((part) => fixture.env.DB.prepare(part))
 		);
 	}
+	return fixture;
+}
+beforeAll(async () => {
+	proxy = await migratedProxy();
 	userId = crypto.randomUUID();
 	await proxy.env.DB.batch([
 		proxy.env.DB.prepare(
@@ -1040,6 +1048,198 @@ it('bounds Games queries, pages variants deterministically, and isolates scoring
 	);
 });
 
+it('closeout keeps late preset cohorts visible at 81 presets and bounds real-D1 score history at the synthetic 100-preset cap', async () => {
+	const db = proxy.env.DB;
+	const presets = catalog.memory.variants!;
+	const groups = presets.flatMap((variant) => variant.leaderboardGroups);
+	expect(presets).toHaveLength(81);
+	expect(new Set(groups).size).toBe(243);
+	const player = crypto.randomUUID();
+	const observedId = `memory:closeout-observed-${player}`;
+	const target = presets.find((variant) => variant.id === 'memory:strata-order')!;
+	const firstGroup = [...groups].sort()[0];
+	const fixtureVersion = `closeout-${player}`;
+	const synthetic = Array.from({ length: 100 }, (_, index) => ({
+		id: `synthetic-cap-${index}`,
+		leaderboardGroups: [6, 8, 10].map((pairs) => `synthetic-cap-${player}:${index}:${pairs}`)
+	}));
+	const insert = (group: string, version: string, score = 1234) =>
+		db
+			.prepare(
+				`INSERT INTO completed_run(id,user_id,family,engine_version,rules_group,score,moves,seconds,seed,move_log,payload_hash,ranked,hidden,created_at,score_config_version)
+			VALUES(?,?,'memory','memory-1',?,?,2,10,'42','[]',?,1,0,?,?)`
+			)
+			.bind(crypto.randomUUID(), player, group, score, crypto.randomUUID(), now, version);
+	try {
+		await db
+			.prepare(
+				'INSERT INTO user(id,name,email,email_verified,created_at,updated_at) VALUES(?,?,?,?,?,?)'
+			)
+			.bind(player, 'Closeout scale fixture', `${player}@example.test`, 1, now, now)
+			.run();
+		await db.batch([
+			...groups.map((group) => insert(group, fixtureVersion)),
+			...Array.from({ length: 102 }, (_, i) =>
+				insert(firstGroup, `aaa-closeout-${i.toString().padStart(3, '0')}`)
+			),
+			insert(target.leaderboardGroups[0], `${fixtureVersion}-second`, 2345),
+			...synthetic.flatMap((preset) =>
+				preset.leaderboardGroups.map((group) => insert(group, fixtureVersion))
+			),
+			db
+				.prepare(
+					"INSERT INTO variant_lifecycle(family,variant,state,reason) VALUES('memory',?,'disabled','Closeout observed fixture')"
+				)
+				.bind(observedId)
+		]);
+		const summary = (await gameOverview(db, 'memory'))[0];
+		const stats = await gameStatistics(db, 'memory', summary);
+		expect(stats.rows).toHaveLength(100);
+		expect(stats.more).toBe(true);
+		const targetRows = stats.variants.find((variant) => variant.id === target.id)!;
+		expect(targetRows.more).toBe(false);
+		expect(
+			targetRows.rows.filter((row) => row.score_config_version.startsWith(fixtureVersion))
+		).toHaveLength(4);
+		expect(targetRows.rows.every((row) => target.leaderboardGroups.includes(row.rules_group))).toBe(
+			true
+		);
+		expect(
+			targetRows.rows.find((row) => row.score_config_version === `${fixtureVersion}-second`)
+		).toMatchObject({ completed: 1, bestScore: 2345 });
+		const flooded = presets.find((variant) => variant.leaderboardGroups.includes(firstGroup))!;
+		expect(stats.variants.find((variant) => variant.id === flooded.id)).toMatchObject({
+			more: true
+		});
+		expect(stats.variants.find((variant) => variant.id === flooded.id)!.rows).toHaveLength(100);
+		const targetIndex = presets.findIndex((variant) => variant.id === target.id);
+		const admin = await loadGamesAdmin(db, undefined, 'memory', Math.floor(targetIndex / 10));
+		expect(admin.gameStats.totalVariants).toBe(81);
+		expect(admin.gameStats.totalVariantPages).toBe(9);
+		expect(admin.gameStats.variants.map((variant) => variant.id)).toEqual(
+			presets
+				.slice(Math.floor(targetIndex / 10) * 10, Math.floor(targetIndex / 10) * 10 + 10)
+				.map((variant) => variant.id)
+		);
+		expect(admin.gameStats.variants.find((variant) => variant.id === target.id)!.rows).toEqual(
+			targetRows.rows
+		);
+		const directory = await loadMemoryDirectory(db, { q: target.id });
+		expect(directory.items).toHaveLength(1);
+		expect(
+			directory.items[0].rows.map((row) => `${row.rules_group}:${row.score_config_version}`)
+		).toEqual(targetRows.rows.map((row) => `${row.rules_group}:${row.score_config_version}`));
+		expect(directory.items[0].more).toBe(false);
+		const overflow = await loadMemoryDirectory(db, { q: flooded.id });
+		expect(overflow.items[0].rows).toHaveLength(100);
+		expect(overflow.items[0].more).toBe(true);
+		const observed = await loadMemoryDirectory(db, { source: 'observed', q: observedId });
+		expect(observed.items[0]).toMatchObject({
+			id: observedId,
+			source: 'observed',
+			state: 'disabled',
+			rows: [],
+			more: false
+		});
+		const firstPage = await loadMemoryDirectory(db, { source: 'curated' });
+		const lastPage = await loadMemoryDirectory(db, {
+			source: 'curated',
+			cursor: firstPage.lastCursor
+		});
+		expect(firstPage.total).toBe(81);
+		expect(lastPage.page).toBe(8);
+		expect(lastPage.items).toHaveLength(1);
+		expect(lastPage.items[0].id).toBe(
+			[...presets].sort((a, b) => a.id.localeCompare(b.id)).at(-1)!.id
+		);
+
+		const measurements = [];
+		for (const [label, mapping] of [
+			['actual-81-presets-243-groups', presets],
+			['synthetic-cap-100-mappings-300-groups', synthetic]
+		] as const) {
+			const durations: number[] = [];
+			const binds: unknown[][] = [];
+			const countedDb = {
+				prepare(sql: string) {
+					const statement = db.prepare(sql);
+					return {
+						bind(...parameters: unknown[]) {
+							binds.push(parameters);
+							return statement.bind(...parameters);
+						}
+					};
+				}
+			} as unknown as D1Database;
+			let returnedRows = 0,
+				payloadBytes = 0;
+			for (let run = 0; run < 5; run++) {
+				const started = performance.now();
+				const rows = await queryScoreHistory(countedDb, 'memory', [...mapping]);
+				durations.push(performance.now() - started);
+				returnedRows = rows.length;
+				payloadBytes = new TextEncoder().encode(JSON.stringify(rows)).length;
+				expect(
+					rows.every((row) =>
+						mapping
+							.find((preset) => preset.id === row.variant)
+							?.leaderboardGroups.includes(row.rules_group)
+					)
+				).toBe(true);
+			}
+			expect(binds).toHaveLength(5);
+			expect(binds.every((parameters) => parameters.length === 2)).toBe(true);
+			expect(returnedRows).toBeLessThanOrEqual(mapping.length * 101);
+			if (label.startsWith('synthetic')) expect(returnedRows).toBe(300);
+			const sorted = [...durations].sort((a, b) => a - b);
+			measurements.push({
+				label,
+				runtime: 'local Node Vitest to isolated workerd D1',
+				network: 'local IPC',
+				load: 'repeated cohort query on seeded database; not browser page loading',
+				runs: 5,
+				durationsMs: durations,
+				medianMs: sorted[2],
+				p95Ms: sorted[4],
+				statementsPerRun: 1,
+				bindsPerStatement: 2,
+				mappingJsonBytes: new TextEncoder().encode(binds[0][0] as string).length,
+				returnedRows,
+				payloadBytes,
+				selectedAdminPage: {
+					page: admin.gameStats.variantPage,
+					items: admin.gameStats.variants.length,
+					historyRows: admin.gameStats.variants.reduce(
+						(sum, variant) => sum + variant.rows.length,
+						0
+					),
+					responseBytes: new TextEncoder().encode(JSON.stringify(admin)).length
+				},
+				filteredDirectory: {
+					query: target.id,
+					items: directory.items.length,
+					historyRows: directory.items.reduce((sum, variant) => sum + variant.rows.length, 0),
+					responseBytes: new TextEncoder().encode(JSON.stringify(directory)).length
+				},
+				gate: 'correct rows/bounds only; elapsed times diagnostic'
+			});
+		}
+		await mkdir('build/v1.3.5.17/integration', { recursive: true });
+		await writeFile(
+			'build/v1.3.5.17/integration/score-history-scale.json',
+			JSON.stringify(measurements, null, 2)
+		);
+	} finally {
+		await db.batch([
+			db
+				.prepare('DELETE FROM variant_lifecycle WHERE family=? AND variant=?')
+				.bind('memory', observedId),
+			db.prepare('DELETE FROM completed_run WHERE user_id=?').bind(player),
+			db.prepare('DELETE FROM user WHERE id=?').bind(player)
+		]);
+	}
+}, 30_000);
+
 const PILOT = [
 	'memory:budget',
 	'memory:lockout',
@@ -1265,9 +1465,15 @@ it('loads Memory directory, filters by search/status/archetype, supports keyset 
 	}
 });
 
-it('Time Strata preserves historical policy, issued identity and explicit controls through ranked save', async () => {
-	const db = proxy.env.DB,
+it('Time Strata preserves historical policy, issued identity and explicit controls through ranked save', async ({
+	onTestFinished
+}) => {
+	// Earlier lifecycle/scoring cases deliberately retain mutations in their shared fixture.
+	const fixture = await migratedProxy();
+	onTestFinished(() => fixture.dispose());
+	const db = fixture.env.DB,
 		variant = 'memory:time-strata';
+	await db.prepare("INSERT INTO admin_actor(id,role) VALUES('operator','admin')").run();
 	const player = crypto.randomUUID();
 	await db.batch([
 		db
@@ -1412,8 +1618,13 @@ it('Time Strata preserves historical policy, issued identity and explicit contro
 	}
 });
 
-it('Batch H issues immutable rules, enforces live policy and saves isolated replayed results', async () => {
-	const db = proxy.env.DB;
+it('Batch H issues immutable rules, enforces live policy and saves isolated replayed results', async ({
+	onTestFinished
+}) => {
+	const fixture = await migratedProxy();
+	onTestFinished(() => fixture.dispose());
+	const db = fixture.env.DB;
+	await db.prepare("INSERT INTO admin_actor(id,role) VALUES('operator','admin')").run();
 	const modes = [
 		['linked', 'availability', 'Linked Tops'],
 		['sweep', 'availability', 'Level Sweep'],

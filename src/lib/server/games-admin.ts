@@ -34,16 +34,14 @@ export async function loadGamesAdmin(
 	};
 	if (selectedGame) {
 		games = await gameOverview(db, selectedGame);
-		const stats = await gameStatistics(db, selectedGame, games[0]);
-		const totalVariants = stats.variants.length;
+		const totalVariants = games[0].variants.length;
 		const totalVariantPages = Math.max(1, Math.ceil(totalVariants / pageSize));
-		const pagedVariants = stats.variants.slice(
-			variantPage * pageSize,
-			(variantPage + 1) * pageSize
-		);
+		const stats = await gameStatistics(db, selectedGame, {
+			...games[0],
+			variants: games[0].variants.slice(variantPage * pageSize, (variantPage + 1) * pageSize)
+		});
 		gameStats = {
 			...stats,
-			variants: pagedVariants,
 			totalVariants,
 			variantPage,
 			variantPageSize: pageSize,
