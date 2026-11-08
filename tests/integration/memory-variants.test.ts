@@ -1155,7 +1155,9 @@ it('loads Memory directory, filters by search/status/archetype, supports keyset 
 	expect(initial.total).toBeGreaterThanOrEqual(catalog.memory.variants!.length);
 	expect(initial.items.length).toBeLessThanOrEqual(10);
 
-	const classic = initial.items.find((v) => v.id === 'memory:classic');
+	// Classic is on page 2 in default sort (id ASC, limit 10), so verify via search
+	const classicResult = await loadMemoryDirectory(db, { q: 'classic' });
+	const classic = classicResult.items.find((v) => v.id === 'memory:classic');
 	expect(classic).toBeDefined();
 	expect(classic?.source).toBe('curated');
 	expect(classic?.archetype).toBe('core');

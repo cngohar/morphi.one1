@@ -17,6 +17,30 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.3.5.12 — Memory Expansion Batch E (10 Botanical & Nature Rulesets under Split Dual-Garden Baseline) accepted & pushed (2026-11-08)
+
+- **Built:** Following owner approval of the visual review fixture (`static/demo/v1.3.5.12-batch-e.html`) with anime.js 4.5.0 motion integration, design brief (`docs/briefs/v1.3.5.12-batch-e-brief.md`), and the direction “update the git repo and push to github”, 10 genuine Memory botanical & nature rulesets under the new Split Dual-Garden Baseline (`memory:cross-pollination`) were implemented under ponytail principles and Constraint C2: Split Dual-Garden Baseline (`memory:cross-pollination`), Underground Spore Symbiosis (`memory:mycelium-network`), Sunlight Absorption & Sunbeam Rotation (`memory:photosynthesis`), Autumn Wind Breeze Scatter (`memory:seed-dispersal`), Perennial Wilt Dormancy (`memory:seasonal-bloom`), Honeybee Hive Waggle Dance (`memory:bee-waggle`), Thorn Entanglement & Dewdrop Release (`memory:carnivorous-briar`), Sap & Dewdrop Energy Budget (`memory:chlorophyll-meter`), Moonlight Phosphor Spore Symmetry (`memory:bioluminescent`), and Biodiversity Cross-Grafting Combos (`memory:botanical-graft`). Implemented stateful turn/deck mechanics in `src/lib/puzzles/memory/logic.ts`, dimension values in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`, localization in `messages.ts` and `i18n/messages.ts`, and regenerated catalog projections. Total catalog Memory variants expanded from 50 to 60 (180 leaderboard groups). [Brief](briefs/v1.3.5.12-batch-e-brief.md), [work/evidence](work/V1.3.5.12_WORK.md).
+- **Skipped (and why):** Non-Memory matrices unchanged; unauditioned audio and local editor exclusions preserved; full `bun run verify` deferred per standing instructions.
+- **Known issues:** No physical device review; browser testing performed via Chromium responsive emulation across 390×844, 844×390, and 1280×800. Full verify deferred.
+- **Decisions and pinned versions:** Owner approved the visual preview and authorized local implementation. Preserved standard integer-only deterministic RNG, zero schema migrations. Non-rectangular split board tied directly to gameplay invariant (cross-pollination rule). Direct parent execution utilized due to unavailable `gpt-6.1-sol`/`gpt-6-luna` models.
+- **Questions for the owner:** Ready for owner functional review of Batch E.
+
+| Acceptance item                                     | Evidence type and location                                                                 | Result                                            |
+| --------------------------------------------------- | ------------------------------------------------------------------------------------------ | ------------------------------------------------- |
+| Visual preview fixture at three sizes with anime.js | `static/demo/v1.3.5.12-batch-e.html`, captures in `build/v1.3.5.12/preview-rulesets-*.png` | ACCEPTED by owner                                 |
+| 10 genuine ruleset mechanics & deterministic state  | `src/lib/puzzles/memory/logic.ts`, [unit tests](src/lib/puzzles/memory/variants.test.ts)   | PASS 46/46                                        |
+| Multi-runtime vector parity (6 runtimes)            | `bun scripts/check-vectors.ts` (Node, Bun, Chromium, Firefox, WebKit, workerd)             | PASS (fingerprints `a8be9d5f...` & `e11e8733...`) |
+| Real-D1 integration suite (15 tests)                | `tests/integration/memory-variants.test.ts`                                                | PASS 15/15                                        |
+| Playwright Chromium admin, directory & policy suite | `tests/e2e/memory-variants-admin.spec.ts`                                                  | PASS 3/3 at one worker                            |
+| Responsive layout (390×844, 844×390, 1280×800)      | Zero horizontal scroll overflow (`scrollWidth <= innerWidth`)                              | PASS at all 3 sizes                               |
+| Format, lint and types                              | Scoped Prettier/ESLint; `bun run check`                                                    | PASS; 0 lint warnings, 0 type errors/warnings     |
+| Full `bun run verify`                               | Standing owner deferral                                                                    | NOT RUN; deferred, not passed/waived              |
+
+- **Measurements:** Checked in local Linux Chromium responsive emulation at 390×844, 844×390, and 1280×800 (one worker). Directory queries and policy lookups remain bounded O(1) single-bind SQL.
+- **Waivers:** None.
+- **Owner responsibilities:** Functional review and acceptance before any commit or push.
+- **CODEMAP updated:** yes.
+
 ## v1.3.5.11 — Memory Expansion Batch D (10 Distributed Cloud & Edge Architecture Rulesets) accepted & pushed (2026-11-07)
 
 - **Built:** Following owner approval of the visual review fixture (`static/demo/v1.3.5.11-batch-d.html`) with anime.js 4.5.0 motion integration, design brief (`docs/briefs/v1.3.5.11-batch-d-brief.md`), and the direction “done, now update the repo and push to github”, 10 genuine Memory distributed cloud & edge architecture rulesets were implemented under ponytail principles: Workers KV eventual consistency (`memory:kv-consistency`), Durable Object actor row coordinator mutex (`memory:durable-object`), Vectorize KNN semantic similarity clustering (`memory:vectorize-knn`), Cloudflare Queues FIFO batch & DLQ shelf (`memory:fifo-queue`), Workers AI 120-token context window budget (`memory:ai-tokens`), Hyperdrive connection pooling multiplier (`memory:hyperdrive-pool`), Turnstile managed challenge human verification (`memory:turnstile-verify`), Zero Trust RBAC tiered clearance (`memory:zero-trust`), Argo smart routing dynamic quadrant reroute (`memory:argo-reroute`), and Cloudflare R2 Glacier cold archive hydration (`memory:r2-glacier`). Implemented stateful turn/deck mechanics in `src/lib/puzzles/memory/logic.ts`, dimension values in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`, localization in `messages.ts` and `i18n/messages.ts`, and regenerated catalog projections. Total catalog Memory variants expanded from 40 to 50 (150 leaderboard groups). [Brief](briefs/v1.3.5.11-batch-d-brief.md), [work/evidence](work/V1.3.5.11_WORK.md).
@@ -29,7 +53,7 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 | --------------------------------------------------- | ------------------------------------------------------------------------------------------ | --------------------------------------------- |
 | Visual preview fixture at three sizes with anime.js | `static/demo/v1.3.5.11-batch-d.html`, captures in `build/v1.3.5.11/preview-rulesets-*.png` | ACCEPTED by owner                             |
 | 10 genuine ruleset mechanics & deterministic state  | `src/lib/puzzles/memory/logic.ts`, [unit tests](src/lib/puzzles/memory/variants.test.ts)   | PASS 45/45                                    |
-| Multi-runtime vector parity (6 runtimes)            | `bun scripts/check-vectors.ts` (Node, Bun, Chromium, Firefox, WebKit, workerd)            | PASS (fingerprint `a8be9d5f...`)              |
+| Multi-runtime vector parity (6 runtimes)            | `bun scripts/check-vectors.ts` (Node, Bun, Chromium, Firefox, WebKit, workerd)             | PASS (fingerprint `a8be9d5f...`)              |
 | Real-D1 integration suite (15 tests)                | `tests/integration/memory-variants.test.ts`                                                | PASS 15/15                                    |
 | Playwright Chromium admin, directory & policy suite | `tests/e2e/memory-variants-admin.spec.ts`                                                  | PASS 3/3 at one worker                        |
 | Responsive layout (390×844, 844×390, 1280×800)      | Zero horizontal scroll overflow (`scrollWidth <= innerWidth`)                              | PASS at all 3 sizes                           |
@@ -64,7 +88,6 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 - **Waivers:** None.
 - **Owner responsibilities:** Owner functional review of Batch C rulesets.
 - **CODEMAP updated:** yes.
-
 
 ## v1.3.5.9 — Memory Expansion Batch B (10 Sci-Fi Exploration Rulesets) accepted locally & pushed (2026-11-07)
 

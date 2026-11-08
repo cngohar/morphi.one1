@@ -33,6 +33,22 @@ For testing and verification:
 
 ## Current phase
 
+**v1.3.5.12 Batch E accepted; source commit and push authorized (2026-11-08):**
+The owner said “update the git repo and push to github”, accepting the completed 10
+genuine Memory botanical and nature rulesets under the new Split Dual-Garden Baseline
+(`memory:cross-pollination`, `memory:mycelium-network`, `memory:photosynthesis`, `memory:seed-dispersal`,
+`memory:seasonal-bloom`, `memory:bee-waggle`, `memory:carnivorous-briar`, `memory:chlorophyll-meter`,
+`memory:bioluminescent`, and `memory:botanical-graft`) and authorizing this source commit and push.
+The 10 rulesets are implemented end-to-end under ponytail principles in `src/lib/puzzles/memory/logic.ts`,
+dimensions in `dimensions.ts`, manifest entries with 30 new immutable leaderboard groups in `manifest.ts`,
+localization in `messages.ts`/`i18n`, and regenerated projections. Non-rectangular split board structure is
+strictly tied to gameplay invariants (intra-bed flips prohibited / cross-pollination invariant) per Constraint C2.
+Total catalog Memory variants are now 60 (180 leaderboard groups). Multi-runtime vectors (6/6 runtimes,
+fingerprint `a8be9d5f...` and memory vector fingerprint `e11e8733...`), workspace types (0 errors/0 warnings),
+unit tests (46/46), real-D1 integration suite (15/15), and Playwright Chromium admin suite (3/3 at one worker) pass.
+Full `bun run verify` remains deferred; unauditioned audio and editor exclusions preserved. No production deployment authorized.
+See `docs/briefs/v1.3.5.12-batch-e-brief.md` and `docs/work/V1.3.5.12_WORK.md`.
+
 **v1.3.5.11 Batch D accepted; source commit and push authorized (2026-11-07):**
 The owner said “done, now update the repo and push to github”, accepting the completed 10
 genuine Memory distributed cloud and edge architecture rulesets (Workers KV eventual consistency,

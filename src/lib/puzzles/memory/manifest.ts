@@ -77,7 +77,17 @@ const NEW_PAIR_SUFFIXES = [
 	'turnstile-verify',
 	'zero-trust',
 	'argo-reroute',
-	'r2-glacier'
+	'r2-glacier',
+	'cross-pollination',
+	'mycelium-network',
+	'photosynthesis',
+	'seed-dispersal',
+	'seasonal-bloom',
+	'bee-waggle',
+	'carnivorous-briar',
+	'chlorophyll-meter',
+	'bioluminescent',
+	'botanical-graft'
 ] as const;
 const NEW_GROUPS = [
 	...NEW_PAIR_SUFFIXES.flatMap((suffix) => groupIds(suffix, PAIR_COUNTS)),
@@ -417,6 +427,46 @@ export const manifest = {
 		pairVariant('r2-glacier', 120, {
 			steps: ['v1.game.memory.step1', 'memory.r2Glacier.step2', 'v1.game.memory.step3'],
 			tips: 'memory.r2Glacier.tips'
+		}),
+		pairVariant('cross-pollination', 120, {
+			steps: ['v1.game.memory.step1', 'memory.crossPollination.step2', 'v1.game.memory.step3'],
+			tips: 'memory.crossPollination.tips'
+		}),
+		pairVariant('mycelium-network', 120, {
+			steps: ['v1.game.memory.step1', 'memory.myceliumNetwork.step2', 'v1.game.memory.step3'],
+			tips: 'memory.myceliumNetwork.tips'
+		}),
+		pairVariant('photosynthesis', 120, {
+			steps: ['v1.game.memory.step1', 'memory.photosynthesis.step2', 'v1.game.memory.step3'],
+			tips: 'memory.photosynthesis.tips'
+		}),
+		pairVariant('seed-dispersal', 120, {
+			steps: ['v1.game.memory.step1', 'memory.seedDispersal.step2', 'v1.game.memory.step3'],
+			tips: 'memory.seedDispersal.tips'
+		}),
+		pairVariant('seasonal-bloom', 120, {
+			steps: ['v1.game.memory.step1', 'memory.seasonalBloom.step2', 'v1.game.memory.step3'],
+			tips: 'memory.seasonalBloom.tips'
+		}),
+		pairVariant('bee-waggle', 120, {
+			steps: ['v1.game.memory.step1', 'memory.beeWaggle.step2', 'v1.game.memory.step3'],
+			tips: 'memory.beeWaggle.tips'
+		}),
+		pairVariant('carnivorous-briar', 120, {
+			steps: ['v1.game.memory.step1', 'memory.carnivorousBriar.step2', 'v1.game.memory.step3'],
+			tips: 'memory.carnivorousBriar.tips'
+		}),
+		pairVariant('chlorophyll-meter', 120, {
+			steps: ['v1.game.memory.step1', 'memory.chlorophyllMeter.step2', 'v1.game.memory.step3'],
+			tips: 'memory.chlorophyllMeter.tips'
+		}),
+		pairVariant('bioluminescent', 120, {
+			steps: ['v1.game.memory.step1', 'memory.bioluminescent.step2', 'v1.game.memory.step3'],
+			tips: 'memory.bioluminescent.tips'
+		}),
+		pairVariant('botanical-graft', 120, {
+			steps: ['v1.game.memory.step1', 'memory.botanicalGraft.step2', 'v1.game.memory.step3'],
+			tips: 'memory.botanicalGraft.tips'
 		})
 	],
 	maxMoves: 180,

@@ -27,6 +27,11 @@ export interface MemoryCard {
 	vectorCluster?: 'ai' | 'db' | 'sec' | 'net';
 	clearanceTier?: 1 | 2 | 3;
 	isGlaciated?: boolean;
+	zone?: 'meadow' | 'grove';
+	isBriarLocked?: boolean;
+	isDewdrop?: boolean;
+	isWilted?: boolean;
+	sporeSymmetry?: 'even' | 'odd';
 }
 
 export const MEMORY_VARIANTS = [
@@ -79,7 +84,17 @@ export const MEMORY_VARIANTS = [
 	'memory:turnstile-verify',
 	'memory:zero-trust',
 	'memory:argo-reroute',
-	'memory:r2-glacier'
+	'memory:r2-glacier',
+	'memory:cross-pollination',
+	'memory:mycelium-network',
+	'memory:photosynthesis',
+	'memory:seed-dispersal',
+	'memory:seasonal-bloom',
+	'memory:bee-waggle',
+	'memory:carnivorous-briar',
+	'memory:chlorophyll-meter',
+	'memory:bioluminescent',
+	'memory:botanical-graft'
 ] as const;
 export type MemoryVariant = (typeof MEMORY_VARIANTS)[number];
 
@@ -186,6 +201,15 @@ export interface MemoryRound {
 	quadrantHits?: Record<number, number>;
 	/** R2 glacier only: consecutive untouched turn counter per card. */
 	glacierUntouched?: Record<number, number>;
+	/** Botanical ecosystem properties */
+	myceliumPulse?: number | null;
+	sunbeamRow?: number;
+	bloomDormancy?: Record<number, number>;
+	beeWaggleRow?: number | null;
+	briarsCleared?: boolean;
+	sap?: number;
+	graftMultiplier?: number;
+	seedBreezeSwapped?: [number, number];
 	/** Group count: pairs (6/8/10), trios (6/8/10) or quads (4/5/6). */
 	pairs: number;
 	cards: MemoryCard[];
@@ -203,6 +227,21 @@ export interface FlipResult {
 	effect: FlipEffect;
 }
 
+export function isBotanical(variant?: string): boolean {
+	return (
+		variant === 'memory:cross-pollination' ||
+		variant === 'memory:mycelium-network' ||
+		variant === 'memory:photosynthesis' ||
+		variant === 'memory:seed-dispersal' ||
+		variant === 'memory:seasonal-bloom' ||
+		variant === 'memory:bee-waggle' ||
+		variant === 'memory:carnivorous-briar' ||
+		variant === 'memory:chlorophyll-meter' ||
+		variant === 'memory:bioluminescent' ||
+		variant === 'memory:botanical-graft'
+	);
+}
+
 export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 	const selectedVariant = parseMemoryVariant(variant);
 	const rng = createRng(seed);
@@ -216,7 +255,8 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		selectedVariant === 'memory:atlas-terminal' ||
 		selectedVariant === 'memory:anycast-route' ||
 		selectedVariant === 'memory:bit-rot' ||
-		selectedVariant === 'memory:argo-reroute'
+		selectedVariant === 'memory:argo-reroute' ||
+		selectedVariant === 'memory:seed-dispersal'
 	) {
 		const nextU64 = rng.nextU64;
 		rng.nextU64 = () => {
@@ -317,9 +357,37 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 				if (c.symbol === selected[sIdx].id) c.clearanceTier = tier;
 			}
 		}
+	} else if (isBotanical(selectedVariant)) {
+		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
+			const cards = deck.filter((c) => c.symbol === selected[sIdx].id);
+			if (cards[0]) cards[0].zone = 'meadow';
+			if (cards[1]) cards[1].zone = 'grove';
+			if (selectedVariant === 'memory:bioluminescent') {
+				if (cards[0]) cards[0].sporeSymmetry = sIdx % 2 === 0 ? 'even' : 'odd';
+				if (cards[1]) cards[1].sporeSymmetry = sIdx % 2 === 0 ? 'even' : 'odd';
+			}
+		}
+		if (selectedVariant === 'memory:carnivorous-briar') {
+			const groveCards = deck.filter((c) => c.zone === 'grove');
+			if (groveCards[0]) groveCards[0].isBriarLocked = true;
+			if (groveCards[1]) groveCards[1].isBriarLocked = true;
+			const meadowCards = deck.filter((c) => c.zone === 'meadow');
+			if (meadowCards[0]) meadowCards[0].isDewdrop = true;
+		}
 	}
 
-	const roundCards = shuffle(rng, deck);
+	const roundCards = isBotanical(selectedVariant)
+		? [
+				...shuffle(
+					rng,
+					deck.filter((c) => c.zone === 'meadow')
+				),
+				...shuffle(
+					rng,
+					deck.filter((c) => c.zone === 'grove')
+				)
+			]
+		: shuffle(rng, deck);
 	if (selectedVariant === 'memory:durable-object') {
 		const cols = 4;
 		let changed = true;
@@ -376,9 +444,14 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		selectedVariant === 'memory:atlas-terminal' ||
 		selectedVariant === 'memory:anycast-route' ||
 		selectedVariant === 'memory:bit-rot' ||
-		selectedVariant === 'memory:argo-reroute'
+		selectedVariant === 'memory:argo-reroute' ||
+		selectedVariant === 'memory:seed-dispersal'
 	)
 		round.rngDraws = rngDraws;
+	if (selectedVariant === 'memory:chlorophyll-meter') round.sap = 100;
+	if (selectedVariant === 'memory:botanical-graft') round.graftMultiplier = 1;
+	if (selectedVariant === 'memory:photosynthesis') round.sunbeamRow = 0;
+	if (selectedVariant === 'memory:carnivorous-briar') round.briarsCleared = false;
 	if (selectedVariant === 'memory:lockout') round.lock = null;
 	if (selectedVariant === 'memory:swaps') round.marked = [];
 	if (selectedVariant === 'memory:collapse') round.cleared = 0;
@@ -614,6 +687,21 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		return { round, effect: 'ignored' };
 	}
 	if (
+		variant === 'memory:carnivorous-briar' &&
+		round.cards[index]?.isBriarLocked &&
+		!round.briarsCleared
+	) {
+		return { round, effect: 'ignored' };
+	}
+	if (isBotanical(variant) && round.revealed.length === 1) {
+		const firstIdx = round.revealed[0];
+		const firstInMeadow = firstIdx < round.pairs;
+		const secondInMeadow = index < round.pairs;
+		if (firstInMeadow === secondInMeadow) {
+			return { round, effect: 'ignored' };
+		}
+	}
+	if (
 		variant === 'memory:durable-object' &&
 		round.lockedActorRow !== null &&
 		round.lockedActorRow !== undefined &&
@@ -627,9 +715,29 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		return { round, effect: 'ignored' };
 	}
 
+	if (card.isWilted) {
+		card.isWilted = false;
+	}
+
 	let lifeSupport = round.lifeSupport;
 	if (variant === 'memory:life-support') {
 		lifeSupport = Math.max(0, (round.lifeSupport ?? 100) - 3);
+	}
+
+	let sap = round.sap;
+	if (variant === 'memory:chlorophyll-meter') {
+		sap = Math.max(0, (round.sap ?? 100) - 3);
+		if (sap <= 0) {
+			return {
+				round: {
+					...round,
+					sap: 0,
+					moves: round.moves + 1,
+					status: 'lost'
+				},
+				effect: 'ignored'
+			};
+		}
 	}
 
 	let aiTokens = round.aiTokens;
@@ -762,13 +870,33 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		if (variant === 'memory:durable-object') {
 			lockedActorRow = row;
 		}
+		let myceliumPulse = round.myceliumPulse;
+		if (variant === 'memory:mycelium-network') {
+			const partnerIdx = round.cards.findIndex(
+				(c, i) => i !== index && c.symbol === card.symbol && !round.matched.includes(i)
+			);
+			myceliumPulse = partnerIdx >= 0 ? partnerIdx : null;
+		}
+		let beeWaggleRow = round.beeWaggleRow;
+		if (variant === 'memory:bee-waggle' && index >= round.pairs) {
+			const partnerIdx = round.cards.findIndex(
+				(c, i) => i !== index && c.symbol === card.symbol && !round.matched.includes(i)
+			);
+			beeWaggleRow = partnerIdx >= 0 ? Math.floor(partnerIdx / cols) : null;
+		}
+		const briarsCleared =
+			variant === 'memory:carnivorous-briar' && card.isDewdrop ? true : round.briarsCleared;
 		return {
 			round: {
 				...base,
 				revealed,
 				...(lifeSupport !== undefined ? { lifeSupport } : {}),
 				...(aiTokens !== undefined ? { aiTokens } : {}),
+				...(sap !== undefined ? { sap } : {}),
 				...(lockedActorRow !== undefined ? { lockedActorRow } : {}),
+				...(myceliumPulse !== undefined ? { myceliumPulse } : {}),
+				...(beeWaggleRow !== undefined ? { beeWaggleRow } : {}),
+				...(briarsCleared !== undefined ? { briarsCleared } : {}),
 				...(illuminated ? { illuminated } : {})
 			},
 			effect: 'flip'
@@ -852,6 +980,18 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				? Math.min(3, (round.hyperdriveMultiplier ?? 2) + 1)
 				: round.hyperdriveMultiplier;
 
+		if (variant === 'memory:chlorophyll-meter') {
+			sap = Math.min(120, (sap ?? 100) + 12);
+		}
+		const graftMultiplier =
+			variant === 'memory:botanical-graft'
+				? Math.min(3, (round.graftMultiplier ?? 1) + 1)
+				: round.graftMultiplier;
+		const briarsCleared =
+			variant === 'memory:carnivorous-briar' && (card.isDewdrop || first.isDewdrop)
+				? true
+				: round.briarsCleared;
+
 		if (variant === 'memory:hyperdrive-warp' && (card.isAnomaly || first.isAnomaly)) {
 			cards = warpAnomalyCards({ ...round, cards, matched }).cards;
 		}
@@ -920,6 +1060,9 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				...(pulseStreak !== undefined ? { pulseStreak } : {}),
 				...(lifeSupport !== undefined ? { lifeSupport } : {}),
 				...(aiTokens !== undefined ? { aiTokens } : {}),
+				...(sap !== undefined ? { sap } : {}),
+				...(graftMultiplier !== undefined ? { graftMultiplier } : {}),
+				...(briarsCleared !== undefined ? { briarsCleared } : {}),
 				...(clearanceTier !== undefined ? { clearanceTier } : {}),
 				...(hyperdriveMultiplier !== undefined ? { hyperdriveMultiplier } : {}),
 				...(variant === 'memory:durable-object' ? { lockedActorRow: null } : {}),
@@ -1027,6 +1170,19 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		mismatched.kvReplicas = replicas;
 	}
 
+	if (variant === 'memory:chlorophyll-meter') {
+		const nextSap = Math.max(0, (sap ?? 100) - 6);
+		mismatched.sap = nextSap;
+		if (nextSap <= 0) {
+			mismatched.sap = 0;
+			mismatched.status = 'lost';
+		}
+	}
+
+	if (variant === 'memory:botanical-graft') {
+		mismatched.graftMultiplier = 1;
+	}
+
 	// Lock the last card only while two other unmatched cards keep a legal attempt open.
 	if (variant === 'memory:lockout')
 		mismatched.lock =
@@ -1089,6 +1245,27 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 			return c;
 		});
 		finalRound = { ...finalRound, cards, glacierUntouched: untouched };
+	} else if (variant === 'memory:photosynthesis') {
+		finalRound = {
+			...finalRound,
+			sunbeamRow: Math.floor(finalRound.moves / 2) % Math.ceil(finalRound.cards.length / cols)
+		};
+	} else if (variant === 'memory:seasonal-bloom') {
+		const dormancy: Record<number, number> = { ...(round.bloomDormancy ?? {}) };
+		finalRound.cards.forEach((_, i) => {
+			if (!finalRound.matched.includes(i) && !revealed.includes(i)) {
+				dormancy[i] = (dormancy[i] ?? 0) + 1;
+			} else {
+				dormancy[i] = 0;
+			}
+		});
+		const cards = finalRound.cards.map((c, i) => {
+			if ((dormancy[i] ?? 0) >= 3) {
+				return { ...c, isWilted: true };
+			}
+			return c;
+		});
+		finalRound = { ...finalRound, cards, bloomDormancy: dormancy };
 	}
 
 	return {
@@ -1109,7 +1286,9 @@ export function resolveMismatch(round: MemoryRound): MemoryRound {
 		...(round.burstPing?.length ? { burstPing: [] } : {}),
 		...(round.quarantine?.length ? { quarantine: [] } : {}),
 		...(round.lockedActorRow !== undefined ? { lockedActorRow: null } : {}),
-		...(round.turnstileActive !== undefined ? { turnstileActive: false } : {})
+		...(round.turnstileActive !== undefined ? { turnstileActive: false } : {}),
+		...(round.myceliumPulse !== undefined ? { myceliumPulse: null } : {}),
+		...(round.beeWaggleRow !== undefined ? { beeWaggleRow: null } : {})
 	};
 	if (round.edgeCache) {
 		const nextCache: Record<number, { symbol: SymbolId; turns: number }> = {};
@@ -1121,7 +1300,8 @@ export function resolveMismatch(round: MemoryRound): MemoryRound {
 		hidden = { ...hidden, edgeCache: nextCache };
 	}
 	const variant = memoryVariant(round);
-	if (variant === 'memory:swaps') return swapHiddenCards(hidden);
+	if (variant === 'memory:swaps' || variant === 'memory:seed-dispersal')
+		return swapHiddenCards(hidden);
 	if (variant === 'memory:drift') return driftRow(hidden, round.revealed[0]);
 	if (variant === 'memory:decay') return updateDecay(hidden, round.revealed);
 	return hidden;

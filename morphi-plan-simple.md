@@ -1,6 +1,19 @@
 # Morphi: Simple Plan
 
-## Current local status — v1.3.5.11 Batch D locally implemented & verified (2026-11-07)
+## Current local status — v1.3.5.12 Batch E accepted and committed (2026-11-08)
+
+The owner instructed “update the git repo and push to github”, accepting the 10 genuine Memory botanical & nature
+rulesets under the new Split Dual-Garden Baseline (`memory:cross-pollination`, `memory:mycelium-network`,
+`memory:photosynthesis`, `memory:seed-dispersal`, `memory:seasonal-bloom`, `memory:bee-waggle`,
+`memory:carnivorous-briar`, `memory:chlorophyll-meter`, `memory:bioluminescent`, and `memory:botanical-graft`)
+and authorizing this source commit and push to main. Total Memory catalogue expanded from 50 to 60 variants
+(150 to 180 leaderboard groups). Multi-runtime vectors (6/6 runtimes, standard fingerprint `a8be9d5f...`, memory
+fingerprint `e11e8733...`), workspace types (0 errors/0 warnings), unit tests (46/46), real-D1 integration suite (15/15),
+and Playwright Chromium admin suite (3/3 at one worker) pass. Full `bun run verify` remains deferred; unauditioned
+audio and editor exclusions preserved. No production deployment authorized.
+See `docs/briefs/v1.3.5.12-batch-e-brief.md` and `docs/work/V1.3.5.12_WORK.md`.
+
+## Earlier local status — v1.3.5.11 Batch D locally implemented & verified (2026-11-07)
 
 Following the owner's review and instruction “got them. i reviewd it and find useful , you can start the implementation”,
 the 10 genuine Memory distributed cloud & edge architecture rulesets (Workers KV eventual consistency, Durable Object

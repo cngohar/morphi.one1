@@ -211,6 +211,16 @@ export const puzzleMessages = {
 	'variant.memory:zero-trust': 'Zero Trust',
 	'variant.memory:argo-reroute': 'Argo Route',
 	'variant.memory:r2-glacier': 'R2 Glacier',
+	'variant.memory:cross-pollination': 'Cross-Pollination',
+	'variant.memory:mycelium-network': 'Mycelium Network',
+	'variant.memory:photosynthesis': 'Photosynthesis',
+	'variant.memory:seed-dispersal': 'Seed Dispersal',
+	'variant.memory:seasonal-bloom': 'Seasonal Bloom',
+	'variant.memory:bee-waggle': 'Bee Waggle',
+	'variant.memory:carnivorous-briar': 'Carnivorous Briar',
+	'variant.memory:chlorophyll-meter': 'Chlorophyll Meter',
+	'variant.memory:bioluminescent': 'Bioluminescent Spores',
+	'variant.memory:botanical-graft': 'Botanical Graft',
 	'memory.countdown.step2':
 		'Clear the board before the countdown clock reaches zero. Running out of time ends the round with no score.',
 	'memory.countdown.tips': 'Maintain a brisk pace; hesitating too long costs the round.',
@@ -345,6 +355,46 @@ export const puzzleMessages = {
 	'memory.r2Glacier.step2':
 		'Cards untouched for four turns transition to Glacier Cold Archive, requiring a hydration cycle to thaw.',
 	'memory.r2Glacier.tips': 'Rotate your memory coverage to prevent cold data archiving.',
+	'memory.crossPollination.step2':
+		'Flowers and pollinators are divided into two garden beds. Every match must cross between the Meadow and the Grove.',
+	'memory.crossPollination.tips':
+		'Never flip two cards in the same bed; pairs always cross the garden perimeter.',
+	'memory.myceliumNetwork.step2':
+		'Underground mycelium root threads send a spore pulse pointing toward the partner bed upon flipping a card.',
+	'memory.myceliumNetwork.tips':
+		'Follow the subterranean mycelial root pulse to locate reciprocal blooms.',
+	'memory.photosynthesis.step2':
+		'A rotating sunbeam illuminates one garden row every two turns, providing a sunlight bloom preview.',
+	'memory.photosynthesis.tips':
+		'Plan your moves to take advantage of rows currently bathed in direct sunlight.',
+	'memory.seedDispersal.step2':
+		'Mismatches trigger an autumn breeze, causing unpicked seed pods to drift and swap positions.',
+	'memory.seedDispersal.tips':
+		'Track where seed pods drift when winds scatter petals across the garden.',
+	'memory.seasonalBloom.step2':
+		'Flowers unvisited for three turns wilt into dormant root bulbs. Rejuvenate bulbs to restore their bloom.',
+	'memory.seasonalBloom.tips':
+		'Revisit dormant bulbs before perennial wilt spreads across the garden bed.',
+	'memory.beeWaggle.step2':
+		'Flipping a honeybee in the Grove performs a waggle dance with an arrow pointing toward the matching flower.',
+	'memory.beeWaggle.tips':
+		'Read the honeybee foraging vector dance to navigate straight to the blossom.',
+	'memory.carnivorousBriar.step2':
+		'Two Grove cards are trapped in thorny briars. Discover the Morning Dewdrop in the Meadow to dissolve the thorns.',
+	'memory.carnivorousBriar.tips':
+		'Find the dewdrop early to liberate trapped blossoms from the briar patch.',
+	'memory.chlorophyllMeter.step2':
+		'Flips consume sap; matches replenish sap. Complete the garden before drought wilt drains your sap reservoir.',
+	'memory.chlorophyllMeter.tips':
+		'Maintain a positive sap balance by prioritizing high-confidence cross-pollinations.',
+	'memory.bioluminescent.step2':
+		'Nocturnal spore rings on card backs indicate petal symmetry to guide your botanical pairings.',
+	'memory.bioluminescent.tips':
+		'Use spore ring symmetry hints on card backs to narrow down floral candidates.',
+	'memory.botanicalGraft.step2':
+		'Consecutive cross-pollinations trigger orchard grafting, escalating a biodiversity combo multiplier.',
+	'memory.botanicalGraft.tips':
+		'Chain unbroken cross-pollinations to harvest champion hybrid graft bonuses.',
 	'scoring.memory.quad': 'Points per quad',
 	'memory.quads.label': 'Quads',
 	'memory.quads.hint': '{pairs} quads · Find four matching symbols',

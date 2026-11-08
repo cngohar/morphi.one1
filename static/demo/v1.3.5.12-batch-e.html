@@ -1,0 +1,865 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta name="robots" content="noindex">
+<title>Morphi v1.3.5.12 — Batch E Split Dual-Garden Baseline & 10 Botanical Nature Rulesets (Fixture Preview with anime.js)</title>
+<style>
+:root {
+	font: 600 14px/1.4 'Nunito Variable', 'Nunito', system-ui, sans-serif;
+	color: #1a2e1d;
+	background: #f4f8f4;
+	--board: #eaf3ea;
+	--edge: #a3c9a8;
+	--back: #c5dec9;
+	--focus: #16a34a;
+	--meadow: #059669;
+	--grove: #d97706;
+	--vine: #10b981;
+	--pollen: #f59e0b;
+	--wilt: #64748b;
+}
+* { box-sizing: border-box; }
+body {
+	margin: 0;
+	min-height: 100dvh;
+	display: flex;
+	flex-direction: column;
+	background: #f4f8f4;
+	color: #1a2e1d;
+	overflow-x: hidden;
+}
+button {
+	font: inherit;
+	color: inherit;
+	cursor: pointer;
+	border: 1px solid #c2dec6;
+	border-radius: 8px;
+	background: #fff;
+	padding: 6px 12px;
+	transition: background-color 0.15s, border-color 0.15s;
+}
+button:hover { background: #ecfdf5; }
+button:focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+
+.review-banner {
+	padding: 8px 14px;
+	background: #fff;
+	border-bottom: 1px solid #c2dec6;
+	font-size: 12px;
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	flex-wrap: wrap;
+	gap: 6px;
+}
+.review-banner strong { color: #059669; }
+.badge {
+	font-size: 11px;
+	padding: 2px 6px;
+	border-radius: 4px;
+	background: #e2e8f0;
+	color: #475569;
+	font-weight: 700;
+}
+.badge-motion {
+	background: #fef3c7;
+	color: #b45309;
+	border: 1px solid #fde68a;
+}
+.badge-baseline {
+	background: #ecfdf5;
+	color: #065f46;
+	border: 1px solid #a7f3d0;
+	font-weight: 800;
+}
+
+.tabs-bar {
+	display: flex;
+	flex-wrap: wrap;
+	gap: 4px;
+	padding: 6px 14px;
+	background: #f0fdf4;
+	border-bottom: 1px solid #c2dec6;
+}
+.tabs-bar button {
+	font-size: 12px;
+	white-space: nowrap;
+	padding: 5px 9px;
+	background: #fff;
+	color: #166534;
+	border-color: #bbf7d0;
+}
+.tabs-bar button[aria-current="page"] {
+	background: #15803d;
+	color: #fff;
+	font-weight: 800;
+	border-color: #15803d;
+}
+
+.container {
+	display: grid;
+	grid-template-columns: minmax(0, 1fr) 340px;
+	flex: 1;
+	min-height: 0;
+	background: var(--board);
+}
+@media (max-width: 900px) {
+	.container {
+		grid-template-columns: 1fr;
+		grid-template-rows: minmax(360px, 1fr) auto;
+	}
+}
+
+.stage-pane {
+	padding: 10px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: space-between;
+	gap: 8px;
+	min-height: 0;
+	position: relative;
+}
+
+.hud {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	gap: 12px;
+	flex-wrap: wrap;
+	font-size: 12px;
+	font-weight: 800;
+	background: #ffffffea;
+	padding: 6px 14px;
+	border-radius: 20px;
+	border: 1px solid #c2dec6;
+	min-height: 34px;
+	box-shadow: 0 2px 6px rgba(0,0,0,0.04);
+}
+
+.garden-arena {
+	flex: 1;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	gap: 12px;
+	width: 100%;
+	max-width: 840px;
+	min-height: 0;
+}
+@media (max-width: 600px) {
+	.garden-arena {
+		flex-direction: column;
+		gap: 8px;
+	}
+}
+
+.garden-bed {
+	background: rgba(255, 255, 255, 0.8);
+	border: 2px solid #a3c9a8;
+	border-radius: 14px;
+	padding: 8px;
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	gap: 6px;
+	box-shadow: 0 4px 12px rgba(6, 95, 70, 0.05);
+	position: relative;
+	transition: border-color 0.2s, box-shadow 0.2s;
+}
+.garden-bed.meadow-bed {
+	border-color: var(--meadow);
+}
+.garden-bed.grove-bed {
+	border-color: var(--grove);
+}
+.garden-bed.active-target {
+	box-shadow: 0 0 16px 3px rgba(16, 185, 129, 0.4);
+	border-color: var(--vine);
+}
+
+.bed-header {
+	display: flex;
+	justify-content: space-between;
+	align-items: center;
+	width: 100%;
+	padding: 2px 6px;
+	font-size: 11px;
+	font-weight: 800;
+	text-transform: uppercase;
+	letter-spacing: 0.5px;
+	border-bottom: 1px solid #dcfce7;
+}
+.bed-header.meadow { color: var(--meadow); }
+.bed-header.grove { color: var(--grove); }
+
+.grid-cards {
+	display: grid;
+	grid-template-columns: repeat(4, 1fr);
+	gap: 5px;
+}
+@media (max-height: 480px) {
+	.grid-cards {
+		grid-template-columns: repeat(4, 1fr);
+		gap: 4px;
+	}
+}
+
+.card {
+	width: var(--size, 52px);
+	height: var(--size, 52px);
+	background: var(--back);
+	border: 2px solid var(--edge);
+	border-radius: 10px;
+	display: grid;
+	place-items: center;
+	position: relative;
+	user-select: none;
+	transform-origin: center;
+	transition: background-color 0.15s ease, border-color 0.15s ease, box-shadow 0.15s ease, opacity 0.15s ease;
+}
+.card.meadow-card {
+	border-color: #86efac;
+}
+.card.grove-card {
+	border-color: #fde047;
+}
+.card.flipped {
+	background: #fff;
+	box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+}
+.card.flipped.meadow-card {
+	border-color: var(--meadow);
+}
+.card.flipped.grove-card {
+	border-color: var(--grove);
+}
+.card.matched {
+	background: #f1f5f9;
+	border-color: #cbd5e1;
+	opacity: 0.25;
+	pointer-events: none;
+}
+.card.wilted {
+	background: #cbd5e1;
+	border-color: var(--wilt);
+	opacity: 0.6;
+}
+.card.briar-locked {
+	background: #fef2f2;
+	border-color: #ef4444;
+	box-shadow: inset 0 0 10px rgba(239, 68, 68, 0.4);
+	cursor: not-allowed;
+}
+
+.card-icon {
+	font-size: calc(var(--size, 52px) * 0.48);
+	line-height: 1;
+}
+
+.pollination-vine {
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+	gap: 4px;
+	padding: 4px 8px;
+}
+@media (max-width: 600px) {
+	.pollination-vine {
+		flex-direction: row;
+		padding: 2px 4px;
+	}
+}
+.vine-stem {
+	width: 4px;
+	height: 48px;
+	background: linear-gradient(to bottom, var(--meadow), var(--grove));
+	border-radius: 2px;
+	position: relative;
+	overflow: hidden;
+}
+@media (max-width: 600px) {
+	.vine-stem {
+		width: 48px;
+		height: 4px;
+		background: linear-gradient(to right, var(--meadow), var(--grove));
+	}
+}
+.pollen-particle {
+	position: absolute;
+	width: 100%;
+	height: 12px;
+	background: #fef08a;
+	box-shadow: 0 0 8px #facc15;
+	animation: pollenFlow 1.2s infinite ease-in-out;
+}
+@keyframes pollenFlow {
+	0% { top: -12px; }
+	100% { top: 100%; }
+}
+@media (max-width: 600px) {
+	.pollen-particle {
+		width: 12px;
+		height: 100%;
+		animation: pollenFlowH 1.2s infinite ease-in-out;
+	}
+	@keyframes pollenFlowH {
+		0% { left: -12px; }
+		100% { left: 100%; }
+	}
+}
+
+.alert-toast {
+	position: absolute;
+	top: 50px;
+	background: #059669;
+	color: #fff;
+	font-weight: 800;
+	font-size: 12px;
+	padding: 6px 14px;
+	border-radius: 8px;
+	box-shadow: 0 4px 12px rgba(5, 150, 105, 0.3);
+	z-index: 40;
+	pointer-events: none;
+	opacity: 0;
+	transform: translateY(-8px);
+	transition: opacity 0.2s, transform 0.2s;
+}
+.alert-toast.visible {
+	opacity: 1;
+	transform: translateY(0);
+}
+
+.details-pane {
+	background: #fff;
+	border-left: 1px solid #c2dec6;
+	padding: 16px;
+	display: flex;
+	flex-direction: column;
+	gap: 12px;
+	overflow-y: auto;
+}
+.details-pane h2 {
+	margin: 0;
+	font-size: 15px;
+	display: flex;
+	align-items: center;
+	gap: 8px;
+}
+.meta-box {
+	background: #f0fdf4;
+	border: 1px solid #bbf7d0;
+	border-radius: 8px;
+	padding: 8px 10px;
+	font-size: 12px;
+	display: flex;
+	flex-direction: column;
+	gap: 5px;
+}
+.meta-box strong { color: #14532d; }
+.rule-box {
+	background: #ecfdf5;
+	border-left: 3px solid var(--meadow);
+	padding: 8px 12px;
+	font-size: 12px;
+	color: #064e3b;
+	line-height: 1.5;
+}
+.score-box {
+	background: #fefce8;
+	border-left: 3px solid #eab308;
+	padding: 8px 12px;
+	font-size: 12px;
+	color: #713f12;
+	line-height: 1.5;
+}
+.controls {
+	display: flex;
+	gap: 8px;
+	flex-wrap: wrap;
+}
+</style>
+</head>
+<body>
+
+<header class="review-banner">
+	<div>
+		<strong>v1.3.5.12 Memory Batch E Preview</strong>: Split Dual-Garden Baseline & 10 Botanical Nature Rulesets
+		<span class="badge badge-baseline">NEW BASELINE: cross-pollination</span>
+		<span class="badge badge-motion">anime.js 4.5.0</span>
+	</div>
+	<div>
+		Viewports: <strong>390×844</strong> (mobile-p), <strong>844×390</strong> (mobile-l), <strong>1280×800</strong> (desktop)
+	</div>
+</header>
+
+<nav class="tabs-bar" id="tabsBar">
+	<!-- Dynamically filled with 10 botanical buttons -->
+</nav>
+
+<main class="container">
+	<section class="stage-pane">
+		<div class="hud" id="hudBar">
+			<!-- HUD State -->
+		</div>
+
+		<div id="alertToast" class="alert-toast">
+			🌱 Intra-garden rustle! Flowers must pair with pollinators across garden beds.
+		</div>
+
+		<div class="garden-arena">
+			<!-- Garden Bed A: Flower Meadow (Zone A, 4x2) -->
+			<div class="garden-bed meadow-bed" id="bedMeadow">
+				<div class="bed-header meadow">
+					<span>🌸 Flower Meadow (Zone A)</span>
+					<span style="font-size:10px;">Floral Species</span>
+				</div>
+				<div class="grid-cards" id="gridMeadow"></div>
+			</div>
+
+			<!-- Pollination Vine Bridge -->
+			<div class="pollination-vine">
+				<div class="vine-stem">
+					<div class="pollen-particle"></div>
+				</div>
+				<div style="font-size:10px;font-weight:800;color:#059669;white-space:nowrap;">POLLEN VINE</div>
+				<div class="vine-stem">
+					<div class="pollen-particle"></div>
+				</div>
+			</div>
+
+			<!-- Garden Bed B: Pollinator Grove (Zone B, 4x2) -->
+			<div class="garden-bed grove-bed" id="bedGrove">
+				<div class="bed-header grove">
+					<span>🐝 Pollinator Grove (Zone B)</span>
+					<span style="font-size:10px;">Insects & Blooms</span>
+				</div>
+				<div class="grid-cards" id="gridGrove"></div>
+			</div>
+		</div>
+
+		<div class="controls">
+			<button id="btnReset">Reset Garden</button>
+			<button id="btnSimulate">Simulate Cross-Pollination</button>
+			<button id="btnAnimate" style="background:#fef3c7;border-color:#fde68a;font-weight:700;">▶ anime.js Bloom Wave</button>
+		</div>
+	</section>
+
+	<aside class="details-pane" id="detailsPane">
+		<!-- Detailed specifications -->
+	</aside>
+</main>
+
+<script src="anime.min.js"></script>
+<script>
+const VARIANTS = [
+	{
+		id: 'memory:cross-pollination',
+		name: 'Cross-Pollination (Baseline)',
+		mechanic: 'Split Dual-Garden & Cross-Bed Pollination Invariant',
+		baseline: 'memory:classic',
+		color: '#059669',
+		rule: 'Morphi\'s first Split Dual-Garden baseline: Arena divides into Flower Meadow (Zone A) and Pollinator Grove (Zone B). A valid match requires cross-pollination (1 Flower from Meadow + 1 Pollinator/Blossom from Grove). Flipping two cards in the same bed rustles petals without pairing!',
+		winLoss: 'Clear both garden beds via cross-pollination.',
+		scoring: 'Cross-pollination biodiversity bonus (base * bioBonus).',
+		groups: 'memory-1:cross-pollination:<6|8|10>',
+		desc: 'Foundational baseline: establishes the split garden ecology and enforces reciprocal cross-bed pairing.'
+	},
+	{
+		id: 'memory:mycelium-network',
+		name: 'Mycelium Network',
+		mechanic: 'Underground Fungal Root Nutrient Pulses',
+		baseline: 'memory:cross-pollination',
+		color: '#8b5cf6',
+		rule: 'Underground fungal threads interconnect root systems. Flipping a card sends a bioluminescent root pulse through the mycelium, highlighting the quadrant of the partner\'s bed with faint fungal spores!',
+		winLoss: 'Clear both beds via underground root guidance.',
+		scoring: 'Mycelium network connectivity multiplier.',
+		groups: 'memory-1:mycelium-network:<6|8|10>',
+		desc: 'Mycelial communication: follow subterranean spore pulses to locate reciprocal partners.'
+	},
+	{
+		id: 'memory:photosynthesis',
+		name: 'Photosynthesis',
+		mechanic: 'Rotating Sunbeam Day/Night Cycles',
+		baseline: 'memory:cross-pollination',
+		color: '#eab308',
+		rule: 'A bright sunbeam illuminates one row of the garden every 2 turns. Cards bathed in direct sunlight bloom openly for a brief preview; cards in shaded rows require photosynthesis energy to uncover.',
+		winLoss: 'Clear garden across rotating solar cycles.',
+		scoring: 'Solar energy conversion efficiency bonus.',
+		groups: 'memory-1:photosynthesis:<6|8|10>',
+		desc: 'Solar cycles: capitalize on rotating sunbeams that reveal illuminated garden rows.'
+	},
+	{
+		id: 'memory:seed-dispersal',
+		name: 'Seed Dispersal',
+		mechanic: 'Wind-Blown Dandelion Seed Position Swaps',
+		baseline: 'memory:cross-pollination',
+		color: '#06b6d4',
+		rule: 'When a cross-bed mismatch occurs, a gentle autumn breeze blows across the garden: two unpicked seed pods drift and swap positions with neighboring breeze slots, scattering floating petals.',
+		winLoss: 'Clear garden despite dynamic wind drifts.',
+		scoring: 'Seed germination accuracy multiplier.',
+		groups: 'memory-1:seed-dispersal:<6|8|10>',
+		desc: 'Wind dispersal: adapt to shifting seed pods carried by gentle garden breezes.'
+	},
+	{
+		id: 'memory:seasonal-bloom',
+		name: 'Seasonal Bloom',
+		mechanic: 'Perennial Wilt Dormancy & Spring Watering',
+		baseline: 'memory:cross-pollination',
+		color: '#64748b',
+		rule: 'Flowers that remain unvisited for 3 turns wilt into dormant root bulbs (frost-wilted backs). Touching a dormant bulb waters and rejuvenates it over 1 turn before its true blossom blooms again.',
+		winLoss: 'Clear garden before perennial root dormancy.',
+		scoring: 'Floriculture conservation bonus.',
+		groups: 'memory-1:seasonal-bloom:<6|8|10>',
+		desc: 'Perennial dormancy: prevent neglected blooms from withering into dormant root bulbs.'
+	},
+	{
+		id: 'memory:bee-waggle',
+		name: 'Bee Waggle Dance',
+		mechanic: 'Directional Honeybee Nectar Foraging Vectors',
+		baseline: 'memory:cross-pollination',
+		color: '#d97706',
+		rule: 'In the Pollinator Grove, flipping a scout honeybee performs an iconic waggle dance: a directional nectar vector arrow appears, pointing directly toward the matching flower\'s meadow row!',
+		winLoss: 'Follow honeybee waggle vectors to clear garden.',
+		scoring: 'Pollinator foraging vector precision bonus.',
+		groups: 'memory-1:bee-waggle:<6|8|10>',
+		desc: 'Honeybee waggle dance: read directional foraging dances to pinpoint distant blooms.'
+	},
+	{
+		id: 'memory:carnivorous-briar',
+		name: 'Carnivorous Briar',
+		mechanic: 'Thorny Briar Patch & Morning Dewdrop Cure',
+		baseline: 'memory:cross-pollination',
+		color: '#ef4444',
+		rule: 'Two cards in the grove are trapped in tangled briars and cannot be flipped. You must discover and flip a Morning Dewdrop card in the meadow to dissolve the thorns and free the trapped blossoms!',
+		winLoss: 'Dissolve all briars and pollinate all pairs.',
+		scoring: 'Pruning & entanglement clearance bonus.',
+		groups: 'memory-1:carnivorous-briar:<6|8|10>',
+		desc: 'Briar thorns: gather morning dew to dissolve thorny tangles and release trapped blooms.'
+	},
+	{
+		id: 'memory:chlorophyll-meter',
+		name: 'Chlorophyll Meter',
+		mechanic: '100-Unit Sap Reservoir & Drought Wilt Survival',
+		baseline: 'memory:cross-pollination',
+		color: '#16a34a',
+		rule: 'Player starts with 100 Sap units. Flips consume 3 sap; matches generate +12 nectar sap; mismatches transpire 6 sap. Dropping to 0 sap causes severe Drought Wilt (round loss)!',
+		winLoss: 'Win: clear garden before sap runs dry. Loss: 0 sap (drought wilt).',
+		scoring: 'Remaining sap reservoir bonus.',
+		groups: 'memory-1:chlorophyll-meter:<6|8|10>',
+		desc: 'Chlorophyll energy budget: sustain the garden\'s vital sap reserves through precise matching.'
+	},
+	{
+		id: 'memory:bioluminescent',
+		name: 'Bioluminescent Spores',
+		mechanic: 'Nocturnal Spore Rings & Organic Symmetry Hints',
+		baseline: 'memory:cross-pollination',
+		color: '#10b981',
+		rule: 'In the twilight garden canopy, card backs glow with faint bioluminescent spore rings indicating petal count symmetry (odd vs even petals), giving astute naturalists organic memory clues.',
+		winLoss: 'Standard full garden clear.',
+		scoring: 'Bioluminescent foraging multiplier.',
+		groups: 'memory-1:bioluminescent:<6|8|10>',
+		desc: 'Bioluminescence: observe glowing nocturnal spore patterns to infer petal anatomy.'
+	},
+	{
+		id: 'memory:botanical-graft',
+		name: 'Botanical Graft',
+		mechanic: 'Orchard Hybridization & Biodiversity Combos',
+		baseline: 'memory:cross-pollination',
+		color: '#ec4899',
+		rule: 'Consecutive rapid cross-pollinations trigger orchard grafting: paired species fuse into a magnificent champion hybrid bloom that awards a 3x biodiversity combo multiplier!',
+		winLoss: 'Complete orchard graft and clear all pairs.',
+		scoring: 'Biodiversity hybrid combo multiplier.',
+		groups: 'memory-1:botanical-graft:<6|8|10>',
+		desc: 'Botanical grafting: cultivate rare hybrid blooms by chaining swift cross-pollinations.'
+	}
+];
+
+let activeIndex = 0;
+let gameState = {};
+
+function initTabs() {
+	const bar = document.getElementById('tabsBar');
+	bar.innerHTML = '';
+	VARIANTS.forEach((v, idx) => {
+		const btn = document.createElement('button');
+		btn.textContent = `${idx + 1}. ${v.name}`;
+		btn.setAttribute('aria-current', idx === activeIndex ? 'page' : 'false');
+		btn.onclick = () => selectVariant(idx);
+		bar.appendChild(btn);
+	});
+}
+
+function selectVariant(idx) {
+	activeIndex = idx;
+	initTabs();
+	setupGame(VARIANTS[idx]);
+	renderDetails(VARIANTS[idx]);
+	triggerEntranceAnimation();
+}
+
+function setupGame(variant) {
+	// 8 pairs across 2 garden beds: 8 Flowers (Meadow) and 8 Pollinators/Blossoms (Grove)
+	const flowers = ['🌸', '🌺', '🌻', '🌷', '🌼', '🌹', '🪷', '💐'];
+	const pollinators = ['🐝', '🦋', '🐞', '🦗', '🕊️', '🌿', '🌱', '🍯'];
+
+	let meadowCards = [];
+	let groveCards = [];
+
+	for (let i = 0; i < 8; i++) {
+		meadowCards.push({ id: `m-${i}`, pairId: i, zone: 'meadow', symbol: flowers[i], flipped: false, matched: false });
+		groveCards.push({ id: `g-${i}`, pairId: i, zone: 'grove', symbol: pollinators[i], flipped: false, matched: false });
+	}
+
+	// Deterministic shuffle
+	meadowCards.sort((a, b) => ((a.pairId * 7 + 13) % 17) - ((b.pairId * 7 + 13) % 17));
+	groveCards.sort((a, b) => ((a.pairId * 11 + 5) % 19) - ((b.pairId * 11 + 5) % 19));
+
+	gameState = {
+		variant,
+		meadowCards,
+		groveCards,
+		activeFlip: null,
+		moves: 0,
+		sap: 100,
+		streak: 0
+	};
+
+	renderBeds();
+	renderHUD();
+}
+
+function renderHUD() {
+	const hud = document.getElementById('hudBar');
+	const v = gameState.variant;
+	let html = `<span>Variant: <strong style="color:${v.color}">${v.name}</strong></span>`;
+	html += `<span>Moves: <strong>${gameState.moves}</strong></span>`;
+	html += `<span>Rule: <strong style="color:#059669;">Cross-Pollination (Meadow ↔ Grove)</strong></span>`;
+
+	if (gameState.activeFlip) {
+		const targetZone = gameState.activeFlip.zone === 'meadow' ? 'Pollinator Grove' : 'Flower Meadow';
+		html += `<span style="color:#d97706;">Target Bed: <strong>${targetZone}</strong></span>`;
+	} else {
+		html += `<span>Garden: <strong>Flourishing</strong></span>`;
+	}
+
+	if (v.id === 'memory:chlorophyll-meter') {
+		html += `<span>Sap: <strong style="color:${gameState.sap > 30 ? '#16a34a' : '#ef4444'}">${gameState.sap}/100</strong></span>`;
+	}
+
+	hud.innerHTML = html;
+}
+
+function renderBeds() {
+	renderGridCards('gridMeadow', gameState.meadowCards, 'meadow');
+	renderGridCards('gridGrove', gameState.groveCards, 'grove');
+
+	const bedMeadow = document.getElementById('bedMeadow');
+	const bedGrove = document.getElementById('bedGrove');
+	bedMeadow.classList.remove('active-target');
+	bedGrove.classList.remove('active-target');
+
+	if (gameState.activeFlip) {
+		if (gameState.activeFlip.zone === 'meadow') {
+			bedGrove.classList.add('active-target');
+		} else {
+			bedMeadow.classList.add('active-target');
+		}
+	}
+}
+
+function renderGridCards(elementId, cards, zone) {
+	const grid = document.getElementById(elementId);
+	grid.innerHTML = '';
+
+	const isLandscape = window.innerHeight < 500;
+	const isMobile = window.innerWidth <= 480;
+	let size = 52;
+	if (isLandscape) size = 38;
+	else if (isMobile) size = 44;
+	else size = 58;
+
+	grid.style.setProperty('--size', `${size}px`);
+
+	cards.forEach((c, idx) => {
+		const cardEl = document.createElement('div');
+		cardEl.className = `card ${zone}-card`;
+		cardEl.id = `card-${zone}-${idx}`;
+
+		const isFlipped = c.flipped || c.matched;
+		if (c.matched) cardEl.classList.add('matched');
+		if (isFlipped) cardEl.classList.add('flipped');
+
+		if (isFlipped) {
+			const icon = document.createElement('span');
+			icon.className = 'card-icon';
+			icon.textContent = c.symbol;
+			cardEl.appendChild(icon);
+		}
+
+		cardEl.onclick = () => onCardClick(c, idx);
+		grid.appendChild(cardEl);
+	});
+}
+
+function onCardClick(card, idx) {
+	if (card.flipped || card.matched) return;
+
+	// Invariant Check: Cross-Pollination
+	if (gameState.activeFlip) {
+		if (gameState.activeFlip.zone === card.zone) {
+			triggerToast('🌱 Intra-garden rustle! Flowers must pair with pollinators across garden beds.');
+			shakeCard(card.zone, idx);
+			return;
+		}
+
+		// Cross-bed pollination attempt
+		card.flipped = true;
+		renderBeds();
+		gameState.moves++;
+
+		const firstCard = gameState.activeFlip;
+		const secondCard = card;
+		gameState.activeFlip = null;
+
+		if (firstCard.pairId === secondCard.pairId) {
+			// Cross-Pollination Match!
+			firstCard.matched = true;
+			secondCard.matched = true;
+			gameState.streak++;
+			if (gameState.variant.id === 'memory:chlorophyll-meter') {
+				gameState.sap = Math.min(100, gameState.sap + 12);
+			}
+			triggerPollenDrift();
+
+			setTimeout(() => {
+				renderBeds();
+				renderHUD();
+			}, 300);
+		} else {
+			// Mismatch!
+			gameState.streak = 0;
+			if (gameState.variant.id === 'memory:chlorophyll-meter') {
+				gameState.sap = Math.max(0, gameState.sap - 6);
+			}
+
+			setTimeout(() => {
+				firstCard.flipped = false;
+				secondCard.flipped = false;
+				renderBeds();
+				renderHUD();
+			}, 700);
+		}
+	} else {
+		// First flip in turn
+		card.flipped = true;
+		gameState.activeFlip = card;
+		if (gameState.variant.id === 'memory:chlorophyll-meter') {
+			gameState.sap = Math.max(0, gameState.sap - 3);
+		}
+		renderBeds();
+	}
+
+	renderHUD();
+}
+
+function triggerToast(msg) {
+	const toast = document.getElementById('alertToast');
+	toast.textContent = msg;
+	toast.classList.add('visible');
+	setTimeout(() => toast.classList.remove('visible'), 2000);
+}
+
+function triggerPollenDrift() {
+	if (window.anime) {
+		anime({
+			targets: '.pollen-particle',
+			scale: [1, 2.4, 1],
+			duration: 450,
+			easing: 'easeOutElastic(1, .5)'
+		});
+	}
+}
+
+function shakeCard(zone, idx) {
+	if (window.anime) {
+		anime({
+			targets: `#card-${zone}-${idx}`,
+			rotate: [-6, 6, -4, 4, 0],
+			duration: 300,
+			easing: 'easeInOutSine'
+		});
+	}
+}
+
+function triggerEntranceAnimation() {
+	if (window.anime) {
+		anime({
+			targets: '.card',
+			scale: [0.6, 1],
+			opacity: [0, 1],
+			delay: anime.stagger(20),
+			duration: 350,
+			easing: 'easeOutBack'
+		});
+	}
+}
+
+function renderDetails(v) {
+	const pane = document.getElementById('detailsPane');
+	pane.innerHTML = `
+		<h2>
+			<span style="display:inline-block;width:12px;height:12px;border-radius:50%;background:${v.color};"></span>
+			${v.name}
+		</h2>
+		<div class="meta-box">
+			<div><strong>Variant ID:</strong> <code>${v.id}</code></div>
+			<div><strong>Baseline:</strong> <code>${v.baseline}</code></div>
+			<div><strong>Botanical Mechanic:</strong> ${v.mechanic}</div>
+			<div><strong>Leaderboard:</strong> <code>${v.groups}</code></div>
+		</div>
+		<div class="rule-box">
+			<strong>Botanical Rule:</strong><br>${v.rule}
+		</div>
+		<div class="score-box">
+			<strong>Scoring & Win Condition:</strong><br>${v.scoring}<br><em>${v.winLoss}</em>
+		</div>
+		<div style="font-size:12px;color:#475569;line-height:1.4;">
+			${v.desc}
+		</div>
+	`;
+}
+
+document.getElementById('btnReset').onclick = () => setupGame(VARIANTS[activeIndex]);
+document.getElementById('btnSimulate').onclick = () => {
+	const unmatchedMeadow = gameState.meadowCards.filter(c => !c.matched);
+	if (unmatchedMeadow.length > 0) {
+		const targetPair = unmatchedMeadow[0].pairId;
+		const meadowCard = gameState.meadowCards.find(c => c.pairId === targetPair);
+		const groveCard = gameState.groveCards.find(c => c.pairId === targetPair);
+		meadowCard.flipped = true;
+		meadowCard.matched = true;
+		groveCard.flipped = true;
+		groveCard.matched = true;
+		gameState.moves++;
+		triggerPollenDrift();
+		renderBeds();
+		renderHUD();
+	}
+};
+document.getElementById('btnAnimate').onclick = triggerEntranceAnimation;
+
+window.addEventListener('resize', () => {
+	renderBeds();
+});
+
+// Boot
+initTabs();
+selectVariant(0);
+</script>
+
+</body>
+</html>

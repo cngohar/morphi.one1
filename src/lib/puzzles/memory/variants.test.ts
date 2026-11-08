@@ -10,6 +10,7 @@ import {
 	memoryCapReached,
 	memoryMoveLimit,
 	resolveMismatch,
+	isBotanical,
 	type MemoryRound,
 	type MemoryVariant
 } from './logic.js';
@@ -51,6 +52,12 @@ function solve(seed: string, variant: string) {
 				live = live.filter(({ card }) => card.symbol === target.card.symbol);
 			}
 		}
+		if (variant === 'memory:carnivorous-briar' && !round.briarsCleared) {
+			const dewdrop = live.find(({ card }) => card.isDewdrop);
+			if (dewdrop) {
+				live = live.filter(({ card }) => card.symbol === dewdrop.card.symbol);
+			}
+		}
 		for (const { index } of live.filter(({ card }) => card.symbol === live[0].card.symbol)) {
 			if (round.matched.includes(index)) continue;
 			moves.push({ index });
@@ -65,7 +72,12 @@ function mismatch(round: MemoryRound) {
 		.map((_, index) => index)
 		.filter((index) => !round.matched.includes(index));
 	const first = available[0];
-	const other = available.find((index) => round.cards[index].symbol !== round.cards[first].symbol)!;
+	const isBot = isBotanical(round.variant);
+	const other = available.find(
+		(index) =>
+			round.cards[index].symbol !== round.cards[first].symbol &&
+			(!isBot || (first < round.pairs ? index >= round.pairs : index < round.pairs))
+	)!;
 	const indices =
 		cardsPerMatch(round) === 3
 			? [first, other, available.find((index) => index !== first && index !== other)!]
@@ -195,7 +207,7 @@ describe('Memory variants', () => {
 	});
 
 	it('owns separate groups, complete messages, and trio scoring without changing pair scoring', () => {
-		expect(new Set(manifest.leaderboardGroups).size).toBe(150);
+		expect(new Set(manifest.leaderboardGroups).size).toBe(180);
 		for (const variant of manifest.variants) {
 			expect(MEMORY_VARIANTS).toContain(variant.id);
 			expect(messages[variant.name as keyof typeof messages]).toBeTruthy();
@@ -827,5 +839,86 @@ describe('Memory v1.3.5.5 pilot rules', () => {
 		}
 		const glaciatedCount = r2.cards.filter((c) => c.isGlaciated).length;
 		expect(glaciatedCount).toBeGreaterThan(0);
+	});
+
+	it('verifies Batch E 10 botanical & nature ruleset mechanics', () => {
+		// 1. Cross-Pollination Baseline & Split Garden
+		const cp = createMemoryRound('42', 'memory:cross-pollination');
+		expect(cp.cards.filter((c) => c.zone === 'meadow').length).toBe(cp.pairs);
+		expect(cp.cards.filter((c) => c.zone === 'grove').length).toBe(cp.pairs);
+		const f1 = flipCard(cp, 0).round;
+		expect(f1.revealed).toEqual([0]);
+		// Intra-bed flip in meadow (index 1 < pairs) should be ignored
+		const intra = flipCard(f1, 1);
+		expect(intra.effect).toBe('ignored');
+		// Cross-bed flip in grove (index >= pairs) should proceed
+		const cross = flipCard(f1, cp.pairs);
+		expect(cross.effect).not.toBe('ignored');
+
+		// 2. Mycelium Network Root Spore Pulse
+		const myc = createMemoryRound('42', 'memory:mycelium-network');
+		const mycFlip = flipCard(myc, 0).round;
+		expect(mycFlip.myceliumPulse).toBeDefined();
+		expect(mycFlip.myceliumPulse).toBeGreaterThanOrEqual(myc.pairs);
+
+		// 3. Photosynthesis Sunbeam Cycles
+		let photo = createMemoryRound('42', 'memory:photosynthesis');
+		expect(photo.sunbeamRow).toBe(0);
+		photo = mismatch(photo);
+		photo = resolveMismatch(photo);
+		photo = mismatch(photo);
+		expect(photo.sunbeamRow).toBe(1);
+
+		// 4. Seed Dispersal Wind Swaps
+		let seed = createMemoryRound('42', 'memory:seed-dispersal');
+		const prevOrder = seed.cards.map((c) => c.id);
+		seed = mismatch(seed);
+		seed = resolveMismatch(seed);
+		const nextOrder = seed.cards.map((c) => c.id);
+		expect(nextOrder).not.toEqual(prevOrder);
+
+		// 5. Seasonal Bloom Perennial Dormancy
+		let bloom = createMemoryRound('42', 'memory:seasonal-bloom');
+		for (let i = 0; i < 3; i++) {
+			bloom = mismatch(bloom);
+			bloom = resolveMismatch(bloom);
+		}
+		const wilted = bloom.cards.filter((c) => c.isWilted).length;
+		expect(wilted).toBeGreaterThan(0);
+
+		// 6. Bee Waggle Dance Vector
+		const bee = createMemoryRound('42', 'memory:bee-waggle');
+		const groveIdx = bee.pairs; // Grove card
+		const beeFlip = flipCard(bee, groveIdx).round;
+		expect(beeFlip.beeWaggleRow).toBeDefined();
+
+		// 7. Carnivorous Briar Patch
+		const briar = createMemoryRound('42', 'memory:carnivorous-briar');
+		const lockedIdx = briar.cards.findIndex((c) => c.isBriarLocked);
+		expect(lockedIdx).toBeGreaterThanOrEqual(0);
+		expect(flipCard(briar, lockedIdx).effect).toBe('ignored'); // Briar locked initially
+		const dewdropIdx = briar.cards.findIndex((c) => c.isDewdrop);
+		expect(dewdropIdx).toBeGreaterThanOrEqual(0);
+		const dewFlip = flipCard(briar, dewdropIdx).round;
+		expect(dewFlip.briarsCleared).toBe(true);
+		expect(flipCard(dewFlip, lockedIdx).effect).not.toBe('ignored'); // Unlocked!
+
+		// 8. Chlorophyll Sap Budget
+		let sapRound = createMemoryRound('42', 'memory:chlorophyll-meter');
+		expect(sapRound.sap).toBe(100);
+		sapRound = flipCard(sapRound, 0).round;
+		expect(sapRound.sap).toBe(97); // -3 on flip
+		sapRound = mismatch(sapRound);
+		expect(sapRound.sap).toBe(88); // 97 - 3 (second flip) - 6 (mismatch)
+
+		// 9. Bioluminescent Spores Symmetry
+		const bio = createMemoryRound('42', 'memory:bioluminescent');
+		for (const card of bio.cards) {
+			expect(card.sporeSymmetry).toMatch(/^(even|odd)$/);
+		}
+
+		// 10. Botanical Graft Biodiversity Combos
+		const graft = createMemoryRound('42', 'memory:botanical-graft');
+		expect(graft.graftMultiplier).toBe(1);
 	});
 });

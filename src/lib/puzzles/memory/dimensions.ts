@@ -15,7 +15,8 @@ export const memoryDimensions = [
 		values: [
 			{ id: 'preview', label: 'policy.preview' },
 			{ id: 'no-preview', label: 'policy.noPreview' },
-			{ id: 'derelict-fog', label: 'policy.derelictFog' }
+			{ id: 'derelict-fog', label: 'policy.derelictFog' },
+			{ id: 'photosynthesis', label: 'policy.photosynthesis' }
 		]
 	},
 	{
@@ -32,7 +33,8 @@ export const memoryDimensions = [
 			{ id: 'atlas-terminal', label: 'policy.atlasTerminal' },
 			{ id: 'anycast-route', label: 'policy.anycastRoute' },
 			{ id: 'bit-rot', label: 'policy.bitRot' },
-			{ id: 'argo-reroute', label: 'policy.argoReroute' }
+			{ id: 'argo-reroute', label: 'policy.argoReroute' },
+			{ id: 'seed-dispersal', label: 'policy.seedDispersal' }
 		]
 	},
 	{
@@ -45,7 +47,9 @@ export const memoryDimensions = [
 			{ id: 'analysis-visor', label: 'policy.analysisVisor' },
 			{ id: 'edge-cache', label: 'policy.edgeCache' },
 			{ id: 'r2-glacier', label: 'policy.r2Glacier' },
-			{ id: 'kv-consistency', label: 'policy.kvConsistency' }
+			{ id: 'kv-consistency', label: 'policy.kvConsistency' },
+			{ id: 'seasonal-bloom', label: 'policy.seasonalBloom' },
+			{ id: 'bioluminescent', label: 'policy.bioluminescent' }
 		]
 	},
 	{
@@ -63,7 +67,9 @@ export const memoryDimensions = [
 			{ id: 'trace-route', label: 'policy.traceRoute' },
 			{ id: 'ai-tokens', label: 'policy.aiTokens' },
 			{ id: 'hyperdrive-pool', label: 'policy.hyperdrivePool' },
-			{ id: 'turnstile-verify', label: 'policy.turnstileVerify' }
+			{ id: 'turnstile-verify', label: 'policy.turnstileVerify' },
+			{ id: 'chlorophyll-meter', label: 'policy.chlorophyllMeter' },
+			{ id: 'botanical-graft', label: 'policy.botanicalGraft' }
 		]
 	},
 	{
@@ -88,7 +94,11 @@ export const memoryDimensions = [
 			{ id: 'durable-object', label: 'policy.durableObject' },
 			{ id: 'vectorize-knn', label: 'policy.vectorizeKnn' },
 			{ id: 'fifo-queue', label: 'policy.fifoQueue' },
-			{ id: 'zero-trust', label: 'policy.zeroTrust' }
+			{ id: 'zero-trust', label: 'policy.zeroTrust' },
+			{ id: 'cross-pollination', label: 'policy.crossPollination' },
+			{ id: 'mycelium-network', label: 'policy.myceliumNetwork' },
+			{ id: 'bee-waggle', label: 'policy.beeWaggle' },
+			{ id: 'carnivorous-briar', label: 'policy.carnivorousBriar' }
 		]
 	}
 ] as const;
@@ -176,5 +186,55 @@ export const memoryPolicyVariants = [
 	},
 	{ id: 'memory:zero-trust', archetype: 'constraints', change: ['availability', 'zero-trust'] },
 	{ id: 'memory:argo-reroute', archetype: 'dynamics', change: ['movement', 'argo-reroute'] },
-	{ id: 'memory:r2-glacier', archetype: 'information', change: ['backs', 'r2-glacier'] }
+	{ id: 'memory:r2-glacier', archetype: 'information', change: ['backs', 'r2-glacier'] },
+	{
+		id: 'memory:cross-pollination',
+		archetype: 'core',
+		change: ['availability', 'cross-pollination']
+	},
+	{
+		id: 'memory:mycelium-network',
+		archetype: 'information',
+		change: ['availability', 'mycelium-network']
+	},
+	{
+		id: 'memory:photosynthesis',
+		archetype: 'information',
+		change: ['opening', 'photosynthesis']
+	},
+	{
+		id: 'memory:seed-dispersal',
+		archetype: 'dynamics',
+		change: ['movement', 'seed-dispersal']
+	},
+	{
+		id: 'memory:seasonal-bloom',
+		archetype: 'information',
+		change: ['backs', 'seasonal-bloom']
+	},
+	{
+		id: 'memory:bee-waggle',
+		archetype: 'information',
+		change: ['availability', 'bee-waggle']
+	},
+	{
+		id: 'memory:carnivorous-briar',
+		archetype: 'constraints',
+		change: ['availability', 'carnivorous-briar']
+	},
+	{
+		id: 'memory:chlorophyll-meter',
+		archetype: 'pressure',
+		change: ['budget', 'chlorophyll-meter']
+	},
+	{
+		id: 'memory:bioluminescent',
+		archetype: 'information',
+		change: ['backs', 'bioluminescent']
+	},
+	{
+		id: 'memory:botanical-graft',
+		archetype: 'pressure',
+		change: ['budget', 'botanical-graft']
+	}
 ] as const;

@@ -1407,6 +1407,226 @@ const metadata = {
 					note: 'v1.game.memory.scoringNote',
 					tips: 'memory.r2Glacier.tips'
 				}
+			},
+			{
+				id: 'memory:cross-pollination',
+				name: 'variant.memory:cross-pollination',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:cross-pollination:6',
+					'memory-1:cross-pollination:8',
+					'memory-1:cross-pollination:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.crossPollination.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.crossPollination.tips'
+				}
+			},
+			{
+				id: 'memory:mycelium-network',
+				name: 'variant.memory:mycelium-network',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:mycelium-network:6',
+					'memory-1:mycelium-network:8',
+					'memory-1:mycelium-network:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.myceliumNetwork.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.myceliumNetwork.tips'
+				}
+			},
+			{
+				id: 'memory:photosynthesis',
+				name: 'variant.memory:photosynthesis',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:photosynthesis:6',
+					'memory-1:photosynthesis:8',
+					'memory-1:photosynthesis:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.photosynthesis.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.photosynthesis.tips'
+				}
+			},
+			{
+				id: 'memory:seed-dispersal',
+				name: 'variant.memory:seed-dispersal',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:seed-dispersal:6',
+					'memory-1:seed-dispersal:8',
+					'memory-1:seed-dispersal:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.seedDispersal.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.seedDispersal.tips'
+				}
+			},
+			{
+				id: 'memory:seasonal-bloom',
+				name: 'variant.memory:seasonal-bloom',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:seasonal-bloom:6',
+					'memory-1:seasonal-bloom:8',
+					'memory-1:seasonal-bloom:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.seasonalBloom.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.seasonalBloom.tips'
+				}
+			},
+			{
+				id: 'memory:bee-waggle',
+				name: 'variant.memory:bee-waggle',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:bee-waggle:6',
+					'memory-1:bee-waggle:8',
+					'memory-1:bee-waggle:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.beeWaggle.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.beeWaggle.tips'
+				}
+			},
+			{
+				id: 'memory:carnivorous-briar',
+				name: 'variant.memory:carnivorous-briar',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:carnivorous-briar:6',
+					'memory-1:carnivorous-briar:8',
+					'memory-1:carnivorous-briar:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.carnivorousBriar.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.carnivorousBriar.tips'
+				}
+			},
+			{
+				id: 'memory:chlorophyll-meter',
+				name: 'variant.memory:chlorophyll-meter',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:chlorophyll-meter:6',
+					'memory-1:chlorophyll-meter:8',
+					'memory-1:chlorophyll-meter:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.chlorophyllMeter.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.chlorophyllMeter.tips'
+				}
+			},
+			{
+				id: 'memory:bioluminescent',
+				name: 'variant.memory:bioluminescent',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:bioluminescent:6',
+					'memory-1:bioluminescent:8',
+					'memory-1:bioluminescent:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.bioluminescent.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.bioluminescent.tips'
+				}
+			},
+			{
+				id: 'memory:botanical-graft',
+				name: 'variant.memory:botanical-graft',
+				weight: 1,
+				maxMoves: 120,
+				leaderboardGroups: [
+					'memory-1:botanical-graft:6',
+					'memory-1:botanical-graft:8',
+					'memory-1:botanical-graft:10'
+				],
+				help: {
+					steps: ['v1.game.memory.step1', 'memory.botanicalGraft.step2', 'v1.game.memory.step3'],
+					rows: [
+						{ label: 'v1.game.memory.row1', field: 'pair', sign: '+' },
+						{ label: 'v1.game.memory.row2', field: 'mismatch', sign: '−' },
+						{ label: 'v1.game.memory.row3', field: 'second', sign: '−' },
+						{ label: 'v1.game.memory.row4', value: 'v1.game.memory.value4' }
+					],
+					note: 'v1.game.memory.scoringNote',
+					tips: 'memory.botanicalGraft.tips'
+				}
 			}
 		],
 		ending: {
@@ -1574,6 +1794,36 @@ const metadata = {
 				'memory-1:r2-glacier:6': 'leaderboard.memory.r2-glacier.6',
 				'memory-1:r2-glacier:8': 'leaderboard.memory.r2-glacier.8',
 				'memory-1:r2-glacier:10': 'leaderboard.memory.r2-glacier.10',
+				'memory-1:cross-pollination:6': 'leaderboard.memory.cross-pollination.6',
+				'memory-1:cross-pollination:8': 'leaderboard.memory.cross-pollination.8',
+				'memory-1:cross-pollination:10': 'leaderboard.memory.cross-pollination.10',
+				'memory-1:mycelium-network:6': 'leaderboard.memory.mycelium-network.6',
+				'memory-1:mycelium-network:8': 'leaderboard.memory.mycelium-network.8',
+				'memory-1:mycelium-network:10': 'leaderboard.memory.mycelium-network.10',
+				'memory-1:photosynthesis:6': 'leaderboard.memory.photosynthesis.6',
+				'memory-1:photosynthesis:8': 'leaderboard.memory.photosynthesis.8',
+				'memory-1:photosynthesis:10': 'leaderboard.memory.photosynthesis.10',
+				'memory-1:seed-dispersal:6': 'leaderboard.memory.seed-dispersal.6',
+				'memory-1:seed-dispersal:8': 'leaderboard.memory.seed-dispersal.8',
+				'memory-1:seed-dispersal:10': 'leaderboard.memory.seed-dispersal.10',
+				'memory-1:seasonal-bloom:6': 'leaderboard.memory.seasonal-bloom.6',
+				'memory-1:seasonal-bloom:8': 'leaderboard.memory.seasonal-bloom.8',
+				'memory-1:seasonal-bloom:10': 'leaderboard.memory.seasonal-bloom.10',
+				'memory-1:bee-waggle:6': 'leaderboard.memory.bee-waggle.6',
+				'memory-1:bee-waggle:8': 'leaderboard.memory.bee-waggle.8',
+				'memory-1:bee-waggle:10': 'leaderboard.memory.bee-waggle.10',
+				'memory-1:carnivorous-briar:6': 'leaderboard.memory.carnivorous-briar.6',
+				'memory-1:carnivorous-briar:8': 'leaderboard.memory.carnivorous-briar.8',
+				'memory-1:carnivorous-briar:10': 'leaderboard.memory.carnivorous-briar.10',
+				'memory-1:chlorophyll-meter:6': 'leaderboard.memory.chlorophyll-meter.6',
+				'memory-1:chlorophyll-meter:8': 'leaderboard.memory.chlorophyll-meter.8',
+				'memory-1:chlorophyll-meter:10': 'leaderboard.memory.chlorophyll-meter.10',
+				'memory-1:bioluminescent:6': 'leaderboard.memory.bioluminescent.6',
+				'memory-1:bioluminescent:8': 'leaderboard.memory.bioluminescent.8',
+				'memory-1:bioluminescent:10': 'leaderboard.memory.bioluminescent.10',
+				'memory-1:botanical-graft:6': 'leaderboard.memory.botanical-graft.6',
+				'memory-1:botanical-graft:8': 'leaderboard.memory.botanical-graft.8',
+				'memory-1:botanical-graft:10': 'leaderboard.memory.botanical-graft.10',
 				'memory-1:quads:4': 'leaderboard.memory.quads.4',
 				'memory-1:quads:5': 'leaderboard.memory.quads.5',
 				'memory-1:quads:6': 'leaderboard.memory.quads.6'
