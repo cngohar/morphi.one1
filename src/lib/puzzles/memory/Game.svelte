@@ -3,7 +3,7 @@
 	import type { ScoreValues } from '#lib/engine/scoring.js';
 	import { onMount, tick, untrack } from 'svelte';
 	import { motion } from '#lib/ui/motion.js';
-	import { memoryEntranceMs, MEMORY_PREVIEW_MS, MEMORY_HIDE_MS } from '#lib/round-timing.js';
+	import { memoryEntranceMs, MEMORY_HIDE_MS } from '#lib/round-timing.js';
 	import Confetti from '#lib/puzzles/memory/Confetti.svelte';
 	import MemoryCard from '#lib/puzzles/memory/Card.svelte';
 	import TimeStrata from '#lib/puzzles/memory/TimeStrata.svelte';
@@ -15,19 +15,18 @@
 		scoreRound,
 		currentScore,
 		cardsPerMatch,
-		memoryVariant,
-		memoryVariantName,
+		memoryRoundRules,
 		memoryMoveLimit,
 		memoryCapReached,
 		matchedCount,
 		applyMemoryMove,
 		timeStrataTops,
 		timeStrataOutcome,
-		isTimeStrata,
 		type MemoryMove,
 		type MemoryRound
 	} from '#lib/puzzles/memory/logic.js';
 	import { SYMBOL_COLORS } from '#lib/puzzles/memory/symbols.js';
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import { t } from '#lib/i18n/messages.js';
 	import { createActiveDelay } from '#lib/ui/active-delay.js';
 	import { formatDuration, formatNumber } from '#lib/ui/format.js';
@@ -114,7 +113,7 @@
 	let clockBase = 0;
 	let clockStart: number | null = null;
 
-	const PREVIEW_MS = MEMORY_PREVIEW_MS;
+	const PREVIEW_MS = untrack(() => memoryRoundRules(round).previewMs);
 	const MISMATCH_HOLD_MS = 500;
 	const WIN_WAVE_DELAY_MS = 160;
 	const WIN_BURST_DELAY_MS = 260;
@@ -146,7 +145,7 @@
 	const mismatchDelay = createActiveDelay(() =>
 		guard(() => {
 			game = resolveMismatch(game);
-			if (memoryVariant(game) === 'memory:moving') sound.play('reshuffle');
+			if (memoryRoundRules(game).shuffleOnMiss) sound.play('reshuffle');
 			if (swaps && game.marked?.length === 2)
 				announcement = t('memory.swaps.swapped', {
 					a: game.marked[0] + 1,
@@ -155,14 +154,14 @@
 		})
 	);
 
-	const variant = $derived(memoryVariant(game));
-	const trios = $derived(variant === 'memory:trios');
-	const quads = $derived(variant === 'memory:quads');
-	const swaps = $derived(variant === 'memory:swaps');
-	const collapse = $derived(variant === 'memory:collapse');
-	const budget = $derived(variant === 'memory:budget');
-	const timeStrata = $derived(isTimeStrata(variant));
-	const noPreview = $derived(variant === 'memory:no-preview' || timeStrata);
+	const rules = $derived(memoryRoundRules(game));
+	const trios = $derived(rules.matchSize === 3);
+	const quads = $derived(rules.matchSize === 4);
+	const swaps = $derived(rules.swapTwoOnResolve && !rules.crossBedOnly);
+	const collapse = $derived(rules.removeMatchedCards);
+	const budget = $derived(rules.attemptsPerCard === 2);
+	const timeStrata = $derived(Boolean(rules.topOnly));
+	const noPreview = $derived(rules.previewMs === 0);
 	const matchSize = $derived(cardsPerMatch(game));
 	const capped = $derived(memoryCapReached(game));
 	// Budget shows its run-over choice once the final miss has turned back down.
@@ -170,9 +169,7 @@
 	const attemptsLeft = $derived(Math.max(0, memoryMoveLimit(game) / matchSize - game.moves));
 	const total = $derived(game.pairs * matchSize);
 	let tryButton = $state<HTMLButtonElement>();
-	const variantLabel = $derived(
-		t('memory.variantLabel', { variant: t(memoryVariantName(variant)) })
-	);
+	const label = $derived(familyName('memory'));
 
 	const columns = $derived(
 		quads
@@ -524,7 +521,7 @@
 			);
 		if (outcome === 'mismatch')
 			return t(
-				variant === 'memory:strata-slip'
+				rules.sinkMissedTops
 					? 'memory.strataSlip.mismatch'
 					: game.shelf && game.revealed.includes(game.shelf.index)
 						? 'memory.strataShelf.mismatch'
@@ -568,7 +565,7 @@
 									: 'memory.timeStrata.lifted'
 								: selectedSample
 									? 'memory.strataShelf.closed'
-									: variant === 'memory:strata-slip'
+									: rules.sinkMissedTops
 										? 'memory.strataSlip.sunk'
 										: 'memory.timeStrata.closed'
 				);
@@ -776,14 +773,13 @@
 	class:is-capped={capped && !budget}
 	style={`--cols:${columns};--rows:${rows};${memoryThemeStyle(theme)};${resolvedTheme ? proceduralStyle(resolvedTheme) : ''}`}
 	data-family="memory"
-	data-variant={variant}
 	data-round={roundNumber}
 	data-theme-version={resolvedTheme?.themeConfigVersion}
 	data-theme-generator={resolvedTheme?.themeGeneratorVersion}
 	data-theme-recipe={resolvedTheme?.recipe}
 	data-phase={phase}
 >
-	<h2 class="sr-only">{variantLabel}</h2>
+	<h2 class="sr-only">{label}</h2>
 
 	<header class="hud">
 		<button
@@ -838,7 +834,7 @@
 		<SoundToggle enabled={soundEnabled} ontoggle={ontogglesound} />
 
 		<p class="round-meta">
-			<span>{variantLabel}</span>
+			<span>{label}</span>
 			<span>{t('game.round', { number: roundNumber })}</span>
 			{#if matchStreak >= 2}
 				{#key matchStreak}
@@ -920,7 +916,7 @@
 		<span
 			>{t(
 				timeStrata
-					? variant === 'memory:strata-shelf'
+					? rules.canLiftTop
 						? 'memory.strataShelf.hint'
 						: 'memory.timeStrata.hint'
 					: trios

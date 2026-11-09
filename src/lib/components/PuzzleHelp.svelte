@@ -1,16 +1,20 @@
 <script lang="ts">
 	import { dismissOnBackdrop } from '#lib/ui/dismiss-dialog.js';
-	import { t } from '#lib/i18n/messages.js';
-	import { familyName } from '#lib/ui/puzzle-presentation.js';
+	import { t, type MessageKey } from '#lib/i18n/messages.js';
+	import { familyName, scoreGuideValue } from '#lib/ui/puzzle-presentation.js';
 	import PuzzleGuide from '#lib/components/PuzzleGuide.svelte';
 	import { motion } from '#lib/ui/motion.js';
 	let {
 		family,
 		variant,
+		help,
+		ruleLine = '',
 		scoring,
 		onpause = () => {}
 	}: {
 		variant?: string;
+		help?: import('#lib/engine/contract.js').PuzzlePresentation['help'];
+		ruleLine?: string;
 		scoring?: import('#lib/engine/scoring.js').ScoreValues;
 		family: import('#lib/engine/contract.js').PuzzleId;
 		onpause?: (paused: boolean) => void;
@@ -60,13 +64,27 @@
 	aria-labelledby="help-title"
 >
 	<header>
-		<p>{familyName(family, variant)}</p>
+		<p>{familyName(family)}</p>
 		<h2 id="help-title">{t(kind === 'how' ? 'v1.game.how' : 'v1.game.helpScoring')}</h2>
 	</header>
-	<PuzzleGuide
-		{family}
-		{variant}
-		{scoring}
-		section={kind === 'scoring' ? 'scoring-tips' : kind}
-	/><button class="btn" onclick={close}>{t('v1.game.back')}</button>
+	{#if ruleLine}<p class="round-rule">{ruleLine}</p>{/if}
+	{#if help}
+		{#if kind === 'how'}
+			<ol>
+				{#each help.steps as step (step)}<li>{t(step as MessageKey)}</li>{/each}
+			</ol>
+		{:else}
+			<dl>
+				{#each help.rows as row (row.label)}<dt>{t(row.label as MessageKey)}</dt>
+					<dd>{scoreGuideValue(row, scoring ?? {})}</dd>{/each}
+			</dl>
+			<p>{t(help.note as MessageKey)}</p>
+			<p>{t(help.tips as MessageKey)}</p>
+		{/if}
+	{:else}<PuzzleGuide
+			{family}
+			{variant}
+			{scoring}
+			section={kind === 'scoring' ? 'scoring-tips' : kind}
+		/>{/if}<button class="btn" onclick={close}>{t('v1.game.back')}</button>
 </dialog>

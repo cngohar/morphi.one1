@@ -2,7 +2,7 @@
 	import { tick } from 'svelte';
 	import Symbol from './Symbol.svelte';
 	import {
-		memoryVariant,
+		memoryRoundRules,
 		timeStrataTops,
 		timeStrataOutcome,
 		timeStrataClues,
@@ -39,20 +39,14 @@
 	} = $props();
 
 	const labels = ['I', 'II', 'III', 'IV'];
-	const variant = $derived(memoryVariant(game));
+	const rules = $derived(memoryRoundRules(game));
 	const tops = $derived(timeStrataTops(game));
 	const clues = $derived(timeStrataClues(game));
 	const echo = $derived((game.echo?.length ?? 0) > 0);
 	const pending = $derived(game.revealed.length === 2 || echo);
 	const outcome = $derived(timeStrataOutcome(game));
-	const utilityMode = $derived(
-		[
-			'memory:strata-shelf',
-			'memory:strata-cycle',
-			'memory:strata-empty-well',
-			'memory:strata-slip'
-		].includes(variant)
-	);
+	const utilityMode = $derived(rules.canLiftTop || rules.canCycleTop || rules.canMoveToEmptyStack);
+	const ruleState = $derived(ruleStatus());
 	const utilityLocked = $derived(locked || controlsLocked || game.revealed.length > 0 || pending);
 	let source = $state(0);
 	let destination = $state(0);
@@ -79,42 +73,34 @@
 		return t(glyph ? `symbol.${glyph.label}` : symbolLabel(symbol));
 	}
 	function ruleStatus(): string {
-		switch (variant) {
-			case 'memory:strata-linked':
-				return t('memory.strataLinked.ring');
-			case 'memory:strata-sweep':
-				return t('memory.strataSweep.height', {
-					count: Math.max(...(game.stacks ?? []).map((stack) => stack.length))
-				});
-			case 'memory:strata-shelf':
-				return t(game.shelf ? 'memory.strataShelf.origin' : 'memory.strataShelf.empty', {
-					stack: labels[game.shelf?.stack ?? 0]
-				});
-			case 'memory:strata-cycle':
-				return t('memory.strataCycle.state');
-			case 'memory:strata-empty-well':
-				return t('memory.strataEmptyWell.state');
-			case 'memory:strata-glimpse':
-				return t('memory.strataGlimpse.state');
-			case 'memory:strata-chain':
-				return t(game.chain ? 'memory.strataChain.active' : 'memory.strataChain.state');
-			case 'memory:strata-echo':
-				return t(echo ? 'memory.strataEcho.active' : 'memory.strataEcho.state');
-			case 'memory:strata-slip':
-				return t('memory.strataSlip.state');
-			case 'memory:strata-order': {
-				const required = game.excavationOrder?.[game.orderCursor ?? 0];
-				return required
-					? t('memory.strataOrder.required', { symbol: nameFor(required) })
-					: t('memory.strataOrder.complete');
-			}
-			default:
-				return '';
+		if (rules.adjacentStacksOnly) return t('memory.strataLinked.ring');
+		if (rules.deepestStackOnly)
+			return t('memory.strataSweep.height', {
+				count: Math.max(...(game.stacks ?? []).map((stack) => stack.length))
+			});
+		if (rules.canLiftTop)
+			return t(game.shelf ? 'memory.strataShelf.origin' : 'memory.strataShelf.empty', {
+				stack: labels[game.shelf?.stack ?? 0]
+			});
+		if (rules.sinkMissedTops) return t('memory.strataSlip.state');
+		if (rules.canCycleTop) return t('memory.strataCycle.state');
+		if (rules.canMoveToEmptyStack) return t('memory.strataEmptyWell.state');
+		if (rules.peekBelowTop) return t('memory.strataGlimpse.state');
+		if (rules.chainExposedMatches)
+			return t(game.chain ? 'memory.strataChain.active' : 'memory.strataChain.state');
+		if (rules.revealExposedTops)
+			return t(echo ? 'memory.strataEcho.active' : 'memory.strataEcho.state');
+		if (rules.orderedSymbols) {
+			const required = game.excavationOrder?.[game.orderCursor ?? 0];
+			return required
+				? t('memory.strataOrder.required', { symbol: nameFor(required) })
+				: t('memory.strataOrder.complete');
 		}
+		return '';
 	}
 	function utility(): void {
-		if (variant === 'memory:strata-shelf') onutility(game.shelf ? { return: 1 } : { lift: source });
-		else if (variant === 'memory:strata-empty-well') onutility({ from: source, to: destination });
+		if (rules.canLiftTop) onutility(game.shelf ? { return: 1 } : { lift: source });
+		else if (rules.canMoveToEmptyStack) onutility({ from: source, to: destination });
 		else onutility({ cycle: source });
 	}
 </script>
@@ -132,14 +118,14 @@
 
 <div
 	class="strata"
-	class:has-rules={variant !== 'memory:time-strata'}
-	class:is-glimpse={variant === 'memory:strata-glimpse'}
-	class:is-order={variant === 'memory:strata-order'}
+	class:has-rules={!!ruleState}
+	class:is-glimpse={rules.peekBelowTop}
+	class:is-order={rules.orderedSymbols}
 >
-	{#if variant !== 'memory:time-strata'}
-		<div class="rule-state" data-strata-rule={variant}>
-			<p>{ruleStatus()}</p>
-			{#if variant === 'memory:strata-order'}
+	{#if ruleState}
+		<div class="rule-state">
+			<p>{ruleState}</p>
+			{#if rules.orderedSymbols}
 				<ol class="order" aria-label={t('memory.strataOrder.sequence')}>
 					{#each game.excavationOrder ?? [] as symbol, position (symbol)}
 						<li
@@ -218,7 +204,7 @@
 					<strong>{t('memory.timeStrata.stack', { stack: labels[stack] })}</strong>
 					<span>{t('memory.timeStrata.cards', { count: depth })}</span>
 				</div>
-				{#if variant === 'memory:strata-glimpse'}
+				{#if rules.peekBelowTop}
 					{@const clue = clues.find((index) => game.stacks?.[stack].includes(index))}
 					<p class="below-clue" data-strata-clue={clue}>
 						{#if clue !== undefined}{t('memory.strataGlimpse.below', {
@@ -273,7 +259,7 @@
 						</select>
 					</label>
 				{/if}
-				{#if variant === 'memory:strata-empty-well'}
+				{#if rules.canMoveToEmptyStack}
 					<label>
 						<span class="sr-only">{t('memory.strataUtility.destination')}</span>
 						<select
@@ -291,24 +277,24 @@
 				{/if}
 				<button
 					type="button"
-					data-strata-utility={variant === 'memory:strata-shelf'
+					data-strata-utility={rules.canLiftTop
 						? game.shelf
 							? 'return'
 							: 'lift'
-						: variant === 'memory:strata-empty-well'
+						: rules.canMoveToEmptyStack
 							? 'transfer'
 							: 'cycle'}
 					disabled={utilityLocked ||
 						(!game.shelf && source < 0) ||
-						(variant === 'memory:strata-empty-well' && destination < 0)}
+						(rules.canMoveToEmptyStack && destination < 0)}
 					onclick={utility}
 				>
 					{t(
-						variant === 'memory:strata-shelf'
+						rules.canLiftTop
 							? game.shelf
 								? 'memory.strataShelf.return'
 								: 'memory.strataShelf.lift'
-							: variant === 'memory:strata-empty-well'
+							: rules.canMoveToEmptyStack
 								? 'memory.strataEmptyWell.move'
 								: 'memory.strataCycle.cycle'
 					)}

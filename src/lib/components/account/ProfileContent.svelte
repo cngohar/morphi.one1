@@ -20,7 +20,6 @@
 			score: number;
 			ranked: boolean;
 			createdAt: number;
-			group: string;
 		}[];
 		bests: { family: string; score: number }[];
 		summary: { family: string; rounds: number; ranked: number; lastPlayed: number }[];
@@ -122,13 +121,9 @@
 							></button
 						>{/each}{#if detail}<ul class="recent-activity history-list">
 							{#each history.filter((row) => row.family === detail) as row (row.id)}<li>
-									<span
-										>{date(row.createdAt)} · {puzzleMetadata[row.family]?.presentation?.groups[
-											row.group
-										]
-											? t(puzzleMetadata[row.family].presentation!.groups[row.group] as MessageKey)
-											: familyName(row.family)}</span
-									><strong>{formatNumber(row.score)}</strong>
+									<span>{familyName(row.family)} · {date(row.createdAt)}</span><strong
+										>{formatNumber(row.score)}</strong
+									>
 								</li>{/each}
 						</ul>
 						{#if !history.some((row) => row.family === detail)}<p>

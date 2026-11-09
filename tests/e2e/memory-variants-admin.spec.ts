@@ -7,6 +7,7 @@ import { mkdir, writeFile } from 'node:fs/promises';
 import { messages } from '../../src/lib/i18n/messages.js';
 import { createAuth } from '../../src/lib/server/auth.js';
 import { totp } from '../../src/lib/server/admin-totp.js';
+import { variantAvailable } from '../../src/lib/server/games.js';
 
 test.use({ baseURL: 'http://localhost:5173' });
 
@@ -681,7 +682,8 @@ test('Memory games detail gates test play, edits independent scores, and plays d
 			.getByRole('combobox', { name: 'Variant', exact: true })
 			.selectOption('block:rush-60');
 		await testPlay.getByRole('button', { name: /^(Start test round|Next test round)$/ }).click();
-		await expect(testPlay.locator('.game')).toHaveAttribute('data-variant', 'block:rush-60');
+		await expect(testPlay.locator('.game')).toHaveAttribute('data-family', 'block');
+		await expect(testPlay.locator('.game')).not.toHaveAttribute('data-variant');
 		await expect(testPlay.locator('.game')).toHaveAttribute('data-phase', 'playing');
 		await testPlay.locator('.tray-slot:not(.is-empty)').first().click();
 		await testPlay.locator('[role=gridcell]').first().click();
@@ -902,10 +904,16 @@ test('dimension policy editor previews and saves only supported Memory values', 
 		expect(saved.status()).toBe(200);
 		await expect(dialog).not.toBeVisible();
 		await expect(page.getByText('80 of 81 variants eligible')).toBeVisible();
-		const available = await context.request.get(
+		expect(await variantAvailable(db, 'memory', 'memory:quads')).toBe(false);
+		const rejectedVariant = await context.request.get(
 			'/api/play/availability?family=memory&variant=memory:quads'
 		);
-		expect((await available.json()).available).toBe(false);
+		expect(rejectedVariant.status()).toBe(400);
+		const available = await context.request.get('/api/play/availability?family=memory');
+		expect(available.status()).toBe(200);
+		const familyAvailability = await available.json();
+		expect(familyAvailability.available).toBe(true);
+		expect(familyAvailability).not.toHaveProperty('variants');
 		const stale = await context.request.post('/admin/games?game=memory&subview=policy', {
 			headers: { Origin: 'http://localhost:5173' },
 			form: {

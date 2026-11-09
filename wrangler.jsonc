@@ -24,6 +24,45 @@
 			"remote": false
 		}
 	],
+	"r2_buckets": [
+		{
+			"binding": "RUN_ARCHIVE",
+			"bucket_name": "morphi-run-archive",
+			"remote": false
+		}
+	],
+	"env": {
+		"cron": {
+			"name": "morphi-one-cron",
+			"main": "workers/cron.ts",
+			"workers_dev": false,
+			"vars": { "BETTER_AUTH_URL": "http://localhost:5173" },
+			"d1_databases": [
+				{
+					"binding": "DB",
+					"database_name": "morphi-accounts-local",
+					"database_id": "local-morphi-accounts",
+					"migrations_dir": "migrations",
+					"remote": false
+				}
+			],
+			"kv_namespaces": [
+				{
+					"binding": "CONFIG_CACHE",
+					"id": "local-morphi-config-cache",
+					"remote": false
+				}
+			],
+			"r2_buckets": [
+				{
+					"binding": "RUN_ARCHIVE",
+					"bucket_name": "morphi-run-archive",
+					"remote": false
+				}
+			],
+			"triggers": { "crons": ["*/5 * * * *", "0 0 * * *", "0 0 1 * *"] }
+		}
+	},
 	"assets": {
 		"binding": "ASSETS",
 		"directory": ".svelte-kit/cloudflare"

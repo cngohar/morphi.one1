@@ -4,9 +4,16 @@ import { resolve } from 'node:path';
 import type {
 	PuzzleFamilyEntry,
 	PuzzleManifest,
-	PuzzleMetadata
+	PuzzleMetadata,
+	PuzzlePresentation,
+	PuzzleVariant
 } from '../src/lib/engine/contract.js';
 import { validateEnding } from './validate-ending.js';
+type ClientPuzzleVariant = Omit<PuzzleVariant, 'leaderboardGroups'>;
+type ClientPuzzleMetadata = Omit<PuzzleMetadata, 'presentation' | 'variants'> & {
+	presentation: Omit<PuzzlePresentation, 'groups'>;
+	variants?: readonly ClientPuzzleVariant[];
+};
 const directories = (await readdir('src/lib/puzzles', { withFileTypes: true }))
 	.filter((entry) => entry.isDirectory())
 	.map((entry) => entry.name)
@@ -16,7 +23,7 @@ const puzzles: {
 	directory: string;
 	id: string;
 	family: PuzzleFamilyEntry;
-	metadata: PuzzleMetadata;
+	metadata: ClientPuzzleMetadata;
 	messages: Readonly<Record<string, string>>;
 }[] = [];
 for (const directory of directories) {
@@ -68,14 +75,18 @@ for (const directory of directories) {
 			(variant.maxSeconds !== undefined &&
 				(!Number.isSafeInteger(variant.maxSeconds) ||
 					variant.maxSeconds <= 0 ||
-					variant.maxSeconds > 7200)) ||
-			!variant.leaderboardGroups.length ||
-			variant.leaderboardGroups.some((group) => !manifest.leaderboardGroups.includes(group))
+					variant.maxSeconds > 7200))
 		)
 			throw new Error(`Invalid variant metadata: ${directory}`);
 		variantIds.add(variant.id);
 		if (variant.ending) validateEnding(manifest.id, variant.ending, manifest.messages);
 	}
+	const { groups, ...clientPresentation } = presentation;
+	void groups;
+	const clientVariants = variants?.map(({ leaderboardGroups, ...clientVariant }) => {
+		void leaderboardGroups;
+		return clientVariant;
+	});
 
 	puzzles.push({
 		directory,
@@ -85,9 +96,9 @@ for (const directory of directories) {
 			engineVersion,
 			titleAfterEntrance,
 			scoring,
-			variants,
+			variants: clientVariants,
 			ending,
-			presentation,
+			presentation: clientPresentation,
 			backdropPieces: manifest.backdropPieces
 		},
 		messages: manifest.messages
@@ -121,9 +132,11 @@ const familyIndex = [
 ];
 const metadata = [
 	header,
-	"import type { PuzzleId, PuzzleMetadata } from './engine/contract.js';",
+	"import type { PuzzleId, PuzzleMetadata, PuzzlePresentation, PuzzleVariant } from './engine/contract.js';",
+	"export type ClientPuzzleVariant = Omit<PuzzleVariant, 'leaderboardGroups'>;",
+	"export type ClientPuzzleMetadata = Omit<PuzzleMetadata, 'presentation' | 'variants'> & { presentation: Omit<PuzzlePresentation, 'groups'>; variants?: readonly ClientPuzzleVariant[] };",
 	`const metadata = {${puzzles.map(({ id, metadata }) => `[${JSON.stringify(id)}]: ${JSON.stringify(metadata)}`).join(',')}} as const;`,
-	'export const puzzleMetadata: Record<PuzzleId, PuzzleMetadata> & typeof metadata = metadata;'
+	'export const puzzleMetadata: Record<PuzzleId, ClientPuzzleMetadata> & typeof metadata = metadata;'
 ];
 const messages = [
 	header,

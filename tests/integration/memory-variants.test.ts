@@ -52,6 +52,7 @@ import {
 	rollbackScoreConfig,
 	saveScoreConfig
 } from '../../src/lib/server/scoring.js';
+import { utcDate } from '../../src/lib/server/daily.js';
 
 let proxy: Awaited<ReturnType<typeof getPlatformProxy<Cloudflare.Env>>>;
 const now = 1800000000000;
@@ -71,6 +72,14 @@ function completion(variant?: string, seed = '42', id = crypto.randomUUID()): Co
 		elapsedSeconds: 10,
 		rankedSession: null
 	};
+}
+async function replayRecord(db: D1Database, id: string) {
+	return db
+		.prepare(
+			'SELECT rules_group AS rulesGroup,score_config_version AS scoreConfigVersion,score FROM completed_run WHERE id=?'
+		)
+		.bind(id)
+		.first<{ rulesGroup: string; scoreConfigVersion: string; score: number }>();
 }
 async function migratedProxy() {
 	const fixture = await getPlatformProxy<Cloudflare.Env>({
@@ -164,7 +173,8 @@ it('dimension policy persists atomically, denies new issuance and preserves an i
 		};
 		await expect(
 			saveRun(db, userId, run, issued.startedAt + CARD_RANKED_OPENING_MS + 30_000)
-		).resolves.toMatchObject({ group: expect.stringMatching(/^memory-1:quads:/) });
+		).resolves.toMatchObject({ group: 'memory', ranked: true });
+		expect((await replayRecord(db, run.id))?.rulesGroup).toMatch(/^memory-1:quads:/);
 		expect(
 			(
 				await db
@@ -490,7 +500,7 @@ it('binds 40 synthetic groups in one parameter and reconciles exact counts acros
 	}
 });
 
-it('isolates shared pair scoring from trios and changes only future scores and live eligibility', async () => {
+it('isolates shared pair scoring from trios and changes only future scores', async () => {
 	const db = proxy.env.DB,
 		variant = 'memory:trios';
 	const original = defaultScoreConfig('memory', variant);
@@ -516,10 +526,11 @@ it('isolates shared pair scoring from trios and changes only future scores and l
 		expect(await readScoreConfig(db, 'memory', undefined, undefined, shared)).toEqual(
 			defaultScoreConfig('memory')
 		);
-	expect((await accountHistory(db, userId)).bests.some((row) => row.group === saved.group)).toBe(
-		false
+	expect((await accountHistory(db, userId)).bests).toEqual([]);
+	expect((await leaderboard(db, 'memory', utcDate(now), userId, undefined, 25, now)).rows).toEqual(
+		[]
 	);
-	expect((await leaderboard(db, saved.group, 0, userId)).scoreConfigVersion).toBe(edit.version);
+	expect((await replayRecord(db, run.id))?.scoreConfigVersion).toBe(original.version);
 	const future = await saveRun(
 		db,
 		userId,
@@ -527,6 +538,7 @@ it('isolates shared pair scoring from trios and changes only future scores and l
 		now + 11
 	);
 	expect(future.score).toBeGreaterThan(saved.score);
+	expect((await replayRecord(db, future.id))?.scoreConfigVersion).toBe(edit.version);
 	expect((await saveRun(db, userId, run, now + 12)).score).toBe(saved.score);
 	const before = (await gameStatistics(db, 'memory')).variants.find((row) => row.id === variant)!;
 	const rollback = await rollbackScoreConfig(
@@ -568,7 +580,8 @@ it('persists authoritative ranked variants, counts ranked starts once, and permi
 	await db.prepare('UPDATE play_session SET variant=NULL WHERE id=?').bind(classic.id).run();
 	const legacy = { ...completion(undefined, classic.seed, classic.id), rankedSession: classic.id };
 	const classicSaved = await saveRun(db, userId, legacy, now);
-	expect(classicSaved.group).toMatch(/^memory-1:(6|8|10)$/);
+	expect(classicSaved.group).toBe('memory');
+	expect((await replayRecord(db, legacy.id))?.rulesGroup).toMatch(/^memory-1:(6|8|10)$/);
 	const session = await startRanked(
 		db,
 		userId,
@@ -579,7 +592,15 @@ it('persists authoritative ranked variants, counts ranked starts once, and permi
 		undefined,
 		variant
 	);
-	expect(await resumableRanked(db, userId, now + 1001)).toMatchObject({ variant });
+	const resumed = await resumableRanked(db, userId, now + 1001);
+	expect(resumed).toMatchObject({
+		id: session.id,
+		round: { rules: { matchSize: 2, previewMs: 0 } }
+	});
+	expect(JSON.stringify(resumed)).not.toContain('"variant":');
+	expect(
+		await db.prepare('SELECT variant FROM play_session WHERE id=?').bind(session.id).first()
+	).toEqual({ variant });
 	const round = { runId: session.id, family: 'memory', rankedSession: session.id, variant };
 	await recordRoundStart(db, userId, round, now + 1002);
 	await recordRoundPlay(db, userId, round, now + 1003);
@@ -604,7 +625,8 @@ it('persists authoritative ranked variants, counts ranked starts once, and permi
 		startRanked(db, userId, 'memory', 'variant-ip', now + 2002, session.id, undefined, variant)
 	).rejects.toMatchObject({ code: 'game_disabled' });
 	const saved = await saveRun(db, userId, run, session.startedAt + CARD_RANKED_OPENING_MS + 10_000);
-	expect(saved.group).toMatch(/^memory-1:no-preview:/);
+	expect(saved.group).toBe('memory');
+	expect((await replayRecord(db, run.id))?.rulesGroup).toMatch(/^memory-1:no-preview:/);
 	const counts = (await gameStatistics(db, 'memory')).variants.find((row) => row.id === variant)!;
 	expect(counts).toMatchObject({
 		shown: 1,
@@ -615,8 +637,10 @@ it('persists authoritative ranked variants, counts ranked starts once, and permi
 		open: 0,
 		imported: 0
 	});
-	const board = await leaderboard(db, saved.group, 0, userId);
-	expect(board.rows[0]?.score).toBe(saved.score);
+	const board = await leaderboard(db, 'memory', utcDate(now), userId, undefined, 25, now);
+	expect(board.rows).toEqual([]);
+	expect(board.own).toBeNull();
+	expect((await replayRecord(db, run.id))?.score).toBe(saved.score);
 	for (const entry of catalog.memory.variants!)
 		if (entry.id !== variant)
 			await changeVariant(
@@ -694,9 +718,17 @@ it('keeps historical ranked identity intact and fails closed for unknown stored 
 	expect(original).toMatchObject({
 		id,
 		family: 'memory',
-		variant: 'memory:classic',
 		engineVersion: 'memory-1',
 		scoring: defaultScoreConfig('memory')
+	});
+	expect(original && 'round' in original ? original.round.rules : null).toEqual({
+		matchSize: 2,
+		previewMs: 3000,
+		attemptsPerCard: 6
+	});
+	expect(JSON.stringify(original)).not.toContain('"variant":');
+	expect(await db.prepare('SELECT variant FROM play_session WHERE id=?').bind(id).first()).toEqual({
+		variant: null
 	});
 	const incompatible = { id, expiresAt: createdAt + 7200000, saving: false };
 	for (const [column, value] of [
@@ -722,9 +754,16 @@ it('keeps historical ranked identity intact and fails closed for unknown stored 
 			)
 			.run();
 	}
-	expect(await resumableRanked(db, userId, createdAt + 1)).toMatchObject({
-		id,
-		variant: 'memory:classic'
+	const restored = await resumableRanked(db, userId, createdAt + 1);
+	expect(restored).toMatchObject({ id });
+	expect(restored && 'round' in restored ? restored.round.rules : null).toEqual({
+		matchSize: 2,
+		previewMs: 3000,
+		attemptsPerCard: 6
+	});
+	expect(JSON.stringify(restored)).not.toContain('"variant":');
+	expect(await db.prepare('SELECT variant FROM play_session WHERE id=?').bind(id).first()).toEqual({
+		variant: null
 	});
 	await abandonRanked(db, userId, id, createdAt + 2);
 });
@@ -1267,7 +1306,7 @@ function liveSolution(seed: string, variant: string) {
 	return moves;
 }
 
-it('saves each pilot identity under its own immutable group and scoring scope', async () => {
+it('stores each pilot identity under its immutable replay group and scoring scope', async () => {
 	const db = proxy.env.DB;
 	for (const variant of PILOT) {
 		const run = { ...completion(variant), moves: liveSolution('42', variant) };
@@ -1275,8 +1314,12 @@ it('saves each pilot identity under its own immutable group and scoring scope', 
 		const groups = catalog.memory.variants!.find(
 			(entry) => entry.id === variant
 		)!.leaderboardGroups;
-		expect(groups).toContain(saved.group);
-		expect(saved.group.startsWith(`memory-1:${variant.slice('memory:'.length)}:`)).toBe(true);
+		const stored = await replayRecord(db, run.id);
+		expect(saved.group).toBe('memory');
+		expect(groups).toContain(stored?.rulesGroup);
+		expect(stored?.rulesGroup.startsWith(`memory-1:${variant.slice('memory:'.length)}:`)).toBe(
+			true
+		);
 		expect(scoreScope('memory', variant)).toBe(variant === 'memory:quads' ? variant : 'memory');
 	}
 	expect(defaultScoreConfig('memory', 'memory:quads')).toEqual({
@@ -1536,11 +1579,16 @@ it('Time Strata preserves historical policy, issued identity and explicit contro
 		await expect(
 			startRanked(db, player, 'memory', 'strata-ip', now + 1002, issued.id, undefined, variant)
 		).rejects.toMatchObject({ code: 'game_disabled' });
-		expect(await resumableRanked(db, player, now + 1003)).toMatchObject({
+		const resumed = await resumableRanked(db, player, now + 1003);
+		expect(resumed).toMatchObject({
 			id: issued.id,
-			variant,
+			round: { rules: { topOnly: true, previewMs: 0 } },
 			scoring: issued.scoring
 		});
+		expect(JSON.stringify(resumed)).not.toContain('"variant":');
+		expect(
+			await db.prepare('SELECT variant FROM play_session WHERE id=?').bind(issued.id).first()
+		).toEqual({ variant });
 		const initial = createMemoryRound(issued.seed, variant);
 		const first = timeStrataTops(initial)[0];
 		const moves: MemoryMove[] = [{ index: first }, { cancel: 1 }];
@@ -1596,12 +1644,15 @@ it('Time Strata preserves historical policy, issued identity and explicit contro
 			)
 		).rejects.toMatchObject({ code: 'invalid_replay' });
 		const saved = await saveRun(db, player, run, issued.startedAt + CARD_RANKED_OPENING_MS + 10000);
-		expect(saved.group).toBe(`memory-1:time-strata:${initial.pairs}`);
-		expect(saved.score).toBe(initial.pairs * 1000 - 45);
-		expect((await accountHistory(db, player)).bests.some((row) => row.group === saved.group)).toBe(
-			true
+		expect(saved.group).toBe('memory');
+		expect((await replayRecord(db, run.id))?.rulesGroup).toBe(
+			`memory-1:time-strata:${initial.pairs}`
 		);
-		expect((await leaderboard(db, saved.group, 0, player)).rows[0]?.score).toBe(saved.score);
+		expect(saved.score).toBe(initial.pairs * 1000 - 45);
+		expect((await accountHistory(db, player)).bests).toEqual([]);
+		expect(
+			(await leaderboard(db, 'memory', utcDate(now), player, undefined, 25, now)).rows
+		).toEqual([]);
 		const directory = await loadMemoryDirectory(db, { q: 'Time Strata' });
 		expect(directory.items.map((row) => row.id)).toEqual([variant]);
 		expect(directory.items[0].name).toBe('Time Strata');
@@ -1626,16 +1677,16 @@ it('Batch H issues immutable rules, enforces live policy and saves isolated repl
 	const db = fixture.env.DB;
 	await db.prepare("INSERT INTO admin_actor(id,role) VALUES('operator','admin')").run();
 	const modes = [
-		['linked', 'availability', 'Linked Tops'],
-		['sweep', 'availability', 'Level Sweep'],
-		['shelf', 'movement', 'Sample Shelf'],
-		['cycle', 'movement', 'Layer Cycle'],
-		['empty-well', 'movement', 'Empty Well'],
-		['glimpse', 'backs', 'Deep Glimpse'],
-		['chain', 'availability', 'Chain Reaction'],
-		['echo', 'backs', 'Layer Echo'],
-		['slip', 'movement', 'Slipping Tops'],
-		['order', 'availability', 'Excavation Order']
+		['linked', 'availability', 'Linked Tops', 'adjacentStacksOnly'],
+		['sweep', 'availability', 'Level Sweep', 'deepestStackOnly'],
+		['shelf', 'movement', 'Sample Shelf', 'canLiftTop'],
+		['cycle', 'movement', 'Layer Cycle', 'canCycleTop'],
+		['empty-well', 'movement', 'Empty Well', 'canMoveToEmptyStack'],
+		['glimpse', 'backs', 'Deep Glimpse', 'peekBelowTop'],
+		['chain', 'availability', 'Chain Reaction', 'chainExposedMatches'],
+		['echo', 'backs', 'Layer Echo', 'revealExposedTops'],
+		['slip', 'movement', 'Slipping Tops', 'sinkMissedTops'],
+		['order', 'availability', 'Excavation Order', 'orderedSymbols']
 	];
 	const original = await db
 		.prepare("SELECT version FROM config_live WHERE key='game:memory'")
@@ -1662,7 +1713,7 @@ it('Batch H issues immutable rules, enforces live policy and saves isolated repl
 				)
 				.bind(legacyVersion)
 		]);
-		for (const [offset, [mode, dimension, name]] of modes.entries()) {
+		for (const [offset, [mode, dimension, name, rule]] of modes.entries()) {
 			const variant = `memory:strata-${mode}`;
 			const player = crypto.randomUUID();
 			await db.batch([
@@ -1709,11 +1760,16 @@ it('Batch H issues immutable rules, enforces live policy and saves isolated repl
 					variant
 				)
 			).rejects.toMatchObject({ code: 'game_disabled' });
-			expect(await resumableRanked(db, player, now + 200_003)).toMatchObject({
+			const resumed = await resumableRanked(db, player, now + 200_003);
+			expect(resumed).toMatchObject({
 				id: issued.id,
-				variant,
+				round: { rules: { topOnly: true, previewMs: 0, [rule]: true } },
 				scoring: issued.scoring
 			});
+			expect(JSON.stringify(resumed)).not.toContain('"variant":');
+			expect(
+				await db.prepare('SELECT variant FROM play_session WHERE id=?').bind(issued.id).first()
+			).toEqual({ variant });
 			let round = createMemoryRound(issued.seed, variant);
 			const initial = round;
 			const moves: MemoryMove[] = [];
@@ -1804,12 +1860,15 @@ it('Batch H issues immutable rules, enforces live policy and saves isolated repl
 				run,
 				issued.startedAt + CARD_RANKED_OPENING_MS + 10000
 			);
-			expect(saved.group).toBe(`memory-1:strata-${mode}:${initial.pairs}`);
+			expect(saved.group).toBe('memory');
+			expect((await replayRecord(db, run.id))?.rulesGroup).toBe(
+				`memory-1:strata-${mode}:${initial.pairs}`
+			);
 			expect(saved.score).toBeGreaterThan(0);
+			expect((await accountHistory(db, player)).bests).toEqual([]);
 			expect(
-				(await accountHistory(db, player)).bests.some((row) => row.group === saved.group)
-			).toBe(true);
-			expect((await leaderboard(db, saved.group, 0, player)).rows[0]?.score).toBe(saved.score);
+				(await leaderboard(db, 'memory', utcDate(now), player, undefined, 25, now)).rows
+			).toEqual([]);
 			const directory = await loadMemoryDirectory(db, { q: name });
 			expect(
 				directory.items.some(

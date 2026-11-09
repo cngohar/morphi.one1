@@ -78,14 +78,14 @@ it('enforces the exact ranked rush ceiling after the fixed openings without anot
 		} else {
 			expect(await saveRun(proxy.env.DB, userId, run, submittedAt)).toMatchObject({
 				ranked: true,
-				group: 'block-placement-1:rush-60',
+				group: 'block',
 				score: 0
 			});
 			expect(
-				await proxy.env.DB.prepare('SELECT seconds FROM completed_run WHERE id=?')
+				await proxy.env.DB.prepare('SELECT seconds,rules_group FROM completed_run WHERE id=?')
 					.bind(run.id)
 					.first()
-			).toEqual({ seconds: gameplayMs / 1000 });
+			).toEqual({ seconds: gameplayMs / 1000, rules_group: 'block-placement-1:rush-60' });
 		}
 	}
 });
@@ -115,12 +115,14 @@ it('accepts a rush completion within the ceiling when reduced motion skips the f
 	};
 	expect(await saveRun(proxy.env.DB, userId, run, now + 60000)).toMatchObject({
 		ranked: true,
-		group: 'block-placement-1:rush-60',
+		group: 'block',
 		score: 0
 	});
 	expect(
-		await proxy.env.DB.prepare('SELECT seconds FROM completed_run WHERE id=?').bind(run.id).first()
-	).toEqual({ seconds: 55 });
+		await proxy.env.DB.prepare('SELECT seconds,rules_group FROM completed_run WHERE id=?')
+			.bind(run.id)
+			.first()
+	).toEqual({ seconds: 55, rules_group: 'block-placement-1:rush-60' });
 });
 
 it('replays and saves a pre-variant Block completion under classic without changing its payload', async () => {
@@ -136,7 +138,12 @@ it('replays and saves a pre-variant Block completion under classic without chang
 	};
 	expect(parseRun(run)).toEqual(run);
 	const saved = await saveRun(proxy.env.DB, await owner(), run, now);
-	expect(saved).toMatchObject({ group: 'block-placement-1', score: cap.score, ranked: false });
+	expect(saved).toMatchObject({ group: 'block', score: cap.score, ranked: false });
+	expect(
+		await proxy.env.DB.prepare('SELECT rules_group FROM completed_run WHERE id=?')
+			.bind(run.id)
+			.first()
+	).toEqual({ rules_group: 'block-placement-1' });
 	expect(catalog.block.replay(cap.seed, cap.moves, 123, undefined, 'block:classic').score).toBe(
 		saved.score
 	);
@@ -163,12 +170,14 @@ it('retains classic ranked elapsed behavior and rejects family or variant substi
 	).rejects.toMatchObject({ code: 'session' });
 	expect(await saveRun(proxy.env.DB, userId, run, now + 120000)).toMatchObject({
 		ranked: true,
-		group: 'block-placement-1',
+		group: 'block',
 		score: cap.score
 	});
 	expect(
-		await proxy.env.DB.prepare('SELECT seconds FROM completed_run WHERE id=?').bind(run.id).first()
-	).toEqual({ seconds: 119 });
+		await proxy.env.DB.prepare('SELECT seconds,rules_group FROM completed_run WHERE id=?')
+			.bind(run.id)
+			.first()
+	).toEqual({ seconds: 119, rules_group: 'block-placement-1' });
 });
 
 it('removes Block from availability when every variant is disabled and restores it without a reason', async () => {

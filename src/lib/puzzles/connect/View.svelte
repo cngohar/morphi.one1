@@ -5,7 +5,11 @@
 	import { t } from '#lib/i18n/messages.js';
 	import { formatDuration, formatNumber } from '#lib/ui/format.js';
 	let props: PuzzleViewProps = $props();
-	const round = $derived(props.round as ConnectRound);
+	const round = $derived.by(() => {
+		const value = { ...(props.round as ConnectRound) };
+		delete value.variant;
+		return value;
+	});
 
 	function finish(score: number, seconds: number, strokes: number, filled: number) {
 		const filledPercent = Math.round((filled * 100) / (round.size * round.size));

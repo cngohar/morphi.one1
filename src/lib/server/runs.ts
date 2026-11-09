@@ -1,14 +1,23 @@
 import { completionActivityStatement } from './activity.js';
 import { readScoreConfig } from './scoring.js';
-import { defaultScoreConfig, puzzleVariant, scoreScope } from '#lib/scoring.js';
+import { defaultScoreConfig, puzzleVariant } from '#lib/scoring.js';
 import { and, asc, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 import { catalog } from '#lib/catalog.js';
 import { normalizeSeed } from '#lib/engine/rng.js';
-import type { CompletedRun, PuzzleManifest } from '#lib/engine/contract.js';
+import type { CompletedRun } from '#lib/engine/contract.js';
 import { createDatabase } from './db/index.js';
 import { completedRun, playSession } from './db/schema.js';
 import { generateTheme, type ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { readThemeVersion } from './config.js';
+import { invalidateDailyBoard } from './config-cache.js';
+import {
+	dailyBest,
+	dailyBoard,
+	dailyCompletionStatements,
+	dailyFreezeAt,
+	dailySessionId,
+	utcDate
+} from './daily.js';
 
 export class RunError extends Error {
 	constructor(
@@ -115,7 +124,7 @@ export function parseRun(value: unknown): CompletedRun {
 	};
 }
 
-export { startRanked } from './ranked-session.js';
+export { startRanked, startDailyRanked } from './ranked-session.js';
 
 export async function saveRun(
 	binding: D1Database,
@@ -125,9 +134,84 @@ export async function saveRun(
 	cache?: KVNamespace
 ) {
 	const db = createDatabase(binding);
-	const run = parseRun(input);
-	const hash = await digest(JSON.stringify(run));
-	const stored = await db.select().from(completedRun).where(eq(completedRun.id, run.id)).get();
+	// Ranked clients send only their session id; resolve its rules before variant-dependent parsing.
+	const candidate =
+		input && typeof input === 'object' && !Array.isArray(input) ? (input as CompletedRun) : null;
+	const stored =
+		candidate && typeof candidate.id === 'string' && UUID.test(candidate.id)
+			? await db.select().from(completedRun).where(eq(completedRun.id, candidate.id)).get()
+			: undefined;
+	if (stored && stored.userId !== userId) throw new RunError('conflict', 409);
+	const issued =
+		candidate &&
+		typeof candidate.id === 'string' &&
+		UUID.test(candidate.id) &&
+		candidate.rankedSession === candidate.id
+			? await db
+					.select()
+					.from(playSession)
+					.where(and(eq(playSession.id, candidate.id), eq(playSession.userId, userId)))
+					.get()
+			: undefined;
+	if (candidate?.rankedSession && !issued && !stored) throw new RunError('session', 403);
+	if (issued && candidate?.variant !== undefined) {
+		try {
+			if (
+				puzzleVariant(issued.family, candidate.variant)?.id !==
+				puzzleVariant(issued.family, issued.variant ?? undefined)?.id
+			)
+				throw new RunError('session', 403);
+		} catch {
+			throw new RunError('session', 403);
+		}
+	}
+	const dailySession =
+		issued &&
+		issued.id === (await dailySessionId(userId, issued.family, utcDate(issued.createdAt)));
+	if (dailySession) {
+		if (!stored && now >= dailyFreezeAt(utcDate(issued.createdAt)))
+			throw new RunError('expired_or_superseded', 410);
+		const puzzle = await binding
+			.prepare(
+				`SELECT seed,variant,engine_version,score_config_version FROM daily_puzzle WHERE family=? AND date=?`
+			)
+			.bind(issued.family, utcDate(issued.createdAt))
+			.first<{
+				seed: string;
+				variant: string;
+				engine_version: string;
+				score_config_version: string;
+			}>();
+		if (
+			!puzzle ||
+			puzzle.seed !== issued.seed ||
+			puzzle.variant !== issued.variant ||
+			puzzle.engine_version !== issued.engineVersion ||
+			puzzle.score_config_version !== issued.scoreConfigVersion
+		)
+			throw new RunError('session', 403);
+	}
+	const internalVariant =
+		issued?.variant ??
+		(stored?.ranked
+			? catalog[stored.family]?.variants?.find((row) =>
+					row.leaderboardGroups.includes(stored.group)
+				)?.id
+			: undefined);
+	if (stored?.ranked && candidate?.variant !== undefined && internalVariant !== candidate.variant)
+		throw new RunError('conflict', 409);
+	const run = parseRun(internalVariant ? { ...candidate, variant: internalVariant } : input);
+	let hash = await digest(JSON.stringify(run));
+	if (
+		candidate?.variant === undefined &&
+		((issued && !dailySession && internalVariant === catalog[run.family].variants?.[0]?.id) ||
+			(stored?.ranked && stored.payloadHash !== hash))
+	) {
+		// Legacy default-rule claims retain their canonical envelope without its identity.
+		const { variant, ...legacyEnvelope } = run;
+		void variant;
+		hash = await digest(JSON.stringify(legacyEnvelope));
+	}
 	if (stored) {
 		if (
 			await binding
@@ -139,7 +223,13 @@ export async function saveRun(
 		if (stored.userId !== userId || stored.payloadHash !== hash)
 			throw new RunError('conflict', 409);
 		await trackCompletion(binding, userId, run.id, now);
-		return { id: stored.id, score: stored.score, ranked: stored.ranked, group: stored.group };
+		const daily = await dailyBest(binding, userId, run.id, cache, now);
+		return {
+			id: stored.id,
+			score: stored.score,
+			ranked: stored.ranked,
+			group: daily ? `${daily.family}:${daily.date}` : stored.family
+		};
 	}
 	const active = await binding
 		.prepare(
@@ -164,10 +254,12 @@ export async function saveRun(
 		)
 			throw new RunError('session', 403);
 	}
-	let scoring = await readScoreConfig(
+	const scoring = await readScoreConfig(
 		binding,
 		run.family,
-		run.scoreConfigVersion ?? defaultScoreConfig(run.family, run.variant).version,
+		issued?.scoreConfigVersion ??
+			run.scoreConfigVersion ??
+			defaultScoreConfig(run.family, run.variant).version,
 		cache,
 		run.variant
 	);
@@ -182,11 +274,6 @@ export async function saveRun(
 		resolvedTheme = generateTheme(run.seed, run.family, config);
 	}
 	if (run.rankedSession) {
-		const issued = await db
-			.select()
-			.from(playSession)
-			.where(and(eq(playSession.id, run.id), eq(playSession.userId, userId)))
-			.get();
 		if (
 			!issued ||
 			issued.seed !== run.seed ||
@@ -198,13 +285,6 @@ export async function saveRun(
 			throw new RunError('session', 403);
 		if (run.scoreConfigVersion && run.scoreConfigVersion !== issued.scoreConfigVersion)
 			throw new RunError('score_version', 409);
-		scoring = await readScoreConfig(
-			binding,
-			run.family,
-			issued.scoreConfigVersion,
-			cache,
-			issued.variant ?? undefined
-		);
 		cardOpeningMs = issued.cardOpeningMs;
 		// The issued snapshot is authoritative, including for a queued legacy client.
 		resolvedTheme = issued.themeSnapshot
@@ -297,14 +377,50 @@ export async function saveRun(
 		})
 	);
 	// Re-check bans in the insertion statement as well as before replay.
-	await db.run(sql`INSERT INTO completed_run
+	const commit = binding
+		.prepare(
+			`INSERT INTO completed_run
 		(id,user_id,family,engine_version,rules_group,score,pairs,moves,seconds,seed,move_log,payload_hash,ranked,hidden,created_at,theme_config_version,theme_generator_version,theme_snapshot,score_config_version)
-		SELECT ${run.id},${userId},${run.family},${run.engineVersion},${result.group},${result.score},${result.pairs},
-		${result.moves},${seconds},${run.seed},${JSON.stringify(run.moves)},${hash},${run.rankedSession ? 1 : 0},0,${submittedAt},${resolvedTheme?.themeConfigVersion ?? 'curated-v1'},${resolvedTheme?.themeGeneratorVersion ?? 'curated-v1'},${resolvedTheme ? JSON.stringify(resolvedTheme) : null},${scoring.version}
-		WHERE NOT EXISTS (SELECT 1 FROM player_ban WHERE user_id=${userId} AND (expires_at IS NULL OR expires_at>${now}))
- AND NOT EXISTS (SELECT 1 FROM user_lifecycle WHERE user_id=${userId})
- AND (${run.rankedSession ? 1 : 0}=1 OR (SELECT count(*) FROM completed_run WHERE user_id=${userId} AND created_at>${now - 3600000})<100)
-		ON CONFLICT(id) DO NOTHING`);
+		SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,0,?,?,?,?,?
+		WHERE NOT EXISTS(SELECT 1 FROM player_ban WHERE user_id=? AND (expires_at IS NULL OR expires_at>?))
+		AND NOT EXISTS(SELECT 1 FROM user_lifecycle WHERE user_id=?)
+		AND (?=1 OR (SELECT count(*) FROM completed_run WHERE user_id=? AND created_at>?)<100)
+		ON CONFLICT(id) DO NOTHING`
+		)
+		.bind(
+			run.id,
+			userId,
+			run.family,
+			run.engineVersion,
+			result.group,
+			result.score,
+			result.pairs,
+			result.moves,
+			seconds,
+			run.seed,
+			JSON.stringify(run.moves),
+			hash,
+			run.rankedSession ? 1 : 0,
+			dailySession ? now : submittedAt,
+			resolvedTheme?.themeConfigVersion ?? 'curated-v1',
+			resolvedTheme?.themeGeneratorVersion ?? 'curated-v1',
+			resolvedTheme ? JSON.stringify(resolvedTheme) : null,
+			scoring.version,
+			userId,
+			now,
+			userId,
+			run.rankedSession ? 1 : 0,
+			userId,
+			now - 3600000
+		);
+	const dailyDate = dailySession ? utcDate(issued!.createdAt) : null;
+	if (dailyDate) {
+		const results = await binding.batch([
+			commit,
+			...dailyCompletionStatements(binding, userId, run.id, run.family, dailyDate, now)
+		]);
+		if (results[1].meta.changes) await invalidateDailyBoard(cache, run.family, dailyDate);
+	} else await commit.run();
 	const committed = await db.select().from(completedRun).where(eq(completedRun.id, run.id)).get();
 	if (!committed) throw new RunError('save_limited', 429);
 	if (committed.userId !== userId || committed.payloadHash !== hash)
@@ -314,7 +430,7 @@ export async function saveRun(
 		id: committed.id,
 		score: committed.score,
 		ranked: committed.ranked,
-		group: committed.group
+		group: dailyDate ? `${committed.family}:${dailyDate}` : committed.family
 	};
 }
 
@@ -333,8 +449,6 @@ export async function accountHistory(binding: D1Database, userId: string) {
 			id: completedRun.id,
 			family: completedRun.family,
 			score: completedRun.score,
-			group: completedRun.group,
-			scoreConfigVersion: completedRun.scoreConfigVersion,
 			ranked: completedRun.ranked,
 			seconds: completedRun.seconds,
 			createdAt: completedRun.createdAt
@@ -343,53 +457,14 @@ export async function accountHistory(binding: D1Database, userId: string) {
 		.where(eq(completedRun.userId, userId))
 		.orderBy(desc(completedRun.createdAt), asc(completedRun.id))
 		.limit(30);
-	const ownVariants = Object.values<PuzzleManifest>(catalog).flatMap((manifest) =>
-		(manifest.variants ?? [])
-			.filter((variant) => variant.scoring)
-			.map((variant) => ({ family: manifest.id, variant }))
-	);
-	const scoreFamily = ownVariants.length
-		? sql`CASE ${sql.join(
-				ownVariants.map(
-					({ family, variant }) =>
-						sql`WHEN ${completedRun.family}=${family} AND ${completedRun.group} IN (${sql.join(
-							variant.leaderboardGroups.map((group) => sql`${group}`),
-							sql`,`
-						)}) THEN ${scoreScope(family, variant.id)}`
-				),
-				sql` `
-			)} ELSE ${completedRun.family} END`
-		: completedRun.family;
-	const defaultVersion = sql`CASE ${sql.join(
-		ownVariants.map(
-			({ family, variant }) =>
-				sql`WHEN ${completedRun.family}=${family} AND ${completedRun.group} IN (${sql.join(
-					variant.leaderboardGroups.map((group) => sql`${group}`),
-					sql`,`
-				)}) THEN ${variant.scoring!.version}`
-		),
-		sql` `
-	)} ${sql.join(
-		Object.values<PuzzleManifest>(catalog).map(
-			(manifest) => sql`WHEN ${completedRun.family}=${manifest.id} THEN ${manifest.scoring.version}`
-		),
-		sql` `
-	)} END`;
-	const bests = await db
-		.select({
-			family: completedRun.family,
-			group: completedRun.group,
-			scoreConfigVersion: completedRun.scoreConfigVersion,
-			score: sql<number>`max(${completedRun.score})`
-		})
-		.from(completedRun)
-		.where(
-			and(
-				eq(completedRun.userId, userId),
-				sql`${completedRun.scoreConfigVersion} = COALESCE((SELECT version FROM score_live WHERE family=${scoreFamily}), ${defaultVersion})`
+	const bests = (
+		await binding
+			.prepare(
+				`SELECT family,date,score FROM daily_best WHERE user_id=? ORDER BY date DESC,family LIMIT 100`
 			)
-		)
-		.groupBy(completedRun.family, completedRun.group, completedRun.scoreConfigVersion);
+			.bind(userId)
+			.all<{ family: string; date: string; score: number }>()
+	).results;
 	const summary = await db
 		.select({
 			family: completedRun.family,
@@ -400,46 +475,21 @@ export async function accountHistory(binding: D1Database, userId: string) {
 		.from(completedRun)
 		.where(eq(completedRun.userId, userId))
 		.groupBy(completedRun.family);
-	return { history, bests, summary };
+	return {
+		history: history.map((row) => ({ ...row, date: utcDate(row.createdAt) })),
+		bests,
+		summary
+	};
 }
 
-export const BOARD_GROUPS = Object.values<PuzzleManifest>(catalog).flatMap(
-	(manifest) => manifest.leaderboardGroups
-);
 export async function leaderboard(
 	binding: D1Database,
-	group: string,
-	offset: number,
+	family: string,
+	date: string,
 	viewer: string | null,
-	cache?: KVNamespace
+	cache?: KVNamespace,
+	limit = 25,
+	now = Date.now()
 ) {
-	const manifest = Object.values<PuzzleManifest>(catalog).find((entry) =>
-		entry.leaderboardGroups.includes(group)
-	);
-	if (!manifest || !Number.isSafeInteger(offset) || offset < 0 || offset > 9900 || offset % 25)
-		throw new RunError('board');
-	const db = createDatabase(binding);
-	const family = manifest.id;
-	const variant = manifest.variants?.find((variant) => variant.leaderboardGroups.includes(group));
-	const scoring = await readScoreConfig(binding, family, undefined, cache, variant?.id);
-	// Each player occupies one place, using their best eligible result.
-	const query = sql`WITH eligible AS (
-		SELECT r.*, p.name, row_number() OVER (PARTITION BY r.user_id ORDER BY r.score DESC,r.created_at,r.id) AS personal
-		FROM completed_run r JOIN player p ON p.user_id=r.user_id
-		WHERE r.rules_group=${group} AND r.score_config_version=${scoring.version} AND r.ranked=1 AND r.hidden=0
-		AND NOT EXISTS (SELECT 1 FROM player_ban b WHERE b.user_id=r.user_id AND (b.expires_at IS NULL OR b.expires_at>unixepoch()*1000))
-		AND NOT EXISTS (SELECT 1 FROM user_lifecycle l WHERE l.user_id=r.user_id)
-	), ranked AS (
-		SELECT name,score,user_id,row_number() OVER (ORDER BY score DESC,created_at,id) AS position
-		FROM eligible WHERE personal=1
-	) SELECT name,score,position,CASE WHEN user_id=${viewer} THEN 1 ELSE 0 END AS own
-	FROM ranked WHERE position>${offset} AND position<=${offset + 25} OR user_id=${viewer} ORDER BY position`;
-	const rows = await db.all<{ name: string; score: number; position: number; own: number }>(query);
-	return {
-		scoreConfigVersion: scoring.version,
-		rows: rows.filter((row) => row.position > offset && row.position <= offset + 25),
-		own: rows.find((row) => row.own) ?? null,
-		offset,
-		group
-	};
+	return dailyBoard(binding, family, date, viewer, cache, limit, now);
 }

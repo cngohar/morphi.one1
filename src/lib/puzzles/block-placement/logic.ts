@@ -125,6 +125,7 @@ export type BlockEndReason = 'none' | 'no-fit' | 'cap' | 'time-up';
 
 export interface BlockRound {
 	variant?: BlockVariant;
+	rules?: { rowsOnly: boolean; boardSize: number; timeLimit: number };
 	/** Classic keeps its original serialized shape; absent means eight. */
 	boardSize?: number;
 	engineVersion: string;
@@ -237,7 +238,11 @@ export function findAnyPlacement(round: BlockRound): BlockMove | null {
 			continue;
 		}
 
-		const placement = findPlacement(round.board, pieceId, round.boardSize);
+		const placement = findPlacement(
+			round.board,
+			pieceId,
+			round.rules?.boardSize ?? round.boardSize
+		);
 		if (placement) {
 			return { trayIndex, x: placement.x, y: placement.y };
 		}
@@ -297,7 +302,17 @@ export function createBlockRound(seed: string, variant?: string): BlockRound {
 	const dealt = dealBlockTray(board, supply, 0, 0, boardSize);
 
 	return withStatus({
-		...(selectedVariant === 'block:classic' ? {} : { variant: selectedVariant, boardSize }),
+		...(selectedVariant === 'block:classic'
+			? {}
+			: {
+					variant: selectedVariant,
+					boardSize,
+					rules: {
+						rowsOnly: selectedVariant === 'block:rows-only',
+						boardSize,
+						timeLimit: selectedVariant === 'block:rush-60' ? BLOCK_RUSH_SECONDS : 0
+					}
+				}),
 		engineVersion: BLOCK_ENGINE_VERSION,
 		seed,
 		board,
@@ -370,7 +385,7 @@ export function placeBlockPiece(
 	scoring: ScoreValues = scoringDefinition.defaults
 ): PlaceResult {
 	const pieceId = round.tray[trayIndex];
-	const boardSize = round.boardSize ?? BLOCK_BOARD_SIZE;
+	const boardSize = round.rules?.boardSize ?? round.boardSize ?? BLOCK_BOARD_SIZE;
 
 	if (round.status !== 'playing' || !pieceId || !canPlace(round.board, pieceId, x, y, boardSize)) {
 		return { round, effect: 'invalid', placed: [], cleared: [], lines: 0, gained: 0 };
@@ -386,7 +401,7 @@ export function placeBlockPiece(
 	}
 	tray[trayIndex] = null;
 
-	const { rows, columns } = fullLines(board, boardSize, round.variant === 'block:rows-only');
+	const { rows, columns } = fullLines(board, boardSize, round.rules?.rowsOnly ?? false);
 	const lineCount = rows.length + columns.length;
 	const clearedIndexes = new Set<number>();
 
@@ -465,7 +480,7 @@ export function replayBlockMoves(
 
 /** The view owns the deadline; replay never reads a clock. */
 export function endBlockRush(round: BlockRound): BlockRound {
-	return round.variant === 'block:rush-60' && round.status === 'playing'
+	return (round.rules?.timeLimit ?? 0) > 0 && round.status === 'playing'
 		? { ...round, status: 'ended', endReason: 'time-up' }
 		: round;
 }

@@ -111,7 +111,14 @@ export interface PuzzleManifest {
 	} | null;
 	scoring: import('./scoring.js').ScoreDefinition;
 	messages: Readonly<Record<string, string>>;
-	createRound(seed: string, variant?: string): { seed: string; variant?: string };
+	createRound(
+		seed: string,
+		variant?: string
+	): {
+		seed: string;
+		variant?: string;
+		rules?: Record<string, number | boolean>;
+	};
 	resumeRound?(
 		seed: string,
 		moves: readonly Move[],

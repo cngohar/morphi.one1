@@ -1,11 +1,7 @@
 <script lang="ts">
 	import Game from './Game.svelte';
-	import {
-		memoryVariantName,
-		memoryVariant,
-		type MemoryRound,
-		type MemoryVariant
-	} from './logic.js';
+	import { cardsPerMatch, type MemoryRound } from './logic.js';
+	import { familyName } from '#lib/ui/puzzle-presentation.js';
 	import type { PuzzleViewProps } from '#lib/ui/puzzle-view.js';
 	import { t } from '#lib/i18n/messages.js';
 	import { formatDuration, formatNumber } from '#lib/ui/format.js';
@@ -13,11 +9,8 @@
 	const round = $derived(props.round as MemoryRound);
 
 	function finish(score: number, seconds: number, moves: number) {
-		const kind = (
-			{ 'memory:trios': 'trios', 'memory:quads': 'quads' } as Partial<
-				Record<MemoryVariant, 'trios' | 'quads'>
-			>
-		)[memoryVariant(round)];
+		const size = cardsPerMatch(round);
+		const kind = size === 3 ? 'trios' : size === 4 ? 'quads' : undefined;
 		const summary = t(kind ? `memory.${kind}.summary` : 'result.summary', {
 			pairs: round.pairs,
 			moves,
@@ -25,7 +18,7 @@
 		});
 		props.onfinish({
 			score,
-			title: t('memory.variantLabel', { variant: t(memoryVariantName(round.variant)) }),
+			title: familyName('memory'),
 			summary,
 			announcement: t('result.announce', { score: formatNumber(score), summary }),
 			stats: [

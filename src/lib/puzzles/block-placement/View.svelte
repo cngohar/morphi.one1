@@ -6,6 +6,11 @@
 	import { formatNumber } from '#lib/ui/format.js';
 	import { loadBlockHintSeen, saveBlockHintSeen } from '#lib/ui/storage.js';
 	let props: PuzzleViewProps = $props();
+	const round = $derived.by(() => {
+		const value = { ...(props.round as BlockRound) };
+		delete value.variant;
+		return value;
+	});
 	const showHint = !loadBlockHintSeen();
 	saveBlockHintSeen();
 
@@ -54,7 +59,7 @@
 
 <Game
 	{...props}
-	round={props.round as BlockRound}
+	{round}
 	{showHint}
 	onfinish={finish}
 	oncomplete={props.oncomplete}

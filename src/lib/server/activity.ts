@@ -2,6 +2,7 @@ import { catalog } from '#lib/catalog.js';
 import type { PuzzleId } from '#lib/engine/contract.js';
 import { puzzleVariant } from '#lib/scoring.js';
 import { RunError } from './runs.js';
+import { dailySessionId, utcDate } from './daily.js';
 
 const UUID = /^[0-9a-f]{8}-[0-9a-f]{4}-4[0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/;
 export interface ReportedRoundStart {
@@ -68,18 +69,59 @@ export async function recordRoundStart(
 	now = Date.now()
 ) {
 	const ranked = round.rankedSession ? 1 : 0;
-	const variant = roundVariant(round);
-	const groups = variant?.leaderboardGroups ?? catalog[round.family].leaderboardGroups;
-	const groupFilter = `AND rules_group IN (${groups.map(() => '?').join(',')})`;
 	const defaultId = catalog[round.family].variants?.[0].id ?? null;
+	const reportedVariant = roundVariant(round);
+	const dailyPuzzle = ranked
+		? await binding
+				.prepare(
+					`SELECT p.variant,p.date FROM daily_puzzle p WHERE p.family=? AND
+					(EXISTS (SELECT 1 FROM play_session s WHERE s.id=? AND s.user_id=? AND s.family=p.family
+					AND p.date=strftime('%Y-%m-%d',s.created_at/1000,'unixepoch') AND s.variant=p.variant
+					AND s.seed=p.seed AND s.engine_version=p.engine_version AND s.score_config_version=p.score_config_version)
+					OR EXISTS (SELECT 1 FROM completed_run r JOIN daily_best b ON b.family=p.family
+					AND b.date=p.date AND b.user_id=r.user_id WHERE r.id=? AND r.user_id=? AND r.family=p.family
+					AND r.ranked=1 AND r.seed=p.seed AND r.engine_version=p.engine_version
+					AND r.score_config_version=p.score_config_version))`
+				)
+				.bind(round.family, round.runId, userId, round.runId, userId)
+				.first<{ variant: string; date: string }>()
+		: null;
+	const daily =
+		dailyPuzzle && (await dailySessionId(userId, round.family, dailyPuzzle.date)) === round.runId
+			? dailyPuzzle
+			: null;
+	let variant = reportedVariant;
+	if (ranked && !daily) {
+		// Legacy ranked issuance still uses a random session id. A deterministic
+		// daily id must retain its authoritative puzzle rather than use this path.
+		const legacy = await binding
+			.prepare('SELECT created_at,variant FROM play_session WHERE id=? AND user_id=? AND family=?')
+			.bind(round.runId, userId, round.family)
+			.first<{ created_at: number; variant: string | null }>();
+		if (
+			!legacy ||
+			(await dailySessionId(userId, round.family, utcDate(legacy.created_at))) === round.runId
+		)
+			throw new RunError('activity_unavailable', 429);
+		variant = roundVariant({ ...round, variant: legacy.variant ?? undefined });
+		if (reportedVariant?.id !== defaultId && reportedVariant?.id !== variant?.id)
+			throw new RunError('conflict', 409);
+	}
+	if (daily && reportedVariant?.id !== defaultId && reportedVariant?.id !== daily.variant)
+		throw new RunError('conflict', 409);
+	if (daily) variant = roundVariant({ ...round, variant: daily.variant });
+	const dailyFilter = `AND (?=0 OR EXISTS (SELECT 1 FROM daily_puzzle p JOIN daily_best b
+		ON b.family=p.family AND b.date=p.date AND b.user_id=completed_run.user_id
+		WHERE p.family=completed_run.family AND p.date=? AND p.variant=? AND p.seed=completed_run.seed
+		AND p.engine_version=completed_run.engine_version AND p.score_config_version=completed_run.score_config_version))`;
 	await binding
 		.prepare(
 			`INSERT INTO account_round_activity (run_id,user_id,family,ranked,variant,started_at,completed_at)
-			SELECT ?,?,?,?,?,?,(SELECT created_at FROM completed_run WHERE id=? AND user_id=? AND family=? AND ranked=? AND created_at>? ${groupFilter}) WHERE EXISTS (SELECT 1 FROM user WHERE id=?)
+			SELECT ?,?,?,?,?,?,(SELECT created_at FROM completed_run WHERE id=? AND user_id=? AND family=? AND ranked=? AND created_at>? ${dailyFilter}) WHERE EXISTS (SELECT 1 FROM user WHERE id=?)
 			AND NOT EXISTS (SELECT 1 FROM user_lifecycle WHERE user_id=?)
 			AND NOT EXISTS (SELECT 1 FROM player_ban WHERE user_id=? AND (expires_at IS NULL OR expires_at>?))
 			AND (SELECT count(*) FROM account_round_activity WHERE user_id=? AND started_at>?)<30
-			AND (EXISTS (SELECT 1 FROM completed_run WHERE id=? AND user_id=? AND family=? AND ranked=? AND created_at>? ${groupFilter})
+			AND (EXISTS (SELECT 1 FROM completed_run WHERE id=? AND user_id=? AND family=? AND ranked=? AND created_at>? ${dailyFilter})
 			OR (NOT EXISTS (SELECT 1 FROM completed_run WHERE id=?) AND
 			((?=1 AND EXISTS (SELECT 1 FROM play_session WHERE id=? AND user_id=? AND family=? AND expires_at>? AND payload_hash IS NULL AND COALESCE(variant,?) IS ?))
 			OR (?=0 AND NOT EXISTS (SELECT 1 FROM play_session WHERE id=?)))))
@@ -97,7 +139,9 @@ export async function recordRoundStart(
 			round.family,
 			ranked,
 			now - 30_000,
-			...groups,
+			daily ? 1 : 0,
+			daily?.date ?? null,
+			variant?.id ?? null,
 			userId,
 			userId,
 			userId,
@@ -109,7 +153,9 @@ export async function recordRoundStart(
 			round.family,
 			ranked,
 			now - 30_000,
-			...groups,
+			daily ? 1 : 0,
+			daily?.date ?? null,
+			variant?.id ?? null,
 			round.runId,
 			ranked,
 			round.runId,

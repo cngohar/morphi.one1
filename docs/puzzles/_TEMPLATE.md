@@ -34,6 +34,28 @@ Copy this file to `docs/puzzles/<id>.md` before building a puzzle. The owner app
   identities or inflate the catalogue with cosmetic/instance changes.
 - Apply this definition to every new family and subsequent update. Preserve
   accepted identities and replay compatibility unless separately authorized.
+- Variants are internal rule deltas. Player boards use `(family, UTC date)`;
+  variant boards: none. Variant ids, names and lists never appear in player UI,
+  URLs, responses, share cards, help headings or results. Operator-only admin
+  test play is the sole display exception.
+- Every variant supplies one plain-language rule sentence for its round, shown
+  for that round only, never as a variant name. Put its differing teaching step
+  in `help.steps`; entrance shows it before the first move, Help retains it and
+  the result describes it. A non-baseline variant without a differing step fails review.
+
+## Variant visibility (standing owner rule, 2026-11-09)
+
+- Board key: `(family, UTC date)`; variant boards: none. New families define no
+  per-variant leaderboard groups. Internal replay/scoring identities stay internal.
+- Daily rounds are server-issued, with anonymous gameplay parameters and this
+  round's teaching only. Players cannot choose or reroll the daily ruleset.
+- Never expose variant ids, names or lists in UI, URLs, JSON, share cards, help
+  headings, results or leaderboard responses. Teach the current rule in plain words.
+- Preserve operator-authenticated, noindex admin test play: it may list variant
+  names, uses the same engine/view/replay, works for disabled variants and writes
+  no ranked sessions, completions, activity or leaderboard entries.
+- Every future implementation brief must state `board key: (family, UTC date)`
+  and `variant boards: none`; reject a brief proposing per-variant boards.
 
 ## Layout and style
 

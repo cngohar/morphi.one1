@@ -64,9 +64,11 @@ it('projects every Block variant label, help, ending and shared scoring key', ()
 	expect(puzzleVariant('block')?.id).toBe('block:classic');
 	for (const variant of manifest.variants) {
 		expect(variant.weight).toBe(1);
+		const { leaderboardGroups, ...clientVariant } = variant;
 		expect(puzzleMetadata.block.variants!.find((entry) => entry.id === variant.id)).toEqual(
-			variant
+			clientVariant
 		);
+		expect(leaderboardGroups.length).toBeGreaterThan(0);
 		expect(familyName('block', variant.id)).toBe(
 			`Block · ${manifest.messages[variant.name as keyof typeof manifest.messages]}`
 		);

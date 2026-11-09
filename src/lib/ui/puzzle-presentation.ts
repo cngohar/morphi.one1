@@ -11,6 +11,23 @@ export function familyName(family: string, variant?: string) {
 	return entry ? `${base} · ${t(entry.name as MessageKey)}` : base;
 }
 
+/** Differing steps, then notes, then scoring rows teach this round without naming it. */
+export function roundRuleLine(family: string, variant?: string): string {
+	const baseline = puzzleVariant(family)?.help ?? puzzleMetadata[family]?.presentation.help;
+	const help = puzzleVariant(family, variant)?.help ?? baseline;
+	const step = help?.steps.find((key) => !baseline?.steps.includes(key));
+	if (step) return t(step as MessageKey);
+	if (help?.note && help.note !== baseline?.note) return t(help.note as MessageKey);
+	const row = help?.rows.find(
+		({ value }) => value && !baseline?.rows.some((baselineRow) => baselineRow.value === value)
+	);
+	if (!row?.value) return '';
+	const value = t(row.value as MessageKey);
+	const board = value.match(/^(\d+ × \d+) grid, (\d+ pairs)$/);
+	if (board) return `This board is ${board[1]} with ${board[2]}.`;
+	return /[.!?]$/.test(value) ? value : `${t(row.label as MessageKey)}: ${value}.`;
+}
+
 export function scoreGuideValue(
 	row: PuzzlePresentation['help']['rows'][number],
 	values: ScoreValues

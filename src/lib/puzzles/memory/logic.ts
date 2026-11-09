@@ -126,8 +126,198 @@ export const MEMORY_VARIANTS = [
 ] as const;
 export type MemoryVariant = (typeof MEMORY_VARIANTS)[number];
 
-export function memoryVariant(round: { variant?: string }): MemoryVariant {
-	return parseMemoryVariant(round.variant);
+/** Anonymous gameplay settings; identity stays in the server/legacy issuance envelope. */
+export type MemoryRules = {
+	readonly matchSize: 2 | 3 | 4;
+	readonly previewMs: number;
+	readonly attemptsPerCard: number;
+	readonly enforceMoveLimit?: boolean;
+	readonly shuffleOnMiss?: boolean;
+	readonly lockLastMissedCard?: boolean;
+	readonly swapTwoOnResolve?: boolean;
+	readonly oppositeCardBacks?: boolean;
+	readonly removeMatchedCards?: boolean;
+	readonly timeLimitPerPair?: number;
+	readonly missLives?: number;
+	readonly wildMatching?: boolean;
+	readonly revealNeighborsOnMatch?: boolean;
+	readonly oppositeShadesOnly?: boolean;
+	readonly driftFirstRowOnMiss?: boolean;
+	readonly seenCardTurns?: number;
+	readonly keepOneRevealOnMiss?: boolean;
+	readonly growMatchMultiplier?: boolean;
+	readonly hazardShuffle?: boolean;
+	readonly blockedRowPeriod?: number;
+	readonly lockAtHeat?: number;
+	readonly orderedTiers?: boolean;
+	readonly spectralCardBacks?: boolean;
+	readonly spendFlipEnergy?: boolean;
+	readonly swapEndpointsOnAnomaly?: boolean;
+	readonly shuffleColumnOnRiskMiss?: boolean;
+	readonly growSpeedMultiplier?: boolean;
+	readonly revealNeighborCone?: boolean;
+	readonly shuffleEveryFlips?: number;
+	readonly missGhostTurns?: number;
+	readonly revealTwin?: boolean;
+	readonly cooldownEveryMisses?: number;
+	readonly canStoreCard?: boolean;
+	readonly unlockAdjacentCards?: boolean;
+	readonly perimeterShiftEveryMisses?: number;
+	readonly requireBothHandshakeStages?: boolean;
+	readonly quarantineAtTrace?: number;
+	readonly transposeAfterMisses?: number;
+	readonly revealAfterStreak?: number;
+	readonly replicateSeenCards?: boolean;
+	readonly differentRowsOnly?: boolean;
+	readonly matchClusters?: boolean;
+	readonly queueMissedCards?: boolean;
+	readonly spendFlipTokens?: boolean;
+	readonly growPoolMultiplier?: boolean;
+	readonly challengeEveryMisses?: number;
+	readonly clearanceTiers?: boolean;
+	readonly quadrantShiftAfterMisses?: number;
+	readonly freezeAfterUntouched?: number;
+	readonly crossBedOnly?: boolean;
+	readonly hintPartnerOnFlip?: boolean;
+	readonly movingSunbeam?: boolean;
+	readonly dormancyAfterUntouched?: number;
+	readonly hintPartnerRowOnFlip?: boolean;
+	readonly unlockWithDewdrop?: boolean;
+	readonly spendSap?: boolean;
+	readonly parityCardBacks?: boolean;
+	readonly growGardenMultiplier?: boolean;
+	readonly retryFailedPairOnce?: boolean;
+	readonly snapshotEveryFlips?: number;
+	readonly rememberViewedCards?: boolean;
+	readonly cycleTargetOnMatch?: boolean;
+	readonly samePartitionOnly?: boolean;
+	readonly swapAdjacentAfterMatch?: boolean;
+	readonly sharpenOnFlip?: boolean;
+	readonly flipSlots?: number;
+	readonly privacyAllowance?: number;
+	readonly hintEveryMatches?: number;
+	readonly topOnly?: boolean;
+	readonly adjacentStacksOnly?: boolean;
+	readonly deepestStackOnly?: boolean;
+	readonly canLiftTop?: boolean;
+	readonly canCycleTop?: boolean;
+	readonly canMoveToEmptyStack?: boolean;
+	readonly peekBelowTop?: boolean;
+	readonly chainExposedMatches?: boolean;
+	readonly revealExposedTops?: boolean;
+	readonly sinkMissedTops?: boolean;
+	readonly orderedSymbols?: boolean;
+};
+
+const RULE_DELTAS = {
+	'memory:classic': {},
+	'memory:no-preview': { previewMs: 0 },
+	'memory:trios': { matchSize: 3, enforceMoveLimit: true },
+	'memory:moving': { shuffleOnMiss: true },
+	'memory:budget': { attemptsPerCard: 2, enforceMoveLimit: true },
+	'memory:lockout': { lockLastMissedCard: true },
+	'memory:swaps': { swapTwoOnResolve: true },
+	'memory:two-backs': { oppositeCardBacks: true },
+	'memory:quads': { matchSize: 4, enforceMoveLimit: true },
+	'memory:collapse': { removeMatchedCards: true },
+	'memory:countdown': { timeLimitPerPair: 10 },
+	'memory:three-strikes': { missLives: 3 },
+	'memory:wild-card': { wildMatching: true },
+	'memory:sonar': { revealNeighborsOnMatch: true },
+	'memory:zebra': { oppositeShadesOnly: true },
+	'memory:drift': { driftFirstRowOnMiss: true },
+	'memory:decay': { seenCardTurns: 3 },
+	'memory:one-flip': { keepOneRevealOnMiss: true },
+	'memory:combo': { growMatchMultiplier: true },
+	'memory:hazard': { hazardShuffle: true },
+	'memory:superstorm': { blockedRowPeriod: 4 },
+	'memory:sentinel-heat': { lockAtHeat: 3 },
+	'memory:glyph-chain': { orderedTiers: true },
+	'memory:analysis-visor': { spectralCardBacks: true },
+	'memory:life-support': { spendFlipEnergy: true },
+	'memory:hyperdrive-warp': { swapEndpointsOnAnomaly: true },
+	'memory:gravitino-risk': { shuffleColumnOnRiskMiss: true },
+	'memory:pulse-drive': { growSpeedMultiplier: true },
+	'memory:derelict-fog': { revealNeighborCone: true },
+	'memory:atlas-terminal': { shuffleEveryFlips: 16 },
+	'memory:edge-cache': { missGhostTurns: 2 },
+	'memory:quantum-entangle': { revealTwin: true },
+	'memory:rate-limiter': { cooldownEveryMisses: 3 },
+	'memory:register-buffer': { canStoreCard: true },
+	'memory:firewall-ice': { unlockAdjacentCards: true },
+	'memory:anycast-route': { perimeterShiftEveryMisses: 3 },
+	'memory:tls-handshake': { requireBothHandshakeStages: true },
+	'memory:trace-route': { quarantineAtTrace: 100 },
+	'memory:bit-rot': { transposeAfterMisses: 3 },
+	'memory:burst-transmission': { revealAfterStreak: 2 },
+	'memory:kv-consistency': { replicateSeenCards: true },
+	'memory:durable-object': { differentRowsOnly: true },
+	'memory:vectorize-knn': { matchClusters: true },
+	'memory:fifo-queue': { queueMissedCards: true },
+	'memory:ai-tokens': { spendFlipTokens: true },
+	'memory:hyperdrive-pool': { growPoolMultiplier: true },
+	'memory:turnstile-verify': { challengeEveryMisses: 4 },
+	'memory:zero-trust': { clearanceTiers: true },
+	'memory:argo-reroute': { quadrantShiftAfterMisses: 3 },
+	'memory:r2-glacier': { freezeAfterUntouched: 4 },
+	'memory:cross-pollination': { crossBedOnly: true },
+	'memory:mycelium-network': { crossBedOnly: true, hintPartnerOnFlip: true },
+	'memory:photosynthesis': { crossBedOnly: true, movingSunbeam: true },
+	'memory:seed-dispersal': { crossBedOnly: true, swapTwoOnResolve: true },
+	'memory:seasonal-bloom': { crossBedOnly: true, dormancyAfterUntouched: 3 },
+	'memory:bee-waggle': { crossBedOnly: true, hintPartnerRowOnFlip: true },
+	'memory:carnivorous-briar': { crossBedOnly: true, unlockWithDewdrop: true },
+	'memory:chlorophyll-meter': { crossBedOnly: true, spendSap: true },
+	'memory:bioluminescent': { crossBedOnly: true, parityCardBacks: true },
+	'memory:botanical-graft': { crossBedOnly: true, growGardenMultiplier: true },
+	'memory:workflows-step': { retryFailedPairOnce: true },
+	'memory:browser-rendering': { snapshotEveryFlips: 4 },
+	'memory:ai-gateway': { rememberViewedCards: true },
+	'memory:k2-streams': { cycleTargetOnMatch: true },
+	'memory:basin-catalog': { samePartitionOnly: true },
+	'memory:edge-snippets': { swapAdjacentAfterMatch: true },
+	'memory:images-transform': { sharpenOnFlip: true },
+	'memory:waiting-room': { flipSlots: 3 },
+	'memory:privacy-pass': { privacyAllowance: 3 },
+	'memory:agents-sdk': { hintEveryMatches: 3 },
+	'memory:time-strata': { topOnly: true, previewMs: 0 },
+	'memory:strata-linked': { topOnly: true, previewMs: 0, adjacentStacksOnly: true },
+	'memory:strata-sweep': { topOnly: true, previewMs: 0, deepestStackOnly: true },
+	'memory:strata-shelf': { topOnly: true, previewMs: 0, canLiftTop: true },
+	'memory:strata-cycle': { topOnly: true, previewMs: 0, canCycleTop: true },
+	'memory:strata-empty-well': { topOnly: true, previewMs: 0, canMoveToEmptyStack: true },
+	'memory:strata-glimpse': { topOnly: true, previewMs: 0, peekBelowTop: true },
+	'memory:strata-chain': { topOnly: true, previewMs: 0, chainExposedMatches: true },
+	'memory:strata-echo': { topOnly: true, previewMs: 0, revealExposedTops: true },
+	'memory:strata-slip': { topOnly: true, previewMs: 0, canCycleTop: true, sinkMissedTops: true },
+	'memory:strata-order': { topOnly: true, previewMs: 0, orderedSymbols: true }
+} satisfies Record<MemoryVariant, Partial<MemoryRules>>;
+
+const MEMORY_RULES = Object.fromEntries(
+	MEMORY_VARIANTS.map((id) => [
+		id,
+		Object.freeze({ matchSize: 2, previewMs: 3000, attemptsPerCard: 6, ...RULE_DELTAS[id] })
+	])
+) as Record<MemoryVariant, MemoryRules>;
+
+/** Resolve an internal issuance identity once; the returned settings contain no identity. */
+export function memoryRules(variant?: string): MemoryRules {
+	return MEMORY_RULES[parseMemoryVariant(variant)];
+}
+
+/** Legacy headless fixtures may omit rules; newly issued rounds always supply them. */
+export function memoryRoundRules({
+	rules,
+	variant
+}: {
+	rules?: MemoryRules;
+	variant?: string;
+}): MemoryRules {
+	return rules ?? memoryRules(variant);
+}
+
+export function memoryVariant({ variant }: { variant?: string }): MemoryVariant {
+	return parseMemoryVariant(variant);
 }
 
 export function parseMemoryVariant(variant?: string): MemoryVariant {
@@ -141,34 +331,29 @@ export function memoryVariantName(variant?: string): `variant.${MemoryVariant}` 
 }
 
 export function isTimeStrata(variant?: string): boolean {
-	return (
-		variant === 'memory:time-strata' ||
-		MEMORY_STRATA_VARIANTS.includes(variant as (typeof MEMORY_STRATA_VARIANTS)[number])
+	return Boolean(
+		variant &&
+		Object.hasOwn(MEMORY_RULES, variant) &&
+		MEMORY_RULES[variant as MemoryVariant].topOnly
 	);
 }
 
-export function cardsPerMatch(round: { variant?: string }): number {
-	const variant = memoryVariant(round);
-	return variant === 'memory:quads' ? 4 : variant === 'memory:trios' ? 3 : 2;
+export function cardsPerMatch(round: { rules?: MemoryRules; variant?: string }): number {
+	return memoryRoundRules(round).matchSize;
 }
 
 /** Replay payload ceiling; Time Strata counts its explicit controls too. */
 export function memoryMoveLimit(round: MemoryRound): number {
-	const variant = memoryVariant(round);
-	return isTimeStrata(variant)
+	const rules = memoryRoundRules(round);
+	return rules.topOnly
 		? MEMORY_TIME_STRATA_MAX_ACTIONS
-		: round.pairs * cardsPerMatch(round) * (variant === 'memory:budget' ? 2 : 6);
+		: round.pairs * rules.matchSize * rules.attemptsPerCard;
 }
 
 /** A final-attempt win counts; Time Strata reserves room to resolve every accepted attempt. */
 export function memoryCapReached(round: MemoryRound): boolean {
-	if (memoryVariant(round) === 'memory:time-strata') {
-		return (
-			round.status !== 'won' &&
-			(round.actions ?? 0) + 3 - round.revealed.length > MEMORY_TIME_STRATA_MAX_ACTIONS
-		);
-	}
-	if (isTimeStrata(memoryVariant(round))) {
+	const rules = memoryRoundRules(round);
+	if (rules.topOnly) {
 		return (
 			round.status !== 'won' &&
 			(round.actions ?? 0) + strataResolutionRoom(round) > MEMORY_TIME_STRATA_MAX_ACTIONS
@@ -176,7 +361,7 @@ export function memoryCapReached(round: MemoryRound): boolean {
 	}
 	const size = cardsPerMatch(round);
 	return (
-		['memory:trios', 'memory:quads', 'memory:budget'].includes(memoryVariant(round)) &&
+		Boolean(rules.enforceMoveLimit) &&
 		round.status !== 'won' &&
 		round.moves * size + (round.revealed.length < size ? round.revealed.length : 0) >=
 			memoryMoveLimit(round)
@@ -188,6 +373,7 @@ export type MemoryStatus = 'playing' | 'won' | 'lost';
 export interface MemoryRound {
 	seed: string;
 	variant?: MemoryVariant;
+	rules?: MemoryRules;
 	/** Time Strata only: four bottom-to-top lists of stable card indices. */
 	stacks?: number[][];
 	/** Time Strata only: accepted flips and explicit controls in the replay log. */
@@ -315,35 +501,28 @@ export interface FlipResult {
 }
 
 export function isBotanical(variant?: string): boolean {
-	return (
-		variant === 'memory:cross-pollination' ||
-		variant === 'memory:mycelium-network' ||
-		variant === 'memory:photosynthesis' ||
-		variant === 'memory:seed-dispersal' ||
-		variant === 'memory:seasonal-bloom' ||
-		variant === 'memory:bee-waggle' ||
-		variant === 'memory:carnivorous-briar' ||
-		variant === 'memory:chlorophyll-meter' ||
-		variant === 'memory:bioluminescent' ||
-		variant === 'memory:botanical-graft'
+	return Boolean(
+		variant &&
+		Object.hasOwn(MEMORY_RULES, variant) &&
+		MEMORY_RULES[variant as MemoryVariant].crossBedOnly
 	);
 }
 
 export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 	const selectedVariant = parseMemoryVariant(variant);
+	const rules = memoryRules(selectedVariant);
 	const rng = createRng(seed);
 	let rngDraws = 0;
 	if (
-		selectedVariant === 'memory:moving' ||
-		selectedVariant === 'memory:swaps' ||
-		selectedVariant === 'memory:hazard' ||
-		selectedVariant === 'memory:hyperdrive-warp' ||
-		selectedVariant === 'memory:gravitino-risk' ||
-		selectedVariant === 'memory:atlas-terminal' ||
-		selectedVariant === 'memory:anycast-route' ||
-		selectedVariant === 'memory:bit-rot' ||
-		selectedVariant === 'memory:argo-reroute' ||
-		selectedVariant === 'memory:seed-dispersal'
+		rules.shuffleOnMiss ||
+		rules.swapTwoOnResolve ||
+		rules.hazardShuffle ||
+		rules.swapEndpointsOnAnomaly ||
+		rules.shuffleColumnOnRiskMiss ||
+		(rules.shuffleEveryFlips ?? 0) > 0 ||
+		(rules.perimeterShiftEveryMisses ?? 0) > 0 ||
+		(rules.transposeAfterMisses ?? 0) > 0 ||
+		(rules.quadrantShiftAfterMisses ?? 0) > 0
 	) {
 		const nextU64 = rng.nextU64;
 		rng.nextU64 = () => {
@@ -351,11 +530,11 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 			return nextU64();
 		};
 	}
-	const counts = selectedVariant === 'memory:quads' ? QUAD_COUNTS : PAIR_COUNTS;
+	const counts = rules.matchSize === 4 ? QUAD_COUNTS : PAIR_COUNTS;
 	const pairs = counts[rng.nextInt(counts.length)] ?? 6;
 	const selected = shuffle(rng, SYMBOLS).slice(0, pairs);
 	const deck: MemoryCard[] = [];
-	const size = cardsPerMatch({ variant: selectedVariant });
+	const size = rules.matchSize;
 
 	for (const symbol of selected)
 		for (let copy = 0; copy < size; copy += 1)
@@ -363,48 +542,46 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 				id: `${symbol.id}:${copy}`,
 				symbol: symbol.id,
 				color: symbol.color,
-				...(selectedVariant === 'memory:two-backs' ? { back: copy as 0 | 1 } : {}),
-				...(selectedVariant === 'memory:zebra'
+				...(rules.oppositeCardBacks ? { back: copy as 0 | 1 } : {}),
+				...(rules.oppositeShadesOnly
 					? { zebra: (copy === 0 ? 'light' : 'dark') as 'light' | 'dark' }
 					: {})
 			});
 
-	if (isTimeStrata(selectedVariant)) {
+	if (rules.topOnly) {
 		const stacks: number[][] = [[], [], [], []];
-		const schedule =
-			selectedVariant === 'memory:strata-linked'
+		const schedule = rules.adjacentStacksOnly
+			? [
+					[0, 1],
+					[2, 3],
+					[1, 2],
+					[3, 0]
+				]
+			: rules.deepestStackOnly || rules.canMoveToEmptyStack || rules.chainExposedMatches
 				? [
 						[0, 1],
-						[2, 3],
-						[1, 2],
-						[3, 0]
+						[2, 3]
 					]
-				: ['memory:strata-sweep', 'memory:strata-empty-well', 'memory:strata-chain'].includes(
-							selectedVariant
-					  )
-					? [
-							[0, 1],
-							[2, 3]
-						]
-					: [
-							[0, 1],
-							[2, 3],
-							[0, 2],
-							[1, 3]
-						];
+				: [
+						[0, 1],
+						[2, 3],
+						[0, 2],
+						[1, 3]
+					];
 		// Reverse insertion always exposes a pair; removing any exposed pair preserves that order.
 		for (let pair = 0; pair < pairs; pair += 1) {
 			const [first, second] = schedule[pair % schedule.length];
 			stacks[first].push(pair * 2);
 			stacks[second].push(pair * 2 + 1);
 		}
-		if (selectedVariant === 'memory:strata-cycle' || selectedVariant === 'memory:strata-slip') {
+		if (rules.canCycleTop) {
 			for (let stack = 0; stack < stacks.length; stack += 1)
 				stacks[stack] = shuffle(rng, stacks[stack]);
 		}
 		return {
 			seed,
 			variant: selectedVariant,
+			rules,
 			stacks,
 			actions: 0,
 			pairs,
@@ -414,23 +591,23 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 			mismatches: 0,
 			moves: 0,
 			status: 'playing',
-			...(selectedVariant === 'memory:strata-shelf' ? { shelf: null } : {}),
-			...(selectedVariant === 'memory:strata-echo' ? { echo: [] } : {}),
-			...(selectedVariant === 'memory:strata-chain' ? { chain: false } : {}),
-			...(selectedVariant === 'memory:strata-order'
+			...(rules.canLiftTop ? { shelf: null } : {}),
+			...(rules.revealExposedTops ? { echo: [] } : {}),
+			...(rules.chainExposedMatches ? { chain: false } : {}),
+			...(rules.orderedSymbols
 				? { excavationOrder: selected.map((symbol) => symbol.id).reverse(), orderCursor: 0 }
 				: {})
 		};
 	}
 
-	if (selectedVariant === 'memory:wild-card') {
+	if (rules.wildMatching) {
 		const lastSymbol = selected[selected.length - 1];
 		const wildCard = deck.find((c) => c.id === `${lastSymbol.id}:1`);
 		if (wildCard) {
 			wildCard.isWild = true;
 			wildCard.color = '#f59e0b';
 		}
-	} else if (selectedVariant === 'memory:hazard') {
+	} else if (rules.hazardShuffle) {
 		const lastSymbol = selected[selected.length - 1];
 		for (const card of deck) {
 			if (card.symbol === lastSymbol.id) {
@@ -438,7 +615,7 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 				card.color = '#ef4444';
 			}
 		}
-	} else if (selectedVariant === 'memory:analysis-visor') {
+	} else if (rules.spectralCardBacks) {
 		const spectrals: ('flora' | 'fauna' | 'mineral' | 'tech')[] = [
 			'flora',
 			'fauna',
@@ -451,39 +628,39 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 				if (c.symbol === selected[sIdx].id) c.spectral = spec;
 			}
 		}
-	} else if (selectedVariant === 'memory:glyph-chain') {
+	} else if (rules.orderedTiers) {
 		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
 			const tier = sIdx + 1;
 			for (const c of deck) {
 				if (c.symbol === selected[sIdx].id) c.tier = tier;
 			}
 		}
-	} else if (selectedVariant === 'memory:hyperdrive-warp') {
+	} else if (rules.swapEndpointsOnAnomaly) {
 		const anomalySymbol = selected[selected.length - 1];
 		for (const c of deck) {
 			if (c.symbol === anomalySymbol.id) c.isAnomaly = true;
 		}
-	} else if (selectedVariant === 'memory:gravitino-risk') {
+	} else if (rules.shuffleColumnOnRiskMiss) {
 		const gravSymbol = selected[0];
 		for (const c of deck) {
 			if (c.symbol === gravSymbol.id) c.isGravitino = true;
 		}
-	} else if (selectedVariant === 'memory:quantum-entangle') {
+	} else if (rules.revealTwin) {
 		const qSymbol = selected[0];
 		for (const c of deck) {
 			if (c.symbol === qSymbol.id) c.isQuantum = true;
 		}
-	} else if (selectedVariant === 'memory:tls-handshake') {
+	} else if (rules.requireBothHandshakeStages) {
 		for (const symbol of selected) {
 			const cards = deck.filter((c) => c.symbol === symbol.id);
 			if (cards[0]) cards[0].tlsStage = 'syn';
 			if (cards[1]) cards[1].tlsStage = 'ack';
 		}
-	} else if (selectedVariant === 'memory:firewall-ice') {
+	} else if (rules.unlockAdjacentCards) {
 		const mid = Math.floor(deck.length / 2);
 		if (deck[mid - 1]) deck[mid - 1].isFirewall = true;
 		if (deck[mid]) deck[mid].isFirewall = true;
-	} else if (selectedVariant === 'memory:vectorize-knn') {
+	} else if (rules.matchClusters) {
 		const clusters: ('ai' | 'db' | 'sec' | 'net')[] = ['ai', 'db', 'sec', 'net'];
 		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
 			const cluster = clusters[sIdx % clusters.length];
@@ -491,44 +668,44 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 				if (c.symbol === selected[sIdx].id) c.vectorCluster = cluster;
 			}
 		}
-	} else if (selectedVariant === 'memory:zero-trust') {
+	} else if (rules.clearanceTiers) {
 		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
 			const tier = (sIdx < 2 ? 1 : sIdx < 5 ? 2 : 3) as 1 | 2 | 3;
 			for (const c of deck) {
 				if (c.symbol === selected[sIdx].id) c.clearanceTier = tier;
 			}
 		}
-	} else if (isBotanical(selectedVariant)) {
+	} else if (rules.crossBedOnly) {
 		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
 			const cards = deck.filter((c) => c.symbol === selected[sIdx].id);
 			if (cards[0]) cards[0].zone = 'meadow';
 			if (cards[1]) cards[1].zone = 'grove';
-			if (selectedVariant === 'memory:bioluminescent') {
+			if (rules.parityCardBacks) {
 				if (cards[0]) cards[0].sporeSymmetry = sIdx % 2 === 0 ? 'even' : 'odd';
 				if (cards[1]) cards[1].sporeSymmetry = sIdx % 2 === 0 ? 'even' : 'odd';
 			}
 		}
-		if (selectedVariant === 'memory:carnivorous-briar') {
+		if (rules.unlockWithDewdrop) {
 			const groveCards = deck.filter((c) => c.zone === 'grove');
 			if (groveCards[0]) groveCards[0].isBriarLocked = true;
 			if (groveCards[1]) groveCards[1].isBriarLocked = true;
 			const meadowCards = deck.filter((c) => c.zone === 'meadow');
 			if (meadowCards[0]) meadowCards[0].isDewdrop = true;
 		}
-	} else if (selectedVariant === 'memory:basin-catalog') {
+	} else if (rules.samePartitionOnly) {
 		for (let sIdx = 0; sIdx < selected.length; sIdx++) {
 			const part = (sIdx % 3) as 0 | 1 | 2;
 			for (const c of deck) {
 				if (c.symbol === selected[sIdx].id) c.partition = part;
 			}
 		}
-	} else if (selectedVariant === 'memory:images-transform') {
+	} else if (rules.sharpenOnFlip) {
 		for (const c of deck) {
 			c.blurLevel = 5;
 		}
 	}
 
-	const roundCards = isBotanical(selectedVariant)
+	const roundCards = rules.crossBedOnly
 		? [
 				...shuffle(
 					rng,
@@ -540,7 +717,7 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 				)
 			]
 		: shuffle(rng, deck);
-	if (selectedVariant === 'memory:durable-object') {
+	if (rules.differentRowsOnly) {
 		const cols = 4;
 		let changed = true;
 		let attempts = 0;
@@ -586,75 +763,83 @@ export function createMemoryRound(seed: string, variant?: string): MemoryRound {
 		moves: 0,
 		status: 'playing'
 	};
-	if (selectedVariant !== 'memory:classic') round.variant = selectedVariant;
+	if (selectedVariant !== 'memory:classic') {
+		Object.assign(round, { variant: selectedVariant, rules });
+	} else {
+		// Preserve classic byte/key compatibility; daily serialization explicitly copies rules.
+		Object.defineProperty(round, 'rules', {
+			value: rules,
+			enumerable: false,
+			writable: true,
+			configurable: true
+		});
+	}
 	if (
-		selectedVariant === 'memory:moving' ||
-		selectedVariant === 'memory:swaps' ||
-		selectedVariant === 'memory:hazard' ||
-		selectedVariant === 'memory:hyperdrive-warp' ||
-		selectedVariant === 'memory:gravitino-risk' ||
-		selectedVariant === 'memory:atlas-terminal' ||
-		selectedVariant === 'memory:anycast-route' ||
-		selectedVariant === 'memory:bit-rot' ||
-		selectedVariant === 'memory:argo-reroute' ||
-		selectedVariant === 'memory:seed-dispersal'
+		rules.shuffleOnMiss ||
+		rules.swapTwoOnResolve ||
+		rules.hazardShuffle ||
+		rules.swapEndpointsOnAnomaly ||
+		rules.shuffleColumnOnRiskMiss ||
+		(rules.shuffleEveryFlips ?? 0) > 0 ||
+		(rules.perimeterShiftEveryMisses ?? 0) > 0 ||
+		(rules.transposeAfterMisses ?? 0) > 0 ||
+		(rules.quadrantShiftAfterMisses ?? 0) > 0
 	)
 		round.rngDraws = rngDraws;
-	if (selectedVariant === 'memory:chlorophyll-meter') round.sap = 100;
-	if (selectedVariant === 'memory:botanical-graft') round.graftMultiplier = 1;
-	if (selectedVariant === 'memory:photosynthesis') round.sunbeamRow = 0;
-	if (selectedVariant === 'memory:carnivorous-briar') round.briarsCleared = false;
-	if (selectedVariant === 'memory:lockout') round.lock = null;
-	if (selectedVariant === 'memory:swaps') round.marked = [];
-	if (selectedVariant === 'memory:collapse') round.cleared = 0;
-	if (selectedVariant === 'memory:countdown')
-		round.timeLimit = pairs === 10 ? 100 : pairs === 8 ? 80 : 60;
-	if (selectedVariant === 'memory:three-strikes') round.lives = 3;
-	if (selectedVariant === 'memory:combo') round.combo = 1;
-	if (selectedVariant === 'memory:decay') round.decay = {};
-	if (selectedVariant === 'memory:sonar') round.sonar = [];
-	if (selectedVariant === 'memory:superstorm') round.stormFrostedRow = -1;
-	if (selectedVariant === 'memory:sentinel-heat') round.sentinelHeat = 0;
-	if (selectedVariant === 'memory:glyph-chain') round.glyphTier = 1;
-	if (selectedVariant === 'memory:life-support') round.lifeSupport = 100;
-	if (selectedVariant === 'memory:pulse-drive') round.pulseStreak = 1;
-	if (selectedVariant === 'memory:derelict-fog') round.illuminated = [];
-	if (selectedVariant === 'memory:edge-cache') round.edgeCache = {};
-	if (selectedVariant === 'memory:rate-limiter') {
+	if (rules.spendSap) round.sap = 100;
+	if (rules.growGardenMultiplier) round.graftMultiplier = 1;
+	if (rules.movingSunbeam) round.sunbeamRow = 0;
+	if (rules.unlockWithDewdrop) round.briarsCleared = false;
+	if (rules.lockLastMissedCard) round.lock = null;
+	if (rules.swapTwoOnResolve && !rules.crossBedOnly) round.marked = [];
+	if (rules.removeMatchedCards) round.cleared = 0;
+	if ((rules.timeLimitPerPair ?? 0) > 0) round.timeLimit = pairs * rules.timeLimitPerPair!;
+	if ((rules.missLives ?? 0) > 0) round.lives = rules.missLives;
+	if (rules.growMatchMultiplier) round.combo = 1;
+	if ((rules.seenCardTurns ?? 0) > 0) round.decay = {};
+	if (rules.revealNeighborsOnMatch) round.sonar = [];
+	if ((rules.blockedRowPeriod ?? 0) > 0) round.stormFrostedRow = -1;
+	if ((rules.lockAtHeat ?? 0) > 0) round.sentinelHeat = 0;
+	if (rules.orderedTiers) round.glyphTier = 1;
+	if (rules.spendFlipEnergy) round.lifeSupport = 100;
+	if (rules.growSpeedMultiplier) round.pulseStreak = 1;
+	if (rules.revealNeighborCone) round.illuminated = [];
+	if ((rules.missGhostTurns ?? 0) > 0) round.edgeCache = {};
+	if ((rules.cooldownEveryMisses ?? 0) > 0) {
 		round.rateLimited = false;
 		round.rateLimitPenalty = 0;
 	}
-	if (selectedVariant === 'memory:register-buffer') round.bufferCard = null;
-	if (selectedVariant === 'memory:trace-route') {
+	if (rules.canStoreCard) round.bufferCard = null;
+	if ((rules.quarantineAtTrace ?? 0) > 0) {
 		round.traceMeter = 0;
 		round.quarantine = [];
 	}
-	if (selectedVariant === 'memory:bit-rot') round.bitRot = {};
-	if (selectedVariant === 'memory:burst-transmission') {
+	if ((rules.transposeAfterMisses ?? 0) > 0) round.bitRot = {};
+	if ((rules.revealAfterStreak ?? 0) > 0) {
 		round.burstStreak = 0;
 		round.burstPing = [];
 	}
-	if (selectedVariant === 'memory:kv-consistency') round.kvReplicas = {};
-	if (selectedVariant === 'memory:durable-object') round.lockedActorRow = null;
-	if (selectedVariant === 'memory:fifo-queue') round.dlqQueue = [];
-	if (selectedVariant === 'memory:ai-tokens') round.aiTokens = 120;
-	if (selectedVariant === 'memory:hyperdrive-pool') round.hyperdriveMultiplier = 2;
-	if (selectedVariant === 'memory:turnstile-verify') round.turnstileActive = false;
-	if (selectedVariant === 'memory:zero-trust') round.clearanceTier = 1;
-	if (selectedVariant === 'memory:argo-reroute') round.quadrantHits = { 0: 0, 1: 0, 2: 0, 3: 0 };
-	if (selectedVariant === 'memory:r2-glacier') round.glacierUntouched = {};
-	if (selectedVariant === 'memory:workflows-step') {
+	if (rules.replicateSeenCards) round.kvReplicas = {};
+	if (rules.differentRowsOnly) round.lockedActorRow = null;
+	if (rules.queueMissedCards) round.dlqQueue = [];
+	if (rules.spendFlipTokens) round.aiTokens = 120;
+	if (rules.growPoolMultiplier) round.hyperdriveMultiplier = 2;
+	if ((rules.challengeEveryMisses ?? 0) > 0) round.turnstileActive = false;
+	if (rules.clearanceTiers) round.clearanceTier = 1;
+	if ((rules.quadrantShiftAfterMisses ?? 0) > 0) round.quadrantHits = { 0: 0, 1: 0, 2: 0, 3: 0 };
+	if ((rules.freezeAfterUntouched ?? 0) > 0) round.glacierUntouched = {};
+	if (rules.retryFailedPairOnce) {
 		round.workflowStep = 1;
 		round.workflowRetryUsed = false;
 	}
-	if (selectedVariant === 'memory:browser-rendering') round.renderScanCountdown = 4;
-	if (selectedVariant === 'memory:ai-gateway') round.cacheKnown = [];
-	if (selectedVariant === 'memory:k2-streams') round.streamTarget = selected[0]?.id;
-	if (selectedVariant === 'memory:basin-catalog') round.partitionFilter = null;
-	if (selectedVariant === 'memory:edge-snippets') round.activeHeader = null;
-	if (selectedVariant === 'memory:waiting-room') round.waitingTokens = 3;
-	if (selectedVariant === 'memory:privacy-pass') round.privacyTokens = 3;
-	if (selectedVariant === 'memory:agents-sdk') round.agentCycles = 0;
+	if ((rules.snapshotEveryFlips ?? 0) > 0) round.renderScanCountdown = rules.snapshotEveryFlips;
+	if (rules.rememberViewedCards) round.cacheKnown = [];
+	if (rules.cycleTargetOnMatch) round.streamTarget = selected[0]?.id;
+	if (rules.samePartitionOnly) round.partitionFilter = null;
+	if (rules.swapAdjacentAfterMatch) round.activeHeader = null;
+	if ((rules.flipSlots ?? 0) > 0) round.waitingTokens = rules.flipSlots;
+	if ((rules.privacyAllowance ?? 0) > 0) round.privacyTokens = rules.privacyAllowance;
+	if ((rules.hintEveryMatches ?? 0) > 0) round.agentCycles = 0;
 	return round;
 }
 
@@ -723,7 +908,7 @@ function driftRow(round: MemoryRound, cardIndex: number): MemoryRound {
 function updateDecay(round: MemoryRound, revealedIndices: number[]): MemoryRound {
 	const decay = { ...(round.decay ?? {}) };
 	revealedIndices.forEach((pos) => {
-		decay[pos] = 3;
+		decay[pos] = memoryRoundRules(round).seenCardTurns ?? 3;
 	});
 	for (const key of Object.keys(decay)) {
 		const pos = Number(key);
@@ -819,16 +1004,18 @@ export function timeStrataTops(round: MemoryRound): number[] {
 
 /** Glimpse and Echo disclose cards without adding playable targets. */
 export function timeStrataClues(round: MemoryRound): number[] {
+	const rules = memoryRoundRules(round);
 	if (round.echo?.length) return round.echo;
-	if (memoryVariant(round) !== 'memory:strata-glimpse' || round.revealed.length !== 1) return [];
+	if (!rules.peekBelowTop || round.revealed.length !== 1) return [];
 	const stack = round.stacks?.find((well) => well.at(-1) === round.revealed[0]);
 	const clue = stack?.at(-2);
 	return clue === undefined ? [] : [clue];
 }
 
 export function timeStrataCanSelect(round: MemoryRound, index: number): boolean {
+	const rules = memoryRoundRules(round);
 	if (
-		!isTimeStrata(memoryVariant(round)) ||
+		!rules.topOnly ||
 		round.status !== 'playing' ||
 		round.echo?.length ||
 		round.revealed.length >= 2 ||
@@ -842,11 +1029,11 @@ export function timeStrataCanSelect(round: MemoryRound, index: number): boolean 
 	if (!tops.includes(index) && round.shelf?.index !== index) return false;
 	const stack = tops.indexOf(index);
 	if (
-		memoryVariant(round) === 'memory:strata-sweep' &&
+		rules.deepestStackOnly &&
 		round.stacks![stack].length !== Math.max(...round.stacks!.map((well) => well.length))
 	)
 		return false;
-	if (memoryVariant(round) === 'memory:strata-linked' && round.revealed.length === 1) {
+	if (rules.adjacentStacksOnly && round.revealed.length === 1) {
 		const first = tops.indexOf(round.revealed[0]);
 		if ((stack - first + 4) % 4 !== 1 && (first - stack + 4) % 4 !== 1) return false;
 	}
@@ -856,11 +1043,11 @@ export function timeStrataCanSelect(round: MemoryRound, index: number): boolean 
 export function timeStrataOutcome(
 	round: MemoryRound
 ): 'match' | 'mismatch' | 'order-blocked' | null {
-	if (!isTimeStrata(memoryVariant(round)) || round.revealed.length !== 2) return null;
+	const rules = memoryRoundRules(round);
+	if (!rules.topOnly || round.revealed.length !== 2) return null;
 	const symbol = round.cards[round.revealed[0]].symbol;
 	if (symbol !== round.cards[round.revealed[1]].symbol) return 'mismatch';
-	return memoryVariant(round) === 'memory:strata-order' &&
-		symbol !== round.excavationOrder?.[round.orderCursor ?? 0]
+	return rules.orderedSymbols && symbol !== round.excavationOrder?.[round.orderCursor ?? 0]
 		? 'order-blocked'
 		: 'match';
 }
@@ -868,12 +1055,12 @@ export function timeStrataOutcome(
 /** Enough wire slots for every confirmation already promised by a selection. */
 function strataResolutionRoom(round: MemoryRound): number {
 	if (round.echo?.length) return 1;
-	const variant = memoryVariant(round);
+	const rules = memoryRoundRules(round);
 	if (round.revealed.length === 2) {
 		if (timeStrataOutcome(round) !== 'match') return 1;
 		const wells = round.stacks!.filter((well) => round.revealed.includes(well.at(-1) ?? -1));
-		if (variant === 'memory:strata-echo') return wells.some((well) => well.length > 1) ? 2 : 1;
-		if (variant === 'memory:strata-chain') {
+		if (rules.revealExposedTops) return wells.some((well) => well.length > 1) ? 2 : 1;
+		if (rules.chainExposedMatches) {
 			let confirmations = 1;
 			while (
 				wells.length === 2 &&
@@ -887,23 +1074,19 @@ function strataResolutionRoom(round: MemoryRound): number {
 		}
 		return 1;
 	}
-	const extra =
-		variant === 'memory:strata-chain'
-			? Math.max(...round.stacks!.map((well) => well.length)) - 1
-			: variant === 'memory:strata-echo' && round.matched.length < round.cards.length - 2
-				? 1
-				: 0;
+	const extra = rules.chainExposedMatches
+		? Math.max(...round.stacks!.map((well) => well.length)) - 1
+		: rules.revealExposedTops && round.matched.length < round.cards.length - 2
+			? 1
+			: 0;
 	return 3 - round.revealed.length + extra;
 }
 
 /** Control actions stay numeric to preserve the shared Move wire contract. */
 export function applyMemoryMove(round: MemoryRound, move: MemoryMove): FlipResult {
+	const rules = memoryRoundRules(round);
 	if ('index' in move) return flipCard(round, move.index);
-	if (
-		!isTimeStrata(memoryVariant(round)) ||
-		round.status !== 'playing' ||
-		memoryCapReached(round)
-	) {
+	if (!rules.topOnly || round.status !== 'playing' || memoryCapReached(round)) {
 		return { round, effect: 'ignored' };
 	}
 	const actions = (round.actions ?? 0) + 1;
@@ -915,14 +1098,11 @@ export function applyMemoryMove(round: MemoryRound, move: MemoryMove): FlipResul
 		const outcome = timeStrataOutcome(round);
 		if (outcome === null) return { round, effect: 'ignored' };
 		if (outcome !== 'match') {
-			const stacks =
-				memoryVariant(round) === 'memory:strata-slip'
-					? round.stacks!.map((well) =>
-							round.revealed.includes(well.at(-1) ?? -1)
-								? [well.at(-1)!, ...well.slice(0, -1)]
-								: well
-						)
-					: round.stacks;
+			const stacks = rules.sinkMissedTops
+				? round.stacks!.map((well) =>
+						round.revealed.includes(well.at(-1) ?? -1) ? [well.at(-1)!, ...well.slice(0, -1)] : well
+					)
+				: round.stacks;
 			return { round: { ...round, revealed: [], stacks, actions }, effect: 'continue' };
 		}
 		const affected = round.stacks!.flatMap((well, stack) =>
@@ -949,26 +1129,19 @@ export function applyMemoryMove(round: MemoryRound, move: MemoryMove): FlipResul
 		});
 		if (
 			!won &&
-			memoryVariant(round) === 'memory:strata-chain' &&
+			rules.chainExposedMatches &&
 			exposed.length === 2 &&
 			next.cards[exposed[0]].symbol === next.cards[exposed[1]].symbol
 		) {
 			next = { ...next, revealed: exposed, chain: true, moves: next.moves + 1 };
 		}
-		if (!won && memoryVariant(round) === 'memory:strata-echo' && exposed.length)
-			next = { ...next, echo: exposed };
+		if (!won && rules.revealExposedTops && exposed.length) next = { ...next, echo: exposed };
 		return { round: next, effect: won ? 'win' : 'match' };
 	}
 	if (round.revealed.length || round.echo?.length) return { round, effect: 'ignored' };
-	const variant = memoryVariant(round);
 	const validStack = (stack: number) => Number.isInteger(stack) && stack >= 0 && stack < 4;
 	let next: MemoryRound | null = null;
-	if (
-		'lift' in move &&
-		variant === 'memory:strata-shelf' &&
-		validStack(move.lift) &&
-		!round.shelf
-	) {
+	if ('lift' in move && rules.canLiftTop && validStack(move.lift) && !round.shelf) {
 		const index = round.stacks![move.lift].at(-1);
 		if (index !== undefined)
 			next = {
@@ -977,12 +1150,7 @@ export function applyMemoryMove(round: MemoryRound, move: MemoryMove): FlipResul
 				shelf: { index, stack: move.lift },
 				stacks: round.stacks!.map((well, stack) => (stack === move.lift ? well.slice(0, -1) : well))
 			};
-	} else if (
-		'return' in move &&
-		move.return === 1 &&
-		variant === 'memory:strata-shelf' &&
-		round.shelf
-	) {
+	} else if ('return' in move && move.return === 1 && rules.canLiftTop && round.shelf) {
 		next = {
 			...round,
 			actions,
@@ -993,7 +1161,7 @@ export function applyMemoryMove(round: MemoryRound, move: MemoryMove): FlipResul
 		};
 	} else if (
 		'cycle' in move &&
-		['memory:strata-cycle', 'memory:strata-slip'].includes(variant) &&
+		rules.canCycleTop &&
 		validStack(move.cycle) &&
 		round.stacks![move.cycle].length
 	) {
@@ -1006,7 +1174,7 @@ export function applyMemoryMove(round: MemoryRound, move: MemoryMove): FlipResul
 		};
 	} else if (
 		'from' in move &&
-		variant === 'memory:strata-empty-well' &&
+		rules.canMoveToEmptyStack &&
 		validStack(move.from) &&
 		validStack(move.to) &&
 		move.from !== move.to &&
@@ -1034,8 +1202,8 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		return { round, effect: 'ignored' };
 	}
 
-	const variant = memoryVariant(round);
-	if (isTimeStrata(variant)) {
+	const rules = memoryRoundRules(round);
+	if (rules.topOnly) {
 		if (!timeStrataCanSelect(round, index)) return { round, effect: 'ignored' };
 		const revealed = [...round.revealed, index];
 		if (revealed.length === 1)
@@ -1053,9 +1221,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		};
 	}
 	const isBufferStash =
-		variant === 'memory:register-buffer' &&
-		round.revealed.length === 1 &&
-		round.revealed[0] === index;
+		rules.canStoreCard && round.revealed.length === 1 && round.revealed[0] === index;
 
 	if (
 		round.matched.includes(index) ||
@@ -1068,29 +1234,25 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	const cols = 4;
 	const row = Math.floor(index / cols);
 
-	if (variant === 'memory:superstorm' && row === round.stormFrostedRow) {
+	if ((rules.blockedRowPeriod ?? 0) > 0 && row === round.stormFrostedRow) {
 		return { round, effect: 'ignored' };
 	}
-	if (variant === 'memory:firewall-ice' && round.cards[index]?.isFirewall) {
+	if (rules.unlockAdjacentCards && round.cards[index]?.isFirewall) {
 		return { round, effect: 'ignored' };
 	}
-	if (variant === 'memory:trace-route' && round.quarantine?.includes(index)) {
+	if ((rules.quarantineAtTrace ?? 0) > 0 && round.quarantine?.includes(index)) {
 		return { round, effect: 'ignored' };
 	}
 	if (
-		variant === 'memory:zero-trust' &&
+		rules.clearanceTiers &&
 		(round.cards[index]?.clearanceTier ?? 1) > (round.clearanceTier ?? 1)
 	) {
 		return { round, effect: 'ignored' };
 	}
-	if (
-		variant === 'memory:carnivorous-briar' &&
-		round.cards[index]?.isBriarLocked &&
-		!round.briarsCleared
-	) {
+	if (rules.unlockWithDewdrop && round.cards[index]?.isBriarLocked && !round.briarsCleared) {
 		return { round, effect: 'ignored' };
 	}
-	if (isBotanical(variant) && round.revealed.length === 1) {
+	if (rules.crossBedOnly && round.revealed.length === 1) {
 		const firstIdx = round.revealed[0];
 		const firstInMeadow = firstIdx < round.pairs;
 		const secondInMeadow = index < round.pairs;
@@ -1099,22 +1261,18 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		}
 	}
 	if (
-		variant === 'memory:durable-object' &&
+		rules.differentRowsOnly &&
 		round.lockedActorRow !== null &&
 		round.lockedActorRow !== undefined &&
 		row === round.lockedActorRow
 	) {
 		return { round, effect: 'ignored' };
 	}
-	if (
-		variant === 'memory:waiting-room' &&
-		round.waitingTokens !== undefined &&
-		round.waitingTokens <= 0
-	) {
+	if ((rules.flipSlots ?? 0) > 0 && round.waitingTokens !== undefined && round.waitingTokens <= 0) {
 		return { round, effect: 'ignored' };
 	}
 	if (
-		variant === 'memory:basin-catalog' &&
+		rules.samePartitionOnly &&
 		round.revealed.length === 1 &&
 		round.partitionFilter !== null &&
 		round.partitionFilter !== undefined &&
@@ -1131,35 +1289,35 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	if (card.isWilted) {
 		card.isWilted = false;
 	}
-	if (variant === 'memory:images-transform') {
+	if (rules.sharpenOnFlip) {
 		card.blurLevel = 0;
 	}
 
 	let waitingTokens = round.waitingTokens;
-	if (variant === 'memory:waiting-room' && waitingTokens !== undefined) {
+	if ((rules.flipSlots ?? 0) > 0 && waitingTokens !== undefined) {
 		waitingTokens = Math.max(0, waitingTokens - 1);
 	}
 	let renderScanCountdown = round.renderScanCountdown;
 	let snapshotQuad = round.snapshotQuad;
-	if (variant === 'memory:browser-rendering') {
-		renderScanCountdown = (renderScanCountdown ?? 4) - 1;
+	if ((rules.snapshotEveryFlips ?? 0) > 0) {
+		renderScanCountdown = (renderScanCountdown ?? rules.snapshotEveryFlips!) - 1;
 		if (renderScanCountdown <= 0) {
-			renderScanCountdown = 4;
+			renderScanCountdown = rules.snapshotEveryFlips!;
 			snapshotQuad = [0, 1, cols, cols + 1];
 		}
 	}
 	let cacheKnown = round.cacheKnown;
-	if (variant === 'memory:ai-gateway') {
+	if (rules.rememberViewedCards) {
 		cacheKnown = cacheKnown ? [...cacheKnown, index] : [index];
 	}
 
 	let lifeSupport = round.lifeSupport;
-	if (variant === 'memory:life-support') {
+	if (rules.spendFlipEnergy) {
 		lifeSupport = Math.max(0, (round.lifeSupport ?? 100) - 3);
 	}
 
 	let sap = round.sap;
-	if (variant === 'memory:chlorophyll-meter') {
+	if (rules.spendSap) {
 		sap = Math.max(0, (round.sap ?? 100) - 3);
 		if (sap <= 0) {
 			return {
@@ -1175,7 +1333,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	}
 
 	let aiTokens = round.aiTokens;
-	if (variant === 'memory:ai-tokens') {
+	if (rules.spendFlipTokens) {
 		aiTokens = Math.max(0, (round.aiTokens ?? 120) - 4);
 		if (aiTokens <= 0) {
 			return {
@@ -1191,7 +1349,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	}
 
 	let illuminated: number[] | undefined;
-	if (variant === 'memory:derelict-fog') {
+	if (rules.revealNeighborCone) {
 		const r = Math.floor(index / cols);
 		const c = index % cols;
 		illuminated = [index];
@@ -1202,7 +1360,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	}
 
 	// Register buffer mechanics
-	if (variant === 'memory:register-buffer') {
+	if (rules.canStoreCard) {
 		const base = round.marked?.length ? { ...round, marked: [] } : round;
 		if (round.bufferCard) {
 			const moves = round.moves + 1;
@@ -1246,7 +1404,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	}
 
 	// Single-flip continuity
-	if (variant === 'memory:one-flip') {
+	if (rules.keepOneRevealOnMiss) {
 		const base = round.marked?.length ? { ...round, marked: [] } : round;
 		if (round.revealed.length === 1) {
 			const prevIdx = round.revealed[0];
@@ -1284,7 +1442,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	}
 
 	const revealed = [...round.revealed, index];
-	if (variant === 'memory:quantum-entangle' && card.isQuantum && round.revealed.length === 0) {
+	if (rules.revealTwin && card.isQuantum && round.revealed.length === 0) {
 		const twin = round.cards.findIndex(
 			(c, i) => i !== index && c.symbol === card.symbol && !round.matched.includes(i)
 		);
@@ -1301,31 +1459,30 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 
 	if (revealed.length < matchSize) {
 		let lockedActorRow = round.lockedActorRow;
-		if (variant === 'memory:durable-object') {
+		if (rules.differentRowsOnly) {
 			lockedActorRow = row;
 		}
 		let myceliumPulse = round.myceliumPulse;
-		if (variant === 'memory:mycelium-network') {
+		if (rules.hintPartnerOnFlip) {
 			const partnerIdx = round.cards.findIndex(
 				(c, i) => i !== index && c.symbol === card.symbol && !round.matched.includes(i)
 			);
 			myceliumPulse = partnerIdx >= 0 ? partnerIdx : null;
 		}
 		let beeWaggleRow = round.beeWaggleRow;
-		if (variant === 'memory:bee-waggle' && index >= round.pairs) {
+		if (rules.hintPartnerRowOnFlip && index >= round.pairs) {
 			const partnerIdx = round.cards.findIndex(
 				(c, i) => i !== index && c.symbol === card.symbol && !round.matched.includes(i)
 			);
 			beeWaggleRow = partnerIdx >= 0 ? Math.floor(partnerIdx / cols) : null;
 		}
-		const briarsCleared =
-			variant === 'memory:carnivorous-briar' && card.isDewdrop ? true : round.briarsCleared;
+		const briarsCleared = rules.unlockWithDewdrop && card.isDewdrop ? true : round.briarsCleared;
 		let partitionFilter = round.partitionFilter;
-		if (variant === 'memory:basin-catalog') {
+		if (rules.samePartitionOnly) {
 			partitionFilter = card.partition ?? 0;
 		}
 		let workflowStep = round.workflowStep;
-		if (variant === 'memory:workflows-step') {
+		if (rules.retryFailedPairOnce) {
 			workflowStep = 2;
 		}
 		return {
@@ -1359,26 +1516,26 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	let isMatch =
 		card.isWild || first.isWild
 			? true
-			: variant === 'memory:zebra'
+			: rules.oppositeShadesOnly
 				? card.symbol === first.symbol && card.zebra !== first.zebra
-				: variant === 'memory:vectorize-knn'
+				: rules.matchClusters
 					? card.vectorCluster !== undefined && card.vectorCluster === first.vectorCluster
 					: revealed.every((position) => round.cards[position]?.symbol === first.symbol);
 
-	if (variant === 'memory:glyph-chain' && isMatch) {
+	if (rules.orderedTiers && isMatch) {
 		if (first.tier !== (round.glyphTier ?? 1)) {
 			isMatch = false;
 		}
 	}
 
-	if (variant === 'memory:tls-handshake' && isMatch) {
+	if (rules.requireBothHandshakeStages && isMatch) {
 		const stages = revealed.map((pos) => round.cards[pos].tlsStage);
 		if (!stages.includes('syn') || !stages.includes('ack')) {
 			isMatch = false;
 		}
 	}
 
-	if (variant === 'memory:durable-object' && isMatch) {
+	if (rules.differentRowsOnly && isMatch) {
 		const rows = revealed.map((pos) => Math.floor(pos / cols));
 		if (new Set(rows).size < revealed.length) {
 			isMatch = false;
@@ -1386,34 +1543,30 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 	}
 
 	if (isMatch) {
-		const collapse = variant === 'memory:collapse';
+		const collapse = rules.removeMatchedCards;
 		const matched = collapse ? [] : [...round.matched, ...revealed].sort((a, b) => a - b);
 		let cards = collapse
 			? round.cards.filter((_, position) => !revealed.includes(position))
 			: round.cards;
 		const won = collapse ? cards.length === 0 : matched.length === cards.length;
-		const combo = variant === 'memory:combo' ? (round.combo ?? 1) + 1 : round.combo;
-		const glyphTier =
-			variant === 'memory:glyph-chain' ? (round.glyphTier ?? 1) + 1 : round.glyphTier;
+		const combo = rules.growMatchMultiplier ? (round.combo ?? 1) + 1 : round.combo;
+		const glyphTier = rules.orderedTiers ? (round.glyphTier ?? 1) + 1 : round.glyphTier;
 		const sentinelHeat =
-			variant === 'memory:sentinel-heat'
-				? Math.max(0, (round.sentinelHeat ?? 0) - 1)
-				: round.sentinelHeat;
-		const pulseStreak =
-			variant === 'memory:pulse-drive'
-				? Math.min(4, (round.pulseStreak ?? 1) + 1)
-				: round.pulseStreak;
+			(rules.lockAtHeat ?? 0) > 0 ? Math.max(0, (round.sentinelHeat ?? 0) - 1) : round.sentinelHeat;
+		const pulseStreak = rules.growSpeedMultiplier
+			? Math.min(4, (round.pulseStreak ?? 1) + 1)
+			: round.pulseStreak;
 
-		if (variant === 'memory:life-support') {
+		if (rules.spendFlipEnergy) {
 			lifeSupport = Math.min(100, (lifeSupport ?? 100) + 12);
 		}
 
-		if (variant === 'memory:ai-tokens') {
+		if (rules.spendFlipTokens) {
 			aiTokens = Math.min(140, (aiTokens ?? 120) + 12);
 		}
 
 		let clearanceTier = round.clearanceTier;
-		if (variant === 'memory:zero-trust') {
+		if (rules.clearanceTiers) {
 			const activeT = round.clearanceTier ?? 1;
 			const allTierMatched = cards.every(
 				(c, idx) => (c.clearanceTier ?? 1) !== activeT || matched.includes(idx)
@@ -1423,28 +1576,24 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 			}
 		}
 
-		const hyperdriveMultiplier =
-			variant === 'memory:hyperdrive-pool'
-				? Math.min(3, (round.hyperdriveMultiplier ?? 2) + 1)
-				: round.hyperdriveMultiplier;
+		const hyperdriveMultiplier = rules.growPoolMultiplier
+			? Math.min(3, (round.hyperdriveMultiplier ?? 2) + 1)
+			: round.hyperdriveMultiplier;
 
-		if (variant === 'memory:chlorophyll-meter') {
+		if (rules.spendSap) {
 			sap = Math.min(120, (sap ?? 100) + 12);
 		}
-		const graftMultiplier =
-			variant === 'memory:botanical-graft'
-				? Math.min(3, (round.graftMultiplier ?? 1) + 1)
-				: round.graftMultiplier;
+		const graftMultiplier = rules.growGardenMultiplier
+			? Math.min(3, (round.graftMultiplier ?? 1) + 1)
+			: round.graftMultiplier;
 		const briarsCleared =
-			variant === 'memory:carnivorous-briar' && (card.isDewdrop || first.isDewdrop)
-				? true
-				: round.briarsCleared;
+			rules.unlockWithDewdrop && (card.isDewdrop || first.isDewdrop) ? true : round.briarsCleared;
 
-		if (variant === 'memory:hyperdrive-warp' && (card.isAnomaly || first.isAnomaly)) {
+		if (rules.swapEndpointsOnAnomaly && (card.isAnomaly || first.isAnomaly)) {
 			cards = warpAnomalyCards({ ...round, cards, matched }).cards;
 		}
 
-		if (variant === 'memory:firewall-ice') {
+		if (rules.unlockAdjacentCards) {
 			cards = cards.map((c, i) => {
 				if (!c.isFirewall) return c;
 				const isAdj = revealed.some((pos) => {
@@ -1459,14 +1608,14 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		}
 
 		const traceMeter =
-			variant === 'memory:trace-route'
+			(rules.quarantineAtTrace ?? 0) > 0
 				? Math.max(0, (round.traceMeter ?? 0) - 10)
 				: round.traceMeter;
 
 		let burstPing: number[] | undefined;
 		const burstStreak =
-			variant === 'memory:burst-transmission' ? (round.burstStreak ?? 0) + 1 : round.burstStreak;
-		if (variant === 'memory:burst-transmission' && (burstStreak ?? 0) >= 2) {
+			(rules.revealAfterStreak ?? 0) > 0 ? (round.burstStreak ?? 0) + 1 : round.burstStreak;
+		if ((rules.revealAfterStreak ?? 0) > 0 && (burstStreak ?? 0) >= rules.revealAfterStreak!) {
 			burstPing = cards
 				.map((_, i) => i)
 				.filter((i) => !matched.includes(i))
@@ -1474,7 +1623,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		}
 
 		let sonar: number[] | undefined;
-		if (variant === 'memory:sonar') {
+		if (rules.revealNeighborsOnMatch) {
 			sonar = revealed
 				.flatMap((pos) => {
 					const r = Math.floor(pos / cols);
@@ -1491,23 +1640,24 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 
 		let streamBurst = round.streamBurst;
 		let streamTarget = round.streamTarget;
-		if (variant === 'memory:k2-streams') {
+		if (rules.cycleTargetOnMatch) {
 			if (card.symbol === round.streamTarget) {
 				streamBurst = true;
 				const symIdx = SYMBOLS.findIndex((s) => s.id === round.streamTarget);
 				streamTarget = SYMBOLS[(symIdx + 1) % SYMBOLS.length]?.id;
 			}
 		}
-		if (variant === 'memory:waiting-room') {
-			waitingTokens = Math.min(3, (waitingTokens ?? 1) + 2);
+		if ((rules.flipSlots ?? 0) > 0) {
+			waitingTokens = Math.min(rules.flipSlots!, (waitingTokens ?? 1) + 2);
 		}
-		const activeHeader =
-			variant === 'memory:edge-snippets' ? 'X-Transform: Swap-Adjacent' : round.activeHeader;
+		const activeHeader = rules.swapAdjacentAfterMatch
+			? 'X-Transform: Swap-Adjacent'
+			: round.activeHeader;
 		let agentCycles = round.agentCycles;
 		let agentHint = round.agentHint;
-		if (variant === 'memory:agents-sdk') {
+		if ((rules.hintEveryMatches ?? 0) > 0) {
 			agentCycles = (round.agentCycles ?? 0) + 1;
-			if (agentCycles >= 3) {
+			if (agentCycles >= rules.hintEveryMatches!) {
 				agentCycles = 0;
 				const un = cards.findIndex((_, i) => !matched.includes(i));
 				agentHint = un >= 0 ? un : null;
@@ -1523,9 +1673,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				moves,
 				status: won ? 'won' : 'playing',
 				...(collapse ? { cleared: round.cleared! + matchSize } : {}),
-				...(variant === 'memory:lockout' || variant === 'memory:sentinel-heat'
-					? { lock: null }
-					: {}),
+				...(rules.lockLastMissedCard || (rules.lockAtHeat ?? 0) > 0 ? { lock: null } : {}),
 				...(combo !== undefined ? { combo } : {}),
 				...(sonar ? { sonar } : {}),
 				...(glyphTier !== undefined ? { glyphTier } : {}),
@@ -1538,7 +1686,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				...(briarsCleared !== undefined ? { briarsCleared } : {}),
 				...(clearanceTier !== undefined ? { clearanceTier } : {}),
 				...(hyperdriveMultiplier !== undefined ? { hyperdriveMultiplier } : {}),
-				...(variant === 'memory:durable-object' ? { lockedActorRow: null } : {}),
+				...(rules.differentRowsOnly ? { lockedActorRow: null } : {}),
 				...(traceMeter !== undefined ? { traceMeter } : {}),
 				...(burstStreak !== undefined ? { burstStreak } : {}),
 				...(burstPing ? { burstPing } : {}),
@@ -1548,20 +1696,14 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 				...(agentCycles !== undefined ? { agentCycles } : {}),
 				...(agentHint !== undefined ? { agentHint } : {}),
 				...(waitingTokens !== undefined ? { waitingTokens } : {}),
-				...(variant === 'memory:basin-catalog' ? { partitionFilter: null } : {}),
-				...(variant === 'memory:workflows-step'
-					? { workflowStep: 1, workflowRetryUsed: false }
-					: {})
+				...(rules.samePartitionOnly ? { partitionFilter: null } : {}),
+				...(rules.retryFailedPairOnce ? { workflowStep: 1, workflowRetryUsed: false } : {})
 			},
 			effect: won ? 'win' : 'match'
 		};
 	}
 
-	if (
-		variant === 'memory:workflows-step' &&
-		(round.workflowStep ?? 1) === 2 &&
-		!round.workflowRetryUsed
-	) {
+	if (rules.retryFailedPairOnce && (round.workflowStep ?? 1) === 2 && !round.workflowRetryUsed) {
 		return {
 			round: {
 				...base,
@@ -1579,9 +1721,9 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		revealed,
 		mismatches: round.mismatches + 1,
 		moves,
-		...(variant === 'memory:combo' ? { combo: 1 } : {}),
-		...(variant === 'memory:pulse-drive' ? { pulseStreak: 1 } : {}),
-		...(variant === 'memory:hyperdrive-pool' ? { hyperdriveMultiplier: 1 } : {}),
+		...(rules.growMatchMultiplier ? { combo: 1 } : {}),
+		...(rules.growSpeedMultiplier ? { pulseStreak: 1 } : {}),
+		...(rules.growPoolMultiplier ? { hyperdriveMultiplier: 1 } : {}),
 		...(lifeSupport !== undefined ? { lifeSupport } : {}),
 		...(illuminated ? { illuminated } : {}),
 		...(waitingTokens !== undefined ? { waitingTokens } : {}),
@@ -1590,41 +1732,41 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		...(cacheKnown ? { cacheKnown } : {})
 	};
 
-	if (variant === 'memory:three-strikes') {
-		const lives = (round.lives ?? 3) - 1;
+	if ((rules.missLives ?? 0) > 0) {
+		const lives = (round.lives ?? rules.missLives!) - 1;
 		mismatched.lives = lives;
 		if (lives <= 0) mismatched.status = 'lost';
 	}
-	if (variant === 'memory:life-support') {
+	if (rules.spendFlipEnergy) {
 		if (lifeSupport === 0) mismatched.status = 'lost';
 	}
 
-	if (variant === 'memory:sentinel-heat') {
-		const heat = Math.min(3, (round.sentinelHeat ?? 0) + 1);
+	if ((rules.lockAtHeat ?? 0) > 0) {
+		const heat = Math.min(rules.lockAtHeat!, (round.sentinelHeat ?? 0) + 1);
 		mismatched.sentinelHeat = heat;
-		if (heat === 3) {
+		if (heat === rules.lockAtHeat) {
 			mismatched.lock = revealed[matchSize - 1];
 		}
 	}
 
-	if (variant === 'memory:superstorm' && (round.mismatches + 1) % 4 === 0) {
+	if ((rules.blockedRowPeriod ?? 0) > 0 && (round.mismatches + 1) % rules.blockedRowPeriod! === 0) {
 		mismatched.stormFrostedRow = row;
-	} else if (variant === 'memory:superstorm') {
+	} else if ((rules.blockedRowPeriod ?? 0) > 0) {
 		mismatched.stormFrostedRow = -1;
 	}
 
-	if (variant === 'memory:rate-limiter') {
+	if ((rules.cooldownEveryMisses ?? 0) > 0) {
 		const penalty = (round.rateLimitPenalty ?? 0) + 1;
 		mismatched.rateLimitPenalty = penalty;
-		if ((round.mismatches + 1) % 3 === 0) {
+		if ((round.mismatches + 1) % rules.cooldownEveryMisses! === 0) {
 			mismatched.rateLimited = true;
 		}
 	}
 
-	if (variant === 'memory:trace-route') {
-		const trace = Math.min(100, (round.traceMeter ?? 0) + 15);
+	if ((rules.quarantineAtTrace ?? 0) > 0) {
+		const trace = Math.min(rules.quarantineAtTrace!, (round.traceMeter ?? 0) + 15);
 		mismatched.traceMeter = trace;
-		if (trace === 100) {
+		if (trace === rules.quarantineAtTrace) {
 			const unrevealed = round.cards
 				.map((_, i) => i)
 				.filter((i) => !round.matched.includes(i) && !revealed.includes(i));
@@ -1632,22 +1774,22 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		}
 	}
 
-	if (variant === 'memory:edge-cache') {
+	if ((rules.missGhostTurns ?? 0) > 0) {
 		const cache: Record<number, { symbol: SymbolId; turns: number }> = {
 			...(round.edgeCache ?? {})
 		};
 		for (const pos of revealed) {
-			cache[pos] = { symbol: round.cards[pos].symbol, turns: 2 };
+			cache[pos] = { symbol: round.cards[pos].symbol, turns: rules.missGhostTurns! };
 		}
 		mismatched.edgeCache = cache;
 	}
 
-	if (variant === 'memory:burst-transmission') {
+	if ((rules.revealAfterStreak ?? 0) > 0) {
 		mismatched.burstStreak = 0;
 		mismatched.burstPing = [];
 	}
 
-	if (variant === 'memory:ai-tokens') {
+	if (rules.spendFlipTokens) {
 		const tokens = Math.max(0, (aiTokens ?? 120) - 8);
 		mismatched.aiTokens = tokens;
 		if (tokens <= 0) {
@@ -1656,17 +1798,17 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		}
 	}
 
-	if (variant === 'memory:fifo-queue') {
+	if (rules.queueMissedCards) {
 		mismatched.dlqQueue = [...(round.dlqQueue ?? []), index];
 	}
 
-	if (variant === 'memory:turnstile-verify') {
-		if ((round.mismatches + 1) % 4 === 0) {
+	if ((rules.challengeEveryMisses ?? 0) > 0) {
+		if ((round.mismatches + 1) % rules.challengeEveryMisses! === 0) {
 			mismatched.turnstileActive = true;
 		}
 	}
 
-	if (variant === 'memory:kv-consistency') {
+	if (rules.replicateSeenCards) {
 		const replicas: Record<number, boolean> = { ...(round.kvReplicas ?? {}) };
 		for (const pos of revealed) {
 			replicas[pos] = true;
@@ -1674,7 +1816,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		mismatched.kvReplicas = replicas;
 	}
 
-	if (variant === 'memory:chlorophyll-meter') {
+	if (rules.spendSap) {
 		const nextSap = Math.max(0, (sap ?? 100) - 6);
 		mismatched.sap = nextSap;
 		if (nextSap <= 0) {
@@ -1683,28 +1825,32 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		}
 	}
 
-	if (variant === 'memory:botanical-graft') {
+	if (rules.growGardenMultiplier) {
 		mismatched.graftMultiplier = 1;
 	}
 
 	// Lock the last card only while two other unmatched cards keep a legal attempt open.
-	if (variant === 'memory:lockout')
+	if (rules.lockLastMissedCard)
 		mismatched.lock =
 			round.cards.length - round.matched.length - 1 >= 2 ? revealed[matchSize - 1] : null;
 
-	const isHazardMismatch = variant === 'memory:hazard' && (card.isHazard || first.isHazard);
+	const isHazardMismatch = rules.hazardShuffle && (card.isHazard || first.isHazard);
 	const isGravitinoMismatch =
-		variant === 'memory:gravitino-risk' && (card.isGravitino || first.isGravitino);
-	const isAtlasLoop = variant === 'memory:atlas-terminal' && (moves * 2) % 16 === 0;
+		rules.shuffleColumnOnRiskMiss && (card.isGravitino || first.isGravitino);
+	const isAtlasLoop =
+		(rules.shuffleEveryFlips ?? 0) > 0 && (moves * 2) % rules.shuffleEveryFlips! === 0;
 
 	let finalRound = mismatched;
-	if (variant === 'memory:moving' || isHazardMismatch || isAtlasLoop) {
+	if (rules.shuffleOnMiss || isHazardMismatch || isAtlasLoop) {
 		finalRound = moveFaceDownCards(finalRound);
 	} else if (isGravitinoMismatch) {
 		finalRound = scrambleColumn(finalRound, index % cols);
-	} else if (variant === 'memory:anycast-route' && (round.mismatches + 1) % 3 === 0) {
+	} else if (
+		(rules.perimeterShiftEveryMisses ?? 0) > 0 &&
+		(round.mismatches + 1) % rules.perimeterShiftEveryMisses! === 0
+	) {
 		finalRound = shiftPerimeterClockwise(finalRound);
-	} else if (variant === 'memory:bit-rot') {
+	} else if ((rules.transposeAfterMisses ?? 0) > 0) {
 		const rot: Record<number, number> = { ...(round.bitRot ?? {}) };
 		for (const pos of revealed) {
 			rot[pos] = (rot[pos] ?? 0) + 1;
@@ -1712,7 +1858,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 		const cards = [...finalRound.cards];
 		for (const [posStr, count] of Object.entries(rot)) {
 			const pos = Number(posStr);
-			if (count >= 3 && !round.matched.includes(pos)) {
+			if (count >= rules.transposeAfterMisses! && !round.matched.includes(pos)) {
 				const swapTarget = (pos + 1) % cards.length;
 				if (!round.matched.includes(swapTarget)) {
 					const tmp = cards[pos];
@@ -1724,16 +1870,16 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 			}
 		}
 		finalRound = { ...finalRound, cards, bitRot: rot };
-	} else if (variant === 'memory:argo-reroute') {
+	} else if ((rules.quadrantShiftAfterMisses ?? 0) > 0) {
 		const q = (Math.floor(index / cols) < 2 ? 0 : 2) + (index % cols < 2 ? 0 : 1);
 		const hits = { ...(round.quadrantHits ?? { 0: 0, 1: 0, 2: 0, 3: 0 }) };
 		hits[q] = (hits[q] ?? 0) + 1;
-		if (hits[q] >= 3) {
+		if (hits[q] >= rules.quadrantShiftAfterMisses!) {
 			hits[q] = 0;
 			finalRound = shiftQuadrantArgo(finalRound, q);
 		}
 		finalRound = { ...finalRound, quadrantHits: hits };
-	} else if (variant === 'memory:r2-glacier') {
+	} else if ((rules.freezeAfterUntouched ?? 0) > 0) {
 		const untouched: Record<number, number> = { ...(round.glacierUntouched ?? {}) };
 		finalRound.cards.forEach((_, i) => {
 			if (!finalRound.matched.includes(i) && !revealed.includes(i)) {
@@ -1743,18 +1889,18 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 			}
 		});
 		const cards = finalRound.cards.map((c, i) => {
-			if ((untouched[i] ?? 0) >= 4) {
+			if ((untouched[i] ?? 0) >= rules.freezeAfterUntouched!) {
 				return { ...c, isGlaciated: true };
 			}
 			return c;
 		});
 		finalRound = { ...finalRound, cards, glacierUntouched: untouched };
-	} else if (variant === 'memory:photosynthesis') {
+	} else if (rules.movingSunbeam) {
 		finalRound = {
 			...finalRound,
 			sunbeamRow: Math.floor(finalRound.moves / 2) % Math.ceil(finalRound.cards.length / cols)
 		};
-	} else if (variant === 'memory:seasonal-bloom') {
+	} else if ((rules.dormancyAfterUntouched ?? 0) > 0) {
 		const dormancy: Record<number, number> = { ...(round.bloomDormancy ?? {}) };
 		finalRound.cards.forEach((_, i) => {
 			if (!finalRound.matched.includes(i) && !revealed.includes(i)) {
@@ -1764,7 +1910,7 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 			}
 		});
 		const cards = finalRound.cards.map((c, i) => {
-			if ((dormancy[i] ?? 0) >= 3) {
+			if ((dormancy[i] ?? 0) >= rules.dormancyAfterUntouched!) {
 				return { ...c, isWilted: true };
 			}
 			return c;
@@ -1779,8 +1925,9 @@ export function flipCard(round: MemoryRound, index: number): FlipResult {
 }
 
 export function resolveMismatch(round: MemoryRound): MemoryRound {
+	const rules = memoryRoundRules(round);
 	// Time Strata outcomes can only be resolved by a replayed Continue action.
-	if (isTimeStrata(memoryVariant(round))) return round;
+	if (rules.topOnly) return round;
 	if (round.revealed.length !== cardsPerMatch(round)) {
 		return round;
 	}
@@ -1810,11 +1957,9 @@ export function resolveMismatch(round: MemoryRound): MemoryRound {
 		}
 		hidden = { ...hidden, edgeCache: nextCache };
 	}
-	const variant = memoryVariant(round);
-	if (variant === 'memory:swaps' || variant === 'memory:seed-dispersal')
-		return swapHiddenCards(hidden);
-	if (variant === 'memory:drift') return driftRow(hidden, round.revealed[0]);
-	if (variant === 'memory:decay') return updateDecay(hidden, round.revealed);
+	if (rules.swapTwoOnResolve) return swapHiddenCards(hidden);
+	if (rules.driftFirstRowOnMiss) return driftRow(hidden, round.revealed[0]);
+	if ((rules.seenCardTurns ?? 0) > 0) return updateDecay(hidden, round.revealed);
 	return hidden;
 }
 
@@ -1848,10 +1993,10 @@ export function scoreFor(
 }
 
 function defaultScoring(round: MemoryRound): ScoreValues {
-	const variant = memoryVariant(round);
-	return variant === 'memory:trios'
+	const rules = memoryRoundRules(round);
+	return rules.matchSize === 3
 		? triosScoring.defaults
-		: variant === 'memory:quads'
+		: rules.matchSize === 4
 			? quadsScoring.defaults
 			: scoringDefinition.defaults;
 }
@@ -1869,10 +2014,11 @@ export function scoreRound(
 	elapsedSeconds: number,
 	scoring: ScoreValues = defaultScoring(round)
 ): number {
+	const rules = memoryRoundRules(round);
 	if (round.status !== 'won') {
 		return 0;
 	}
-	if (round.variant === 'memory:countdown' && elapsedSeconds > (round.timeLimit ?? 60)) {
+	if ((rules.timeLimitPerPair ?? 0) > 0 && elapsedSeconds > (round.timeLimit ?? 60)) {
 		return 0;
 	}
 

@@ -15,13 +15,38 @@ import { ensureCatalogFamily, readThemeConfig } from './config.js';
 import { variantAvailable } from './games.js';
 import { memorySqlPaths } from './memory-policy.js';
 import { assertAccountActive } from './user-lifecycle.js';
+import { dailyPuzzle, dailySessionId, utcDate, type DailyIssued } from './daily.js';
+import { generateTheme } from '#lib/engine/theme/generator.js';
+import { roundRuleLine } from '#lib/ui/puzzle-presentation.js';
+
+function issuedRound(family: string, seed: string, variant?: string) {
+	const raw = catalog[family].createRound(seed, variant) as {
+		seed: string;
+		variant?: string;
+		rules?: Record<string, number | boolean>;
+	};
+	const { variant: identity, ...round } = raw;
+	void identity;
+	return { ...round, rules: raw.rules ?? {} };
+}
+
+function roundTeaching(family: string, variant?: string) {
+	const { condition, ...ending } = puzzleVariant(family, variant)?.ending ?? catalog[family].ending;
+	void condition;
+	return {
+		help: puzzleVariant(family, variant)?.help ?? catalog[family].presentation.help,
+		ending,
+		roundRuleLine: roundRuleLine(family, variant)
+	};
+}
 
 /** Returns only the authenticated account's original issuance snapshot; never a new seed. */
 export async function resumableRanked(
 	binding: D1Database,
 	userId: string,
 	now = Date.now(),
-	cache?: KVNamespace
+	cache?: KVNamespace,
+	sessionId?: string
 ) {
 	await assertAccountActive(binding, userId, now);
 	const row = await binding
@@ -30,10 +55,11 @@ export async function resumableRanked(
 		created_at AS startedAt,expires_at AS expiresAt,theme_snapshot AS themeSnapshot,
 		score_config_version AS scoreVersion,payload_hash IS NOT NULL AS saving
 		FROM play_session active WHERE user_id=? AND abandoned_at IS NULL AND expires_at>?
+		AND (? IS NULL OR id=?)
 		AND NOT EXISTS (SELECT 1 FROM completed_run finished WHERE finished.id=active.id)
 		ORDER BY (payload_hash IS NOT NULL) DESC,sequence DESC LIMIT 1`
 		)
-		.bind(userId, now)
+		.bind(userId, now, sessionId ?? null, sessionId ?? null)
 		.first<{
 			id: string;
 			family: string;
@@ -47,7 +73,7 @@ export async function resumableRanked(
 			saving: number;
 		}>();
 	if (!row) return null;
-	if (row.saving) return { id: row.id, expiresAt: row.expiresAt, saving: true };
+	if (row.saving && !sessionId) return { id: row.id, expiresAt: row.expiresAt, saving: true };
 	if (
 		!Object.hasOwn(catalog, row.family) ||
 		row.engineVersion !== catalog[row.family].engineVersion
@@ -60,7 +86,7 @@ export async function resumableRanked(
 		return { id: row.id, expiresAt: row.expiresAt, saving: false };
 	}
 	try {
-		const { themeSnapshot, scoreVersion, saving, ...session } = row;
+		const { themeSnapshot, scoreVersion, saving, variant, ...session } = row;
 		const theme = JSON.parse(themeSnapshot) as ResolvedTheme;
 		if (
 			!theme ||
@@ -71,18 +97,23 @@ export async function resumableRanked(
 			typeof theme.themeGeneratorVersion !== 'string'
 		)
 			throw new RangeError('theme_snapshot');
+		const scoring = await readScoreConfig(
+			binding,
+			row.family,
+			scoreVersion,
+			cache,
+			variant ?? undefined
+		);
+		const date = utcDate(row.startedAt);
+		const daily = row.id === (await dailySessionId(userId, row.family, date));
 		return {
 			...session,
-			variant: puzzleVariant(row.family, row.variant ?? undefined)?.id,
 			saving: Boolean(saving),
 			theme,
-			scoring: await readScoreConfig(
-				binding,
-				row.family,
-				scoreVersion,
-				cache,
-				row.variant ?? undefined
-			)
+			scoring,
+			round: issuedRound(row.family, row.seed, variant ?? undefined),
+			...roundTeaching(row.family, variant ?? undefined),
+			...(daily ? { daily: true as const, date } : {})
 		};
 	} catch (error) {
 		if (
@@ -277,12 +308,217 @@ export async function startRanked(
 			id,
 			seed,
 			family,
-			...(variant ? { variant } : {}),
 			theme,
+			round: issuedRound(family, seed, variant),
+			...roundTeaching(family, variant),
 			engineVersion: catalog[family].engineVersion,
 			startedAt: now,
 			expiresAt: now + 7200000
 		};
 	}
 	throw new RunError('score_conflict', 409);
+}
+
+/** One stable, authoritative attempt per account/family/UTC day. No client variant choice. */
+export async function startDailyRanked(
+	binding: D1Database,
+	userId: string,
+	family: PuzzleId,
+	ipHash: string,
+	now = Date.now(),
+	cache?: KVNamespace,
+	secret = ''
+): Promise<DailyIssued> {
+	await assertAccountActive(binding, userId, now);
+	await ensureCatalogFamily(binding, family);
+	const date = utcDate(now);
+	const id = await dailySessionId(userId, family, date);
+	const existing = await binding
+		.prepare(
+			`SELECT id,abandoned_at,expires_at,
+		EXISTS(SELECT 1 FROM completed_run r WHERE r.id=play_session.id) AS completed
+		FROM play_session WHERE id=? AND user_id=?`
+		)
+		.bind(id, userId)
+		.first<{ id: string; abandoned_at: number | null; expires_at: number; completed: number }>();
+	if (existing) {
+		if (existing.abandoned_at !== null || existing.expires_at <= now || existing.completed)
+			throw new RunError('daily_spent', 409);
+		const restored = await resumableRanked(binding, userId, now, cache, id);
+		if (restored && 'daily' in restored && restored.daily) return restored as DailyIssued;
+		throw new RunError('daily_unavailable', 503);
+	}
+	const puzzle = await dailyPuzzle(binding, family, date, secret, cache, now);
+	if (puzzle.engineVersion !== catalog[family].engineVersion) throw new RunError('version', 409);
+	const { values: themeConfig } = await readThemeConfig(binding, cache);
+	const theme = generateTheme(puzzle.seed, family, themeConfig);
+	const scoring = await readScoreConfig(
+		binding,
+		family,
+		puzzle.scoreConfigVersion,
+		cache,
+		puzzle.variant
+	);
+	for (let attempt = 0; attempt < 3; attempt++) {
+		const { liveVersion } = await readLiveScoreConfig(binding, family, cache, puzzle.variant);
+		// Pinned daily rules survive later variant/policy disablement. Family/account/cap guards remain live.
+		const result = await binding
+			.prepare(
+				`INSERT INTO play_session
+			(id,user_id,family,variant,seed,engine_version,created_at,expires_at,ip_hash,theme_config_version,theme_generator_version,theme_snapshot,card_opening_ms,score_config_version)
+			SELECT ?,?,?,?,?,?,?,?,?,?,?,?,?,?
+			WHERE EXISTS(SELECT 1 FROM player WHERE user_id=?)
+			AND NOT EXISTS(SELECT 1 FROM player_ban WHERE user_id=? AND (expires_at IS NULL OR expires_at>?))
+			AND NOT EXISTS(SELECT 1 FROM user_lifecycle WHERE user_id=?)
+			AND EXISTS(SELECT 1 FROM game_lifecycle WHERE family=? AND state='enabled')
+			AND EXISTS(SELECT 1 FROM daily_puzzle WHERE family=? AND date=? AND variant=? AND seed=? AND score_config_version=?)
+			AND NOT EXISTS(SELECT 1 FROM site_control WHERE key='ranked' AND enabled=0)
+			AND COALESCE((SELECT version FROM score_live WHERE family=?),?)=?
+			AND NOT EXISTS(SELECT 1 FROM play_session s WHERE s.user_id=? AND s.abandoned_at IS NULL AND s.expires_at>?
+			AND NOT EXISTS(SELECT 1 FROM completed_run r WHERE r.id=s.id))
+			AND (SELECT COUNT(*) FROM play_session WHERE user_id=? AND created_at>?)<30
+			AND (SELECT COUNT(*) FROM play_session WHERE ip_hash=? AND created_at>?)<30
+			AND (SELECT COUNT(*) FROM play_session s WHERE s.user_id=? AND s.created_at>?
+			AND (s.abandoned_at IS NOT NULL OR (s.payload_hash IS NULL AND EXISTS(SELECT 1 FROM play_session newer
+			WHERE newer.user_id=s.user_id AND newer.family=s.family AND newer.sequence>s.sequence))))
+			+ CASE WHEN EXISTS(SELECT 1 FROM play_session current WHERE current.user_id=? AND current.family=?
+			AND current.payload_hash IS NULL AND current.abandoned_at IS NULL AND current.created_at>?
+			AND NOT EXISTS(SELECT 1 FROM completed_run r WHERE r.id=current.id)
+			AND NOT EXISTS(SELECT 1 FROM play_session newer WHERE newer.user_id=current.user_id AND newer.family=current.family AND newer.sequence>current.sequence)) THEN 1 ELSE 0 END<=10
+			ON CONFLICT(id) DO NOTHING RETURNING id`
+			)
+			.bind(
+				id,
+				userId,
+				family,
+				puzzle.variant,
+				puzzle.seed,
+				puzzle.engineVersion,
+				now,
+				now + 7200000,
+				ipHash,
+				theme.themeConfigVersion,
+				theme.themeGeneratorVersion,
+				JSON.stringify(theme),
+				CARD_RANKED_OPENING_MS,
+				scoring.version,
+				userId,
+				userId,
+				now,
+				userId,
+				family,
+				family,
+				date,
+				puzzle.variant,
+				puzzle.seed,
+				scoring.version,
+				scoreScope(family, puzzle.variant),
+				defaultScoreConfig(family, puzzle.variant).version,
+				liveVersion,
+				userId,
+				now,
+				userId,
+				now - 3600000,
+				ipHash,
+				now - 3600000,
+				userId,
+				now - 3600000,
+				userId,
+				family,
+				now - 3600000
+			)
+			.all();
+		if (result.results.length)
+			return {
+				id,
+				family,
+				seed: puzzle.seed,
+				engineVersion: puzzle.engineVersion,
+				startedAt: now,
+				expiresAt: now + 7200000,
+				theme,
+				scoring,
+				round: issuedRound(family, puzzle.seed, puzzle.variant),
+				...roundTeaching(family, puzzle.variant),
+				date,
+				daily: true
+			};
+		const raced = await binding
+			.prepare('SELECT id FROM play_session WHERE id=? AND user_id=?')
+			.bind(id, userId)
+			.first();
+		if (raced) return startDailyRanked(binding, userId, family, ipHash, now, cache, secret);
+		const enabled = await binding
+			.prepare("SELECT family FROM game_lifecycle WHERE family=? AND state='enabled'")
+			.bind(family)
+			.first();
+		if (!enabled) throw new RunError('game_disabled', 409);
+		const current = await binding
+			.prepare('SELECT version FROM score_live WHERE family=?')
+			.bind(scoreScope(family, puzzle.variant))
+			.first<{ version: string }>();
+		if ((current?.version ?? defaultScoreConfig(family, puzzle.variant).version) !== liveVersion)
+			continue;
+		if (await activeRanked(binding, userId, now)) throw new RunError('ranked_active', 409);
+		throw new RunError('start_limited', 429);
+	}
+	throw new RunError('score_conflict', 409);
+}
+
+/** Rebuild a checkpoint with server-held rules; moves are validated without accepting an identity. */
+export async function resumeDailyRanked(
+	binding: D1Database,
+	userId: string,
+	sessionId: string,
+	moves: unknown,
+	cache?: KVNamespace,
+	now = Date.now()
+): Promise<DailyIssued> {
+	await assertAccountActive(binding, userId, now);
+	const issued = await binding
+		.prepare(
+			`SELECT s.family,s.seed,s.variant,s.created_at AS startedAt,p.date
+		FROM play_session s JOIN daily_puzzle p ON p.family=s.family AND p.seed=s.seed AND p.variant=s.variant
+		AND p.engine_version=s.engine_version AND p.score_config_version=s.score_config_version
+		AND p.date=strftime('%Y-%m-%d',s.created_at/1000,'unixepoch')
+		WHERE s.id=? AND s.user_id=? AND s.abandoned_at IS NULL AND s.expires_at>?
+		AND s.payload_hash IS NULL AND NOT EXISTS(SELECT 1 FROM completed_run r WHERE r.id=s.id)`
+		)
+		.bind(sessionId, userId, now)
+		.first<{ family: string; seed: string; variant: string; startedAt: number; date: string }>();
+	if (!issued || (await dailySessionId(userId, issued.family, issued.date)) !== sessionId)
+		throw new RunError('session', 403);
+	const manifest = catalog[issued.family];
+	if (
+		!manifest ||
+		!Array.isArray(moves) ||
+		moves.length > (puzzleVariant(issued.family, issued.variant)?.maxMoves ?? manifest.maxMoves)
+	)
+		throw new RunError('moves');
+	let parsed;
+	try {
+		parsed = moves.map((move) => manifest.parseMove(move));
+	} catch {
+		throw new RunError('move');
+	}
+	const restored = await resumableRanked(binding, userId, now, cache, sessionId);
+	if (!restored || !('daily' in restored) || !restored.daily || !('round' in restored))
+		throw new RunError('daily_unavailable', 503);
+	if (parsed.length) {
+		if (!manifest.resumeRound) throw new RunError('resume_unavailable', 409);
+		try {
+			const raw = manifest.resumeRound(
+				issued.seed,
+				parsed,
+				restored.scoring.values,
+				issued.variant
+			) as { seed: string; variant?: string; rules?: Record<string, number | boolean> };
+			const { variant, ...round } = raw;
+			void variant;
+			restored.round = { ...round, rules: raw.rules ?? restored.round.rules };
+		} catch {
+			throw new RunError('invalid_replay');
+		}
+	}
+	return restored as DailyIssued;
 }

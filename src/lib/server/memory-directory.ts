@@ -1,8 +1,8 @@
 import { catalog } from '#lib/catalog.js';
-import { dimensionChange } from '#lib/engine/contract.js';
-import { puzzleVariant } from '#lib/scoring.js';
+import { dimensionChange, type PuzzleVariant } from '#lib/engine/contract.js';
 import { readMemoryPolicy, memoryBlockers } from './memory-policy.js';
 import { queryActivityCounts, queryScoreHistory, type ActivityMappingEntry } from './games.js';
+import { utcDate } from './daily.js';
 
 export type DirectoryFilter = {
 	q?: string;
@@ -116,8 +116,9 @@ export async function loadMemoryDirectory(
 	db: D1Database,
 	filter: DirectoryFilter = {}
 ): Promise<MemoryDirectoryResult> {
-	const curatedDefs = catalog.memory.variants ?? [];
+	const curatedDefs: readonly PuzzleVariant[] = catalog.memory.variants ?? [];
 	const policy = catalog.memory.dimensionPolicy;
+	const board = `${catalog.memory.id} · ${utcDate()}`;
 
 	// 1. Fetch observed variant identities from D1.
 	const observedRows = (
@@ -168,7 +169,7 @@ export async function loadMemoryDirectory(
 	// 6. Assemble directory metadata; selected score cohorts load after filtering/pagination.
 	const allVariants: DirectoryVariant[] = allVariantIds.map((id) => {
 		const isCurated = curatedDefs.some((v) => v.id === id);
-		const def = isCurated ? puzzleVariant('memory', id) : undefined;
+		const def = curatedDefs.find((variant) => variant.id === id);
 		const lifecycleRow = lifecycleRows.find((r) => r.variant === id);
 		const lifecycleState: 'enabled' | 'disabled' =
 			lifecycleRow?.state ?? (def?.enabled === false ? 'disabled' : 'enabled');
@@ -210,8 +211,6 @@ export async function loadMemoryDirectory(
 					isBlocked: false
 				}));
 
-		const rulesGroup = def?.leaderboardGroups?.[0] ?? 'memory-1';
-
 		return {
 			id,
 			nameKey: def?.name,
@@ -234,7 +233,7 @@ export async function loadMemoryDirectory(
 			imported: countRow?.imported ?? 0,
 			totalCompleted: countRow?.totalCompleted ?? 0,
 			ranked: countRow?.ranked ?? 0,
-			rulesGroup,
+			rulesGroup: board,
 			more: false,
 			rows: [] as DirectoryVariant['rows']
 		};
@@ -298,7 +297,7 @@ export async function loadMemoryDirectory(
 		pagedItems.map((item) => ({
 			id: item.id,
 			leaderboardGroups: curatedDefs.find((variant) => variant.id === item.id)
-				?.leaderboardGroups ?? [item.rulesGroup]
+				?.leaderboardGroups ?? ['memory-1']
 		}))
 	);
 	for (const item of pagedItems) {

@@ -21,7 +21,7 @@ export interface PuzzleSelector<Family extends string = PuzzleFamily> {
 	next(): Family;
 	peekVariant(
 		family: Family,
-		variants: readonly PuzzleVariant[] | undefined,
+		variants: readonly Pick<PuzzleVariant, 'id' | 'weight' | 'enabled'>[] | undefined,
 		enabled: readonly string[]
 	): string | undefined;
 	commitVariant(family: Family, variant?: string): void;

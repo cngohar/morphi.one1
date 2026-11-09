@@ -10,6 +10,7 @@ import { activeRanked, abandonRanked } from '../../src/lib/server/ranked-session
 import { readGameConfig, readStyleConfig, readThemeConfig } from '../../src/lib/server/config.js';
 import { readLiveScoreConfig, readScoreConfig } from '../../src/lib/server/scoring.js';
 import { parseMeasurement } from '../../src/lib/server/measurement.js';
+import { utcDate } from '../../src/lib/server/daily.js';
 
 const family = 'slice3-synthetic-numeric';
 const group = 'slice3-numeric-1:custom';
@@ -300,7 +301,13 @@ it('starts, validates, replays and scores a novel manifest family through the ca
 	const issued = await startRanked(db(), userId, family, 'slice3-ip', now, null, cache());
 	const rankedRun = run(issued.id, issued.seed, [{ charge: 2, steps: 3 }], true);
 	const saved = await saveRun(db(), userId, rankedRun, now + 7100, cache());
-	expect(saved).toEqual({ id: issued.id, score: 69, ranked: true, group });
+	expect(saved).toEqual({ id: issued.id, score: 69, ranked: true, group: family });
+	expect(
+		await db()
+			.prepare('SELECT rules_group,score_config_version,score FROM completed_run WHERE id=?')
+			.bind(issued.id)
+			.first()
+	).toEqual({ rules_group: group, score_config_version: manifest.scoring.version, score: 69 });
 
 	const reordered = { ...rankedRun, moves: [{ steps: 3, charge: 2 }] };
 	expect(await saveRun(db(), userId, reordered, now + 7200, cache())).toEqual(saved);
@@ -340,20 +347,16 @@ it('starts, validates, replays and scores a novel manifest family through the ca
 
 	const solo = run(crypto.randomUUID(), '42', [{ steps: 1, charge: 0 }], false);
 	const soloResult = await saveRun(db(), userId, solo, now + 9000, cache());
-	expect(soloResult).toMatchObject({ ranked: false, score: 3, group });
+	expect(soloResult).toMatchObject({ ranked: false, score: 3, group: family });
 	const history = await accountHistory(db(), userId);
 	expect(history.history).toHaveLength(2);
-	expect(history.bests).toContainEqual(
-		expect.objectContaining({
-			family,
-			group,
-			scoreConfigVersion: manifest.scoring.version,
-			score: 69
-		})
+	expect(history.bests).toEqual([]);
+	expect(history.history.every((row) => row.family === family && row.date === utcDate(now))).toBe(
+		true
 	);
-	expect((await leaderboard(db(), group, 0, userId, cache())).rows).toEqual([
-		expect.objectContaining({ score: 69, own: 1 })
-	]);
+	expect((await leaderboard(db(), family, utcDate(now), userId, cache(), 25, now)).rows).toEqual(
+		[]
+	);
 
 	const tooFast = await startRanked(db(), userId, family, 'slice3-ip', now + 10_000, null, cache());
 	expect(await activeRanked(db(), userId, now + 10_000)).toMatchObject({

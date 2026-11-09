@@ -122,7 +122,12 @@ try {
 			);
 		} else if (command === 'prune-expired') {
 			if (target || reasonWords.length) throw new Error('prune-expired takes no extra arguments.');
-			const changes = await pruneExpiredRecords(proxy.env.DB, actor);
+			const changes = await pruneExpiredRecords(
+				proxy.env.DB,
+				actor,
+				undefined,
+				proxy.env.RUN_ARCHIVE
+			);
 			console.info(JSON.stringify({ event: 'local_retention_completed', changes }));
 		} else if (command === 'privacy-delete') {
 			if (!target || reasonWords.length !== 1)

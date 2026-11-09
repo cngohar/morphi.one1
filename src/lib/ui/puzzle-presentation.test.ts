@@ -6,15 +6,15 @@ import { generateTheme } from '#lib/engine/theme/generator.js';
 import { familyName, scoreGuideValue } from './puzzle-presentation.js';
 import { puzzleBackdrop } from './puzzle-backdrop.js';
 
-it('every shipped family supplies valid help, scoring, name and leaderboard copy', () => {
+it('every shipped family supplies valid help, scoring and name copy without variant boards', () => {
 	for (const { id } of familyIndex) {
 		const metadata = puzzleMetadata[id];
 		const presentation = metadata.presentation!;
 		expect(presentation).toBeDefined();
+		expect(Object.hasOwn(presentation, 'groups')).toBe(false);
 		for (const key of [
 			presentation.name,
 			...Object.values(presentation.scoringLabels),
-			...Object.values(presentation.groups),
 			...presentation.help.steps,
 			presentation.help.note,
 			presentation.help.tips,

@@ -1,5 +1,92 @@
 # DECISIONS.md
 
+## v1.4 rev 6 — local implementation and targeted verification complete (2026-11-09)
+
+The preserved v1.4 work is built and §§8A–8E/full targeted §9 pass; owner functional
+acceptance is pending. **253 player variant groups → 0; boards = families × UTC
+days.** Replay/scoring cohorts remain internal. Every enabled family is daily,
+Top25/optional Top100 and public monthly dates remain, and late results credit
+the start-day board until final freeze at 02:00 UTC. Existing puzzles survive
+secret rotation; future generation uses the new key. Banned/deleted users are
+anonymised without shifting frozen ranks. Streak advances on the completion UTC
+date, once site-wide; premium freeze is the required ineligible stub, not live.
+
+§8E uses step → note → scoring-row teaching, with no manifest fallback/edit.
+Named actions use bounded form transport while retaining existing play guards;
+full anonymous teaching occupies the existing header gap without changing games.
+The Cron shape is a separate scheduled-only Worker environment because the app
+exports fetch only. The actual local scheduled handler and authenticated CLI/R2
+archive-before-delete at 90 days pass. No production resource was provisioned.
+
+Final evidence: types 0 errors/0 warnings, scoped lint, build/boundaries/lazy
+bundle, 145 units, 8 shared validation cases, 68 unique D1 cases, all frozen vectors
+in six runtimes and 123 Chromium cases at one worker pass. Light 10,000-entry Top25
+reads 25 rows; counts retain index work. Legacy save calls remain 7, daily needs 8.
+Full verify/production load/device review remain deferred. Ten untouched formatting
+failures and the explicit zero-edit telemetry/legacy-recovery/admin-anchor limits
+are recorded in [CODEMAP](CODEMAP.md), with the complete file inventory/evidence.
+
+No functional acceptance, commit, push, deployment, v1.4.1 or release is inferred.
+The local v1.4 stop rule is complete; earlier entries below remain historical.
+
+## v1.4 rev 5 verification stop (2026-11-09)
+
+Resumed the preserved work with Ponytail; §8D source and narrow test-contract
+reconciliation are authored. Final types pass with 0 errors / 0 warnings;
+registry and binding generation pass. Focused units finish at 117/118 unique
+passes, with the required teaching-data assertion failing. Full lint fails at
+Prettier in 10 untouched historical files; later §9 checks are unrun.
+
+The exact §5A derivation exposes missing differing help steps for Connect board-8
+and rush-60. Both manifests reuse baseline steps; their scoring help differences
+cannot supply the required step-based rule line. Manifests are forbidden by the
+brief, so the refactor-gap stop rule applies. No fallback or test relaxation was
+introduced. Daily streak remains completion-day based (§2); late results credit
+the start-day board through its 02:00 UTC freeze (§10). Pro streak freeze remains
+an explicit ineligible stub, not live. **253 variant groups → 0 player variant
+boards; boards = families × UTC days** is authored but unbuilt/unaccepted.
+See [exact evidence, inventory and remaining conflicts](CODEMAP.md).
+No commit, push, deployment, full verify or later milestone was performed.
+
+## v1.4 rev 4 resumed; further refactor-gap stop (2026-11-09)
+
+The preserved implementation was resumed, including §8C TimeStrata anonymous
+rules and maintenance R2 pass-through. Daily results credit the UTC start-day
+board through 02:00 UTC; then rankings freeze. Accepted entries preserve rank
+after bans/deletions and show Anonymous through a live name lookup. Stored daily
+puzzles remain valid through secret rotation; replace the key for future
+generation without deleting already pinned puzzles. Cron uses a separate
+scheduled-only environment because the SvelteKit app Worker exports fetch only.
+
+The board change is authored: **253 variant groups → 0 player variant boards;
+boards = families × UTC days**. Internal manifest/replay groups remain unchanged.
+The premium streak freeze is a stub, not live: `streakFreezeEligible(userId)`
+returns `{ eligible: false, reason: 'premium-not-launched' }` for every player,
+with the named TODO and an authored, unrun unit case. No premium/payments/freeze
+consumption is implemented.
+
+Registry and binding generation pass; types fail with 44 errors / 0 warnings.
+The explicit stop rule applies to removed-metadata consumers in `activity.ts`
+and `memory-directory.ts`, both outside §§8–8C. Selector practice signatures and
+legacy test contracts also need reconciliation. Other §9 checks are unrun;
+v1.4 remains incomplete and unaccepted. See [resume record and inventory](CODEMAP.md).
+No commit, push, deployment, later feature or full verify was performed.
+
+## v1.4 midnight decision and partial implementation (2026-11-09)
+
+The owner explicitly chose: “Credit start day; freeze after grace (Recommended)”.
+A daily round started before 00:00 UTC and completed within its two-hour session
+expiry belongs to the UTC day it started; yesterday's final board freezes after
+that grace period. This supersedes the brief's immediate-midnight-freeze wording
+for the in-flight-round edge case only. The final source adjustment is pending.
+
+The required premium streak-freeze stub is authored locally but not verified or
+live: everyone is ineligible with reason `premium-not-launched`; no premium status,
+payment or freeze consumption exists. v1.4 remains partial, stopped at the explicit
+edit-list gaps described in [CODEMAP](CODEMAP.md). No functional acceptance,
+verification pass, completed 253-to-zero board transition, commit, push or deployment
+is recorded.
+
 ## 2026-11-08 — v1.3.5.17 closeout accepted; audio files approved; source commit and push authorized
 
 The owner said “closeout is now done, you can comit and then push to github, also i review the audio file and approved it,you can include in comit too”.

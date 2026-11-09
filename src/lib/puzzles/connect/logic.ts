@@ -37,6 +37,7 @@ export interface ConnectMove extends Move {
 export interface ConnectRound {
 	seed: string;
 	variant?: ConnectVariant;
+	rules?: { fullGrid: boolean; timeLimit: number };
 	band: number;
 	size: number;
 	par: number;
@@ -123,7 +124,15 @@ export function createConnectRound(seed: string, variant?: string): ConnectRound
 	const order = shuffle(rng, segments);
 	return {
 		seed,
-		...(selectedVariant === 'connect:classic' ? {} : { variant: selectedVariant }),
+		...(selectedVariant === 'connect:classic'
+			? {}
+			: {
+					variant: selectedVariant,
+					rules: {
+						fullGrid: selectedVariant === 'connect:full-grid',
+						timeLimit: selectedVariant === 'connect:rush-60' ? 60 : 0
+					}
+				}),
 		band,
 		size,
 		par,
@@ -235,7 +244,7 @@ export function applyConnectMove(round: ConnectRound, move: ConnectMove): Connec
 	};
 	for (let i = 0; i < paths.length; i++) if (connected(next, i)) next.everConnected[i] = true;
 	const allPairsConnected = connectedCount(next) === next.pairs.length;
-	if (round.variant === 'connect:full-grid') {
+	if (round.rules?.fullGrid) {
 		if (allPairsConnected && filledCount(next) === next.size * next.size) next.status = 'won';
 	} else {
 		if (allPairsConnected) next.status = 'won';

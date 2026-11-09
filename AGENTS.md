@@ -33,6 +33,21 @@ For testing and verification:
 
 ## Current phase
 
+**v1.4 Daily family boards + variant-surface removal accepted; source commit and push authorized (2026-11-09):**
+The owner said “this repo is updated, now comit and  push to github”, accepting the completed
+v1.4 Daily family boards + variant-surface removal (253 player variant board groups → 0;
+boards = families × UTC days) and authorizing this source commit and push to GitHub.
+One board key `(family, UTC date)` replaces all per-variant leaderboards while internal replay/scoring
+cohorts remain. Variant identity is removed from player-facing surfaces (HUD, help headings, results,
+profile history, selector, metadata) while plain-language round-rule teaching lines are preserved
+via help derivation. Server-authoritative daily puzzle issuance, single-attempt ranked play, one
+site-wide streak, frozen board rollover with 2h midnight grace, 90-day move-log R2 archiving before delete,
+and Cron Worker integration are complete. Scoped lint, types (0 errors / 0 warnings), 145 unit tests,
+68 real-D1 integration cases, vectors across 6 runtimes, and 123-case Chromium matrix pass.
+Full `bun run verify` remains deferred; unauditioned audio and editor exclusions (.cursor, .vscode/mcp.json)
+persist. No production deployment authorized.
+See `docs/briefs/v1.4-leaderboard-codex-brief.md`, `docs/CODEMAP.md`, and `morphi-plan-simple.md`.
+
 **v1.3.5.17 Memory closeout accepted; audio approved; source commit and push authorized (2026-11-08):**
 The owner said “closeout is now done, you can comit and then push to github, also i review the audio file and approved it,you can include in comit too”.
 This accepts the completed v1.3.5.17 focused Memory integration and closeout, approves the three audio files

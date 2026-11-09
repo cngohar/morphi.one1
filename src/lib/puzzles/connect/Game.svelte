@@ -65,7 +65,8 @@
 	let lastInvalidAt = -Infinity;
 	let elapsed = $state(0);
 	const CONNECT_RUSH_SECONDS = 60;
-	const rush = $derived(game.variant === 'connect:rush-60');
+	const timeLimit = $derived(game.rules?.timeLimit ?? 0);
+	const rush = $derived(timeLimit > 0);
 	let remaining = $state(CONNECT_RUSH_SECONDS);
 	let lastTick = -1;
 	let announcement = $state('');
@@ -140,7 +141,7 @@
 			const ms = clockMs();
 			elapsed = Math.floor(ms / 1000);
 			if (rush) {
-				remaining = Math.max(0, Math.ceil((CONNECT_RUSH_SECONDS * 1000 - ms) / 1000));
+				remaining = Math.max(0, Math.ceil((timeLimit * 1000 - ms) / 1000));
 				if (remaining > 0 && remaining <= 10 && remaining !== lastTick) sound.play('timer-tick');
 				lastTick = remaining;
 				if (remaining === 0 && phase === 'playing') {
@@ -148,8 +149,8 @@
 					activePair = -1;
 					pauseClock();
 					sound.play('connect-invalid');
-					const score = connectScore(game, CONNECT_RUSH_SECONDS, scoring);
-					oncomplete(score, CONNECT_RUSH_SECONDS);
+					const score = connectScore(game, timeLimit, scoring);
+					oncomplete(score, timeLimit);
 					announcement = t('ending.connect.timeUp');
 					finishDelay.start(motion.reduced() ? 0 : 1000, document.hidden || paused);
 				}

@@ -360,7 +360,9 @@ export async function gameStatistics(
 		family,
 		baseVariants.map((variant) => ({
 			id: variant.id,
-			leaderboardGroups: puzzleVariant(family, variant.id)?.leaderboardGroups ?? []
+			leaderboardGroups:
+				variantDefinitions(family).find((definition) => definition.id === variant.id)
+					?.leaderboardGroups ?? []
 		})),
 		true
 	);

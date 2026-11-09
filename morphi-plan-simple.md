@@ -1,5 +1,77 @@
 # Morphi: Simple Plan
 
+## Active status — v1.4 built locally; targeted verification complete; STOP (2026-11-09)
+
+Resumed the preserved implementation without resetting HEAD `9e10b73`.
+§§8A–8E and full targeted §9 are complete. **253 player variant groups → 0;
+boards = families × UTC days**. Daily issuance/recovery is anonymous, practice
+rules remain, and every non-baseline round keeps its teaching. §8E needed no
+manifest edit. The premium streak freeze remains an ineligible stub.
+
+Scoped lint, types (0 errors/0 warnings), build/boundaries/lazy bundle, 145 units,
+8 shared validation cases, 68 unique real-D1 cases, frozen vectors in six runtimes,
+and the final whole 123-case Chromium matrix (one worker) pass. Actual local Cron,
+interactive CLI/R2 archive-before-delete and the light 10,000-entry query/call
+measurements pass. Full `bun run verify` and production/physical-device checks
+remain deferred. The parent used recorded owner takeover after the required
+verifier returned 503; coding used the prescribed available agents.
+
+Owner functional review is pending. See [complete results, 53-file inventory and
+zero-edit limits](docs/CODEMAP.md) and [rev 6 brief](docs/briefs/v1.4-leaderboard-codex-brief.md).
+No commit, push, deployment, release, new family/variant or v1.4.1 was performed.
+**Stop at local v1.4.** Earlier active-status entries below are historical.
+
+## Active status — v1.4 rev 5 types green; teaching-data scope stop (2026-11-09)
+
+Resumed the preserved partial implementation without resetting HEAD `9e10b73`.
+§8D source changes, type-contract corrections and required daily test files are
+authored. Registry/binding generation pass; final types pass with **0 errors /
+0 warnings**. Focused unit outcome is **117/118 unique passes**. The required
+round-rule test fails because Connect board-8 and rush-60 provide no differing
+help step. The brief forbids the manifest edits needed to satisfy §5A, so its
+refactor-gap stop rule applies. Full lint also fails in 10 untouched historical
+files. Build and remaining §9 runtime/browser/load checks are unrun.
+
+**253 variant groups → 0 player variant boards; boards = families × UTC days**
+is authored, not built or functionally accepted. The required verifier returned
+503; parent verification used the owner's explicit takeover authorization.
+Full verify remains deferred. See [current evidence/inventory/conflicts](docs/CODEMAP.md)
+and [brief](docs/briefs/v1.4-leaderboard-codex-brief.md). No commit, push,
+deployment, release or v1.4.1 follows. Resume this tree after resolving the named
+allowances; do not restart.
+
+## Active status — v1.4 rev 4 resumed; stopped on further scope gaps (2026-11-09)
+
+The preserved daily-family implementation was resumed without resetting HEAD
+`9e10b73`. §§8A–8C source connections, family/date board UI, anonymous rules/help,
+streak and the template are authored. Midnight rounds credit their UTC start day;
+boards freeze at 02:00 UTC. **253 variant groups → 0 player variant boards;
+boards = families × days** is authored but not built or verified.
+
+Registry/type generation pass. `bun run check` fails with **44 errors / 0 warnings
+in 15 files**. Removing client groups exposes two further source dependencies
+outside the brief's edit list: `server/activity.ts` and `server/memory-directory.ts`.
+Practice selector types and old board/projection tests also need reconciliation.
+The brief requires stopping on such gaps; partial work and logs are preserved.
+Build and all remaining §9 checks are unrun; full verify remains deferred.
+The required verifier returned 503, so the parent took over as authorized.
+See [current handoff/inventory](docs/CODEMAP.md) and [brief](docs/briefs/v1.4-leaderboard-codex-brief.md).
+No v1.4 acceptance, commit, push, deployment or next milestone follows.
+
+## Active status — v1.4 rev 3 partial implementation; stopped on scope gaps (2026-11-09)
+
+The owner selected exact v1.4 implementation including §8A/§8B with Ponytail;
+no commit, push, deployment or later milestone. Partial source is preserved locally.
+The brief's stop rule applies: `memory/TimeStrata.svelte` still needs anonymous-rule
+and variant-display changes outside its explicit file list, and the maintenance CLI
+caller must pass `RUN_ARCHIVE` to activate the new completed-run pruning.
+All build and verification checks remain unrun; the board transition is incomplete.
+The owner chose start-day credit and final freeze after the two-hour midnight grace;
+this decision is recorded but its final source adjustment remains pending.
+See [partial inventory and handoff](docs/CODEMAP.md) and
+[revised brief](docs/briefs/v1.4-leaderboard-codex-brief.md).
+No v1.4 acceptance or release authorization is inferred.
+
 ## Active status — v1.3.5.17 Memory closeout accepted; audio approved; source commit and push authorized (2026-11-08)
 
 The owner instructed “closeout is now done, you can comit and then push to github, also i review the audio file and approved it,you can include in comit too”.

@@ -94,7 +94,9 @@ async function setup(
 	);
 	await page.goto('/play');
 	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'playing', { timeout: 15000 });
-	await expect(page.locator('.active-round')).toHaveAttribute('data-variant', variant);
+	await expect(page.locator('.active-round')).toHaveAttribute('data-family', 'memory');
+	await expect(page.locator('.active-round')).not.toHaveAttribute('data-variant');
+	await expect(page.locator('.game')).not.toHaveAttribute('data-variant');
 }
 
 function exposedPair(round: ReferenceRound) {
@@ -228,11 +230,13 @@ for (const vector of vectors.slice(0, 3))
 			expect(sawEmpty).toBe(true);
 			await expect(page.locator('.ending')).toContainText('All layers cleared');
 			await expect(page.locator('.result')).toBeVisible({ timeout: 15000 });
-			await expect(page.locator('.result')).toContainText('Time Strata');
+			await expect(page.locator('.result')).toContainText('Memory');
+			await expect(page.locator('.result')).not.toContainText('Time Strata');
 			await page.screenshot({ path: `${evidence}/${tag}-result.png` });
 			await page.getByRole('button', { name: 'Next puzzle', exact: true }).click();
 			await expect(page.locator('.game')).toHaveAttribute('data-round', '2');
-			await expect(page.locator('.active-round')).toHaveAttribute('data-variant', variant);
+			await expect(page.locator('.active-round')).toHaveAttribute('data-family', 'memory');
+			await expect(page.locator('.active-round')).not.toHaveAttribute('data-variant');
 		});
 	}
 

@@ -1,5 +1,521 @@
 # CODEMAP.md
 
+## v1.4 rev 6 — built locally; full targeted §9 passed; stopped (2026-11-09)
+
+Resumed the preserved implementation through §§8A–8E without resetting or
+restarting completed files. The initial CODEMAP/diff inspection preserved HEAD
+`9e10b73`; it remains unchanged. **253 player variant board groups → 0; boards =
+families × UTC days.** Internal immutable replay/scoring cohorts remain.
+The owner has not functionally accepted v1.4. No commit, push, deployment,
+provisioning, release or next milestone was performed.
+
+Preserved: daily migration/storage, server issuance and replay validation,
+anonymous engine rules, daily start/recovery, family/date board UI and history,
+TimeStrata rule controls, archive retention/CLI wiring, separate Cron Worker,
+generated metadata removal, and the template/decision updates.
+
+Finished in this run: §8E teaching derivation (step → note → scoring-row value),
+all required units and runtime checks, authoritative legacy ranked start
+compatibility inside §8D's start-validation allowance, and final-freeze rejection
+for uncommitted daily claims. Omitted-baseline canonical hashes remain compatible.
+Browser verification found and corrected the named-action JSON transport in the
+already-authorised PlaySession/leaderboard files: a bounded single-payload form
+now enters SvelteKit, then the existing JSON/auth/session/origin/owner guards.
+The new teaching line uses the existing header gap and compact full text, retaining
+original game-frame space. Result teaching spacing was fitted in portrait.
+Tests were reconciled with anonymous rules and the removed public variant query;
+no assertions were skipped or game outcomes changed. The network recorder now
+reads finished responses, retaining every outgoing request, so reload-interrupted
+keepalive bodies cannot hang verification.
+
+§8E's manifest fallback was **not needed**. No manifest was edited. Both required
+Connect sentences pass exactly: “This board is 8 × 8 with 8 pairs.” and “Connect
+all pairs before the 60-second clock runs out.” Every non-baseline round has a
+nonempty anonymous teaching line. All 86 non-baseline copies fit at the three
+required sizes: **258 layout checks**, minimum measured clearance **2.609375px**,
+with full text preserved and no HUD overlap.
+
+Required `gpt-6.1-sol/high` agents performed scoped coding. The required
+`gpt-6-luna/max` verifier returned 503; the parent performed verification under
+the previously recorded explicit owner takeover instruction. No substitute-model
+evidence is claimed. Source was stable during checks; shared setup/builds and
+browser execution were serial, with Playwright **workers: 1** retained.
+
+### Every §9 verification result
+
+Evidence is local under `build/v1.4/`; this directory is ignored.
+
+- Registry generation: **PASS**, `registry-rev6.log`. Only the regenerated client
+  metadata projection changes; no per-variant board data is emitted.
+- Binding generation: **PASS**, `types-rev6.log`; D1/KV/R2 and local secret types.
+  Generated `worker-configuration.d.ts` is ignored, never hand-edited.
+- Scoped Prettier + ESLint: **PASS** on all v1.4 files supported by these tools;
+  final log `lint-v14-complete.log`. The SQL migration has no installed Prettier
+  parser and is validated by real D1. Untouched formatting drift is listed below.
+- Types: **PASS**, **0 errors / 0 warnings**, `check-v14-complete.log`.
+  No suppression or waiver of the earlier 44 errors.
+- Build: **PASS**, `build-v14-complete.log`.
+- Import boundaries: **PASS**, `boundaries.log`.
+- Lazy bundle: **PASS**, `lazy-bundle-v14-complete.log`; shell isolation and three
+  independently imported Game views remain.
+- Focused units: **145/145 across 13 complete files**, `unit-rev6.log`, including
+  the original 118-case scope, every existing Block/Memory/Connect variant file,
+  teaching priority/exact Connect sentences, daily derivation/weighted enabled
+  pick, ties/ranks/percentiles, streak transitions, freeze stub and cache rules.
+  Daily recheck: **14/14**, `daily-unit-final.log`.
+- Shared catalogue/server validation: **8/8**, `slice3-validation.log` (isolated
+  real D1). Synthetic validation is test-only; no new family was implemented.
+- Real-D1 integration: **68 unique cases pass** across accounts, runs, Block,
+  Memory and daily boards. `integration-final.log` had 66/68 with one stale rules
+  assertion causing a downstream active-session failure. After that correction,
+  the entire Memory file passes **18/18**, `memory-integration-final.log`; the
+  other four complete files already passed. Daily start/save/best/snapshot/read,
+  replay tampering, spent/second attempts, start validation, start-day credit,
+  final freeze/interrupted claims, history and retention are covered.
+- Frozen vectors: **PASS in all six runtimes** — Node, Bun, Chromium, Firefox,
+  WebKit and workerd. `vectors-global.log` retains fingerprint `a8be9d5f…`
+  (nine game vectors plus six theme vectors); `vectors-memory.log` covers all
+  **72 Memory vectors** (38 frozen + 4 Time Strata + 30 Batch H);
+  `vectors-block.log` covers all **12 Block vectors**. Outcomes unchanged.
+- Chromium browser/admin: final whole run **123/123**, **one worker**, **25.0m**,
+  `browser-v14-complete.log`: Connect 9, daily boards 8, admin 4, Time Strata
+  baseline 11 and Batch H 91. Earlier failures were corrected and superseded
+  by this full run. Required 390×844 / 844×390 / 1280×800 board views, zero
+  horizontal overflow, 44px targets, family-only selectors/results/profile/Home,
+  anonymous issuance/network/DOM/resume, no-preview and clock teaching,
+  admin variant inspection and zero-write test play all pass. Time Strata includes
+  every mode/size/viewport, utility recovery, bounds, keyboard and motion failure.
+- Source/refactor audits: **PASS**, `source-audit.log`: no gameplay
+  `round.variant`/literal variant comparison, TimeStrata identity reads/attribute,
+  `rules_group` filter in activity, `BOARD_GROUPS` or window-ranked run query.
+  Admin statistics keep their server-manifest cohort breakdown; directory board
+  references use family/date. Public availability rejects `?variant=` (400),
+  returns no variant list; old group board URLs return 404. Admin test play uses
+  its operator/manifest path, independently of public variant availability.
+- Local Cron: **PASS**, `cron-invocations.json` and `cron-proof.log`. Actual
+  scheduled invocations at midnight, month start and 02:00 returned 200/ok;
+  tomorrow's three family puzzles, six current/previous snapshots and yesterday's
+  final freeze were verified. Shape: **separate scheduled-only `workers/cron.ts`
+  via Wrangler's `env.cron`**, because the SvelteKit app Worker exports fetch only.
+  The app fetch handler was untouched. All configured bindings remain shared.
+- Actual authenticated interactive CLI prune/R2: **PASS**, `cli-prune.log`
+  (TOTP redacted) and `cli-r2-proof.log`. A >90-day run's exact move log was archived
+  to local `RUN_ARCHIVE` by run ID, then deleted from D1. It did not silently skip.
+  The isolated fixture was removed after proof; original credentials stayed local.
+- Light local load: **PASS**, `integration/daily-load.json`. With 10,000 entries,
+  indexed Top25 reads **25 rows**; total COUNT reads **10001**, outside-top own-rank
+  COUNT **10000**. Query plan uses covering `daily_best_board`; cold board has
+  **6 round trips**, without a window scan. True HEAD/current comparison in
+  `save-before-after.log`: legacy `saveRun` **7 → 7**, daily **8** calls, including
+  Drizzle `raw()`. This is a local query measurement, not production throughput;
+  no speculative DO/Queue was introduced.
+
+### Untouched formatting drift — pre-existing, not fixed
+
+The earlier global lint failure was limited to these ten files, unchanged from
+HEAD. §8E narrows lint to v1.4 files; this is not a global lint pass.
+
+- `docs/briefs/v1.3.4-mahjong-codex-brief.md.md`
+- `docs/briefs/v1.3.5.10-batch-c-brief.md`
+- `docs/briefs/v1.3.5.13-batch-f-brief.md`
+- `docs/briefs/v1.3.5.6-tier1-policy-brief.md`
+- `docs/briefs/v1.3.5.7-tier2-directory-brief.md`
+- `docs/evidence/v1.3.4/research/review.json`
+- `docs/evidence/v1.3.5/v1.3.5.1-verification.json`
+- `docs/work/V1.3.5.1_WORK.md`
+- `docs/work/V1.3.5.6_WORK.md`
+- `docs/work/V1.3.5.7_WORK.md`
+
+### Zero-edit scope limits, preserved and reported
+
+- `recordRoundPlay`/`recordRoundAbandon` remain outside §8D's start-validation
+  allowance. Non-baseline anonymous daily telemetry does not update first-move/
+  departure timestamps. Exact-session abandonment spends the attempt; authoritative
+  daily replay/save/board/streak functionality passes.
+- Historical non-daily/non-baseline ranked UI recovery may lose identity. New
+  anonymous daily recovery and current practice TimeStrata checkpoints pass;
+  no out-of-scope legacy recovery patch or owner waiver is claimed.
+- Excluded `MemoryDirectory.svelte` still uses its board-reference value as a
+  scoring-editor fragment and retains an old rules-group heading. The authorised
+  server directory reference is family/date; admin tests pass. Its wording/anchor
+  was not patched outside this brief.
+
+Premium streak freeze remains the specified **ineligible stub**, not live.
+Full `bun run verify`, global lint repair, production load/device measurements,
+physical-device review and provisioning/deployment remain unrun/deferred.
+No v1.4.1, new family/variant, friends boards, leagues, DO/Queue/sharding, payments,
+new sounds or release work followed. **STOP at local v1.4; owner review next.**
+
+### Final authored/preserved/regenerated inventory — 53 files
+
+The owner-provided brief is included. `.cursor/` and `.vscode/mcp.json` remain
+excluded. Ignored build evidence and generated Worker types are not source files.
+
+- `docs/CODEMAP.md`
+- `docs/DECISIONS.md`
+- `docs/briefs/v1.4-leaderboard-codex-brief.md`
+- `docs/puzzles/_TEMPLATE.md`
+- `migrations/0015_daily_boards.sql`
+- `morphi-plan-simple.md`
+- `scripts/admin-local.ts`
+- `scripts/generate-registry.ts`
+- `src/lib/block-variants.test.ts`
+- `src/lib/components/PuzzleHelp.svelte`
+- `src/lib/components/account/ProfileContent.svelte`
+- `src/lib/engine/contract.ts`
+- `src/lib/i18n/messages.ts`
+- `src/lib/puzzle-metadata.ts`
+- `src/lib/puzzles/block-placement/Game.svelte`
+- `src/lib/puzzles/block-placement/View.svelte`
+- `src/lib/puzzles/block-placement/logic.ts`
+- `src/lib/puzzles/connect/Game.svelte`
+- `src/lib/puzzles/connect/View.svelte`
+- `src/lib/puzzles/connect/logic.ts`
+- `src/lib/puzzles/memory/Game.svelte`
+- `src/lib/puzzles/memory/TimeStrata.svelte`
+- `src/lib/puzzles/memory/View.svelte`
+- `src/lib/puzzles/memory/logic.ts`
+- `src/lib/screens/PlaySession.svelte`
+- `src/lib/screens/ResultScreen.svelte`
+- `src/lib/selector.ts`
+- `src/lib/server/activity.ts`
+- `src/lib/server/config-cache.ts`
+- `src/lib/server/daily.test.ts`
+- `src/lib/server/daily.ts`
+- `src/lib/server/games.ts`
+- `src/lib/server/memory-directory.ts`
+- `src/lib/server/ranked-session.ts`
+- `src/lib/server/retention.ts`
+- `src/lib/server/runs.ts`
+- `src/lib/ui/puzzle-presentation.test.ts`
+- `src/lib/ui/puzzle-presentation.ts`
+- `src/routes/api/play/availability/+server.ts`
+- `src/routes/leaderboard/+page.server.ts`
+- `src/routes/leaderboard/+page.svelte`
+- `tests/e2e/daily-boards.spec.ts`
+- `tests/e2e/memory-variants-admin.spec.ts`
+- `tests/e2e/time-strata-batch-h.spec.ts`
+- `tests/e2e/time-strata.spec.ts`
+- `tests/integration/accounts.test.ts`
+- `tests/integration/block-variants.test.ts`
+- `tests/integration/daily-boards.test.ts`
+- `tests/integration/memory-variants.test.ts`
+- `tests/integration/runs.test.ts`
+- `tests/slices/slice3-catalog-server-validation.test.ts`
+- `workers/cron.ts`
+- `wrangler.jsonc`
+
+The earlier records below are preserved history, superseded by this closeout.
+
+## v1.4 rev 5 — resumed; types green; stopped at required teaching-data gap (2026-11-09)
+
+The owner requested resuming the preserved partial implementation exactly through
+§§8A–8D and §9, with no commit, push or deployment. The run first read this
+CODEMAP's preserved rev 4 handoff and `git diff --stat`; HEAD remains `9e10b73`.
+No completed source file was reset or restarted. Ponytail was applied. Required
+`gpt-6.1-sol/high` coding agents completed scoped tasks; the required
+`gpt-6-luna/max` verifier returned 503, and the parent performed checks under the
+owner's explicit takeover instruction. **v1.4 remains incomplete and unbuilt.**
+
+Preserved from earlier runs: migration and daily storage/issuance/replay, anonymous
+engine rules and teaching envelopes, family/date board UI, profile history,
+TimeStrata anonymous controls, R2 retention and CLI pass-through, separate Cron
+entrypoint, generated client metadata removal and template/documentation changes.
+This run authored §8D start validation against authoritative daily family/date
+identity and `daily_best` recovery, plus the admin Memory directory's family/date
+board reference. Internal activity variant and admin replay/scoring cohorts remain
+server-side. It fixed the selector's needless board-group type requirement,
+Memory rules structural compatibility, the Cron/app auth-URL environment type,
+unknown-JSON action narrowing, and stale tests of deliberately removed public
+board/history/identity contracts. A final server-manifest annotation corrected
+one new directory type diagnostic; no type error was waived or suppressed.
+The two required daily integration/browser files are authored and formatted.
+
+### Verification results
+
+- `bun run registry:generate`: PASS (`build/v1.4/registry-rev5.log`). Manifests
+  unchanged; only `puzzle-metadata.ts` differs among generated registry files.
+- `bun run cf:types`: PASS (`build/v1.4/types-rev5.log`). D1/KV/R2 and secret types
+  generated. Cron explicitly carries the same non-secret auth URL so app types
+  retain their required string; no secret was printed or committed.
+- `bun run check`: final PASS, **0 errors / 0 warnings**
+  (`build/v1.4/check-final.log`). The preserved 44 errors are fixed.
+- Focused units: 10 complete files / 118 cases; first run 116 passed, one failed
+  required teaching test, and one Connect 1,200-seed test timed out at the default
+  five seconds (`build/v1.4/unit-rev5.log`). The entire Connect file passed 7/7 in
+  a serial rerun with a 15-second timeout, taking 2.42 seconds
+  (`build/v1.4/connect-unit-recheck.log`). Unique final result: **117/118 pass**;
+  the required daily teaching test remains failing and is not relaxed.
+- `bun run lint`: FAIL at Prettier in 10 untouched historical files
+  (`build/v1.4/lint-rev5.log`); ESLint was not reached. `git diff --quiet` confirms
+  these files are unchanged from HEAD: the .4 Mahjong, .5.10, .5.13, .5.6 and .5.7
+  briefs, the .4 research and .5.1 verification JSON evidence, and .5.1/.5.6/.5.7
+  work logs. Formatting those files is outside this brief's edit list.
+- Read-only source audits: no `round.variant` or literal variant-ID comparison
+  in Game/logic gameplay branches; no `memoryVariant(`, `variant ===` or
+  `data-strata-rule={variant}` in TimeStrata; no `rules_group` in activity.ts;
+  no old window-ranking query or `BOARD_GROUPS` in runs.ts. Client metadata has
+  no board data; its `Omit<..., 'leaderboardGroups'>` type explicitly removes that
+  property. These inspections are not browser/runtime acceptance.
+- **Not run after the refactor-gap stop:** build, boundaries, lazy-bundle,
+  six-runtime vectors, real-D1 daily/legacy integration, browser/admin tests,
+  local scheduled runtime, interactive prune-expired CLI/R2 end-to-end, or the
+  10,000-row/round-trip measurements. Authored tests and load instrumentation
+  are unverified. Full `bun run verify` remains deferred.
+
+### Exact stopping point and remaining scope conflicts
+
+§5A requires every non-baseline variant's round-rule line to come from its first
+help step absent from baseline; §9 requires none of these lines to be empty.
+The brief asserts all current variants already have that step. The actual
+`src/lib/puzzles/connect/manifest.ts:81` (`connect:board-8`) and `:92`
+(`connect:rush-60`) both spread baseline help without overriding `steps`.
+Only scoring rows/note/tips differ. Therefore both required rule lines are empty.
+The new required daily unit case detects this. Correcting the missing teaching
+steps needs an explicit narrow manifest allowance (and a Connect message-copy
+allowance if new sentences are supplied); manifests are explicitly forbidden.
+No invented fallback, manifest edit, skipped assertion or changed gameplay was
+used to hide this conflict. The brief's refactor-gap rule requires stopping here.
+
+Further traced consumers, preserved without out-of-scope changes:
+
+- `parseRoundActivity` normalizes omitted variant and an explicit baseline to the
+  same value. `recordRoundStart` resolves anonymous daily identity server-side;
+  it can reject mismatched non-baseline identity/family/owner/session, but cannot
+  distinguish that parser-normalized explicit baseline from omission.
+- Existing `recordRoundPlay`/`recordRoundAbandon` compare the request's normalized
+  baseline identity. Non-baseline anonymous daily telemetry will not update its
+  first-move/departure timestamps without a shared server-identity resolution
+  allowance. Exact-session `abandonSession` still spends the daily attempt;
+  completion and board eligibility use authoritative issuance.
+- Legacy ranked activity assertions were retained in existing integration tests.
+  §8D start validation currently requires daily identity for ranked starts; the
+  untouched legacy issuance path still exists. This compatibility conflict needs
+  review inside the start-validation allowance; its tests have not run.
+- `MemoryDirectory.svelte:488` uses the board-reference field as a scoring-editor
+  fragment. Its new family/date value is not a scoring cohort anchor, and the
+  drawer's old heading still says leaderboard rules group. This component is
+  explicitly excluded; the directory data change is authored, not browser-verified.
+
+The board transition is authored: **253 variant groups → 0 player variant boards;
+boards = families × UTC days**. Internal manifest/replay groups are unchanged.
+No successful v1.4 build, full §9 pass, functional acceptance, commit, push,
+deployment, release, v1.4.1, new family, friends/leagues, DO/Queue/sharding or
+physical-device evidence is claimed. Resume this working tree after resolving
+these specific allowances; do not restart.
+
+### Preserved authored/regenerated inventory
+
+The owner's in-repo brief is also present. Generated `worker-configuration.d.ts`
+is ignored and regenerated, not hand-edited. Existing `.cursor/` and
+`.vscode/mcp.json` remain excluded and unchanged by this run.
+
+- `docs/CODEMAP.md`
+- `docs/DECISIONS.md`
+- `docs/puzzles/_TEMPLATE.md`
+- `migrations/0015_daily_boards.sql`
+- `morphi-plan-simple.md`
+- `scripts/admin-local.ts`
+- `scripts/generate-registry.ts`
+- `src/lib/block-variants.test.ts`
+- `src/lib/components/PuzzleHelp.svelte`
+- `src/lib/components/account/ProfileContent.svelte`
+- `src/lib/engine/contract.ts`
+- `src/lib/i18n/messages.ts`
+- `src/lib/puzzle-metadata.ts`
+- `src/lib/puzzles/block-placement/Game.svelte`
+- `src/lib/puzzles/block-placement/View.svelte`
+- `src/lib/puzzles/block-placement/logic.ts`
+- `src/lib/puzzles/connect/Game.svelte`
+- `src/lib/puzzles/connect/View.svelte`
+- `src/lib/puzzles/connect/logic.ts`
+- `src/lib/puzzles/memory/Game.svelte`
+- `src/lib/puzzles/memory/TimeStrata.svelte`
+- `src/lib/puzzles/memory/View.svelte`
+- `src/lib/puzzles/memory/logic.ts`
+- `src/lib/screens/PlaySession.svelte`
+- `src/lib/screens/ResultScreen.svelte`
+- `src/lib/selector.ts`
+- `src/lib/server/activity.ts`
+- `src/lib/server/config-cache.ts`
+- `src/lib/server/daily.test.ts`
+- `src/lib/server/daily.ts`
+- `src/lib/server/games.ts`
+- `src/lib/server/memory-directory.ts`
+- `src/lib/server/ranked-session.ts`
+- `src/lib/server/retention.ts`
+- `src/lib/server/runs.ts`
+- `src/lib/ui/puzzle-presentation.test.ts`
+- `src/lib/ui/puzzle-presentation.ts`
+- `src/routes/api/play/availability/+server.ts`
+- `src/routes/leaderboard/+page.server.ts`
+- `src/routes/leaderboard/+page.svelte`
+- `tests/e2e/daily-boards.spec.ts`
+- `tests/e2e/memory-variants-admin.spec.ts`
+- `tests/e2e/time-strata-batch-h.spec.ts`
+- `tests/e2e/time-strata.spec.ts`
+- `tests/integration/accounts.test.ts`
+- `tests/integration/block-variants.test.ts`
+- `tests/integration/daily-boards.test.ts`
+- `tests/integration/memory-variants.test.ts`
+- `tests/integration/runs.test.ts`
+- `tests/slices/slice3-catalog-server-validation.test.ts`
+- `workers/cron.ts`
+- `wrangler.jsonc`
+
+## v1.4 rev 4 — resumed partial work; verification found further scope gaps (2026-11-09)
+
+The run first read the preserved rev 3 handoff below and `git diff --stat`, then
+continued those changes without resetting or rewriting completed files from HEAD.
+HEAD remains `9e10b73`. The owner selected §§8A–8C and all of §9, with Ponytail,
+no commit, push, deployment, release or later milestone. **v1.4 is incomplete.**
+
+Already preserved: migration/daily storage, server issuance and replay checks,
+anonymous engine rules, metadata generator changes, presentation helpers,
+retention and the separate Cron entrypoint. This run completed client daily
+start/live recovery, anonymous ending/help/rules, streak display, the family/date
+board UI and public availability removal. §8C TimeStrata now reads anonymous
+rules without an identity attribute; `admin-local.ts` passes `RUN_ARCHIVE`.
+Daily completion/best/snapshot invalidation/streak now commit atomically.
+Start-day board credit remains open through 02:00 UTC; frozen retries cannot
+rewrite ranks. Accepted entries retain positions when a player is deleted/banned;
+live name resolution anonymizes them. Existing puzzles survive secret rotation;
+future puzzles use the new key. Only midnight pre-generates tomorrow.
+
+The template records `(family, UTC date)`, variant boards: none, per-round teaching
+and the admin test-play exception. The old board query is removed; regenerated
+client metadata contains no board-group data. **253 variant groups → 0 player
+variant boards is authored, not built or verified; boards = families × days.**
+
+Verification performed:
+
+- `bun run registry:generate`: PASS. Only `puzzle-metadata.ts` changed among
+  generated registry files; no manifest was edited.
+- `bun run cf:types`: PASS. Local D1/KV/R2 and auth/daily secret types generated;
+  the secret value remains only in ignored `.dev.vars`. Required-secret declarations
+  were removed to preserve existing dev credential inference. Named Cron env
+  currently makes `BETTER_AUTH_URL` optional in the generated common interface;
+  config/type reconciliation remains unfinished.
+- `bun run check`: FAIL — **44 errors, 0 warnings, 15 files**. Log:
+  `build/v1.4/check.log`; generation logs are beside it.
+- Read-only source audit: no `round.variant` or literal variant equality remains
+  in Game/logic gameplay; no `memoryVariant(`, `variant ===` or identity attribute
+  remains in TimeStrata; no old window ranking or BOARD_GROUPS remains in runs.ts.
+  These inspections are not gameplay or browser passes.
+- Not run: build, lint, boundaries, lazy-bundle, daily/variant units, six-runtime
+  vectors, real-D1 integration, browser/admin checks, local Cron, CLI/R2 retention
+  or 10,000-row load/round-trip measurements. Full `bun run verify` stays deferred.
+  Thirteen daily unit cases are authored but unrun. New daily integration/E2E files
+  have not been authored. The required `gpt-6-luna/max` verifier returned 503;
+  the parent took over under the owner's explicit instruction.
+
+The brief's refactor-gap stop rule was triggered by two unlisted source consumers:
+
+1. `server/activity.ts:72` still reads `puzzleVariant(...).leaderboardGroups` from
+   client metadata for activity recovery/cohort binding. It needs a server-manifest
+   lookup that preserves variant scoping; restoring client board groups would
+   violate v1.4. This file is outside §§8–8C.
+2. `server/memory-directory.ts:213` also reads that removed property for admin
+   inspection. Its server-only manifest lookup is outside §§8–8C; the allowance
+   for `server/games.ts` does not cover this consumer.
+
+Additional type failures needing explicit reconciliation: selector `peekVariant`
+still requires full PuzzleVariant including leaderboardGroups (the failing caller
+is practice, beyond the daily-only selector allowance); presentation/Block
+projection tests require deleted metadata; old account/run/Memory/Slice3 tests
+call the deleted group/offset board contract or inspect removed history fields.
+Existing TimeStrata browser tests likewise require removed identity attributes.
+Narrowly updating those tests has not been authorized by the edit list. Within
+the allowed files, MemoryRules lacks the Record index signature required by the
+new createRound contract, and the practice scoring action needs unknown-JSON
+object narrowing. No implementation fixes followed detection of the scope gaps.
+
+Authored/regenerated inventory (38 files, including reporting/template; plus the
+owner's brief; existing editor/MCP files preserved):
+
+- `docs/CODEMAP.md`, `docs/DECISIONS.md`, `docs/puzzles/_TEMPLATE.md`, `morphi-plan-simple.md`
+- `migrations/0015_daily_boards.sql`, `workers/cron.ts`, `wrangler.jsonc`
+- `scripts/admin-local.ts`, `scripts/generate-registry.ts`
+- `src/lib/engine/contract.ts`, `src/lib/i18n/messages.ts`, `src/lib/puzzle-metadata.ts`
+- `src/lib/components/PuzzleHelp.svelte`, `src/lib/components/account/ProfileContent.svelte`
+- `src/lib/puzzles/block-placement/{logic.ts,Game.svelte,View.svelte}`
+- `src/lib/puzzles/connect/{logic.ts,Game.svelte,View.svelte}`
+- `src/lib/puzzles/memory/{logic.ts,Game.svelte,View.svelte,TimeStrata.svelte}`
+- `src/lib/screens/{PlaySession,ResultScreen}.svelte`, `src/lib/ui/puzzle-presentation.ts`
+- `src/lib/server/{daily.ts,daily.test.ts,config-cache.ts,games.ts,ranked-session.ts,retention.ts,runs.ts}`
+- `src/routes/api/play/availability/+server.ts`, `src/routes/leaderboard/+page.server.ts`, `src/routes/leaderboard/+page.svelte`
+- `tests/e2e/memory-variants-admin.spec.ts` (only the removed nested Game identity
+  expectation was changed to family plus absent data-variant; not executed)
+
+No successful build, functional acceptance, full §9 pass, commit, push, deployment,
+v1.4.1, friends/leagues, DO/Queues/sharding, new family or release work is claimed.
+Resume from this tree only after the remaining edit-list gaps are resolved.
+
+## v1.4 rev 3 — partial local implementation; stopped on scope gaps (2026-11-09)
+
+The owner selected exact implementation of the daily-family leaderboard brief, including
+§8A and §8B, under Ponytail, with no commit, push, deployment or later milestone.
+Source changes are **partial and unverified**. No build, registry generation, generated
+binding types, lint/type/boundary/lazy-bundle checks, integration, browser or load checks
+were run. Nine daily unit cases were authored but not executed. The completed v1.3.5.17
+baseline remains `9e10b73`; the working tree contains the partial v1.4 changes below.
+The 253-to-zero board transition is not complete or verified.
+
+The brief's stop rule was triggered by `src/lib/puzzles/memory/TimeStrata.svelte`,
+which still derives variant IDs for utility controls and exposes `data-strata-rule`.
+The required anonymous-rule and display conversion is outside the explicit
+`logic.ts` / `Game.svelte` / stated View allowances in §8B. A second integration
+scope gap is `scripts/admin-local.ts:125`: the existing maintenance command does
+not pass the new `RUN_ARCHIVE` binding, so its invocation safely skips completed-run
+pruning. Activating archive-before-delete through that command requires its caller
+to pass the bucket; this caller is outside the brief's edit list.
+
+The owner answered the midnight edge case during implementation: **credit the UTC
+start day and freeze after the two-hour grace period**. This answer is recorded,
+but the source still needs the final 02:00 UTC freeze adjustment. Other unfinished
+integration includes consistent live/frozen ban/deletion membership, restricting
+tomorrow generation to the required schedule, wiring PlaySession and the board UI,
+registry/type generation, all verification and the final visibility/template closeout.
+
+Implementation choices already authored: daily start/resume actions in the permitted
+leaderboard server route preserve the existing ranked start API; anonymous gameplay
+parameters in the three families; a separate scheduled-only Cron environment; one
+local `RUN_ARCHIVE` binding. These are not acceptance or test-pass claims.
+
+Authored source inventory (26 files; none constitutes a successfully built v1.4):
+
+- `migrations/0015_daily_boards.sql`
+- `scripts/generate-registry.ts`
+- `src/lib/components/PuzzleHelp.svelte`
+- `src/lib/components/account/ProfileContent.svelte`
+- `src/lib/engine/contract.ts`
+- `src/lib/puzzles/block-placement/Game.svelte`
+- `src/lib/puzzles/block-placement/View.svelte`
+- `src/lib/puzzles/block-placement/logic.ts`
+- `src/lib/puzzles/connect/Game.svelte`
+- `src/lib/puzzles/connect/View.svelte`
+- `src/lib/puzzles/connect/logic.ts`
+- `src/lib/puzzles/memory/Game.svelte`
+- `src/lib/puzzles/memory/View.svelte`
+- `src/lib/puzzles/memory/logic.ts`
+- `src/lib/screens/ResultScreen.svelte`
+- `src/lib/server/config-cache.ts`
+- `src/lib/server/daily.test.ts`
+- `src/lib/server/daily.ts`
+- `src/lib/server/games.ts`
+- `src/lib/server/ranked-session.ts`
+- `src/lib/server/retention.ts`
+- `src/lib/server/runs.ts`
+- `src/lib/ui/puzzle-presentation.ts`
+- `src/routes/leaderboard/+page.server.ts`
+- `workers/cron.ts`
+- `wrangler.jsonc`
+
+The owner-provided brief and unrelated `.cursor/` / `.vscode/mcp.json` files are
+preserved. This report, `docs/DECISIONS.md` and `morphi-plan-simple.md` are the only
+additional reporting edits. Resume only within a revised authorized scope; no
+v1.4.1, release, commit, push, deployment or new-family work follows this stop.
+
 - **v1.3.5.17 locally verified; ready for owner closeout review (2026-11-08):** .16 omitted;
   81 accepted/implemented presets and 243 groups at pushed `9372b99`.
   `server/games.ts` owns bounded score-cohort queries; `games-admin.ts` selects

@@ -118,7 +118,9 @@ async function setup(page: Page, vector: Vector, motion: 'reduce' | 'no-preferen
 	);
 	await page.goto('/play');
 	await expect(page.locator('.game')).toHaveAttribute('data-phase', 'playing', { timeout: 15000 });
-	await expect(page.locator('.active-round')).toHaveAttribute('data-variant', vector.variant);
+	await expect(page.locator('.active-round')).toHaveAttribute('data-family', 'memory');
+	await expect(page.locator('.active-round')).not.toHaveAttribute('data-variant');
+	await expect(page.locator('.game')).not.toHaveAttribute('data-variant');
 }
 async function nativeMove(page: Page, action: MemoryMove) {
 	if ('index' in action) await page.locator(`[data-card-index="${action.index}"]`).click();

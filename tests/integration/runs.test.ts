@@ -35,6 +35,7 @@ import {
 	THEME_CONFIG_VERSION,
 	THEME_GENERATOR_VERSION
 } from '../../src/lib/engine/theme/config.js';
+import { utcDate } from '../../src/lib/server/daily.js';
 let proxy: Awaited<ReturnType<typeof getPlatformProxy<Cloudflare.Env>>>;
 let serial = 0;
 const now = 1800000000000;
@@ -177,7 +178,10 @@ describe('completed progress and ranked runs against real local D1', () => {
 		const saved = await saveRun(proxy.env.DB, a, run, now + 60000);
 		expect(saved.ranked).toBe(true);
 		expect(saved.score).toBeGreaterThan(1000);
-		expect((await leaderboard(proxy.env.DB, saved.group, 0, a)).rows).toHaveLength(1);
+		expect(
+			(await leaderboard(proxy.env.DB, 'connect', utcDate(now), a, undefined, 25, now)).rows
+		).toEqual([]);
+		expect((await accountHistory(proxy.env.DB, a)).bests).toEqual([]);
 		await expect(
 			saveRun(proxy.env.DB, a, { ...connect(), moves: run.moves.slice(0, -1) }, now)
 		).rejects.toMatchObject({ code: 'invalid_replay' });
@@ -321,7 +325,9 @@ describe('completed progress and ranked runs against real local D1', () => {
 		expect((await accountHistory(proxy.env.DB, a)).history).toHaveLength(1);
 		expect((await accountHistory(proxy.env.DB, b)).history).toEqual([]);
 		await expect(saveRun(proxy.env.DB, b, run, now)).rejects.toMatchObject({ code: 'conflict' });
-		expect((await leaderboard(proxy.env.DB, result.group, 0, a)).rows).toEqual([]);
+		expect(
+			(await leaderboard(proxy.env.DB, 'memory', utcDate(now), a, undefined, 25, now)).rows
+		).toEqual([]);
 	});
 	it('uses the issued Card allowance while legacy sessions keep their original timing', async () => {
 		const a = await owner(),
@@ -378,8 +384,10 @@ describe('completed progress and ranked runs against real local D1', () => {
 					5
 		);
 		expect((await accountHistory(proxy.env.DB, a)).history).toHaveLength(1);
-		const board = await leaderboard(proxy.env.DB, results[0].group, 0, a);
-		expect(board.own?.score).toBe(results[0].score);
+		const board = await leaderboard(proxy.env.DB, 'memory', utcDate(now), a, undefined, 25, now);
+		expect(board.own).toBeNull();
+		expect(board.rows).toEqual([]);
+		expect((await accountHistory(proxy.env.DB, a)).bests).toEqual([]);
 		expect(JSON.stringify(board)).not.toContain('Private Name');
 		await expect(
 			saveRun(proxy.env.DB, a, { ...run, elapsedSeconds: 1 }, now + 40000)
@@ -590,17 +598,21 @@ describe('completed progress and ranked runs against real local D1', () => {
 		});
 		expect(await activeRanked(proxy.env.DB, a, now + 30002)).toBeNull();
 	});
-	it('reflects hidden scores, bans, and account deletion in public rankings', async () => {
+	it('keeps legacy ranked runs off daily boards while enforcing bans and account deletion', async () => {
 		const a = await owner();
 		const issued = await startRanked(proxy.env.DB, a, 'memory', a, now);
 		const run = { ...memory(issued.seed, issued.id), rankedSession: issued.id };
 		const result = await saveRun(proxy.env.DB, a, run, now + 30000);
 		const db = createDatabase(proxy.env.DB);
 		await db.update(completedRun).set({ hidden: true }).where(eq(completedRun.id, run.id));
-		expect((await leaderboard(proxy.env.DB, result.group, 0, a)).own).toBeNull();
+		expect(
+			(await leaderboard(proxy.env.DB, 'memory', utcDate(now), a, undefined, 25, now)).own
+		).toBeNull();
 		await db.update(completedRun).set({ hidden: false }).where(eq(completedRun.id, run.id));
 		await db.insert(playerBan).values({ userId: a, reason: 'test', createdAt: now });
-		expect((await leaderboard(proxy.env.DB, result.group, 0, a)).own).toBeNull();
+		expect(
+			(await leaderboard(proxy.env.DB, 'memory', utcDate(now), a, undefined, 25, now)).own
+		).toBeNull();
 		await expect(saveRun(proxy.env.DB, a, memory(), now)).rejects.toMatchObject({ status: 403 });
 		await expect(saveRun(proxy.env.DB, a, run, now)).resolves.toEqual(result);
 		await db.delete(user).where(eq(user.id, a));
@@ -619,13 +631,15 @@ describe('completed progress and ranked runs against real local D1', () => {
 		]) {
 			await expect(saveRun(proxy.env.DB, a, bad, now)).rejects.toBeDefined();
 		}
-		await expect(leaderboard(proxy.env.DB, 'unknown', 0, null)).rejects.toMatchObject({
+		await expect(
+			leaderboard(proxy.env.DB, 'unknown', utcDate(now), null, undefined, 25, now)
+		).rejects.toMatchObject({
 			code: 'board'
 		});
 	});
 });
 
-it('versions scoring edits, freezes in-flight/past replay, separates boards and audits defaults', async () => {
+it('versions scoring edits, freezes in-flight/past replay, excludes legacy daily credit and audits defaults', async () => {
 	const { readScoreConfig, saveScoreConfig } = await import('../../src/lib/server/scoring.js');
 	const { catalog } = await import('../../src/lib/catalog.js');
 	const db = proxy.env.DB,
@@ -672,18 +686,25 @@ it('versions scoring edits, freezes in-flight/past replay, separates boards and 
 		.bind(newer.id)
 		.first<{ score_config_version: string }>();
 	expect(row?.score_config_version).toBe(edited.version);
-	const board = await leaderboard(db, savedOld.group, 0, userId);
-	expect(board.scoreConfigVersion).toBe(edited.version);
+	const oldRow = await db
+		.prepare('SELECT score_config_version,score FROM completed_run WHERE id=?')
+		.bind(old.id)
+		.first<{ score_config_version: string; score: number }>();
+	expect(oldRow).toEqual({ score_config_version: old.scoring.version, score: savedOld.score });
+	const board = await leaderboard(db, 'memory', utcDate(now), userId, undefined, 25, now);
 	const historyAfterEdit = await accountHistory(db, userId);
-	expect(historyAfterEdit.bests.every((best) => best.scoreConfigVersion === edited.version)).toBe(
+	expect(historyAfterEdit.bests).toEqual([]);
+	expect(historyAfterEdit.history).toEqual(
+		expect.arrayContaining([
+			expect.objectContaining({ id: old.id, score: savedOld.score, date: utcDate(now) }),
+			expect.objectContaining({ id: newer.id, score: savedNew.score, date: utcDate(now) })
+		])
+	);
+	expect(historyAfterEdit.history.every((item) => !Object.hasOwn(item, 'scoreConfigVersion'))).toBe(
 		true
 	);
-	expect(
-		historyAfterEdit.history.some((item) => item.scoreConfigVersion === old.scoring.version)
-	).toBe(true);
-	if (savedOld.group === savedNew.group)
-		expect(board.rows.find((row) => row.own)?.score).toBe(savedNew.score);
-	else expect(board.rows.find((row) => row.own)).toBeUndefined();
+	expect(board.rows).toEqual([]);
+	expect(board.own).toBeNull();
 	const audit = await db
 		.prepare(
 			"SELECT before,after FROM admin_audit WHERE action='score-change' AND target='memory' ORDER BY created_at DESC LIMIT 1"

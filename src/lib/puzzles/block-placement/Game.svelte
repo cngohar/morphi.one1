@@ -11,7 +11,6 @@
 		BLOCK_BOARD_SIZE,
 		BLOCK_RUSH_SECONDS,
 		endBlockRush,
-		parseBlockVariant,
 		PIECE_BY_ID,
 		canPlace,
 		placeBlockPiece,
@@ -106,10 +105,11 @@
 	const themeStyle = $derived(
 		blockThemeStyle(theme) + ';' + (resolvedTheme ? proceduralStyle(resolvedTheme) : '')
 	);
-	const boardSize = $derived(round.boardSize ?? BLOCK_BOARD_SIZE);
-	const variant = $derived(parseBlockVariant(round.variant));
-	const rush = $derived(variant === 'block:rush-60');
-	const variantLabel = $derived(familyName('block', variant));
+	const boardSize = $derived(round.rules?.boardSize ?? round.boardSize ?? BLOCK_BOARD_SIZE);
+	const rowsOnly = $derived(round.rules?.rowsOnly ?? false);
+	const timeLimit = $derived(round.rules?.timeLimit || BLOCK_RUSH_SECONDS);
+	const rush = $derived((round.rules?.timeLimit ?? 0) > 0);
+	const familyLabel = familyName('block');
 	const boardRows = $derived(
 		Array.from({ length: boardSize }, (_, row) =>
 			Array.from({ length: boardSize }, (_, column) => row * boardSize + column)
@@ -200,7 +200,7 @@
 
 	function clockMs(): number {
 		return Math.min(
-			BLOCK_RUSH_SECONDS * 1000,
+			timeLimit * 1000,
 			clockBase + (clockStart === null ? 0 : performance.now() - clockStart)
 		);
 	}
@@ -228,7 +228,7 @@
 	function updateClock(): boolean {
 		if (!rush || !clockStarted) return false;
 		try {
-			remaining = Math.max(0, Math.ceil((BLOCK_RUSH_SECONDS * 1000 - clockMs()) / 1000));
+			remaining = Math.max(0, Math.ceil((timeLimit * 1000 - clockMs()) / 1000));
 			if (remaining > 0 && remaining <= 10 && remaining !== lastTick) sound.play('timer-tick');
 			lastTick = remaining;
 			if (remaining !== 0 || game.status !== 'playing') return game.status === 'ended';
@@ -946,7 +946,7 @@
 	}
 	$effect(() => {
 		if (!mounted) return;
-		paused;
+		void paused;
 		untrack(handleVisibility);
 	});
 
@@ -988,11 +988,11 @@
 	onMount(() => {
 		if (rush && resume?.clockStarted && game.placements > 0) {
 			clockBase = Math.min(
-				BLOCK_RUSH_SECONDS * 1000,
+				timeLimit * 1000,
 				resume.elapsedMs +
 					(checkpointSavedAt === undefined ? 0 : Math.max(0, Date.now() - checkpointSavedAt))
 			);
-			remaining = Math.max(0, Math.ceil((BLOCK_RUSH_SECONDS * 1000 - clockBase) / 1000));
+			remaining = Math.max(0, Math.ceil((timeLimit * 1000 - clockBase) / 1000));
 			lastTick = remaining;
 			startClock();
 		}
@@ -1046,11 +1046,10 @@
 	data-theme-version={resolvedTheme?.themeConfigVersion}
 	data-theme-generator={resolvedTheme?.themeGeneratorVersion}
 	data-family="block"
-	data-variant={variant}
 	data-round={roundNumber}
 	data-phase={entering ? 'dealing' : 'playing'}
 >
-	<h2 class="sr-only">{variantLabel}</h2>
+	<h2 class="sr-only">{familyLabel}</h2>
 
 	<header class="hud">
 		<button type="button" class="home-button" aria-label={t('block.home')} onclick={onhome}>
@@ -1093,7 +1092,7 @@
 		<SoundToggle enabled={soundEnabled} ontoggle={ontogglesound} />
 
 		<p class="round-meta">
-			<span>{variantLabel}</span>
+			<span>{familyLabel}</span>
 			<span>{t('block.round', { number: roundNumber })}</span>
 			<span>{t('block.best', { score: formatNumber(best) })}</span>
 		</p>
@@ -1185,8 +1184,8 @@
 				{selected !== null
 					? t('block.hintSelected')
 					: game.placements === 0
-						? t(variant === 'block:rows-only' ? 'block.rowsOnly.hint' : 'block.hint')
-						: t(variant === 'block:rows-only' ? 'block.rowsOnly.hintShort' : 'block.hintShort')}
+						? t(rowsOnly ? 'block.rowsOnly.hint' : 'block.hint')
+						: t(rowsOnly ? 'block.rowsOnly.hintShort' : 'block.hintShort')}
 			</span>
 		</footer>
 	{/if}

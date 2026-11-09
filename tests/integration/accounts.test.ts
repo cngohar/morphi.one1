@@ -19,6 +19,7 @@ import {
 } from '../../src/lib/server/runs.js';
 import { catalog } from '../../src/lib/catalog.js';
 import type { CompletedRun } from '../../src/lib/engine/contract.js';
+import { utcDate } from '../../src/lib/server/daily.js';
 
 const settings: AuthSettings = {
 	baseURL: 'http://localhost:5173',
@@ -361,14 +362,19 @@ describe('accounts against local D1 and Better Auth', () => {
 		});
 		const now = Date.now();
 		const issued = await startRanked(proxy.env.DB, user.id, 'memory', 'fixture-ip', now);
-		const result = await saveRun(
-			proxy.env.DB,
-			user.id,
-			solvedMemory(issued.seed, issued.id),
-			now + 30_000
-		);
-		const publicBoard = await leaderboard(proxy.env.DB, result.group, 0, user.id);
-		expect(Object.keys(publicBoard.own!).sort()).toEqual(['name', 'own', 'position', 'score']);
+		await saveRun(proxy.env.DB, user.id, solvedMemory(issued.seed, issued.id), now + 30_000);
+		const publicBoard = await leaderboard(proxy.env.DB, 'memory', utcDate(now), user.id);
+		expect(publicBoard.own).toBeNull();
+		expect(publicBoard.rows).toEqual([]);
+		expect(Object.keys(publicBoard).sort()).toEqual([
+			'date',
+			'family',
+			'frozen',
+			'own',
+			'rows',
+			'totalPlayers',
+			'updatedAt'
+		]);
 		await db
 			.insert(schema.playerBan)
 			.values({ userId: user.id, reason: 'fixture', createdAt: now });
@@ -411,7 +417,7 @@ describe('accounts against local D1 and Better Auth', () => {
 			await (await request(auth, 'get-session', undefined, new Headers(login.headers))).json()
 		).toBeNull();
 		expect((await accountHistory(proxy.env.DB, user.id)).history).toEqual([]);
-		expect((await leaderboard(proxy.env.DB, result.group, 0, user.id)).own).toBeNull();
+		expect((await leaderboard(proxy.env.DB, 'memory', utcDate(now), user.id)).own).toBeNull();
 		expect(
 			await db.select().from(schema.user).where(eq(schema.user.id, other.user.id))
 		).toHaveLength(1);

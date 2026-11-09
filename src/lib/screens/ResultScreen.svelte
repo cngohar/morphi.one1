@@ -5,8 +5,8 @@
 	import { formatNumber } from '#lib/ui/format.js';
 	let {
 		family,
-		variant,
-		title,
+		ruleLine = '',
+		streak = 0,
 		summary,
 		score,
 		best,
@@ -22,9 +22,9 @@
 		stats,
 		onnext
 	}: {
-		variant?: string;
+		ruleLine?: string;
+		streak?: number;
 		family: import('#lib/engine/contract.js').PuzzleId;
-		title: string;
 		summary: string;
 		score: number;
 		best: number;
@@ -45,8 +45,10 @@
 <main class="result-main result">
 	<section class="result-summary">
 		<p class="eyebrow">
-			{title} · {familyName(family, variant)}
+			{familyName(family)}
 		</p>
+		{#if ruleLine}<p class="round-rule">{ruleLine}</p>{/if}
+		{#if streak > 0}<p>{t('daily.streak', { count: streak })}</p>{/if}
 		<h1>{t('v1.result.title')}</h1>
 		<section class="result-score" aria-label={t('result.score')}>
 			<p class="eyebrow">{t('result.score')}</p>
@@ -96,6 +98,12 @@
 </main>
 
 <style>
+	.round-rule {
+		margin: 0 0 4px;
+		color: var(--muted);
+		font-size: 12px;
+		line-height: 1.3;
+	}
 	.guest-note {
 		order: 4;
 		margin-top: 18px;
@@ -112,5 +120,13 @@
 		color: var(--muted);
 		font-size: 13px;
 		margin-top: 6px;
+	}
+	@media (max-width: 600px) and (orientation: portrait) {
+		.result-main:has(.round-rule) {
+			padding-top: 0;
+		}
+		.result-summary:has(.round-rule) h1 {
+			margin-bottom: 4px;
+		}
 	}
 </style>

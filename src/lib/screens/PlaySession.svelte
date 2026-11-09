@@ -6,7 +6,8 @@
 		type ScoreConfig
 	} from '#lib/scoring.js';
 	import { measure } from '#lib/ui/measurement.js';
-	import { familyName } from '#lib/ui/puzzle-presentation.js';
+	import { familyName, roundRuleLine } from '#lib/ui/puzzle-presentation.js';
+	import type { DailyIssued } from '#lib/server/daily.js';
 	import {
 		loadCheckpoint,
 		saveCheckpoint,
@@ -37,6 +38,7 @@
 	import { onMount, tick } from 'svelte';
 	import { SvelteMap } from 'svelte/reactivity';
 	import { goto } from '$app/navigation';
+	import { deserialize } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { createRng } from '#lib/engine/rng.js';
 	import { puzzleViews, puzzlePools } from '#lib/registry.js';
@@ -78,7 +80,6 @@
 	import {
 		enqueue,
 		syncProgress,
-		startSession,
 		activeSession,
 		type ResumableRankedSession,
 		abandonSession,
@@ -107,7 +108,6 @@
 		isNewBest: boolean;
 		isSoClose: boolean;
 		gap: number;
-		title: string;
 		summary: string;
 		stats: { label: string; value: string }[];
 	}
@@ -180,6 +180,11 @@
 	let screen = $state<Screen>('home');
 	let family = $state<PuzzleFamily>(families[0]!);
 	let variant = $state<string | undefined>();
+	let dailyRound = $state<DailyIssued | null>(null);
+	let streak = $state(0);
+	const ruleLine = $derived(dailyRound?.roundRuleLine ?? roundRuleLine(family, variant));
+	type DailyActive = DailyIssued & { saving: boolean };
+	type ResumeChoice = RoundCheckpoint | ResumableRankedSession | DailyActive;
 	let availableVariants: Record<string, string[]> = Object.fromEntries(
 		families.map((id) => [
 			id,
@@ -226,7 +231,7 @@
 	let soundEnabled = $state(true);
 	let startError = $state(false);
 	let rankedConflict = $state<ActiveRankedSession | null>(null);
-	let resumeChoice = $state<RoundCheckpoint | ResumableRankedSession | null>(null);
+	let resumeChoice = $state<ResumeChoice | null>(null);
 	let resumeInvalid = $state(false);
 	let resumeError = $state(false);
 	let roundLocked = $state(false);
@@ -265,6 +270,16 @@
 		if (saved.id !== roundId) return;
 		syncStatus = saved.ranked ? 'progress.ranked' : 'progress.saved';
 		savedScore = saved.score;
+		if (saved.ranked && dailyRound) void refreshStreak();
+	}
+	async function refreshStreak() {
+		if (!account.ownerKey) return;
+		try {
+			const value = await pageAction<{ current: number }>('streak', { ownerKey: account.ownerKey });
+			if (Number.isSafeInteger(value.current) && value.current >= 0) streak = value.current;
+		} catch {
+			/* Board/account views can refresh the count after an offline save. */
+		}
 	}
 	function retrySync() {
 		if (account.ownerKey)
@@ -315,6 +330,131 @@
 		};
 	});
 
+	async function pageAction<T>(
+		action: 'daily' | 'scoring' | 'streak',
+		body: Record<string, unknown>
+	): Promise<T> {
+		const form = new FormData();
+		form.set('payload', JSON.stringify(body));
+		const response = await fetch(resolve('/leaderboard') + `?/${action}`, {
+			method: 'POST',
+			credentials: 'same-origin',
+			headers: { Accept: 'application/json', 'x-sveltekit-action': 'true' },
+			body: form,
+			signal: AbortSignal.timeout(8000)
+		});
+		const result = deserialize(await response.text());
+		if (result.type === 'success') return result.data as T;
+		const failure =
+			result.type === 'failure'
+				? (result.data as { code?: string; active?: ActiveRankedSession })
+				: null;
+		if (
+			failure?.code === 'ranked_active' &&
+			failure.active &&
+			typeof failure.active.id === 'string' &&
+			typeof failure.active.saving === 'boolean' &&
+			Number.isSafeInteger(failure.active.expiresAt)
+		)
+			throw new RankedSessionConflict(failure.active);
+		throw new Error(failure?.code ?? 'daily_unavailable');
+	}
+	function anonymousRound(value: PuzzleRound) {
+		const { variant: identity, ...round } = value as PuzzleRound & {
+			rules?: Record<string, number | boolean>;
+		};
+		void identity;
+		return { ...round, rules: (value as { rules?: Record<string, number | boolean> }).rules ?? {} };
+	}
+	function validDaily(value: unknown): DailyActive {
+		if (!value || typeof value !== 'object') throw new Error('daily_response');
+		const issued = value as DailyActive;
+		if (
+			issued.daily !== true ||
+			'variant' in issued ||
+			!Object.hasOwn(puzzleMetadata, issued.family) ||
+			typeof issued.id !== 'string' ||
+			typeof issued.seed !== 'string' ||
+			!/^(0|[1-9]\d{0,19})$/.test(issued.seed) ||
+			BigInt(issued.seed) > 18446744073709551615n ||
+			issued.engineVersion !== puzzleMetadata[issued.family].engineVersion ||
+			!Number.isSafeInteger(issued.startedAt) ||
+			!Number.isSafeInteger(issued.expiresAt) ||
+			typeof issued.date !== 'string' ||
+			!/^\d{4}-\d{2}-\d{2}$/.test(issued.date) ||
+			typeof issued.roundRuleLine !== 'string' ||
+			!issued.round ||
+			'variant' in issued.round ||
+			issued.round.seed !== issued.seed ||
+			!issued.round.rules ||
+			typeof issued.round.rules !== 'object' ||
+			Array.isArray(issued.round.rules) ||
+			!Object.values(issued.round.rules).every(
+				(value) =>
+					typeof value === 'boolean' || (typeof value === 'number' && Number.isFinite(value))
+			) ||
+			!issued.scoring ||
+			typeof issued.scoring.version !== 'string' ||
+			!issued.scoring.values ||
+			!Object.values(issued.scoring.values).every(
+				(value) => typeof value === 'number' && Number.isFinite(value)
+			) ||
+			!issued.help ||
+			!Array.isArray(issued.help.steps) ||
+			!Array.isArray(issued.help.rows) ||
+			!issued.theme ||
+			issued.theme.family !== issued.family ||
+			issued.theme.seed !== issued.seed ||
+			paletteIssues(issued.theme).length
+		)
+			throw new Error('daily_response');
+		return { ...issued, saving: Boolean(issued.saving) };
+	}
+	function dailySnapshot(choice: ResumeChoice): DailyIssued | null {
+		if ('daily' in choice && choice.daily === true) return validDaily(choice);
+		if ('daily' in choice && choice.daily && typeof choice.daily === 'object')
+			return validDaily(choice.daily);
+		return null;
+	}
+	function sameFields(left: Record<string, unknown>, right: Record<string, unknown>) {
+		const keys = Object.keys(left);
+		return (
+			keys.length === Object.keys(right).length && keys.every((key) => left[key] === right[key])
+		);
+	}
+	function matchesIssued(
+		checkpoint: RoundCheckpoint,
+		issued: ResumableRankedSession | DailyActive
+	) {
+		const daily = dailySnapshot(checkpoint);
+		if (!('daily' in issued) || !issued.daily)
+			return !daily && checkpointMatchesIssued(checkpoint, issued);
+		return Boolean(
+			daily &&
+			checkpoint.id === issued.id &&
+			checkpoint.rankedSession === issued.id &&
+			checkpoint.family === issued.family &&
+			checkpoint.seed === issued.seed &&
+			checkpoint.engineVersion === issued.engineVersion &&
+			checkpoint.scoring.version === issued.scoring.version &&
+			sameFields(checkpoint.scoring.values, issued.scoring.values) &&
+			sameFields(daily.round.rules, issued.round.rules)
+		);
+	}
+	async function readActiveSession(
+		owner: string
+	): Promise<ActiveRankedSession | ResumableRankedSession | DailyActive | null> {
+		const response = await fetch(
+			resolve('/api/play/active') + '?' + new URLSearchParams({ ownerKey: owner }),
+			{ cache: 'no-store', signal: AbortSignal.timeout(8000) }
+		);
+		if (!response.ok) throw new Error('ranked_resume_unavailable');
+		const value: unknown = await response.json();
+		if (value === null) return null;
+		if (value && typeof value === 'object' && 'daily' in value && value.daily === true)
+			return validDaily(value);
+		return activeSession(owner);
+	}
 	async function restoreChoice(): Promise<void> {
 		if (accountsEnabled) {
 			try {
@@ -338,12 +478,13 @@
 				console.warn('morphi:account_status_unavailable');
 			}
 		}
+		void refreshStreak();
 		const checkpoint = await loadCheckpoint(account.ownerKey);
 		storageNotice = !checkpointDurable;
-		let active: ActiveRankedSession | ResumableRankedSession | null = null;
+		let active: ActiveRankedSession | ResumableRankedSession | DailyActive | null = null;
 		if (account.ownerKey) {
 			try {
-				active = await activeSession(account.ownerKey);
+				active = await readActiveSession(account.ownerKey);
 			} catch {
 				resumeChoice = checkpoint;
 				resumeError = true;
@@ -357,16 +498,18 @@
 			return;
 		}
 		if (active && 'family' in active) {
-			if (checkpoint?.rankedSession === active.id && !checkpointMatchesIssued(checkpoint, active))
+			if (checkpoint?.rankedSession === active.id && !matchesIssued(checkpoint, active))
 				console.warn('morphi:checkpoint_identity_mismatch');
-			resumeChoice =
-				checkpoint && checkpointMatchesIssued(checkpoint, active) ? checkpoint : active;
+			resumeChoice = checkpoint && matchesIssued(checkpoint, active) ? checkpoint : active;
 		} else if (checkpoint) {
 			// A released/expired ranked checkpoint may still continue locally, without a ranked claim.
 			resumeChoice = { ...checkpoint, rankedSession: null, rankedStartedAt: null };
+			// Anonymous daily replay requires the authoritative live session.
+			resumeInvalid = Boolean(dailySnapshot(checkpoint));
 		}
 		if (resumeChoice) {
 			resumeInvalid =
+				resumeInvalid ||
 				!Object.hasOwn(puzzleMetadata, resumeChoice.family) ||
 				resumeChoice.engineVersion !== puzzleMetadata[resumeChoice.family].engineVersion;
 			if (resumeInvalid) {
@@ -385,7 +528,7 @@
 						resumeChoice.id,
 						resumeChoice.family,
 						'rankedSession' in resumeChoice ? resumeChoice.rankedSession : resumeChoice.id,
-						resumeChoice.variant
+						'variant' in resumeChoice ? resumeChoice.variant : undefined
 					);
 			}
 		} else startRound();
@@ -440,28 +583,27 @@
 			return;
 		try {
 			const state = checkpointReader();
-			await saveCheckpoint(
-				{
-					version: 1,
-					id: roundId,
-					owner: roundOwner,
-					family,
-					...(variant ? { variant } : {}),
-					seed: round.seed,
-					engineVersion: puzzleMetadata[family].engineVersion,
-					difficulty: 'band' in round && typeof round.band === 'number' ? round.band : null,
-					modifiers: {},
-					theme: resolvedTheme,
-					scoring,
-					moves: runMoves.slice(),
-					state,
-					status: 'active',
-					savedAt: Date.now(),
-					rankedSession,
-					rankedStartedAt
-				},
-				checkpointLease
-			);
+			const checkpoint: RoundCheckpoint & { daily?: DailyIssued } = {
+				version: 1,
+				id: roundId,
+				owner: roundOwner,
+				family,
+				...(variant ? { variant } : {}),
+				seed: round.seed,
+				engineVersion: puzzleMetadata[family].engineVersion,
+				difficulty: 'band' in round && typeof round.band === 'number' ? round.band : null,
+				modifiers: {},
+				theme: resolvedTheme,
+				scoring,
+				moves: runMoves.slice(),
+				state,
+				status: 'active',
+				savedAt: Date.now(),
+				rankedSession,
+				rankedStartedAt,
+				...(dailyRound ? { daily: dailyRound } : {})
+			};
+			await saveCheckpoint(checkpoint, checkpointLease);
 			storageNotice = !checkpointDurable;
 		} catch {
 			console.warn('morphi:checkpoint_save_failed');
@@ -518,7 +660,7 @@
 				return;
 			}
 			if (account.ownerKey && ('rankedSession' in choice ? choice.rankedSession : choice.id)) {
-				const active = await activeSession(account.ownerKey);
+				const active = await readActiveSession(account.ownerKey);
 				if (!active || active.id !== choice.id || active.saving)
 					throw new Error('ranked_resume_unavailable');
 				if (!('family' in active)) {
@@ -526,7 +668,7 @@
 					checkpointLease?.release();
 					return;
 				}
-				if ('moves' in choice && !checkpointMatchesIssued(choice, active)) {
+				if ('moves' in choice && !matchesIssued(choice, active)) {
 					console.warn('morphi:checkpoint_identity_mismatch');
 					choice = active;
 				}
@@ -534,13 +676,17 @@
 			if (!puzzleMetadata[choice.family].variants?.length) await assertGameAvailable(choice.family);
 			const module = await loadPuzzleModule(puzzlePools[choice.family], generationLifetime.signal);
 			const checkpoint = 'moves' in choice ? choice : null;
+			let issuedDaily = dailySnapshot(choice);
 			const config = choice.scoring;
-			validateScoreValues(choice.family, config.values, choice.variant);
-			if (
-				config.version !== defaultScoreConfig(choice.family, choice.variant).version &&
-				!/^[0-9a-f-]{36}$/.test(config.version)
-			)
-				throw new Error('checkpoint_version');
+			const choiceVariant = 'variant' in choice ? choice.variant : undefined;
+			if (!issuedDaily) {
+				validateScoreValues(choice.family, config.values, choiceVariant);
+				if (
+					config.version !== defaultScoreConfig(choice.family, choiceVariant).version &&
+					!/^[0-9a-f-]{36}$/.test(config.version)
+				)
+					throw new Error('checkpoint_version');
+			}
 			const theme = 'theme' in choice ? choice.theme : null;
 			if (
 				theme &&
@@ -552,13 +698,35 @@
 			const moves = checkpoint?.moves ?? [];
 			if (moves.length > module.manifest.maxMoves) throw new Error('checkpoint_moves');
 			for (const move of moves) module.manifest.parseMove(move);
-			if (!module.manifest.resumeRound) throw new Error('checkpoint_version');
-			const restored = module.manifest.resumeRound(
-				choice.seed,
-				moves,
-				config.values,
-				choice.variant
-			);
+			let restored: PuzzleRound;
+			if (issuedDaily) {
+				if (!account.ownerKey || (checkpoint && !checkpoint.rankedSession))
+					throw new Error('checkpoint_version');
+				issuedDaily = validDaily(
+					await pageAction('daily', {
+						family: choice.family,
+						ownerKey: account.ownerKey,
+						sessionId: choice.id,
+						resumeMoves: moves
+					})
+				);
+				if (
+					issuedDaily.id !== choice.id ||
+					issuedDaily.family !== choice.family ||
+					issuedDaily.engineVersion !== choice.engineVersion ||
+					issuedDaily.seed !== choice.seed ||
+					issuedDaily.scoring.version !== config.version ||
+					!sameFields(issuedDaily.scoring.values, config.values) ||
+					!sameFields(issuedDaily.round.rules, dailySnapshot(choice)!.round.rules)
+				)
+					throw new Error('checkpoint_version');
+				restored = issuedDaily.round;
+			} else {
+				if (!module.manifest.resumeRound) throw new Error('checkpoint_version');
+				restored = anonymousRound(
+					module.manifest.resumeRound(choice.seed, moves, config.values, choiceVariant)
+				);
+			}
 			const view = await loadPuzzleView(puzzleViews[choice.family], generationLifetime.signal);
 			if (generationLifetime.signal.aborted) return;
 			if (screen === 'game') {
@@ -568,7 +736,8 @@
 				await tick();
 			}
 			family = choice.family;
-			variant = puzzleVariant(choice.family, choice.variant)?.id;
+			variant = issuedDaily ? undefined : puzzleVariant(choice.family, choiceVariant)?.id;
+			dailyRound = issuedDaily;
 			round = restored;
 			View = view;
 			resolvedTheme = theme;
@@ -602,7 +771,7 @@
 			cardReady = true;
 			resumeChoice = null;
 			startError = false;
-			void preparation.warm(getSelector().peek());
+			if (!account.ownerKey) void preparation.warm(getSelector().peek());
 			await tick();
 			restoring = false;
 			await checkpointRound();
@@ -642,11 +811,12 @@
 					choice.id,
 					choice.family,
 					session,
-					choice.variant
+					'variant' in choice ? choice.variant : undefined
 				);
 			resumeChoice = null;
 			resumeInvalid = false;
 			resumeError = false;
+			dailyRound = null;
 			roundLocked = false;
 		} catch {
 			resumeError = true;
@@ -699,66 +869,62 @@
 	}
 	async function makeCandidate(
 		chosen: PuzzleFamily,
-		nextVariant: string | undefined,
 		rankedGate: Promise<void>,
 		takeoverSession?: string
 	) {
 		const view = await loadPuzzleView(puzzleViews[chosen], generationLifetime.signal);
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
-		let seed = randomSeed();
-		let nextTheme: ResolvedTheme | null = null;
-		let nextScoring = defaultScoreConfig(chosen, nextVariant);
-		let nextRunId: string = crypto.randomUUID();
 		const nextOwner = account.ownerKey;
-		let nextSession: string | null = null;
-		let nextStartedAt: number | null = null;
+		let nextDaily: DailyIssued | null = null;
 		if (nextOwner) {
 			await rankedGate;
 			if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
+			if (takeoverSession) await abandonSession(takeoverSession, nextOwner);
 			try {
-				const issued = await startSession(chosen, nextOwner, takeoverSession, nextVariant);
-				seed = issued.seed;
-				nextTheme = issued.theme;
-				nextScoring = issued.scoring;
-				nextRunId = issued.id;
-				nextSession = issued.id;
-				nextStartedAt = issued.startedAt;
+				nextDaily = validDaily(await pageAction('daily', { family: chosen, ownerKey: nextOwner }));
+				if (nextDaily.family !== chosen) throw new Error('daily_response');
 			} catch (error) {
 				if (
-					takeoverSession ||
 					error instanceof RankedSessionConflict ||
 					(error instanceof Error && error.message === 'game_disabled')
 				)
 					throw error;
-				console.warn('morphi:ranked_start_unavailable');
+				if (!(error instanceof Error && error.message === 'daily_spent'))
+					console.warn('morphi:daily_start_unavailable');
 			}
 		}
-		let candidate = null;
-		if (!nextSession) {
-			candidate = await preparation.take(chosen);
-			if (!candidate) {
-				// One foreground retry after failed speculative preparation; retain the family.
-				candidate = await preparation.take(chosen);
-				if (!candidate) throw new Error('round_preparation_failed');
-			}
-			nextTheme = candidate.theme;
-			seed = candidate.seed;
-		} else preparation.clear();
-		if (!nextSession && accountsEnabled) {
+		if (nextDaily) {
+			preparation.clear();
+			return {
+				chosen,
+				nextVariant: undefined,
+				nextDaily,
+				nextRound: nextDaily.round,
+				nextView: view,
+				nextTheme: nextDaily.theme,
+				nextOwner,
+				nextSession: nextDaily.id,
+				nextStartedAt: nextDaily.startedAt,
+				nextRunId: nextDaily.id,
+				nextScoring: nextDaily.scoring
+			};
+		}
+		// Only practice consults the internal variant selector.
+		const nextVariant = getSelector().peekVariant(
+			chosen,
+			puzzleMetadata[chosen].variants,
+			availableVariants[chosen] ?? []
+		);
+		let candidate = await preparation.take(chosen);
+		if (!candidate) candidate = await preparation.take(chosen);
+		if (!candidate) throw new Error('round_preparation_failed');
+		let nextScoring = defaultScoreConfig(chosen, nextVariant);
+		if (accountsEnabled) {
 			try {
-				const response = await fetch(
-					resolve('/api/play/scoring') +
-						'?' +
-						new URLSearchParams({
-							family: chosen,
-							...(nextVariant ? { variant: nextVariant } : {})
-						}),
-					{
-						signal: AbortSignal.timeout(3000)
-					}
-				);
-				if (!response.ok) throw new Error('scoring_unavailable');
-				const config: ScoreConfig = await response.json();
+				const config = await pageAction<ScoreConfig>('scoring', {
+					family: chosen,
+					...(nextVariant ? { variant: nextVariant } : {})
+				});
 				nextScoring = {
 					version: config.version,
 					values: validateScoreValues(chosen, config.values, nextVariant)
@@ -767,28 +933,28 @@
 				console.warn('morphi:score_defaults_offline');
 			}
 		}
-		if (accountsEnabled && !nextTheme) throw new Error('round_theme_missing');
+		if (accountsEnabled && !candidate.theme) throw new Error('round_theme_missing');
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
-		const nextRound =
+		const raw =
 			(nextVariant === undefined || nextVariant === puzzleMetadata[chosen].variants?.[0]?.id
-				? candidate?.round
+				? candidate.round
 				: null) ??
 			(await loadPuzzleModule(puzzlePools[chosen], generationLifetime.signal)).manifest.createRound(
-				seed,
+				candidate.seed,
 				nextVariant
 			);
-		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
-
+		const nextRound = anonymousRound(raw);
 		return {
 			chosen,
 			nextVariant,
+			nextDaily: null,
 			nextRound,
 			nextView: view,
-			nextTheme,
+			nextTheme: candidate.theme,
 			nextOwner,
-			nextSession,
-			nextStartedAt,
-			nextRunId,
+			nextSession: null,
+			nextStartedAt: null,
+			nextRunId: crypto.randomUUID(),
 			nextScoring
 		};
 	}
@@ -815,18 +981,10 @@
 			)
 		);
 	}
-	async function assertGameAvailable(
-		chosen: PuzzleFamily,
-		selectedVariant?: string
-	): Promise<void> {
+	async function assertGameAvailable(chosen: PuzzleFamily): Promise<void> {
 		if (!accountsEnabled) return;
 		const response = await fetch(
-			resolve('/api/play/availability') +
-				'?' +
-				new URLSearchParams({
-					family: chosen,
-					...(selectedVariant ? { variant: selectedVariant } : {})
-				}),
+			resolve('/api/play/availability') + '?' + new URLSearchParams({ family: chosen }),
 			{
 				signal: AbortSignal.timeout(3000),
 				cache: 'no-store'
@@ -847,18 +1005,14 @@
 			sound.unlock();
 			await refreshAvailableGames();
 			const chosen = getSelector().peek();
-			const chosenVariant = getSelector().peekVariant(
-				chosen,
-				puzzleMetadata[chosen].variants,
-				availableVariants[chosen] ?? []
-			);
+
 			startErrorFamily = chosen;
-			await assertGameAvailable(chosen, chosenVariant);
+			await assertGameAvailable(chosen);
 			let ready = false;
 			const rankedGate = new Promise<void>((resolveGate) => {
 				releaseRanked = resolveGate;
 			});
-			const work = makeCandidate(chosen, chosenVariant, rankedGate, takeoverSession).then(
+			const work = makeCandidate(chosen, rankedGate, takeoverSession).then(
 				(value) => {
 					ready = true;
 					return { value };
@@ -888,17 +1042,20 @@
 				nextSession,
 				nextStartedAt,
 				nextRunId,
-				nextScoring
+				nextScoring,
+				nextVariant: chosenVariant,
+				nextDaily
 			} = prepared.value;
 			if (generationLifetime.signal.aborted) return;
-			if (!nextSession) await assertGameAvailable(chosen, chosenVariant);
+			if (!nextSession) await assertGameAvailable(chosen);
 			await ownCheckpoint(nextRunId);
 			if (generationLifetime.signal.aborted) return;
 			// Commit rotation only after generation succeeds. Retry keeps the same family.
-			getSelector().commitVariant(chosen, chosenVariant);
+			if (!nextDaily) getSelector().commitVariant(chosen, chosenVariant);
 			getSelector().next();
 			family = chosen;
 			variant = chosenVariant;
+			dailyRound = nextDaily;
 			round = nextRound;
 			View = nextView;
 			resolvedTheme = nextTheme;
@@ -927,7 +1084,7 @@
 			screen = 'game';
 			// Only a committed deal enters history. Slow persistence never delays its board.
 			if (nextTheme) void rememberTheme(nextTheme);
-			void preparation.warm(getSelector().peek());
+			if (!account.ownerKey) void preparation.warm(getSelector().peek());
 			cardPhase = 'flipping';
 			await tick();
 			stage?.present('flip');
@@ -969,7 +1126,6 @@
 	}
 	function recordResult({
 		score,
-		title,
 		summary,
 		announcement,
 		stats,
@@ -989,7 +1145,8 @@
 		}
 
 		resultAnnouncement = announcement;
-		const endingSpec = puzzleVariant(game, variant)?.ending ?? puzzleMetadata[game].ending;
+		const endingSpec =
+			dailyRound?.ending ?? puzzleVariant(game, variant)?.ending ?? puzzleMetadata[game].ending;
 		ending = resultEnding ?? {
 			headline: t(
 				(cap
@@ -1005,7 +1162,6 @@
 			isNewBest,
 			isSoClose,
 			gap,
-			title,
 			summary,
 			stats
 		};
@@ -1044,7 +1200,7 @@
 			stack = [
 				...stack,
 				{
-					family: familyName(game, variant),
+					family: familyName(game),
 					best: Math.max(previousBest, score),
 					color: resolvedTheme?.back ?? 'var(--surface-2)'
 				}
@@ -1175,7 +1331,6 @@
 	class="active-round card-session"
 	inert={roundLocked || Boolean(resumeChoice) || resumeError || (starting && screen === 'game')}
 	data-family={family}
-	data-variant={variant}
 	data-card-phase={cardPhase}
 	style={shellStyle}
 >
@@ -1193,14 +1348,15 @@
 		onhome={goHome}
 		gameTitle={revealed &&
 		(!puzzleMetadata[family].titleAfterEntrance || cardReady || screen === 'result')
-			? familyName(family, variant)
+			? familyName(family)
 			: ''}
 		gameMode
 	/>
+	{#if revealed && screen === 'game' && ruleLine}<p class="entrance-rule">{ruleLine}</p>{/if}
 	<RoundStage
 		bind:this={stage}
 		phase={cardPhase}
-		title={familyName(family, variant)}
+		title={familyName(family)}
 		best={result?.best ?? bests[family]}
 		ready={cardReady && screen === 'game'}
 		failed={startError}
@@ -1246,9 +1402,9 @@
 			{#if result}
 				<ResultScreen
 					{family}
-					{variant}
+					{ruleLine}
+					{streak}
 					stats={result.stats}
-					title={result.title}
 					summary={result.summary}
 					score={result.score}
 					best={result.best}
@@ -1279,6 +1435,8 @@
 			{#if revealed}<PuzzleHelp
 					{family}
 					{variant}
+					help={dailyRound?.help}
+					{ruleLine}
 					scoring={scoring.values}
 					onpause={(value) => (helpOpen = value)}
 				/>{/if}
@@ -1343,6 +1501,28 @@
 <p class="sr-only" aria-live="polite" aria-atomic="true">{resultAnnouncement}</p>
 
 <style>
+	.entrance-rule {
+		position: absolute;
+		top: var(--game-header-height);
+		left: 50%;
+		transform: translateX(-50%);
+		width: max-content;
+		z-index: 2;
+		max-width: min(760px, calc(100vw - 32px));
+		margin: 0 auto;
+		padding: 2px 8px;
+		border-radius: 8px;
+		background: var(--surface);
+		color: var(--ink);
+		font-size: 12px;
+		line-height: 1.3;
+		text-align: center;
+	}
+	@media (orientation: landscape) and (max-height: 560px) {
+		.entrance-rule {
+			line-height: 1.2;
+		}
+	}
 	.ranked-conflict {
 		position: fixed;
 		inset: 50% auto auto 50%;

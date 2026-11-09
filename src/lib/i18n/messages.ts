@@ -2,6 +2,20 @@ import { puzzleMessages } from '../puzzle-messages.js';
 
 export const messages = {
 	...puzzleMessages,
+	'daily.boardDescription':
+		'The same daily puzzle for everyone. One ranked attempt per family each UTC day.',
+	'daily.today': "Today's {family}",
+	'daily.family': 'Puzzle family',
+	'daily.date': 'UTC date',
+	'daily.streak': 'Streak {count}',
+	'daily.updated': 'Updated {time} UTC',
+	'daily.frozen': 'Frozen',
+	'daily.top100': 'Show Top 100',
+	'daily.top25': 'Show Top 25',
+	'daily.percentile': 'Top {percent}%',
+	'daily.archive': 'Monthly archive',
+	'daily.share': "Solved Today's {family} — Top {percent}%",
+
 	'privacy.information.support':
 		'If you contact member support, we store your ticket subject, category, priority and messages so our administrators and moderators can respond. Support is also available to banned members.',
 	'privacy.retention.support':

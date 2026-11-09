@@ -8,6 +8,7 @@ import { anonymizeExpiredUsers } from './user-lifecycle.js';
 // conservative cleanup buffer, not a promise of scheduled deletion.
 export const AUTH_LIMIT_CLEANUP_BUFFER_MS = 86_400_000;
 const RANKED_LIMIT_WINDOW_MS = 3_600_000;
+const COMPLETED_RUN_RETENTION_MS = 90 * 86_400_000;
 
 async function requireAdmin(binding: D1Database, actor: string) {
 	const identity = await createDatabase(binding)
@@ -19,13 +20,52 @@ async function requireAdmin(binding: D1Database, actor: string) {
 }
 
 /** Operator-invoked maintenance. No background job or time-to-erasure guarantee. */
-export async function pruneExpiredRecords(binding: D1Database, actor: string, now = Date.now()) {
+export async function pruneExpiredRecords(
+	binding: D1Database,
+	actor: string,
+	now = Date.now(),
+	archive?: R2Bucket
+) {
 	await requireAdmin(binding, actor);
 	await anonymizeExpiredUsers(binding, now);
+	const completedRunBefore = now - COMPLETED_RUN_RETENTION_MS;
+	const completedDeletes: D1PreparedStatement[] = [];
+	if (archive) {
+		const rows = (
+			await binding
+				.prepare(
+					`SELECT id,move_log,payload_hash,created_at FROM completed_run
+					WHERE created_at < ? ORDER BY created_at,id LIMIT 50`
+				)
+				.bind(completedRunBefore)
+				.all<{ id: string; move_log: string; payload_hash: string; created_at: number }>()
+		).results;
+		for (const row of rows) {
+			try {
+				const stored = await archive.put(row.id, row.move_log, {
+					httpMetadata: { contentType: 'application/json' }
+				});
+				if (!stored) throw new Error('run_archive_failed');
+			} catch (error) {
+				console.error(JSON.stringify({ event: 'run_archive_failed' }));
+				throw error;
+			}
+			completedDeletes.push(
+				binding
+					.prepare(
+						`DELETE FROM completed_run WHERE id=? AND payload_hash=?
+						AND created_at=? AND move_log=? AND created_at < ?`
+					)
+					.bind(row.id, row.payload_hash, row.created_at, row.move_log, completedRunBefore)
+			);
+		}
+	}
 	const criteria = {
 		expiredAt: now,
 		authLimiterBefore: now - AUTH_LIMIT_CLEANUP_BUFFER_MS,
-		rankedAddressBefore: now - RANKED_LIMIT_WINDOW_MS
+		rankedAddressBefore: now - RANKED_LIMIT_WINDOW_MS,
+		completedRunBefore,
+		archivedRuns: completedDeletes.length
 	};
 	const results = await binding.batch([
 		binding.prepare('DELETE FROM support_limit WHERE expires_at <= ?').bind(now),
@@ -42,16 +82,20 @@ export async function pruneExpiredRecords(binding: D1Database, actor: string, no
 		binding
 			.prepare("UPDATE play_session SET ip_hash = '' WHERE created_at <= ? AND ip_hash != ''")
 			.bind(criteria.rankedAddressBefore),
-		// Preserve claimed-but-uncommitted runs for retry recovery. Preserve all
-		// unexpired rows: deleting a newer row could revive a superseded start.
+		// Preserve unresolved claims and today's spent daily attempts. Removing
+		// a daily tombstone would allow its deterministic session to be reissued.
 		binding
 			.prepare(
 				`DELETE FROM play_session WHERE expires_at <= ? AND
 				(payload_hash IS NULL OR EXISTS (SELECT 1 FROM completed_run r
 				WHERE r.id = play_session.id AND r.user_id = play_session.user_id
-				AND r.payload_hash = play_session.payload_hash))`
+				AND r.payload_hash = play_session.payload_hash))
+				AND NOT EXISTS (SELECT 1 FROM daily_puzzle p WHERE p.date = ?
+				AND p.family = play_session.family AND p.seed = play_session.seed
+				AND p.variant = COALESCE(play_session.variant,''))`
 			)
-			.bind(now),
+			.bind(now, new Date(now).toISOString().slice(0, 10)),
+		...completedDeletes,
 		binding
 			.prepare(
 				`INSERT INTO admin_audit
