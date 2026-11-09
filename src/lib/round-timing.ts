@@ -3,6 +3,7 @@ export const MEMORY_PREVIEW_MS = 3000;
 export const MEMORY_HIDE_MS = 250;
 export const BLOCK_ENTRANCE_MS = 3000;
 export const CONNECT_ENTRANCE_MS = 2500;
+export const NONOGRAM_ENTRANCE_MS = 2500;
 export function memoryEntranceMs(pairs: number): number {
 	return pairs <= 6 ? 3000 : pairs <= 8 ? 4000 : 5000;
 }

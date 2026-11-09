@@ -1,6 +1,77 @@
 # Morphi: Simple Plan
 
-## Active status — v1.4 built locally; targeted verification complete; STOP (2026-11-09)
+## Active status — v1.4.1 rev 3 built and focused verification complete; STOP (2026-11-09)
+
+Resumed the preserved pre-build handoff at `56e6460`, without reset/restart.
+The owner's explicit rev 3 completion instruction authorizes execution despite
+the brief's draft header; functional acceptance remains pending.
+Classic was verified before adding exactly ten Batch A variants. **11 enabled
+presets / 0 variant groups**, three size bands, one reused `(nonogram, UTC date)`
+board per day. No new daily subsystem or other-family game implementation.
+
+§8A optional contracts/pinned recovery and §8B family-cohort persistence,
+exact-millisecond timing downgrade and admin attribution are complete. Registry
+generator source needed no edit; projections were regenerated, never hand-edited.
+Below-floor saved runs consume the attempt, remain unranked and create no daily
+row. Per-preset scoring stays immutable/internal. Without a surviving recorded
+start, group-less historical completions stay in family history but are omitted
+from preset counts/history.
+
+Focused format/lint, types (0 errors/warnings), boundaries, build/lazy isolation,
+30 unit cases, 20 real-D1 cases, 33 solved/66 rejected vectors in six runtimes,
+and 42 unique Chromium cases across serial one-worker runs pass. Final colour
+portrait cells are ≥19px; teaching leaves HUD labels visible. The required
+`gpt-6-luna/max` verifier returned 503; the owner authorized parent verification,
+without substitute-agent evidence. Full verify, global lint, other-family suites
+and physical-device/production checks remain unrun. Workspace generation
+diagnostics are not phone performance proof.
+
+See [complete inventory, §8A/§8B choices, evidence and limits](docs/CODEMAP.md).
+**STOP at baseline + Batch A.** Owner functional review is next; no automatic
+acceptance, Batch B, new sounds, commit, push, deployment or release step.
+The owner brief/fixture and unrelated editor/MCP files remain untouched.
+
+## Earlier status — v1.4.1 rev 2 resumed; remaining scope stop (2026-11-09)
+
+Resumed the preserved pre-build handoff at `56e6460`, using the owner-accepted
+rev 2 and unchanged fixture. The brief now also exists at the requested
+`docs/briefs/v1.4.1-nonogram-codex-brief.md` as an exact copy of the provided
+`v1.4.1-nonogram-codex.md`. No restart or production source change was made.
+
+§8A authorises optional registration/recovery, but `saveRun` still binds the
+replay group directly into a required database field and rejects/abandons
+below-floor claims instead of saving them unranked. Its whole-second comparison
+also cannot enforce the locked 2,500 / 22,500 ms boundaries exactly. These require
+insertion/timing operations beyond §8A's recovery-only `runs.ts` allowance.
+Additional safe field reads and group-based activity/history consumers remain
+in the read-only Memory directory; admin-query compatibility must be resolved.
+The brief's §8A/§10 conflict stop applies; no workaround or scope expansion.
+
+Baseline + Batch A, §8A and all focused §9 checks remain **unimplemented/unrun**.
+Presets/groups/Nonogram boards added: **0 / 0 / 0**. Read-only scope audit used
+the required `gpt-6.1-sol/high`; `gpt-6-luna/max` returned 503, with no substitute
+verification claimed. See [exact gaps, inventory, resume needs and every §9
+status](docs/CODEMAP.md). Full verification remains deferred. STOP: no Batch B,
+other-family change, new sounds, commit, push, deployment or release work.
+
+## Earlier status — v1.4.1 Nonogram pre-build contract-gap stop (2026-11-09)
+
+The owner selected baseline + Batch A exactly from
+`docs/briefs/v1.4.1-nonogram-codex-brief.md`, with baseline first, focused §9
+checks and no commit/push/deployment. The provided demo exists and remains a
+reference only. HEAD remains `56e6460`; no Nonogram source, presets, variant
+groups or daily boards were added.
+
+Stopped under the brief's explicit conflict rule: new Nonogram manifests must
+define no `leaderboardGroups`, but both manifest/variant contracts require that
+field and daily recovery/admin paths consume it. Fixing this needs a scope
+resolution; engine/server edits and invented group arrays were not made.
+See the top of `docs/CODEMAP.md` for exact source references and remaining
+brief inconsistencies. Only these two handoff documents changed. All §9 checks
+remain unrun after the pre-build stop; full verification remains deferred.
+No Batch B, other family, sounds or release step followed.
+
+## Earlier status — v1.4 built locally; targeted verification complete; STOP (2026-11-09)
 
 Resumed the preserved implementation without resetting HEAD `9e10b73`.
 §§8A–8E and full targeted §9 are complete. **253 player variant groups → 0;

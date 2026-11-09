@@ -2,6 +2,35 @@
 
 Catalog of edge cases with the expected behavior. Every case needs a test (unit, property, Playwright, or a manual drill noted in the phase report). Each phase's acceptance names the categories it must cover. Add every real bug found in play, with a regression test. Format: case → expected behavior.
 
+## Nonogram v1.4.1
+
+- Empty/full/zero-slack clues and colour adjacency → consistent 0 rendering,
+  exact equal-colour gap/different-colour touching semantics; own logic units.
+- Ambiguous opening, reduced clues or totals → certify with the actual variant
+  solver, reject stalled/ambiguous boards; checkerboard and per-preset units/vectors.
+  Generation is structurally bounded at 100 attempts per band, then fallback/
+  rejection; counting search has a 10,000-node guard. Forced exhaustion is not a
+  separate automated fixture; no unbounded retry or uniqueness-only acceptance.
+- Wrong X → free; checked wrong fill → refused and stops the stroke. Unchecked
+  requires a decided grid; strict Check exposes counts only; variant units/browser.
+- Stroke completes a line and triggers Auto-X → Undo restores the whole stroke,
+  including crosses; penalties/hints stay spent. Restart retains seed/time/costs;
+  logic units and browser helpers.
+- Drag, long-press, right-click, repeat and cancellation → one locked row/column,
+  whole-stroke Undo, X without accidental fill, repeated keydown ignored; browser.
+- Hidden/reloaded/rotated/early-input/navigation/motion-failure → checkpoint and
+  same-seed recovery, logical entrance lock, safe cleanup and settled presentation;
+  browser. Practice pauses while hidden; ranked uses server wall-clock.
+- Exact floor/timed ceiling/midnight/session removal → milliseconds determine
+  rank; below-floor saves consume attempts with no daily row; recover original
+  pinned date through grace only; real-D1 tests.
+- Countdown/hearts exhaustion → retain failed board, no score/result, exact-session
+  abandon on leaving; units/D1/browser. Fake browser clocks install before play.
+- Colour clues shrink portrait cells or teaching covers HUD → bounded above-grid
+  colour sequences, ≥19px cells at 390×844 and non-overlapping teaching/HUD;
+  final portrait and all-variant browser regressions/captures.
+- Missing sound → hint/gameplay remains usable; browser. No new assets.
+
 ## 1. Page lifecycle
 
 - Refresh mid-round → the round resumes from the checkpoint (replayed moves), same seed and look.

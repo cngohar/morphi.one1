@@ -19,7 +19,7 @@ export interface CompletedRun {
 }
 export interface ReplayedResult {
 	score: number;
-	group: string;
+	group?: string;
 	pairs: number | null;
 	moves: number;
 }
@@ -30,7 +30,7 @@ export interface PuzzleVariant {
 	enabled?: boolean;
 	maxMoves: number;
 	maxSeconds?: number;
-	leaderboardGroups: readonly string[];
+	leaderboardGroups?: readonly string[];
 	scoring?: import('./scoring.js').ScoreDefinition;
 	help?: PuzzlePresentation['help'];
 	ending?: PuzzleManifest['ending'];
@@ -102,7 +102,7 @@ export interface PuzzleManifest {
 	maxMoves: number;
 	/** Validates exact wire fields and returns their canonical order. */
 	parseMove(move: Move): Move;
-	leaderboardGroups: readonly string[];
+	leaderboardGroups?: readonly string[];
 	/** Null preserves games whose ranked score has no presentation allowance. */
 	rankedTiming: {
 		/** Null preserves the family's legacy timing for this variant. */

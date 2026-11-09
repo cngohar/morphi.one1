@@ -156,7 +156,7 @@ export async function loadMemoryDirectory(
 	const defaultVariantId = curatedDefs[0]?.id ?? 'memory:classic';
 	const activityMapping: ActivityMappingEntry[] = allVariantIds.flatMap((id) => {
 		const def = curatedDefs.find((v) => v.id === id);
-		const groups = def?.leaderboardGroups ?? ['memory-1'];
+		const groups = def ? (def.leaderboardGroups ?? ['memory']) : ['memory-1'];
 		return groups.map((rulesGroup) => ({
 			family: 'memory',
 			variant: id,
@@ -294,11 +294,13 @@ export async function loadMemoryDirectory(
 	const history = await queryScoreHistory(
 		db,
 		'memory',
-		pagedItems.map((item) => ({
-			id: item.id,
-			leaderboardGroups: curatedDefs.find((variant) => variant.id === item.id)
-				?.leaderboardGroups ?? ['memory-1']
-		}))
+		pagedItems.map((item) => {
+			const definition = curatedDefs.find((variant) => variant.id === item.id);
+			return {
+				id: item.id,
+				leaderboardGroups: definition ? (definition.leaderboardGroups ?? ['memory']) : ['memory-1']
+			};
+		})
 	);
 	for (const item of pagedItems) {
 		const rows = history.filter((row) => row.variant === item.id);

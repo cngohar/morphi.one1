@@ -3,9 +3,16 @@ import type { PuzzleId, PuzzleManifest } from './engine/contract.js';
 import { manifest as manifest0 } from './puzzles/block-placement/manifest.js';
 import { manifest as manifest1 } from './puzzles/connect/manifest.js';
 import { manifest as manifest2 } from './puzzles/memory/manifest.js';
+import { manifest as manifest3 } from './puzzles/nonogram/manifest.js';
 export const catalog: Record<PuzzleId, PuzzleManifest> & {
 	block: typeof manifest0;
 	connect: typeof manifest1;
 	memory: typeof manifest2;
-} = { ['block']: manifest0, ['connect']: manifest1, ['memory']: manifest2 };
+	nonogram: typeof manifest3;
+} = {
+	['block']: manifest0,
+	['connect']: manifest1,
+	['memory']: manifest2,
+	['nonogram']: manifest3
+};
 export { puzzleMessages } from './puzzle-messages.js';

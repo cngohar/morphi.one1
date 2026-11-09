@@ -17,6 +17,48 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.4.1 rev 3 — Nonogram locally complete; baseline + Batch A STOP (2026-11-09)
+
+- **Built:** Resumed `56e6460` without restart. Classic verified before ten
+  genuine Batch A deltas; 11 enabled presets, three bands, zero variant groups,
+  one reused family/UTC-day board. Generation/actual solvers, replay, scoring,
+  controls, ending/loss, motion, teaching, reflow and generic admin integration.
+  §8A/§8B are applied; full inventory and zero-edit exceptions in [CODEMAP](CODEMAP.md).
+- **Skipped:** Full verify/global lint/other-family tests per owner scope;
+  physical-device/production checks, Batch B–J, geometry, new daily machinery,
+  sounds, commit/push/deployment/release. Brief/demo/editor files are preserved.
+- **Known issues:** Group-less completions without surviving starts cannot be
+  attributed to presets; family history retains them. Tiny portrait colour
+  badges still need owner device review. Workspace generation max outlier
+  310.55ms is not phone budget evidence. No required focused test remains failing.
+  Untouched other-family `too_fast` test expectations need review before full verify.
+- **Decisions/pins:** Exact 2,500/10,000/22,500ms floors downgrade saved claims;
+  per-preset immutable scoring, quarter-line rounding down, clue-derived cached
+  proofs and above-grid colour runs. Existing dependency versions unchanged.
+  Required `gpt-6-luna/max` returned 503; owner authorized parent checks. No
+  substitute-agent verification claim. See [decisions](DECISIONS.md).
+- **Questions/owner responsibility:** Review and accept or revise the local game.
+  Functional acceptance and future source handoff/deployment are separate.
+
+| Acceptance item                                     | Local evidence under `build/v1.4.1/`                        | Result                                     |
+| --------------------------------------------------- | ----------------------------------------------------------- | ------------------------------------------ |
+| Rules/generation/solvers/controls/group-less replay | `unit-final.log`                                            | PASS, 30 units                             |
+| Six-runtime deterministic solved/rejected replay    | `vectors-final.log`                                         | PASS, 33 solved + 66 rejected per runtime  |
+| §8A/§8B daily, timing, admin and scoring            | `d1-final.log`                                              | PASS, 20 real-D1 cases                     |
+| Game/lifecycle/failure/layout/input                 | Serial browser logs, `browser/` captures                    | PASS, 42 unique Chromium cases, one worker |
+| Format/lint/types                                   | `format-final.log`, scoped lint logs, `types-final.log`     | PASS, types 0 errors/warnings              |
+| Boundaries/build/lazy isolation                     | `boundaries-final.log`, `build-final.log`, `lazy-final.log` | PASS                                       |
+| Functional acceptance                               | Owner review                                                | PENDING                                    |
+| Full verify/physical devices/production             | Owner scope                                                 | NOT RUN; no waiver or pass                 |
+
+- **Measurements:** 100 seeds per preset, workspace Bun after module load,
+  first synchronous call included; no network/device emulation or app cold-load
+  measurement. Median 0.20–0.53ms, p95 0.44–7.70ms, max 310.55ms; goal-only
+  diagnostics in `generation-performance.json`, not a physical-phone gate pass.
+- **Waivers:** None. Verification scope is owner-limited; parent takeover is
+  explicitly authorized, not an independent-verification waiver claim.
+- **CODEMAP updated:** Yes. Historical pre-build stops retained. STOP followed.
+
 ## v1.3.5.17 — Memory closeout accepted; audio approved; source commit and push authorized (2026-11-08)
 
 The owner instructed “closeout is now done, you can comit and then push to github, also i review the audio file and approved it,you can include in comit too”,

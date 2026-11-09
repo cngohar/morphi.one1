@@ -204,9 +204,9 @@ export async function dailyBest(
 	cache?: KVNamespace,
 	now = Date.now()
 ) {
-	const run = await binding
+	const candidates = await binding
 		.prepare(
-			`SELECT r.family,r.score,r.seconds,r.moves,r.rules_group AS rulesGroup,r.created_at AS submittedAt,p.variant,p.date
+			`SELECT r.family,r.score,r.seconds,r.moves,r.created_at AS submittedAt,p.variant,p.date
 		FROM completed_run r LEFT JOIN play_session s ON s.id=r.id AND s.user_id=r.user_id
 		JOIN daily_puzzle p ON p.family=r.family AND p.seed=r.seed AND p.engine_version=r.engine_version
 		AND p.score_config_version=r.score_config_version
@@ -216,24 +216,26 @@ export async function dailyBest(
 		WHERE r.id=? AND r.user_id=? AND r.ranked=1 AND r.hidden=0`
 		)
 		.bind(runId, userId)
-		.first<{
+		.all<{
 			family: string;
 			date: string;
 			variant: string;
-			rulesGroup: string;
 			score: number;
 			seconds: number;
 			moves: number;
 			submittedAt: number;
 		}>();
-	if (
-		!run ||
-		(await dailySessionId(userId, run.family, run.date)) !== runId ||
-		!catalog[run.family]?.variants
-			?.find((row) => row.id === run.variant)
-			?.leaderboardGroups.includes(run.rulesGroup)
-	)
-		return null;
+	let run;
+	for (const candidate of candidates.results) {
+		if (
+			(await dailySessionId(userId, candidate.family, candidate.date)) === runId &&
+			catalog[candidate.family]?.variants?.some((row) => row.id === candidate.variant)
+		) {
+			run = candidate;
+			break;
+		}
+	}
+	if (!run) return null;
 	const results = await binding.batch(
 		dailyCompletionStatements(binding, userId, runId, run.family, run.date, now)
 	);

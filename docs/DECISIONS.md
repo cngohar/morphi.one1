@@ -1,5 +1,30 @@
 # DECISIONS.md
 
+## v1.4.1 rev 3 — local Nonogram baseline + Batch A stop (2026-11-09)
+
+The owner's explicit rev 3 completion instruction authorizes execution from the
+preserved stop, not functional acceptance. Classic first, then ten single-rule
+deltas: 11 enabled presets, three size bands, zero variant groups. Reuse one
+`(nonogram, UTC date)` daily board. Per-preset `brief-v1` scoring stays internal.
+§8A optionalizes groups and recovers pinned family/date identity. §8B stores the
+family cohort, compares exact active milliseconds and saves below-floor claims
+unranked without a board row, consuming the attempt. No schema/migration change.
+Preset history/counts require surviving recorded starts for group-less cohorts;
+unattributable completions remain in family history. Existing grouped imports
+retain cohort attribution. Registry source/shared scoring needed no edits.
+
+Partial-clue quarters round down to 2/5/7 whole hidden lines. Actual reduced,
+totals and colour solvers must pass; no issued solution/deduced grid. Colour
+silhouettes keep long sequences above the board for portrait sizing; all RNG
+draws remain ordered. Restart/Undo retain spent penalties/hints and elapsed time.
+Losses keep the board and use exact-session abandonment on leaving.
+Existing anime.js 4.5.0 and dependencies are unchanged; no new sound files.
+
+The required verifier returned 503; the owner authorized parent verification.
+Focused checks pass; owner functional review and physical-device performance
+remain unproven. See [CODEMAP](CODEMAP.md) for exact evidence, diagnostics and
+limits. STOP: no Batch B, commit, push, deployment or release step.
+
 ## v1.4 rev 6 — local implementation and targeted verification complete (2026-11-09)
 
 The preserved v1.4 work is built and §§8A–8E/full targeted §9 pass; owner functional

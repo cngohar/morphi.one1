@@ -33,6 +33,20 @@ For testing and verification:
 
 ## Current phase
 
+**v1.4.1 Nonogram baseline + 10 Batch A variants accepted; source commit and push authorized (2026-11-09):**
+The owner said “this repo updated again, you can comit and push to github”, accepting the completed
+v1.4.1 Nonogram implementation (Classic baseline + 10 Batch A rulesets: `nonogram:colour-2`,
+`nonogram:colour-5`, `nonogram:partial-clues`, `nonogram:totals-only`, `nonogram:unchecked`,
+`nonogram:strict-count`, `nonogram:countdown`, `nonogram:three-hearts`, `nonogram:no-undo`,
+`nonogram:hint-budget`) and authorizing this source commit and push to GitHub.
+Catalogue totals 11 enabled presets across 3 size bands (5×5, 10×10, 15×15) with 0 variant groups,
+reusing the single `(nonogram, UTC date)` board key. Below-floor saved runs consume the attempt and
+remain unranked without a daily board row.
+Scoped lint/types (0/0), 30 unit cases, 20 real-D1 cases, 33 solved/66 rejected vectors in 6 runtimes,
+and 42 Chromium cases pass. Full `bun run verify` remains deferred; editor exclusions (.cursor, .vscode/mcp.json)
+persist. No production deployment authorized.
+See `docs/briefs/v1.4.1-nonogram-codex-brief.md`, `docs/CODEMAP.md`, and `morphi-plan-simple.md`.
+
 **v1.4 Daily family boards + variant-surface removal accepted; source commit and push authorized (2026-11-09):**
 The owner said “this repo is updated, now comit and  push to github”, accepting the completed
 v1.4 Daily family boards + variant-surface removal (253 player variant board groups → 0;

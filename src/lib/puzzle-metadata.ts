@@ -1890,6 +1890,437 @@ const metadata = {
 			},
 			profileIcon: { color: 'var(--accent)', rotation: 8 }
 		}
+	},
+	['nonogram']: {
+		engineVersion: 'nonogram-1',
+		titleAfterEntrance: true,
+		scoring: {
+			version: 'brief-v1',
+			fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+			defaults: {
+				completion: 1000,
+				cell: 10,
+				second: 10,
+				mistake: 50,
+				hint: 100,
+				countdown: 10,
+				heart: 250
+			}
+		},
+		variants: [
+			{
+				id: 'nonogram:classic',
+				name: 'variant.nonogram:classic',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.step2', 'nonogram.step3'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			},
+			{
+				id: 'nonogram:colour-2',
+				name: 'variant.nonogram:colour-2',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.colour-2'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			},
+			{
+				id: 'nonogram:colour-5',
+				name: 'variant.nonogram:colour-5',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.colour-5'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			},
+			{
+				id: 'nonogram:partial-clues',
+				name: 'variant.nonogram:partial-clues',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.partial-clues'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			},
+			{
+				id: 'nonogram:totals-only',
+				name: 'variant.nonogram:totals-only',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.totals-only'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			},
+			{
+				id: 'nonogram:unchecked',
+				name: 'variant.nonogram:unchecked',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.unchecked'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			},
+			{
+				id: 'nonogram:strict-count',
+				name: 'variant.nonogram:strict-count',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.strict-count'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			},
+			{
+				id: 'nonogram:countdown',
+				name: 'variant.nonogram:countdown',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.countdown'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				},
+				maxSeconds: 1800,
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.nonogram.headline', cap: 'ending.nonogram.over' },
+					subline: { key: 'ending.nonogram.subline', values: ['filled', 'mistakes'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Clear before the countdown reaches zero; timeout leaves the failed board with no saved score.'
+				}
+			},
+			{
+				id: 'nonogram:three-hearts',
+				name: 'variant.nonogram:three-hearts',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.three-hearts'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.nonogram.headline', cap: 'ending.nonogram.over' },
+					subline: { key: 'ending.nonogram.subline', values: ['filled', 'mistakes'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Clear with at least one heart; zero hearts leaves the failed board with no saved score.'
+				}
+			},
+			{
+				id: 'nonogram:no-undo',
+				name: 'variant.nonogram:no-undo',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.no-undo'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			},
+			{
+				id: 'nonogram:hint-budget',
+				name: 'variant.nonogram:hint-budget',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'cell', 'second', 'mistake', 'hint', 'countdown', 'heart'],
+					defaults: {
+						completion: 1000,
+						cell: 10,
+						second: 10,
+						mistake: 50,
+						hint: 100,
+						countdown: 10,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['nonogram.step1', 'nonogram.rule.hint-budget'],
+					rows: [
+						{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+						{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'nonogram.note',
+					tips: 'nonogram.tips'
+				}
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.nonogram.headline' },
+			subline: { key: 'ending.nonogram.subline', values: ['filled', 'mistakes'] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition: 'The player fills every solution cell according to the clues.'
+		},
+		presentation: {
+			name: 'v1.game.nonogram',
+			scoringLabels: {
+				completion: 'scoring.nonogram.completion',
+				cell: 'scoring.nonogram.cell',
+				second: 'scoring.nonogram.second',
+				mistake: 'scoring.nonogram.mistake',
+				hint: 'scoring.nonogram.hint',
+				countdown: 'scoring.nonogram.countdown',
+				heart: 'scoring.nonogram.heart'
+			},
+			help: {
+				steps: ['nonogram.step1', 'nonogram.step2', 'nonogram.step3'],
+				rows: [
+					{ label: 'scoring.nonogram.completion', field: 'completion', sign: '+' },
+					{ label: 'scoring.nonogram.cell', field: 'cell', sign: '+' },
+					{ label: 'scoring.nonogram.second', field: 'second', sign: '+' },
+					{ label: 'scoring.nonogram.mistake', field: 'mistake', sign: '−' },
+					{ label: 'scoring.nonogram.hint', field: 'hint', sign: '−' }
+				],
+				note: 'nonogram.note',
+				tips: 'nonogram.tips'
+			},
+			backdrop: {
+				items: [
+					{
+						id: 'clue-grid',
+						path: 'M8 8h48v48H8ZM8 24h48M8 40h48M24 8v48M40 8v48M24 24h16v16H24ZM8 40h16v16H8Z'
+					}
+				],
+				fill: 'outline'
+			}
+		}
 	}
 } as const;
 export const puzzleMetadata: Record<PuzzleId, ClientPuzzleMetadata> & typeof metadata = metadata;

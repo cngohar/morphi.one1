@@ -1,5 +1,284 @@
 # CODEMAP.md
 
+## v1.4.1 Nonogram rev 3 — locally built and focused verification complete; STOP (2026-11-09)
+
+Resumed the preserved pre-build handoff at HEAD `56e6460`; no reset or restart.
+The owner explicitly instructed completion of rev 3, including §8A/§8B, then
+focused §9 and STOP. That execution instruction supersedes the brief's draft
+header/pre-build acceptance-line gate; it does **not** record functional acceptance.
+The owner brief and seven-puzzle fixture remain unchanged. Required
+`gpt-6.1-sol/high` agents implemented engine, UI and carve-outs. The required
+`gpt-6-luna/max` verifier returned 503; the owner explicitly authorized parent
+verification. All runtime evidence below is parent verification, without
+substitute-agent or independent-verifier claims.
+
+**Built:** Classic first, then exactly ten Batch A rule deltas. The baseline
+passed eight initial units, types/scoped lint and eleven Chromium cases before
+Batch A was added. Final catalogue: **11 enabled presets, 0 variant leaderboard
+groups**, three size bands; one reused `(nonogram, UTC date)` board per day.
+No new daily subsystem, schema, migration, dependency, selector or other-family
+game implementation. Owner functional review remains pending.
+
+### File inventory and authorized shared changes
+
+- Design/rules: `docs/puzzles/nonogram.md`,
+  `src/lib/puzzles/nonogram/README.md`.
+- Engine/manifest/scoring/messages:
+  `src/lib/puzzles/nonogram/{logic,manifest,scoring,messages}.ts`.
+- DOM game and adapter: `src/lib/puzzles/nonogram/{Game,View}.svelte`.
+- Units: `src/lib/puzzles/nonogram/{logic,variants}.test.ts`.
+- Frozen vectors/runner: `tests/vectors/nonogram.json` and
+  `tests/vectors/nonogram-runner.ts`; real D1:
+  `tests/integration/nonogram.test.ts`; browser:
+  `tests/e2e/nonogram.spec.ts`.
+- Four small shared touches: `src/lib/ui/motion.ts` adds one `nonogramEnter`
+  presentation method; `src/lib/round-timing.ts` adds the 2,500ms constant;
+  `src/lib/ui/game-shell.css` adds Nonogram-only reflow/teaching spacing;
+  `scripts/check-vectors.ts` adds `--nonogram`, with wrappers in temporary files.
+- §8A: `src/lib/engine/contract.ts` makes manifest/variant groups and replay
+  group optional; `src/lib/server/daily.ts` and `runs.ts` recover the original
+  pinned family/date identity after session removal and across midnight;
+  `src/lib/server/games.ts` maps family/variant rows to internal cohorts.
+  **Zero-edit exception:** `scripts/generate-registry.ts` already strips client
+  groups and accepts the relaxed contract; its source required no change.
+- §8B: `runs.ts` stores `result.group ?? run.family`, compares exact active
+  milliseconds in both timing branches, and saves below-floor claims unranked
+  without a daily row while consuming the attempt. `games.ts` activity/history
+  queries use surviving recorded starts for honest preset attribution.
+  `memory-directory.ts` changes only its two authorized mapping/history call sites.
+- `bun run registry:generate` regenerated
+  `src/lib/{catalog,registry,family-index,puzzle-metadata,puzzle-messages}.ts`.
+  **Zero-edit exception:** shared `src/lib/scoring.ts` is not generator output
+  and needed no change. No generated projection was hand-edited.
+- Required reporting updates: this CODEMAP, `morphi-plan-simple.md`, plus
+  existing `docs/PHASE_REPORTS.md`/`DECISIONS.md` under AGENTS and
+  `docs/EDGE_CASES.md` under §10. No new work-report file.
+  Owner-provided brief/demo and unrelated `.cursor/`/`.vscode/mcp.json` are preserved.
+
+### Decisions and limits
+
+Clues derive from seeded silhouettes at 50–60% density. Actual colour/partial/
+totals solvers certify line-solvability and uniqueness, with bounded counting
+and 100 attempts per band before fallback/rejection. Full/empty and single-run
+lines are processed first. Colour silhouettes place bounded coloured sequences
+above the grid to preserve portrait cell space; RNG draw order stays fixed.
+No generated solution or deduced grid is issued or checkpointed; clue-derived
+proofs use an internal WeakMap. Player clues/state determine completion.
+
+Partial clues round 25% down to whole lines: **2/5/7** hidden at sizes 5/10/15.
+Seeded hiding retains the anchor, and the physically reduced clues still pass
+their own solver. Only unchecked requires every cell decided; unknown and X
+both represent empty cells for other modes' clue-based completion.
+Numeric wire keys are exactly `at,cell,mark,stroke`. Undo restores the complete
+stroke including Auto-X; Restart retains seed, time, penalties and spent hints.
+Countdown/hearts losses leave the failed board, save no result, and abandon the
+exact ranked session through the existing Try Another flow when leaving.
+
+Ranked replay first resolves timing metadata at zero seconds, then validates
+and scores with authoritative active seconds after opening allowances. The floor
+comparison retains exact milliseconds; storage/scoring seconds remain floored.
+Per-preset immutable `brief-v1` configs remain internal, never board keys.
+Group-less completions without any surviving recorded start cannot be safely
+attributed to a preset: family history retains them; preset activity/history
+omits them. Grouped historical imports retain existing cohort attribution.
+Existing other-family tests expecting `too_fast` rejection were not run or
+rewritten under the focused scope; their expectations need review before full verify.
+
+### Focused §9 evidence
+
+Evidence directory: `build/v1.4.1/` (local, ignored). No full verification pass
+or physical-device acceptance is inferred.
+
+| Item                                                                                                                      | Evidence                                                                          | Result                                                                                                                                 |
+| ------------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------------- | -------------------------------------------------------------------------------------------------------------------------------------- |
+| Scoped Prettier / ESLint                                                                                                  | `format-final.log`, `lint-final.log`, `lint-corrections.log`, `lint-teaching.log` | PASS; only owned/affected source. Global `bun run lint` wrapper not run.                                                               |
+| Types                                                                                                                     | `types-final.log`                                                                 | PASS, 0 errors / 0 warnings; no suppression/waiver.                                                                                    |
+| Import/purity boundaries                                                                                                  | `boundaries-final.log`, scoped ESLint                                             | PASS; official synthetic boundary self-checks, no other-family test suite.                                                             |
+| Build / Nonogram lazy isolation                                                                                           | `build-final.log`, `lazy-final.log`                                               | PASS; dynamic View includes only its Game; no eager shell Game import.                                                                 |
+| Generation, clues, actual solvers, legal moves, helpers, all rule deltas, group-less replay                               | `unit-final.log`                                                                  | PASS, 30 cases.                                                                                                                        |
+| Frozen generation/solved/illegal/incomplete replays                                                                       | `vectors-final.log`                                                               | PASS, 33 solved + 66 rejected in each of Node/Bun/Chromium/Firefox/WebKit/workerd; one seed per preset/band. Clean final process exit. |
+| Daily persistence/recovery, exact floors, timed branch, losses, audit, scoring isolation, group-less admin counts/history | `d1-final.log`                                                                    | PASS, 20 real-D1 cases with isolated `persist:false` database.                                                                         |
+| Seeded clears, endings/result/Next, keyboard/helpers, all three bands/viewports, loss, lifecycle/failure/input            | Serial browser logs below                                                         | PASS, 42 unique Chromium cases at one worker.                                                                                          |
+| Final portrait colours and readable HUD                                                                                   | `browser-captures-final.log`, `browser/colour-{2,5}-15-390x844.png`               | PASS; ≥19px colour cells, no overflow; final capture visually inspected.                                                               |
+| Owner functional acceptance                                                                                               | Owner review                                                                      | PENDING, no acceptance inferred.                                                                                                       |
+
+Browser evidence is serial, not a claim of a single uninterrupted 42-case pass:
+`browser-final.log` initially passed 40/41; the countdown fixture installed a fake
+clock after gameplay began and needed correction. `browser-corrections.log`
+passed countdown/pointer checks but exposed colour portrait sizing; subsequent
+`browser-colour-final.log` passed clears/wide layouts. Final
+`browser-portrait-final.log` passes all seven portrait cases,
+`browser-teaching-final.log` passes all ten variant teaching/clear cases, and
+`browser-captures-final.log` passes both final colour portraits. The later passing
+checks supersede earlier failed cases; failure evidence is retained.
+
+Final vector SHA-256:
+`322a369e54a400b0759c069b5e8451c95eae8f2ca0cb86853beb0bc81b1f7e0b`.
+
+**Measurements (diagnostic goal only):** `generation-performance.json` records
+100 seeds per preset in workspace Bun 1.4.2, synchronous calls after module load,
+first call included; no device/network emulation, app cold-load or physical-phone
+measurement. Median 0.20–0.53ms; p95 0.44–7.70ms (colour-2 1.23ms, colour-5 0.62ms,
+totals 3.81ms). Maximum workspace outlier 310.55ms. These are workspace diagnostics,
+not proof of an 8ms phone budget. Existing Node 24.14.1, TypeScript 6.0.3,
+anime.js 4.5.0, Vitest 4.1.12, Playwright 1.64.1 and Wrangler 4.151.3 are unchanged.
+
+**STOP:** baseline + Batch A complete locally. Full `bun run verify`, global lint,
+other-family suites, physical-device/production checks, Batch B–J, geometry
+baselines, a new daily system, sounds, commit, push, deployment, provisioning and
+release steps were not performed. No waiver or functional acceptance is claimed.
+Owner responsibility: review/accept the local game; future source handoff or
+deployment needs its own instruction. Historical pre-build stops below are preserved.
+
+## v1.4.1 Nonogram rev 2 — resumed; remaining contract-scope stop (2026-11-09)
+
+The owner requested resuming the preserved pre-build stop, completing baseline +
+Batch A including §8A, then focused §9 verification and STOP. The accepted rev 2
+was present as `docs/briefs/v1.4.1-nonogram-codex.md`; an identical copy now lives
+at the requested `docs/briefs/v1.4.1-nonogram-codex-brief.md` (§8's permitted file).
+The owner fixture `static/demo/v1.4.1-nonogram.html`, existing documentation and
+HEAD `56e6460` were preserved. This is a continuation, not a new implementation
+or a reset. Rev 2 resolves the original required-field, research-path, table-name
+and portrait-cell decisions, but the remaining source dependencies below still
+conflict with its operation limits.
+
+**Required stop:** §8A authorises only its five listed files and operations;
+`runs.ts` is limited to stored-variant recovery. §8A says, “If any other consumer
+of the field is found, stop and report it — do not widen this carve-out silently.”
+§10 also says, “If a requirement conflicts with the code as it is, stop and report.
+Do not improvise a workaround that changes the design.” No source relaxation,
+partial registration, invented group or timing workaround was made.
+
+### Remaining gaps and exact source evidence
+
+- **Group-less persistence:** `src/lib/server/runs.ts:395` binds `result.group`
+  directly into `completed_run.rules_group`, which remains required/non-null in
+  `src/lib/server/db/schema.ts:139`. Making `ReplayedResult.group` optional does
+  not define the stored value or make this insertion work. §8A's `runs.ts`
+  instruction at brief line 120 permits recovery changes, not this persistence
+  change. A family/date internal storage value would preserve the daily-board
+  design, but requires an explicit storage rule and operation authorisation;
+  it was not silently added. No schema/migration edit is proposed or made.
+- **Exact timing and downgrade:** §5 requires 2,500 / 10,000 / 22,500 ms active
+  floors and below-floor claims saved as unranked. `runs.ts:348` floors active
+  duration to seconds, `:356` throws `too_fast`, and `:358–369` abandons the
+  claimed session and rethrows. `:403` persists ranked status solely from
+  `run.rankedSession`. Fractional `minimumSeconds` cannot restore discarded
+  milliseconds: 2.5 / 22.5 would reject valid 2,500–2,999 / 22,500–22,999 ms
+  claims, while rounding down admits claims below the locked floors. The timed
+  `maxSeconds` branch at `:335–346` also bypasses `minimumSeconds`. No manifest-only
+  implementation can provide the required exact downgrade; this needs explicit
+  timing/validation/persistence authorisation in `runs.ts`, beyond recovery.
+- **Additional group consumers and admin compatibility:**
+  `src/lib/server/memory-directory.ts:159` and `:299` read the optionalised field
+  with safe defaults; those reads do not independently require type fixes.
+  However, `:157–167` supplies a group-expanded `ActivityMappingEntry[]` to the
+  shared `queryActivityCounts`, and `:294–301` calls group-based
+  `queryScoreHistory`. They are additional consumers covered by §8A's reporting
+  rule. Changing `buildActivityMapping` alone leaves `games.ts:86`, `:97` and
+  `:109` querying group identity. `games.ts:302/:307` also requires groups for
+  per-preset score history, with the `:363–365` empty fallback yielding no
+  Nonogram preset history. The shared queries need a stated compatibility rule
+  for group-less rows and historical imports without a recorded start; the
+  latter currently use internal groups for variant attribution. No Memory
+  directory, other-family source, existing test or shared query was changed.
+
+**Feasible parts, not applied:** existing manifests use `satisfies PuzzleManifest`
+and retain their concrete group arrays/results when the interface is relaxed.
+Registry metadata already strips groups (`scripts/generate-registry.ts:86`),
+and catalog/pool generation derives its acceptance from that interface. Daily
+recovery already joins pinned puzzle/session identity (`daily.ts:209–215`) and
+checks the deterministic family/date run id (`:231`); its group check can be
+replaced locally. Stored recovery after session removal must join the original
+pinned puzzle and verify its family/date run id, retaining midnight-grace rules
+rather than inferring the start date from completion submission time.
+
+### Inventory and verification at this stop
+
+Built production files: **none**. §8A applied: **no**; all five files remain
+unchanged. New Nonogram presets: **0** (baseline and Batch A remain unbuilt).
+Variant groups added: **0**. New Nonogram daily boards: **0**; the required target
+remains one `(nonogram, UTC date)` board per day after a compliant implementation.
+Changed in this continuation: this CODEMAP, `morphi-plan-simple.md`, and the exact
+rev 2 brief copy at its requested filename. The original brief and fixture remain
+unchanged. Existing `.cursor/` and `.vscode/mcp.json` files remain untouched.
+
+| §9 item                                      | Result  | Reason / evidence                                                                    |
+| -------------------------------------------- | ------- | ------------------------------------------------------------------------------------ |
+| Focused Prettier / ESLint                    | NOT RUN | Required pre-build scope stop; no game/shared source changed.                        |
+| Types, 0 errors / 0 warnings                 | NOT RUN | No contract relaxation or typed Nonogram registration exists yet; no pass or waiver. |
+| Import boundaries                            | NOT RUN | Implementation stopped before source changes.                                        |
+| Build / lazy bundle                          | NOT RUN | No Nonogram View/Game or registry addition to build/check.                           |
+| Nonogram + §8A units                         | NOT RUN | Required game and contract cases are not implemented.                                |
+| Frozen vectors in six runtimes, `--nonogram` | NOT RUN | No Nonogram vectors/runner or filter implemented.                                    |
+| Real-D1 integration                          | NOT RUN | Group-less insertion and timing behavior need the scope resolution above.            |
+| One-worker Chromium, three viewports         | NOT RUN | No app-integrated Nonogram to exercise; fixture is reference only.                   |
+
+The parent and required `gpt-6.1-sol/high` scope auditor traced the source read-only.
+The requested independent `gpt-6-luna/max` verifier returned **503/unavailable**;
+no substitute, parent runtime takeover or independent verification pass is
+claimed for this milestone. Read-only audit evidence is not §9 verification.
+Full `bun run verify`, untouched-file lint, other-family tests and physical-device
+measurements remain unrun. No performance measurements or acceptance is inferred.
+
+**Resume requires:** explicitly specify group-less internal storage and permit
+the necessary insertion change; permit exact timing-floor downgrade in `runs.ts`;
+resolve additional-consumer/admin-query compatibility while retaining existing
+internal historical cohorts. These are decisions needed for the current baseline
+and Batch A, not a proposal for a new milestone or broader architecture.
+STOP followed: no Batch B–J, geometry baseline, new daily subsystem, sounds,
+other-family change, commit, push, deployment, provisioning or release step.
+
+## v1.4.1 Nonogram — pre-build contract-gap stop (2026-11-09)
+
+The owner selected `docs/briefs/v1.4.1-nonogram-codex-brief.md` exactly:
+actual baseline first, then Batch A only, focused §9 verification, no commit,
+push or deployment. HEAD is `56e6460`. The owner-provided brief and
+`static/demo/v1.4.1-nonogram.html` are present and preserved; the fixture was
+read as a visual/behaviour reference only. No production puzzle code was copied
+or implemented. No baseline or Batch A preset, variant group or daily board
+was added. Only this CODEMAP and `morphi-plan-simple.md` were updated.
+
+**Required stop:** §§1/5/8/10 forbid new Nonogram `leaderboardGroups`, prohibit
+engine/server edits and require stopping if reality conflicts with the brief.
+The current `src/lib/engine/contract.ts` requires `leaderboardGroups` on both
+`PuzzleVariant` (line 33) and `PuzzleManifest` (line 105), and requires a replay
+`group` (line 22). Registry generation omits groups from client metadata, but
+its generated catalog and pool types still require `PuzzleManifest`.
+There is no compliant typed registration under the current contract.
+
+This is also a runtime dependency, not just a type mismatch:
+
+- `src/lib/server/daily.ts:234` calls the selected variant's
+  `leaderboardGroups.includes(run.rulesGroup)` during daily completion recovery.
+- `src/lib/server/runs.ts:198` uses the array to recover a stored ranked variant.
+- `src/lib/server/games.ts:68` maps every variant's array for admin activity;
+  omitting it would break the generic admin path required by the brief.
+
+Empty arrays or type assertions are not a resolution: they do not remove the
+required field or preserve recovery/admin cohort behaviour. No workaround,
+contract relaxation or server refactor was made. Resume needs an explicit
+resolution of this contract gap and its permitted source scope.
+
+Other brief issues observed before stopping: the two referenced research
+files under `workspace/research_notes/` are absent at the stated repository
+paths; §9 names `leaderboard_best`, while the v1.4 daily table is `daily_best`;
+and a 15-column board at 44px per cell needs at least 660px before clue gutters,
+so it cannot fit 390px portrait without a band/layout decision. These were not
+resolved by changing the design. `visibilitychange` currently checkpoints the
+round and reports ranked departure when hidden; Connect's reference pauses
+practice timing and presentation, while ranked timing remains server based.
+
+**§9 verification:** not run after the required pre-build stop: scoped
+Prettier/ESLint, type check, boundaries, lazy bundle, Nonogram units, six-runtime
+vectors, real-D1 integration and one-worker Chromium/three-viewport checks.
+The contract trace is read-only evidence, not a test pass. Full-repo verification,
+other-family tests and physical-device checks were not run. The requested
+`gpt-6-luna/max` independent contract verifier returned 503/unavailable; no
+substitute agent or independent verification pass is claimed. No Batch B–J,
+geometry baseline, new sound, other-family change, commit, push, deployment or
+release work followed. Existing editor/MCP files remain untouched.
+
 ## v1.4 rev 6 — built locally; full targeted §9 passed; stopped (2026-11-09)
 
 Resumed the preserved implementation through §§8A–8E without resetting or

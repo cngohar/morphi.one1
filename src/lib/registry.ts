@@ -6,11 +6,13 @@ export const puzzleViews: Record<PuzzleId, () => Promise<{ default: Component<Pu
 	{
 		block: () => import('./puzzles/block-placement/View.svelte'),
 		connect: () => import('./puzzles/connect/View.svelte'),
-		memory: () => import('./puzzles/memory/View.svelte')
+		memory: () => import('./puzzles/memory/View.svelte'),
+		nonogram: () => import('./puzzles/nonogram/View.svelte')
 	};
 // Each current pool generates its existing procedural variants through createRound.
 export const puzzlePools: Record<PuzzleId, () => Promise<{ manifest: PuzzleManifest }>> = {
 	block: () => import('./puzzles/block-placement/manifest.js'),
 	connect: () => import('./puzzles/connect/manifest.js'),
-	memory: () => import('./puzzles/memory/manifest.js')
+	memory: () => import('./puzzles/memory/manifest.js'),
+	nonogram: () => import('./puzzles/nonogram/manifest.js')
 };

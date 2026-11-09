@@ -1,0 +1,1154 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Nonogram Playable Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@500;700;800;900&family=IBM+Plex+Mono:wght@500;600&display=swap" rel="stylesheet" />
+    <style>
+      :root{
+        --bg:#eef2f7; --surface:#ffffff; --surface2:#f6f8fb; --ink:#1b2433; --ink2:#43506a;
+        --muted:#71809c; --line:#d7dee9; --line-strong:#aeb9cc;
+        --brand:#e5532d; --brand-ink:#ffffff; --blue:#2f6fed; --teal:#009a86; --violet:#7d61ae;
+        --fill:#1b2433; --x:#93a2bb; --good:#0d8a6c; --bad:#d92d20; --warn:#b54708;
+        --clue-dim:#a7b2c6; --hl:rgba(47,111,237,.10); --hl-strong:rgba(47,111,237,.18);
+        --shadow:0 10px 28px rgba(27,36,51,.10); --radius:16px;
+        color-scheme: light;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#12161f; --surface:#1b2230; --surface2:#232c3f; --ink:#eef2f7; --ink2:#c3cede;
+          --muted:#8d9cb6; --line:#33405a; --line-strong:#4d5d7d;
+          --fill:#eef2f7; --x:#67769a; --hl:rgba(96,150,255,.14); --hl-strong:rgba(96,150,255,.24);
+          --shadow:0 10px 28px rgba(0,0,0,.4); color-scheme: dark;
+        }
+      }
+      *{box-sizing:border-box}
+      html{-webkit-text-size-adjust:100%}
+      body{margin:0;background:var(--bg);color:var(--ink);
+        font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+        font-size:16px;line-height:1.45;}
+      .mono{font-family:"IBM Plex Mono",ui-monospace,monospace}
+      main{max-width:1060px;margin:0 auto;padding:18px 14px 56px}
+      button{font:inherit;cursor:pointer}
+      :focus-visible{outline:3px solid var(--blue);outline-offset:2px;border-radius:6px}
+
+      /* ---------- intro ---------- */
+      .intro{display:flex;flex-wrap:wrap;gap:8px 14px;align-items:baseline;margin:2px 0 4px}
+      .intro h1{font-size:clamp(24px,4.5vw,34px);font-weight:900;margin:0;letter-spacing:-.01em}
+      .tag{font-size:12px;font-weight:800;letter-spacing:.08em;text-transform:uppercase;color:var(--brand);
+        border:1.5px solid var(--brand);border-radius:999px;padding:2px 9px;white-space:nowrap}
+      .lede{color:var(--ink2);max-width:72ch;margin:2px 0 14px;font-size:15.5px}
+      .lede strong{color:var(--ink)}
+
+      /* ---------- layout ---------- */
+      .stage{display:grid;grid-template-columns:minmax(0,1fr) 300px;gap:18px;align-items:start}
+      @media (max-width:880px){.stage{grid-template-columns:minmax(0,1fr)}}
+      .card{background:var(--surface);border:1px solid var(--line);border-radius:var(--radius);box-shadow:var(--shadow)}
+      .boardcard{padding:14px 14px 16px}
+      .side{display:flex;flex-direction:column;gap:14px}
+      .panel{padding:14px 16px}
+      .panel h2{font-size:13px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:0 0 10px}
+      .panel p{margin:0 0 8px;font-size:14.5px;color:var(--ink2)}
+      .panel p:last-child{margin-bottom:0}
+      .panel strong{color:var(--ink)}
+
+      /* ---------- pickers ---------- */
+      .pickerlabel{font-size:12px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);margin:12px 0 6px}
+      .pickerlabel:first-child{margin-top:0}
+      .chips{display:flex;flex-wrap:wrap;gap:7px}
+      .chip{border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);
+        border-radius:999px;padding:7px 13px;font-weight:800;font-size:14px;min-height:40px}
+      .chip[aria-pressed="true"]{background:var(--ink);color:var(--bg);border-color:var(--ink)}
+      .chip.colourchip[aria-pressed="true"]{background:var(--violet);border-color:var(--violet);color:#fff}
+      .modes{display:grid;grid-template-columns:1fr 1fr;gap:7px}
+      .modebtn{border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:12px;
+        padding:9px 10px;text-align:left;min-height:52px}
+      .modebtn b{display:block;font-size:14.5px;font-weight:900;line-height:1.2}
+      .modebtn span{display:block;font-size:12px;color:var(--muted);font-weight:700;margin-top:1px}
+      .modebtn[aria-pressed="true"]{border-color:var(--brand);background:color-mix(in srgb,var(--brand) 9%,var(--surface))}
+      .modebtn[aria-pressed="true"] span{color:var(--ink2)}
+
+      /* ---------- stats ---------- */
+      .stats{display:flex;flex-wrap:wrap;gap:8px;margin:14px 0 4px}
+      .stat{background:var(--surface2);border:1px solid var(--line);border-radius:12px;padding:7px 12px;min-width:96px}
+      .stat .k{font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+      .stat .v{font-size:19px;font-weight:900;line-height:1.15}
+      .stat .v.bad{color:var(--bad)} .stat .v.warn{color:var(--warn)}
+      .hearts{font-size:17px;letter-spacing:2px;color:var(--brand)}
+      .hearts .off{color:var(--line-strong)}
+      .badge{display:inline-flex;align-items:center;gap:6px;font-size:12.5px;font-weight:800;border-radius:999px;
+        padding:3px 10px;border:1.5px solid var(--line-strong);color:var(--ink2);margin-top:10px}
+      .badge.ok{border-color:var(--good);color:var(--good)}
+      .badge.warnb{border-color:var(--warn);color:var(--warn)}
+      .badge .dot{width:8px;height:8px;border-radius:50%;background:currentColor;flex:none}
+
+      /* ---------- board ---------- */
+      .boardwrap{display:flex;justify-content:center;padding:8px 0 2px}
+      .board{display:grid;container-type:inline-size;width:min(100%,620px);
+        --tot:10; --rd:2; --cd:2;
+        grid-template-columns:repeat(var(--tot),1fr);grid-template-rows:repeat(var(--totr,10),1fr);
+        user-select:none;-webkit-user-select:none;touch-action:none}
+      .corner{border-right:2px solid var(--line-strong);border-bottom:2px solid var(--line-strong)}
+      .colclue{display:flex;flex-direction:column;justify-content:flex-end;align-items:center;
+        padding:2px 0 5px;border-bottom:2px solid var(--line-strong);gap:0}
+      .rowclue{display:flex;flex-direction:row;justify-content:flex-end;align-items:center;
+        padding:0 6px 0 2px;border-right:2px solid var(--line-strong);gap:4px}
+      .colclue.hl,.rowclue.hl{background:var(--hl)}
+      .cluenum{font-family:"IBM Plex Mono",ui-monospace,monospace;font-weight:600;line-height:1.25;
+        font-size:calc(100cqw / var(--tot) * .52);color:var(--ink);min-width:1.15em;text-align:center;border-radius:5px;padding:0 1px}
+      .colclue .cluenum{display:block}
+      .clues-done .cluenum{color:var(--clue-dim)}
+      .clues-error .cluenum{color:var(--bad)}
+      .cluenum.chipcol{color:#fff;font-weight:700}
+      .cell{position:relative;border:0;padding:0;margin:0;background:var(--surface);
+        border-right:1px solid var(--line);border-bottom:1px solid var(--line);aspect-ratio:1/1;width:100%}
+      .cell.bR{border-right:2px solid var(--line-strong)}
+      .cell.bB{border-bottom:2px solid var(--line-strong)}
+      .cell.edgeR{border-right:2px solid var(--line-strong)}
+      .cell.edgeB{border-bottom:2px solid var(--line-strong)}
+      .cell.hl{background:var(--hl)}
+      .cell.cursorcell{box-shadow:inset 0 0 0 3px var(--blue);z-index:2}
+      .cell.filled{background:var(--fill)}
+      .cell.filled.hl{background:color-mix(in srgb,var(--fill) 82%,var(--blue))}
+      .cell.colfill{box-shadow:inset 0 0 0 1px rgba(0,0,0,.18)}
+      .cell.isx::before,.cell.isx::after{content:"";position:absolute;left:22%;right:22%;top:50%;height:2.5px;
+        background:var(--x);border-radius:2px;transform:rotate(45deg)}
+      .cell.isx::after{transform:rotate(-45deg)}
+      .cell.penaltyx::before,.cell.penaltyx::after{background:var(--bad)}
+      .cell.checkwrong{box-shadow:inset 0 0 0 3px var(--bad);z-index:2}
+      .cell.hinted{box-shadow:inset 0 0 0 3px var(--teal);z-index:2}
+      .board.won .cell{border-color:transparent}
+      .board.won .cell.filled{border-radius:18%}
+
+      /* ---------- build order ---------- */
+      .steps{display:grid;grid-template-columns:repeat(4,1fr);gap:10px;margin:0 0 16px}
+      @media (max-width:880px){.steps{grid-template-columns:1fr 1fr}}
+      @media (max-width:480px){.steps{grid-template-columns:1fr}}
+      .step{background:var(--surface);border:1px solid var(--line);border-radius:12px;padding:11px 13px;box-shadow:var(--shadow)}
+      .step .n{font-size:11px;font-weight:900;letter-spacing:.07em;text-transform:uppercase;color:var(--muted)}
+      .step b{display:block;font-size:15.5px;font-weight:900;line-height:1.25;margin:2px 0 3px}
+      .step p{margin:0;font-size:13px;color:var(--ink2)}
+      .step .st{display:inline-block;margin-top:7px;font-size:11.5px;font-weight:900;border-radius:999px;padding:2px 9px;border:1.5px solid var(--line-strong);color:var(--ink2)}
+      .step.done .st{border-color:var(--good);color:var(--good)}
+      .step.now{border-color:var(--brand)}
+      .step.now .st{border-color:var(--brand);color:var(--brand)}
+      .step.locked{opacity:.78}
+      .step.locked .st{border-color:var(--warn);color:var(--warn)}
+
+      /* ---------- tools ---------- */
+      .tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center;margin-top:14px}
+      .toolseg{display:flex;border:1.5px solid var(--line-strong);border-radius:12px;overflow:hidden}
+      .toolseg button{border:0;background:var(--surface);color:var(--ink);font-weight:900;font-size:15px;
+        padding:10px 16px;min-height:46px;display:flex;align-items:center;gap:7px}
+      .toolseg button + button{border-left:1.5px solid var(--line-strong)}
+      .toolseg button[aria-pressed="true"]{background:var(--ink);color:var(--bg)}
+      .toolseg button .swatch{width:16px;height:16px;border-radius:4px;background:var(--fill);border:1px solid var(--line-strong);flex:none}
+      .toolseg button[aria-pressed="true"] .swatch{background:var(--bg)}
+      .toolseg button .xmark{font-weight:900;color:var(--x);font-size:17px;line-height:1}
+      .tbtn{border:1.5px solid var(--line-strong);background:var(--surface);color:var(--ink);border-radius:12px;
+        font-weight:800;font-size:14.5px;padding:10px 14px;min-height:46px}
+      .tbtn:disabled{opacity:.42;cursor:not-allowed}
+      .tbtn.danger[aria-pressed="true"]{background:var(--bad);border-color:var(--bad);color:#fff}
+      .palette{display:none;flex-wrap:wrap;gap:7px;align-items:center;width:100%;margin-top:2px}
+      .palette.show{display:flex}
+      .palette .plabel{font-size:12px;font-weight:900;letter-spacing:.06em;text-transform:uppercase;color:var(--muted);margin-right:2px}
+      .pchip{width:44px;height:44px;border-radius:12px;border:2.5px solid transparent;padding:0;position:relative}
+      .pchip[aria-pressed="true"]{border-color:var(--ink);box-shadow:0 0 0 2px var(--surface),0 0 0 4.5px var(--ink)}
+      .pchip .pn{position:absolute;inset:auto 0 -17px;font-size:10.5px;font-weight:800;color:var(--ink2);text-align:center}
+      .msg{min-height:24px;margin:12px 0 0;font-weight:800;font-size:15px;color:var(--ink2)}
+      .msg.good{color:var(--good)} .msg.bad{color:var(--bad)} .msg.warn{color:var(--warn)}
+      .sizehint{font-size:13px;color:var(--muted);font-weight:700;margin-top:6px}
+
+      /* ---------- overlay ---------- */
+      .overlay{position:fixed;inset:0;background:rgba(18,22,31,.55);display:none;align-items:center;justify-content:center;
+        padding:18px;z-index:50}
+      .overlay.show{display:flex}
+      .dialog{background:var(--surface);color:var(--ink);border-radius:20px;max-width:430px;width:100%;
+        padding:26px 24px;box-shadow:var(--shadow);text-align:center}
+      .dialog .bigpic{font-size:44px;line-height:1}
+      .dialog h2{margin:8px 0 4px;font-size:26px;font-weight:900}
+      .dialog p{color:var(--ink2);margin:0 0 6px}
+      .dialog .dstats{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin:14px 0 18px}
+      .dialog .dstats .stat{min-width:86px}
+      .dialog .row{display:flex;gap:8px;justify-content:center;flex-wrap:wrap}
+      .btn{border:0;border-radius:12px;font-weight:900;font-size:15.5px;padding:12px 20px;min-height:48px}
+      .btn.primary{background:var(--brand);color:var(--brand-ink)}
+      .btn.ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--line-strong)}
+
+      /* ---------- below-board sections ---------- */
+      .below{display:grid;grid-template-columns:1fr 1fr;gap:18px;margin-top:18px}
+      @media (max-width:880px){.below{grid-template-columns:1fr}}
+      .below .card{padding:18px 20px}
+      .below h2{font-size:19px;font-weight:900;margin:0 0 10px}
+      .below h3{font-size:15px;font-weight:900;margin:16px 0 6px}
+      .below p,.below li{font-size:14.5px;color:var(--ink2)}
+      .below p{margin:0 0 8px}
+      .below ol,.below ul{margin:0;padding-left:20px}
+      .below li{margin-bottom:5px}
+      .below strong{color:var(--ink)}
+      .below a{color:var(--blue);font-weight:700}
+      table.modes{width:100%;border-collapse:collapse;font-size:14px;margin-top:4px}
+      table.modes th,table.modes td{text-align:left;padding:7px 8px;border-bottom:1px solid var(--line);vertical-align:top;color:var(--ink2)}
+      table.modes th{color:var(--ink);font-weight:900;white-space:nowrap}
+      table.modes tr:last-child td{border-bottom:0}
+      .callout{border:1.5px solid var(--violet);border-radius:12px;padding:12px 14px;margin-top:10px;background:color-mix(in srgb,var(--violet) 7%,var(--surface))}
+      .callout p{margin:0}
+      kbd{font-family:"IBM Plex Mono",monospace;font-size:12.5px;background:var(--surface2);border:1px solid var(--line-strong);
+        border-bottom-width:2.5px;border-radius:6px;padding:1px 6px;color:var(--ink)}
+      .srcs{font-size:13px;color:var(--muted)}
+      .srcs a{color:var(--blue)}
+      .foot{margin-top:22px;font-size:13px;color:var(--muted);max-width:75ch}
+    </style>
+  </head>
+  <body>
+    <main>
+      <div class="intro">
+        <h1>Nonogram — playable demo</h1>
+        <span class="tag">v1.4.1 sample fixture</span>
+      </div>
+      <p class="lede">A standalone sample built from the Nonogram research paper, to check the core loop before the Codex brief is written. <strong>This build is the puzzle base only</strong> — baseline rules, plus one researched genuine variant (Colour Nonogram) as a worked example. The full variant matrix comes <strong>after</strong> the base is signed off, and only from the variant research — never before it. Grid size and picture are difficulties, not variants, so they aren’t labelled as any. Every puzzle below is checked by a line solver in your browser the moment the page loads — the badge under the board is the result of that check, not a claim. All animation runs on <strong>anime.js 4.5.0</strong>, Morphi’s animation library, through one presentation-only layer — it never decides or commits a move.</p>
+
+      <div class="steps" aria-label="Build order for this puzzle">
+        <div class="step done"><span class="n">Step 1</span><b>Global research</b><p>How Nonogram is played, win / lose conditions, controls, and which variants are genuine — sourced first, before any build.</p><span class="st">Done — research paper</span></div>
+        <div class="step now"><span class="n">Step 2 · you are here</span><b>Puzzle base</b><p>The playable baseline: clues, fill / X, drag, undo per stroke, feedback modes, wide layout, anime.js motion.</p><span class="st">This demo</span></div>
+        <div class="step done"><span class="n">Step 3</span><b>Variant matrix</b><p>Designed only after the variant research in Step 1 and after this base — never before the research. It lives in its own design document; no matrix variants are built into this demo — see the gate below.</p><span class="st">Designed separately — not in this demo</span></div>
+        <div class="step locked"><span class="n">Step 4</span><b>Codex brief</b><p>Written last, citing the research for the rules and this demo for the play and visuals, with the matrix from Step 3.</p><span class="st">After Step 3</span></div>
+      </div>
+
+      <div class="stage">
+        <section class="card boardcard" aria-label="Nonogram board">
+          <div class="stats" role="group" aria-label="Game status">
+            <div class="stat"><div class="k" id="timerLabel">Time</div><div class="v mono" id="timerVal">00:00</div></div>
+            <div class="stat"><div class="k">Progress</div><div class="v" id="progVal">0%</div></div>
+            <div class="stat" id="mistakeStat"><div class="k" id="mistakeLabel">Mistakes</div><div class="v" id="mistakeVal">0</div></div>
+            <div class="stat"><div class="k">Hints left</div><div class="v" id="hintVal">3</div></div>
+          </div>
+
+          <div class="boardwrap">
+            <div class="board" id="board" tabindex="0" role="application"
+                 aria-label="Nonogram grid. Use arrow keys to move, Space to fill, X to mark empty."></div>
+          </div>
+          <div id="solverBadge"></div>
+          <p class="sizehint" id="sizeHint"></p>
+
+          <div class="tools" role="group" aria-label="Drawing tools">
+            <div class="toolseg" role="group" aria-label="Paint mode">
+              <button type="button" id="toolFill" aria-pressed="true"><span class="swatch" aria-hidden="true"></span>Fill</button>
+              <button type="button" id="toolX" aria-pressed="false"><span class="xmark" aria-hidden="true">✕</span>Mark X</button>
+              <button type="button" id="toolErase" aria-pressed="false">Erase</button>
+            </div>
+            <div class="palette" id="palette" aria-label="Colour to fill with"></div>
+            <button type="button" class="tbtn" id="undoBtn">↩ Undo</button>
+            <button type="button" class="tbtn" id="redoBtn">↪ Redo</button>
+            <button type="button" class="tbtn" id="hintBtn">Hint</button>
+            <button type="button" class="tbtn" id="checkBtn">Check</button>
+            <button type="button" class="tbtn" id="autoXBtn" aria-pressed="true" title="When a line is completed, mark its remaining cells X automatically">Auto-X: on</button>
+            <button type="button" class="tbtn danger" id="restartBtn" aria-pressed="false">Restart</button>
+          </div>
+          <p class="msg" id="msg" aria-live="polite">Pick a cell to start. Rows and columns must match their clues.</p>
+        </section>
+
+        <aside class="side">
+          <section class="card panel" aria-label="Choose a puzzle">
+            <h2>Puzzle</h2>
+            <div class="pickerlabel">Learn — 5×5</div>
+            <div class="chips" id="chipsLearn"></div>
+            <div class="pickerlabel">Classic — 10×10</div>
+            <div class="chips" id="chipsClassic"></div>
+            <div class="pickerlabel">Large — 15×15 (wide test)</div>
+            <div class="chips" id="chipsLarge"></div>
+            <div class="pickerlabel">Genuine variant — rules change</div>
+            <div class="chips" id="chipsColour"></div>
+          </section>
+
+          <section class="card panel" aria-label="Choose a feedback mode">
+            <h2>Feedback mode</h2>
+            <div class="modes" id="modeBtns">
+              <button type="button" class="modebtn" data-mode="classic" aria-pressed="true"><b>Classic</b><span>Paper rules · no lose state</span></button>
+              <button type="button" class="modebtn" data-mode="arcade" aria-pressed="false"><b>Arcade</b><span>3 hearts · wrong fill refused</span></button>
+              <button type="button" class="modebtn" data-mode="strict" aria-pressed="false"><b>Strict</b><span>No feedback · Check gives a count</span></button>
+              <button type="button" class="modebtn" data-mode="timed" aria-pressed="false"><b>Picross-style</b><span>30:00 countdown · −2 / −4 / −8 min</span></button>
+            </div>
+            <p style="margin-top:10px">Switching mode keeps your grid. The research is blunt on this: <strong>classic Nonogram has no lose state at all</strong> — hearts and time penalties are inventions of specific apps, so here they are modes you opt into, never the default.</p>
+          </section>
+
+          <section class="card panel" aria-label="Animation">
+            <h2>Animation — anime.js</h2>
+            <p>Every animation on this page — board entrance, fill and X pops, mistake shake, hint pulse, the win reveal and the dialog — is driven by <strong>anime.js 4.5.0</strong>, the same library and version Morphi uses, called from <strong>one place only</strong> (this demo’s equivalent of <span class="mono">src/lib/ui/motion.ts</span>).</p>
+            <p><strong>Presentation never commits a move.</strong> Game state changes only in the game logic; the animation layer just reflects a change that has already happened. If anime.js fails to load, or you prefer reduced motion, the animations switch off and the game plays exactly the same.</p>
+            <p class="mono" id="motionStatus" style="font-size:13px">Animation layer: checking anime.js…</p>
+          </section>
+
+          <section class="card panel" aria-label="How deduction works">
+            <h2>The one move that matters</h2>
+            <p><strong>Overlap:</strong> slide a run to its leftmost and rightmost legal spots — any cell covered both times is certainly filled. A clue of <span class="mono">8</span> in a row of 10 forces the middle six cells.</p>
+            <p><strong>X-marks are logic, not decoration.</strong> Proving a cell empty is what splits a line into segments small enough to force the next fill.</p>
+          </section>
+        </aside>
+      </div>
+
+      <div class="below">
+        <section class="card" aria-label="How to play">
+          <h2>How to play</h2>
+          <ol>
+            <li>Each number is <strong>one run of consecutive filled cells</strong> of exactly that length, in the order shown. <span class="mono">3 1</span> means a run of 3, at least one empty cell, then a run of 1.</li>
+            <li><strong>Tap / click</strong> to fill in Fill mode. Switch to <strong>Mark X</strong> for cells you’ve proved empty — or <strong>right-click</strong> / <strong>long-press</strong> any cell to X it directly.</li>
+            <li><strong>Drag</strong> to paint a run in one stroke. A drag locks to its starting row or column, and <strong>Undo takes back the whole stroke</strong>, not one cell.</li>
+            <li>A clue <span class="mono">0</span> means the whole line is empty. Clues <strong>dim</strong> when their line matches, and your current row and column stay highlighted so you never lose your place.</li>
+            <li>Finish the picture to win. What “finish” means depends on the feedback mode — see the table.</li>
+          </ol>
+          <h3>Keyboard</h3>
+          <p><kbd>← ↑ ↓ →</kbd> move cursor · <kbd>Space</kbd> fill / clear · <kbd>X</kbd> mark X / clear · <kbd>Del</kbd> erase · <kbd>Ctrl/⌘ Z</kbd> undo · <kbd>Ctrl/⌘ ⇧ Z</kbd> redo. Click the board first to give it focus.</p>
+          <div class="callout">
+            <p><strong>Colour Nonogram — the genuine variant.</strong> Each clue number carries a colour. <strong>Different-colour runs may sit directly against each other with no gap; same-colour runs still need at least one empty cell between them.</strong> Watch the rocket’s fins touch its body, and its orange flame touch the yellow tip — no empty cell anywhere. That one rule change rewrites the deduction, which is why it counts as a variant and a bigger grid doesn’t.</p>
+          </div>
+        </section>
+
+        <section class="card" aria-label="Modes, win and lose conditions">
+          <h2>Win, lose, and what a wrong fill does</h2>
+          <table class="modes">
+            <tr><th>Classic</th><td><strong>Win:</strong> every cell decided (filled or X) and all fills correct. <strong>Lose:</strong> none — the paper puzzle has no timer, lives, or penalty. Wrong fills simply sit there until logic exposes them, so Check and Hint are your safety net.</td></tr>
+            <tr><th>Arcade</th><td><strong>Win:</strong> all picture cells filled (X’s optional). <strong>Lose:</strong> 3 hearts gone — a wrong fill is refused, marked with a red X, costs a heart, and stops your drag on the spot so one slip can’t burn several hearts. Modelled on Nonogram.com’s reported 3-heart system (secondary sources, not Easybrain’s own docs).</td></tr>
+            <tr><th>Strict</th><td><strong>Win:</strong> same as Classic. <strong>Lose:</strong> none, and <strong>no feedback at all</strong> while you play — the Wario / Time-Trial pattern. Check tells you <em>how many</em> cells differ, never which ones.</td></tr>
+            <tr><th>Picross-style</th><td><strong>Win:</strong> all picture cells filled before the clock dies. <strong>Lose:</strong> the 30:00 countdown reaches zero. Wrong fills are refused and cost time — <strong>−2 min, then −4, then −8 each</strong> — exactly Mario’s Picross (Game Boy, 1995). Wrong X’s cost nothing, as in the original.</td></tr>
+          </table>
+          <h3>The fairness gate this demo runs</h3>
+          <p>A puzzle can have exactly one solution and <em>still</em> be unfair — in Jan Wolter’s test set, 7 puzzles were unique yet needed a guess or lookahead, against 5 that solved by pure line logic. So this page runs a <strong>line solver</strong> on every puzzle at load: it repeatedly fixes any cell that is the same in <em>every</em> legal placement of its row and column. If that alone completes the picture, the badge says <strong>line-solvable</strong>. Deciding whether a nonogram has a solution at all is NP-complete (Ueda &amp; Nagao, 1996), which is why the check is per-puzzle and size-bounded — and why Morphi’s generator must reject any seed the solver can’t finish, instead of shipping it as “Hard.”</p>
+          <p class="srcs">Sources: <a href="https://en.wikipedia.org/wiki/Nonogram">Wikipedia — Nonogram</a> · <a href="https://www.mariowiki.com/Mario%27s_Picross">Mario Wiki — Mario’s Picross</a> · <a href="https://www.puzzlevuzzle.com/games/nonogram/">PuzzleVuzzle — controls</a> · <a href="https://everygamemade.com/play/nonogram.html">EveryGameMade — uniqueness vs line-solvability</a> · <a href="https://dev.to/selenium39dev/generating-puzzles-with-exactly-one-solution-sudoku-nonogram-and-a-daily-seed-in-plain-javascript-1f57">dev.to — seeded generation pipeline</a>. Solve-time bands in the research are rough and conflicting (≈2–5 min at 5×5, ≈10–20 at 10×10, ≈25–45 at 15×15), so this demo shows your own time instead of promising one.</p>
+        </section>
+
+        <section class="card" style="grid-column:1/-1" aria-label="Variant matrix gate">
+          <h2>Variant matrix — separate step, not built into this demo</h2>
+          <p>The order is fixed: <strong>global variant research first, puzzle base second, variant matrix third.</strong> Designing the matrix before the research — or before the base plays correctly — is how cosmetic reskins end up labelled as variants. So this demo ships the base and <strong>one</strong> researched variant as an example, and nothing else. The matrix itself was designed afterwards as its own document (design only, following this order), and its variants are implemented in the real build — not multiplied into this base demo.</p>
+          <p>What the global research actually found in the wild is the <strong>only</strong> starting list the matrix may draw from. It gives no total count — there is no global “how many variants are possible” number to copy. Morphi’s 100+ per type is its own design target, to be reached by designing new rule deltas in batches that pass the variant test (a variant must change matching, legal moves, available information, movement, limits or win conditions), not by counting sizes, pictures or themes.</p>
+          <table class="modes">
+            <tr><th>Colour Nonogram</th><td><strong>Researched — one sample built in this base.</strong> Different-colour runs may touch with no gap; same-colour runs still need at least one empty cell. The Rocket · Colour puzzle above is the worked example.</td></tr>
+            <tr><th>Triddlers</th><td><strong>Researched — not built.</strong> Triangular cells on a hexagonal board, clues on three axes. Waits for the matrix step; it also needs different geometry, so it is not a base feature.</td></tr>
+            <tr><th>Trianograms</th><td><strong>Researched — not built.</strong> Some cells are half-filled triangles, adding cell states the line solver must handle. Waits for the matrix step.</td></tr>
+            <tr><th>Picross 3D</th><td><strong>Researched — not built.</strong> A prism of cubes chipped away, with count and group-count clues and a 5-strike restart in the original. A different stage shape entirely — waits for the matrix step. (“Picross” is Nintendo’s brand; the name is used descriptively here only.)</td></tr>
+            <tr><th>Multi-grid / Mega</th><td><strong>Researched — not built.</strong> Several small grids solved separately that combine into one large picture. Per-grid rules are unchanged, so whether it counts as a variant at all is a matrix-step decision, not assumed here.</td></tr>
+            <tr><th>Torus · Clue-less</th><td><strong>Unverified — excluded.</strong> Each was found in a single source (vectree.io) with no major implementation behind it. They stay out of the matrix until verified.</td></tr>
+            <tr><th>Size · theme · picture</th><td><strong>Not variants — never in the matrix.</strong> A 15×15 or a new picture is a difficulty or an instance of the same rules, per the research and Morphi’s own variant rule.</td></tr>
+          </table>
+          <p style="margin-top:10px">Sources: <a href="https://en.wikipedia.org/wiki/Nonogram">Wikipedia — Nonogram (variants)</a> · <a href="https://en.wikipedia.org/wiki/Picross_3D">Wikipedia — Picross 3D</a> · <a href="https://play.google.com/store/apps/details?id=com.easybrain.nonogram.color">Google Play — Nonogram Color (colour rules)</a> · <a href="https://lib.rs/crates/number-loom">number-loom — Triddlers &amp; Trianograms</a>.</p>
+        </section>
+      </div>
+
+      <p class="foot">Demo fixture for the v1.4.1 workflow, in the agreed order: research paper (including variant research) → this playable base → variant matrix → Codex brief citing the research, this demo, and the matrix. Animation is anime.js 4.5.0 via a single presentation-only layer, mirroring Morphi’s <span class="mono">motion.ts</span> rule. Progress is kept only while this tab is open (switching puzzles preserves each grid in memory); nothing is saved or sent anywhere. “Picross” is Nintendo’s brand and is used here only descriptively for the timed mode’s rules — the game itself is called Nonogram, the safe generic name.</p>
+    </main>
+
+    <div class="overlay" id="overlay" role="dialog" aria-modal="true" aria-labelledby="ovTitle">
+      <div class="dialog">
+        <div class="bigpic" id="ovEmoji" aria-hidden="true">◆</div>
+        <h2 id="ovTitle">Picture complete</h2>
+        <p id="ovText"></p>
+        <div class="dstats">
+          <div class="stat"><div class="k">Time</div><div class="v mono" id="ovTime">00:00</div></div>
+          <div class="stat"><div class="k">Mistakes</div><div class="v" id="ovMistakes">0</div></div>
+          <div class="stat"><div class="k">Hints used</div><div class="v" id="ovHints">0</div></div>
+        </div>
+        <div class="row">
+          <button type="button" class="btn primary" id="ovNext">Next puzzle</button>
+          <button type="button" class="btn ghost" id="ovAgain">Play again</button>
+          <button type="button" class="btn ghost" id="ovClose">Look at the picture</button>
+        </div>
+      </div>
+    </div>
+  <script src="https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.umd.min.js"></script>
+  <script>
+  "use strict";
+  /* ================= animation layer (anime.js) =================
+     Mirrors Morphi's rule for the real build: ALL anime.js use lives in
+     this one module — the demo's equivalent of src/lib/ui/motion.ts
+     (animejs 4.5.0). Presentation NEVER commits a move: every function
+     below only reflects a state change the game logic has already made.
+     If the CDN copy of anime.js is unavailable, or the player prefers
+     reduced motion, every call is a no-op and the game is unchanged. */
+  var Motion = (function(){
+    var lib = (typeof window !== "undefined" && window.anime) ? window.anime : null;
+    var reduced = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    function ok(){ return !!(lib && typeof lib.animate === "function" && !reduced); }
+    function run(targets, params){
+      if(!ok() || !targets) return;
+      if(targets.length !== undefined && targets.length === 0) return;
+      try{ lib.animate(targets, params); }catch(e){ /* animation is decoration only */ }
+    }
+    function stag(step, opts){ try{ return lib.stagger(step, opts || {}); }catch(e){ return 0; } }
+    function timeline(){ try{ return (lib && typeof lib.createTimeline === "function") ? lib.createTimeline() : null; }catch(e){ return null; } }
+    return {
+      available: function(){ return ok(); },
+      describe: function(){
+        if(!lib) return "Animation layer: anime.js not loaded — animations off, game unchanged.";
+        if(reduced) return "Animation layer: anime.js 4.5.0 loaded — off, because you prefer reduced motion.";
+        return "Animation layer: anime.js 4.5.0 active — presentation only, never commits a move.";
+      },
+      boardIn: function(cells, clues){
+        if(!ok()) return;
+        run(cells, { scale:[.55,1], opacity:[0,1], duration:340, delay:stag(3) });
+        run(clues, { opacity:[0,1], duration:420, delay:stag(14) });
+      },
+      pop: function(el, kind){
+        if(!el) return;
+        if(kind === "x") run(el, { scale:[.7,1], duration:240 });
+        else if(kind === "erase") run(el, { scale:[1.15,1], opacity:[.35,1], duration:180 });
+        else run(el, { scale:[1.3,1], duration:260 });
+      },
+      wrong: function(el){
+        if(!el || !ok()) return;
+        var tl=timeline(); if(!tl){ run(el, { scale:[.84,1], duration:380 }); return; }
+        try{
+          tl.add(el, { translateX:-3, scale:.88, duration:95 })
+            .add(el, { translateX:3, duration:95 })
+            .add(el, { translateX:-2, duration:85 })
+            .add(el, { translateX:0, scale:1, duration:110 });
+        }catch(e){ run(el, { scale:[.84,1], duration:380 }); }
+      },
+      hint: function(el){
+        if(!el || !ok()) return;
+        var tl=timeline(); if(!tl){ run(el, { scale:[1.3,1], duration:420 }); return; }
+        try{ tl.add(el, { scale:1.35, duration:230 }).add(el, { scale:1, duration:280 }); }
+        catch(e){ run(el, { scale:[1.3,1], duration:420 }); }
+      },
+      checkWrong: function(els){ run(els, { scale:[.8,1], duration:380, delay:stag(30) }); },
+      winReveal: function(filledEls){
+        if(!ok() || !filledEls || filledEls.length===0) return;
+        var tl=timeline();
+        if(!tl){ run(filledEls, { scale:[1.18,1], duration:420, delay:stag(9, { from:"center" }) }); return; }
+        try{
+          tl.add(filledEls, { scale:1.22, duration:230, delay:stag(9, { from:"center" }) })
+            .add(filledEls, { scale:1, duration:280, delay:stag(9, { from:"center" }) });
+        }catch(e){ run(filledEls, { scale:[1.18,1], duration:420, delay:stag(9, { from:"center" }) }); }
+      },
+      overlayIn: function(dialogEl){
+        if(!dialogEl) return;
+        run(dialogEl, { scale:[.9,1], opacity:[0,1], translateY:[14,0], duration:340 });
+      },
+      chipIn: function(els){ run(els, { opacity:[0,1], translateY:[8,0], duration:320, delay:stag(28) }); }
+    };
+  })();
+
+  /* ================= data =================
+     Classic grids: '#' filled, '.' empty. Colour grids: one letter per cell,
+     '.' empty. Clues are always computed from the grid — never hand-written. */
+  var COLOURS = {
+    R:{name:"Red",    hex:"#e5532d"},
+    B:{name:"Blue",   hex:"#2f6fed"},
+    T:{name:"Teal",   hex:"#009a86"},
+    O:{name:"Orange", hex:"#ef8f2d"},
+    Y:{name:"Yellow", hex:"#e9c33c"}
+  };
+  var PUZZLES = [
+    {id:"diamond", name:"Diamond", group:"learn", type:"classic",
+     note:"The worked example from the research paper — row 2 and column 3 are full lines, the perfect first moves.",
+     grid:[".###.","#####","#.#.#",".###.","..#.."]},
+    {id:"heart", name:"Heart", group:"learn", type:"classic",
+     note:"A 5×5 with a 0-free clue set — every line has something in it.",
+     grid:["##.##","#####","#####",".###.","..#.."]},
+    {id:"house", name:"House", group:"classic", type:"classic",
+     note:"The door gap turns rows 7–9 into two-run clues — your first splitting deduction.",
+     grid:["....##....","....##....","...####...","..######..",".########.","##########",".########.",".###..###.",".###..###.",".###..###."]},
+    {id:"rocket", name:"Rocket", group:"classic", type:"classic",
+     note:"The porthole row is a two-run clue with exactly one legal placement once the fins are known.",
+     grid:["....##....","...####...","...####...","..######..","..##..##..","..######..","..######..",".###..###.",".##....##.","...#..#..."]},
+    {id:"tree", name:"Pine Tree", group:"large", type:"classic",
+     note:"15×15 wide-stage test. In portrait the cells drop to about 19px — the research caps portrait play at 15×15 before zoom becomes mandatory, and this board is why.",
+     grid:[".......#.......","......###......",".....#####.....","....#######....","...#########...","..###########..",".#############.","###############","......###......","......###......","......###......","......###......","......###......","..###########..",".#############."]},
+    {id:"sail", name:"Sailboat", group:"large", type:"classic",
+     note:"Includes a fully empty row (clue 0) and multi-run wave rows — both edge cases from the research checklist.",
+     grid:[".......#.......","......###......",".....#####.....","....#######....","...#########...","..###########..",".#############.",".......#.......",".......#.......","..###########..","...#########...","....#######....","...............",".##..##..##....","...##....##...."]},
+    {id:"crocket", name:"Rocket · Colour", group:"colour", type:"colour",
+     note:"Colour rules: the red fins touch the blue body and the orange flame touches the yellow tip with no empty cell between — legal, because the colours differ. Two red runs in one line would still need a gap.",
+     grid:["....RR....","...RRRR...","..RRRRRR..","..BBBBBB..","..BBTTBB..","..BBBBBB..",".RRBBBBRR.",".RR.BB.RR.","....OO....","....YY...."]}
+  ];
+
+  /* ================= clue computation ================= */
+  function computeClues(p){
+    var N=p.grid.length, sol=[], r, c, v;
+    for(r=0;r<N;r++){ sol.push([]); for(c=0;c<N;c++){ var ch=p.grid[r][c]; sol[r].push(ch==="."?0:(p.type==="colour"?ch:1)); } }
+    function runsOf(line){
+      var runs=[], i=0;
+      while(i<line.length){
+        if(line[i]===0){ i++; continue; }
+        var col=line[i], len=0;
+        while(i<line.length && line[i]===col){ len++; i++; }
+        runs.push(p.type==="colour"?{len:len,color:col}:len);
+      }
+      if(runs.length===0) runs.push(p.type==="colour"?{len:0,color:null}:0);
+      return runs;
+    }
+    var rowClues=[], colClues=[];
+    for(r=0;r<N;r++) rowClues.push(runsOf(sol[r]));
+    for(c=0;c<N;c++){ var colLine=[]; for(r=0;r<N;r++) colLine.push(sol[r][c]); colClues.push(runsOf(colLine)); }
+    var fills=0; for(r=0;r<N;r++) for(c=0;c<N;c++) if(sol[r][c]!==0) fills++;
+    return {sol:sol,rowClues:rowClues,colClues:colClues,fills:fills,N:N};
+  }
+  PUZZLES.forEach(function(p){ p.derived=computeClues(p); });
+
+  /* ================= line solver =================
+     Placement enumeration + intersection, iterated to a fixpoint.
+     Classic: known -1 unknown / 1 filled / 0 empty.
+     Colour:  known -1 unknown / 0 empty / colour letter. Gap rule:
+     >=1 empty between same-colour runs, >=0 between different colours. */
+  function placementsClassic(len, runs, known){
+    var out=[], cur=new Array(len).fill(0);
+    var realRuns = (runs.length===1 && runs[0]===0) ? [] : runs;
+    function rec(idx, from){
+      if(out.length>6000) return;
+      if(idx===realRuns.length){
+        for(var i=from;i<len;i++) cur[i]=0;
+        for(var j=0;j<len;j++) if(known[j]!==-1 && known[j]!==cur[j]) return;
+        out.push(cur.slice()); return;
+      }
+      var L=realRuns[idx], rest=0;
+      for(var k=idx+1;k<realRuns.length;k++) rest+=realRuns[k]+1;
+      for(var s=from; s+ L + rest <= len; s++){
+        for(var a=from;a<s;a++) cur[a]=0;
+        for(var b=s;b<s+L;b++) cur[b]=1;
+        if(s+L<len) cur[s+L]=0;
+        rec(idx+1, s+L+1);
+      }
+    }
+    rec(0,0); return out;
+  }
+  function placementsColour(len, runs, known){
+    var out=[], cur=new Array(len).fill(0);
+    var realRuns = (runs.length===1 && runs[0].len===0) ? [] : runs;
+    function minSuffix(idx){ var t=0; for(var k=idx;k<realRuns.length;k++){ t+=realRuns[k].len; if(k>idx) t+=(realRuns[k-1].color===realRuns[k].color?1:0);} return t; }
+    function rec(idx, from){
+      if(out.length>6000) return;
+      if(idx===realRuns.length){
+        for(var i=from;i<len;i++) cur[i]=0;
+        for(var j=0;j<len;j++) if(known[j]!==-1 && known[j]!==cur[j]) return;
+        out.push(cur.slice()); return;
+      }
+      var run=realRuns[idx];
+      for(var s=from; s+run.len+minSuffix(idx+1) <= len; s++){
+        for(var a=from;a<s;a++) cur[a]=0;
+        for(var b=s;b<s+run.len;b++) cur[b]=run.color;
+        var nextFrom=s+run.len;
+        if(idx<realRuns.length-1 && run.color===realRuns[idx+1].color) nextFrom+=1;
+        for(var g=s+run.len; g<nextFrom; g++) cur[g]=0;
+        rec(idx+1, nextFrom);
+      }
+    }
+    rec(0,0); return out;
+  }
+  function lineSolve(p){
+    var d=p.derived, N=d.N, r, c, i;
+    var known=[];
+    for(r=0;r<N;r++){ known.push(new Array(N).fill(-1)); }
+    function solveLine(getKnown, runs, isColour){
+      var pl = isColour ? placementsColour(getKnown.length, runs, getKnown)
+                        : placementsClassic(getKnown.length, runs, getKnown);
+      if(pl.length===0) return null;
+      var forced=[];
+      for(i=0;i<getKnown.length;i++){
+        var v=pl[0][i], same=true;
+        for(var q=1;q<pl.length;q++) if(pl[q][i]!==v){ same=false; break; }
+        forced.push(same?v:-1);
+      }
+      return forced;
+    }
+    for(var iter=0; iter<200; iter++){
+      var changed=false;
+      for(r=0;r<N;r++){
+        var f=solveLine(known[r], d.rowClues[r], p.type==="colour");
+        if(!f) return {status:"fail"};
+        for(c=0;c<N;c++) if(f[c]!==-1 && known[r][c]===-1){ known[r][c]=f[c]; changed=true; }
+      }
+      for(c=0;c<N;c++){
+        var colKnown=[]; for(r=0;r<N;r++) colKnown.push(known[r][c]);
+        var fc=solveLine(colKnown, d.colClues[c], p.type==="colour");
+        if(!fc) return {status:"fail"};
+        for(r=0;r<N;r++) if(fc[r]!==-1 && known[r][c]===-1){ known[r][c]=fc[r]; changed=true; }
+      }
+      var done=true;
+      for(r=0;r<N;r++) for(c=0;c<N;c++) if(known[r][c]===-1) done=false;
+      if(done) return {status:"line"};
+      if(!changed) return {status:"stall"};
+    }
+    return {status:"stall"};
+  }
+  var solverResults={};
+  PUZZLES.forEach(function(p){ solverResults[p.id]={status:"checking"}; });
+  setTimeout(function(){
+    PUZZLES.forEach(function(p){
+      try{ solverResults[p.id]=lineSolve(p); }catch(e){ solverResults[p.id]={status:"stall"}; }
+    });
+    renderBadge();
+  }, 30);
+
+  /* ================= game state ================= */
+  var $=function(id){ return document.getElementById(id); };
+  var boardEl=$("board"), msgEl=$("msg");
+  var G=null;
+  var savedStates={};
+  var globalMode="classic";
+
+  function freshState(p){
+    return { puzzle:p, cells:new Array(p.derived.N*p.derived.N).fill(0),
+      penaltyXs:{}, undo:[], redo:[], mistakes:0, penaltyCount:0, hearts:3,
+      hintsLeft:3, hintsUsed:0, elapsed:0, timedRemaining:30*60,
+      status:"playing", started:false, cursor:{r:0,c:0}, lastCheckWrong:0 };
+  }
+  function snapshot(){
+    if(!G) return;
+    savedStates[G.puzzle.id]={ cells:G.cells.slice(), penaltyXs:Object.assign({},G.penaltyXs),
+      mistakes:G.mistakes, penaltyCount:G.penaltyCount, hearts:G.hearts,
+      hintsLeft:G.hintsLeft, hintsUsed:G.hintsUsed, elapsed:G.elapsed,
+      timedRemaining:G.timedRemaining, status:G.status, started:G.started, lastCheckWrong:G.lastCheckWrong };
+  }
+  function loadPuzzle(p){
+    snapshot();
+    var s=savedStates[p.id];
+    G=freshState(p);
+    if(s){ G.cells=s.cells.slice(); G.penaltyXs=Object.assign({},s.penaltyXs); G.mistakes=s.mistakes;
+      G.penaltyCount=s.penaltyCount; G.hearts=s.hearts; G.hintsLeft=s.hintsLeft; G.hintsUsed=s.hintsUsed;
+      G.elapsed=s.elapsed; G.timedRemaining=s.timedRemaining; G.status=s.status; G.started=s.started;
+      G.lastCheckWrong=s.lastCheckWrong; }
+    tool="fill"; activeColour = p.type==="colour" ? firstColour(p) : null;
+    buildBoard(); buildPalette(); syncToolBtns(); syncChips(); renderAll();
+    Motion.boardIn(cellEls, rowClueEls.concat(colClueEls));
+    setMsg(p.note, "");
+    if(G.status==="won") setMsg("Already solved in this session — Restart for a fresh run, or pick another puzzle.","good");
+  }
+  function firstColour(p){
+    for(var r=0;r<p.derived.N;r++) for(var c=0;c<p.derived.N;c++){ var v=p.derived.sol[r][c]; if(v!==0) return v; }
+    return "R";
+  }
+
+  var tool="fill", activeColour=null;
+
+  /* ================= board build ================= */
+  var cellEls=[], rowClueEls=[], colClueEls=[];
+  function clueNumEl(run){
+    var s=document.createElement("span"); s.className="cluenum";
+    if(typeof run==="object"){ s.textContent=run.len; if(run.color){ s.classList.add("chipcol"); s.style.background=COLOURS[run.color].hex; } }
+    else s.textContent=run;
+    return s;
+  }
+  function buildBoard(){
+    var p=G.puzzle, d=p.derived, N=d.N;
+    var rd=Math.max.apply(null, d.rowClues.map(function(x){return x.length;}).concat([1]));
+    var cd=Math.max.apply(null, d.colClues.map(function(x){return x.length;}).concat([1]));
+    var tot=rd+N, totr=cd+N;
+    boardEl.style.setProperty("--tot", tot);
+    boardEl.style.setProperty("--totr", totr);
+    boardEl.classList.toggle("won", G.status==="won");
+    boardEl.innerHTML=""; cellEls=[]; rowClueEls=[]; colClueEls=[];
+    var corner=document.createElement("div"); corner.className="corner";
+    corner.style.gridColumn="1 / span "+rd; corner.style.gridRow="1 / span "+cd;
+    boardEl.appendChild(corner);
+    var r,c,i;
+    for(c=0;c<N;c++){
+      var cc=document.createElement("div"); cc.className="colclue";
+      cc.style.gridColumn=(rd+c+1); cc.style.gridRow="1 / span "+cd;
+      d.colClues[c].forEach(function(run){ cc.appendChild(clueNumEl(run)); });
+      boardEl.appendChild(cc); colClueEls.push(cc);
+    }
+    for(r=0;r<N;r++){
+      var rc=document.createElement("div"); rc.className="rowclue";
+      rc.style.gridRow=(cd+r+1); rc.style.gridColumn="1 / span "+rd;
+      d.rowClues[r].forEach(function(run){ rc.appendChild(clueNumEl(run)); });
+      boardEl.appendChild(rc); rowClueEls.push(rc);
+      for(c=0;c<N;c++){
+        var b=document.createElement("button"); b.type="button"; b.className="cell";
+        b.style.gridRow=(cd+r+1); b.style.gridColumn=(rd+c+1);
+        if((c+1)%5===0 && c<N-1) b.classList.add("bR");
+        if((r+1)%5===0 && r<N-1) b.classList.add("bB");
+        if(c===N-1) b.classList.add("edgeR");
+        if(r===N-1) b.classList.add("edgeB");
+        b.dataset.r=r; b.dataset.c=c;
+        b.setAttribute("aria-label","Row "+(r+1)+" column "+(c+1)+", undecided");
+        boardEl.appendChild(b); cellEls.push(b);
+      }
+    }
+    G._rd=rd; G._cd=cd;
+    $("sizeHint").textContent = p.derived.N===15
+      ? "Wide check: board = grid + clue gutters as one component. At 360px wide this 15×15 gives ~19px cells — tight by design, and the reason the research caps portrait at 15×15."
+      : (p.type==="colour" ? "Colour check: clue numbers carry their run's colour. Different colours may touch; same colour still needs a gap." : "");
+    renderBadge();
+  }
+  function renderBadge(){
+    var el=$("solverBadge"); if(!G) return;
+    var res=solverResults[G.puzzle.id], d=G.puzzle.derived;
+    var pct=Math.round(d.fills/(d.N*d.N)*100);
+    var meta=d.N+"×"+d.N+" · "+d.fills+" filled cells ("+pct+"%) · clues computed from the picture";
+    if(!res || res.status==="checking") el.innerHTML='<span class="badge"><span class="dot"></span>Line solver running… · '+meta+'</span>';
+    else if(res.status==="line") el.innerHTML='<span class="badge ok"><span class="dot"></span>Line-solvable — pure logic completes it, no guessing (checked on this page) · '+meta+'</span>';
+    else el.innerHTML='<span class="badge warnb"><span class="dot"></span>Line solver stalls — may need lookahead. Morphi\u2019s generator would reject this seed. · '+meta+'</span>';
+  }
+
+  /* ================= rendering ================= */
+  function lineSatisfied(isRow, idx){
+    var d=G.puzzle.derived, N=d.N, i;
+    for(i=0;i<N;i++){
+      var cell = isRow ? G.cells[idx*N+i] : G.cells[i*N+idx];
+      var sol  = isRow ? d.sol[idx][i]    : d.sol[i][idx];
+      var filledVal = (cell===2||cell==="X") ? 0 : cell;
+      if(filledVal!==sol) return false;
+    }
+    return true;
+  }
+  function lineImpossible(isRow, idx){
+    var d=G.puzzle.derived, N=d.N, i;
+    for(i=0;i<N;i++){
+      var cell = isRow ? G.cells[idx*N+i] : G.cells[i*N+idx];
+      var sol  = isRow ? d.sol[idx][i]    : d.sol[i][idx];
+      if(cell!==0 && cell!==2 && cell!=="X" && sol===0) return true;
+      if(cell!==0 && cell!==2 && cell!=="X" && G.puzzle.type==="colour" && sol!==cell) return true;
+      if((cell===2||cell==="X") && sol!==0) return true;
+    }
+    return false;
+  }
+  function renderAll(){
+    var p=G.puzzle, d=p.derived, N=d.N, r, c, idx;
+    for(r=0;r<N;r++) for(c=0;c<N;c++){
+      idx=r*N+c; var el=cellEls[idx], v=G.cells[idx];
+      el.className="cell"
+        + ((c+1)%5===0 && c<N-1 ? " bR":"") + ((r+1)%5===0 && r<N-1 ? " bB":"")
+        + (c===N-1 ? " edgeR":"") + (r===N-1 ? " edgeB":"")
+        + (r===G.cursor.r || c===G.cursor.c ? " hl":"")
+        + (r===G.cursor.r && c===G.cursor.c ? " cursorcell":"");
+      el.style.background="";
+      var stateName="undecided";
+      if(v===1){ el.classList.add("filled"); stateName="filled"; }
+      else if(typeof v==="string" && v!=="X"){ el.classList.add("colfill"); el.style.background=COLOURS[v].hex; stateName="filled "+COLOURS[v].name; }
+      else if(v===2 || v==="X"){ el.classList.add("isx"); stateName="marked empty"; if(G.penaltyXs[idx]) el.classList.add("penaltyx"); }
+      el.setAttribute("aria-label","Row "+(r+1)+" column "+(c+1)+", "+stateName);
+    }
+    var strict = globalMode==="strict";
+    for(r=0;r<N;r++){
+      rowClueEls[r].classList.toggle("hl", r===G.cursor.r);
+      rowClueEls[r].classList.toggle("clues-done", !strict && lineSatisfied(true,r));
+      rowClueEls[r].classList.toggle("clues-error", !strict && globalMode!=="arcade" && globalMode!=="timed" && lineImpossible(true,r));
+    }
+    for(c=0;c<N;c++){
+      colClueEls[c].classList.toggle("hl", c===G.cursor.c);
+      colClueEls[c].classList.toggle("clues-done", !strict && lineSatisfied(false,c));
+      colClueEls[c].classList.toggle("clues-error", !strict && globalMode!=="arcade" && globalMode!=="timed" && lineImpossible(false,c));
+    }
+    boardEl.classList.toggle("won", G.status==="won");
+    renderStats();
+  }
+  function fmt(s){ s=Math.max(0,s); var m=Math.floor(s/60), ss=s%60; return (m<10?"0":"")+m+":"+(ss<10?"0":"")+ss; }
+  function renderStats(){
+    var d=G.puzzle.derived;
+    var correct=0, i;
+    for(i=0;i<G.cells.length;i++){
+      var sol=G.puzzle.derived.sol[Math.floor(i/d.N)][i%d.N];
+      if(sol!==0 && G.cells[i]===sol) correct++;
+    }
+    $("progVal").textContent=Math.round(correct/d.fills*100)+"%";
+    $("timerLabel").textContent = globalMode==="timed" ? "Time left" : "Time";
+    $("timerVal").textContent = fmt(globalMode==="timed" ? G.timedRemaining : G.elapsed);
+    $("timerVal").classList.toggle("bad", globalMode==="timed" && G.timedRemaining<=120 && G.status==="playing");
+    if(globalMode==="arcade"){
+      $("mistakeLabel").textContent="Hearts";
+      var h=""; for(i=0;i<3;i++) h+='<span class="'+(i<G.hearts?"":"off")+'">♥</span>';
+      $("mistakeVal").innerHTML='<span class="hearts">'+h+"</span>";
+    } else if(globalMode==="timed"){
+      $("mistakeLabel").textContent="Time penalties";
+      $("mistakeVal").textContent=G.penaltyCount===0?"0":G.penaltyCount+" (−"+[0,2,6,14][Math.min(G.penaltyCount,3)]+(G.penaltyCount>3?"−8×"+(G.penaltyCount-3):"")+" min so far)";
+    } else {
+      $("mistakeLabel").textContent="Mistakes";
+      $("mistakeVal").textContent=G.lastCheckWrong>0 ? G.lastCheckWrong+" (last Check)" : "—";
+    }
+    $("hintVal").textContent=G.hintsLeft;
+    $("hintBtn").disabled = G.hintsLeft<=0 || G.status!=="playing";
+    $("checkBtn").disabled = (globalMode==="arcade" || globalMode==="timed") || G.status!=="playing";
+    $("autoXBtn").disabled = globalMode==="strict" || G.status!=="playing";
+    $("undoBtn").disabled = G.undo.length===0;
+    $("redoBtn").disabled = G.redo.length===0;
+  }
+  function setMsg(t, kind){ msgEl.textContent=t; msgEl.className="msg"+(kind?" "+kind:""); }
+
+  /* ================= painting ================= */
+  var autoX=true;
+  function solAt(idx){ var d=G.puzzle.derived; return d.sol[Math.floor(idx/d.N)][idx%d.N]; }
+  function isFillVal(v){ return v===1 || (typeof v==="string" && v!=="X"); }
+  function applyChange(action, idx, to){
+    var from=G.cells[idx];
+    if(from===to) return;
+    var existing=null;
+    for(var i=0;i<action.changes.length;i++) if(action.changes[i].idx===idx) existing=action.changes[i];
+    if(existing) existing.to=to; else action.changes.push({idx:idx, from:from, to:to});
+    G.cells[idx]=to;
+    if(to!==2 && to!=="X") delete G.penaltyXs[idx];
+  }
+  function commitAction(action){
+    if(action.changes.length===0) return;
+    action.after={hearts:G.hearts, mistakes:G.mistakes, penaltyCount:G.penaltyCount, timedRemaining:G.timedRemaining};
+    G.undo.push(action); if(G.undo.length>200) G.undo.shift();
+    G.redo.length=0;
+    afterMove();
+  }
+  function afterMove(){
+    renderAll();
+    if(G.status!=="playing") return;
+    var d=G.puzzle.derived, N=d.N, i, allFills=true;
+    for(i=0;i<G.cells.length;i++){ var s=solAt(i); if(s!==0 && G.cells[i]!==s){ allFills=false; break; } }
+    if(globalMode==="arcade" || globalMode==="timed"){
+      if(allFills) return win();
+    } else {
+      var allDecided=true;
+      for(i=0;i<G.cells.length;i++) if(G.cells[i]===0){ allDecided=false; break; }
+      if(allDecided && allFills) return win();
+      if(allFills) setMsg("Every picture cell is filled correctly — mark the remaining cells X to finish (Classic and Strict need every cell decided).","");
+    }
+  }
+  function doAutoX(action){
+    if(!autoX || globalMode==="strict") return;
+    var d=G.puzzle.derived, N=d.N, r, c, i;
+    var lines=[];
+    for(r=0;r<N;r++) if(lineSatisfied(true,r)) lines.push({row:true,idx:r});
+    for(c=0;c<N;c++) if(lineSatisfied(false,c)) lines.push({row:false,idx:c});
+    lines.forEach(function(L){
+      for(i=0;i<N;i++){
+        var idx=L.row ? L.idx*N+i : i*N+L.idx;
+        if(G.cells[idx]===0) applyChange(action, idx, G.puzzle.type==="colour" ? "X" : 2);
+      }
+    });
+  }
+  function registerMistake(idx, action){
+    G.mistakes++;
+    if(globalMode==="arcade"){
+      G.hearts--;
+      applyChange(action, idx, G.puzzle.type==="colour" ? "X" : 2);
+      G.penaltyXs[idx]=true;
+      Motion.wrong(cellEls[idx]);
+      if(G.hearts<=0){ commitAction(action); stroke=null; renderAll(); return lose("Out of hearts. The picture was \u201C"+G.puzzle.name+"\u201D — every heart went on a cell the clues had already ruled out."); }
+      setMsg("Wrong cell — that costs a heart ("+G.hearts+" left). The drag stops here so one slip can't cost more.","bad");
+    } else if(globalMode==="timed"){
+      G.penaltyCount++;
+      var pen = G.penaltyCount===1?120 : G.penaltyCount===2?240 : 480;
+      G.timedRemaining-=pen;
+      flashCell(idx);
+      if(G.timedRemaining<=0){ G.timedRemaining=0; commitAction(action); stroke=null; renderAll(); return lose("Time's up. The −2 / −4 / −8 minute penalties are exactly Mario's Picross arithmetic — on a 30-minute clock, the fifth mistake ends the run."); }
+      setMsg("Wrong cell — −"+(pen/60)+" minutes. Penalties run −2, −4, then −8 each time.","bad");
+    }
+  }
+  function flashCell(idx){ var el=cellEls[idx]; if(!el) return; Motion.wrong(el); }
+
+  var stroke=null;
+  function beginStroke(r, c, forcedTool){
+    if(G.status!=="playing") return;
+    G.started=true;
+    var idx=r*G.puzzle.derived.N+c;
+    var useTool=forcedTool||tool;
+    var target;
+    if(useTool==="fill") target = G.puzzle.type==="colour" ? activeColour : 1;
+    else if(useTool==="x") target = G.puzzle.type==="colour" ? "X" : 2;
+    else target = 0;
+    var value = (useTool!=="erase" && G.cells[idx]===target) ? 0 : target;
+    stroke={ value:value, action:{changes:[], before:{hearts:G.hearts, mistakes:G.mistakes, penaltyCount:G.penaltyCount, timedRemaining:G.timedRemaining}},
+             sr:r, sc:c, lock:null, painted:{}, stopped:false, toolUsed:useTool };
+    paintAt(r,c);
+  }
+  function paintAt(r, c){
+    if(!stroke || stroke.stopped) return;
+    var N=G.puzzle.derived.N, idx=r*N+c;
+    if(stroke.painted[idx]) return;
+    stroke.painted[idx]=true;
+    G.cursor={r:r,c:c};
+    var v=stroke.value;
+    if(isFillVal(v) && (globalMode==="arcade" || globalMode==="timed")){
+      if(solAt(idx)!==v){ stroke.stopped=true; registerMistake(idx, stroke.action); return; }
+    }
+    var beforeVal=G.cells[idx];
+    applyChange(stroke.action, idx, v);
+    renderAll();
+    if(G.cells[idx]!==beforeVal){
+      /* state already committed above — anime.js only presents it */
+      Motion.pop(cellEls[idx], (v===2||v==="X") ? "x" : (v===0 ? "erase" : "fill"));
+    }
+  }
+  function strokeTo(r, c){
+    if(!stroke) return;
+    if(!stroke.lock && (r!==stroke.sr || c!==stroke.sc)){
+      stroke.lock = Math.abs(r-stroke.sr) >= Math.abs(c-stroke.sc) ? "row" : "col";
+    }
+    var i, N=G.puzzle.derived.N;
+    if(stroke.lock==="row"){
+      var step = c>=stroke.sc?1:-1;
+      for(i=stroke.sc; ; i+=step){ paintAt(stroke.sr, i); if(i===c) break; }
+    } else if(stroke.lock==="col"){
+      var step2 = r>=stroke.sr?1:-1;
+      for(i=stroke.sr; ; i+=step2){ paintAt(i, stroke.sc); if(i===r) break; }
+    } else paintAt(r,c);
+  }
+  function endStroke(){
+    if(!stroke) return;
+    var a=stroke.action; stroke=null;
+    doAutoX(a);
+    commitAction(a);
+  }
+  function singleAction(r, c, forcedTool){
+    beginStroke(r,c,forcedTool); endStroke();
+  }
+
+  /* ================= pointer / mouse / touch ================= */
+  function cellFromEvent(e){
+    var rect=boardEl.getBoundingClientRect();
+    var tot=G._rd+G.puzzle.derived.N, totr=G._cd+G.puzzle.derived.N;
+    var unit=rect.width/tot;
+    var col=Math.floor((e.clientX-rect.left)/unit)-G._rd;
+    var row=Math.floor((e.clientY-rect.top)/(rect.height/totr))-G._cd;
+    var N=G.puzzle.derived.N;
+    if(col<0||row<0||col>=N||row>=N) return null;
+    return {r:row,c:col};
+  }
+  var longTimer=null, longFired=false;
+  boardEl.addEventListener("pointerdown", function(e){
+    var pos=cellFromEvent(e); if(!pos) return;
+    e.preventDefault(); boardEl.focus({preventScroll:true});
+    G.cursor=pos; renderAll();
+    if(e.button===2) return; /* handled by contextmenu */
+    longFired=false;
+    longTimer=setTimeout(function(){
+      longFired=true;
+      if(stroke){ endStroke(); }
+      singleAction(pos.r, pos.c, "x");
+      setMsg("Long-press = Mark X.","");
+    }, 520);
+    beginStroke(pos.r, pos.c, e.button===1 ? "x" : null);
+    try{ boardEl.setPointerCapture(e.pointerId); }catch(err){}
+  });
+  boardEl.addEventListener("pointermove", function(e){
+    var pos=cellFromEvent(e); if(!pos) return;
+    if(stroke && (pos.r!==stroke.sr || pos.c!==stroke.sc) && longTimer){ clearTimeout(longTimer); longTimer=null; }
+    if(stroke && !longFired) strokeTo(pos.r, pos.c);
+    else if(!stroke){ G.cursor=pos; renderAll(); }
+  });
+  function pointerEnd(e){
+    if(longTimer){ clearTimeout(longTimer); longTimer=null; }
+    if(stroke && !longFired) endStroke();
+    stroke=null;
+  }
+  boardEl.addEventListener("pointerup", pointerEnd);
+  boardEl.addEventListener("pointercancel", pointerEnd);
+  boardEl.addEventListener("contextmenu", function(e){
+    e.preventDefault();
+    var pos=cellFromEvent(e); if(!pos || G.status!=="playing") return;
+    if(stroke){ endStroke(); }
+    G.cursor=pos;
+    singleAction(pos.r, pos.c, "x");
+  });
+
+  /* ================= keyboard ================= */
+  boardEl.addEventListener("keydown", function(e){
+    var N=G.puzzle.derived.N, cur={r:G.cursor.r, c:G.cursor.c}, handled=true;
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="z"){ e.shiftKey ? doRedo() : doUndo(); return; }
+    if((e.ctrlKey||e.metaKey) && e.key.toLowerCase()==="y"){ doRedo(); return; }
+    switch(e.key){
+      case "ArrowUp": cur.r=Math.max(0,cur.r-1); break;
+      case "ArrowDown": cur.r=Math.min(N-1,cur.r+1); break;
+      case "ArrowLeft": cur.c=Math.max(0,cur.c-1); break;
+      case "ArrowRight": cur.c=Math.min(N-1,cur.c+1); break;
+      case " ": singleAction(cur.r, cur.c, "fill"); break;
+      case "x": case "X": singleAction(cur.r, cur.c, "x"); break;
+      case "Delete": case "Backspace": singleAction(cur.r, cur.c, "erase"); break;
+      default: handled=false;
+    }
+    if(handled){ e.preventDefault(); G.cursor=cur; renderAll(); }
+  });
+
+  /* ================= undo / redo ================= */
+  function restoreCounters(snap){ G.hearts=snap.hearts; G.mistakes=snap.mistakes; G.penaltyCount=snap.penaltyCount; G.timedRemaining=snap.timedRemaining; }
+  function doUndo(){
+    var a=G.undo.pop(); if(!a) return;
+    for(var i=a.changes.length-1;i>=0;i--){ G.cells[a.changes[i].idx]=a.changes[i].from; if(a.changes[i].to===2||a.changes[i].to==="X"){} }
+    a.changes.forEach(function(ch){ if(ch.from!==2 && ch.from!=="X") delete G.penaltyXs[ch.idx]; });
+    restoreCounters(a.before);
+    if(G.status!=="playing"){ G.status="playing"; hideOverlay(); }
+    G.redo.push(a); renderAll(); setMsg("Undone — one whole stroke.","");
+  }
+  function doRedo(){
+    var a=G.redo.pop(); if(!a) return;
+    a.changes.forEach(function(ch){ G.cells[ch.idx]=ch.to; });
+    restoreCounters(a.after);
+    G.undo.push(a); afterMove(); renderAll();
+  }
+  $("undoBtn").addEventListener("click", doUndo);
+  $("redoBtn").addEventListener("click", doRedo);
+
+  /* ================= tools / palette / modes ================= */
+  function syncToolBtns(){
+    $("toolFill").setAttribute("aria-pressed", tool==="fill");
+    $("toolX").setAttribute("aria-pressed", tool==="x");
+    $("toolErase").setAttribute("aria-pressed", tool==="erase");
+  }
+  $("toolFill").addEventListener("click", function(){ tool="fill"; syncToolBtns(); });
+  $("toolX").addEventListener("click", function(){ tool="x"; syncToolBtns(); });
+  $("toolErase").addEventListener("click", function(){ tool="erase"; syncToolBtns(); });
+  function buildPalette(){
+    var pal=$("palette"); pal.innerHTML="";
+    if(!G || G.puzzle.type!=="colour"){ pal.classList.remove("show"); return; }
+    pal.classList.add("show");
+    var lab=document.createElement("span"); lab.className="plabel"; lab.textContent="Fill colour"; pal.appendChild(lab);
+    Object.keys(COLOURS).forEach(function(k){
+      var used=G.puzzle.grid.join("").indexOf(k)!==-1; if(!used) return;
+      var b=document.createElement("button"); b.type="button"; b.className="pchip";
+      b.style.background=COLOURS[k].hex; b.setAttribute("aria-pressed", activeColour===k);
+      b.setAttribute("aria-label","Fill with "+COLOURS[k].name);
+      b.innerHTML='<span class="pn">'+COLOURS[k].name+"</span>";
+      b.addEventListener("click", function(){ activeColour=k; tool="fill"; syncToolBtns(); buildPalette(); });
+      pal.appendChild(b);
+    });
+    var spacer=document.createElement("span"); spacer.style.width="100%"; spacer.style.height="14px"; pal.appendChild(spacer);
+  }
+  document.querySelectorAll("#modeBtns .modebtn").forEach(function(b){
+    b.addEventListener("click", function(){
+      globalMode=b.dataset.mode;
+      document.querySelectorAll("#modeBtns .modebtn").forEach(function(x){ x.setAttribute("aria-pressed", x===b); });
+      if(globalMode==="strict" && autoX) setMsg("Strict mode: no clue dimming, no Auto-X, no feedback — Check gives a count only.","");
+      else if(globalMode==="timed") setMsg("Picross-style: 30:00 on the clock. Wrong fills cost −2, −4, then −8 minutes. Wrong X's are free.","warn");
+      else if(globalMode==="arcade") setMsg("Arcade: 3 hearts. A wrong fill is refused, marked red, and stops your drag.","warn");
+      else setMsg("Classic: paper rules. No timer pressure, no lives — take as long as you like.","");
+      renderAll();
+    });
+  });
+  $("autoXBtn").addEventListener("click", function(){
+    autoX=!autoX;
+    this.setAttribute("aria-pressed", autoX);
+    this.textContent="Auto-X: "+(autoX?"on":"off");
+    setMsg(autoX?"Auto-X on: completing a line marks its remaining cells X for you.":"Auto-X off: you mark every empty yourself.","");
+  });
+  var restartArmed=false, restartTimer=null;
+  $("restartBtn").addEventListener("click", function(){
+    var btn=this;
+    if(!restartArmed){
+      restartArmed=true; btn.setAttribute("aria-pressed","true"); btn.textContent="Tap again to confirm";
+      restartTimer=setTimeout(function(){ restartArmed=false; btn.setAttribute("aria-pressed","false"); btn.textContent="Restart"; }, 3000);
+      return;
+    }
+    clearTimeout(restartTimer); restartArmed=false; btn.setAttribute("aria-pressed","false"); btn.textContent="Restart";
+    delete savedStates[G.puzzle.id];
+    var p=G.puzzle; G=freshState(p);
+    buildBoard(); buildPalette(); renderAll();
+    setMsg("Same puzzle, clean grid — Restart never re-rolls the picture.","");
+  });
+
+  /* ================= hint & check ================= */
+  $("hintBtn").addEventListener("click", function(){
+    if(G.hintsLeft<=0 || G.status!=="playing") return;
+    var d=G.puzzle.derived, N=d.N, idx=-1, i;
+    for(i=0;i<G.cells.length;i++){ var s=solAt(i); if(G.cells[i]!==s && !(s===0 && (G.cells[i]===2||G.cells[i]==="X"))){ idx=i; break; } }
+    if(idx===-1){ setMsg("Nothing left for a hint to reveal.",""); return; }
+    var action={changes:[], before:{hearts:G.hearts, mistakes:G.mistakes, penaltyCount:G.penaltyCount, timedRemaining:G.timedRemaining}};
+    var sol=solAt(idx);
+    applyChange(action, idx, sol===0 ? (G.puzzle.type==="colour"?"X":2) : sol);
+    G.hintsLeft--; G.hintsUsed++;
+    doAutoX(action); commitAction(action);
+    var el=cellEls[idx]; if(el){ el.classList.add("hinted"); Motion.hint(el); setTimeout(function(){ el.classList.remove("hinted"); },1400); }
+    G.cursor={r:Math.floor(idx/N), c:idx%N}; renderAll();
+    setMsg("Hint used ("+G.hintsLeft+" left): one forced cell revealed.","");
+  });
+  $("checkBtn").addEventListener("click", function(){
+    if(globalMode==="arcade" || globalMode==="timed") return;
+    var wrong=[], undecided=0, i;
+    for(i=0;i<G.cells.length;i++){
+      var s=solAt(i), v=G.cells[i];
+      if(v===0) undecided++;
+      else if(s===0 && isFillVal(v)) wrong.push(i);
+      else if(s!==0 && (v===2||v==="X")) wrong.push(i);
+      else if(s!==0 && isFillVal(v) && v!==s) wrong.push(i);
+    }
+    G.lastCheckWrong=wrong.length;
+    if(globalMode==="strict"){
+      setMsg(wrong.length===0 ? "Check: every decided cell is right so far ("+undecided+" still undecided)."
+                               : "Check: "+wrong.length+" decided cell"+(wrong.length===1?"":"s")+" differ"+(wrong.length===1?"s":"")+" from the picture. Which ones is for you to find.", wrong.length?"warn":"good");
+    } else {
+      Motion.checkWrong(wrong.map(function(idx){ return cellEls[idx]; }));
+      wrong.forEach(function(idx){ var el=cellEls[idx]; el.classList.add("checkwrong"); setTimeout(function(){ el.classList.remove("checkwrong"); },1600); });
+      setMsg(wrong.length===0 ? "Check: no mistakes on the board ("+undecided+" cells still undecided)."
+                              : "Check: "+wrong.length+" wrong cell"+(wrong.length===1?"":"s")+" flashed red — fills on empty cells, or X's on picture cells.", wrong.length?"warn":"good");
+    }
+    renderStats();
+  });
+
+  /* ================= win / lose / overlay ================= */
+  function win(){
+    G.status="won"; snapshot();
+    var filledEls=[];
+    for(var i=0;i<G.cells.length;i++) if(isFillVal(G.cells[i])) filledEls.push(cellEls[i]);
+    Motion.winReveal(filledEls);
+    showOverlay(true, "Picture complete — \u201C"+G.puzzle.name+"\u201D",
+      globalMode==="arcade" ? "Solved with "+G.hearts+" heart"+(G.hearts===1?"":"s")+" to spare."
+      : globalMode==="timed" ? "Solved with "+fmt(G.timedRemaining)+" still on the clock."
+      : "Solved the paper way — every cell decided, every clue satisfied.");
+    renderAll();
+  }
+  function lose(text){
+    G.status="lost";
+    showOverlay(false, globalMode==="arcade" ? "Out of hearts" : "Time's up", text);
+  }
+  function showOverlay(won, title, text){
+    $("ovEmoji").textContent = won ? "◆" : "✕";
+    $("ovEmoji").style.color = won ? "var(--teal)" : "var(--bad)";
+    $("ovTitle").textContent=title;
+    $("ovText").textContent=text;
+    $("ovTime").textContent=fmt(G.elapsed);
+    $("ovMistakes").textContent=G.mistakes;
+    $("ovHints").textContent=G.hintsUsed;
+    $("ovNext").style.display = won ? "" : "none";
+    $("ovAgain").textContent = won ? "Play again" : "Try again";
+    $("overlay").classList.add("show");
+    Motion.overlayIn($("overlay").querySelector(".dialog"));
+  }
+  function hideOverlay(){ $("overlay").classList.remove("show"); }
+  $("ovClose").addEventListener("click", hideOverlay);
+  $("ovAgain").addEventListener("click", function(){
+    hideOverlay();
+    delete savedStates[G.puzzle.id];
+    var p=G.puzzle; G=freshState(p);
+    buildBoard(); buildPalette(); renderAll(); setMsg(p.note,"");
+  });
+  $("ovNext").addEventListener("click", function(){
+    hideOverlay();
+    var i=PUZZLES.indexOf(G.puzzle);
+    loadPuzzle(PUZZLES[(i+1)%PUZZLES.length]);
+  });
+
+  /* ================= chips ================= */
+  function syncChips(){
+    document.querySelectorAll(".chip").forEach(function(ch){
+      ch.setAttribute("aria-pressed", ch.dataset.id===G.puzzle.id);
+    });
+  }
+  function buildChips(){
+    var groups={learn:$("chipsLearn"), classic:$("chipsClassic"), large:$("chipsLarge"), colour:$("chipsColour")};
+    PUZZLES.forEach(function(p){
+      var b=document.createElement("button"); b.type="button";
+      b.className="chip"+(p.type==="colour"?" colourchip":"");
+      b.dataset.id=p.id; b.setAttribute("aria-pressed","false");
+      b.textContent=p.derived.N+"×"+p.derived.N+" "+p.name;
+      b.addEventListener("click", function(){ loadPuzzle(p); });
+      groups[p.group].appendChild(b);
+    });
+  }
+
+  /* ================= timer ================= */
+  setInterval(function(){
+    if(!G || G.status!=="playing" || !G.started) return;
+    G.elapsed++;
+    if(globalMode==="timed"){
+      G.timedRemaining--;
+      if(G.timedRemaining<=0){ G.timedRemaining=0; renderStats(); lose("The 30-minute clock ran out — in Mario's Picross that's a restart, and it is here too."); return; }
+    }
+    renderStats();
+  }, 1000);
+
+  /* ================= go ================= */
+  buildChips();
+  var msEl=$("motionStatus"); if(msEl) msEl.textContent=Motion.describe();
+  Motion.chipIn(document.querySelectorAll(".step"));
+  loadPuzzle(PUZZLES[0]);
+  </script>
+  </body>
+</html>

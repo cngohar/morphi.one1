@@ -191,21 +191,42 @@ export async function saveRun(
 		)
 			throw new RunError('session', 403);
 	}
-	const internalVariant =
-		issued?.variant ??
-		(stored?.ranked
-			? catalog[stored.family]?.variants?.find((row) =>
-					row.leaderboardGroups.includes(stored.group)
-				)?.id
-			: undefined);
-	if (stored?.ranked && candidate?.variant !== undefined && internalVariant !== candidate.variant)
+	let internalVariant = issued?.variant ?? undefined;
+	if (!issued && stored && (stored.ranked || candidate?.rankedSession === stored.id)) {
+		const pinned = await binding
+			.prepare(
+				`SELECT p.date,p.variant FROM completed_run r JOIN daily_puzzle p ON p.family=r.family
+				AND p.seed=r.seed AND p.engine_version=r.engine_version AND p.score_config_version=r.score_config_version
+				WHERE r.id=? AND r.user_id=?`
+			)
+			.bind(stored.id, userId)
+			.all<{ date: string; variant: string }>();
+		for (const puzzle of pinned.results) {
+			if ((await dailySessionId(userId, stored.family, puzzle.date)) === stored.id) {
+				internalVariant = puzzle.variant;
+				break;
+			}
+		}
+		// Legacy non-daily imports retain their internal cohort attribution.
+		internalVariant ??= catalog[stored.family]?.variants?.find((row) =>
+			row.leaderboardGroups?.includes(stored.group)
+		)?.id;
+		if (!internalVariant && catalog[stored.family]?.leaderboardGroups === undefined)
+			throw new RunError('conflict', 409);
+	}
+	if (
+		stored &&
+		internalVariant &&
+		candidate?.variant !== undefined &&
+		internalVariant !== candidate.variant
+	)
 		throw new RunError('conflict', 409);
 	const run = parseRun(internalVariant ? { ...candidate, variant: internalVariant } : input);
 	let hash = await digest(JSON.stringify(run));
 	if (
 		candidate?.variant === undefined &&
 		((issued && !dailySession && internalVariant === catalog[run.family].variants?.[0]?.id) ||
-			(stored?.ranked && stored.payloadHash !== hash))
+			(stored && candidate?.rankedSession === stored.id && stored.payloadHash !== hash))
 	) {
 		// Legacy default-rule claims retain their canonical envelope without its identity.
 		const { variant, ...legacyEnvelope } = run;
@@ -326,26 +347,31 @@ export async function saveRun(
 		seconds = Math.floor(rankedWallMs / 1000);
 	}
 	let result;
+	let ranked = Boolean(run.rankedSession);
 	const replayStarted = performance.now();
 	try {
-		result = catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values, run.variant);
 		const timing = catalog[run.family].rankedTiming;
+		// Resolve the presentation allowance before elapsed-time validation sees it.
+		result = catalog[run.family].replay(
+			run.seed,
+			run.moves,
+			run.rankedSession && timing ? 0 : seconds,
+			scoring.values,
+			run.variant
+		);
 		const openingMs = timing?.openingMs(result, run.variant) ?? null;
 		const maxSeconds = puzzleVariant(run.family, run.variant)?.maxSeconds;
+		let gameplayMs = rankedWallMs;
 		if (run.rankedSession && maxSeconds !== undefined) {
 			// Timed rounds use an exact ceiling; the existing scoring allowance must not add grace.
-			const gameplayMs = Math.max(0, rankedElapsedMs - (openingMs ?? 0) - cardOpeningMs);
+			gameplayMs = Math.max(0, rankedElapsedMs - (openingMs ?? 0) - cardOpeningMs);
 			if (gameplayMs > (maxSeconds + 2) * 1000) throw new RunError('too_slow');
 			seconds = Math.floor(gameplayMs / 1000);
-			result = catalog[run.family].replay(
-				run.seed,
-				run.moves,
-				seconds,
-				scoring.values,
-				run.variant
-			);
 		} else if (run.rankedSession && timing && openingMs !== null) {
-			seconds = Math.floor(Math.max(0, rankedWallMs - openingMs - cardOpeningMs) / 1000);
+			gameplayMs = Math.max(0, rankedWallMs - openingMs - cardOpeningMs);
+			seconds = Math.floor(gameplayMs / 1000);
+		}
+		if (run.rankedSession && (timing || maxSeconds !== undefined))
 			result = catalog[run.family].replay(
 				run.seed,
 				run.moves,
@@ -353,8 +379,8 @@ export async function saveRun(
 				scoring.values,
 				run.variant
 			);
-			if (seconds < timing.minimumSeconds(result, run.variant)) throw new RunError('too_fast');
-		}
+		if (run.rankedSession && timing && (maxSeconds !== undefined || openingMs !== null))
+			ranked = gameplayMs >= timing.minimumSeconds(result, run.variant) * 1000;
 	} catch (error) {
 		// Terminal validation failures release the lock; storage failures retain retry rights.
 		if (run.rankedSession)
@@ -392,7 +418,7 @@ export async function saveRun(
 			userId,
 			run.family,
 			run.engineVersion,
-			result.group,
+			result.group ?? run.family,
 			result.score,
 			result.pairs,
 			result.moves,
@@ -400,7 +426,7 @@ export async function saveRun(
 			run.seed,
 			JSON.stringify(run.moves),
 			hash,
-			run.rankedSession ? 1 : 0,
+			ranked ? 1 : 0,
 			dailySession ? now : submittedAt,
 			resolvedTheme?.themeConfigVersion ?? 'curated-v1',
 			resolvedTheme?.themeGeneratorVersion ?? 'curated-v1',
@@ -409,11 +435,11 @@ export async function saveRun(
 			userId,
 			now,
 			userId,
-			run.rankedSession ? 1 : 0,
+			ranked ? 1 : 0,
 			userId,
 			now - 3600000
 		);
-	const dailyDate = dailySession ? utcDate(issued!.createdAt) : null;
+	const dailyDate = dailySession && ranked ? utcDate(issued!.createdAt) : null;
 	if (dailyDate) {
 		const results = await binding.batch([
 			commit,

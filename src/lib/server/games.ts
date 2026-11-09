@@ -65,7 +65,7 @@ export function buildActivityMapping(family?: PuzzleId): ActivityMappingEntry[] 
 		const defs = variantDefinitions(family);
 		const defaultVariant = defs[0].id;
 		return defs.flatMap((variant) =>
-			variant.leaderboardGroups.map((group) => ({
+			(variant.leaderboardGroups ?? [family]).map((group) => ({
 				family,
 				variant: variant.id,
 				defaultVariant,
@@ -75,6 +75,7 @@ export function buildActivityMapping(family?: PuzzleId): ActivityMappingEntry[] 
 	});
 }
 
+// shortcut: group-less preset attribution needs a surviving start; persist preset identity if long-term history needs it.
 export async function queryActivityCounts(
 	db: D1Database,
 	mapping: ActivityMappingEntry[]
@@ -106,7 +107,9 @@ export async function queryActivityCounts(
  ), completions AS (
  SELECT m.family,m.variant,count(r.id) totalCompleted,COALESCE(sum(r.ranked),0) ranked,
  COALESCE(sum(r.id IS NOT NULL AND NOT EXISTS(SELECT 1 FROM starts s WHERE s.id=r.id AND s.user_id=r.user_id AND s.family=r.family AND COALESCE(s.variant,m.default_variant)=m.variant)),0) imported
- FROM mapping m LEFT JOIN completed_run r ON r.family=m.family AND r.rules_group=m.rules_group GROUP BY m.family,m.variant
+ FROM mapping m LEFT JOIN completed_run r ON r.family=m.family AND r.rules_group=m.rules_group
+ AND (m.rules_group<>m.family OR EXISTS(SELECT 1 FROM starts s WHERE s.id=r.id AND s.user_id=r.user_id
+ AND s.family=r.family AND COALESCE(s.variant,m.default_variant)=m.variant)) GROUP BY m.family,m.variant
  ) SELECT c.*,COALESCE(s.shown,0) shown,COALESCE(s.ignored,0) ignored,COALESCE(s.played,0) played,
  COALESCE(s.abandoned,0) abandoned,COALESCE(s.finished,0) finished,COALESCE(s.open,0) open
  FROM completions c LEFT JOIN starts_counts s ON s.family=c.family AND s.variant=c.variant`
@@ -299,12 +302,15 @@ export async function invalidateOverview(cache?: KVNamespace) {
 export async function queryScoreHistory(
 	db: D1Database,
 	family: PuzzleId,
-	variants: { id: string; leaderboardGroups: readonly string[] }[],
+	variants: { id: string; leaderboardGroups?: readonly string[] }[],
 	includeFamily = false
 ) {
 	const mapping: { variant: string | null; rulesGroup: string | null }[] = variants.flatMap(
 		(variant) =>
-			variant.leaderboardGroups.map((rulesGroup) => ({ variant: variant.id, rulesGroup }))
+			(variant.leaderboardGroups ?? [family]).map((rulesGroup) => ({
+				variant: variant.id,
+				rulesGroup
+			}))
 	);
 	if (includeFamily) mapping.push({ variant: null, rulesGroup: null });
 	if (!mapping.length) return [];
@@ -313,17 +319,23 @@ export async function queryScoreHistory(
 			.prepare(
 				`WITH mapping(variant,rules_group) AS (
 			SELECT value ->> 'variant',value ->> 'rulesGroup' FROM json_each(?)
+			), starts AS (
+			SELECT id,user_id,family,variant FROM play_session WHERE family=?
+			UNION ALL SELECT run_id,user_id,family,variant FROM account_round_activity a WHERE a.family=?
+			AND NOT EXISTS(SELECT 1 FROM play_session p WHERE p.id=a.run_id AND p.user_id=a.user_id AND p.family=a.family)
 			), cohorts AS (
 			SELECT m.variant,r.rules_group,r.score_config_version,count(*) completed,coalesce(sum(r.ranked),0) ranked,
 			max(r.score) bestScore,avg(r.score) averageScore,avg(r.seconds) averageSeconds,coalesce(sum(r.hidden),0) hidden
-			FROM completed_run r JOIN mapping m ON m.rules_group IS NULL OR m.rules_group=r.rules_group
+			FROM completed_run r JOIN mapping m ON m.rules_group IS NULL OR (m.rules_group=r.rules_group
+			AND (m.rules_group<>r.family OR EXISTS(SELECT 1 FROM starts s WHERE s.id=r.id AND s.user_id=r.user_id
+			AND s.family=r.family AND COALESCE(s.variant,?)=m.variant)))
 			WHERE r.family=? GROUP BY m.variant,r.rules_group,r.score_config_version
 			), bounded AS (
 			SELECT *,row_number() OVER (PARTITION BY variant ORDER BY rules_group,score_config_version) ordinal FROM cohorts
 			) SELECT variant,rules_group,score_config_version,completed,ranked,bestScore,averageScore,averageSeconds,hidden
 			FROM bounded WHERE ordinal<=101 ORDER BY variant,rules_group,score_config_version`
 			)
-			.bind(JSON.stringify(mapping), family)
+			.bind(JSON.stringify(mapping), family, family, variantDefinitions(family)[0].id, family)
 			.all<{
 				variant: string | null;
 				rules_group: string;
@@ -360,9 +372,9 @@ export async function gameStatistics(
 		family,
 		baseVariants.map((variant) => ({
 			id: variant.id,
-			leaderboardGroups:
-				variantDefinitions(family).find((definition) => definition.id === variant.id)
-					?.leaderboardGroups ?? []
+			leaderboardGroups: variantDefinitions(family).find(
+				(definition) => definition.id === variant.id
+			)?.leaderboardGroups ?? [family]
 		})),
 		true
 	);

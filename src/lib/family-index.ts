@@ -3,5 +3,6 @@ import type { PuzzleFamilyEntry } from './engine/contract.js';
 export const familyIndex: readonly PuzzleFamilyEntry[] = [
 	{ id: 'block', weight: 1, enabled: true, orientation: 'any', selectionOrder: 0 },
 	{ id: 'memory', weight: 1, enabled: true, orientation: 'any', selectionOrder: 1 },
-	{ id: 'connect', weight: 1, enabled: true, orientation: 'any', selectionOrder: 2 }
+	{ id: 'connect', weight: 1, enabled: true, orientation: 'any', selectionOrder: 2 },
+	{ id: 'nonogram', weight: 1, enabled: true, orientation: 'any', selectionOrder: 3 }
 ];

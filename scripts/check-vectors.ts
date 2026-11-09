@@ -1,6 +1,6 @@
 import { mkdtemp, readFile, writeFile, rm } from 'node:fs/promises';
 import { tmpdir } from 'node:os';
-import { join } from 'node:path';
+import { join, resolve } from 'node:path';
 import { createServer } from 'node:http';
 import { spawn, execFile } from 'node:child_process';
 import { promisify } from 'node:util';
@@ -10,7 +10,9 @@ import type { verifyVectors } from '../tests/vectors/runner.js';
 const run = promisify(execFile);
 const memoryOnly = process.argv.includes('--memory');
 const blockOnly = process.argv.includes('--block');
-if (memoryOnly && blockOnly) throw new Error('Choose one family vector filter.');
+const nonogramOnly = process.argv.includes('--nonogram');
+if ([memoryOnly, blockOnly, nonogramOnly].filter(Boolean).length > 1)
+	throw new Error('Choose one family vector filter.');
 const prefix = memoryOnly ? 'memory-' : blockOnly ? 'block-' : '';
 const directory = await mkdtemp(join(tmpdir(), 'morphi-vectors-'));
 const server = createServer((_request, response) => {
@@ -28,9 +30,23 @@ try {
 		['browser', 'browser'],
 		['worker', 'browser']
 	] as const) {
+		let source = `tests/vectors/${prefix}${entry}.ts`;
+		if (nonogramOnly) {
+			source = join(directory, `${entry}.ts`);
+			const harness =
+				entry === 'node'
+					? 'console.info(JSON.stringify(await verifyVectors()));'
+					: entry === 'browser'
+						? 'globalThis.verifyMorphiVectors = verifyVectors;'
+						: 'export default { async fetch() { return Response.json(await verifyVectors()); } };';
+			await writeFile(
+				source,
+				`import { verifyVectors } from ${JSON.stringify(resolve('tests/vectors/nonogram-runner.ts'))};\n${harness}\n`
+			);
+		}
 		await run('bun', [
 			'build',
-			`tests/vectors/${prefix}${entry}.ts`,
+			source,
 			'--target',
 			target,
 			'--format',
