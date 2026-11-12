@@ -1,4 +1,5 @@
 import { format } from 'prettier';
+import { existsSync } from 'node:fs';
 import { readdir, writeFile } from 'node:fs/promises';
 import { resolve } from 'node:path';
 import type {
@@ -118,10 +119,19 @@ catalog.push(
 );
 const registry = [
 	header,
-	"import type { Component } from 'svelte';",
+	"import type { Component, ComponentProps, Snippet } from 'svelte';",
+	"import type RoundStage from './components/RoundStage.svelte';",
 	"import type { PuzzleId, PuzzleManifest } from './engine/contract.js';",
 	"import type { PuzzleViewProps } from './ui/puzzle-view.js';",
 	`export const puzzleViews: Record<PuzzleId, () => Promise<{ default: Component<PuzzleViewProps> }>> = {${puzzles.map(({ directory, id }) => `${JSON.stringify(id)}: () => import('./puzzles/${directory}/View.svelte')`).join(',')}};`,
+	"export type PuzzleStage = Component<ComponentProps<typeof RoundStage> & { footerContent?: Snippet }, Pick<RoundStage, 'present' | 'stop' | 'measureFrame'>>;",
+	`export const puzzleStages: Partial<Record<PuzzleId, () => Promise<{ default: PuzzleStage }>>> = {${puzzles
+		.filter(({ directory }) => existsSync(resolve('src/lib/puzzles', directory, 'Stage.svelte')))
+		.map(
+			({ directory, id }) =>
+				`${JSON.stringify(id)}: () => import('./puzzles/${directory}/Stage.svelte')`
+		)
+		.join(',')}};`,
 	'// Each current pool generates its existing procedural variants through createRound.',
 	`export const puzzlePools: Record<PuzzleId, () => Promise<{ manifest: PuzzleManifest }>> = {${puzzles.map(({ directory, id }) => `${JSON.stringify(id)}: () => import('./puzzles/${directory}/manifest.js')`).join(',')}};`
 ];

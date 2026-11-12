@@ -41,7 +41,7 @@
 	import { deserialize } from '$app/forms';
 	import { resolve } from '$app/paths';
 	import { createRng } from '#lib/engine/rng.js';
-	import { puzzleViews, puzzlePools } from '#lib/registry.js';
+	import { puzzleViews, puzzlePools, puzzleStages, type PuzzleStage } from '#lib/registry.js';
 	import { familyIndex } from '#lib/family-index.js';
 	import { puzzleMetadata } from '#lib/puzzle-metadata.js';
 	import { eligibleFamilies, selectorAvailability } from '#lib/ui/selector-eligibility.js';
@@ -116,6 +116,7 @@
 	let cardReady = $state(false);
 	let revealed = $state(false);
 	let stage: RoundStage;
+	let Stage = $state<PuzzleStage>(RoundStage);
 	let playedCount = $state(0);
 	let stack = $state<{ family: string; best: number; color: string }[]>([]);
 	const endingArrivalMs = 420;
@@ -727,6 +728,7 @@
 					module.manifest.resumeRound(choice.seed, moves, config.values, choiceVariant)
 				);
 			}
+			const nextStage = await loadStage(choice.family);
 			const view = await loadPuzzleView(puzzleViews[choice.family], generationLifetime.signal);
 			if (generationLifetime.signal.aborted) return;
 			if (screen === 'game') {
@@ -740,6 +742,7 @@
 			dailyRound = issuedDaily;
 			round = restored;
 			View = view;
+			Stage = nextStage;
 			resolvedTheme = theme;
 			scoring = config;
 			bests = { ...bests, [family]: loadBestScore(bestKey(), scoring.version) };
@@ -867,12 +870,19 @@
 			console.error('morphi:round_start_failed');
 		});
 	}
+	async function loadStage(chosen: PuzzleFamily): Promise<PuzzleStage> {
+		const load = puzzleStages[chosen];
+		return load ? (await loadPuzzleModule(load, generationLifetime.signal)).default : RoundStage;
+	}
 	async function makeCandidate(
 		chosen: PuzzleFamily,
 		rankedGate: Promise<void>,
 		takeoverSession?: string
 	) {
-		const view = await loadPuzzleView(puzzleViews[chosen], generationLifetime.signal);
+		const [nextStage, view] = await Promise.all([
+			loadStage(chosen),
+			loadPuzzleView(puzzleViews[chosen], generationLifetime.signal)
+		]);
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 		const nextOwner = account.ownerKey;
 		let nextDaily: DailyIssued | null = null;
@@ -901,6 +911,7 @@
 				nextDaily,
 				nextRound: nextDaily.round,
 				nextView: view,
+				nextStage,
 				nextTheme: nextDaily.theme,
 				nextOwner,
 				nextSession: nextDaily.id,
@@ -950,6 +961,7 @@
 			nextDaily: null,
 			nextRound,
 			nextView: view,
+			nextStage,
 			nextTheme: candidate.theme,
 			nextOwner,
 			nextSession: null,
@@ -996,7 +1008,12 @@
 			throw new Error('game_unavailable');
 	}
 	async function prepareRound(takeoverSession?: string): Promise<void> {
-		if (screen === 'game' || starting || (screen === 'result' && cardPhase !== 'result')) return;
+		if (
+			screen === 'game' ||
+			starting ||
+			(screen === 'result' && cardPhase !== 'result' && cardPhase !== 'failed')
+		)
+			return;
 		starting = true;
 		startError = false;
 		rankedConflict = null;
@@ -1037,6 +1054,7 @@
 			const {
 				nextRound,
 				nextView,
+				nextStage,
 				nextTheme,
 				nextOwner,
 				nextSession,
@@ -1058,6 +1076,7 @@
 			dailyRound = nextDaily;
 			round = nextRound;
 			View = nextView;
+			Stage = nextStage;
 			resolvedTheme = nextTheme;
 			scoring = nextScoring;
 			bests = {
@@ -1105,7 +1124,7 @@
 			console.error('morphi:round_start_failed', { family: startErrorFamily });
 			stage?.stop();
 			startError = !rankedConflict;
-			cardPhase = result ? 'result' : 'failed';
+			cardPhase = 'failed';
 			revealed = Boolean(result);
 		} finally {
 			releaseRanked();
@@ -1353,7 +1372,7 @@
 		gameMode
 	/>
 	{#if revealed && screen === 'game' && ruleLine}<p class="entrance-rule">{ruleLine}</p>{/if}
-	<RoundStage
+	<Stage
 		bind:this={stage}
 		phase={cardPhase}
 		title={familyName(family)}
@@ -1363,6 +1382,7 @@
 		{stack}
 		{playedCount}
 		onretry={() => startRound()}
+		footerContent={roundFooter}
 	>
 		{#key roundId}
 			{#if round && View}
@@ -1429,27 +1449,28 @@
 				</div>
 			{/if}
 		{/snippet}
-	</RoundStage>
-	<footer class="round-panel">
-		<div class="round-panel-inner">
-			{#if revealed}<PuzzleHelp
-					{family}
-					{variant}
-					help={dailyRound?.help}
-					{ruleLine}
-					scoring={scoring.values}
-					onpause={(value) => (helpOpen = value)}
-				/>{/if}
-			<div class="family-high">
-				<span>{t('v1.game.best')}</span><strong
-					>{revealed ? formatNumber(bests[family]) : '—'}{#if revealed && !played[family]}<small
-							>{t('v11.game.new')}</small
-						>{/if}</strong
-				>
-			</div>
-		</div>
-	</footer>
+	</Stage>
+	{#if Stage === RoundStage}<footer class="round-panel">
+			<div class="round-panel-inner">{@render roundFooter()}</div>
+		</footer>{/if}
 </div>
+{#snippet roundFooter()}
+	{#if revealed}<PuzzleHelp
+			{family}
+			{variant}
+			help={dailyRound?.help}
+			{ruleLine}
+			scoring={scoring.values}
+			onpause={(value) => (helpOpen = value)}
+		/>{/if}
+	<div class="family-high">
+		<span>{t('v1.game.best')}</span><strong
+			>{revealed ? formatNumber(bests[family]) : '—'}{#if revealed && !played[family]}<small
+					>{t('v11.game.new')}</small
+				>{/if}</strong
+		>
+	</div>
+{/snippet}
 {#if resumeChoice || roundLocked || resumeError}
 	<aside class="ranked-conflict" aria-live="polite" aria-labelledby="resume-title">
 		<h2 id="resume-title">{t(roundLocked ? 'resume.locked' : 'resume.title')}</h2>
@@ -1497,7 +1518,6 @@
 		<button type="button" onclick={goHome}>{t('ranked.keepCurrent')}</button>
 	</aside>
 {/if}
-{#if startError && result}<p class="start-error" role="alert">{t('round.startError')}</p>{/if}
 <p class="sr-only" aria-live="polite" aria-atomic="true">{resultAnnouncement}</p>
 
 <style>
@@ -1584,20 +1604,5 @@
 	}
 	.ending span {
 		font-size: var(--text-15);
-	}
-	.start-error {
-		position: fixed;
-		left: 50%;
-		bottom: calc(20px + var(--safe-bottom));
-		transform: translateX(-50%);
-		z-index: 30;
-		max-width: min(92vw, 420px);
-		padding: 12px 18px;
-		border-radius: 14px;
-		background: var(--danger);
-		color: var(--surface);
-		font-size: var(--text-15);
-		font-weight: 700;
-		text-align: center;
 	}
 </style>

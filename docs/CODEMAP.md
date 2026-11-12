@@ -1,5 +1,109 @@
 # CODEMAP.md
 
+## Nonogram shell migration — built; verification STOP, not accepted (2026-11-12)
+
+**Owner acceptance (2026-11-12): ACCEPTED.** Supersedes the prior migration-stop wording; ranked reload/resume is deferred as a separate pre-launch policy decision, proven pre-existing at `e69bfe5`, not a migration issue and not waived.
+
+Implemented Steps 1–5 of the accepted shell-migration brief and its §5A
+carve-outs. Required focused verification is incomplete: the ranked daily
+reload/resume browser case fails on an existing session-abandonment path.
+No owner acceptance, waiver or final verification pass is inferred.
+This remains a v1.4.1 revision with engine version `nonogram-1`.
+
+### Built files and shared touches
+
+- `src/lib/puzzles/nonogram/motion.ts`: moved `nonogramEnter` unchanged from
+  shared motion; `Game.svelte` imports the family file. Shared card and Connect
+  motion remain unchanged.
+- `src/lib/puzzles/nonogram/Stage.svelte`: copied RoundStage's required props,
+  three required snippets, methods, guarded card calls and inert rules. One
+  optional `footerContent` snippet supplies session-owned help/high-score
+  content; the family Stage renders the copied bottom footer bar. Existing
+  shared RoundStage, PuzzleHelp and SiteHeader remain unchanged.
+- `scripts/generate-registry.ts`: native `Stage.svelte` presence detection emits
+  a partial lazy `puzzleStages` registry and a component type derived from
+  RoundStage. Ran `bun run registry:generate`; only `src/lib/registry.ts`
+  changed among generated projections. No generated file was hand-edited.
+- `src/lib/screens/PlaySession.svelte`: bounded/abortable Stage loading before
+  fresh daily issuance and before fresh/resumed state replacement; missing
+  registrations use RoundStage. Stage assignment follows successful preparation
+  and the previous result exit. The binding interface and `cardBeat()` remain
+  unchanged. Failed Next loads retain result data and the pending selector
+  family, show the existing failed card with Retry/Home, and permit Retry.
+  One shared snippet retains footer content and help-pause state.
+- `src/lib/ui/game-shell.css`: moved exactly 18 Nonogram-only rules into family
+  Stage CSS, preserving declarations, specificity and media queries. Existing
+  980px width and container-based cell/clue sizing remain.
+- `tests/e2e/nonogram.spec.ts`: only the authorised motion-failure injection
+  target changed from shared motion to the family motion file.
+- Reporting: this CODEMAP entry and the factual migration entry in
+  `docs/DECISIONS.md`. The owner brief, existing owner documentation changes,
+  unrelated template/editor/MCP files and all other families are preserved.
+
+No version bump, new dependency, engine/logic/manifest/scoring change, selector,
+server, schema, migration, shared card-shell change or other-family migration.
+Locked timings remain: entrance 2,500ms; deal/flip/unfold/fold/result exit
+650/400/800/500/350ms. Active-time floors remain 2,500/10,000/22,500ms.
+
+### Focused evidence and required stop
+
+- Baseline and post-extraction evidence: `build/nonogram-shell-baseline/` and
+  `build/nonogram-shell-step1/`; each returns green scoped checks, 30 unit
+  cases, 20 real-D1 cases and 42 Chromium cases at one worker.
+- Final static evidence:
+  `build/nonogram-shell-final/static/verification.log`. Scoped format/lint,
+  types (0 errors/0 warnings), 30 unit cases, 20 real-D1 cases, import boundaries,
+  build and focused lazy-Stage isolation pass. Source assertions confirm the
+  exact 18-rule CSS move and unchanged cardBeat/motion bodies.
+- Original focused browser suite:
+  `build/nonogram-shell-final/browser-42.log`, **42 passed**, one worker.
+- Supplemental browser evidence:
+  `build/nonogram-shell-final/browser-supplement-5.log`, **4 passed / 1 failed**.
+  Passing coverage: optional registry/fallback; footer/help at widths 320, 390,
+  844 and 1280 plus resize and missing-game measurement; locked card timings;
+  initial/Next Stage-load failure with retained result, pending family,
+  Retry and Home. The signed daily reload/resume case fails.
+- Focused diagnostic:
+  `build/nonogram-shell-final/browser-signed-diagnostic.log`, **1 failed**.
+  Before reload the active-session API returns HTTP 200 with the session;
+  after reload it returns HTTP 200 with null. The real reload visibility event
+  reaches existing PlaySession `cardVisibility` → `reportAbandon` → server
+  `recordRoundAbandon`, setting `play_session.abandoned_at`. No synthetic
+  hidden event preceded this latest diagnostic. This handler was not changed
+  by the migration.
+- Required ranked checkpoint/reload/resume: **FAIL**. Ranked UI win/result/Next
+  after resume: **NOT REACHED**, not a pass. The 20 real-D1 server cases,
+  including below-floor unranked persistence/attempt consumption, still pass;
+  they do not establish the failed browser flow.
+
+The existing abandonment behavior and ranked attempt policy are outside the
+narrow migration authorisation. Stop and report this gap; no server, policy,
+activity handler or shared contract workaround was introduced.
+
+**Motion wording tension:** §6 broadly asks for a failed card on motion failure,
+but Step 1 and the stage contract require unchanged motion behavior. Existing
+Nonogram entrance-motion failure safely settles to a playable board, as the
+passing 42-case suite explicitly verifies. Stage-load failures show the failed
+card with Retry/Home. No claim is made that entrance-motion failure transitions
+to that card; adding a Game callback/shared contract change was not authorised.
+
+**Edge cases recorded here:** absent Stage registration; bounded/aborted Stage
+loads; initial and Next failure/retry with retained result/pending family;
+measurement without `.game`; resize/rotation; help pausing and narrow-phone
+footer bounds; reduced motion, hidden-tab timing and navigation during entrance.
+The ranked reload failure above limits lifecycle verification. These notes
+remain here because `docs/EDGE_CASES.md` is outside the brief's narrow edit list.
+
+**Cleanup:** the temporary today-Nonogram daily puzzle and snapshot were restored
+to their original null state; fixture users were removed. Runtime checks ended,
+with no task process or port 5173 listener left running.
+
+**STOP:** no owner acceptance, Mahjong, Tangram, other-family migration, Connect
+motion move, sound work, full `bun run verify`, other-family tests,
+physical-device measurements, commit, push, deployment, provisioning or release
+step. Owner resolution of the ranked abandonment-policy scope gap is required
+before the failed acceptance item can be completed.
+
 ## v1.4.1 Nonogram rev 3 — locally built and focused verification complete; STOP (2026-11-09)
 
 Resumed the preserved pre-build handoff at HEAD `56e6460`; no reset or restart.

@@ -258,13 +258,13 @@ test('checkpoint restores marks after reload and same seed after resume', async 
 });
 
 test('failed entrance motion settles to a playable board', async ({ page }) => {
-	await page.route('**/src/lib/ui/motion.ts*', async (route) => {
+	await page.route('**/src/lib/puzzles/nonogram/motion.ts*', async (route) => {
 		const response = await route.fetch();
 		await route.fulfill({
 			response,
 			body:
 				(await response.text()) +
-				'\nmotion.nonogramEnter = () => { throw new Error("injected motion failure"); };\n'
+				'\nnonogramEnter = () => { throw new Error("injected motion failure"); };\n'
 		});
 	});
 	await seeded(page);

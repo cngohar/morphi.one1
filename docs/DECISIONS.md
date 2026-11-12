@@ -1,5 +1,56 @@
 # DECISIONS.md
 
+## Nonogram shell migration — implementation and verification stop (2026-11-12)
+
+**Owner acceptance (2026-11-12): ACCEPTED.** Supersedes the prior migration-stop wording; ranked reload/resume is deferred as a separate pre-launch policy decision, proven pre-existing at `e69bfe5`, not a migration issue and not waived.
+
+The accepted per-family shell decision is implemented for Nonogram only,
+through migration Steps 1–5 and §5A. This remains a v1.4.1 revision with
+`nonogram-1`: presets, scoring, daily-board identity, entrance budget, timing
+floors and shared card beats are unchanged. No version bump.
+
+A family Stage retains RoundStage's required props, three required snippets and
+present/stop/measureFrame methods. Nonogram adds one optional `footerContent`
+snippet. PlaySession retains shared PuzzleHelp content, pause state and
+high-score data; Stage owns the copied bottom footer bar. RoundStage,
+PuzzleHelp and SiteHeader are unchanged.
+
+The generator detects native `Stage.svelte` presence and emits optional lazy
+loaders. Missing registrations use RoundStage. Existing bounded/abortable
+loading is reused; Stage assignment occurs only after successful preparation.
+A failed Next retains finished result data and the pending selector family,
+shows the existing failed card, and permits Retry/Home. Nonogram-only shell CSS
+moves unchanged into its Stage, retaining 980px/container-based sizing. No new
+generic shell system, dependency, shared contract file or other-family migration.
+
+Focused static checks, 30 unit cases, 20 real-D1 cases and the original
+42-case Chromium suite pass. Four of five supplemental browser cases pass.
+Required ranked daily reload/resume fails: the actual reload visibility event
+reaches existing PlaySession cardVisibility/reportAbandon and server
+recordRoundAbandon, setting `play_session.abandoned_at`. The active-session API
+returns a session before reload and null afterwards, both HTTP 200. No synthetic
+hidden event preceded the latest diagnostic. Ranked UI win/result/Next after
+resume was not reached. Passing below-floor server cases do not establish that
+browser flow. Evidence: `build/nonogram-shell-final/static/verification.log`,
+`browser-42.log`, `browser-supplement-5.log` and
+`browser-signed-diagnostic.log` under `build/nonogram-shell-final/`.
+
+This is a verification **STOP**, not acceptance or a waiver. The unchanged
+activity handler, ranked attempt policy and server behavior are outside the
+narrow migration scope; no policy workaround was authorised or implemented.
+
+The brief's motion-failure wording also needs to be read against its unchanged
+motion requirement: entrance-motion failure retains the existing safe playable
+fallback, verified by the original browser suite. Stage-load failure shows the
+failed card with Retry/Home. No new entrance-motion failed-card transition or
+Game/shared-contract callback was added.
+
+Temporary daily-puzzle/snapshot fixtures were restored to their original null
+state, fixture users removed and runtime processes stopped. No full verify,
+other-family tests, physical-device measurement, sound work, commit, push,
+deployment, provisioning or release step. Owner resolution of the ranked
+abandonment-policy scope gap is required before completing that acceptance item.
+
 ## v1.4.1 rev 3 — local Nonogram baseline + Batch A stop (2026-11-09)
 
 The owner's explicit rev 3 completion instruction authorizes execution from the
@@ -1684,3 +1735,215 @@ the palette stage changed timing fields only. Keep final evidence under
   browser coverage includes the Scoring link and focus restoration.
 - No dependency/version change. Full verification remains deferred under the
   owner's earlier direction; scoped checks do not constitute a full pass.
+## Per-family game shell — design note (2026-11-12)
+
+**Status:** ACCEPTED BY OWNER 2026-11-12.
+
+## Problem
+
+Morphi's game shell is one shared, centered shell. It cannot express the
+layouts some puzzles need:
+
+- Tangram, as the owner found on shape-shifters.digitaldreamwork.site, is
+  two-column full-screen (silhouette one side, tray and controls the other).
+  Morphi's shell is centered with the controls below the board.
+- Mahjong is wide; Nonogram is wide. Both already bend the shared shell
+  with per-family CSS.
+- Jigsaw (v1.4.4) will be full-screen pan/zoom.
+
+PLAN §11.16 promised three stage modes (centered / wide / full). Wide and
+full were never built in code — they are PLAN-only. The current system only
+proves centered. The per-family shell is the implementation of that promise,
+not a new idea on top of it.
+
+## Decision
+
+Move the presentation shell into each family. Each family owns its own
+stage, animation and controls. The core stays shared. Migrate one family at
+a time — no big-bang rewrite.
+
+## The line: what stays shared, what moves
+
+Checked against the repo at HEAD `e69bfe5` (2026-11-11).
+
+### Stays shared (the core)
+
+- **The selector** — `src/lib/selector.ts` (`createPuzzleSelector`,
+  weighted order, no-repeat gap, repair queue) plus
+  `src/lib/ui/selector-eligibility.ts`. It picks the next family; the
+  player never sees the list. This is the one thing the owner's proposal
+  keeps shared.
+- **Daily issue** — `src/lib/server/daily.ts` (`deriveDailyPuzzle`).
+  The server hands a family a seed and a date; the family returns a
+  solvable board. A family must accept the seed, never invent its own.
+- **Session core** — `src/lib/screens/PlaySession.svelte` (~1,600 lines):
+  checkpoints and resume, scoring validation, timing, account activity,
+  the header, the help dialog (component + content shared; where its
+  triggers sit is stage chrome — see Footer placement below).
+  Presentation never commits a move.
+- **The card opening** — `cardSceneMotion` in `src/lib/ui/motion.ts`
+  (deal 650 ms + flip 400 ms + unfold 800 ms; fold 500 ms; result exit
+  350 ms, all in `src/lib/round-timing.ts`). Locked by the owner's
+  THE-CARD decision (2026-10-26) and re-locked by the owner 2026-11-11:
+  the card deal is Morphi's signature style and stays shared forever.
+  Families own animation *after* the card opens, never the opening.
+- **Result recording** — the round result is written in the standard
+  `PuzzleResult` shape (`src/lib/ui/puzzle-view.ts`) and ranked only
+  above the timing floor; below the floor it saves unranked. The family
+  owns the result *screen*; it does not own the *record*.
+- **Help dialog and help content** — the `PuzzleHelp` component
+  (the buttons, the dialog, how/scoring tabs, backdrop dismissal,
+  pausing the game, dialog motion) stays shared, and the help
+  *content* is already per-family: each manifest defines its own
+  steps, scoring rows, note and tips (`presentation.help`), and the
+  panel only renders that data. A family whose play method differs
+  says so in its own help data, not in its own panel.
+- **Footer placement moves per family** — the footer *bar* (the
+  `round-panel` in `PlaySession` today: the help buttons and the
+  family high score) is stage chrome, not a shared bar. The Stage
+  decides where the help triggers and the high score sit: bottom
+  (Block, Nonogram today), right rail (Tangram's two-column
+  layout), left rail. What stays shared is the component, the
+  content, the high-score value and the pause-on-open behaviour —
+  not the position. (Correction 2026-11-12, from the owner's
+  screenshot question: the first draft of this note wrongly put the
+  whole footer on the shared side.)
+- **Engine contract** — `src/lib/engine/` (contract types, SplitMix64
+  RNG, scoring framework, theme generator) stays shared, and the
+  server replay stays shared. The family *logic* is already private
+  to each family (`src/lib/puzzles/<family>/logic.ts` — rules, moves,
+  generation, scoring formula). Making the contract private per
+  family would break server replay and cross-family ranking: the
+  server replays every family's moves through the one contract, and
+  the seeded daily puzzles depend on every family drawing from the
+  same deterministic RNG.
+- **Timing floors and entrance budgets** — locked per family
+  (Block 3,000 ms, Connect 2,500 ms, Nonogram 2,500 ms, Memory 3,000–
+  5,000 ms by pairs, Mahjong 2,000 ms locked 2026-11-10). Input stays
+  locked until the logical active-time deadline. Reduced motion is
+  honoured everywhere, the way `motion.ts` does today.
+- **anime.js setup** — anime.js 4.5.0, used only via `motion.ts` today.
+  After the move, each family's motion file uses the same library; no
+  second animation library.
+- **Top header stays shared** (owner question 2026-11-12) — `SiteHeader`
+  (brand, game title, account, sound) is the Morphi identity bar and
+  is never redesigned per family. The title is per-family data,
+  revealed in the header at the flip as part of the card ritual. The
+  header is a slim bar above the stage and does not constrain the
+  stage layout.
+
+### Moves per family (the shell)
+
+- **Stage** — layout, chrome, and where the controls live. Today that is
+  `src/lib/components/RoundStage.svelte` (180 lines: the centered card,
+  phases dealing → playing → ending → result, title, best, stack,
+  `onretry`, and the board / ending / result snippets). After the move,
+  `RoundStage` stays as the **default centered stage**; a family may
+  supply its own Stage instead.
+- **Motion** — entrance, feedback, clear and win choreography. The
+  pattern already exists twice inside the shared file: `motion.nonogramEnter`
+  and `motion.connectEnter`. The move takes those functions out of
+  `motion.ts` and into the family (e.g. `src/lib/puzzles/nonogram/motion.ts`).
+- **Result and ending presentation** — the layout of the ending panel and
+  the result screen. The content is already family-owned (`PuzzleResult`:
+  score, title, summary, stats, ending headline/subline); the panel
+  chrome moves with the stage.
+
+## Sound (decided, owner 2026-11-12)
+
+- **Sound sets are per family.** Block sounds cannot be used with
+  Connect, Nonogram sounds cannot be used with Memory, same for every
+  family. Connect already has its own set (`connect-*`); that is the
+  pattern. The card's own sounds (`deal`, `flip`) stay shared — they
+  belong to the shared opening, not to any family.
+- **The sound engine stays shared** — `SoundEngine`
+  (`src/lib/ui/sound.ts`), the AudioContext, play/mute. What changes
+  is *what it loads*.
+- **The loader rule (the RAM rule).** The engine today loads and
+  decodes all 25 sounds at once on first play (`unlock()` loops every
+  kind) and holds every decoded buffer forever (`buffers` map, never
+  evicted). At 25 sounds that is ~2 MB and invisible. At 100 families
+  with their own sets it would be tens of MB held forever — the same
+  unbounded-cache shape as Facebook's scroll: keep everything, never
+  evict. So the rule is: load only the current family's sounds,
+  lazily; release the previous family's decoded buffers when the
+  family changes; keep at most the current family plus the next one
+  being prepared. Never load all families' sounds upfront, never hold
+  them forever. Per family that is ~0.5–1 MB in RAM at a time,
+  however many families exist.
+- This migration adds no new sounds: Nonogram keeps its current cues
+  (`pick`, `place`, `invalid`, `win`, `clear`) as its set. New
+  per-family recordings need owner audition (existing gate). The
+  loader rework itself is separate future work, not part of this
+  migration.
+
+## The stage contract
+
+A family Stage is a drop-in replacement for `RoundStage`. It receives the
+same props `RoundStage` takes today:
+
+- `phase` (dealing / waiting / flipping / unfolding / arriving / playing /
+  folding / ending / result / result-leaving / failed), `title`, `best`,
+  `ready`, `failed`, `stack`, `playedCount`, `onretry`
+- three snippets: the board (`children`), the ending content, the result
+  content
+
+The `PuzzleViewProps` contract (`src/lib/ui/puzzle-view.ts`) does not
+change: the shell keeps identity, each view owns its concrete round and
+result presentation. The family must honour the timing contract (entrance
+inside the locked budget, input locked until the deadline, reduced motion
+honoured) and the result contract (standard record shape, floors enforced
+server-side).
+
+## Locked rules (owner, 2026-11-11)
+
+- The card deal stays shared forever. It is the signature; families may
+  not reinvent the opening.
+- The selector stays shared. Everything else presentation moves per family.
+
+## Migration order
+
+1. **Nonogram first.** Built, committed (`e69bfe5`), verified (30/30
+   units, vectors, 11 presets), not live, wide, and already halfway
+   there (`nonogramEnter`). The migration is: move `nonogramEnter` out
+   of `motion.ts`, give Nonogram its own Stage, keep card / selector /
+   issue / record untouched. It proves the contract on real code.
+2. **Mahjong next, through its brief.** The v1.4.2 brief is accepted
+   (2026-11-11, 153 lines) but the Codex build has not started. The
+   stage contract goes into the brief *before* the Codex run, so Mahjong
+   is built per-family from day one. Amending an accepted brief is the
+   owner's call.
+3. **Tangram next.** Its brief is still DRAFT; it is finalised with the
+   contract in it, using the two-column full-screen stage the owner
+   found on shape-shifters.
+4. **Centered families last.** Memory, Block and Connect fit today's
+   shell; there is no rush to move them.
+
+## Risks
+
+- **Duplication.** Keyboard handling, accessibility, reduced motion and
+  phone sizing are fixed once today, in one place. Per family they are
+  fixed once per family. Mitigation: the contracts above, and focused
+  verification per migration (the family's own files plus the shared
+  code the change touches — no full-repo verification, per the owner's
+  standing rule).
+- **Drift.** If a family invents its own timing or its own result shape,
+  the ten games stop being one Morphi. Mitigation: timing floors and the
+  result record stay server-enforced; the stage contract is the only
+  freedom a family gets.
+- **Feel.** The shared shell is part of what makes Morphi feel like one
+  product. Mitigation: the card opening — the one moment every round
+  shares — never moves.
+
+## Sources (all checked 2026-11-11, repo HEAD `e69bfe5`)
+
+- `src/lib/screens/PlaySession.svelte`, `src/lib/components/RoundStage.svelte`,
+  `src/lib/ui/motion.ts`, `src/lib/ui/puzzle-view.ts`,
+  `src/lib/round-timing.ts`, `src/lib/selector.ts`,
+  `src/lib/ui/selector-eligibility.ts`, `src/lib/server/daily.ts`
+- `docs/PLAN.md` §11.16, `docs/DECISIONS.md`,
+  `docs/morphi-v1.1-handoff-2026-10-26/morphi-game-ui-redesign/THE-CARD-decision.md`
+- Owner direction in the 'Game shell per family' thread, 2026-11-11:
+  per-family shell; animation per family; only the selector stays shared;
+  card deal stays shared; start from an already-built puzzle (Nonogram),
+  not Tangram; Mahjong build not started.

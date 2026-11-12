@@ -10,7 +10,7 @@
 	import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 	import { themeStyle } from '#lib/engine/theme/style.js';
 	import { t } from '#lib/i18n/messages.js';
-	import { motion } from '#lib/ui/motion.js';
+	import * as motion from './motion.js';
 	import { createActiveDelay } from '#lib/ui/active-delay.js';
 	import { sound } from '#lib/ui/sound.js';
 	import { formatDuration, formatNumber } from '#lib/ui/format.js';
