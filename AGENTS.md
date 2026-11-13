@@ -33,6 +33,23 @@ For testing and verification:
 
 ## Current phase
 
+**v1.4.2 Mahjong Solitaire source commit and push authorized (2026-11-13):**
+The owner said “comit and push to github”, authorizing this completed source
+handoff to existing `origin/main`: Classic plus ten Batch A variants,
+`mahjong-solitaire-1`, 11 enabled presets / 0 variant groups and one reused
+`(mahjong-solitaire, UTC date)` daily board. This supersedes the prior local
+commit/push stop for this handoff only. Include the family, focused tests/vectors,
+two shared source touches, generated projections, related documentation and
+owner-provided brief/demo/reference image/template update. Preserve `.cursor/`
+and `.vscode/mcp.json` exclusions; build evidence stays local.
+Existing focused evidence remains 24 units, 10 real-D1 cases, 33 solved/66 rejected
+vectors in six runtimes, 32 single-worker Chromium cases, scoped format/lint/types
+(0 errors/0 warnings), boundaries, build and lazy isolation. No new verification,
+physical-device review or owner functional acceptance is inferred from this
+source handoff. Full `bun run verify` remains deferred. No Batch B, deployment,
+provisioning or production release is authorized.
+See `docs/briefs/v1.4.2-mahjong-codex-brief.md` and the top of `docs/CODEMAP.md`.
+
 **v1.4.1 Nonogram baseline + 10 Batch A variants accepted; source commit and push authorized (2026-11-09):**
 The owner said “this repo updated again, you can comit and push to github”, accepting the completed
 v1.4.1 Nonogram implementation (Classic baseline + 10 Batch A rulesets: `nonogram:colour-2`,

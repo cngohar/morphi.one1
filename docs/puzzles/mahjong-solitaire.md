@@ -1,100 +1,104 @@
-# Puzzle design brief: Mahjong Solitaire (`mahjong-solitaire`)
+# Mahjong Solitaire (`mahjong-solitaire`) — v1.4.2
 
-**Status:** Draft for v1.3.4; owner approval required before build.
-**Reference:** `docs/references/game-guides/Mahjong Solitaire — How It Is Played.html`.
-**Scope proposal:** Solo tile-pair Mahjong Solitaire, not four-player Mahjong.
+Owner-approved 2026-11-11; per-family shell and Rev 2 corrections approved
+2026-11-12. Implementation authority is
+[`v1.4.2-mahjong-codex-brief.md`](../briefs/v1.4.2-mahjong-codex-brief.md).
+This replaces the stale v1.3.4 proposal. Build Classic first, then Batch A only.
 
-## Core loop
+## Rules and controls
 
-- Verb: select two free matching tiles to remove a pair.
-- Goal: clear all tiles in the selected seeded layout.
-- Win: no tiles remain. Run over: tiles remain but no legal matching free pair exists. Any timer expiry, if approved, is a scored run-over, not invalid replay.
-- A tile is free when no tile covers any part of it and at least one long side has no same-layer neighbor. Flowers match Flowers; Seasons match Seasons; other faces require exact matches.
-- Fun within the first 30 seconds: spot and remove a free pair, revealing a more open board.
+Remove matching free tiles until none remain. A free tile has no overlapping
+higher tile and at least one open left/right side on its own layer. Same-layer
+vertical neighbours do not block. Ordinary faces match exactly; Flowers match
+Flowers and Seasons match Seasons. Identical-copy choices can strand a board.
 
-## Proposed variants
+Tap/click selects, tapping again cancels, and a nonmatching free tile replaces
+the selection. Tab enters the board; arrows focus free tiles; Enter/Space selects;
+Escape cancels. H/U/S/R trigger Hint/Undo/Shuffle/Restart. Restart preserves the
+seed and board. Classic Hint/Shuffle/Undo are unlimited. A hint chooses the legal
+match freeing the most tiles. Shuffle reverse-deals surviving faces and clears
+Undo. Blocked boards lose only when neither Shuffle nor Undo can rescue them.
 
-Each variant has a stable family-owned code and separate ranked score group; shared matching rules and tile-face set:
+## Bands, generation and integrity
 
-- `turtle`: classic 144-tile, four-layer Turtle layout; default and signature mode.
-- `quick`: compact 56-tile teaching layout, 14 faces with four copies each; exact geometry is a Morphi design choice.
-- `fortress`: 144-tile Fortress layout with a different layered topology from Turtle.
+Bands are layouts, never variants or boards: Quick 56 (42+14), Turtle 144
+(87+36+16+4+1), Fortress 144 (92+40+12; 29 initially free). Half-step integer
+coordinates are frozen from the supplied fixture. Tile rectangles are 2×2;
+upper-layer offsets and Turtle head/tail positions remain as approved.
 
-These are layout variants, not rule variants. The 56-tile count is an example used by an existing game, not a universal standard. Final layouts require design and solvability review.
+SplitMix64 draws the band first (Quick/Turtle/Fortress), then a reverse-deal
+witness and shuffled face groups. Validate by replay before issuance. Bound each
+band to 100 attempts, fall back toward Quick, then reject exhausted generation.
+No exact solver. Triple uses only its fixed 108-tile Turtle (63+27+12+5+1),
+without a band draw. Avalanche witnesses simulate every slide. Witnesses exist
+for tests only and never judge a player's solution or enter issued JSON.
 
-## Controls
+Family and all 11 presets ship enabled. Board key: `(mahjong-solitaire, UTC date)`;
+variant boards: none; variant leaderboard groups: **0**. Reuse existing server
+issuance/replay, daily storage, immutable per-preset scoring, admin controls and
+activity/history plumbing. Moves have exact numeric-only keys and illegal moves
+throw. Maximum 10,000 moves. No engine/selector/server/schema/migration changes.
 
-- Touch/mouse/pen: tap/click a free tile, then its matching free tile. A different free tile replaces the selection; tapping the selected tile again cancels. Blocked tiles do not select.
-- Keyboard: Tab enters the board; arrows move focus among tiles; Enter/Space selects. Expose accessible face, layer, selected and free/blocked state; visual color never carries state alone.
+## Batch A — each delta from Classic
 
-## Difficulty and scoring
+| Preset suffix  | Single rule delta                                                                                 |
+| -------------- | ------------------------------------------------------------------------------------------------- |
+| classic        | Match two free tiles; face up; free-tile cues; unlimited helpers.                                 |
+| triple-match   | Match three; fixed 108 tiles, 34 ordinary faces ×3 plus three Flowers and Seasons.                |
+| exact-only     | Bonus faces match exactly; first two Flowers and Seasons each occur twice.                        |
+| face-down-peek | Twelve seeded tiles turn down after witness validation; peek is recorded and permanent.           |
+| no-highlight   | Remove free-tile brightening, outline and dot; blocked tiles remain unselectable.                 |
+| countdown      | Quick 180 seconds; Turtle/Fortress 600 seconds; timeout loses without a score.                    |
+| three-hearts   | Each mismatch loses one of three hearts and keeps the last selection; zero loses.                 |
+| no-undo        | Disable Undo.                                                                                     |
+| hint-budget    | Three hints; 100-point cost each.                                                                 |
+| shuffle-budget | Three shuffles; 50-point cost each.                                                               |
+| avalanche      | After removal, screen-above tiles in the same column slide into vacated slots; recompute freedom. |
 
-- Bands: proposed first axis is layout (`quick`, `turtle`, `fortress`). Whether to add multiple bands per layout is undecided.
-- Progression/fairness: deterministic generation from server-issued seed, variant and engine version. Build the initial deal by reverse-dealing legal matching pairs from an empty approved layout and retain the removal witness. Validate the witness before issuance. A random face shuffle may make unsolvable boards; exact solving is computationally hard. Server replay independently validates the player's actual moves.
-- Score proposal for a cleared board: `pair × pairs + clear + second × max(0, parSeconds − activeSeconds)`. Provisional defaults: pair=100, clear=1,000, second=5; Quick par=180 s, Turtle/Fortress par=600 s. The existing admin scoring editor configures the three coefficients; par is fixed per variant. Owner may tune after playtesting.
-- Fully cleared boards are leaderboard-eligible in their own variant group. Blocked boards remain in history with progress/time but have no leaderboard score. No hints, reshuffles or mismatch penalties in v1.3.4. Wrong selection does not change score.
-- Ranked clock is server-owned, excluding only the fixed entrance allowance; client never submits score. Move cap and abandonment behavior require owner approval.
+## Scoring and endings
 
-## Layout and style
+`brief-v1` defaults: completion 1,000; removal 100 (triple 150); each second
+under par 5; each hint −100; each shuffle −50; floor zero. Par is Quick 180,
+otherwise 600. Three-hearts adds 250 per surviving heart. Coefficients are
+immutable admin-editable versions. Countdown's remaining-time bonus uses its
+same par and five-per-second default. Timing floors: Quick exactly 2,500ms;
+Turtle/Fortress/Triple exactly 10,000ms. Below-floor claims save unranked and
+consume the daily attempt. Hidden ranked time uses server wall-clock.
 
-- Layout profiles: compact, medium and expanded all use `wide` or `full` stage sizing to preserve tile legibility and overlap hit areas. Exact profile-to-layout mapping and minimum tile target are to be settled in wireframes at phone portrait 390×844, phone landscape 844×390 and desktop 1280×800 before implementation.
-- Side panels: left side How to play; right side Scoring & tips on expanded layouts; drawers below the project's 1024 px breakpoint; none on phones. Confirm against current page template before build.
-- Renderer: SVG candidate, because stacked layers need scalable overlap geometry and deterministic hit regions. Confirm after a small interaction/layout proof; do not add a rendering dependency without need.
-- Style profile: flat, original tile faces with clear suit/number or distinct honor symbols; no gradients, glows, shadows/bevels on game objects, emoji or color-only distinctions. Use the project's approved site tokens and theme recipes. Tiles retain stable face identity across cosmetic themes.
-- Themeable surfaces: tile backs, board/background and non-semantic accents only. Never alter face matching or readability.
+Clear means an empty player board, `completion`; timed/hearts/no-rescue failure
+is `run_over`, with the failed board viewable and no score or daily row. Leaving
+abandons the exact ranked session. Ending text uses authoritative counts/time;
+`fade-rise`, `auto_500ms`. Persistence never waits for presentation.
 
-## Puzzle-specific backdrop (standing owner rule, 2026-10-27)
+## Presentation
 
-- Allowed objects: Mahjong tiles and tile-pair silhouettes only; shapes/data owned by this puzzle's theme/backdrop adapter.
-- Generate positions, rotations and arrangement from the cosmetic seeded RNG; backdrop seed is independent of logic RNG.
-- In play use current-puzzle objects only, at 20% opacity, behind the board and outside header/bottom bands. Compact/mobile portrait and landscape hide them. Wider layouts show seeded random 1–5 objects per side scattered in two dimensions. No fixed columns or evenly spaced rows.
-- Missing legacy backdrop data uses a deterministic arrangement of Mahjong objects, never another puzzle's motifs or generic decoration. Reveal with the puzzle arrival after the Card reveals its identity. Reduced motion shows static objects only where permitted.
-- Evidence: family-isolation and deterministic-scatter tests; hidden backdrop captures at both phone sizes and bounded desktop scatter; verify rotation across visibility breakpoint.
+Own `Stage.svelte` and `motion.ts`; Stage preserves shared Card props, snippets,
+methods, beats, inert rules and footer content. Shared SiteHeader remains the
+identity bar. SVG layered opaque traditional-style faces are original artwork:
+Characters, Bamboo, Circles, Winds, Dragons, plant Flowers and Seasons. Cream
+pills, green edges, visible thickness and bevel follow the supplied style image;
+geometry and behaviour follow the fixture only. The scenic image is reference,
+not a runtime asset. No English text labels replace tile art.
 
-## Feedback and feel
+Quick targets ≥44px tiles at 390px portrait. Turtle/Fortress use Fit/zoom and
+panning inside bounded overflow. Resize and rotation preserve the round.
+Mahjong-only tile-pair backdrop motifs scatter deterministically on wide screens
+and hide on compact layouts. No other family's objects.
 
-- Selection, valid pair, invalid pair, removal, blocked ending and win each get clear accessible visual feedback. Sound cues are distinct, original offline-generated assets if approved; missing sound remains silent without error.
-- Arrival: after the continuous Card unfolds, show the board face-up. Tiles settle by layer with small upward movement and row stagger; no second miniature board and no face-down Memory-style preview. Proposed fixed entrance: 1.6 s Quick, 2.5 s Turtle/Fortress. Input stays locked to a logical active-time deadline; solo scoring time starts afterward, and ranked timing uses the matching server-owned allowance.
-- Pair: selected free tile lifts slightly and gets an outline. A non-match gives a brief shake with no penalty and selects the second tile. A match lifts/fades both tiles over about 180 ms; newly uncovered tiles settle and newly free edges briefly highlight. Animations never control rules or scoring.
-- Ending: board folds into played stack, then shared 420 ms result fade-rise. Only the large score may use the accepted 500 ms scramble. Reduced motion settles immediately.
-- Replay hook: variant best, score, pairs removed, elapsed time and Next.
+Entrance shows an empty board, then every tile in layer order at uniform stagger,
+all within 2,000ms. Input uses that logical active deadline. Removal lifts/fades
+for 500ms; newly exposed/free tiles settle/highlight; mismatch shakes; win reveals.
+Family anime.js wrapper only; reduced motion settles immediately and failures
+switch off animation. Generic existing sound cues only; no new sound assets.
+First-round hint teaches freedom; first triple round gets one coaching line.
+Quick teaching omits bonus groups because Quick has none.
 
-## Ending contract (required)
+## Verification and stopping point
 
-- Exact engine condition: `completion` when the final legal pair leaves zero tiles; `run_over` when tiles remain and the engine finds no matching pair among currently free tiles. If a ranked timer is approved, expiry is a distinct scored run-over reason. Generation failure is not a game ending; return a bounded preparation failure while preserving the current result/pending family.
-- Manifest `ending.kind`: `completion` for clear; `run_over` for blocked/timed-out.
-- Catalog keys: default completion headline and default run-over headline; distinct blocked/timed-out headline keys if timeout is approved. Exact key names pending message-catalog implementation.
-- Catalog subline: completion values `pairs` and `elapsed`; blocked values `tilesRemaining`; timed-out values `tilesRemaining` and `elapsed`. Each value comes from authoritative engine/replay output. Exact key names pending.
-- Manifest animation type: `fade-rise`; continue rule: `auto_2s_tap`.
-- Complete the manifest declaration and verify keys/placeholders with registry generation before the build is reviewable. Presentation never decides end state or delays result persistence.
-
-## Teaching
-
-- Tutorial depth: `coach` candidate; introduce free-tile top/side rule, matching and Flower/Season groups with an accessible first selection.
-- Explain blocked endings and that choosing among identical copies can affect future options.
-- Whether hints exist, and whether they are disabled or penalized in ranked play, remains an owner decision.
-
-## Risks
-
-- Edge cases for `docs/EDGE_CASES.md`: unsolvable witness rejection; bounded generation exhaustion/fallback; partial tile overlap and z-order hit testing; identical-copy dead ends; no free matching pair; interruption/resume; missing asset; rapid/double input; navigation during entrance; reduced motion; duplicate ranked submission; storage failure.
-- Performance: bound reverse-deal attempts and layout size; measure generation and SVG interaction on a named mid-range phone and desktop. Do not add an exact solver to the request path.
-- IP: original Morphi symbols, layout data, sound and presentation. The reference guide informs rules only; do not copy its art/code or distinctive visual identity.
-
-## Approval
-
-- Owner approval date: pending.
-- Owner decisions: approve game and variants; approve Flower/Season groups; pick timer or move-based scoring and coefficients/par targets; decide hint policy; approve visual direction, sounds and entrance timing; confirm this is the v1.3.4 implementation phase.
-- Game-feel review notes: pending. The owner must approve this brief before implementation.
-
-## Entrance and timing contract
-
-Use `src/lib/ui/motion.ts` only for presentation. Choose a fixed entrance deadline after layout and device-size review; do not scale gameplay timing by tile count without an approved contract. Input readiness follows an active-time phase deadline, never animation completion. Ranked opening allowance is fixed by server-owned metadata; no client-supplied timing. Reduced motion settles presentation while preserving server-owned ranked allowance. Cosmetic travel uses external crypto entropy and never changes the seed, rules or score.
-
-Test early input, hidden mount, hide/resume, resize/rotation, navigation cleanup, reduced-motion changes, failed motion and missing sound. Prepare the next solo candidate without consuming selector draws or reserving a ranked session; on preparation failure retain the result and pending family with retry/Home. Follow the shared Card contract in `_TEMPLATE.md` and existing shell.
-
-## Research references
-
-- [Rules and named layouts](https://www.mahjongsolitaire.games/pages/rules)
-- [56-tile easy board example](https://mahjong.handeware.com/)
-- [Reverse-deal and solvability notes](https://www.meowjong.com/mahjong-solitaire/rules/)
-- [Complexity result](https://arxiv.org/abs/1203.6559)
+Focused §9 only: family units, 33+ frozen solved/illegal/incomplete vector sets in
+six runtimes, real-D1 daily/scoring/activity cases, one-worker Chromium at
+390×844, 844×390 and 1280×800, scoped format/lint/types/boundaries/lazy bundle.
+Include keyboard, Fit/zoom, hidden time, checkpoint/resume, input/motion failure
+and navigation cleanup. Report missing evidence honestly. No full verify, other
+families' tests, physical-device measurements, commit, push, deploy or Batch B.
+Owner functional review and pre-launch trademark clearance remain separate.

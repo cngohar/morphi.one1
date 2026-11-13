@@ -7,6 +7,7 @@ export const puzzleViews: Record<PuzzleId, () => Promise<{ default: Component<Pu
 	{
 		block: () => import('./puzzles/block-placement/View.svelte'),
 		connect: () => import('./puzzles/connect/View.svelte'),
+		'mahjong-solitaire': () => import('./puzzles/mahjong-solitaire/View.svelte'),
 		memory: () => import('./puzzles/memory/View.svelte'),
 		nonogram: () => import('./puzzles/nonogram/View.svelte')
 	};
@@ -15,12 +16,14 @@ export type PuzzleStage = Component<
 	Pick<RoundStage, 'present' | 'stop' | 'measureFrame'>
 >;
 export const puzzleStages: Partial<Record<PuzzleId, () => Promise<{ default: PuzzleStage }>>> = {
+	'mahjong-solitaire': () => import('./puzzles/mahjong-solitaire/Stage.svelte'),
 	nonogram: () => import('./puzzles/nonogram/Stage.svelte')
 };
 // Each current pool generates its existing procedural variants through createRound.
 export const puzzlePools: Record<PuzzleId, () => Promise<{ manifest: PuzzleManifest }>> = {
 	block: () => import('./puzzles/block-placement/manifest.js'),
 	connect: () => import('./puzzles/connect/manifest.js'),
+	'mahjong-solitaire': () => import('./puzzles/mahjong-solitaire/manifest.js'),
 	memory: () => import('./puzzles/memory/manifest.js'),
 	nonogram: () => import('./puzzles/nonogram/manifest.js')
 };

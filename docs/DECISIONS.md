@@ -1,5 +1,20 @@
 # DECISIONS.md
 
+## 2026-11-13 — v1.4.2 source handoff authorized
+
+The owner said “comit and push to github”, authorizing the completed Mahjong
+Classic + ten Batch A source handoff to existing `origin/main`. This supersedes
+the earlier local commit/push stop for this handoff only. Include the family,
+focused tests/vectors, two shared source touches, generated projections, related
+docs and owner-provided brief/demo/reference image/template update. Keep build
+evidence local and exclude `.cursor/` and `.vscode/mcp.json`.
+
+The focused evidence recorded below is unchanged; no new verification,
+physical-device review or owner functional acceptance is inferred. Full
+`bun run verify` remains deferred. No Batch B, deployment, provisioning or
+production release is authorized. The prior closeout below remains the local
+implementation/evidence record; its commit/push restriction is superseded here.
+
 ## Nonogram shell migration — implementation and verification stop (2026-11-12)
 
 **Owner acceptance (2026-11-12): ACCEPTED.** Supersedes the prior migration-stop wording; ranked reload/resume is deferred as a separate pre-launch policy decision, proven pre-existing at `e69bfe5`, not a migration issue and not waived.
@@ -1947,3 +1962,48 @@ server-side).
   per-family shell; animation per family; only the selector stays shared;
   card deal stays shared; start from an already-built puzzle (Nonogram),
   not Tangram; Mahjong build not started.
+
+## 2026-11-13 — v1.4.2 Mahjong Solitaire local handoff
+
+Owner execution selected the accepted Rev 2 brief on 2026-11-12, based on
+`56b58af`; closeout resumed after “continue” on 2026-11-13. This records local
+implementation/verification, not owner acceptance or permission to release.
+
+- `mahjong-solitaire-1`: Classic plus ten single-delta rulesets, all enabled;
+  no variant groups. `(mahjong-solitaire, UTC date)` is the sole daily board key.
+- Quick/Turtle/Fortress are bands drawn first from SplitMix64. Triple skips that
+  draw and always uses the frozen 108-tile Turtle. Half-step layouts are immutable;
+  a future layout change requires a family engine-version bump.
+- Witness-validated reverse-deals only, including actual Avalanche column motion;
+  witnesses remain private test proofs, never player-solution judges. One hundred
+  attempts per band, fallback toward Quick, then a preparation rejection. A failed
+  bounded Shuffle preserves the round; a successful one validates its variant
+  witness and clears Undo. No exact solver or silent position/layout change.
+- `brief-v1` defaults: completion 1,000; pair 100; triple 150; standard second 5;
+  hint 100 deduction; shuffle 50 deduction; countdown second 5; remaining heart 250. **Brief wording priority:** locked §5/A2 deductions are used for every
+  preset, despite §3's “Hint free” description for Classic. Unlimited helpers
+  remain unlimited except hint-budget/shuffle-budget (three each). Countdown's
+  “Standard + remaining-seconds bonus” in §3 is implemented as two explicit score
+  terms, not replacement of the standard term. These are disclosed implementation
+  choices under the locked values, not separately supplied owner decisions.
+- Exact numeric move shapes; countdown alone carries monotonic `at`. Score is
+  awarded on clear only; timed/hearts/blocked/capped losses retain the board and
+  produce no score/result. The existing leave/try-another flow abandons the exact
+  ranked session. The 10,000th accepted move can still win if it clears the board.
+- Family Stage/motion from day one; shared Card beats, SiteHeader, session contract
+  and selector remain unchanged. Entrance 2,000ms uniform layer order, removal
+  500ms; active deadlines own input. Reuse existing generic audio, no new assets.
+- Original SVG artwork; the supplied demo is geometry/behaviour reference only.
+  The image exists at `docs/reference/mahjong-chatgpt.png`, not the plural path
+  in the brief; read it there without moving or incorporating it as an asset.
+- Exactly two shared source touches and generated projections; no new §8A
+  carve-out, contract/server/schema/migration/dependency/config change. Existing
+  generator Stage discovery and shared scoring/i18n need zero source edits.
+- All focused final checks pass: 24 units, 10 isolated real-D1 cases, 33 solved /
+  66 rejected vectors in six runtimes and 32 one-worker Chromium cases, plus
+  scoped format/lint/types (0/0), purity boundaries, build and lazy isolation.
+  Full verify, device measurements and release work remain outside this scope.
+
+See the top of CODEMAP and PHASE_REPORTS. Existing signed-in browser reload /
+abandonment policy is still separately deferred; this work does not waive it.
+No new dependencies or version upgrades. No commit, push, deployment or Batch B.

@@ -65,6 +65,47 @@ Copy this file to `docs/puzzles/<id>.md` before building a puzzle. The owner app
 - Style profile: shape families and proportions, topology, depth cues, motion style, sound palette, backdrop kinds:
 - Themeable surfaces:
 
+## Per-family shell (standing owner rule, 2026-11-12)
+
+From now on, every puzzle family owns its own standards for presentation.
+The shared centered shell is the default, not the rule.
+
+- **Stage:** each family owns its own Stage (`src/lib/puzzles/<id>/Stage.svelte`).
+  The stage mode (`centered`, `wide`, `full`) is the family's own layout choice,
+  not a shared mode. The shared `RoundStage` stays as the default centered stage;
+  a family supplies its own Stage when the default cannot express its layout.
+  A family Stage is a drop-in replacement for `RoundStage`: same props (`phase`,
+  `title`, `best`, `ready`, `failed`, `stack`, `playedCount`, `onretry`, the
+  board / ending / result snippets) and the same three exported methods
+  (`present(beat)`, `stop()`, `measureFrame()`). Same inert rules, same card
+  beats through `cardSceneMotion`, same session chrome rendered (card, played
+  stack, ending overlay, result slot, loading/failed card, footer bar).
+- **Footer placement is stage chrome:** the Stage decides where the help triggers
+  and the family high score sit — bottom, left rail, right rail. The `PuzzleHelp`
+  component, the help content (each manifest's `presentation.help`) and the
+  high-score value stay shared; only the position moves.
+- **Top header stays shared:** `SiteHeader` (brand, game title, account, sound)
+  is the Morphi identity bar and is never redesigned per family. The title is
+  per-family data, revealed in the header at the flip as part of the card ritual.
+- **Motion:** each family owns its own motion file (`src/lib/puzzles/<id>/motion.ts`),
+  anime.js only, same wrapper pattern. The shared `src/lib/ui/motion.ts` keeps
+  only the card scene (`cardSceneMotion`, `cardProofMotion`) and the generic
+  helpers. The card opening (deal / flip / unfold) stays shared forever and is
+  never reinvented per family.
+- **Engine:** the engine contract stays shared (`src/lib/engine/` — contract
+  types, SplitMix64 RNG, scoring framework, theme generator) and the server
+  replay stays shared. Each family's logic (`src/lib/puzzles/<id>/logic.ts` —
+  rules, moves, generation, scoring formula) is already private to that family.
+- **Sound sets are per family:** each family owns its own sound set
+  (Block sounds cannot be used with Connect, and so on). The sound engine
+  stays shared. The loader loads only the current family's sounds, lazily,
+  and releases the previous family's decoded buffers on family switch —
+  never all families upfront, never held forever (the RAM rule, owner
+  2026-11-12). The card's own sounds (`deal`, `flip`) stay shared.
+- **What never moves:** the selector, the daily issue (server hands a family a
+  seed, the family returns a solvable board), the result record in the standard
+  shape, server-enforced timing floors, and checkpoints.
+
 ## Puzzle-specific backdrop (standing owner rule, 2026-10-27)
 
 - Declare this puzzle's allowed objects and the code/data that owns their shapes:
@@ -91,6 +132,8 @@ Copy this file to `docs/puzzles/<id>.md` before building a puzzle. The owner app
 ## Feedback and feel
 
 - Animations (trigger, duration token, reduced-motion alternative, paired sound):
+  each family's animations live in its own `motion.ts` (anime.js only, same
+  wrapper pattern); the card opening stays shared.
 - Arrival and exit animation:
 - Replay hook (personal best, "so close", next puzzle):
 
@@ -125,8 +168,8 @@ Copy this file to `docs/puzzles/<id>.md` before building a puzzle. The owner app
 ## Entrance and timing contract
 
 Describe the per-object entrance, size-to-duration mapping, ready/input lock,
-visible-time pauses, reduced motion and cleanup. Use the shared anime.js
-`src/lib/ui/motion.ts` wrapper for presentation only; an active-time phase
+visible-time pauses, reduced motion and cleanup. Use anime.js via the family's
+own `src/lib/puzzles/<id>/motion.ts` for presentation only; an active-time phase
 deadline owns readiness, never an animation completion callback. Arrival must
 finish before a free preview begins, and hiding must finish before scoring
 time/input starts. Rank timing allowances must be fixed by the server from
@@ -142,7 +185,7 @@ result visible after fold-away, with score, Your high score, statistics and
 Next, while the played stack remains visible.
 
 Actual registry game views accept `entranceReady` (default `true` for isolated
-routes). The shared stage opens that gate after unfolding. Start the game's own
+routes). The family's Stage opens that gate after unfolding. Start the game's own
 entrance once, then notify optional `onready` when its logical phase becomes
 playable. This notification updates shell presentation only. Keep the engine,
 input readiness and scoring clock independent of animation callbacks; do not

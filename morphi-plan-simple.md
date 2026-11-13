@@ -1,5 +1,48 @@
 # Morphi: Simple Plan
 
+## Active status — v1.4.2 source commit and push authorized (2026-11-13)
+
+The owner said “comit and push to github”, authorizing the completed Mahjong
+Classic + ten Batch A source handoff to existing `origin/main`. This supersedes
+the earlier local commit/push stop for this handoff only. Include the family,
+focused tests/vectors, two shared source touches, generated projections, related
+docs and owner-provided brief/demo/reference image/template update. Keep build
+evidence local and exclude `.cursor/` and `.vscode/mcp.json`.
+
+The focused evidence recorded below is unchanged; no new verification,
+physical-device review or owner functional acceptance is inferred. Full
+`bun run verify` remains deferred. No Batch B, deployment, provisioning or
+production release is authorized. The prior closeout below remains the local
+implementation/evidence record; its commit/push restriction is superseded here.
+
+## Active status — v1.4.2 Mahjong Solitaire built; focused checks complete; STOP (2026-11-13)
+
+The owner selected the accepted Rev 2 brief at `56b58af` on 2026-11-12.
+Classic passed its baseline gate before exactly ten Batch A variants were added.
+**11 enabled presets / 0 variant groups**, seeded Quick/Turtle/Fortress bands,
+and a fixed 108-tile Triple exception. One reused `(mahjong-solitaire, UTC date)`
+board per day. Family-owned SVG Game, Stage and motion from day one.
+
+Focused format/lint, types (0 errors/0 warnings), 24 units, boundary probes,
+build/lazy isolation, 33 solved/66 rejected frozen vectors in six runtimes,
+10 isolated real-D1 cases and 32 single-worker Chromium cases pass. Nine captures
+cover all three bands at 390×844, 844×390 and 1280×800; Quick reaches the 44px
+portrait target and larger boards have Fit/zoom/pan without page overflow.
+The runtime process completed before its agent's usage-limit failure; the owner
+said “continue” and the parent inspected the completed evidence and closed docs.
+No substitute-agent verification or owner functional acceptance is claimed.
+
+Exactly two shared source touches (entrance constant and vector filter), plus
+regenerated registries. No new §8A carve-out, shared contract/server/schema,
+selector, shared shell/motion, dependency or other-family edits. Supplied
+brief/demo/style image, template and editor/MCP changes remain preserved.
+
+See [CODEMAP inventory, evidence, choices and limits](docs/CODEMAP.md).
+**STOP:** no full verify/global lint/other-family suites, physical-device checks,
+Batch B–J, new sounds, commit, push, deployment or release. Owner review is next.
+The existing signed-browser reload/abandonment policy remains separately deferred;
+practice checkpoints and D1 ranked resume are not a waiver of that issue.
+
 ## Active status — v1.4.1 rev 3 built and focused verification complete; STOP (2026-11-09)
 
 Resumed the preserved pre-build handoff at `56e6460`, without reset/restart.

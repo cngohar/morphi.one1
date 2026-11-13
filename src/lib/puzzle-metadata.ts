@@ -327,6 +327,566 @@ const metadata = {
 			}
 		}
 	},
+	['mahjong-solitaire']: {
+		engineVersion: 'mahjong-solitaire-1',
+		titleAfterEntrance: true,
+		scoring: {
+			version: 'brief-v1',
+			fields: ['completion', 'pair', 'triple', 'second', 'hint', 'shuffle', 'countdown', 'heart'],
+			defaults: {
+				completion: 1000,
+				pair: 100,
+				triple: 150,
+				second: 5,
+				hint: 100,
+				shuffle: 50,
+				countdown: 5,
+				heart: 250
+			}
+		},
+		variants: [
+			{
+				id: 'mahjong-solitaire:classic',
+				name: 'variant.mahjong-solitaire:classic',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.step3'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:triple-match',
+				name: 'variant.mahjong-solitaire:triple-match',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.rule.triple-match', 'mahjong.step2', 'mahjong.step3'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.triple', field: 'triple', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:exact-only',
+				name: 'variant.mahjong-solitaire:exact-only',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.exact-only'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:face-down-peek',
+				name: 'variant.mahjong-solitaire:face-down-peek',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.face-down-peek'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:no-highlight',
+				name: 'variant.mahjong-solitaire:no-highlight',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.no-highlight'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:countdown',
+				name: 'variant.mahjong-solitaire:countdown',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.countdown'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' },
+						{ label: 'scoring.mahjong.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				},
+				maxSeconds: 600,
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.mahjong.headline', cap: 'ending.mahjong.over' },
+					subline: { key: 'ending.mahjong.subline', values: ['pairs', 'elapsed'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Clear the board; timeout, exhausted hearts or a blocked board without a rescue ends the run with no saved score.'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:three-hearts',
+				name: 'variant.mahjong-solitaire:three-hearts',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.three-hearts'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' },
+						{ label: 'scoring.mahjong.heart', field: 'heart', sign: '+' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.mahjong.headline', cap: 'ending.mahjong.over' },
+					subline: { key: 'ending.mahjong.subline', values: ['pairs', 'elapsed'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Clear the board; timeout, exhausted hearts or a blocked board without a rescue ends the run with no saved score.'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:no-undo',
+				name: 'variant.mahjong-solitaire:no-undo',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.no-undo'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.mahjong.headline', cap: 'ending.mahjong.over' },
+					subline: { key: 'ending.mahjong.subline', values: ['pairs', 'elapsed'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Clear the board; timeout, exhausted hearts or a blocked board without a rescue ends the run with no saved score.'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:hint-budget',
+				name: 'variant.mahjong-solitaire:hint-budget',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.hint-budget'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:shuffle-budget',
+				name: 'variant.mahjong-solitaire:shuffle-budget',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.shuffle-budget'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.mahjong.headline', cap: 'ending.mahjong.over' },
+					subline: { key: 'ending.mahjong.subline', values: ['pairs', 'elapsed'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Clear the board; timeout, exhausted hearts or a blocked board without a rescue ends the run with no saved score.'
+				}
+			},
+			{
+				id: 'mahjong-solitaire:avalanche',
+				name: 'variant.mahjong-solitaire:avalanche',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'completion',
+						'pair',
+						'triple',
+						'second',
+						'hint',
+						'shuffle',
+						'countdown',
+						'heart'
+					],
+					defaults: {
+						completion: 1000,
+						pair: 100,
+						triple: 150,
+						second: 5,
+						hint: 100,
+						shuffle: 50,
+						countdown: 5,
+						heart: 250
+					}
+				},
+				help: {
+					steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.rule.avalanche'],
+					rows: [
+						{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+						{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+						{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+					],
+					note: 'mahjong.note',
+					tips: 'mahjong.tips'
+				}
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.mahjong.headline' },
+			subline: { key: 'ending.mahjong.subline', values: ['pairs', 'elapsed'] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition: 'Legal matching removals leave no tiles on the board.'
+		},
+		presentation: {
+			name: 'v1.game.mahjong-solitaire',
+			scoringLabels: {
+				completion: 'scoring.mahjong.completion',
+				pair: 'scoring.mahjong.pair',
+				triple: 'scoring.mahjong.triple',
+				second: 'scoring.mahjong.second',
+				hint: 'scoring.mahjong.hint',
+				shuffle: 'scoring.mahjong.shuffle',
+				countdown: 'scoring.mahjong.countdown',
+				heart: 'scoring.mahjong.heart'
+			},
+			help: {
+				steps: ['mahjong.step1', 'mahjong.step2', 'mahjong.step3'],
+				rows: [
+					{ label: 'scoring.mahjong.completion', field: 'completion', sign: '+' },
+					{ label: 'scoring.mahjong.pair', field: 'pair', sign: '+' },
+					{ label: 'scoring.mahjong.second', field: 'second', sign: '+' },
+					{ label: 'scoring.mahjong.hint', field: 'hint', sign: '−' },
+					{ label: 'scoring.mahjong.shuffle', field: 'shuffle', sign: '−' }
+				],
+				note: 'mahjong.note',
+				tips: 'mahjong.tips'
+			},
+			backdrop: {
+				items: [
+					{ id: 'tile-pair', path: 'M6 8h22v40H6ZM32 16h22v40H32ZM12 18h10v20H12ZM38 26h10v20H38Z' }
+				],
+				fill: 'outline'
+			}
+		}
+	},
 	['memory']: {
 		engineVersion: 'memory-1',
 		scoring: {

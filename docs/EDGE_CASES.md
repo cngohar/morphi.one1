@@ -2,6 +2,49 @@
 
 Catalog of edge cases with the expected behavior. Every case needs a test (unit, property, Playwright, or a manual drill noted in the phase report). Each phase's acceptance names the categories it must cover. Add every real bug found in play, with a regression test. Format: case → expected behavior.
 
+## Mahjong Solitaire v1.4.2
+
+- Half-step cover, partial side adjacency and Turtle in-row head/tail → rectangle
+  geometry, not grid adjacency; frozen counts and Fortress's 29 free positions
+  are verified in family units.
+- Wrong identical-copy choice / no visible match → Undo or certified Shuffle can
+  rescue where available; no-rescue, hearts, timeout and cap losses retain an
+  inspectable unsaved board. Units exercise blocked/rescue and failed Shuffle
+  source preservation; Chromium covers hearts/countdown loss and helper budgets.
+- Generation and Shuffle exhaustion → bounded attempts, no random uncertified
+  deal; initial generation falls back toward Quick then rejects, Shuffle rejects
+  without modifying the board. Initial forced exhaustion is not fault-injected.
+- Triple → fixed 108 tiles and witnesses in triples; no ordinary band draw.
+  Exact-only → four bonus faces ×2; different bonus faces cannot match.
+  Per-preset units, frozen vectors and solved/mismatch Chromium cases.
+- Face-down peek → free hidden tile only, numeric recorded move, no points,
+  permanent face-up through Undo. Hidden DOM faces/aria remain undisclosed until
+  reveal; rules units plus peek/solve Chromium and frozen replay vectors.
+- Avalanche → same-layer/same-column tiles cascade screen-down into vacancies;
+  recompute freedom and restore coordinates on Undo. Hint maximizes net free
+  count after slides, not new IDs alone; seeded exhaustive-candidate units.
+- Restart → same seed/rules/board even for anonymous daily metadata; retain helper
+  costs, hearts, elapsed time and consumed moves. Shuffle clears Undo. Own units.
+- Countdown at exact zero or with invalid moves → legal timeout loses before the
+  next removal; illegal actions/indices still throw. Server elapsed score rejects
+  forged completion after the limit. Hidden practice pauses; ranked time remains
+  server-owned. Units, fake-clock Chromium and real-D1 resume/time test.
+- 10,000th accepted move → loss unless it clears the board; terminal moves reject.
+  Heart mismatches are recorded and keep the newest tile selected; units/browser.
+- Timing floors 2,499/2,500ms and 9,999/10,000ms → exact D1 downgrade boundaries;
+  unranked save consumes the attempt and adds no daily board row. All bands tested.
+- Early input, repeated keys, entrance hide/resume, resize, navigation and motion
+  failure → logical 2,000ms deadline, guarded cleanup, safe settling, no corrupt
+  moves. Chromium single-worker cases; practice reload replays checkpoint moves.
+- Narrow Turtle/Fortress → Fit plus readable zoom and panning inside the stage;
+  no page overflow. Three bands at all three viewports have retained captures.
+  No slide-to-match/path gesture exists in Batch A; drag is viewport panning only.
+- Missing audio asset → existing generic sound engine falls back silently; no
+  new family sound asset or separate missing-audio drill in this focused suite.
+- Existing shared signed-in reload/page-hide abandonment → remains a separate
+  deferred pre-launch policy issue. D1 ranked resume and practice browser reload
+  pass; a signed-in browser reload was not re-tested or waived in this phase.
+
 ## Nonogram v1.4.1
 
 - Empty/full/zero-slack clues and colour adjacency → consistent 0 rendering,

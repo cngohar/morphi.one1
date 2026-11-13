@@ -17,6 +17,79 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.4.2 Mahjong Solitaire — source commit and push authorized (2026-11-13)
+
+The owner said “comit and push to github”, authorizing the completed Mahjong
+Classic + ten Batch A source handoff to existing `origin/main`. This supersedes
+the earlier local commit/push stop for this handoff only. Include the family,
+focused tests/vectors, two shared source touches, generated projections, related
+docs and owner-provided brief/demo/reference image/template update. Keep build
+evidence local and exclude `.cursor/` and `.vscode/mcp.json`.
+
+The focused evidence recorded below is unchanged; no new verification,
+physical-device review or owner functional acceptance is inferred. Full
+`bun run verify` remains deferred. No Batch B, deployment, provisioning or
+production release is authorized. The prior closeout below remains the local
+implementation/evidence record; its commit/push restriction is superseded here.
+
+## v1.4.2 Mahjong Solitaire — baseline + Batch A locally complete; STOP (2026-11-13)
+
+- **Built:** At `56b58af`, Classic first, then exactly ten Batch A rulesets.
+  Eleven enabled presets, zero variant groups, three ordinary seeded bands and
+  the fixed Triple Turtle exception. Family-owned `Stage.svelte` and `motion.ts`,
+  original traditional SVG faces, bounded witness-validated generation, replay,
+  helpers, scoring, timing, endings/losses, keyboard, Fit/zoom/pan and checkpoints.
+  Existing generic daily/admin plumbing is reused unchanged. [Inventory and
+  full evidence](CODEMAP.md#v142-mahjong-solitaire--built-and-focused-verification-complete-stop-closeout-2026-11-13).
+- **Shared changes:** Only `round-timing.ts` (+2,000ms constant),
+  `check-vectors.ts` (+family filter) and generated registry projections.
+  **New carve-outs: none.** No shared engine/selector/server/schema/migration,
+  shared shell/motion, other-family, dependency or deployment configuration edit.
+- **Skipped:** Batch B–J, other baselines, multiplayer, wildcards, new sound
+  assets, full verify/global lint/untouched-family tests, physical-device or
+  production measurements, commit/push/deployment/provisioning/release.
+- **Known issues/limits:** No required focused check remains failing. The existing
+  shared signed-in browser reload/abandonment policy remains separately deferred;
+  this phase verifies practice reload and D1 ranked resume, not that browser flow.
+  Tiny Turtle/Fortress Fit tiles require zoom on phones. No owner acceptance is
+  inferred. Initial forced generation-exhaustion fallback is bounded in code but
+  not fault-injected; rejected Shuffle immutability is tested.
+- **Decisions:** Locked A2/§5 helper deductions take priority over Classic's “Hint
+  free” wording; only the budget variants have usage limits. Countdown adds its
+  §3 remaining-time bonus to the standard formula. See DECISIONS for details.
+  `mahjong-solitaire-1`, `brief-v1`; existing anime.js 4.5.0/TypeScript pin reused,
+  no dependency change. Supplied style image was read at its actual singular
+  `docs/reference/` path; owner assets/template/editor changes were preserved.
+- **Questions for the owner:** No scope question blocks this local handoff;
+  functional/visual review is the next owner action. No future work authorised.
+- **Evidence:** All logs at `build/v1.4.2/final/`; complete acceptance mapping in
+  CODEMAP. Baseline gate passed nine units and fifteen Chromium cases across
+  serial runs before Batch A; final results below include the integrated family.
+
+| Acceptance                                           | Evidence                                          | Result                                    |
+| ---------------------------------------------------- | ------------------------------------------------- | ----------------------------------------- |
+| Scoped format/lint/types                             | `prettier.log`, `eslint.log`, `svelte-check.log`  | PASS; 0 type errors/warnings              |
+| Rules, geometry, witnesses, scoring and helpers      | `unit.log`                                        | PASS; 24/24                               |
+| Pure/import/lazy family boundaries                   | `boundaries.log`, `build.log`, `lazy-mahjong.log` | PASS                                      |
+| Six-runtime frozen vectors                           | `vectors.log`                                     | PASS; 33 solved / 66 rejected per runtime |
+| Real D1 daily/rank/scoring/audit/history             | `mahjong-d1.log`                                  | PASS; 10/10                               |
+| Chromium gameplay/lifecycle and nine layout captures | `mahjong-e2e.log`, `build/v1.4.2/browser/`        | PASS; 32/32, one worker                   |
+
+- **Measurements:** Automated browser bounds at 390×844, 844×390 and 1280×800:
+  zero horizontal page overflow; Quick ≥44px portrait; larger-band zoom/pan
+  assertions pass. Workspace/emulation only; no named physical-device/network
+  class, cold/preloaded device benchmark, median or p95 collected. No performance
+  claim or waiver is inferred from test durations.
+- **Waivers:** None added. Full verify remains explicitly deferred, not passed.
+- **Agent evidence:** Required sol/high agents authored engine/UI; required
+  luna/max agents ran checks. Runtime agent hit its usage limit after launching
+  Chromium; that process completed all 32 cases. Following the owner's “continue”,
+  the parent inspected the completed logs/captures and wrote the closeout; no
+  replacement-model or additional independent-check claim.
+- **Owner responsibilities:** Review the local family and retained captures;
+  any acceptance, future work, source handoff or deployment needs owner direction.
+- **CODEMAP updated:** yes. **STOP; no commit, push or deployment.**
+
 ## v1.4.1 rev 3 — Nonogram locally complete; baseline + Batch A STOP (2026-11-09)
 
 - **Built:** Resumed `56e6460` without restart. Classic verified before ten

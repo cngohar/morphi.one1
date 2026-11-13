@@ -2,17 +2,20 @@
 import type { PuzzleId, PuzzleManifest } from './engine/contract.js';
 import { manifest as manifest0 } from './puzzles/block-placement/manifest.js';
 import { manifest as manifest1 } from './puzzles/connect/manifest.js';
-import { manifest as manifest2 } from './puzzles/memory/manifest.js';
-import { manifest as manifest3 } from './puzzles/nonogram/manifest.js';
+import { manifest as manifest2 } from './puzzles/mahjong-solitaire/manifest.js';
+import { manifest as manifest3 } from './puzzles/memory/manifest.js';
+import { manifest as manifest4 } from './puzzles/nonogram/manifest.js';
 export const catalog: Record<PuzzleId, PuzzleManifest> & {
 	block: typeof manifest0;
 	connect: typeof manifest1;
-	memory: typeof manifest2;
-	nonogram: typeof manifest3;
+	'mahjong-solitaire': typeof manifest2;
+	memory: typeof manifest3;
+	nonogram: typeof manifest4;
 } = {
 	['block']: manifest0,
 	['connect']: manifest1,
-	['memory']: manifest2,
-	['nonogram']: manifest3
+	['mahjong-solitaire']: manifest2,
+	['memory']: manifest3,
+	['nonogram']: manifest4
 };
 export { puzzleMessages } from './puzzle-messages.js';

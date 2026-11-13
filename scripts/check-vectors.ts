@@ -11,7 +11,8 @@ const run = promisify(execFile);
 const memoryOnly = process.argv.includes('--memory');
 const blockOnly = process.argv.includes('--block');
 const nonogramOnly = process.argv.includes('--nonogram');
-if ([memoryOnly, blockOnly, nonogramOnly].filter(Boolean).length > 1)
+const mahjongOnly = process.argv.includes('--mahjong-solitaire');
+if ([memoryOnly, blockOnly, nonogramOnly, mahjongOnly].filter(Boolean).length > 1)
 	throw new Error('Choose one family vector filter.');
 const prefix = memoryOnly ? 'memory-' : blockOnly ? 'block-' : '';
 const directory = await mkdtemp(join(tmpdir(), 'morphi-vectors-'));
@@ -31,7 +32,7 @@ try {
 		['worker', 'browser']
 	] as const) {
 		let source = `tests/vectors/${prefix}${entry}.ts`;
-		if (nonogramOnly) {
+		if (nonogramOnly || mahjongOnly) {
 			source = join(directory, `${entry}.ts`);
 			const harness =
 				entry === 'node'
@@ -41,7 +42,7 @@ try {
 						: 'export default { async fetch() { return Response.json(await verifyVectors()); } };';
 			await writeFile(
 				source,
-				`import { verifyVectors } from ${JSON.stringify(resolve('tests/vectors/nonogram-runner.ts'))};\n${harness}\n`
+				`import { verifyVectors } from ${JSON.stringify(resolve(`tests/vectors/${mahjongOnly ? 'mahjong-solitaire' : 'nonogram'}-runner.ts`))};\n${harness}\n`
 			);
 		}
 		await run('bun', [

@@ -1,5 +1,147 @@
 # CODEMAP.md
 
+## v1.4.2 Mahjong Solitaire — source commit and push authorized (2026-11-13)
+
+The owner said “comit and push to github”, authorizing the completed Mahjong
+Classic + ten Batch A source handoff to existing `origin/main`. This supersedes
+the earlier local commit/push stop for this handoff only. Include the family,
+focused tests/vectors, two shared source touches, generated projections, related
+docs and owner-provided brief/demo/reference image/template update. Keep build
+evidence local and exclude `.cursor/` and `.vscode/mcp.json`.
+
+The focused evidence recorded below is unchanged; no new verification,
+physical-device review or owner functional acceptance is inferred. Full
+`bun run verify` remains deferred. No Batch B, deployment, provisioning or
+production release is authorized. The prior closeout below remains the local
+implementation/evidence record; its commit/push restriction is superseded here.
+
+## v1.4.2 Mahjong Solitaire — built and focused verification complete; STOP (closeout 2026-11-13)
+
+The owner selected the accepted Rev 2 brief on 2026-11-12 at HEAD `56b58af`:
+Classic first, then exactly ten Batch A variants, per-family from day one,
+focused §9 only, no commit/push/deployment. Source and runtime evidence were
+completed on 2026-11-12; the owner said “continue” on 2026-11-13 after the runtime
+agent hit its usage limit. The browser process had independently finished its
+entire run successfully; the parent inspected that completed log and closed the
+documentation. No substitute-model verification or owner acceptance is inferred.
+
+**Built:** `mahjong-solitaire-1`, **11 enabled presets / 0 variant groups**.
+Quick 56, Turtle 144 and frozen Morphi Fortress 144 are seeded bands, not variants;
+Triple alone uses the fixed 108-tile layout without a band draw. One reused
+`(mahjong-solitaire, UTC date)` daily board per day. No new daily subsystem.
+
+### Files and scope
+
+- Design: `docs/puzzles/mahjong-solitaire.md` replaces the stale v1.3.4 proposal;
+  `src/lib/puzzles/mahjong-solitaire/README.md` records all eleven rulesets.
+- Family engine/data: `src/lib/puzzles/mahjong-solitaire/logic.ts`, `manifest.ts`,
+  `scoring.ts`, `messages.ts`.
+- Family presentation: `Game.svelte`, `View.svelte`, **`Stage.svelte` and `motion.ts`**
+  in the same directory. Original SVG traditional faces include eight distinct
+  plant drawings. The shared SiteHeader and Card beats are reused unchanged.
+- Units: `src/lib/puzzles/mahjong-solitaire/logic.test.ts`, `variants.test.ts`.
+- Frozen vectors: `tests/vectors/mahjong-solitaire.json`,
+  `tests/vectors/mahjong-solitaire-runner.ts`.
+- Real D1: `tests/integration/mahjong-solitaire.test.ts`.
+- Chromium: `tests/e2e/mahjong-solitaire.spec.ts`.
+- Exactly two shared source touches: `src/lib/round-timing.ts` adds
+  `MAHJONG_ENTRANCE_MS = 2000`; `scripts/check-vectors.ts` adds
+  `--mahjong-solitaire` using temporary runtime wrappers.
+- Ran `bun run registry:generate`; generated changes are `src/lib/catalog.ts`,
+  `family-index.ts`, `puzzle-messages.ts`, `puzzle-metadata.ts`, `registry.ts`.
+  No generated file was hand-edited. **Zero-edit exceptions:** existing generator
+  Stage discovery and generic `src/lib/scoring.ts` already work; neither needed
+  a source change. Shared i18n consumes the generated puzzle messages unchanged.
+- Reporting: this CODEMAP, simple plan, PHASE_REPORTS, DECISIONS and EDGE_CASES.
+
+**Carve-out applied: NONE new.** §8A is reuse only. No shared engine, selector,
+server, database schema, migration, package/config/dependency, PlaySession,
+shared game-shell CSS, shared motion or other-family source changes.
+The owner brief/demo/style image and pre-existing template/editor/MCP changes
+were preserved. The supplied image is actually at
+`docs/reference/mahjong-chatgpt.png` (singular directory); it was read there,
+not moved or made a runtime asset.
+
+### Rules, safety and implementation choices
+
+SplitMix64 draws the ordinary band first, then bounded reverse-deals and
+unbiased face-group shuffles. Half-step rectangles govern cover/side freedom;
+Fortress opens with 29 free positions. Each issuance validates its witness;
+Triple proves triples, Avalanche simulates column slides. Witnesses live in a
+WeakMap, never in issued JSON/checkpoints or player-solution validation. Replays
+judge the actual player board. Generation tries at most 100 times per band,
+falls back toward Quick, then rejects; there is no runtime exact solver.
+
+Numeric wire keys are exact: pair `tileA,tileB`; triple adds `tileC`; peek `tile`;
+helpers `action`. Countdown alone requires `at` on its pair/helper moves.
+Illegal keys/actions/indices are rejected even at timeout. Successful Shuffle
+certifies the remaining geometry under its rules and clears Undo; a bounded
+failed attempt preserves the source state. Hint ranks net free-tile gain after
+Avalanche slides. Peek remains face-up through Undo. Restart reconstructs the
+same rules/seed from anonymous rule metadata while retaining spent helpers,
+hearts, elapsed time and move count. The 10,000th accepted move loses unless it
+clears the board. Loss leaves the board viewable and saves no result; leaving
+uses the existing exact-session abandonment flow.
+
+Scoring uses immutable per-preset `brief-v1` defaults. **Wording choices:** the
+locked §5/A2 formula deducts hints/shuffles for all presets, despite §3 Classic's
+“Hint free” wording; helpers are unlimited except in their respective budget
+variants. Countdown follows §3's “Standard + remaining-seconds bonus”: normal
+under-par seconds plus the separate remaining-countdown coefficient (both
+start at 5). Three-hearts adds 250 per remaining heart. These are reported choices,
+not new owner approvals. Final score is awarded only on completion.
+
+Family motion owns the uniform layer-ordered 2,000ms entrance, 500ms removal,
+column slides, free-edge feedback and failure/reduced-motion settling. Logical
+active deadlines own input, never animation completion. Quick targets ≥44px at
+390px portrait; larger boards have bounded Fit/zoom/panning. No new sound assets.
+
+### Focused evidence
+
+All final runtime logs are under `build/v1.4.2/final/`:
+
+| Acceptance item                                                                                                                              | Evidence                                                                                                                      | Result                                                |
+| -------------------------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ----------------------------------------------------- |
+| Baseline before variants                                                                                                                     | `build/v1.4.2/baseline/`: nine units, scoped lint/types, nine layouts plus corrected six interaction cases across serial runs | PASS                                                  |
+| Scoped formatting and lint                                                                                                                   | `prettier.log`, `eslint.log`; family, two shared touches, own tests/docs and generated projections                            | PASS                                                  |
+| Scoped types                                                                                                                                 | `svelte-kit-sync.log`, `svelte-check.log`                                                                                     | PASS, 0 errors / 0 warnings                           |
+| Geometry, generation, witness tampering, all ten rule deltas, helpers, cap and scoring                                                       | `unit.log`; own logic and variants files only                                                                                 | PASS, 24/24                                           |
+| Import/purity and lazy View/Stage                                                                                                            | `boundaries.log`, `build.log`, `lazy-mahjong.log`; Mahjong-only self-probes and target-only lazy analysis                     | PASS                                                  |
+| Frozen deterministic solved/illegal/incomplete replays                                                                                       | `vectors.log`; Node, Bun, Chromium, Firefox, WebKit and local workerd                                                         | PASS, 33 solved / 66 rejected in each of six runtimes |
+| Daily issuance/replay/save, family cohort, exact floors, attempt consumption, resume/server time, audit, scoring isolation, activity/history | `mahjong-d1.log`; isolated real D1 via `vitest.accounts.config.ts`                                                            | PASS, 10/10                                           |
+| Seeded solves/ending/result/Next, all ten variants, losses, helpers, keyboard, motion, lifecycle and practice checkpoint                     | `mahjong-e2e.log`; Chromium, one worker                                                                                       | PASS, 32/32                                           |
+| Three bands × 390×844 / 844×390 / 1280×800, no page overflow, Quick target and larger-board Fit/zoom/pan                                     | Nine layout cases; `build/v1.4.2/browser/{quick,turtle,fortress}-<width>x<height>.png`                                        | PASS                                                  |
+
+Vector fingerprint:
+`2561591280cf089f910e58618a92ea4c1d7a625180846fb73d70b6ed5f8e4c85`.
+Representative portrait/landscape/desktop captures were inspected by the parent;
+this is browser emulation, not owner acceptance or physical-device review.
+
+The initial cold development startup failed safely, then passed its focused warm
+retry. A wrong shared-result-copy assertion was corrected; an interrupted Turtle
+case was not counted as a failure/repro. The final uninterrupted 32-case run is
+green. The abandoned exploratory shuffle diagnostic produced no result and is
+not claimed as evidence; bounded failed-shuffle immutability is covered by units.
+
+### Limits and stop
+
+No required focused check remains failing. Real signed-in browser reload/resume
+was not repeated here; the existing shared page-hide/session-abandonment policy
+recorded below remains a separate deferred pre-launch issue. Practice reload and
+server-authoritative ranked resume/time are verified; they do not establish that
+signed-in browser flow. No waiver of that existing issue is implied.
+
+No physical-device, network-profile or production performance measurements were
+run (explicit focused scope). Median/p95 and cold/preloaded device budgets remain
+unmeasured; workspace test durations are not performance proof. Forced initial
+100-attempt exhaustion/fallback was not injected as a separate automated fixture;
+the bound is explicit and failed Shuffle preservation is tested.
+
+**STOP:** no Batch B–J, other baseline, Race/Duel, wildcard tiles, new sounds,
+other-family work, full `bun run verify`, global lint, other-family tests,
+physical-device testing, commit, push, deploy, provisioning or release step.
+Owner functional/visual review is next; no acceptance is inferred.
+
 ## Nonogram shell migration — built; verification STOP, not accepted (2026-11-12)
 
 **Owner acceptance (2026-11-12): ACCEPTED.** Supersedes the prior migration-stop wording; ranked reload/resume is deferred as a separate pre-launch policy decision, proven pre-existing at `e69bfe5`, not a migration issue and not waived.
