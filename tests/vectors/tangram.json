@@ -1,0 +1,3847 @@
+{
+	"generation": [
+		{
+			"seed": "1",
+			"variant": "tangram:classic",
+			"silhouette": {
+				"id": "pyramid",
+				"name": "Pyramid",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 16,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 6,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:classic",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:classic",
+			"silhouette": {
+				"id": "hexagon-c",
+				"name": "Hexagon C",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:flip-off",
+			"silhouette": {
+				"id": "rectangle",
+				"name": "Rectangle",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 16,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 16,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 8,
+					"xq": 0,
+					"yp": 16,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 4,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 4,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 4,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:flip-off",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:flip-off",
+			"silhouette": {
+				"id": "parallelogram",
+				"name": "Parallelogram",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:sei-shonagon",
+			"silhouette": {
+				"id": "sei-convex-2",
+				"name": "Quadrilateral",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 32,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 36,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 8,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 16,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 28,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 16,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 16,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 36,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:sei-shonagon",
+			"silhouette": {
+				"id": "sei-convex-15",
+				"name": "Hexagon",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 8,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 4,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 4,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:sei-shonagon",
+			"silhouette": {
+				"id": "sei-convex-14",
+				"name": "Hexagon",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 8,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 16,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 16,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 12,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 0,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 3,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:double-14",
+			"silhouette": {
+				"id": "double-rectangle-1",
+				"name": "Rectangle",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 16,
+						"xq": 0,
+						"yp": 16,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 24,
+						"yq": 0
+					},
+					{
+						"xp": -8,
+						"xq": 0,
+						"yp": 8,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 16,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": -4,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": -4,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 4,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 4,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 7,
+					"xp": 8,
+					"xq": 0,
+					"yp": 24,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 8,
+					"xp": 16,
+					"xq": 0,
+					"yp": 16,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 9,
+					"xp": 4,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 10,
+					"xp": 4,
+					"xq": 0,
+					"yp": 16,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 11,
+					"xp": 12,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 12,
+					"xp": 12,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 13,
+					"xp": 8,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 2250,
+				"pairs": null,
+				"moves": 14
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:double-14",
+			"silhouette": {
+				"id": "double-rectangle-6",
+				"name": "Rectangle",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": -16
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": -16
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": -8,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": -8,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": -2,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": -4,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": -4,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 2,
+					"yp": 0,
+					"yq": -2,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 7,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": -16,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 8,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": -16,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 9,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": -8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 10,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": -10,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 11,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": -12,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 12,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": -12,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 13,
+					"xp": 0,
+					"xq": 2,
+					"yp": 0,
+					"yq": -10,
+					"rot": 0,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 2250,
+				"pairs": null,
+				"moves": 14
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:double-14",
+			"silhouette": {
+				"id": "double-rectangle-5",
+				"name": "Rectangle",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": -16,
+						"xq": 0,
+						"yp": -16,
+						"yq": 0
+					},
+					{
+						"xp": -8,
+						"xq": 0,
+						"yp": -24,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": -8,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": -16,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": -8,
+					"xq": 0,
+					"yp": -8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 4,
+					"xq": 0,
+					"yp": -4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 4,
+					"xq": 0,
+					"yp": -8,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": -4,
+					"xq": 0,
+					"yp": -4,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": -4,
+					"xq": 0,
+					"yp": -4,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": -4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 7,
+					"xp": -8,
+					"xq": 0,
+					"yp": -24,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 8,
+					"xp": -16,
+					"xq": 0,
+					"yp": -16,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 9,
+					"xp": -4,
+					"xq": 0,
+					"yp": -12,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 10,
+					"xp": -4,
+					"xq": 0,
+					"yp": -16,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 11,
+					"xp": -12,
+					"xq": 0,
+					"yp": -12,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 12,
+					"xp": -12,
+					"xq": 0,
+					"yp": -12,
+					"yq": 0,
+					"rot": 5,
+					"flip": 0
+				},
+				{
+					"piece": 13,
+					"xp": -8,
+					"xq": 0,
+					"yp": -12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 2250,
+				"pairs": null,
+				"moves": 14
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:coloured-map",
+			"silhouette": {
+				"id": "pyramid",
+				"name": "Pyramid",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 16,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 6,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1700,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:coloured-map",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1700,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:coloured-map",
+			"silhouette": {
+				"id": "hexagon-c",
+				"name": "Hexagon C",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1700,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:no-full-size",
+			"silhouette": {
+				"id": "pyramid",
+				"name": "Pyramid",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 16,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 6,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 2100,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:no-full-size",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 2100,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:no-full-size",
+			"silhouette": {
+				"id": "hexagon-c",
+				"name": "Hexagon C",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 2100,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:countdown-120",
+			"silhouette": {
+				"id": "pyramid",
+				"name": "Pyramid",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0,
+					"at": 8000
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 16,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0,
+					"at": 8100
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0,
+					"at": 8200
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 6,
+					"rot": 0,
+					"flip": 0,
+					"at": 8300
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0,
+					"at": 8400
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 0,
+					"flip": 0,
+					"at": 8500
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 1,
+					"at": 8600
+				}
+			],
+			"result": {
+				"score": 2250,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:countdown-120",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0,
+					"at": 8000
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0,
+					"at": 8100
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0,
+					"at": 8200
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0,
+					"at": 8300
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0,
+					"at": 8400
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0,
+					"at": 8500
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0,
+					"at": 8600
+				}
+			],
+			"result": {
+				"score": 2250,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:countdown-120",
+			"silhouette": {
+				"id": "hexagon-c",
+				"name": "Hexagon C",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0,
+					"at": 8000
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0,
+					"at": 8100
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0,
+					"at": 8200
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0,
+					"at": 8300
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0,
+					"at": 8400
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0,
+					"at": 8500
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 1,
+					"at": 8600
+				}
+			],
+			"result": {
+				"score": 2250,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:mistake-limit-4",
+			"silhouette": {
+				"id": "pyramid",
+				"name": "Pyramid",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 16,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 6,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:mistake-limit-4",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:mistake-limit-4",
+			"silhouette": {
+				"id": "hexagon-c",
+				"name": "Hexagon C",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:falling-pieces",
+			"silhouette": {
+				"id": "pyramid",
+				"name": "Pyramid",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0,
+					"at": 8000
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 16,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0,
+					"at": 8100
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0,
+					"at": 8200
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 6,
+					"rot": 0,
+					"flip": 0,
+					"at": 8300
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0,
+					"at": 8400
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 0,
+					"flip": 0,
+					"at": 8500
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 1,
+					"at": 8600
+				}
+			],
+			"result": {
+				"score": 2100,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:falling-pieces",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0,
+					"at": 8000
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0,
+					"at": 8100
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0,
+					"at": 8200
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0,
+					"at": 8300
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0,
+					"at": 8400
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0,
+					"at": 8500
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0,
+					"at": 8600
+				}
+			],
+			"result": {
+				"score": 2100,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:falling-pieces",
+			"silhouette": {
+				"id": "hexagon-c",
+				"name": "Hexagon C",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0,
+					"at": 8000
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0,
+					"at": 8100
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0,
+					"at": 8200
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0,
+					"at": 8300
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0,
+					"at": 8400
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0,
+					"at": 8500
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 1,
+					"at": 8600
+				}
+			],
+			"result": {
+				"score": 2100,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:hint-budget-3",
+			"silhouette": {
+				"id": "pyramid",
+				"name": "Pyramid",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 16,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 6,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:hint-budget-3",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:hint-budget-3",
+			"silhouette": {
+				"id": "hexagon-c",
+				"name": "Hexagon C",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "tangram:no-hint",
+			"silhouette": {
+				"id": "pyramid",
+				"name": "Pyramid",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 8
+					},
+					{
+						"xp": 0,
+						"xq": 8,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 16,
+						"yp": 0,
+						"yq": 8
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 16,
+					"yp": 0,
+					"yq": 8,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 6,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 0,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 6,
+					"yp": 0,
+					"yq": 2,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "tangram:no-hint",
+			"silhouette": {
+				"id": "hexagon-a",
+				"name": "Hexagon A",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 0,
+						"yq": 4
+					},
+					{
+						"xp": 0,
+						"xq": 4,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 12,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 14,
+						"yp": 0,
+						"yq": 2
+					},
+					{
+						"xp": 0,
+						"xq": 10,
+						"yp": 0,
+						"yq": 6
+					},
+					{
+						"xp": 0,
+						"xq": 2,
+						"yp": 0,
+						"yq": 6
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 8,
+					"yp": 0,
+					"yq": 4,
+					"rot": 4,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 2,
+					"rot": 2,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 0,
+					"xq": 4,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 0,
+					"xq": 10,
+					"yp": 0,
+					"yq": 6,
+					"rot": 6,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 0,
+					"xq": 12,
+					"yp": 0,
+					"yq": 0,
+					"rot": 0,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 0,
+					"xq": 0,
+					"yp": 0,
+					"yq": 4,
+					"rot": 0,
+					"flip": 0
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "tangram:no-hint",
+			"silhouette": {
+				"id": "hexagon-c",
+				"name": "Hexagon C",
+				"outline": [
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 4,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 8,
+						"xq": 0,
+						"yp": 0,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 4,
+						"yq": 0
+					},
+					{
+						"xp": 12,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					},
+					{
+						"xp": 0,
+						"xq": 0,
+						"yp": 12,
+						"yq": 0
+					}
+				]
+			},
+			"moves": [
+				{
+					"piece": 0,
+					"xp": 0,
+					"xq": 0,
+					"yp": 12,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 1,
+					"xp": 8,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 2,
+					"xp": 0,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 3,
+					"xp": 8,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 7,
+					"flip": 0
+				},
+				{
+					"piece": 4,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 3,
+					"flip": 0
+				},
+				{
+					"piece": 5,
+					"xp": 12,
+					"xq": 0,
+					"yp": 8,
+					"yq": 0,
+					"rot": 1,
+					"flip": 0
+				},
+				{
+					"piece": 6,
+					"xp": 12,
+					"xq": 0,
+					"yp": 4,
+					"yq": 0,
+					"rot": 1,
+					"flip": 1
+				}
+			],
+			"result": {
+				"score": 1950,
+				"pairs": null,
+				"moves": 7
+			}
+		}
+	]
+}

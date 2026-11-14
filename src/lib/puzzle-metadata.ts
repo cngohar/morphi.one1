@@ -2881,6 +2881,320 @@ const metadata = {
 				fill: 'outline'
 			}
 		}
+	},
+	['tangram']: {
+		engineVersion: 'tangram-1',
+		titleAfterEntrance: true,
+		scoring: {
+			version: 'brief-v1',
+			fields: ['completion', 'piece', 'second', 'hint'],
+			defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+		},
+		variants: [
+			{
+				id: 'tangram:classic',
+				name: 'variant.tangram:classic',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.step3'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			},
+			{
+				id: 'tangram:flip-off',
+				name: 'variant.tangram:flip-off',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.flip-off'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			},
+			{
+				id: 'tangram:sei-shonagon',
+				name: 'variant.tangram:sei-shonagon',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.sei-shonagon'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			},
+			{
+				id: 'tangram:double-14',
+				name: 'variant.tangram:double-14',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 50, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1.double', 'tangram.step2', 'tangram.rule.double-14'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			},
+			{
+				id: 'tangram:coloured-map',
+				name: 'variant.tangram:coloured-map',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'hint'],
+					defaults: { completion: 1000, piece: 100, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.coloured-map'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			},
+			{
+				id: 'tangram:no-full-size',
+				name: 'variant.tangram:no-full-size',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.no-full-size'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			},
+			{
+				id: 'tangram:countdown-120',
+				name: 'variant.tangram:countdown-120',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.countdown-120'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.remaining', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				},
+				maxSeconds: 120,
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.tangram.headline', cap: 'ending.tangram.timeUp' },
+					subline: { key: 'ending.tangram.subline', values: [] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Complete before 120 seconds; timeout keeps the failed board with no score saved.'
+				}
+			},
+			{
+				id: 'tangram:mistake-limit-4',
+				name: 'variant.tangram:mistake-limit-4',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.mistake-limit-4'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.tangram.headline', cap: 'ending.tangram.mistakes' },
+					subline: { key: 'ending.tangram.subline', values: [] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Complete before four rejected wrong-slot snap attempts; exhaustion keeps the failed board with no score saved.'
+				}
+			},
+			{
+				id: 'tangram:falling-pieces',
+				name: 'variant.tangram:falling-pieces',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.falling-pieces'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			},
+			{
+				id: 'tangram:hint-budget-3',
+				name: 'variant.tangram:hint-budget-3',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.hint-budget-3'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			},
+			{
+				id: 'tangram:no-hint',
+				name: 'variant.tangram:no-hint',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: ['completion', 'piece', 'second', 'hint'],
+					defaults: { completion: 1000, piece: 100, second: 5, hint: 100 }
+				},
+				help: {
+					steps: ['tangram.step1', 'tangram.step2', 'tangram.rule.no-hint'],
+					rows: [
+						{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+						{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+						{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+					],
+					note: 'tangram.note',
+					tips: 'tangram.tips'
+				}
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.tangram.headline' },
+			subline: { key: 'ending.tangram.subline', values: [] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition: 'Every piece exactly covers the silhouette, with no overlap or gap.'
+		},
+		presentation: {
+			name: 'v1.game.tangram',
+			help: {
+				steps: ['tangram.step1', 'tangram.step2', 'tangram.step3'],
+				rows: [
+					{ label: 'scoring.tangram.completion', field: 'completion', sign: '+' },
+					{ label: 'scoring.tangram.piece', field: 'piece', sign: '+' },
+					{ label: 'scoring.tangram.second', field: 'second', sign: '+' },
+					{ label: 'scoring.tangram.hint', field: 'hint', sign: '−' }
+				],
+				note: 'tangram.note',
+				tips: 'tangram.tips'
+			},
+			scoringLabels: {
+				completion: 'scoring.tangram.completion',
+				piece: 'scoring.tangram.piece',
+				second: 'scoring.tangram.second',
+				hint: 'scoring.tangram.hint'
+			},
+			backdrop: {
+				items: [{ id: 'tan', path: 'M8 8H56L32 32ZM8 40L24 24L40 40L24 56ZM40 40H56V56Z' }],
+				fill: 'solid'
+			}
+		}
 	}
 } as const;
 export const puzzleMetadata: Record<PuzzleId, ClientPuzzleMetadata> & typeof metadata = metadata;

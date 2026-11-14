@@ -1,5 +1,84 @@
 # CODEMAP.md
 
+## v1.4.4 Tangram — focused verification complete; owner review pending (2026-11-14)
+
+Classic and ten Batch A variants are locally implemented: eleven enabled presets,
+zero variant groups, and the reused `(tangram, UTC date)` daily board. Amendment 4
+removes New silhouette; Amendment 5 removes Row and its toggle, leaving the Square
+tray only. The earlier stops below are historical and superseded by these amendments.
+
+Focused evidence: 26 unit cases, 11 real-D1 cases, 23 single-worker Chromium cases,
+33 solved and 66 rejected vectors in each of six runtimes, scoped lint/types (0 errors,
+0 warnings), boundaries, build and lazy isolation passed. The shared saver's `seconds=0`
+opening replay preflight checks geometry; positive elapsed replay enforces timing. A
+zero-active-time save falls below the five-second ranked floor and is unranked.
+
+Owner functional review remains pending. Full `bun run verify` and physical-device
+review were not performed. No commit, push, deployment, release or Batch B is authorized.
+
+## Historical, superseded: v1.4.4 partial baseline and session-contract stop (2026-11-13)
+
+The owner selected baseline first, then Batch A, under the accepted Tangram
+brief and Amendments 2/3, with focused checks only and no commit/push/deploy.
+The accepted `tangram-middle-style-demo` opened in local Chromium; its screenshots
+remain in `build/v1.4.4/reference/`. The supplied fixture was copied to
+`static/demo/tangram.html` as directed by the fix handover. The earlier UI
+projection stop is resolved by Amendment 3; engine geometry remains exact.
+
+**STOP / incomplete:** the demo's New silhouette control requests another
+Tangram target. `PuzzleViewProps` exposes only `ontryanother`, explicitly
+run-over-only (`src/lib/ui/puzzle-view.ts:40`); `PlaySession.tryAnother()` abandons
+the session, records `run_over`, and invokes the cross-family selector
+(`src/lib/screens/PlaySession.svelte:1304`). There is no family-preserving fresh
+round request in the view contract. The local draft currently wires New
+silhouette to that callback; this does not establish the requested behavior.
+Changing the view/session contract or PlaySession is outside brief §8, so no
+such change or selector workaround was made. Owner clarification/amendment is
+needed for this control before the baseline can be called complete.
+
+**Local source, not acceptance:** Classic only, `tangram-1`, one enabled preset,
+zero variant groups. Exact integer-pair geometry, all eight orientations,
+coverage independent of witness identity, eighteen frozen silhouettes (thirteen
+convex plus Cat/House/Bird/Boat/Swan), family SVG Game/View, Stage and motion.
+The inherited Swan candidate had equal-area boundary additions/omissions;
+its outline was reconstructed from the unchanged seven-piece assembly and
+then passed exact coverage. Bird and Boat are own assemblies. The real Sei
+cut and all sixteen convex witness candidates are researched under `/tmp/`
+only; **no Batch A variant has been added**.
+
+**Files:** `src/lib/puzzles/tangram/{logic,manifest,scoring,messages,motion}.ts`,
+`Game.svelte`, `View.svelte`, `Stage.svelte`, `logic.test.ts`, `README.md`;
+`docs/puzzles/tangram.md`; `tests/vectors/tangram.json` and
+`tangram-runner.ts`; `tests/integration/tangram.test.ts` (prepared for the final
+Batch A catalogue, not run); `tests/e2e/tangram.spec.ts`. Two shared source touches
+only: `src/lib/round-timing.ts` (1500 ms constant), `scripts/check-vectors.ts`
+(`--tangram`). Registry generation, never hand edits, produced catalog,
+family-index, puzzle-messages, puzzle-metadata and registry updates.
+
+**Evidence:** `build/v1.4.4/baseline/recheck-unit.log`: 12/12 units pass,
+including all eighteen witnesses, all eight exact orientations and an alternate
+square/two-small-triangle solution. Scoped ESLint passed and scoped Svelte
+check reported 0 errors/0 warnings (`recheck-eslint.log`, `recheck-types.log`).
+These two checks precede the latest one-line pointer pickup correction and
+have not been repeated after it. Three Classic solved vectors were frozen,
+not yet exercised in six runtimes. Chromium runs use one worker. First the
+harness selected Connect; saved-selector state then selected Tangram. The
+real pointer solve still failed at its first placement in the latest completed
+run (`browser-pointer.log`), including after preserving the selected draft's
+rotation on pickup. No browser pass, viewport fit or keyboard completion is
+claimed. The 844×390 collapse observed in the reference remains a required
+app check, not an app pass.
+
+Required `gpt-6.1-sol/high` coding/research and `gpt-6-luna/max` verification
+agents performed the recorded work; they subsequently hit usage limits. No
+substitute-model checks or silent parent takeover are claimed.
+
+**Not run:** final scoped lint/types after the pointer correction, remaining
+browser cases, D1 integration, six-runtime vectors, boundaries, build/lazy
+isolation, physical-device checks or full `bun run verify`. No Batch B–J,
+other-family implementation, new sounds, commit, push, deployment or release.
+Existing editor/MCP files and unrelated static-image deletions were preserved.
+
 ## v1.4.2 Mahjong Solitaire — source commit and push authorized (2026-11-13)
 
 The owner said “comit and push to github”, authorizing the completed Mahjong

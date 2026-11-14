@@ -5,17 +5,20 @@ import { manifest as manifest1 } from './puzzles/connect/manifest.js';
 import { manifest as manifest2 } from './puzzles/mahjong-solitaire/manifest.js';
 import { manifest as manifest3 } from './puzzles/memory/manifest.js';
 import { manifest as manifest4 } from './puzzles/nonogram/manifest.js';
+import { manifest as manifest5 } from './puzzles/tangram/manifest.js';
 export const catalog: Record<PuzzleId, PuzzleManifest> & {
 	block: typeof manifest0;
 	connect: typeof manifest1;
 	'mahjong-solitaire': typeof manifest2;
 	memory: typeof manifest3;
 	nonogram: typeof manifest4;
+	tangram: typeof manifest5;
 } = {
 	['block']: manifest0,
 	['connect']: manifest1,
 	['mahjong-solitaire']: manifest2,
 	['memory']: manifest3,
-	['nonogram']: manifest4
+	['nonogram']: manifest4,
+	['tangram']: manifest5
 };
 export { puzzleMessages } from './puzzle-messages.js';

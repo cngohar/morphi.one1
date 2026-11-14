@@ -5,5 +5,6 @@ export const familyIndex: readonly PuzzleFamilyEntry[] = [
 	{ id: 'memory', weight: 1, enabled: true, orientation: 'any', selectionOrder: 1 },
 	{ id: 'connect', weight: 1, enabled: true, orientation: 'any', selectionOrder: 2 },
 	{ id: 'nonogram', weight: 1, enabled: true, orientation: 'any', selectionOrder: 3 },
-	{ id: 'mahjong-solitaire', weight: 1, enabled: true, orientation: 'any', selectionOrder: 4 }
+	{ id: 'mahjong-solitaire', weight: 1, enabled: true, orientation: 'any', selectionOrder: 4 },
+	{ id: 'tangram', weight: 1, enabled: true, orientation: 'any', selectionOrder: 5 }
 ];

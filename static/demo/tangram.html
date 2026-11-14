@@ -1,0 +1,1512 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Tangram — Middle Style Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&family=Caveat:wght@600;700&display=swap" rel="stylesheet" />
+<script src="https://cdn.jsdelivr.net/npm/animejs@4.5.0/dist/bundles/anime.umd.min.js"></script>
+<style>
+:root{
+  --bg:#eef2f7; --panel:#ffffff; --panel2:#e3eaf2; --ink:#1b2433; --ink-soft:#43506a;
+  --line:#c9d4e2; --accent:#e5532d; --blue:#2f6fed; --teal:#009a86; --violet:#7d61ae;
+  --ghost-fill:rgba(27,36,51,.07); --good:#0b7a5c; --warn-bg:#fff3e0; --shadow:0 6px 24px rgba(27,36,51,.12);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#10151f; --panel:#1b2433; --panel2:#232f45; --ink:#eef2f7; --ink-soft:#aebbd2;
+    --line:#33415c; --ghost-fill:rgba(238,242,247,.10); --warn-bg:#3a2c14; --shadow:0 6px 24px rgba(0,0,0,.45);
+  }
+}
+*{box-sizing:border-box}
+html,body{margin:0;padding:0;height:100%}
+body{
+  font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+  background:var(--bg); color:var(--ink); height:100dvh;
+  display:flex; flex-direction:column; overflow:hidden; overscroll-behavior:none;
+  -webkit-tap-highlight-color:transparent;
+}
+button,[role="button"],select,input:not([type="checkbox"]){min-height:2.25rem}
+button{font-family:inherit; font-weight:800; cursor:pointer; border-radius:12px; border:2px solid var(--line);
+  background:var(--panel); color:var(--ink); padding:.45rem .8rem; font-size:.95rem; line-height:1.1}
+button:hover{border-color:var(--ink-soft)}
+button:disabled{opacity:.45; cursor:not-allowed}
+button.primary{background:var(--accent); border-color:var(--accent); color:#fff}
+button.blue{background:var(--blue); border-color:var(--blue); color:#fff}
+button.teal{background:var(--teal); border-color:var(--teal); color:#fff}
+button:focus-visible, [tabindex]:focus-visible, input:focus-visible, select:focus-visible{outline:3px solid var(--blue); outline-offset:2px}
+header.topbar{
+  display:flex; flex-wrap:wrap; align-items:center; gap:.5rem .6rem;
+  padding:.55rem .9rem; background:var(--panel); border-bottom:2px solid var(--line);
+  flex:0 0 auto; z-index:30;
+}
+.brand{font-weight:900; font-size:1.15rem; letter-spacing:.2px}
+.brand .dot{color:var(--accent)}
+.puzzle-name{font-weight:800; color:var(--ink-soft); font-size:1rem}
+.puzzle-name b{color:var(--ink)}
+.spacer{flex:1}
+.timer{
+  font-variant-numeric:tabular-nums; font-weight:900; font-size:1.25rem;
+  background:var(--panel2); border-radius:10px; padding:.3rem .7rem; min-width:5.2rem; text-align:center;
+}
+.timer.low{color:var(--accent)}
+.mode-toggle{display:inline-flex; border:2px solid var(--line); border-radius:12px; overflow:hidden}
+.mode-toggle button{border:0; border-radius:0; background:var(--panel); padding:.45rem .7rem}
+.mode-toggle button[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+.icon-btn{min-width:2.75rem}
+.layout{
+  display:grid; grid-template-columns:minmax(0,1fr) 372px; gap:1rem;
+  padding:1rem; max-width:1440px; margin:0 auto; width:100%;
+  flex:1 1 auto; min-height:0; align-items:stretch;
+}
+.board-card{
+  background:var(--panel); border:2px solid var(--line); border-radius:18px; box-shadow:var(--shadow);
+  padding:.8rem; display:flex; flex-direction:column; min-height:0; height:100%; overflow:hidden;
+}
+.board-head{display:flex; align-items:baseline; gap:.6rem; flex-wrap:wrap; padding:0 .2rem .5rem; flex:0 0 auto}
+.board-head h1{font-size:1.3rem; margin:0; font-weight:900}
+.board-head .par{color:var(--ink-soft); font-weight:700; font-size:.9rem}
+.board-wrap{position:relative; flex:1 1 auto; min-height:0; display:flex}
+svg.board, svg.tray{display:block; touch-action:none}
+svg.board{width:100%; height:100%; min-height:0; flex:1 1 auto}
+svg.tray{width:100%; height:100%; min-height:0; flex:1 1 auto}
+svg.board{background:
+  radial-gradient(circle at 18% 12%, rgba(47,111,237,.08), transparent 42%),
+  radial-gradient(circle at 85% 90%, rgba(0,154,134,.08), transparent 42%), var(--panel)}
+.piece{cursor:grab}
+.piece:active{cursor:grabbing}
+.piece polygon{stroke:#1b2433; stroke-width:.14; stroke-linejoin:round}
+.piece.selected polygon{stroke:#1b2433; stroke-width:.3}
+.piece.placed polygon{stroke-width:.12}
+.piece:focus{outline:none}
+.piece:focus-visible polygon{stroke:var(--blue); stroke-width:.34}
+.piece.hint-glow polygon{filter:drop-shadow(0 0 .55rem #ffb020) brightness(1.25)}
+.piece.dragging polygon{filter:drop-shadow(0 .3rem .25rem rgba(27,36,51,.45))}
+.stars span{display:inline-block}
+.timer.low{animation:timerPulse .9s ease-in-out infinite alternate}
+@keyframes timerPulse{from{transform:scale(1)}to{transform:scale(1.09)}}
+.ghost-outline{pointer-events:none}
+.ghost-trace{pointer-events:none}
+.magnet{pointer-events:none}
+.hint-slot{pointer-events:none}
+.peek-layer{pointer-events:none}
+.side{display:flex; flex-direction:column; gap:1rem; min-height:0; height:100%; overflow-y:auto; overscroll-behavior:contain}
+.tray-card{background:var(--panel); border:2px solid var(--line); border-radius:18px; box-shadow:var(--shadow); padding:.8rem;
+  display:flex; flex-direction:column; min-height:0; flex:1 1 auto}
+.tray-card h2{flex:0 0 auto}
+.controls-card{flex:0 0 auto}
+.tray-card h2, .controls-card h2{font-size:1rem; margin:0 0 .5rem; font-weight:900}
+.tray-note{font-size:.82rem; color:var(--ink-soft); font-weight:700; margin:.4rem 0 0}
+.controls-card{background:var(--panel); border:2px solid var(--line); border-radius:18px; box-shadow:var(--shadow); padding:.8rem}
+.controls-grid{display:grid; grid-template-columns:1fr 1fr; gap:.55rem}
+.controls-grid button{min-height:3rem; font-size:1rem}
+.switch-row{display:flex; align-items:center; justify-content:space-between; gap:.6rem; padding:.55rem .1rem 0; font-weight:800}
+.switch-row label{display:flex; align-items:center; gap:.5rem; cursor:pointer; min-height:2.25rem}
+.switch-row input[type="checkbox"]{width:1.4rem; height:1.4rem; accent-color:var(--teal)}
+.message{
+  min-height:3.1rem; border-radius:12px; padding:.6rem .8rem; font-weight:800; font-size:.98rem;
+  background:var(--panel2); border:2px dashed var(--line); display:flex; align-items:center; flex:0 0 auto;
+}
+.progress-row{flex:0 0 auto}
+.banner{flex:0 0 auto}
+.message.good{background:#e2f5ee; border-color:var(--teal); color:#065f4c}
+.message.close{background:var(--warn-bg); border-color:#e8a33d; color:#7a4b00}
+@media (prefers-color-scheme: dark){
+  .message.good{background:#123c31; color:#8fe6c8}
+  .message.close{background:#3a2c14; color:#ffd38a}
+}
+.progress-row{display:flex; gap:.5rem; flex-wrap:wrap; font-weight:800; font-size:.9rem; color:var(--ink-soft)}
+.progress-row .chip{background:var(--panel2); border-radius:999px; padding:.25rem .65rem}
+.banner{
+  display:none; border-radius:14px; padding:.9rem 1rem; font-weight:800;
+  background:#fde7e0; border:2px solid var(--accent); color:#7c2410;
+}
+.banner.show{display:flex; align-items:center; gap:.8rem; flex-wrap:wrap}
+@media (prefers-color-scheme: dark){ .banner{background:#402016; color:#ffb59d} }
+.modal-backdrop{
+  display:none; position:fixed; inset:0; background:rgba(16,21,31,.55); z-index:60;
+  align-items:center; justify-content:center; padding:1rem;
+}
+.modal-backdrop.show{display:flex}
+.modal{
+  background:var(--panel); color:var(--ink); border-radius:20px; max-width:640px; width:100%;
+  max-height:88vh; overflow:auto; padding:1.2rem 1.3rem; box-shadow:var(--shadow);
+}
+.modal h2{margin:.1rem 0 .6rem; font-size:1.5rem; font-weight:900}
+.modal h3{margin:1rem 0 .35rem; font-size:1.05rem}
+.modal p, .modal li{font-size:.97rem; line-height:1.45; color:var(--ink)}
+.modal ul{padding-left:1.2rem; margin:.3rem 0}
+.stars{font-size:2.2rem; letter-spacing:.2rem; color:#e8a33d; text-align:center; margin:.3rem 0}
+.stars .off{color:var(--line)}
+.perfect{font-size:1.6rem; font-weight:900; color:var(--accent); text-align:center; margin:.2rem 0}
+.win-stats{text-align:center; font-weight:800; color:var(--ink-soft)}
+.modal-actions{display:flex; gap:.6rem; justify-content:center; margin-top:1rem; flex-wrap:wrap}
+.modal-actions button{min-height:3rem; padding:.6rem 1.3rem; font-size:1.05rem}
+.chooser-tools{display:flex; gap:.55rem; flex-wrap:wrap; margin-bottom:.7rem}
+.chooser-tools input[type="search"], .chooser-tools select{
+  font-family:inherit; font-weight:700; font-size:.95rem; border:2px solid var(--line);
+  border-radius:10px; padding:.45rem .6rem; background:var(--panel); color:var(--ink);
+}
+.chooser-tools input[type="search"]{flex:1; min-width:150px}
+.chooser-grid{display:grid; grid-template-columns:repeat(auto-fill,minmax(150px,1fr)); gap:.7rem}
+.chooser-card{
+  border:2px solid var(--line); border-radius:14px; padding:.55rem; background:var(--panel);
+  text-align:left; display:flex; flex-direction:column; gap:.3rem; min-height:0;
+}
+.chooser-card:hover{border-color:var(--blue)}
+.chooser-card svg{width:100%; height:auto; background:var(--panel2); border-radius:8px}
+.chooser-card .nm{font-weight:900; font-size:1rem}
+.chooser-card .meta{font-size:.82rem; color:var(--ink-soft); font-weight:700}
+.chooser-card .solved{color:var(--teal); font-weight:900}
+.demo-note{
+  background:var(--warn-bg); border:2px dashed #e8a33d; border-radius:12px;
+  padding:.6rem .8rem; font-weight:800; font-size:.9rem; margin-bottom:.8rem;
+}
+.large-preview{margin-bottom:.8rem; text-align:center}
+.large-preview svg{width:min(300px,80vw); height:auto; background:var(--panel2); border-radius:12px}
+.large-preview .cap{font-weight:800; color:var(--ink-soft); margin-top:.3rem}
+.confetti-bit{position:fixed; width:12px; height:12px; z-index:80; pointer-events:none; border-radius:3px}
+.kbd{background:var(--panel2); border:1.5px solid var(--line); border-bottom-width:3px; border-radius:6px;
+  padding:.05rem .4rem; font-weight:900; font-size:.85em}
+.tray-toggle-row{display:none}
+@media (max-width:860px){
+  .layout{grid-template-columns:1fr; grid-template-rows:minmax(0,1.55fr) minmax(0,1fr); padding:.6rem; gap:.6rem}
+  .puzzle-name{display:none} /* the board head already names the puzzle */
+  .side{gap:.6rem; height:100%}
+  .tray-card{flex:0 0 auto}
+  svg.tray{height:auto; max-height:27dvh; flex:0 0 auto}
+  .board-card{padding:.6rem}
+  .board-head h1{font-size:1.15rem}
+  .board-head .par{font-size:.82rem}
+  .message{min-height:0; font-size:.92rem; padding:.5rem .7rem}
+  .progress-row{font-size:.82rem; margin-top:.45rem !important}
+  .timer{font-size:1.1rem; min-width:4.6rem}
+  .brand{font-size:1.05rem}
+  .controls-grid button{min-height:3.2rem}
+}
+@media (prefers-reduced-motion: reduce){
+  *{animation:none !important; transition:none !important}
+}
+</style>
+<style>
+/* ============ Middle-design theme (ChatGPT tangram_2) adapted to the
+   agreed two-column layout: cream ground, soft blobs, big-radius white
+   cards, pill header controls, Tools tiles, green switches, flat tans. */
+:root{
+  --bg:#fff6e9; --panel:#fffdf8; --panel2:#fdf0da; --ink:#22304a; --ink-soft:#6d7688;
+  --line:#f0e3cb; --accent:#e5532d; --blue:#2f6fed; --teal:#00a67e; --violet:#7d61ae;
+  --ghost-fill:rgba(34,48,74,.05); --good:#0b7a5c; --warn-bg:#fff3d6;
+  --shadow:0 10px 30px rgba(120,90,30,.13);
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#171410; --panel:#241f18; --panel2:#322a20; --ink:#f5ecdc; --ink-soft:#c4b299;
+    --line:#453a2a; --ghost-fill:rgba(245,236,220,.08); --warn-bg:#3a2c14;
+    --shadow:0 10px 30px rgba(0,0,0,.5);
+  }
+}
+body{background:var(--bg)}
+.decor{position:fixed; inset:0; overflow:hidden; pointer-events:none; z-index:0}
+.decor .blob{position:absolute; border-radius:50%}
+.decor .b1{width:230px;height:230px; background:#fdeec3; top:-110px; left:44%}
+.decor .b2{width:340px;height:340px; background:#bfe8d8; top:-190px; right:-120px}
+.decor .b3{width:150px;height:150px; background:#cfe0fb; bottom:120px; left:-70px}
+.decor .b4{width:120px;height:120px; background:#fdeec3; bottom:-50px; right:16%}
+.decor .wave{
+  position:absolute; left:-30px; bottom:64px; width:340px; height:120px;
+  background:#7d8ff0; border-radius:50% 60% 0 0 / 100% 100% 0 0; opacity:.85;
+  transform:rotate(-4deg);
+}
+.decor .wave span{
+  position:absolute; left:56px; top:26px; color:#fff; transform:rotate(2deg);
+  font-family:"Caveat",cursive; font-size:1.65rem; font-weight:700; white-space:nowrap;
+}
+.decor .wave span::after{content:""; display:block; width:64px; height:4px; border-radius:4px; background:#f5b921; margin-top:2px}
+@media (max-width:1100px){ .decor .wave{display:none} }
+@media (prefers-color-scheme: dark){ .decor .b1,.decor .b4{background:#3a2f18} .decor .b2{background:#123c31} .decor .b3{background:#1c2c4d} .decor .wave{background:#31449e} }
+header.topbar{
+  position:relative; z-index:30; background:transparent; border-bottom:0; padding:.8rem 1.1rem .3rem;
+}
+.brand{font-size:1.35rem; color:var(--ink)}
+.brand .dot{color:var(--accent)}
+.puzzle-name{color:var(--ink-soft)}
+.timer{
+  background:var(--panel); border-radius:999px; box-shadow:var(--shadow);
+  padding:.45rem .9rem; font-size:1.3rem;
+}
+.timer::before{content:"⏱ "}
+.mode-toggle{border:0; background:var(--panel); border-radius:999px; box-shadow:var(--shadow); padding:.25rem; gap:.25rem}
+.mode-toggle button{border-radius:999px; padding:.45rem .85rem}
+.mode-toggle button[aria-pressed="true"]{background:var(--teal); color:#fff}
+.mode-toggle button[aria-pressed="true"]::before{content:"● "; font-size:.7em; vertical-align:.15em}
+header.topbar > button{
+  background:var(--panel); border:0; border-radius:999px; box-shadow:var(--shadow); min-height:2.75rem;
+}
+.layout{position:relative; z-index:1}
+.board-card,.tray-card,.controls-card,.shape-card{
+  background:var(--panel); border:0; border-radius:28px; box-shadow:var(--shadow);
+}
+.board-card{padding:1.1rem}
+svg.board{background:transparent}
+.ghost-outline{stroke:#8b93a5 !important}
+.piece polygon{stroke:rgba(34,48,74,.28); stroke-width:.1}
+.piece.selected polygon{stroke:#22304a; stroke-width:.3}
+.message{background:var(--panel2); border:2px dashed var(--line); border-radius:16px}
+.progress-row .chip{background:var(--panel2)}
+.shape-card{padding:.9rem 1rem; flex:0 0 auto}
+.shape-card h2{font-size:1rem; margin:0 0 .5rem; font-weight:900}
+.shape-flex{display:flex; gap:.9rem; align-items:center}
+.shape-preview{flex:0 0 118px}
+.shape-preview svg{width:118px; height:auto; display:block}
+.shape-tip{font-size:.92rem; font-weight:700; color:var(--ink-soft); line-height:1.4; margin:0}
+.shape-tip b{color:var(--ink)}
+.shape-tip .bulb{
+  display:inline-flex; align-items:center; justify-content:center; width:1.7rem; height:1.7rem;
+  border-radius:50%; background:#fdf0da; font-size:.95rem; margin-right:.35rem; vertical-align:-.45rem;
+}
+@media (prefers-color-scheme: dark){ .shape-tip .bulb{background:#3a2c14} }
+.controls-grid{gap:.7rem}
+.controls-grid button{
+  min-height:4.4rem; border:0; border-radius:18px; background:var(--panel2);
+  display:flex; flex-direction:column; align-items:center; justify-content:center; gap:.2rem;
+  font-size:.98rem; box-shadow:inset 0 0 0 2px var(--line);
+}
+.controls-grid button .tic{font-size:1.45rem; line-height:1}
+.controls-grid button:hover{box-shadow:inset 0 0 0 2px var(--ink-soft)}
+.controls-grid button:disabled{box-shadow:inset 0 0 0 2px var(--line)}
+#btnSnapConfirm{width:100%; margin-top:.7rem; min-height:3rem; border:0; border-radius:16px;
+  background:var(--teal); color:#fff; box-shadow:none; flex-direction:row; font-size:1rem}
+.switch-row{padding-top:.8rem}
+.switch-row label{gap:.55rem}
+.switch-row input[type="checkbox"]{
+  appearance:none; -webkit-appearance:none; width:2.9rem; height:1.65rem; border-radius:999px;
+  background:#d8d2c4; position:relative; cursor:pointer; flex:0 0 auto; margin:0;
+  transition:background .18s ease;
+}
+.switch-row input[type="checkbox"]::after{
+  content:""; position:absolute; top:.18rem; left:.2rem; width:1.3rem; height:1.3rem;
+  border-radius:50%; background:#fff; box-shadow:0 2px 6px rgba(0,0,0,.25); transition:left .18s ease;
+}
+.switch-row input[type="checkbox"]:checked{background:#22b573}
+.switch-row input[type="checkbox"]:checked::after{left:1.42rem}
+@media (prefers-color-scheme: dark){ .switch-row input[type="checkbox"]{background:#4a4033} .switch-row input[type="checkbox"]:checked{background:#22b573} }
+.tray-toggle{display:inline-flex; background:var(--panel2); border-radius:999px; padding:.25rem; gap:.25rem; box-shadow:inset 0 0 0 2px var(--line)}
+.tray-toggle button{border:0; border-radius:999px; background:transparent; padding:.35rem .9rem; min-height:2.25rem}
+.tray-toggle button[aria-pressed="true"]{background:var(--ink); color:var(--bg)}
+.tray-head{display:flex; align-items:center; justify-content:space-between; gap:.6rem; flex-wrap:wrap; margin-bottom:.5rem}
+.tray-head h2{margin:0}
+.build-label{pointer-events:none}
+@media (min-width:861px){
+  /* The tray gets a fixed, fully-visible height: the SVG letterboxes its
+     mosaic inside it instead of overflowing the card when the shape card
+     and the taller Tools panel share the column. */
+  .tray-card{flex:0 0 auto}
+  svg.tray[data-mode="square"]{height:180px; min-height:180px; flex:0 0 auto}
+  svg.tray[data-mode="row"]{height:76px; min-height:76px; flex:0 0 auto}
+  .shape-card{padding:.65rem .9rem}
+  .shape-preview{flex-basis:80px}
+  .shape-preview svg{width:80px}
+  .controls-grid button{min-height:3.3rem}
+}
+@media (max-width:860px){
+  /* Phone: the whole game fits ONE viewport — no page scroll, no
+     side-column scroll. Stacked: compact header, board (flexes to
+     whatever height is left), the full tray with its complete caption,
+     then the essential Tools. The shape card duplicates the board head
+     (name · par) and the message line, so it is the one card
+     dropped on phones; the keyboard-only note and the "Place piece"
+     button (the Enter-key duplicate — touch places by drag + snap)
+     go with it. Nothing else is removed. */
+  header.topbar{padding:.45rem .6rem .25rem; gap:.35rem .45rem}
+  .spacer{display:none}
+  .brand{font-size:1.02rem}
+  .timer{font-size:1.02rem; min-width:0; padding:.28rem .6rem}
+  .mode-toggle{padding:.18rem}
+  .mode-toggle button{padding:.32rem .6rem; font-size:.82rem; min-height:2rem}
+  header.topbar > button{min-height:2.1rem; padding:.32rem .6rem; font-size:.84rem}
+  .layout{display:flex; flex-direction:column; padding:.5rem; gap:.5rem}
+  .board-card{flex:1 1 auto; height:auto; min-height:0; padding:.6rem .7rem}
+  .board-head{padding-bottom:.25rem}
+  .board-head h1{font-size:1.05rem}
+  .board-head .par{font-size:.76rem}
+  .message{font-size:.82rem; padding:.38rem .6rem; min-height:0}
+  .progress-row{font-size:.74rem; margin-top:.35rem !important; gap:.35rem}
+  .progress-row .chip{padding:.16rem .5rem}
+  .side{flex:0 0 auto; height:auto; min-height:0; overflow:visible; gap:.5rem}
+  .shape-card{display:none}
+  .tray-card{order:1; flex:0 0 auto; padding:.5rem .7rem .55rem}
+  .tray-head{margin-bottom:.15rem}
+  .tray-head h2{font-size:.92rem}
+  .tray-toggle{padding:.18rem}
+  .tray-toggle button{min-height:1.9rem; padding:.22rem .6rem; font-size:.82rem}
+  svg.tray{flex:0 0 auto; width:100%; height:auto; max-height:none}
+  svg.tray[data-mode="square"]{height:clamp(96px,16.5dvh,150px)}
+  svg.tray[data-mode="row"]{height:54px}
+  .tray-note{font-size:.75rem; line-height:1.3; margin-top:.28rem}
+  .controls-card{order:2; flex:0 0 auto; padding:.5rem .7rem .55rem}
+  .controls-card h2{font-size:.92rem; margin-bottom:.35rem}
+  .controls-grid{grid-template-columns:repeat(4,1fr); gap:.45rem}
+  .controls-grid button{min-height:2.9rem; font-size:.8rem; border-radius:14px; gap:.1rem; padding:.3rem .2rem}
+  .controls-grid button .tic{font-size:1.05rem}
+  #btnSnapConfirm{display:none}
+  .controls-card .tray-note{display:none}
+  .switch-row{padding-top:.45rem; font-size:.82rem; flex-wrap:wrap; justify-content:flex-start; gap:.3rem .7rem}
+  .switch-row label{gap:.35rem; min-height:1.9rem}
+  .switch-row input[type="checkbox"]{width:2.3rem; height:1.3rem}
+  .switch-row input[type="checkbox"]::after{width:1rem; height:1rem; top:.15rem; left:.16rem}
+  .switch-row input[type="checkbox"]:checked::after{left:1.14rem}
+}
+@media (max-width:860px) and (max-height:700px){
+  /* Short phones (e.g. 667px tall): shave the tray and tools a little
+     more so the board still gets a playable height. */
+  svg.tray[data-mode="square"]{height:94px}
+  .controls-grid button{min-height:2.55rem}
+  .board-card{padding:.5rem .6rem}
+}
+</style>
+</head>
+<body>
+<div class="decor" aria-hidden="true">
+  <div class="blob b1"></div><div class="blob b2"></div><div class="blob b3"></div><div class="blob b4"></div>
+  <div class="wave"><span>Think · Arrange · Complete</span></div>
+</div>
+<header class="topbar">
+  <div class="brand">Morphi<span class="dot">.</span> Tangram</div>
+  <div class="puzzle-name" id="puzzleName">Now playing: <b>Pyramid</b></div>
+  <div class="spacer"></div>
+  <div class="mode-toggle" data-testid="mode-toggle" role="group" aria-label="Timer mode">
+    <button type="button" id="modeClassic" aria-pressed="true">Classic</button>
+    <button type="button" id="modeCountdown" aria-pressed="false">Countdown 120</button>
+  </div>
+  <div class="timer" data-testid="timer" id="timer" aria-label="Timer">0:00</div>
+  <button type="button" class="icon-btn" id="btnPause" data-testid="btn-pause" aria-label="Pause or resume">⏸</button>
+  <button type="button" id="btnChooserTop" data-testid="btn-chooser">Puzzles</button>
+  <button type="button" id="btnHelp" data-testid="btn-help">Help</button>
+</header>
+
+<main class="layout">
+  <section class="board-card" aria-label="Tangram board">
+    <div class="board-head">
+      <h1 id="boardTitle">Pyramid</h1>
+      <span class="par" id="boardPar">Par 0:30 · Fill the dashed outline with all 7 tans</span>
+    </div>
+    <div class="banner" data-testid="lose-banner" id="loseBanner" role="alert">
+      <span>⏰ Time's up! The silhouette got away this time.</span>
+      <button type="button" class="primary" id="btnLoseReset" data-testid="btn-lose-reset">Play again</button>
+    </div>
+    <div class="board-wrap">
+      <svg class="board" data-testid="board" id="boardSvg" viewBox="-2 -14 20 18" role="application"
+           aria-label="Tangram board. Drag pieces onto the dashed silhouette. Click a piece to rotate it 45 degrees."></svg>
+    </div>
+    <div class="message" data-testid="message" id="message" aria-live="polite">Drag the seven tans from the tray onto the silhouette. Click or tap a piece to rotate it 45°.</div>
+    <div class="progress-row" style="margin-top:.6rem">
+      <span class="chip" id="chipPlaced">Placed 0 / 7</span>
+      <span class="chip" id="chipMistakes">Wrong placements 0</span>
+      <span class="chip" id="chipMode">Classic · counts up</span>
+    </div>
+  </section>
+
+  <aside class="side">
+    <section class="shape-card" aria-label="About this shape">
+      <h2 id="shapeCardTitle">Pyramid</h2>
+      <div class="shape-flex">
+        <div class="shape-preview" id="shapePreview" aria-hidden="true"></div>
+        <p class="shape-tip"><span class="bulb" aria-hidden="true">💡</span><span id="shapeTip">Drag the 7 pieces to complete the shape. The grey preview shows the outline only — never the answer.</span></p>
+      </div>
+    </section>
+
+    <section class="tray-card" aria-label="Piece tray">
+      <div class="tray-head">
+        <h2>Your seven tans</h2>
+        <div class="tray-toggle" role="group" aria-label="Tray arrangement">
+          <button type="button" id="traySquare" data-testid="tray-square" aria-pressed="true">▦ Square</button>
+          <button type="button" id="trayRow" data-testid="tray-row" aria-pressed="false">▬ Row</button>
+        </div>
+      </div>
+      <svg class="tray" data-testid="tray" id="traySvg" viewBox="-1 -9.6 10 10.6" aria-label="Tray holding the seven tangram pieces"></svg>
+      <p class="tray-note" id="trayNote">Arriving as the classic square — same pieces and rules as Row. A tray setting, not a variant.</p>
+    </section>
+
+    <section class="controls-card" aria-label="Tools">
+      <h2>Tools</h2>
+      <div class="controls-grid">
+        <button type="button" id="btnFlip" data-testid="btn-flip"><span class="tic" aria-hidden="true">◐◑</span>Flip</button>
+        <button type="button" id="btnHint" data-testid="btn-hint"><span class="tic" aria-hidden="true">💡</span>Hint</button>
+        <button type="button" id="btnPeek" data-testid="btn-peek"><span class="tic" aria-hidden="true">👀</span>Peek</button>
+        <button type="button" id="btnReset" data-testid="btn-reset"><span class="tic" aria-hidden="true">↺</span>Reset</button>
+      </div>
+      <button type="button" id="btnSnapConfirm" data-testid="btn-confirm">✓ Place piece (Enter)</button>
+      <div class="switch-row">
+        <label for="snapToggle"><input type="checkbox" id="snapToggle" data-testid="snap-toggle" checked /> Snap to Grid</label>
+        <label for="soundToggle"><input type="checkbox" id="soundToggle" data-testid="sound-toggle" checked /> Sound</label>
+        <label for="musicToggle"><input type="checkbox" id="musicToggle" data-testid="music-toggle" /> Music</label>
+      </div>
+      <p class="tray-note">Click or tap any piece to rotate it 45° — no button needed. Keyboard: <span class="kbd">R</span> rotate · <span class="kbd">Shift</span>+<span class="kbd">R</span> back · <span class="kbd">F</span> flip · <span class="kbd">H</span> hint · arrows nudge · <span class="kbd">Enter</span> place. Flip works only on the parallelogram — it is the only piece that changes when flipped.</p>
+    </section>
+  </aside>
+</main>
+
+<!-- Win modal -->
+<div class="modal-backdrop" id="winBackdrop">
+  <div class="modal" data-testid="win-modal" role="dialog" aria-modal="true" aria-labelledby="winTitle">
+    <div class="perfect" id="winPerfect" style="display:none">Perfect!</div>
+    <h2 id="winTitle" style="text-align:center">Pyramid complete!</h2>
+    <div class="stars" id="winStars" aria-label="Stars earned">★★★</div>
+    <p class="win-stats" id="winStats">Time 0:00</p>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="btnWinNext" data-testid="btn-win-next">Next puzzle ▸</button>
+      <button type="button" id="btnWinRetry" data-testid="btn-win-retry">Retry</button>
+      <button type="button" id="btnWinClose" data-testid="btn-win-close">Keep looking</button>
+    </div>
+  </div>
+</div>
+
+<!-- Chooser modal -->
+<div class="modal-backdrop" id="chooserBackdrop">
+  <div class="modal" data-testid="chooser" role="dialog" aria-modal="true" aria-labelledby="chooserTitle" style="max-width:720px">
+    <h2 id="chooserTitle">Choose a silhouette</h2>
+    <div class="demo-note">Demo chooser only — live Morphi hides the catalogue (hidden-discovery rule) and the chooser does not ship.</div>
+    <div class="large-preview" id="largePreview"></div>
+    <div class="chooser-tools">
+      <input type="search" id="chooserSearch" data-testid="chooser-search" placeholder="Search silhouettes…" aria-label="Search silhouettes" />
+      <button type="button" id="btnChooserClose">Close</button>
+    </div>
+    <div class="chooser-grid" id="chooserGrid"></div>
+  </div>
+</div>
+
+<!-- Help modal -->
+<div class="modal-backdrop" id="helpBackdrop">
+  <div class="modal" role="dialog" aria-modal="true" aria-labelledby="helpTitle" style="max-width:680px">
+    <h2 id="helpTitle">How to play Tangram</h2>
+    <p>Fill the dashed silhouette using <b>all seven tans</b> — two large triangles, one medium triangle, two small triangles, a square and a parallelogram. Pieces must not overlap, and every piece is used exactly once. The same seven pieces make every picture; only the silhouette changes.</p>
+    <h3>Moving pieces</h3>
+    <ul>
+      <li>Drag a piece with your finger or mouse. Drop it back over the tray to return it to its tray slot.</li>
+      <li>Click or tap a piece to rotate it 45° — there is no Rotate button. Clicking a piece on the board turns it in place; clicking a tray piece lifts it onto the board and turns it there. A placed piece can be lifted and moved again — only Reset restarts the whole puzzle.</li>
+      <li><b>Flip</b> mirrors a piece — it only changes the <b>parallelogram</b>, the one chiral piece. Flipping a triangle or the square changes nothing, so Flip is disabled for them.</li>
+      <li><b>Snap on drop:</b> when a piece is close to its true spot (inside the dashed magnet circle), with the right rotation — and the right flip for the parallelogram — it snaps exactly into place. Turn the toggle off to place pieces fully by hand.</li>
+    </ul>
+    <h3>Modes</h3>
+    <ul>
+      <li><b>Classic</b> counts up. There is no way to lose — take as long as you like.</li>
+      <li><b>Countdown 120</b> gives you 120 seconds. Reaching 0:00 shows a lose banner with an instant reset.</li>
+    </ul>
+    <h3>Hint and Peek</h3>
+    <p><b>Hint</b> glows the next unplaced piece and the slot it belongs in. <b>Peek</b> shows the finished picture, semi-transparent, for a few seconds. Both are unlimited in this demo.</p>
+    <h3>Stars — the exact rule</h3>
+    <ul>
+      <li><b>3 stars</b> = solved with no Hint, no Peek, no wrong placement, and finished before the par time (par: Pyramid 30s, House 45s, Cat 60s, Swan 60s, Dog 75s).</li>
+      <li><b>2 stars</b> = no Hint and no wrong placement.</li>
+      <li><b>1 star</b> = solved.</li>
+      <li>"Perfect!" appears only for a true 3-star perfect solve, never otherwise.</li>
+    </ul>
+    <h3>Keyboard</h3>
+    <ul>
+      <li><span class="kbd">Tab</span> or click selects a piece. Selecting a tray piece with the keyboard lifts it onto the board.</li>
+      <li><span class="kbd">R</span> rotate clockwise · <span class="kbd">Shift</span>+<span class="kbd">R</span> counter-clockwise · <span class="kbd">F</span> flip (parallelogram only) · <span class="kbd">H</span> hint.</li>
+      <li>Arrow keys nudge the selected piece 1 unit (<span class="kbd">Shift</span> + arrows: 0.25 units). <span class="kbd">Enter</span> confirms — it tries to snap the selected piece into its slot.</li>
+    </ul>
+    <h3>Coming in the real build</h3>
+    <p>A daily seeded Tangram is a Morphi feature in the real build — everyone gets the same silhouette each day. This demo also keeps your best times and solved markers on this device only; there is no sign-in and no paywall.</p>
+    <div class="modal-actions">
+      <button type="button" class="primary" id="btnHelpClose">Got it</button>
+    </div>
+  </div>
+</div>
+
+<script>
+"use strict";
+/* ================= Data (proven silhouettes — do not alter) ================= */
+const PIECE_DEFS = [
+  { id:"large1", name:"Large triangle 1", poly:[[0,0],[8,0],[4,4]], color:"#f07d2b" },
+  { id:"large2", name:"Large triangle 2", poly:[[0,0],[8,0],[4,4]], color:"#2e7cd6" },
+  { id:"medium", name:"Medium triangle", poly:[[0,0],[4,0],[4,4]], color:"#00a67e" },
+  { id:"small1", name:"Small triangle 1", poly:[[0,0],[4,0],[2,2]], color:"#f2b01e" },
+  { id:"small2", name:"Small triangle 2", poly:[[0,0],[4,0],[2,2]], color:"#7d61ae" },
+  { id:"square", name:"Square", poly:[[0,0],[2,2],[0,4],[-2,2]], color:"#2f9be8" },
+  { id:"para",   name:"Parallelogram",  poly:[[0,0],[4,0],[6,2],[2,2]], color:"#e84c3d" }
+];
+function W(rot, flip, cx, cy){ return {rot:rot, flip:flip, cx:cx, cy:cy}; }
+const SILHOUETTES = [
+  { id:"pyramid", name:"Pyramid", par:30,
+    outline:[[0,0],[8,8],[16,0]],
+    witness:{ large1:W(0,0,4,1.3333), large2:W(0,0,12,1.3333), medium:W(0,0,6.6667,5.3333),
+              para:W(2,0,9,5), square:W(0,0,8,2), small1:W(4,0,6,3.3333), small2:W(6,0,10.6667,4) } },
+  { id:"house", name:"House", par:45,
+    outline:[[0,0],[0,12],[8,4],[8,0]],
+    witness:{ large1:W(0,0,4,1.3333), large2:W(6,0,1.3333,4), square:W(0,0,2,8),
+              para:W(2,0,7,3), medium:W(2,0,4.6667,4.6667), small1:W(0,0,4,6.6667), small2:W(6,0,0.6667,10) } },
+  { id:"cat", name:"Cat", par:60,
+    outline:[[2,10],[4,12],[4,8],[2,6],[10,-2],[6,-2],[4,0],[4,-4],[0,0],[0,12]],
+    witness:{ large1:W(0,0,4,1.3333), large2:W(6,0,1.3333,4), square:W(0,0,2,8),
+              small1:W(6,0,0.6667,10), small2:W(2,0,3.3333,10), medium:W(2,0,2.6667,-1.3333), para:W(0,1,7,-1) } },
+  { id:"swan", name:"Swan", par:60,
+    outline:[[4,12],[4,4],[6,2],[8,4],[10,2],[8,0],[10,-2],[6,-2],[4,0],[0,0],[0,8]],
+    witness:{ large1:W(0,0,4,1.3333), large2:W(6,0,1.3333,4), medium:W(2,0,2.6667,6.6667),
+              small1:W(0,0,2,8.6667), small2:W(2,0,3.3333,10), square:W(0,0,8,2), para:W(0,1,7,-1) } },
+  { id:"dog", name:"Dog", par:75,
+    outline:[[6,10],[8,12],[10,10],[8,8],[8,0],[6,-2],[4,0],[4,-4],[0,0],[4,4],[0,4],[2,6],[6,6]],
+    witness:{ large1:W(0,0,4,1.3333), large2:W(2,0,6.6667,4), small1:W(6,0,6.6667,8),
+              square:W(0,0,8,10), medium:W(2,0,2.6667,-1.3333), small2:W(4,0,6,-0.6667), para:W(0,0,3,5) } }
+];
+const TRAY = { large1:W(0,0,4,1.3333), large2:W(2,0,6.6667,4), square:W(0,0,2,4),
+               medium:W(4,0,1.3333,6.6667), para:W(0,0,5,7), small1:W(4,0,4,5.3333), small2:W(6,0,0.6667,2) };
+/* Row arrangement: the same seven tans in one horizontal strip, in the
+   middle design's tray order — orange large, blue diamond, green medium,
+   yellow small, violet small, red parallelogram, blue large. A tray
+   setting (band), not a variant: identical pieces, rules and win. */
+const ROW_TRAY = { large1:W(0,0,4,0), square:W(0,0,10.4,0), medium:W(0,0,14.8,0),
+                   small1:W(0,0,19.2,0), small2:W(0,0,23.4,0), para:W(0,0,28.2,0), large2:W(0,0,35.8,0) };
+const ROW_ORDER = ["large1","square","medium","small1","small2","para","large2"];
+let trayMode = "square";
+function trayPos(id){ return trayMode==="row" ? ROW_TRAY[id] : TRAY[id]; }
+function trayStack(){ return trayMode==="row" ? {x:-7, y:0} : {x:4, y:4}; }
+window.__TANGRAM_DEMO__ = { silhouettes: SILHOUETTES, tray: TRAY, rowTray: ROW_TRAY, pieces: PIECE_DEFS };
+
+/* ================= Geometry ================= */
+function polyCentroid(poly){
+  let a=0, cx=0, cy=0;
+  for(let i=0;i<poly.length;i++){
+    const [x1,y1]=poly[i], [x2,y2]=poly[(i+1)%poly.length];
+    const f=x1*y2-x2*y1; a+=f; cx+=(x1+x2)*f; cy+=(y1+y2)*f;
+  }
+  a*=0.5; return [cx/(6*a), cy/(6*a)];
+}
+const CENTROIDS = {}; PIECE_DEFS.forEach(d=>{ CENTROIDS[d.id]=polyCentroid(d.poly); });
+/* Placed polygon in tangram coords (y-up) for a placement {rot,flip,cx,cy} */
+function placedPoly(def, pl, flipScale){
+  const [ccx,ccy]=CENTROIDS[def.id];
+  const th=pl.rot*Math.PI/4, cos=Math.cos(th), sin=Math.sin(th);
+  return def.poly.map(([px,py])=>{
+    let x=px-ccx, y=py-ccy;
+    if(flipScale!==undefined && flipScale!==null) x*=flipScale; else if(pl.flip) x=-x;
+    const rx=x*cos-y*sin, ry=x*sin+y*cos;
+    return [rx+pl.cx, ry+pl.cy];
+  });
+}
+/* tangram (x,y-up) -> svg (x, -y) */
+function toSvg(pts){ return pts.map(([x,y])=> (Math.round(x*1000)/1000)+","+ (Math.round(-y*1000)/1000)).join(" "); }
+function pointInPoly(x,y,poly){
+  let inside=false;
+  for(let i=0,j=poly.length-1;i<poly.length;j=i++){
+    const [xi,yi]=poly[i], [xj,yj]=poly[j];
+    if(((yi>y)!==(yj>y)) && (x < (xj-xi)*(y-yi)/(yj-yi)+xi)) inside=!inside;
+  }
+  return inside;
+}
+function fmtTime(s){ s=Math.max(0,Math.round(s)); return Math.floor(s/60)+":"+String(s%60).padStart(2,"0"); }
+
+/* ================= Motion layer (presentation only) ================= */
+const reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+const Motion = {
+  ok: function(){ return !reducedMotion && typeof window.anime!=="undefined" && typeof window.anime.animate==="function"; },
+  snapPulse: function(el, delay){
+    if(!this.ok()) return;
+    try{ window.anime.animate(el, { scale:[1.18,1], duration:280, delay:delay||0, ease:"outBack(2)" }); }catch(e){ /* presentation only */ }
+  },
+  pop: function(el){
+    if(!this.ok()) return;
+    try{ window.anime.animate(el, { scale:[0.92,1], duration:220, ease:"outQuad" }); }catch(e){}
+  },
+  fadeIn: function(el){
+    if(!this.ok()) return;
+    try{ window.anime.animate(el, { opacity:[0,1], translateY:[10,0], duration:300, ease:"outQuad" }); }catch(e){}
+  }
+};
+function cancelAnim(a){ if(!a) return; try{ if(a.cancel) a.cancel(); else if(a.pause) a.pause(); }catch(e){} }
+
+/* ================= Sound (guarded WebAudio) ================= */
+let audioCtx=null, musicTimer=null, musicStep=0;
+function beep(freq, dur, type, gain, when){
+  try{
+    if(!document.getElementById("soundToggle").checked && !when) { /* still allow win/lose via same guard below */ }
+    if(!audioCtx) audioCtx=new (window.AudioContext||window.webkitAudioContext)();
+    if(audioCtx.state==="suspended") audioCtx.resume();
+    const t=audioCtx.currentTime+(when||0);
+    const o=audioCtx.createOscillator(), g=audioCtx.createGain();
+    o.type=type||"sine"; o.frequency.value=freq;
+    g.gain.setValueAtTime(gain||0.12, t); g.gain.exponentialRampToValueAtTime(0.001, t+(dur||0.15));
+    o.connect(g); g.connect(audioCtx.destination); o.start(t); o.stop(t+(dur||0.15)+0.02);
+  }catch(e){ /* silence is fine */ }
+}
+function soundOn(){ const el=document.getElementById("soundToggle"); return el && el.checked; }
+function sndSnap(){ if(soundOn()) beep(660,0.12,"sine",0.14); }
+function sndSelect(){ if(soundOn()) beep(440,0.06,"sine",0.05); }
+function sndWin(){ if(!soundOn()) return; [523,659,784,1046].forEach((f,i)=>beep(f,0.22,"triangle",0.13,i*0.11)); }
+function sndLose(){ if(!soundOn()) return; [392,330,262].forEach((f,i)=>beep(f,0.25,"sawtooth",0.07,i*0.16)); }
+function startMusic(){
+  stopMusic();
+  if(!document.getElementById("musicToggle").checked) return;
+  const notes=[262,294,330,392,330,294];
+  musicTimer=setInterval(()=>{ if(soundOn()){ beep(notes[musicStep%notes.length],0.4,"sine",0.035); } musicStep++; }, 620);
+}
+function stopMusic(){ if(musicTimer){ clearInterval(musicTimer); musicTimer=null; } }
+
+/* ================= State ================= */
+const SVGNS="http://www.w3.org/2000/svg";
+const boardSvg=document.getElementById("boardSvg");
+const traySvg=document.getElementById("traySvg");
+const messageEl=document.getElementById("message");
+const store = (function(){
+  try{ const k="tangram-middle-style-v1"; const raw=localStorage.getItem(k);
+    return { data: raw?JSON.parse(raw):{best:{},solved:{}}, save(){ try{ localStorage.setItem(k, JSON.stringify(this.data)); }catch(e){} } };
+  }catch(e){ return { data:{best:{},solved:{}}, save(){} }; }
+})();
+let state=null;
+function freshState(silIdx, mode){
+  const pieces={};
+  PIECE_DEFS.forEach(d=>{
+    const t=trayPos(d.id);
+    pieces[d.id]={ id:d.id, loc:"tray", rot:t.rot, flip:t.flip, cx:t.cx, cy:t.cy, placed:false, el:null, polyEl:null };
+  });
+  return { silIdx:silIdx, mode:mode, pieces:pieces, selected:null,
+           mistakes:0, usedHint:false, usedPeek:false,
+           elapsedBase:0, startedAt:Date.now(), paused:false, over:false, won:false,
+           timerInt:null };
+}
+function curSil(){ return SILHOUETTES[state.silIdx]; }
+function elapsedSec(){
+  if(!state) return 0;
+  if(state.paused || state.over) return state.elapsedBase;
+  return state.elapsedBase + (Date.now()-state.startedAt)/1000;
+}
+function setMessage(txt, kind){
+  messageEl.textContent=txt;
+  messageEl.className="message"+(kind?(" "+kind):"");
+  if(Motion.ok()){ try{ window.anime.animate(messageEl,{opacity:[0.35,1],translateY:[5,0],duration:180,ease:"outQuad"}); }catch(e){} }
+}
+
+/* ================= DOM build ================= */
+let boardPiecesG, ghostPath, tracePath, magnetG, magnetCircle, hintSlotG, peekG, buildLabelG;
+let drawGuard=false, drawAnim=null, dealTimer=null, loadSeq=0;
+function outlinePerimeter(outline){
+  let per=0;
+  for(let i=0;i<outline.length;i++){
+    const a=outline[i], b=outline[(i+1)%outline.length];
+    per+=Math.hypot(b[0]-a[0], b[1]-a[1]);
+  }
+  return per;
+}
+function drawDurationFor(sil){
+  /* Complexity-scaled: linear with perimeter length plus a per-vertex
+     bonus for each corner the pen has to turn. Simple shapes stay quick,
+     complex ones take proportionally longer. Clamped 700–2400ms. */
+  const raw = 320 + outlinePerimeter(sil.outline)*16 + sil.outline.length*38;
+  return Math.max(700, Math.min(2400, Math.round(raw)));
+}
+function outlinePathD(outline){
+  return "M"+outline.map(function(p){ return p[0]+","+(-p[1]); }).join(" L")+" Z";
+}
+function buildBoard(){
+  boardSvg.innerHTML="";
+  const sil=curSil();
+  const xs=sil.outline.map(p=>p[0]), ys=sil.outline.map(p=>p[1]);
+  const minX=Math.min.apply(null,xs)-2, maxX=Math.max.apply(null,xs)+2;
+  const minY=Math.min.apply(null,ys)-2, maxY=Math.max.apply(null,ys)+2;
+  boardSvg.setAttribute("viewBox", minX+" "+(-maxY)+" "+(maxX-minX)+" "+(maxY-minY));
+  peekG=document.createElementNS(SVGNS,"g"); peekG.setAttribute("class","peek-layer"); peekG.style.display="none";
+  boardSvg.appendChild(peekG);
+  boardPiecesG=document.createElementNS(SVGNS,"g"); boardSvg.appendChild(boardPiecesG);
+  magnetG=document.createElementNS(SVGNS,"g"); magnetG.setAttribute("class","magnet"); magnetG.style.display="none";
+  magnetCircle=document.createElementNS(SVGNS,"circle");
+  magnetCircle.setAttribute("r","1.5"); magnetCircle.setAttribute("fill","rgba(47,111,237,.10)");
+  magnetCircle.setAttribute("stroke","#2f6fed"); magnetCircle.setAttribute("stroke-width","0.09");
+  magnetCircle.setAttribute("stroke-dasharray","0.35 0.25");
+  const magnetDot=document.createElementNS(SVGNS,"circle");
+  magnetDot.setAttribute("r","0.16"); magnetDot.setAttribute("fill","#2f6fed");
+  magnetG.appendChild(magnetCircle); magnetG.appendChild(magnetDot);
+  boardSvg.appendChild(magnetG);
+  hintSlotG=document.createElementNS(SVGNS,"g"); hintSlotG.setAttribute("class","hint-slot"); hintSlotG.style.display="none";
+  boardSvg.appendChild(hintSlotG);
+  /* Middle-design board centrepiece: a quiet mountain mark + BUILD THE
+     SHAPE, shown only while nothing is placed yet. */
+  buildLabelG=document.createElementNS(SVGNS,"g"); buildLabelG.setAttribute("class","build-label");
+  const bcx=xs.reduce(function(a,b){return a+b;},0)/xs.length;
+  const bcy=ys.reduce(function(a,b){return a+b;},0)/ys.length;
+  buildLabelG.innerHTML='<path d="M '+(bcx-1.7)+' '+(-(bcy+0.55))+' L '+(bcx-0.55)+' '+(-(bcy+1.75))+' L '+(bcx+0.15)+' '+(-(bcy+0.95))+' L '+(bcx+0.75)+' '+(-(bcy+1.55))+' L '+(bcx+1.7)+' '+(-(bcy+0.55))+'" fill="none" stroke="#9aa3b5" stroke-width="0.16" stroke-linecap="round" stroke-linejoin="round"/>'
+    +'<text x="'+bcx+'" y="'+(-(bcy-0.55))+'" text-anchor="middle" font-size="0.78" font-weight="800" letter-spacing="0.16" fill="#9aa3b5" font-family="Nunito, sans-serif">BUILD THE SHAPE</text>';
+  boardSvg.appendChild(buildLabelG);
+  /* Ghost outline ON TOP of pieces, always visible, never intercepts pointer */
+  ghostPath=document.createElementNS(SVGNS,"polygon");
+  ghostPath.setAttribute("points", toSvg(sil.outline));
+  ghostPath.setAttribute("fill","var(--ghost-fill)");
+  ghostPath.setAttribute("stroke","#1b2433"); ghostPath.setAttribute("stroke-width","0.14");
+  ghostPath.setAttribute("stroke-dasharray","0.55 0.35"); ghostPath.setAttribute("stroke-linejoin","round");
+  ghostPath.setAttribute("class","ghost-outline");
+  boardSvg.appendChild(ghostPath);
+  /* Tracing pen for the signature opening: a solid stroke that draws the
+     outline vertex to vertex (pathLength normalised to 100) and then hands
+     over to the dashed ghost above once the loop closes. */
+  tracePath=document.createElementNS(SVGNS,"path");
+  tracePath.setAttribute("d", outlinePathD(sil.outline));
+  tracePath.setAttribute("fill","none");
+  tracePath.setAttribute("stroke","#1b2433"); tracePath.setAttribute("stroke-width","0.18");
+  tracePath.setAttribute("stroke-linejoin","round"); tracePath.setAttribute("stroke-linecap","round");
+  tracePath.setAttribute("pathLength","100");
+  tracePath.setAttribute("stroke-dasharray","100"); tracePath.setAttribute("stroke-dashoffset","100");
+  tracePath.setAttribute("class","ghost-trace");
+  tracePath.style.display="none";
+  boardSvg.appendChild(tracePath);
+}
+function buildTray(){
+  traySvg.innerHTML="";
+  traySvg.setAttribute("data-mode", trayMode);
+  const bg=document.createElementNS(SVGNS,"rect");
+  if(trayMode==="row"){
+    traySvg.setAttribute("viewBox","-1.6 -3.6 43.4 7.2");
+    bg.setAttribute("x","-0.9"); bg.setAttribute("y","-3.1"); bg.setAttribute("width","42"); bg.setAttribute("height","6.2");
+    bg.setAttribute("rx","1.2");
+  } else {
+    traySvg.setAttribute("viewBox","-1 -9.6 10 10.6");
+    bg.setAttribute("x","0"); bg.setAttribute("y","-8"); bg.setAttribute("width","8"); bg.setAttribute("height","8");
+  }
+  bg.setAttribute("fill","var(--ghost-fill)"); bg.setAttribute("stroke","#8b93a5");
+  bg.setAttribute("stroke-width","0.08"); bg.setAttribute("stroke-dasharray","0.4 0.3");
+  traySvg.appendChild(bg);
+  const g=document.createElementNS(SVGNS,"g"); g.id="trayPieces"; traySvg.appendChild(g);
+}
+function makePieceEl(p){
+  const def=PIECE_DEFS.find(d=>d.id===p.id);
+  const g=document.createElementNS(SVGNS,"g");
+  g.setAttribute("class","piece"); g.setAttribute("data-testid","piece-"+p.id);
+  g.setAttribute("data-piece",p.id); g.setAttribute("tabindex","0");
+  g.setAttribute("role","button");
+  g.setAttribute("aria-label", def.name+" piece. Click to rotate 45 degrees, or press R. Arrow keys move it, Enter places it.");
+  g.style.transformBox="fill-box"; g.style.transformOrigin="center";
+  const poly=document.createElementNS(SVGNS,"polygon");
+  poly.setAttribute("fill", def.color);
+  g.appendChild(poly);
+  p.el=g; p.polyEl=poly;
+  g.addEventListener("pointerdown", onPiecePointerDown);
+  g.addEventListener("click", function(e){ e.stopPropagation(); });
+  g.addEventListener("focus", function(){ selectPiece(p.id,{fromKeyboard:tabFocus}); });
+  return g;
+}
+function renderPiece(p){
+  const def=PIECE_DEFS.find(d=>d.id===p.id);
+  /* In-flight animation overrides: _visRot is a fractional rotation while a
+     rotate tween runs; _flipT/_flipFrom interpolate the mirror flip. */
+  const flipScale = (p._flipT!=null) ? p._flipFrom*(1-2*p._flipT) : null;
+  if(p._visRot!=null || flipScale!==null){
+    const pl={ rot:(p._visRot!=null?p._visRot:p.rot), flip:p.flip, cx:p.cx, cy:p.cy };
+    p.polyEl.setAttribute("points", toSvg(placedPoly(def, pl, flipScale)));
+  } else {
+    p.polyEl.setAttribute("points", toSvg(placedPoly(def, p)));
+  }
+  p.el.classList.toggle("selected", state.selected===p.id);
+  p.el.classList.toggle("placed", p.placed);
+}
+function attachPiece(p){
+  const parent = p.loc==="board" ? boardPiecesG : traySvg.querySelector("#trayPieces");
+  parent.appendChild(p.el);
+  renderPiece(p);
+}
+function updateMagnet(){
+  if(!state || !state.selected){ magnetG.style.display="none"; return; }
+  const p=state.pieces[state.selected];
+  if(p.loc!=="board"){ magnetG.style.display="none"; return; }
+  const w=curSil().witness[p.id];
+  magnetCircle.setAttribute("cx", w.cx); magnetCircle.setAttribute("cy", -w.cy);
+  magnetG.querySelectorAll("circle")[1].setAttribute("cx", w.cx);
+  magnetG.querySelectorAll("circle")[1].setAttribute("cy", -w.cy);
+  magnetG.style.display="";
+}
+function updateHud(){
+  const placedCount=PIECE_DEFS.filter(d=>state.pieces[d.id].placed).length;
+  if(buildLabelG) buildLabelG.style.display = placedCount===0 ? "" : "none";
+  document.getElementById("chipPlaced").textContent="Placed "+placedCount+" / 7";
+  document.getElementById("chipMistakes").textContent="Wrong placements "+state.mistakes;
+  document.getElementById("chipMode").textContent = state.mode==="classic" ? "Classic · counts up" : "Countdown · 120 seconds";
+  const flipBtn=document.getElementById("btnFlip");
+  const sel=state.selected?state.pieces[state.selected]:null;
+  flipBtn.disabled = !(sel && sel.id==="para");
+  flipBtn.title = sel && sel.id!=="para" ? "Flip only changes the parallelogram — other pieces look the same flipped." : "Flip the parallelogram";
+  updateMagnet();
+}
+
+/* ================= Selection ================= */
+function selectPiece(id, opts){
+  opts=opts||{};
+  if(drawGuard) return;
+  if(state.over) return;
+  state.selected=id;
+  const p=state.pieces[id];
+  /* Keyboard selection of a tray piece lifts it onto the board so arrows can move it */
+  if(opts.fromKeyboard && p.loc==="tray"){
+    liftToBoard(p);
+  }
+  PIECE_DEFS.forEach(d=>renderPiece(state.pieces[d.id]));
+  updateHud();
+  if(!opts.quiet) sndSelect();
+}
+/* If a piece is grabbed (or lifted by keyboard) while its opening deal tween
+   is still flying, finish that piece instantly so input takes over cleanly. */
+function finishDeal(p){
+  if(!p.dealAnim) return;
+  cancelAnim(p.dealAnim); p.dealAnim=null;
+  const t=trayPos(p.id);
+  if(p.loc==="tray"){ p.cx=t.cx; p.cy=t.cy; }
+  p._visRot=null; p.el.style.opacity=""; renderPiece(p);
+}
+function liftToBoard(p){
+  finishDeal(p);
+  const sil=curSil();
+  const xs=sil.outline.map(q=>q[0]), ys=sil.outline.map(q=>q[1]);
+  p.loc="board"; p.placed=false;
+  p.cx=(Math.min.apply(null,xs)+Math.max.apply(null,xs))/2;
+  p.cy=(Math.min.apply(null,ys)+Math.max.apply(null,ys))/2;
+  attachPiece(p);
+  setMessage(p.id==="para" ? "Parallelogram lifted onto the board. Arrows move it, F flips it, Enter places it."
+                            : "Piece lifted onto the board. Arrows move it, R rotates, Enter places it.");
+}
+
+/* ================= Snap / placement logic ================= */
+function trySnap(p, opts){
+  opts=opts||{};
+  const w=curSil().witness[p.id];
+  const dist=Math.hypot(p.cx-w.cx, p.cy-w.cy);
+  const rotOK = ((p.rot%8)+8)%8 === ((w.rot%8)+8)%8;
+  const flipOK = p.id!=="para" || p.flip===w.flip;
+  if(dist<=1.5 && rotOK && flipOK){
+    cancelAnim(p.rotAnim); p.rotAnim=null; cancelAnim(p.flipAnim); p.flipAnim=null; cancelAnim(p.posAnim); p.posAnim=null;
+    p._visRot=null; p._flipT=null;
+    p.rot=w.rot; p.flip=w.flip; p.placed=true;
+    const sx=p.cx, sy=p.cy, token=(p._snapToken=(p._snapToken||0)+1);
+    renderPiece(p);
+    sndSnap();
+    setMessage("Snapped in! "+(PIECE_DEFS.find(d=>d.id===p.id).name)+" is home.", "good");
+    updateHud();
+    if(Motion.ok() && (Math.abs(sx-w.cx)>0.02 || Math.abs(sy-w.cy)>0.02)){
+      /* Glide the last stretch into the slot instead of teleporting. */
+      const proxy={x:sx, y:sy};
+      try{
+        p.posAnim=window.anime.animate(proxy, { x:w.cx, y:w.cy, duration:210, ease:"outCubic",
+          onUpdate:function(){ p.cx=proxy.x; p.cy=proxy.y; renderPiece(p); },
+          onComplete:function(){ p.posAnim=null; p.cx=w.cx; p.cy=w.cy; renderPiece(p);
+            if(p._snapToken===token && p.placed && state.pieces[p.id]===p){ Motion.snapPulse(p.el); checkWin(); } } });
+      }catch(e){ p.cx=w.cx; p.cy=w.cy; renderPiece(p); Motion.snapPulse(p.el); checkWin(); }
+    } else {
+      p.cx=w.cx; p.cy=w.cy; renderPiece(p);
+      Motion.snapPulse(p.el);
+      checkWin();
+    }
+    return true;
+  }
+  if(opts.report){
+    if(dist<=1.5 && !rotOK){
+      setMessage("Close! Click the piece (or press R) to rotate it to fit.", "close");
+    } else if(dist<=1.5 && rotOK && !flipOK){
+      setMessage("Flip the parallelogram (F) to fit.", "close");
+    } else if(p.loc==="board" && pointInPoly(p.cx, p.cy, curSil().outline)){
+      state.mistakes++;
+      setMessage("That piece goes somewhere else.", "close");
+      updateHud();
+    } else if(dist>1.5){
+      setMessage("Not quite — the dashed magnet circle marks this piece's true spot.", "");
+    }
+  }
+  return false;
+}
+function checkWin(){
+  const allPlaced=PIECE_DEFS.every(d=>state.pieces[d.id].placed);
+  if(!allPlaced) return;
+  const finalElapsed=elapsedSec(); /* capture BEFORE flagging over — elapsedSec() freezes once over is set */
+  state.over=true; state.won=true; state.elapsedBase=finalElapsed;
+  stopTimer();
+  const secs=Math.round(state.elapsedBase);
+  const sil=curSil();
+  let stars=1;
+  if(!state.usedHint && state.mistakes===0 && !state.usedPeek && secs<=sil.par) stars=3;
+  else if(!state.usedHint && state.mistakes===0) stars=2;
+  const key=sil.id+"_"+state.mode;
+  if(!store.data.best[key] || secs<store.data.best[key]) store.data.best[key]=secs;
+  store.data.solved[sil.id]=true; store.save();
+  document.getElementById("winTitle").textContent=sil.name+" complete!";
+  document.getElementById("winPerfect").style.display = stars===3 ? "" : "none";
+  document.getElementById("winStars").innerHTML =
+    [1,2,3].map(i=> '<span class="'+(i<=stars?"on":"off")+'">★</span>').join("");
+  document.getElementById("winStars").setAttribute("aria-label", stars+" of 3 stars");
+  document.getElementById("winStats").textContent =
+    "Time "+fmtTime(secs)+" · Par "+fmtTime(sil.par)+" · "+(state.mode==="classic"?"Classic":"Countdown 120")+
+    " · Best "+fmtTime(store.data.best[key]);
+  showModal("winBackdrop");
+  sndWin(); confetti();
+  if(Motion.ok()){
+    /* The finished silhouette ripples piece by piece, then the stars pop in. */
+    PIECE_DEFS.forEach((d,i)=>{ const pp=state.pieces[d.id]; if(pp&&pp.el) Motion.snapPulse(pp.el, 120+i*90); });
+    document.querySelectorAll("#winStars span").forEach((el,i)=>{
+      try{ window.anime.animate(el,{scale:[0,1],opacity:[0,1],duration:420,delay:200+i*150,ease:"outBack(2.2)"}); }catch(e){}
+    });
+    if(stars===3){ try{ window.anime.animate(document.getElementById("winPerfect"),{scale:[0.5,1],duration:450,delay:150,ease:"outBack(2)"}); }catch(e){} }
+  }
+  updateHud();
+}
+
+/* ================= Drag (pointer events, mouse + touch) ================= */
+let drag=null;
+function svgTangram(svg, clientX, clientY){
+  const pt=svg.createSVGPoint(); pt.x=clientX; pt.y=clientY;
+  const m=svg.getScreenCTM(); if(!m) return null;
+  const p=pt.matrixTransform(m.inverse());
+  return { x:p.x, y:-p.y };
+}
+function onPiecePointerDown(e){
+  if(drawGuard) return;
+  if(state.over || state.paused) return;
+  const id=e.currentTarget.getAttribute("data-piece");
+  const p=state.pieces[id];
+  e.preventDefault(); e.stopPropagation();
+  clearHintGlow();
+  const svg = p.loc==="board" ? boardSvg : traySvg;
+  const t=svgTangram(svg, e.clientX, e.clientY); if(!t) return;
+  finishDeal(p);
+  p._snapToken=(p._snapToken||0)+1;
+  cancelAnim(p.posAnim); p.posAnim=null;
+  cancelAnim(p.rotAnim); p.rotAnim=null; cancelAnim(p.flipAnim); p.flipAnim=null;
+  if(p._visRot!=null || p._flipT!=null){ p._visRot=null; p._flipT=null; renderPiece(p); }
+  const wasPlaced=p.placed;
+  drag={ id:id, startX:e.clientX, startY:e.clientY, offX:t.x-p.cx, offY:t.y-p.cy,
+         moved:false, wasPlaced:wasPlaced, pointerId:e.pointerId };
+  if(state.selected!==id){ state.selected=id; PIECE_DEFS.forEach(d=>renderPiece(state.pieces[d.id])); updateHud(); }
+  if(p.placed){ p.placed=false; renderPiece(p); updateHud(); }
+  /* bring to front within its svg */
+  p.el.parentNode.appendChild(p.el);
+}
+window.addEventListener("pointermove", function(e){
+  if(!drag) return;
+  e.preventDefault(); /* dragging a piece must never drag or scroll the page/board away */
+  const p=state.pieces[drag.id];
+  const dx=e.clientX-drag.startX, dy=e.clientY-drag.startY;
+  if(Math.abs(dx)+Math.abs(dy)>5 && !drag.moved){
+    drag.moved=true;
+    p.el.classList.add("dragging");
+    if(Motion.ok()){ try{ window.anime.animate(p.el,{scale:1.06,duration:160,ease:"outQuad"}); }catch(e){} }
+  }
+  if(!drag.moved) return;
+  const bRect=boardSvg.getBoundingClientRect(), tRect=traySvg.getBoundingClientRect();
+  const inBoard = e.clientX>=bRect.left&&e.clientX<=bRect.right&&e.clientY>=bRect.top&&e.clientY<=bRect.bottom;
+  const inTray = e.clientX>=tRect.left&&e.clientX<=tRect.right&&e.clientY>=tRect.top&&e.clientY<=tRect.bottom;
+  /* Between the two SVGs (over the page gutter) the piece waits: extrapolating
+     either SVG's coordinates there would fling it far off the board. The grab
+     offset is in tangram units, which both SVGs share, so on entering the
+     other SVG the piece lands exactly under the pointer again. */
+  if(!inBoard && !inTray) return;
+  let target=null, svg=null;
+  if(inBoard){ target="board"; svg=boardSvg; }
+  else { target="tray"; svg=traySvg; }
+  const t=svgTangram(svg, e.clientX, e.clientY); if(!t) return;
+  if(target!==p.loc){
+    p.loc=target;
+    if(target==="board"){ p.placed=false; }
+    attachPiece(p);
+  }
+  p.cx=t.x-drag.offX; p.cy=t.y-drag.offY;
+  renderPiece(p); updateMagnet();
+});
+window.addEventListener("pointerup", function(e){
+  if(!drag) return;
+  const p=state.pieces[drag.id];
+  const wasDrag=drag.moved, wasPlaced=drag.wasPlaced;
+  const startLoc = drag;
+  drag=null;
+  p.el.classList.remove("dragging");
+  if(!wasDrag){
+    /* Click / tap (no drag) rotates the piece 45° — there is no Rotate button.
+       On the board it turns in place; in the tray the click lifts the piece
+       onto the board and turns it there, ready to drag into place. */
+    if(p.loc==="board"){
+      rotatePiece(p, +1); /* clockwise click-rotate */
+      setMessage("Rotated 45°. Click again to turn it more, or drag it into place.");
+      trySnap(p,{report:false});
+    } else {
+      liftToBoard(p);
+      rotatePiece(p, +1);
+      setMessage("Lifted onto the board and rotated 45°. Click again to turn it more, or drag it into place.");
+    }
+    updateHud();
+    return;
+  }
+  /* Dropped over the tray -> return to tray slot */
+  const tRect=traySvg.getBoundingClientRect();
+  const overTray = e.clientX>=tRect.left&&e.clientX<=tRect.right&&e.clientY>=tRect.top&&e.clientY<=tRect.bottom;
+  if(overTray || p.loc==="tray"){
+    const t=trayPos(p.id);
+    p.loc="tray"; p.rot=t.rot; p.flip=t.flip; p.cx=t.cx; p.cy=t.cy; p.placed=false;
+    attachPiece(p); setMessage("Back in the tray.");
+    if(wasDrag && Motion.ok()){ try{ window.anime.animate(p.el,{scale:[1.06,1],duration:180,ease:"outQuad"}); }catch(e){} }
+    updateHud(); return;
+  }
+  p.loc="board"; attachPiece(p);
+  const snapOn=document.getElementById("snapToggle").checked;
+  if(snapOn){
+    trySnap(p,{report:true});
+  } else {
+    /* snap off: only an exact hand placement counts */
+    const w=curSil().witness[p.id];
+    if(Math.hypot(p.cx-w.cx,p.cy-w.cy)<0.05 && p.rot===w.rot && (p.id!=="para"||p.flip===w.flip)){
+      p.cx=w.cx; p.cy=w.cy; p.placed=true; renderPiece(p); sndSnap();
+      setMessage("Placed exactly — snap is off, that was all you.", "good"); checkWin();
+    } else if(pointInPoly(p.cx,p.cy,curSil().outline) && Math.hypot(p.cx-w.cx,p.cy-w.cy)>1.5){
+      state.mistakes++; setMessage("That piece goes somewhere else.", "close");
+    } else {
+      setMessage("Snap is off — nudge with the arrow keys and press Enter to place.");
+    }
+  }
+  if(wasDrag && !p.placed && Motion.ok()){ try{ window.anime.animate(p.el,{scale:[1.06,1],duration:150,ease:"outQuad"}); }catch(e){} }
+  renderPiece(p); updateHud();
+});
+boardSvg.addEventListener("pointerdown", function(){ if(state && !state.over) setMessage("Drag a piece from the tray — click or tap a piece to rotate it 45°."); });
+
+/* ================= Actions ================= */
+function rotatePiece(p, dir){ /* dir +1 = clockwise, -1 = counter-clockwise */
+  const from=(p._visRot!=null)? p._visRot : p.rot;
+  cancelAnim(p.rotAnim); p.rotAnim=null;
+  p.rot=((p.rot - dir)%8+8)%8; /* stored rot counts CCW steps; clockwise decrements */
+  if(p.placed) p.placed=false;
+  if(Motion.ok()){
+    /* The piece visibly turns its 45° — a short tween with a slight overshoot,
+       re-rendering the polygon at fractional rotations each frame. */
+    const proxy={v:from}, target=from-dir;
+    p._visRot=from; renderPiece(p);
+    try{
+      p.rotAnim=window.anime.animate(proxy, { v:target, duration:280, ease:"outBack(1.25)",
+        onUpdate:function(){ p._visRot=proxy.v; renderPiece(p); },
+        onComplete:function(){ p.rotAnim=null; p._visRot=null; renderPiece(p); } });
+    }catch(e){ p._visRot=null; renderPiece(p); }
+  } else {
+    renderPiece(p); Motion.pop(p.el);
+  }
+}
+function doRotate(dir){
+  if(drawGuard) return;
+  if(!state || state.over || !state.selected) { if(!state||!state.selected) setMessage("Select a piece first — tap one, or press Tab."); return; }
+  clearHintGlow();
+  rotatePiece(state.pieces[state.selected], dir||1);
+  setMessage("Rotated. Press Enter to try placing it.");
+  updateHud();
+}
+function doFlip(){
+  if(drawGuard) return;
+  if(!state || state.over || !state.selected){ setMessage("Select a piece first — tap one, or press Tab."); return; }
+  const p=state.pieces[state.selected];
+  if(p.id!=="para"){ setMessage("Flip only changes the parallelogram — triangles and the square look the same flipped."); return; }
+  clearHintGlow();
+  const fromSign = p.flip ? -1 : 1;
+  cancelAnim(p.flipAnim); p.flipAnim=null;
+  p.flip=p.flip?0:1; if(p.placed) p.placed=false;
+  if(Motion.ok()){
+    /* Mirror-flip through edge-on: the x scale sweeps +1 → 0 → −1. */
+    const proxy={t:0};
+    p._flipFrom=fromSign; p._flipT=0; renderPiece(p);
+    try{
+      p.flipAnim=window.anime.animate(proxy, { t:1, duration:300, ease:"inOutQuad",
+        onUpdate:function(){ p._flipT=proxy.t; renderPiece(p); },
+        onComplete:function(){ p.flipAnim=null; p._flipT=null; renderPiece(p); } });
+    }catch(e){ p._flipT=null; renderPiece(p); }
+  } else {
+    renderPiece(p); Motion.pop(p.el);
+  }
+  setMessage("Parallelogram flipped. Press Enter to try placing it.");
+  updateHud();
+}
+let hintTimeout=null;
+function clearHintGlow(){
+  PIECE_DEFS.forEach(d=>{ const p=state&&state.pieces[d.id]; if(p&&p.el) p.el.classList.remove("hint-glow"); });
+  if(state && state.hintPulse){ cancelAnim(state.hintPulse); state.hintPulse=null;
+    if(state.hintPieceEl && Motion.ok()){ try{ window.anime.animate(state.hintPieceEl,{scale:1,duration:140,ease:"outQuad"}); }catch(e){} }
+    state.hintPieceEl=null;
+  }
+  if(hintSlotG) hintSlotG.style.display="none";
+  if(hintTimeout){ clearTimeout(hintTimeout); hintTimeout=null; }
+}
+function doHint(){
+  if(drawGuard) return;
+  if(!state || state.over) return;
+  clearHintGlow();
+  const next=PIECE_DEFS.find(d=>!state.pieces[d.id].placed);
+  if(!next){ return; }
+  state.usedHint=true;
+  const p=state.pieces[next.id], w=curSil().witness[next.id];
+  p.el.classList.add("hint-glow");
+  if(Motion.ok()){ try{ state.hintPulse=window.anime.animate(p.el,{scale:[1,1.08],duration:520,ease:"inOutQuad",loop:true,alternate:true}); state.hintPieceEl=p.el; }catch(e){} }
+  hintSlotG.innerHTML="";
+  const poly=document.createElementNS(SVGNS,"polygon");
+  poly.setAttribute("points", toSvg(placedPoly(next, w)));
+  poly.setAttribute("fill","rgba(255,176,32,.35)"); poly.setAttribute("stroke","#e8a33d");
+  poly.setAttribute("stroke-width","0.16"); poly.setAttribute("stroke-dasharray","0.3 0.2");
+  hintSlotG.appendChild(poly); hintSlotG.style.display="";
+  setMessage("Hint: the glowing "+next.name.toLowerCase()+" belongs in the glowing slot. (Hints are unlimited in this demo.)");
+  hintTimeout=setTimeout(clearHintGlow, 4000);
+  updateHud();
+}
+let peekTimeout=null;
+function doPeek(){
+  if(drawGuard) return;
+  if(!state || state.over) return;
+  state.usedPeek=true;
+  peekG.innerHTML="";
+  PIECE_DEFS.forEach(d=>{
+    const poly=document.createElementNS(SVGNS,"polygon");
+    poly.setAttribute("points", toSvg(placedPoly(d, curSil().witness[d.id])));
+    poly.setAttribute("fill", d.color); poly.setAttribute("opacity","0.45");
+    poly.setAttribute("stroke","#1b2433"); poly.setAttribute("stroke-width","0.08");
+    peekG.appendChild(poly);
+  });
+  peekG.style.display="";
+  if(Motion.ok()){ peekG.style.opacity="0"; try{ window.anime.animate(peekG,{opacity:1,duration:260,ease:"outQuad"}); }catch(e){ peekG.style.opacity=""; } }
+  setMessage("Peek: that's the finished "+curSil().name+". It fades in a few seconds.");
+  if(peekTimeout) clearTimeout(peekTimeout);
+  peekTimeout=setTimeout(()=>{
+    if(Motion.ok()){ try{ window.anime.animate(peekG,{opacity:0,duration:300,ease:"outQuad",onComplete:function(){ peekG.style.display="none"; peekG.style.opacity=""; }}); }catch(e){ peekG.style.display="none"; } }
+    else peekG.style.display="none";
+  }, 3000);
+  updateHud();
+}
+function doReset(){
+  loadPuzzle(state.silIdx, state.mode);
+  setMessage("Reset — all seven tans are back in the tray "+(trayMode==="row"?"row":"square")+". Timer restarted.");
+}
+/* Tray arrangement switch — a setting, not a variant. Board pieces stay
+   exactly where they are; only tans still in the tray move to the other
+   arrangement's slots, with a short glide so the change is visible. */
+function setTrayMode(mode){
+  if(trayMode===mode || !state) return;
+  trayMode=mode;
+  document.getElementById("traySquare").setAttribute("aria-pressed", mode==="square"?"true":"false");
+  document.getElementById("trayRow").setAttribute("aria-pressed", mode==="row"?"true":"false");
+  buildTray();
+  PIECE_DEFS.forEach(d=>{
+    const p=state.pieces[d.id];
+    if(p.loc!=="tray"){ attachPiece(p); return; }
+    cancelAnim(p.dealAnim); p.dealAnim=null;
+    const slot=trayPos(d.id), sx=p.cx, sy=p.cy;
+    attachPiece(p);
+    if(Motion.ok() && (Math.abs(sx-slot.cx)>0.02 || Math.abs(sy-slot.cy)>0.02)){
+      const proxy={x:sx, y:sy};
+      try{
+        p.dealAnim=window.anime.animate(proxy, { x:slot.cx, y:slot.cy, duration:380, ease:"outCubic",
+          onUpdate:function(){ p.cx=proxy.x; p.cy=proxy.y; renderPiece(p); },
+          onComplete:function(){ p.dealAnim=null; p.cx=slot.cx; p.cy=slot.cy; p.rot=slot.rot; p.flip=slot.flip; renderPiece(p); } });
+      }catch(e){ p.cx=slot.cx; p.cy=slot.cy; p.rot=slot.rot; p.flip=slot.flip; renderPiece(p); }
+    } else {
+      p.cx=slot.cx; p.cy=slot.cy; p.rot=slot.rot; p.flip=slot.flip; renderPiece(p);
+    }
+  });
+  /* Keep the medium-triangle hit-test fix in square mode after a rebuild. */
+  const tp=traySvg.querySelector("#trayPieces");
+  if(tp && state.pieces.medium.loc==="tray") tp.appendChild(state.pieces.medium.el);
+  document.getElementById("trayNote").textContent = mode==="row"
+    ? "Arriving in a row — same pieces and rules as Square. A tray setting, not a variant. Note the row squeezes each tan smaller in this column."
+    : "Arriving as the classic square — same pieces and rules as Row. A tray setting, not a variant.";
+  setMessage(mode==="row" ? "Tray: Row — the seven tans now arrive in one strip." : "Tray: Square — the seven tans now arrive as the classic square.");
+  updateHud();
+}
+function doConfirm(){
+  if(drawGuard) return;
+  if(!state || state.over || !state.selected){ setMessage("Select a piece first — tap one, or press Tab."); return; }
+  const p=state.pieces[state.selected];
+  if(p.loc==="tray"){ liftToBoard(p); return; }
+  clearHintGlow();
+  trySnap(p,{report:true});
+  updateHud();
+}
+
+/* ================= Timer / modes ================= */
+function tick(){
+  if(!state) return;
+  const el=document.getElementById("timer");
+  if(state.mode==="classic"){
+    el.textContent=fmtTime(elapsedSec()); el.classList.remove("low");
+  } else {
+    const remain=120-elapsedSec();
+    el.textContent=fmtTime(Math.max(0,remain));
+    el.classList.toggle("low", remain<=15 && remain>0);
+    if(remain<=0 && !state.over){
+      state.over=true; state.elapsedBase=120; stopTimer();
+      document.getElementById("loseBanner").classList.add("show");
+      setMessage("Time's up in Countdown 120. Hit Play again for an instant reset.", "close");
+      sndLose();
+    }
+  }
+}
+function startTimer(){
+  stopTimer();
+  state.timerInt=setInterval(tick, 200); tick();
+}
+function stopTimer(){ if(state && state.timerInt){ clearInterval(state.timerInt); state.timerInt=null; } }
+function togglePause(){
+  if(!state || state.over) return;
+  if(state.paused){
+    state.paused=false; state.startedAt=Date.now();
+    document.getElementById("btnPause").textContent="⏸";
+    setMessage("Resumed.");
+  } else {
+    state.elapsedBase=elapsedSec(); state.paused=true;
+    document.getElementById("btnPause").textContent="▶";
+    setMessage("Paused — the clock is stopped.");
+  }
+  tick();
+}
+function setMode(mode){
+  if(state && state.mode===mode) return;
+  loadPuzzle(state?state.silIdx:0, mode);
+  setMessage(mode==="classic" ? "Classic mode: the clock counts up, and there is no lose state."
+                               : "Countdown 120: you have 120 seconds. Reaching 0:00 ends the run.");
+}
+
+/* ================= Puzzle lifecycle ================= */
+function loadPuzzle(silIdx, mode){
+  if(state) stopTimer();
+  /* A new puzzle always starts with the board in view: the page never scrolls
+     (the layout fits the viewport), and the tray column rewinds to the top so
+     the seven tans are on screen next to the board. */
+  try{ window.scrollTo(0,0); }catch(e){}
+  const sideEl=document.querySelector(".side"); if(sideEl) sideEl.scrollTop=0;
+  stopMusic(); if(document.getElementById("musicToggle").checked) startMusic();
+  state=freshState(silIdx, mode);
+  document.getElementById("loseBanner").classList.remove("show");
+  document.getElementById("btnPause").textContent="⏸";
+  hideModal("winBackdrop");
+  buildBoard(); buildTray();
+  PIECE_DEFS.forEach(d=>{ const p=state.pieces[d.id]; makePieceEl(p); attachPiece(p); });
+  /* The medium triangle's bounding-box centre is exactly the tray mosaic's
+     junction point, where four pieces meet — paint it last in the tray so
+     that point hit-tests to the medium itself, not a neighbour's corner. */
+  traySvg.querySelector("#trayPieces").appendChild(state.pieces.medium.el);
+  /* Signature opening — the silhouette draws itself first, then the tans.
+     The dashed outline is traced as one continuous pen stroke: it starts at
+     the first vertex, runs edge to edge around the whole perimeter (a simple
+     triangle is a single 3-edge loop; a complex outline is traced vertex to
+     vertex without stopping) and closes the loop. Only once the draw has
+     completely finished — from its onComplete handler (finishDraw), never
+     part-way through — do the seven tans spin out from the tray-centre stack
+     into the tray square, one by one. While the pen is drawing, input is
+     guarded (drawGuard) so no piece can be grabbed early; grabbing a piece
+     mid-deal still finishes it instantly (see finishDeal). */
+  const seq=++loadSeq;
+  if(drawAnim){ cancelAnim(drawAnim); drawAnim=null; }
+  if(dealTimer){ clearTimeout(dealTimer); dealTimer=null; }
+  drawGuard=false;
+  function startDeal(){
+    if(seq!==loadSeq) return;
+    dealTimer=null;
+    drawGuard=false; /* the deal itself stays interruptible, as before */
+    const stack=trayStack();
+    const order = trayMode==="row" ? ROW_ORDER.map(function(id){ return PIECE_DEFS.find(function(d){ return d.id===id; }); }) : PIECE_DEFS;
+    order.forEach((d,i)=>{
+      const p=state.pieces[d.id], slot=trayPos(d.id);
+      const proxy={x:stack.x, y:stack.y, r:slot.rot+2, o:0};
+      p.cx=stack.x; p.cy=stack.y; p._visRot=slot.rot+2; p.el.style.opacity="0"; renderPiece(p);
+      try{
+        p.dealAnim=window.anime.animate(proxy, { x:slot.cx, y:slot.cy, r:slot.rot, o:1,
+          duration:500, delay:i*70, ease:"outQuint",
+          onUpdate:function(){ p.cx=proxy.x; p.cy=proxy.y; p._visRot=proxy.r; p.el.style.opacity=String(proxy.o); renderPiece(p); },
+          onComplete:function(){ p.dealAnim=null; p._visRot=null; p.el.style.opacity=""; p.cx=slot.cx; p.cy=slot.cy; renderPiece(p); } });
+      }catch(e){ p.dealAnim=null; p.cx=slot.cx; p.cy=slot.cy; p._visRot=null; p.el.style.opacity=""; renderPiece(p); }
+    });
+  }
+  function finishDraw(){
+    if(seq!==loadSeq) return;
+    drawAnim=null;
+    tracePath.style.display="none";
+    /* Hand over to the final dashed outline — identical stroke, dash pattern,
+       fill and stacking as before the draw existed. */
+    ghostPath.style.opacity="";
+    try{ window.anime.animate(ghostPath,{opacity:[0,1],duration:220,ease:"outQuad",
+      onComplete:function(){ ghostPath.style.opacity=""; }}); }catch(e){ ghostPath.style.opacity=""; }
+    /* The outline has completely finished drawing — only now do the tans appear. */
+    startDeal();
+  }
+  if(Motion.ok()){
+    drawGuard=true;
+    /* Park the tans hidden at the tray stack until the deal starts —
+       the square's centre, or just off the row strip's left end. */
+    const stack=trayStack();
+    PIECE_DEFS.forEach(d=>{
+      const p=state.pieces[d.id], slot=trayPos(d.id);
+      p.cx=stack.x; p.cy=stack.y; p._visRot=slot.rot+2; p.el.style.opacity="0"; renderPiece(p);
+    });
+    ghostPath.style.opacity="0";
+    const dur=drawDurationFor(curSil());
+    boardSvg.setAttribute("data-draw-duration", String(dur));
+    tracePath.style.display="";
+    tracePath.setAttribute("stroke-dashoffset","100");
+    const pen={v:100};
+    try{
+      drawAnim=window.anime.animate(pen, { v:0, duration:dur, ease:"inOutQuad",
+        onUpdate:function(){ tracePath.setAttribute("stroke-dashoffset", String(pen.v)); },
+        onComplete:finishDraw });
+    }catch(e){
+      drawAnim=null; tracePath.style.display="none"; ghostPath.style.opacity="";
+    }
+    if(!drawAnim){
+      /* Animation failed to start — never leave the player locked out. */
+      drawGuard=false;
+      PIECE_DEFS.forEach(d=>{ const p=state.pieces[d.id], slot=trayPos(d.id);
+        p.cx=slot.cx; p.cy=slot.cy; p._visRot=null; p.el.style.opacity=""; renderPiece(p); });
+    }
+  } else {
+    ghostPath.style.opacity="";
+    tracePath.style.display="none";
+  }
+  const sil=curSil();
+  document.getElementById("boardTitle").textContent=sil.name;
+  document.getElementById("shapeCardTitle").textContent=sil.name+" · Par "+fmtTime(sil.par);
+  document.getElementById("shapePreview").innerHTML=silhouettePreviewSVG(sil, false);
+  document.getElementById("boardPar").textContent="Par "+fmtTime(sil.par)+" · Fill the dashed outline with all 7 tans";
+  document.getElementById("puzzleName").innerHTML="Now playing: <b>"+sil.name+"</b>";
+  document.getElementById("modeClassic").setAttribute("aria-pressed", mode==="classic"?"true":"false");
+  document.getElementById("modeCountdown").setAttribute("aria-pressed", mode==="countdown"?"true":"false");
+  state.selected="large1";
+  PIECE_DEFS.forEach(d=>renderPiece(state.pieces[d.id]));
+  updateHud(); startTimer();
+}
+
+/* ================= Modals / chooser / confetti ================= */
+function showModal(id){ const b=document.getElementById(id); b.classList.add("show"); Motion.fadeIn(b.querySelector(".modal")); }
+function hideModal(id){ document.getElementById(id).classList.remove("show"); }
+function silhouettePreviewSVG(sil, filled){
+  const xs=sil.outline.map(p=>p[0]), ys=sil.outline.map(p=>p[1]);
+  const minX=Math.min.apply(null,xs)-1, maxX=Math.max.apply(null,xs)+1;
+  const minY=Math.min.apply(null,ys)-1, maxY=Math.max.apply(null,ys)+1;
+  const pts=toSvg(sil.outline);
+  let inner='<polygon points="'+pts+'" fill="'+(filled?"#7d61ae":"#9aa7ba")+'" fill-opacity="'+(filled?"0.85":"0.55")+'" stroke="#1b2433" stroke-width="0.12" stroke-linejoin="round"/>';
+  if(filled){
+    inner = PIECE_DEFS.map(d=>'<polygon points="'+toSvg(placedPoly(d, sil.witness[d.id]))+'" fill="'+d.color+'" stroke="#1b2433" stroke-width="0.08"/>').join("");
+  }
+  return '<svg viewBox="'+minX+' '+(-maxY)+' '+(maxX-minX)+' '+(maxY-minY)+'" aria-hidden="true">'+inner+'</svg>';
+}
+let chooserAnimate=false;
+function renderChooser(){
+  const q=(document.getElementById("chooserSearch").value||"").toLowerCase();
+  const grid=document.getElementById("chooserGrid"); grid.innerHTML="";
+  const animateCards=chooserAnimate; chooserAnimate=false;
+  const matches=SILHOUETTES.filter(s=> s.name.toLowerCase().indexOf(q)>=0);
+  if(!matches.length){ grid.innerHTML='<p style="font-weight:700;color:var(--ink-soft)">No silhouette matches that search.</p>'; }
+  matches.forEach(s=>{
+    const solved=!!store.data.solved[s.id];
+    const bestC=store.data.best[s.id+"_classic"], bestD=store.data.best[s.id+"_countdown"];
+    const card=document.createElement("button");
+    card.type="button"; card.className="chooser-card"; card.setAttribute("data-testid","chooser-card-"+s.id);
+    card.innerHTML = silhouettePreviewSVG(s, solved)
+      + '<span class="nm">'+s.name+'</span>'
+      + '<span class="meta">Par '+fmtTime(s.par)+'</span>'
+      + '<span class="meta">'+(bestC?("Best (Classic) "+fmtTime(bestC)):(bestD?("Best (Countdown) "+fmtTime(bestD)):"No best time yet"))+'</span>'
+      + (solved?'<span class="solved">✓ Solved by you</span>':'<span class="meta">Not solved yet</span>');
+    card.addEventListener("click", function(){
+      hideModal("chooserBackdrop");
+      loadPuzzle(SILHOUETTES.indexOf(s), state.mode);
+      setMessage(s.name+" loaded. Any silhouette can be picked — no unlocking needed.");
+    });
+    card.addEventListener("mouseenter", function(){ showLargePreview(s); });
+    card.addEventListener("focus", function(){ showLargePreview(s); });
+    grid.appendChild(card);
+  });
+  if(animateCards && Motion.ok()){
+    Array.prototype.forEach.call(grid.children, function(el,i){
+      try{ window.anime.animate(el,{opacity:[0,1],translateY:[14,0],duration:300,delay:i*40,ease:"outQuad"}); }catch(e){}
+    });
+  }
+  showLargePreview(matches[0] || curSil());
+}
+function showLargePreview(sil){
+  const solved=!!store.data.solved[sil.id];
+  document.getElementById("largePreview").innerHTML =
+    silhouettePreviewSVG(sil, solved) +
+    '<div class="cap">'+sil.name+' · Par '+fmtTime(sil.par)+(solved?" · ✓ Solved by you":"")+'</div>';
+}
+function confetti(){
+  if(reducedMotion) return;
+  const colors=["#e5532d","#2f6fed","#009a86","#7d61ae","#ffb020"];
+  for(let i=0;i<36;i++){
+    const bit=document.createElement("div");
+    bit.className="confetti-bit";
+    bit.style.background=colors[i%colors.length];
+    bit.style.left=(15+Math.random()*70)+"vw"; bit.style.top="-20px";
+    if(i%3===0) bit.style.borderRadius="50%";
+    document.body.appendChild(bit);
+    const dx=(Math.random()-0.5)*220, dy=window.innerHeight*(0.45+Math.random()*0.4), rot=Math.random()*540-270;
+    if(Motion.ok()){
+      try{ window.anime.animate(bit,{ translateX:dx, translateY:dy, rotate:rot, opacity:[1,0], duration:1300+Math.random()*700, ease:"outQuad",
+        onComplete:function(){ bit.remove(); } }); }catch(e){ bit.remove(); }
+    } else {
+      bit.style.transition="transform 1.4s ease-out, opacity 1.4s";
+      requestAnimationFrame(()=>{ bit.style.transform="translate("+dx+"px,"+dy+"px) rotate("+rot+"deg)"; bit.style.opacity="0"; });
+      setTimeout(()=>bit.remove(), 1500);
+    }
+  }
+}
+
+/* ================= Keyboard ================= */
+/* Only genuine Tab focus lifts a tray piece onto the board; a mouse press also
+   fires focus, and lifting then would teleport the piece mid-drag. */
+let tabFocus=false;
+window.addEventListener("keydown", function(e){ if(e.key==="Tab") tabFocus=true; }, true);
+window.addEventListener("pointerdown", function(){ tabFocus=false; }, true);
+window.addEventListener("keydown", function(e){
+  const tag=(e.target && e.target.tagName)||"";
+  if(tag==="INPUT" || tag==="SELECT" || tag==="TEXTAREA") return;
+  if(document.querySelector(".modal-backdrop.show")) return;
+  if(drawGuard) return;
+  if(!state || state.over) return;
+  const k=e.key;
+  if(k==="r" || k==="R"){ e.preventDefault(); doRotate(e.shiftKey?-1:1); }
+  else if(k==="f" || k==="F"){ e.preventDefault(); doFlip(); }
+  else if(k==="h" || k==="H"){ e.preventDefault(); doHint(); }
+  else if(k==="Enter"){ e.preventDefault(); doConfirm(); }
+  else if(k.indexOf("Arrow")===0){
+    e.preventDefault();
+    if(!state.selected){ setMessage("Select a piece first — press Tab."); return; }
+    if(state.paused) return;
+    clearHintGlow();
+    const p=state.pieces[state.selected];
+    if(p.loc==="tray"){ liftToBoard(p); }
+    const step=e.shiftKey?0.25:1;
+    if(k==="ArrowLeft") p.cx-=step; else if(k==="ArrowRight") p.cx+=step;
+    else if(k==="ArrowUp") p.cy+=step; else if(k==="ArrowDown") p.cy-=step;
+    if(p.placed) p.placed=false;
+    renderPiece(p); updateMagnet();
+    setMessage("Nudged. The magnet circle shows where this piece truly belongs — Enter tries to place it.");
+  }
+});
+
+/* ================= Wiring ================= */
+document.getElementById("traySquare").addEventListener("click", ()=>setTrayMode("square"));
+document.getElementById("trayRow").addEventListener("click", ()=>setTrayMode("row"));
+document.getElementById("btnFlip").addEventListener("click", doFlip);
+document.getElementById("btnHint").addEventListener("click", doHint);
+document.getElementById("btnPeek").addEventListener("click", doPeek);
+document.getElementById("btnReset").addEventListener("click", doReset);
+document.getElementById("btnSnapConfirm").addEventListener("click", doConfirm);
+document.getElementById("btnPause").addEventListener("click", togglePause);
+document.getElementById("btnLoseReset").addEventListener("click", doReset);
+document.getElementById("modeClassic").addEventListener("click", ()=>setMode("classic"));
+document.getElementById("modeCountdown").addEventListener("click", ()=>setMode("countdown"));
+document.getElementById("btnWinNext").addEventListener("click", function(){
+  const next=(state.silIdx+1)%SILHOUETTES.length;
+  loadPuzzle(next, state.mode);
+  setMessage("Next up: "+SILHOUETTES[next].name+".");
+});
+document.getElementById("btnWinRetry").addEventListener("click", doReset);
+document.getElementById("btnWinClose").addEventListener("click", ()=>hideModal("winBackdrop"));
+document.getElementById("btnChooserTop").addEventListener("click", function(){ chooserAnimate=true; renderChooser(); showModal("chooserBackdrop"); });
+document.getElementById("btnChooserClose").addEventListener("click", ()=>hideModal("chooserBackdrop"));
+document.getElementById("chooserSearch").addEventListener("input", renderChooser);
+document.getElementById("btnHelp").addEventListener("click", ()=>showModal("helpBackdrop"));
+document.getElementById("btnHelpClose").addEventListener("click", ()=>hideModal("helpBackdrop"));
+document.getElementById("musicToggle").addEventListener("change", function(){ if(this.checked) startMusic(); else stopMusic(); });
+document.querySelectorAll(".modal-backdrop").forEach(b=>{
+  b.addEventListener("click", function(e){ if(e.target===b) b.classList.remove("show"); });
+});
+window.addEventListener("keydown", function(e){
+  if(e.key==="Escape") document.querySelectorAll(".modal-backdrop.show").forEach(b=>b.classList.remove("show"));
+});
+
+loadPuzzle(0, "classic");
+</script>
+</body>
+</html>

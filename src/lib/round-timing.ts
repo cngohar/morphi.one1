@@ -5,6 +5,7 @@ export const BLOCK_ENTRANCE_MS = 3000;
 export const CONNECT_ENTRANCE_MS = 2500;
 export const NONOGRAM_ENTRANCE_MS = 2500;
 export const MAHJONG_ENTRANCE_MS = 2000;
+export const TANGRAM_ENTRANCE_MS = 1500;
 export function memoryEntranceMs(pairs: number): number {
 	return pairs <= 6 ? 3000 : pairs <= 8 ? 4000 : 5000;
 }
