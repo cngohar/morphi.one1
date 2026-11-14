@@ -436,7 +436,7 @@ export function autoFinishSweep(state: KlondikeState): AutoFinishResult {
 // ---------------------------------------------------------------------------
 
 export interface SolverResult {
-	outcome: 'won' | 'proved-dead' | 'undecided';
+	outcome: 'won' | 'undecided';
 	nodes: number;
 	moves?: Move[];
 }
@@ -950,8 +950,7 @@ export function solveKlondike(
 		}
 	}
 
-	if (nodes >= maxNodes) return { outcome: 'undecided', nodes };
-	return { outcome: 'proved-dead', nodes };
+	return { outcome: 'undecided', nodes };
 }
 
 /** Same generation pipeline as createRound: deterministic for a seed + variant. */
@@ -959,9 +958,7 @@ export function klondikeDeal(seed: string, variantId?: string): KlondikeDeal {
 	const rules = parseRules(variantId);
 	const rng = createRng(seed);
 	let nodes = 0;
-	const MAX_NODES = 400000;
-	const PER_ATTEMPT_BUDGET = 4000;
-	for (let attempt = 0; attempt < 100 && nodes < MAX_NODES; attempt++) {
+	for (let attempt = 0; attempt < 100; attempt++) {
 		const deck = shuffle(
 			rng,
 			Array.from({ length: 52 }, (_, i) => i)
@@ -969,8 +966,7 @@ export function klondikeDeal(seed: string, variantId?: string): KlondikeDeal {
 		nodes += 52;
 		const initial = createInitialDeal(deck, rules);
 		if (!hasOpeningMove(initial, rules)) continue;
-		const budget = Math.min(PER_ATTEMPT_BUDGET, MAX_NODES - nodes);
-		const solved = solveKlondike(deck, rules, budget);
+		const solved = solveKlondike(deck, rules, 400000);
 		nodes += solved.nodes;
 		if (solved.outcome === 'won') return { deck, attempts: attempt + 1, nodes };
 	}

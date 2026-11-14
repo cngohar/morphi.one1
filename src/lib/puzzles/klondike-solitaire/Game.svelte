@@ -82,7 +82,7 @@
 	let gameState: KlondikeState = $state(
 		createInitialDeal(initialDeal.deck, parseRules(round.variant))
 	);
-	const currentScore = $derived.by(() => klondikeScore(gameState, seconds, scoring, rules));
+	const currentScore = $derived.by(() => klondikeScore(gameState, 0, scoring, rules));
 
 	let undoStack: KlondikeState[] = $state([]);
 	let runMoves: Move[] = $state([]);
@@ -518,7 +518,7 @@
 			};
 			undoStack = [...undoStack, JSON.parse(JSON.stringify(gameState))];
 			sound.play('win');
-			commitMove(move, sweep.finalState);
+			commitMove(move, { ...sweep.finalState, movesCount: sweep.finalState.movesCount + 1 });
 		}
 	}
 

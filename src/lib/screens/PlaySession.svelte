@@ -1364,10 +1364,10 @@
 					fixedVariant = mod.manifest.resolveVariantFromRules(rules);
 				}
 			}
-			if (!fixedVariant) {
-				console.error('morphi:variant_resolution_failed');
-				return;
-			}
+		}
+		if (!fixedVariant) {
+			console.error('morphi:variant_resolution_failed');
+			return;
 		}
 		if (roundOwner && rankedSession)
 			await abandonSession(rankedSession, roundOwner).catch(() =>

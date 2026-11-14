@@ -58,3 +58,36 @@ All eleven presets are enabled and `presentation.groups` is empty. The existing 
 - `svelte-check` (0 errors, 0 warnings).
 - Boundary check (`bun run check:boundaries`).
 - Lazy bundle isolation check (`bun run check:lazy-bundle`) confirming shell isolation and exactly 7 independent Game views.
+
+### Measured
+
+Fix round, local Bun on an AMD PRO A8-8650B (4 cores), 2026-11-14. Solver
+samples are the first shuffled deck for seeds 1–100 in each mode, with a
+400,000-node limit. Medians use the midpoint and p95 is nearest-rank.
+
+| Solver | Won / undecided | Median / p95 nodes | Median / p95 wall time |
+| ------ | --------------- | ------------------ | ---------------------- |
+| Draw 1 | 44 / 56         | 400,000 / 400,000  | 6,894.7 / 20,193.8 ms  |
+| Draw 3 | 15 / 85         | 400,000 / 400,000  | 6,248.1 / 15,321.1 ms  |
+
+Daily derivation sampled 2026-01-01 through 2026-01-30 with a fixed local
+HMAC secret, forcing each mode independently. Nodes are the generator's total,
+including its accounting of 52 per shuffled candidate; seeds walked count daily
+derived seeds, not candidate shuffles.
+
+| Daily  | Median / p95 seeds | Median / p95 nodes     | Median / p95 wall time  |
+| ------ | ------------------ | ---------------------- | ----------------------- |
+| Draw 1 | 1 / 1              | 342 / 2,800,691        | 6.26 / 63,941.24 ms     |
+| Draw 3 | 1 / 1              | 2,000,559 / 16,002,407 | 48,050.0 / 316,881.6 ms |
+
+The slowest Draw 3 date took 464,210.4 ms and 68 candidates (25,603,664
+nodes). Early Draw 1 solver samples overlapped verification; 29 Draw 3 daily
+dates ran partly or fully alongside one or two other sampling workers. Swap
+was in use, so wall times are machine- and contention-specific. These observed
+tails exceed an interactive budget.
+
+A real local D1 leaderboard daily action accepted 10,000 valid sequential
+restart moves in a 550,302-byte multipart request and returned the matching
+session and seed in 391 ms under concurrent solver load. This confirms the
+bounded transport and action response, not a restored board: the action does
+not replay the moves and the game view does not reconstruct them on resume.

@@ -47,7 +47,8 @@ export function klondikeEnter(
 			const cards = [...root.querySelectorAll<HTMLElement>('.tableau-card-enter')];
 			const count = cards.length; // 28 cards
 			if (count > 0) {
-				const gap = thoughtful ? (KLONDIKE_ENTRANCE_MS - 240) / Math.max(1, count - 1) : 96;
+				const gap =
+					(KLONDIKE_ENTRANCE_MS - 240 - (thoughtful ? 0 : 180)) / Math.max(1, count - 1);
 				for (const [idx, card] of cards.entries()) {
 					const start = idx * gap;
 					// Straight translate flight
