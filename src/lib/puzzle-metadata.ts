@@ -327,6 +327,760 @@ const metadata = {
 			}
 		}
 	},
+	['klondike-solitaire']: {
+		engineVersion: 'klondike-solitaire-1',
+		titleAfterEntrance: true,
+		scoring: {
+			version: 'brief-v1',
+			fields: [
+				'wasteTableau',
+				'foundation',
+				'flip',
+				'foundationReturn',
+				'recycleDraw1',
+				'recycleDraw3',
+				'timeBonus',
+				'hint'
+			],
+			defaults: {
+				wasteTableau: 5,
+				foundation: 10,
+				flip: 5,
+				foundationReturn: 15,
+				recycleDraw1: 100,
+				recycleDraw3: 20,
+				timeBonus: 7000,
+				hint: 20
+			}
+		},
+		variants: [
+			{
+				id: 'klondike-solitaire:classic',
+				name: 'variant.klondike-solitaire:classic',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: [
+						'klondike-solitaire.step1',
+						'klondike-solitaire.step2',
+						'klondike-solitaire.step3'
+					],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:draw-3',
+				name: 'variant.klondike-solitaire:draw-3',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.draw-3'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:pass-3',
+				name: 'variant.klondike-solitaire:pass-3',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.pass-3'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:pass-1',
+				name: 'variant.klondike-solitaire:pass-1',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.pass-1'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:any-card',
+				name: 'variant.klondike-solitaire:any-card',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.any-card'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:thoughtful',
+				name: 'variant.klondike-solitaire:thoughtful',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.thoughtful'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:same-colour',
+				name: 'variant.klondike-solitaire:same-colour',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.same-colour'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:different-suit',
+				name: 'variant.klondike-solitaire:different-suit',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.different-suit'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:no-undo',
+				name: 'variant.klondike-solitaire:no-undo',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.no-undo'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:hint-budget-3',
+				name: 'variant.klondike-solitaire:hint-budget-3',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.hint-budget-3'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			},
+			{
+				id: 'klondike-solitaire:draw-3-pass-3',
+				name: 'variant.klondike-solitaire:draw-3-pass-3',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				scoring: {
+					version: 'brief-v1',
+					fields: [
+						'wasteTableau',
+						'foundation',
+						'flip',
+						'foundationReturn',
+						'recycleDraw1',
+						'recycleDraw3',
+						'timeBonus',
+						'hint'
+					],
+					defaults: {
+						wasteTableau: 5,
+						foundation: 10,
+						flip: 5,
+						foundationReturn: 15,
+						recycleDraw1: 100,
+						recycleDraw3: 20,
+						timeBonus: 7000,
+						hint: 20
+					}
+				},
+				help: {
+					steps: ['klondike-solitaire.step1', 'klondike-solitaire.rule.draw-3-pass-3'],
+					rows: [
+						{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+						{
+							label: 'scoring.klondike-solitaire.foundationReturn',
+							field: 'foundationReturn',
+							sign: '−'
+						},
+						{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+						{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+						{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+					],
+					note: 'klondike-solitaire.note',
+					tips: 'klondike-solitaire.tips'
+				},
+				ending: {
+					kind: 'run_over',
+					headlines: {
+						default: 'ending.klondike-solitaire.headline',
+						cap: 'ending.klondike-solitaire.over'
+					},
+					subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'No legal moves remaining and stock is exhausted; round ends with no saved score.'
+				}
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.klondike-solitaire.headline' },
+			subline: { key: 'ending.klondike-solitaire.subline', values: ['moves'] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition: 'All 52 cards are moved to the four foundations.'
+		},
+		presentation: {
+			name: 'v1.game.klondike-solitaire',
+			scoringLabels: {
+				wasteTableau: 'scoring.klondike-solitaire.wasteTableau',
+				foundation: 'scoring.klondike-solitaire.foundation',
+				flip: 'scoring.klondike-solitaire.flip',
+				foundationReturn: 'scoring.klondike-solitaire.foundationReturn',
+				recycleDraw1: 'scoring.klondike-solitaire.recycleDraw1',
+				recycleDraw3: 'scoring.klondike-solitaire.recycleDraw3',
+				timeBonus: 'scoring.klondike-solitaire.timeBonus',
+				hint: 'scoring.klondike-solitaire.hint'
+			},
+			help: {
+				steps: ['klondike-solitaire.step1', 'klondike-solitaire.step2', 'klondike-solitaire.step3'],
+				rows: [
+					{ label: 'scoring.klondike-solitaire.wasteTableau', field: 'wasteTableau', sign: '+' },
+					{ label: 'scoring.klondike-solitaire.foundation', field: 'foundation', sign: '+' },
+					{ label: 'scoring.klondike-solitaire.flip', field: 'flip', sign: '+' },
+					{
+						label: 'scoring.klondike-solitaire.foundationReturn',
+						field: 'foundationReturn',
+						sign: '−'
+					},
+					{ label: 'scoring.klondike-solitaire.recycleDraw1', field: 'recycleDraw1', sign: '−' },
+					{ label: 'scoring.klondike-solitaire.recycleDraw3', field: 'recycleDraw3', sign: '−' },
+					{ label: 'scoring.klondike-solitaire.timeBonus', field: 'timeBonus', sign: '+' },
+					{ label: 'scoring.klondike-solitaire.hint', field: 'hint', sign: '−' }
+				],
+				note: 'klondike-solitaire.note',
+				tips: 'klondike-solitaire.tips'
+			},
+			backdrop: {
+				items: [
+					{
+						id: 'spade-motif',
+						path: 'M32 8 C26 18 16 26 16 36 C16 43 21 48 28 48 C30 48 31 47 32 46 C33 47 34 48 36 48 C43 48 48 43 48 36 C48 26 38 18 32 8 Z M30 46 L27 56 L37 56 L34 46 Z'
+					},
+					{ id: 'diamond-motif', path: 'M32 10 L48 32 L32 54 L16 32 Z' }
+				],
+				fill: 'outline'
+			}
+		}
+	},
 	['mahjong-solitaire']: {
 		engineVersion: 'mahjong-solitaire-1',
 		titleAfterEntrance: true,

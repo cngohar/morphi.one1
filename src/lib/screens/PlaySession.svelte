@@ -877,7 +877,10 @@
 	async function makeCandidate(
 		chosen: PuzzleFamily,
 		rankedGate: Promise<void>,
-		takeoverSession?: string
+		takeoverSession?: string,
+		fixedVariant?: string,
+		previousSeed?: string,
+		isFixed = false
 	) {
 		const [nextStage, view] = await Promise.all([
 			loadStage(chosen),
@@ -886,7 +889,7 @@
 		if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 		const nextOwner = account.ownerKey;
 		let nextDaily: DailyIssued | null = null;
-		if (nextOwner) {
+		if (nextOwner && !isFixed) {
 			await rankedGate;
 			if (generationLifetime.signal.aborted) throw new Error('round_cancelled');
 			if (takeoverSession) await abandonSession(takeoverSession, nextOwner);
@@ -921,14 +924,26 @@
 			};
 		}
 		// Only practice consults the internal variant selector.
-		const nextVariant = getSelector().peekVariant(
-			chosen,
-			puzzleMetadata[chosen].variants,
-			availableVariants[chosen] ?? []
-		);
+		const nextVariant = isFixed
+			? fixedVariant
+			: getSelector().peekVariant(
+					chosen,
+					puzzleMetadata[chosen].variants,
+					availableVariants[chosen] ?? []
+				);
 		let candidate = await preparation.take(chosen);
 		if (!candidate) candidate = await preparation.take(chosen);
 		if (!candidate) throw new Error('round_preparation_failed');
+		if (previousSeed !== undefined) {
+			let attempts = 0;
+			while (candidate && candidate.seed === previousSeed && attempts < 3) {
+				preparation.clear();
+				candidate = await preparation.take(chosen);
+				attempts++;
+			}
+			if (!candidate || candidate.seed === previousSeed)
+				throw new Error('round_preparation_failed');
+		}
 		let nextScoring = defaultScoreConfig(chosen, nextVariant);
 		if (accountsEnabled) {
 			try {
@@ -970,7 +985,7 @@
 			nextScoring
 		};
 	}
-	async function refreshAvailableGames(): Promise<void> {
+	async function refreshAvailableGames(options?: { updateSelector?: boolean }): Promise<void> {
 		let available: readonly string[] = families;
 		if (accountsEnabled) {
 			const response = await fetch(resolve('/api/play/availability'), {
@@ -984,14 +999,16 @@
 			for (const entry of familyIndex)
 				weights.set(entry.id, data.weights[entry.id] ?? entry.weight);
 		}
-		getSelector().setAvailable(
-			eligibleFamilies(
-				familyIndex,
-				available.filter((id) => (weights.get(id) ?? 0) > 0),
-				window.innerWidth,
-				window.innerHeight
-			)
-		);
+		if (options?.updateSelector !== false) {
+			getSelector().setAvailable(
+				eligibleFamilies(
+					familyIndex,
+					available.filter((id) => (weights.get(id) ?? 0) > 0),
+					window.innerWidth,
+					window.innerHeight
+				)
+			);
+		}
 	}
 	async function assertGameAvailable(chosen: PuzzleFamily): Promise<void> {
 		if (!accountsEnabled) return;
@@ -1007,7 +1024,10 @@
 		if (!data || typeof data !== 'object' || !('available' in data) || data.available !== true)
 			throw new Error('game_unavailable');
 	}
-	async function prepareRound(takeoverSession?: string): Promise<void> {
+	async function prepareRound(
+		takeoverSession?: string,
+		fixed?: { family: PuzzleFamily; variant?: string; previousSeed?: string }
+	): Promise<void> {
 		if (
 			screen === 'game' ||
 			starting ||
@@ -1020,8 +1040,8 @@
 		let releaseRanked = () => {};
 		try {
 			sound.unlock();
-			await refreshAvailableGames();
-			const chosen = getSelector().peek();
+			await refreshAvailableGames(fixed ? { updateSelector: false } : undefined);
+			const chosen = fixed ? fixed.family : getSelector().peek();
 
 			startErrorFamily = chosen;
 			await assertGameAvailable(chosen);
@@ -1029,7 +1049,14 @@
 			const rankedGate = new Promise<void>((resolveGate) => {
 				releaseRanked = resolveGate;
 			});
-			const work = makeCandidate(chosen, rankedGate, takeoverSession).then(
+			const work = makeCandidate(
+				chosen,
+				rankedGate,
+				takeoverSession,
+				fixed?.variant,
+				fixed?.previousSeed,
+				Boolean(fixed)
+			).then(
 				(value) => {
 					ready = true;
 					return { value };
@@ -1069,8 +1096,8 @@
 			await ownCheckpoint(nextRunId);
 			if (generationLifetime.signal.aborted) return;
 			// Commit rotation only after generation succeeds. Retry keeps the same family.
-			if (!nextDaily) getSelector().commitVariant(chosen, chosenVariant);
-			getSelector().next();
+			if (!nextDaily && !fixed) getSelector().commitVariant(chosen, chosenVariant);
+			if (!fixed) getSelector().next();
 			family = chosen;
 			variant = chosenVariant;
 			dailyRound = nextDaily;
@@ -1103,7 +1130,7 @@
 			screen = 'game';
 			// Only a committed deal enters history. Slow persistence never delays its board.
 			if (nextTheme) void rememberTheme(nextTheme);
-			if (!account.ownerKey) void preparation.warm(getSelector().peek());
+			if (!account.ownerKey && !fixed) void preparation.warm(getSelector().peek());
 			cardPhase = 'flipping';
 			await tick();
 			stage?.present('flip');
@@ -1320,6 +1347,51 @@
 		startRound();
 	}
 
+	/** Family-preserving new deal: abandon the current round and start a fresh round in the same family, same variant, new seed. */
+	async function newDeal(): Promise<void> {
+		if (screen !== 'game' || starting) return;
+		const fixedFamily = family;
+		let fixedVariant = variant;
+		const previousSeed = round?.seed;
+		const roundWithRules = round as (PuzzleRound & { rules?: Record<string, number | boolean> }) | null;
+		const dailyWithRules = dailyRound?.round as (PuzzleRound & { rules?: Record<string, number | boolean> }) | undefined;
+		if (!fixedVariant && (roundWithRules?.rules || dailyWithRules?.rules)) {
+			const rules = roundWithRules?.rules ?? dailyWithRules?.rules;
+			const pool = puzzlePools[fixedFamily];
+			if (pool && rules) {
+				const mod = await loadPuzzleModule(pool, generationLifetime.signal);
+				if (mod.manifest.resolveVariantFromRules) {
+					fixedVariant = mod.manifest.resolveVariantFromRules(rules);
+				}
+			}
+			if (!fixedVariant) {
+				console.error('morphi:variant_resolution_failed');
+				return;
+			}
+		}
+		if (roundOwner && rankedSession)
+			await abandonSession(rankedSession, roundOwner).catch(() =>
+				console.warn('morphi:ranked_abandon_failed')
+			);
+		reportAbandon();
+		console.info(JSON.stringify({ event: 'round_abandoned', family: fixedFamily, reason: 'new_deal' }));
+		await clearCheckpoint(roundOwner, roundId);
+		stage?.stop();
+		round = null;
+		View = null;
+		checkpointReader = null;
+		cardReady = false;
+		revealed = false;
+		screen = 'home';
+		prepareRound(undefined, { family: fixedFamily, variant: fixedVariant, previousSeed }).catch(
+			(error) => {
+				starting = false;
+				startError = true;
+				console.error('morphi:round_start_failed', error);
+			}
+		);
+	}
+
 	function goHome(): void {
 		if (screen === 'game' && completedQueuedId !== roundId && roundOwner && rankedSession) {
 			void abandonSession(rankedSession, roundOwner).catch(() =>
@@ -1404,6 +1476,7 @@
 					onfinish={recordResult}
 					onhome={goHome}
 					ontryanother={() => void tryAnother()}
+					onnewdeal={() => void newDeal()}
 					resume={resumeState}
 					{checkpointSavedAt}
 					{rankedStartedAt}

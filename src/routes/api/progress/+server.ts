@@ -4,7 +4,7 @@ import { ownerKey, playFailure, readPlayBody } from '#lib/server/play-http.js';
 import type { RequestHandler } from './$types';
 export const POST: RequestHandler = async (event) => {
 	try {
-		const body = await readPlayBody(event);
+		const body = await readPlayBody(event, 1_048_576);
 		if (
 			Object.keys(body).sort().join(',') !== 'ownerKey,run' ||
 			body.ownerKey !== (await ownerKey(event.locals.user!.id))

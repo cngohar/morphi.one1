@@ -14,15 +14,15 @@ Instructions for coding agents (Codex, Gemini, OpenCode, Claude Code, etc.) work
 
 The owner authorizes delegation during repository tasks using this routing:
 
-- Planning and research: `gpt-6.1-sol`, reasoning effort `high`.
-- Coding, debugging and other execution: `gpt-6.1-sol`, reasoning effort `high`.
-- Testing and verification, including lint, E2E, Chromium, Playwright and `bun run verify`: `gpt-6-luna`, reasoning effort `max`.
+- Planning and research: `gpt-6.1-terra`, reasoning effort `high`.
+- Coding, debugging and other execution: `gpt-6.1-terra`, reasoning effort `high`.
+- Testing and verification, including lint, E2E, Chromium, Playwright and `bun run verify`: `gpt-6-luna`, reasoning effort `high`.
 
 The parent agent coordinates tasks, integrates results and reports to the owner. Spawn with the explicit model and reasoning effort above, `fork_turns: "none"`, and supply the task context and applicable repository instructions. If a required model or effort is unavailable, report it rather than silently substituting. This policy applies only to this repository; existing scope limits and approval gates remain in force.
 
 For testing and verification:
 
-- Use 2–3 `gpt-6-luna` agents at `max` reasoning for independent checks when useful and concurrency and local resources permit. A suggested split is lint/type checks, unit tests, and integration/Worker/browser checks; coordinate shared setup dependencies first. Small tasks use one testing agent; neither three agents nor duplicate checks are required.
+- Use 2–3 `gpt-6-luna` agents at `high` reasoning for independent checks when useful and concurrency and local resources permit. A suggested split is lint/type checks, unit tests, and integration/Worker/browser checks; coordinate shared setup dependencies first. Small tasks use one testing agent; neither three agents nor duplicate checks are required.
 - One agent owns browser testing. Preserve Playwright `workers: 1` unless an isolation or configuration change is separately justified.
 - Stabilize source before testing; do not edit or fix files while checks are active. Serialize conflicting builds, Svelte sync, generated-file writes, migrations/local database access, shared server ports and output artifacts.
 - Never run multiple `bun run verify` commands concurrently or overlap a full verify with its component commands.
@@ -32,6 +32,23 @@ For testing and verification:
 `morphi-plan-simple.md` is the active day-to-day plan: games first, architecture second. The owner reaffirmed this on 2026-10-23. `docs/PLAN.md` is reference only; pull in relevant sections when the simple plan calls for them. The simple plan and explicit owner instructions take precedence over the full-plan phase requirements below; do not introduce the full platform architecture as a prerequisite to game work. `docs/DECISIONS.md` lists decisions already made. Use `docs/CODEMAP.md` to find code before running broad searches. Report unresolved conflicts to the owner.
 
 ## Current phase
+
+**v1.4.3 Klondike Solitaire source commit and push authorized (2026-11-14):**
+The owner said “update the git repo and push to github”, authorizing this completed source
+handoff to existing `origin/main`: Classic plus ten Batch A variants,
+11 enabled presets / 0 variant groups and one reused
+`(klondike-solitaire, UTC date)` daily board. This supersedes the prior local
+commit/push stop for this handoff only. Include the family, focused tests/vectors,
+ten shared source touches, generated projections, related documentation,
+and demo fixture. Preserve `.cursor/` and `.vscode/mcp.json` exclusions; build
+evidence stays local.
+Existing focused evidence remains 26 units (15 logic + 11 variant deltas), 5 real-D1
+cases, 33 solved/66 rejected vectors in six runtimes, 6 single-worker Chromium cases,
+scoped format/lint/types (0 errors/0 warnings), boundaries, build and lazy isolation.
+No new verification, physical-device review or owner functional acceptance is inferred
+from this source handoff. Full `bun run verify` remains deferred. No Batch B, deployment,
+provisioning or production release is authorized.
+See `docs/briefs/v1.4.3-klondike-codex-brief.md` and the top of `docs/CODEMAP.md`.
 
 **v1.4.2 Mahjong Solitaire source commit and push authorized (2026-11-13):**
 The owner said “comit and push to github”, authorizing this completed source

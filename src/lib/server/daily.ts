@@ -110,6 +110,36 @@ export async function dailyPuzzle(
 	const enabled = await enabledVariants(binding, family);
 	const choices = (catalog[family].variants ?? []).filter((row) => enabled.includes(row.id));
 	const derived = await deriveDailyPuzzle(date, family, secret, choices);
+	let pinnedSeed = derived.seed;
+	if (catalog[family].dailySeedOk) {
+		if (catalog[family].dailySeedOk(derived.seed, derived.variant)) {
+			pinnedSeed = derived.seed;
+		} else {
+			const key = await crypto.subtle.importKey(
+				'raw',
+				new TextEncoder().encode(secret),
+				{ name: 'HMAC', hash: 'SHA-256' },
+				false,
+				['sign']
+			);
+			let found = false;
+			for (let a = 1; a < 1000; a++) {
+				const bytes = new Uint8Array(
+					await crypto.subtle.sign('HMAC', key, new TextEncoder().encode(`${date}|${family}|${a}`))
+				);
+				const candidateSeed = bytes
+					.slice(0, 8)
+					.reduce((value, byte) => (value << 8n) | BigInt(byte), 0n)
+					.toString();
+				if (catalog[family].dailySeedOk(candidateSeed, derived.variant)) {
+					pinnedSeed = candidateSeed;
+					found = true;
+					break;
+				}
+			}
+			if (!found) throw new RunError('daily_unavailable', 503);
+		}
+	}
 	const { config, liveVersion } = await readLiveScoreConfig(
 		binding,
 		family,
@@ -136,7 +166,7 @@ export async function dailyPuzzle(
 			family,
 			date,
 			derived.variant,
-			derived.seed,
+			pinnedSeed,
 			catalog[family].engineVersion,
 			config.version,
 			now,
@@ -504,28 +534,37 @@ export async function refreshDailyBoards(
 	const yesterday = utcDate(now - DAY_MS);
 	const midnight = generateTomorrow && midnightDailyGeneration(now);
 	for (const family of Object.keys(catalog)) {
-		if (midnight && (await gameAvailable(binding, family))) {
-			// Today is a cold-start/Cron-failure repair; future generation is midnight-only.
-			await dailyPuzzle(binding, family, today, secret, cache, now);
-			await dailyPuzzle(binding, family, tomorrow, secret, cache, now);
-		}
-		for (const date of [today, yesterday]) {
-			if (isDailyFrozen(date, now)) {
-				const stored = await binding
-					.prepare(
-						'SELECT updated_at AS updatedAt FROM daily_board_snapshot WHERE family=? AND date=?'
-					)
-					.bind(family, date)
-					.first<{ updatedAt: number }>();
-				if (stored && stored.updatedAt >= dailyFreezeAt(date)) continue;
+		try {
+			if (midnight && (await gameAvailable(binding, family))) {
+				// Today is a cold-start/Cron-failure repair; future generation is midnight-only.
+				await dailyPuzzle(binding, family, today, secret, cache, now);
+				await dailyPuzzle(binding, family, tomorrow, secret, cache, now);
 			}
-			const row = await computeSnapshot(binding, family, date, now);
-			await invalidateDailyBoard(cache, family, date);
-			try {
-				await cache?.put(dailyBoardKey(family, date), JSON.stringify(row), { expirationTtl: 300 });
-			} catch {
-				console.warn('morphi:daily_board_cache_write_failed');
+			for (const date of [today, yesterday]) {
+				if (isDailyFrozen(date, now)) {
+					const stored = await binding
+						.prepare(
+							'SELECT updated_at AS updatedAt FROM daily_board_snapshot WHERE family=? AND date=?'
+						)
+						.bind(family, date)
+						.first<{ updatedAt: number }>();
+					if (stored && stored.updatedAt >= dailyFreezeAt(date)) continue;
+				}
+				const row = await computeSnapshot(binding, family, date, now);
+				await invalidateDailyBoard(cache, family, date);
+				try {
+					await cache?.put(dailyBoardKey(family, date), JSON.stringify(row), {
+						expirationTtl: 300
+					});
+				} catch {
+					console.warn('morphi:daily_board_cache_write_failed');
+				}
 			}
+		} catch (error) {
+			const code =
+				error instanceof RunError ? error.code : error instanceof Error ? error.message : 'failed';
+			console.error(JSON.stringify({ event: 'daily_refresh_failed', family, date: today, code }));
+			continue;
 		}
 	}
 	if (monthly) {
@@ -535,8 +574,18 @@ export async function refreshDailyBoards(
 			)
 			.bind(today)
 			.all<{ family: string; date: string }>();
-		for (const row of dates.results)
-			if (isDailyFrozen(row.date, now)) await computeSnapshot(binding, row.family, row.date, now);
+		for (const row of dates.results) {
+			try {
+				if (isDailyFrozen(row.date, now)) await computeSnapshot(binding, row.family, row.date, now);
+			} catch (error) {
+				const code =
+					error instanceof RunError ? error.code : error instanceof Error ? error.message : 'failed';
+				console.error(
+					JSON.stringify({ event: 'daily_refresh_failed', family: row.family, date: row.date, code })
+				);
+				continue;
+			}
+		}
 	}
 	return { date: today };
 }

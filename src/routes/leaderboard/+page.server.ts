@@ -123,7 +123,10 @@ export const actions: Actions = {
 	},
 	daily: async (event) => {
 		try {
-			const body = await readPlayBody({ ...event, request: await actionRequest(event) });
+			const body = await readPlayBody(
+				{ ...event, request: await actionRequest(event, 1_048_576) },
+				1_048_576
+			);
 			if (
 				typeof body.family !== 'string' ||
 				!Object.hasOwn(catalog, body.family) ||

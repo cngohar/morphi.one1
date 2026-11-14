@@ -22,6 +22,7 @@ export interface ReplayedResult {
 	group?: string;
 	pairs: number | null;
 	moves: number;
+	hintUsed?: boolean;
 }
 export interface PuzzleVariant {
 	id: string;
@@ -119,6 +120,8 @@ export interface PuzzleManifest {
 		variant?: string;
 		rules?: Record<string, number | boolean>;
 	};
+	resolveVariantFromRules?(rules: Record<string, number | boolean>): string | undefined;
+	dailySeedOk?(seed: string, variant?: string): boolean;
 	resumeRound?(
 		seed: string,
 		moves: readonly Move[],

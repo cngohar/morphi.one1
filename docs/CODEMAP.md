@@ -1,5 +1,24 @@
 # CODEMAP.md
 
+## v1.4.3 Klondike Solitaire — baseline + Batch A implemented & verified; STOP (2026-11-14)
+
+Classic baseline and ten Batch A variants are locally implemented:
+eleven enabled presets, zero variant groups, and the single `(klondike-solitaire, UTC date)`
+daily board. Built under Ponytail lazy senior dev principles with the parent takeover
+explicitly authorized by the owner.
+
+Focused evidence: 26 unit/variant tests (15 baseline logic + 11 variant rule deltas),
+5 real-D1 integration cases, 6 single-worker Chromium Playwright E2E cases (viewports
+390×844, 844×390, 1280×800, stock draw, control buttons, keyboard navigation), 33 solved
+and 66 rejected vectors across all six runtimes (Node, Bun, Chromium, Firefox, WebKit,
+Cloudflare Worker workerd) with identical SHA-256 fingerprint
+`a2dcc6a6d98ffc00ac31221a74ea0606c39c6ffbff8dcfec0eede76a7b52ef5d`, scoped lint/types
+(0 errors, 0 warnings across whole workspace), architecture boundaries, build and lazy
+isolation passed.
+
+Stop rule enforced: STOP and report. Owner functional review pending. Full `bun run verify`
+remains deferred. No commit, push, deployment, release or Batch B is authorized.
+
 ## v1.4.4 Tangram — focused verification complete; owner review pending (2026-11-14)
 
 Classic and ten Batch A variants are locally implemented: eleven enabled presets,

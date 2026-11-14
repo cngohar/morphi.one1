@@ -6,13 +6,16 @@ import { digest, RunError } from './runs.js';
 export async function ownerKey(userId: string): Promise<string> {
 	return digest(`${env.BETTER_AUTH_SECRET}\0progress\0${userId}`);
 }
-export async function readPlayBody(event: RequestEvent): Promise<Record<string, unknown>> {
+export async function readPlayBody(
+	event: RequestEvent,
+	limit = 65536
+): Promise<Record<string, unknown>> {
 	if (!event.locals.user || !event.locals.session) throw new RunError('signed_out', 401);
 	if (event.request.headers.get('origin') !== new URL(env.BETTER_AUTH_URL).origin)
 		throw new RunError('origin', 403);
 	if (!event.request.headers.get('content-type')?.startsWith('application/json'))
 		throw new RunError('content_type', 415);
-	const bounded = await boundAccountRequest(event.request, 65536);
+	const bounded = await boundAccountRequest(event.request, limit);
 	if (!bounded) throw new RunError('body_limit', 413);
 	let value;
 	try {

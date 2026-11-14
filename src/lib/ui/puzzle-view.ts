@@ -39,6 +39,8 @@ export interface PuzzleViewProps {
 	onhome: () => void;
 	/** Run-over only: abandon the failed round and start another puzzle. */
 	ontryanother?: () => void;
+	/** Family-preserving new deal — abandon the current round and start a fresh round in the same family, same variant, new seed, unlimited play. */
+	onnewdeal?: () => void;
 	onready: () => void;
 	onmove: (move: Move) => void;
 	oncomplete: (score: number, seconds: number) => void;
