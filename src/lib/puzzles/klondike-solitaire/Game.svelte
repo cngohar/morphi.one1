@@ -24,6 +24,7 @@
 		klondikeDeal,
 		klondikeScore,
 		parseRules,
+		resolveVariantFromRules,
 		type KlondikeRules,
 		type KlondikeState
 	} from './logic.js';
@@ -72,21 +73,32 @@
 	let rootEl: HTMLDivElement;
 	let boardEl: HTMLDivElement;
 
-	const rules: KlondikeRules = $derived.by(() => parseRules(round.variant));
+	const variant = $derived(
+		round.variant ??
+			resolveVariantFromRules(
+				(round as PuzzleRound & { rules?: Record<string, number | boolean> }).rules ?? {}
+			)
+	);
+	const rules: KlondikeRules = $derived.by(() => parseRules(variant));
 
 	// Deal generation from seed
 	// svelte-ignore state_referenced_locally
-	const initialDeal = klondikeDeal(round.seed, round.variant);
+	const initialDeal = klondikeDeal(round.seed, variant);
 	let initialDeck: number[] = $state(initialDeal.deck);
 	// svelte-ignore state_referenced_locally
 	let gameState: KlondikeState = $state(
-		createInitialDeal(initialDeal.deck, parseRules(round.variant))
+		(round as PuzzleRound & { state?: KlondikeState }).state ??
+			createInitialDeal(initialDeal.deck, parseRules(variant))
 	);
 	const currentScore = $derived.by(() => klondikeScore(gameState, 0, scoring, rules));
 
-	let undoStack: KlondikeState[] = $state([]);
+	// svelte-ignore state_referenced_locally
+	let undoStack: KlondikeState[] = $state(
+		(round as PuzzleRound & { undoStack?: KlondikeState[] }).undoStack ?? []
+	);
 	let runMoves: Move[] = $state([]);
-	let hintUsedSession = $state(false);
+	// svelte-ignore state_referenced_locally
+	let hintUsedSession = $state((round as PuzzleRound & { hintUsed?: boolean }).hintUsed ?? false);
 	let seconds = $state(0);
 	let timerInterval: ReturnType<typeof setInterval> | null = null;
 	let timerStarted = $state(false);
@@ -129,7 +141,7 @@
 	}
 
 	function initRound() {
-		const { deck } = klondikeDeal(round.seed, round.variant);
+		const { deck } = klondikeDeal(round.seed, variant);
 		initialDeck = deck;
 		gameState = createInitialDeal(initialDeck, rules);
 		undoStack = [];
@@ -322,7 +334,11 @@
 		if (!rules.undo || undoStack.length === 0 || completed) return;
 		const previous = undoStack[undoStack.length - 1];
 		undoStack = undoStack.slice(0, -1);
-		gameState = previous;
+		gameState = {
+			...previous,
+			hintsUsed: gameState.hintsUsed,
+			movesCount: gameState.movesCount + 1
+		};
 		selected = null;
 		hintHighlight = null;
 		sound.play('clear');
@@ -494,6 +510,7 @@
 
 		const move: Move = { action: KLONDIKE_ACTION.hint, at: 0, card: 0, count: 0, dst: 0, src: 0 };
 		const res = applyKlondikeMove(gameState, move, rules, initialDeck);
+		undoStack = [...undoStack, JSON.parse(JSON.stringify(gameState))];
 		sound.play('pick');
 		commitMove(move, res.nextState);
 	}
@@ -600,7 +617,6 @@
 					: resume.elapsedMs;
 			seconds = Math.floor(elapsed / 1000);
 			if (resume.clockStarted) {
-				timerStarted = true;
 				startTimer();
 			}
 		} else {

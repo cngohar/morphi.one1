@@ -27,7 +27,7 @@ describe('Klondike Solitaire - 11 Variants C2 Invariant & Rule Deltas', () => {
 	it('variant 2 (draw-3): draws 3 cards at a time from stock', () => {
 		const rules = parseRules('klondike-solitaire:draw-3');
 		expect(rules.draw).toBe(3);
-		const { deck } = klondikeDeal('2001', 'klondike-solitaire:draw-3');
+		const { deck } = klondikeDeal('2001', 'klondike-solitaire:draw-3', 4000);
 		const s0 = createInitialDeal(deck, rules);
 		const drawnCards = s0.stock.slice(-3).reverse();
 		const top = drawnCards[drawnCards.length - 1];
@@ -47,7 +47,7 @@ describe('Klondike Solitaire - 11 Variants C2 Invariant & Rule Deltas', () => {
 	it('variant 3 (pass-3): restricts stock passes to 3 (2 recycles max)', () => {
 		const rules = parseRules('klondike-solitaire:pass-3');
 		expect(rules.passes).toBe(3);
-		const { deck } = klondikeDeal('2002', 'klondike-solitaire:pass-3');
+		const { deck } = klondikeDeal('2002', 'klondike-solitaire:pass-3', 4000);
 		let state: KlondikeState = {
 			...createInitialDeal(deck, rules),
 			stock: [],
@@ -111,7 +111,7 @@ describe('Klondike Solitaire - 11 Variants C2 Invariant & Rule Deltas', () => {
 	it('variant 4 (pass-1): restricts to single pass through stock (0 recycles)', () => {
 		const rules = parseRules('klondike-solitaire:pass-1');
 		expect(rules.passes).toBe(1);
-		const { deck } = klondikeDeal('2003', 'klondike-solitaire:pass-1');
+		const { deck } = klondikeDeal('2003', 'klondike-solitaire:pass-1', 4000);
 		const state: KlondikeState = {
 			...createInitialDeal(deck, rules),
 			stock: [],
@@ -146,7 +146,7 @@ describe('Klondike Solitaire - 11 Variants C2 Invariant & Rule Deltas', () => {
 	it('variant 6 (thoughtful): opens with all 28 tableau cards face up', () => {
 		const rules = parseRules('klondike-solitaire:thoughtful');
 		expect(rules.thoughtful).toBe(true);
-		const { deck } = klondikeDeal('2004', 'klondike-solitaire:thoughtful');
+		const { deck } = klondikeDeal('2004', 'klondike-solitaire:thoughtful', 4000);
 		const state = createInitialDeal(deck, rules);
 		for (const col of state.tableau) {
 			expect(col.down).toHaveLength(0);
@@ -181,7 +181,7 @@ describe('Klondike Solitaire - 11 Variants C2 Invariant & Rule Deltas', () => {
 	it('variant 10 (hint-budget-3): limits hints to 3 and enforces budget', () => {
 		const rules = parseRules('klondike-solitaire:hint-budget-3');
 		expect(rules.hintBudget).toBe(3);
-		const { deck } = klondikeDeal('2005', 'klondike-solitaire:hint-budget-3');
+		const { deck } = klondikeDeal('2005', 'klondike-solitaire:hint-budget-3', 4000);
 		let state = createInitialDeal(deck, rules);
 
 		// Use 3 hints

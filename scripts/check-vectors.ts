@@ -71,6 +71,7 @@ try {
 	for (const executable of ['node', 'bun']) {
 		const { stdout } = await run(executable, [join(directory, 'node.mjs')]);
 		results.push({ runtime: executable, result: JSON.parse(stdout) });
+		console.error(JSON.stringify(results.at(-1)));
 	}
 	for (const [name, browserType] of [
 		['Chromium', chromium],
@@ -88,6 +89,7 @@ try {
 				).verifyMorphiVectors()
 			);
 			results.push({ runtime: name, result });
+			console.error(JSON.stringify(results.at(-1)));
 		} finally {
 			await browser.close();
 		}
@@ -135,7 +137,10 @@ try {
 		if (worker.exitCode !== null)
 			throw new Error(`Local Worker exited (${worker.exitCode}): ${startupError}`);
 		try {
-			const response = await fetch(`http://127.0.0.1:${address.port}`);
+			// Worker vectors can run longer than Bun’s five-minute socket idle timeout.
+			const response = await fetch(`http://127.0.0.1:${address.port}`, {
+				timeout: false
+			} as RequestInit & { timeout: boolean });
 			if (response.ok) {
 				result = await response.json();
 				break;
@@ -147,6 +152,7 @@ try {
 	}
 	if (!result) throw new Error(`Local Worker vector harness did not become ready. ${startupError}`);
 	results.push({ runtime: 'Worker (workerd)', result });
+	console.error(JSON.stringify(results.at(-1)));
 	if (new Set(results.map(({ result }) => JSON.stringify(result))).size !== 1)
 		throw new Error('Runtime vector results differ.');
 	console.info(JSON.stringify(results, null, 2));

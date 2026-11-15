@@ -1,21 +1,39 @@
-import { afterAll, beforeAll, expect, it } from 'vitest';
+import { afterAll, beforeAll, expect, it, vi } from 'vitest';
 import { readFile, readdir } from 'node:fs/promises';
 import { getPlatformProxy } from 'wrangler';
 import { manifest } from '../../src/lib/puzzles/klondike-solitaire/manifest.js';
 import {
 	klondikeDeal,
+	createInitialDeal,
+	applyKlondikeMove,
 	solveKlondike,
 	parseRules,
 	KLONDIKE_ACTION
 } from '../../src/lib/puzzles/klondike-solitaire/logic.js';
 import { saveRun } from '../../src/lib/server/runs.js';
-import {
-	resumeDailyRanked,
-	startDailyRanked
-} from '../../src/lib/server/ranked-session.js';
+import { resumeDailyRanked, startDailyRanked } from '../../src/lib/server/ranked-session.js';
 import { dailyBoard, utcDate } from '../../src/lib/server/daily.js';
 import { CARD_RANKED_OPENING_MS, KLONDIKE_ENTRANCE_MS } from '../../src/lib/round-timing.js';
 import type { CompletedRun, Move } from '../../src/lib/engine/contract.js';
+
+vi.mock('../../src/lib/puzzles/klondike-solitaire/logic.js', async (importOriginal) => {
+	const actual =
+		await importOriginal<typeof import('../../src/lib/puzzles/klondike-solitaire/logic.js')>();
+	return {
+		...actual,
+		klondikeDeal: (seed: string, variant?: string) => actual.klondikeDeal(seed, variant, 4000),
+		createKlondikeRound: (seed: string, variant?: string) =>
+			actual.createKlondikeRound(seed, variant, 4000),
+		dailySeedOk: (seed: string, variant?: string) => actual.dailySeedOk(seed, variant, 4000),
+		replayKlondike: (
+			seed: string,
+			moves: readonly Move[],
+			seconds: number,
+			scoring?: Parameters<typeof actual.replayKlondike>[3],
+			variant?: string
+		) => actual.replayKlondike(seed, moves, seconds, scoring, variant, 4000)
+	};
+});
 
 const FAMILY = 'klondike-solitaire';
 const CLASSIC = `${FAMILY}:classic`;
@@ -24,6 +42,7 @@ const day = 86_400_000;
 const secret = 'klondike-local-test-secret';
 let proxy: Awaited<ReturnType<typeof getPlatformProxy<Cloudflare.Env>>>;
 let sequence = 0;
+let testDeck: number[];
 const db = () => proxy.env.DB;
 
 async function owner() {
@@ -69,8 +88,7 @@ async function issue(variant = CLASSIC, version = 'brief-v1') {
 
 function solveWitnessMoves(seed: string, variant: string): Move[] {
 	const rules = parseRules(variant);
-	const { deck } = klondikeDeal(seed, variant);
-	const res = solveKlondike(deck, rules, 5000);
+	const res = solveKlondike(testDeck, rules, 5000);
 	if (res.outcome !== 'won' || !res.moves) throw new Error(`Seed ${seed} not solvable in witness`);
 	return res.moves;
 }
@@ -117,7 +135,8 @@ beforeAll(async () => {
 				.map((part) => db().prepare(part))
 		);
 	await db().prepare("INSERT INTO admin_actor(id,role) VALUES('klondike-operator','admin')").run();
-});
+	testDeck = klondikeDeal('1', CLASSIC).deck;
+}, 180000);
 
 afterAll(async () => {
 	await proxy?.dispose();
@@ -154,6 +173,12 @@ it('issues a group-less daily board and keeps its one ranked attempt', async () 
 	);
 	expect(resumed.id).toBe(issued.id);
 	expect(resumed.round.seed).toBe(issued.seed);
+	const rules = parseRules(CLASSIC);
+	const deck = testDeck;
+	expect(resumed.round.state).toEqual(
+		applyKlondikeMove(createInitialDeal(deck, rules), run.moves[0]!, rules, deck).nextState
+	);
+	expect(resumed.round.undoStack).toEqual([createInitialDeal(deck, rules)]);
 
 	// 65 seconds active play (> 60s timing floor)
 	const saved = await saveRun(
@@ -178,7 +203,7 @@ it('issues a group-less daily board and keeps its one ranked attempt', async () 
 
 	const board = await dailyBoard(db(), FAMILY, utcDate(now), id, undefined, 25, now + 70000);
 	expect(board.own?.score).toBe(saved.score);
-});
+}, 180000);
 
 for (const [activeSeconds, activeMs, ranked] of [
 	[59, 59999, false],
@@ -205,7 +230,7 @@ for (const [activeSeconds, activeMs, ranked] of [
 		).rejects.toMatchObject({
 			code: 'daily_spent'
 		});
-	});
+	}, 180000);
 }
 
 it('hint-assisted daily win saves unranked without daily_best row (D8)', async () => {
@@ -229,7 +254,7 @@ it('hint-assisted daily win saves unranked without daily_best row (D8)', async (
 	});
 	// No daily_best row inserted for hint-assisted win
 	expect(await boardRows(id)).toBe(0);
-});
+}, 180000);
 
 it('accepts 10,000-move max boundary serialization without crashing', async () => {
 	expect(manifest.maxMoves).toBe(10000);

@@ -1,13 +1,13 @@
-import type {
-	Move,
-	PuzzleManifest,
-	PuzzlePresentation
-} from '#lib/engine/contract.js';
+import type { Move, PuzzleManifest, PuzzlePresentation } from '#lib/engine/contract.js';
 import { KLONDIKE_ENTRANCE_MS } from '#lib/round-timing.js';
 import { messages } from './messages.js';
 import { scoring } from './scoring.js';
 import {
 	createKlondikeRound,
+	encodeRules,
+	klondikeDeal,
+	parseRules,
+	replayKlondikeMoves,
 	dailySeedOk,
 	KLONDIKE_ENGINE_VERSION,
 	KLONDIKE_VARIANTS,
@@ -136,7 +136,18 @@ export const manifest = {
 	createRound: createKlondikeRound,
 	resumeRound(seed, moves, _scoring, variant) {
 		if (moves.length > this.maxMoves) throw new RangeError('move_limit');
-		return createKlondikeRound(seed, variant);
+		const rules = parseRules(variant);
+		const { deck } = klondikeDeal(seed, variant);
+		return {
+			seed,
+			variant,
+			rules: encodeRules(rules),
+			...replayKlondikeMoves(
+				deck,
+				rules,
+				moves.map((move) => this.parseMove(move))
+			)
+		};
 	},
 	resolveVariantFromRules,
 	dailySeedOk,

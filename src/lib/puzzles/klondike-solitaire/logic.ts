@@ -954,7 +954,13 @@ export function solveKlondike(
 }
 
 /** Same generation pipeline as createRound: deterministic for a seed + variant. */
-export function klondikeDeal(seed: string, variantId?: string): KlondikeDeal {
+export const KLONDIKE_SOLVER_BUDGET = 400000;
+
+export function klondikeDeal(
+	seed: string,
+	variantId?: string,
+	budget = KLONDIKE_SOLVER_BUDGET
+): KlondikeDeal {
 	const rules = parseRules(variantId);
 	const rng = createRng(seed);
 	let nodes = 0;
@@ -966,7 +972,7 @@ export function klondikeDeal(seed: string, variantId?: string): KlondikeDeal {
 		nodes += 52;
 		const initial = createInitialDeal(deck, rules);
 		if (!hasOpeningMove(initial, rules)) continue;
-		const solved = solveKlondike(deck, rules, 400000);
+		const solved = solveKlondike(deck, rules, budget);
 		nodes += solved.nodes;
 		if (solved.outcome === 'won') return { deck, attempts: attempt + 1, nodes };
 	}
@@ -994,21 +1000,22 @@ function hasOpeningMove(state: KlondikeState, rules: KlondikeRules): boolean {
 
 export function createKlondikeRound(
 	seed: string,
-	variantId?: string
+	variantId?: string,
+	budget?: number
 ): {
 	seed: string;
 	variant?: string;
 	rules: Record<string, number | boolean>;
 } {
 	const rules = parseRules(variantId);
-	klondikeDeal(seed, variantId);
+	klondikeDeal(seed, variantId, budget);
 	return { seed, variant: variantId, rules: encodeRules(rules) };
 }
 
 /** Daily gate: true iff the same createRound pipeline yields a solver-won deal. */
-export function dailySeedOk(seed: string, variantId?: string): boolean {
+export function dailySeedOk(seed: string, variantId?: string, budget?: number): boolean {
 	try {
-		klondikeDeal(seed, variantId);
+		klondikeDeal(seed, variantId, budget);
 		return true;
 	} catch {
 		return false;
@@ -1197,15 +1204,11 @@ export function klondikeScore(
 	return Math.max(0, board) + bonus;
 }
 
-export function replayKlondike(
-	seed: string,
-	moves: readonly Move[],
-	seconds: number,
-	scoring?: ScoreValues,
-	variantId?: string
-): ReplayedResult {
-	const rules = parseRules(variantId);
-	const { deck } = klondikeDeal(seed, variantId);
+export function replayKlondikeMoves(
+	deck: readonly number[],
+	rules: KlondikeRules,
+	moves: readonly Move[]
+) {
 	let state = createInitialDeal(deck, rules);
 	const undoStack: KlondikeState[] = [];
 	let hintUsed = false;
@@ -1228,6 +1231,21 @@ export function replayKlondike(
 		state = applyKlondikeMove(state, move, rules, deck).nextState;
 		if (move.action === KLONDIKE_ACTION.restart) undoStack.length = 0;
 	}
+
+	return { state, undoStack, hintUsed };
+}
+
+export function replayKlondike(
+	seed: string,
+	moves: readonly Move[],
+	seconds: number,
+	scoring?: ScoreValues,
+	variantId?: string,
+	budget?: number
+): ReplayedResult {
+	const rules = parseRules(variantId);
+	const { deck } = klondikeDeal(seed, variantId, budget);
+	const { state, hintUsed } = replayKlondikeMoves(deck, rules, moves);
 
 	const totalHome = state.foundations.reduce((sum, rank) => sum + rank, 0);
 	if (totalHome !== 52) throw new RangeError(`Game not won: only ${totalHome}/52 cards home`);

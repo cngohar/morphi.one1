@@ -87,13 +87,13 @@ async function installSeed(page: Page, seed: string) {
 	}, seed);
 }
 
-async function seeded(page: Page, variant = classic, seed = '1') {
+async function seeded(page: Page, variant = classic, seed = '1', timeout = 15000) {
 	await page.emulateMedia({ reducedMotion: 'reduce' });
 	await installAvailability(page, variant);
 	await installSeed(page, seed);
 	await page.goto('/play');
 	const game = page.locator('.klondike-game');
-	await expect(game).toBeVisible({ timeout: 15000 });
+	await expect(game).toBeVisible({ timeout });
 	return { game };
 }
 
@@ -167,4 +167,44 @@ test.describe('Klondike Solitaire - Gameplay & Interactions', () => {
 		const focused = await page.evaluate(() => document.activeElement !== document.body);
 		expect(focused).toBe(true);
 	});
+});
+
+test('checkpoint restores the board and undo after reload', async ({ page }) => {
+	test.setTimeout(480000);
+	await seeded(page, classic, '1', 120000);
+	const board = page.locator('.board');
+	const snapshot = () =>
+		board.evaluate((element) => ({
+			stock: element.querySelector('.stock-cell')?.textContent?.trim(),
+			waste: Array.from(element.querySelectorAll('.waste-cell [aria-label]'), (card) =>
+				card.getAttribute('aria-label')
+			),
+			foundations: Array.from(element.querySelectorAll('.foundation-cell'), (cell) =>
+				cell.textContent?.trim()
+			),
+			tableau: Array.from(element.querySelectorAll('.tableau-column'), (cell) => ({
+				down: cell.querySelectorAll('.card-back').length,
+				up: Array.from(cell.querySelectorAll('.card-face'), (card) =>
+					card.getAttribute('aria-label')
+				)
+			}))
+		}));
+	const initial = await snapshot();
+	await page.getByRole('button', { name: /Draw from stock/ }).click();
+	const played = await snapshot();
+	expect(played.stock).toBe('23');
+	expect(played.waste).toHaveLength(1);
+	expect(played.foundations).toHaveLength(4);
+	expect(played.tableau).toHaveLength(7);
+	await page.waitForTimeout(700);
+	await page.reload();
+	await page.getByRole('button', { name: 'Resume', exact: true }).click();
+	await expect(page.locator('.klondike-game')).toBeVisible({ timeout: 120000 });
+	expect(await snapshot()).toEqual(played);
+	await page.keyboard.press('u');
+	expect(await snapshot()).toEqual(initial);
+	await expect(page.getByRole('button', { name: /Draw from stock/ })).toHaveAttribute(
+		'aria-label',
+		'Draw from stock (24 cards remaining)'
+	);
 });

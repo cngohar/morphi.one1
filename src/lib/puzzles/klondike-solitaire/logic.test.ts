@@ -13,6 +13,7 @@ import {
 	klondikeScore,
 	parseRules,
 	KLONDIKE_ACTION,
+	KLONDIKE_SOLVER_BUDGET,
 	KLONDIKE_PILE,
 	type KlondikeState
 } from './logic.js';
@@ -90,14 +91,14 @@ describe('Klondike Solitaire - Card Math & Building Rules', () => {
 
 describe('Klondike Solitaire - Deal Generation & Initial Board', () => {
 	it('generates deterministic deals and solvable rounds', () => {
-		const deal1 = klondikeDeal('1001', 'klondike-solitaire:classic');
-		const deal2 = klondikeDeal('1001', 'klondike-solitaire:classic');
+		const deal1 = klondikeDeal('1001', 'klondike-solitaire:classic', 4000);
+		const deal2 = klondikeDeal('1001', 'klondike-solitaire:classic', 4000);
 		expect(deal1.deck).toEqual(deal2.deck);
 	});
 
 	it('creates correct initial deal shape (7 columns, 28 tableau cards, 24 stock)', () => {
 		const rules = parseRules('klondike-solitaire:classic');
-		const { deck } = klondikeDeal('1002');
+		const { deck } = klondikeDeal('1002', undefined, 4000);
 		const state = createInitialDeal(deck, rules);
 
 		expect(state.tableau).toHaveLength(7);
@@ -119,7 +120,7 @@ describe('Klondike Solitaire - Deal Generation & Initial Board', () => {
 
 	it('creates Thoughtful variant with all 28 tableau cards face up', () => {
 		const rules = parseRules('klondike-solitaire:thoughtful');
-		const { deck } = klondikeDeal('1003', 'klondike-solitaire:thoughtful');
+		const { deck } = klondikeDeal('1003', 'klondike-solitaire:thoughtful', 4000);
 		const state = createInitialDeal(deck, rules);
 
 		for (let c = 0; c < 7; c++) {
@@ -132,7 +133,7 @@ describe('Klondike Solitaire - Deal Generation & Initial Board', () => {
 describe('Klondike Solitaire - Moves & State Transitions', () => {
 	it('draws 1 card from stock to waste in Classic', () => {
 		const rules = parseRules('klondike-solitaire:classic');
-		const { deck } = klondikeDeal('1004');
+		const { deck } = klondikeDeal('1004', undefined, 4000);
 		const state0 = createInitialDeal(deck, rules);
 		const topStock = state0.stock[state0.stock.length - 1];
 
@@ -153,7 +154,7 @@ describe('Klondike Solitaire - Moves & State Transitions', () => {
 
 	it('draws 3 cards from stock to waste in Draw 3 mode', () => {
 		const rules = parseRules('klondike-solitaire:draw-3');
-		const { deck } = klondikeDeal('1005', 'klondike-solitaire:draw-3');
+		const { deck } = klondikeDeal('1005', 'klondike-solitaire:draw-3', 4000);
 		const state0 = createInitialDeal(deck, rules);
 		const drawnCards = state0.stock.slice(-3).reverse();
 		const topDrawn = drawnCards[drawnCards.length - 1];
@@ -174,7 +175,7 @@ describe('Klondike Solitaire - Moves & State Transitions', () => {
 
 	it('recycles waste back to stock when stock is exhausted', () => {
 		const rules = parseRules('klondike-solitaire:classic');
-		const { deck } = klondikeDeal('1006');
+		const { deck } = klondikeDeal('1006', undefined, 4000);
 		const state0: KlondikeState = {
 			...createInitialDeal(deck, rules),
 			stock: [],
@@ -198,7 +199,7 @@ describe('Klondike Solitaire - Moves & State Transitions', () => {
 
 	it('enforces pass limits on single-pass and pass-3 variants', () => {
 		const rulesPass1 = parseRules('klondike-solitaire:pass-1');
-		const { deck } = klondikeDeal('1007', 'klondike-solitaire:pass-1');
+		const { deck } = klondikeDeal('1007', 'klondike-solitaire:pass-1', 4000);
 		const statePass1: KlondikeState = {
 			...createInitialDeal(deck, rulesPass1),
 			stock: [],
@@ -226,7 +227,7 @@ describe('Klondike Solitaire - Moves & State Transitions', () => {
 describe('Klondike Solitaire - Auto-finish Sweep', () => {
 	it('sweeps remaining tableau cards to foundation when safe', () => {
 		const rules = parseRules('klondike-solitaire:classic');
-		const { deck } = klondikeDeal('1008');
+		const { deck } = klondikeDeal('1008', undefined, 4000);
 		// Construct state where all face-down cards are exposed and stock/waste empty
 		const state: KlondikeState = {
 			...createInitialDeal(deck, rules),
@@ -257,7 +258,7 @@ describe('Klondike Solitaire - Auto-finish Sweep', () => {
 
 	it('returns won: false if there are remaining stock, waste, or face-down cards', () => {
 		const rules = parseRules('klondike-solitaire:classic');
-		const { deck } = klondikeDeal('1009');
+		const { deck } = klondikeDeal('1009', undefined, 4000);
 		const stateWithStock = createInitialDeal(deck, rules);
 		expect(autoFinishSweep(stateWithStock).won).toBe(false);
 	});
@@ -266,7 +267,7 @@ describe('Klondike Solitaire - Auto-finish Sweep', () => {
 describe('Klondike Solitaire - Scoring & Timing Floor', () => {
 	it('calculates Microsoft Standard scoring with time bonus for completions >= 30s', () => {
 		const rules = parseRules('klondike-solitaire:classic');
-		const { deck } = klondikeDeal('1010');
+		const { deck } = klondikeDeal('1010', undefined, 4000);
 		const state: KlondikeState = {
 			...createInitialDeal(deck, rules),
 			wasteToTableau: 2, // 2 * 5 = 10
@@ -294,3 +295,35 @@ describe('Klondike Solitaire - Scoring & Timing Floor', () => {
 		expect(manifest.variants).toHaveLength(11);
 	});
 });
+
+it('uses the production solver budget by default', () => {
+	expect(KLONDIKE_SOLVER_BUDGET).toBe(400000);
+	expect(klondikeDeal('1')).toEqual(klondikeDeal('1', undefined, KLONDIKE_SOLVER_BUDGET));
+}, 120000);
+
+it('restores a checkpoint including hints and undo history', () => {
+	const seed = '1';
+	const rules = parseRules();
+	const { deck } = klondikeDeal(seed);
+	const draw: Move = {
+		action: KLONDIKE_ACTION.draw,
+		at: 0,
+		card: createInitialDeal(deck, rules).stock.at(-1)!,
+		count: 1,
+		dst: 0,
+		src: 0
+	};
+	const hint: Move = { action: KLONDIKE_ACTION.hint, at: 0, card: 0, count: 0, dst: 0, src: 0 };
+	const undo: Move = { action: KLONDIKE_ACTION.undo, at: 0, card: 0, count: 0, dst: 0, src: 0 };
+	let state = createInitialDeal(deck, rules);
+	state = applyKlondikeMove(state, draw, rules, deck).nextState;
+	state = applyKlondikeMove(state, hint, rules, deck).nextState;
+	const restored = manifest.resumeRound(seed, [draw, hint, undo], undefined, undefined);
+	expect(restored.state).toEqual({
+		...applyKlondikeMove(createInitialDeal(deck, rules), draw, rules, deck).nextState,
+		hintsUsed: state.hintsUsed,
+		movesCount: state.movesCount + 1
+	});
+	expect(restored.undoStack).toEqual([createInitialDeal(deck, rules)]);
+	expect(restored.hintUsed).toBe(true);
+}, 120000);

@@ -40,7 +40,7 @@ All eleven presets are enabled and `presentation.groups` is empty. The existing 
 - **D2**: First attempt only counts for ranking.
 - **D3**: Standard Microsoft scoring default.
 - **D4**: Timing floor 60,000 ms (1 minute, constant in manifest).
-- **D5**: Solver budget 100 attempts per deal, 400,000 nodes per deal max; only "won" issues a deal.
+- **D5**: Solver budget 100 attempts per deal, 400,000 nodes per attempt; only "won" issues a deal.
 - **D6**: Thoughtful variant reveals all 52 locations (all 28 tableau cards face up).
 - **D7**: Foundation move-back allowed (−15 penalty).
 - **D8**: Hint-assisted daily win marked "solved with hint" and saved unranked.
@@ -48,7 +48,7 @@ All eleven presets are enabled and `presentation.groups` is empty. The existing 
 - **D10**: Product name "Klondike Solitaire" (display "Klondike").
 - **D11**: `maxMoves` = 10,000. Transport bound raised to 1 MiB on progress/daily routes.
 
-### Focused Checks Passed
+### Original Focused Checks Passed
 
 - 15 unit test cases in `logic.test.ts`.
 - 11 variant test cases in `variants.test.ts`.
@@ -88,6 +88,37 @@ tails exceed an interactive budget.
 
 A real local D1 leaderboard daily action accepted 10,000 valid sequential
 restart moves in a 550,302-byte multipart request and returned the matching
-session and seed in 391 ms under concurrent solver load. This confirms the
-bounded transport and action response, not a restored board: the action does
-not replay the moves and the game view does not reconstruct them on resume.
+session and seed in 391 ms under concurrent solver load. This confirmed bounded transport and the action response; board restoration was
+verified separately in Fix round 2 below.
+
+### Fix round 2
+
+Checkpoint resume now replays the move log and restores the board, counters and
+undo history. The focused checks passed: 28 unit cases, 5 real-D1 integration
+cases, and one single-worker Chromium checkpoint/reload case. The full vector
+command passed in Node, Bun, Chromium, Firefox, WebKit and Worker (workerd):
+33 solved and 66 rejected in each, with SHA-256 fingerprint
+`ebc164b2f49300f8c4f32c4a56ebd5fad45335fa8ff77ea01fbd1a58a6148d09`.
+Three witnesses changed (Single Pass seeds 1 and 3, Draw 3 Pass 3 seed 1)
+because the Fix round 1 increase from 4,000 to 400,000 nodes per attempt can
+select an earlier shuffled deal; all 33 seed/variant pairs remain.
+
+The same 100-seed solver samples and 30 daily dates were measured again with
+the 400,000-node budget. Medians use the midpoint and p95 is nearest-rank.
+
+| Sample        | Outcomes              | Median / p95 nodes     | Median / p95 wall time  |
+| ------------- | --------------------- | ---------------------- | ----------------------- |
+| Draw 1 solver | 44 won / 56 undecided | 400,000 / 400,000      | 6,983.1 / 18,322.5 ms   |
+| Draw 3 solver | 15 won / 85 undecided | 400,000 / 400,000      | 8,174.1 / 18,743.4 ms   |
+| Draw 1 daily  | 30/30 dates           | 342 / 2,800,691        | 33.7 / 107,803.6 ms     |
+| Draw 3 daily  | 30/30 dates           | 2,000,559 / 16,002,407 | 44,361.0 / 312,957.7 ms |
+
+All daily rows walked one derived seed. Median/p95 candidate counts were 2/10
+for Draw 1 and 6.5/43 for Draw 3. The slowest Draw 1 date took 120,489.7 ms;
+the slowest Draw 3 date took 581,259.9 ms and 68 candidates (25,603,664 nodes).
+Vector verification ran concurrently: its WebKit runtime and the sampler each
+used about one CPU core, and other local browser/workerd CPU activity was also
+observed. Sampler peak RSS was near 5.0 GB; available host memory was 6.7–7.0
+GiB and swap use stayed negligible at checks. These wall times are contended and
+machine-specific. The optional foundation-to-tableau solver improvement was not
+taken, so the solver's move generation remains unchanged.
