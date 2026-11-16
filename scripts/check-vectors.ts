@@ -14,9 +14,17 @@ const nonogramOnly = process.argv.includes('--nonogram');
 const mahjongOnly = process.argv.includes('--mahjong-solitaire');
 const tangramOnly = process.argv.includes('--tangram');
 const klondikeOnly = process.argv.includes('--klondike-solitaire');
+const lightBendOnly = process.argv.includes('--light-bend');
 if (
-	[memoryOnly, blockOnly, nonogramOnly, mahjongOnly, tangramOnly, klondikeOnly].filter(Boolean)
-		.length > 1
+	[
+		memoryOnly,
+		blockOnly,
+		nonogramOnly,
+		mahjongOnly,
+		tangramOnly,
+		klondikeOnly,
+		lightBendOnly
+	].filter(Boolean).length > 1
 )
 	throw new Error('Choose one family vector filter.');
 const prefix = memoryOnly ? 'memory-' : blockOnly ? 'block-' : '';
@@ -37,7 +45,7 @@ try {
 		['worker', 'browser']
 	] as const) {
 		let source = `tests/vectors/${prefix}${entry}.ts`;
-		if (nonogramOnly || mahjongOnly || tangramOnly || klondikeOnly) {
+		if (nonogramOnly || mahjongOnly || tangramOnly || klondikeOnly || lightBendOnly) {
 			source = join(directory, `${entry}.ts`);
 			const harness =
 				entry === 'node'
@@ -45,13 +53,15 @@ try {
 					: entry === 'browser'
 						? 'globalThis.verifyMorphiVectors = verifyVectors;'
 						: 'export default { async fetch() { return Response.json(await verifyVectors()); } };';
-			const runnerFile = klondikeOnly
-				? 'klondike-solitaire'
-				: tangramOnly
-					? 'tangram'
-					: mahjongOnly
-						? 'mahjong-solitaire'
-						: 'nonogram';
+			const runnerFile = lightBendOnly
+				? 'light-bend'
+				: klondikeOnly
+					? 'klondike-solitaire'
+					: tangramOnly
+						? 'tangram'
+						: mahjongOnly
+							? 'mahjong-solitaire'
+							: 'nonogram';
 			await writeFile(
 				source,
 				`import { verifyVectors } from ${JSON.stringify(resolve(`tests/vectors/${runnerFile}-runner.ts`))};\n${harness}\n`

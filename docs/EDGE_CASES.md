@@ -2,6 +2,54 @@
 
 Catalog of edge cases with the expected behavior. Every case needs a test (unit, property, Playwright, or a manual drill noted in the phase report). Each phase's acceptance names the categories it must cover. Add every real bug found in play, with a regression test. Format: case → expected behavior.
 
+## Light Bend v1.4.5
+
+- Non-uniqueness is expected → any trace that lights every crystal wins, even a
+  shorter trail than the planted path. Par is the BFS minimum over all solutions,
+  never the planted tap count; witnesses grade 3 stars, other traces grade by
+  their own state diff. Units compare par against exhaustive enumeration.
+- Hint targets the BFS shortest solution → a mirror already correct in that
+  solution is never flagged, and `hintCell` returns -1 on a solved board.
+- Splitter branch blocked mid-trace → only that branch stops; the other branch
+  and its crystals still light, and the round is not won on a partial trace.
+- Portal exit into a wall or the board edge → the beam stops at the exit cell;
+  the exit is drawn in the polyline but never appended to `path`.
+- Two sources lighting the same crystal → lit once, both beams keep their own
+  colour, and a crystal lit by only one source still counts.
+- Colour filter changing a beam mid-trace → crystals behind the filter use the
+  new colour; a crystal passed at the wrong colour stays dark permanently.
+- `no-preview` fire with a mid-trace chain/switch-shutter → the win is judged only
+  on the fired trace; every later rotation/place/undo/reset clears `fired` and
+  returns the round to play.
+- Undo refunding a rotation → the undo stack restores the previous orientation
+  without spending the mirror budget, and `lightBendTurned` returns to its earlier
+  value so stars do not move.
+- Countdown timeout mid-drag → the timeout ends the round at 0 ms left; the
+  in-flight pan/rotate is dropped, no move is recorded, and the retry is
+  practice-only. A timeout during the entrance is impossible (the countdown starts
+  at beam start).
+- Restart must not re-roll → same seed yields the same board, band and par; only
+  `orientations`/`places` reset, while hints used, undos, resets and elapsed time
+  are retained.
+- Generation exhaustion → 100 bounded attempts, a `light_bend_generation_exhausted`
+  event with the last gate, a `RangeError`, and `dailySeedOk` returning false so
+  the daily walk advances to the next seed (then `daily_unavailable`, 503).
+- Mid-round resize/rotation → pan offset, zoom scale and the selected mirror
+  survive a viewport change; the board never forces page-level horizontal scroll.
+- Hidden-tab ranked time → the server's `gameplayMs` is authoritative, so hidden
+  time is measured by the server, not the visible clock.
+- Rapid/double input → a double tap on a mirror rotates once; taps during the
+  3,000 ms entrance lock are ignored rather than queued.
+- Resume/checkpoint → replaying stored moves restores orientations, `placed`,
+  `tray`, `hintsUsed`, `undos`, `resets`, `fired` and the live trace.
+- Missing asset → no Light Bend-specific audio asset is added in this milestone;
+  the generic sound engine falls back silently.
+- Navigation during entrance → the entrance is cancelled, timers are cleared, and
+  no incomplete round is saved or ranked.
+- Beam exiting a clear row → every cell is entered plus one final step out of the
+  board, so `steps === width` and the last beam point sits one half-cell past the
+  edge cell; this is expected, not an off-by-one bug.
+
 ## Mahjong Solitaire v1.4.2
 
 - Half-step cover, partial side adjacency and Turtle in-row head/tail → rectangle

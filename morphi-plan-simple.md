@@ -1,5 +1,32 @@
 # Morphi: Simple Plan
 
+## v1.4.5 Light Bend — source handoff authorized (2026-11-16)
+
+The owner requested updating the repository and pushing to GitHub, authorizing this
+source handoff. The focused verification and remaining evidence limits are recorded
+below; this request does not establish functional acceptance or authorize deployment,
+Batch B–J, other-family work or full verification.
+
+
+## v1.4.5 Light Bend — amended local verification (2026-11-16)
+
+Classic and ten Batch A variants are implemented: 11 enabled presets, zero variant
+groups and one `(light-bend, UTC date)` daily board. The owner authorized a fifth
+shared touch for N/Next in `ResultScreen.svelte`; it calls the existing Next action
+only while enabled. Owner functional acceptance remains pending.
+
+Focused evidence: 59 unit cases, 11 real-D1 cases, 43 generated and solved vectors
+and 172 rejected replays in each of six runtimes, 24 single-worker Chromium cases,
+scoped formatting/lint, types (0 errors / 0 warnings), boundaries, build, lazy
+isolation and registry freshness pass. Global lint previously stopped on Prettier
+drift in 22 other files including the owner-provided brief. The controlled exhaustion
+test forces rejected RNG draws; it is not a naturally exhausting seed. The straight
+path rejection guard is not directly exercised: generation constructs at least one
+turn. Mirror-budget gate (f) has no Batch A variant. See
+`docs/work/V1.4.5_LIGHT_BEND_WORK.md` for evidence and measurements.
+Full verification and physical-device review remain deferred; no commit, push,
+deployment, Batch B–J or other-family implementation is authorized.
+
 ## v1.4.3 Klondike Solitaire — baseline + Batch A implemented & verified; STOP (2026-11-14)
 
 Classic baseline and ten Batch A variants are locally implemented:

@@ -381,7 +381,7 @@ export async function saveRun(
 			);
 		if (run.rankedSession && timing && (maxSeconds !== undefined || openingMs !== null))
 			ranked = gameplayMs >= timing.minimumSeconds(result, run.variant) * 1000;
-		ranked = ranked && !result.hintUsed;
+		ranked = ranked && !(result.hintUsed && (scoring.values.hintSolvedRanks ?? 0) === 0);
 	} catch (error) {
 		// Terminal validation failures release the lock; storage failures retain retry rights.
 		if (run.rankedSession)

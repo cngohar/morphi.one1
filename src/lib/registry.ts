@@ -8,6 +8,7 @@ export const puzzleViews: Record<PuzzleId, () => Promise<{ default: Component<Pu
 		block: () => import('./puzzles/block-placement/View.svelte'),
 		connect: () => import('./puzzles/connect/View.svelte'),
 		'klondike-solitaire': () => import('./puzzles/klondike-solitaire/View.svelte'),
+		'light-bend': () => import('./puzzles/light-bend/View.svelte'),
 		'mahjong-solitaire': () => import('./puzzles/mahjong-solitaire/View.svelte'),
 		memory: () => import('./puzzles/memory/View.svelte'),
 		nonogram: () => import('./puzzles/nonogram/View.svelte'),
@@ -19,6 +20,7 @@ export type PuzzleStage = Component<
 >;
 export const puzzleStages: Partial<Record<PuzzleId, () => Promise<{ default: PuzzleStage }>>> = {
 	'klondike-solitaire': () => import('./puzzles/klondike-solitaire/Stage.svelte'),
+	'light-bend': () => import('./puzzles/light-bend/Stage.svelte'),
 	'mahjong-solitaire': () => import('./puzzles/mahjong-solitaire/Stage.svelte'),
 	nonogram: () => import('./puzzles/nonogram/Stage.svelte'),
 	tangram: () => import('./puzzles/tangram/Stage.svelte')
@@ -28,6 +30,7 @@ export const puzzlePools: Record<PuzzleId, () => Promise<{ manifest: PuzzleManif
 	block: () => import('./puzzles/block-placement/manifest.js'),
 	connect: () => import('./puzzles/connect/manifest.js'),
 	'klondike-solitaire': () => import('./puzzles/klondike-solitaire/manifest.js'),
+	'light-bend': () => import('./puzzles/light-bend/manifest.js'),
 	'mahjong-solitaire': () => import('./puzzles/mahjong-solitaire/manifest.js'),
 	memory: () => import('./puzzles/memory/manifest.js'),
 	nonogram: () => import('./puzzles/nonogram/manifest.js'),

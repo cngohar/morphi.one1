@@ -3,25 +3,28 @@ import type { PuzzleId, PuzzleManifest } from './engine/contract.js';
 import { manifest as manifest0 } from './puzzles/block-placement/manifest.js';
 import { manifest as manifest1 } from './puzzles/connect/manifest.js';
 import { manifest as manifest2 } from './puzzles/klondike-solitaire/manifest.js';
-import { manifest as manifest3 } from './puzzles/mahjong-solitaire/manifest.js';
-import { manifest as manifest4 } from './puzzles/memory/manifest.js';
-import { manifest as manifest5 } from './puzzles/nonogram/manifest.js';
-import { manifest as manifest6 } from './puzzles/tangram/manifest.js';
+import { manifest as manifest3 } from './puzzles/light-bend/manifest.js';
+import { manifest as manifest4 } from './puzzles/mahjong-solitaire/manifest.js';
+import { manifest as manifest5 } from './puzzles/memory/manifest.js';
+import { manifest as manifest6 } from './puzzles/nonogram/manifest.js';
+import { manifest as manifest7 } from './puzzles/tangram/manifest.js';
 export const catalog: Record<PuzzleId, PuzzleManifest> & {
 	block: typeof manifest0;
 	connect: typeof manifest1;
 	'klondike-solitaire': typeof manifest2;
-	'mahjong-solitaire': typeof manifest3;
-	memory: typeof manifest4;
-	nonogram: typeof manifest5;
-	tangram: typeof manifest6;
+	'light-bend': typeof manifest3;
+	'mahjong-solitaire': typeof manifest4;
+	memory: typeof manifest5;
+	nonogram: typeof manifest6;
+	tangram: typeof manifest7;
 } = {
 	['block']: manifest0,
 	['connect']: manifest1,
 	['klondike-solitaire']: manifest2,
-	['mahjong-solitaire']: manifest3,
-	['memory']: manifest4,
-	['nonogram']: manifest5,
-	['tangram']: manifest6
+	['light-bend']: manifest3,
+	['mahjong-solitaire']: manifest4,
+	['memory']: manifest5,
+	['nonogram']: manifest6,
+	['tangram']: manifest7
 };
 export { puzzleMessages } from './puzzle-messages.js';

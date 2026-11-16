@@ -1081,6 +1081,274 @@ const metadata = {
 			}
 		}
 	},
+	['light-bend']: {
+		engineVersion: 'light-bend-1',
+		titleAfterEntrance: true,
+		scoring: {
+			version: 'brief-v1',
+			fields: ['completion', 'second', 'hint', 'reset', 'countdown', 'hintSolvedRanks'],
+			defaults: {
+				completion: 1000,
+				second: 4,
+				hint: 100,
+				reset: 50,
+				countdown: 10,
+				hintSolvedRanks: 1
+			}
+		},
+		variants: [
+			{
+				id: 'light-bend:classic',
+				name: 'variant.light-bend:classic',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.step2', 'light-bend.step3'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:place-your-own',
+				name: 'variant.light-bend:place-your-own',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.place-your-own'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:colour',
+				name: 'variant.light-bend:colour',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.colour'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:splitter',
+				name: 'variant.light-bend:splitter',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.splitter'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:portal',
+				name: 'variant.light-bend:portal',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.portal'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:two-sources',
+				name: 'variant.light-bend:two-sources',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.two-sources'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:no-preview',
+				name: 'variant.light-bend:no-preview',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.no-preview'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:countdown-120',
+				name: 'variant.light-bend:countdown-120',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.countdown-120'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				},
+				maxSeconds: 120,
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.light-bend.headline', cap: 'ending.light-bend.timeUp' },
+					subline: { key: 'ending.light-bend.subline', values: ['crystals', 'stars'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Light every crystal before the countdown reaches zero; timeout keeps the failed board with no score saved.'
+				}
+			},
+			{
+				id: 'light-bend:no-undo',
+				name: 'variant.light-bend:no-undo',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.no-undo'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:no-hint',
+				name: 'variant.light-bend:no-hint',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.no-hint'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			},
+			{
+				id: 'light-bend:checkpoint',
+				name: 'variant.light-bend:checkpoint',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['light-bend.step1', 'light-bend.rule.checkpoint'],
+					rows: [
+						{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+						{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+						{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'light-bend.note',
+					tips: 'light-bend.tips'
+				}
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.light-bend.headline' },
+			subline: { key: 'ending.light-bend.subline', values: ['crystals', 'stars'] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition: 'Every crystal is lit by the beam in one trace.'
+		},
+		presentation: {
+			name: 'v1.game.light-bend',
+			scoringLabels: {
+				completion: 'scoring.light-bend.completion',
+				second: 'scoring.light-bend.second',
+				hint: 'scoring.light-bend.hint',
+				reset: 'scoring.light-bend.reset',
+				countdown: 'scoring.light-bend.countdown'
+			},
+			help: {
+				steps: ['light-bend.step1', 'light-bend.step2', 'light-bend.step3'],
+				rows: [
+					{ label: 'scoring.light-bend.completion', field: 'completion', sign: '+' },
+					{ label: 'scoring.light-bend.second', field: 'second', sign: '+' },
+					{ label: 'scoring.light-bend.hint', field: 'hint', sign: '−' },
+					{ label: 'scoring.light-bend.reset', field: 'reset', sign: '−' },
+					{ label: 'scoring.light-bend.countdown', field: 'countdown', sign: '+' }
+				],
+				note: 'light-bend.note',
+				tips: 'light-bend.tips'
+			},
+			backdrop: { items: [{ id: 'beam', path: 'M6 32h20l6-14 8 20h10l6-12h16' }], fill: 'outline' }
+		}
+	},
 	['mahjong-solitaire']: {
 		engineVersion: 'mahjong-solitaire-1',
 		titleAfterEntrance: true,

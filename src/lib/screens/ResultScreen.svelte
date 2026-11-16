@@ -42,6 +42,12 @@
 	} = $props();
 </script>
 
+<svelte:window
+	onkeydown={(event) => {
+		if ((event.key === 'n' || event.key === 'N') && !starting) onnext();
+	}}
+/>
+
 <main class="result-main result">
 	<section class="result-summary">
 		<p class="eyebrow">
