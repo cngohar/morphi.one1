@@ -670,3 +670,32 @@ results and limits in `docs/work/V1.3.4_SLICE0_WORK.md`.
 - Old immutable policy snapshots may omit only the explicitly new Time Strata values; malformed values and missing older keys fail closed. Live policy denies future issuance while issued rounds retain their rules and isolated groups.
 
 Evidence: `memory/time-strata.test.ts`, `dimensions.test.ts`, `tests/vectors/memory-batch-h.json`, focused D1 and Chromium sources; current results in `docs/work/V1.3.5.15_WORK.md`.
+
+## Word Guess v1.4.6
+
+- A duplicate can be grey after the other copies are matched. Correct
+  positions consume copies first, then present matches consume them from
+  left to right. Invalid or constraint-breaking guesses spend no row.
+- Hard Mode permits grey reuse. Ultra Hard moves present letters away
+  from previously rejected positions and enforces the grey copy limit.
+- Shared guesses apply to all unsolved boards. Boards can solve on
+  different guesses and score individually, including 25/20/15/10/5/5/5
+  for guesses 7–13. A hint targets the leftmost unrevealed position on
+  the first unsolved board, including when only the final board remains.
+- A zero-point hinted win inserts an eligible daily row. A completed loss
+  saves score zero without a row. A retry with no recoverable Word Guess
+  outcome leaves the board empty. Persisted hint labels survive archival.
+- Countdown expiry during typing spends no row and saves no score. Ranked
+  time includes time spent hidden. Resume restores the same seed, moves,
+  hints, elapsed clock and partial input. Unlimited Reset starts a fresh
+  round and ranked play has no Reset.
+- A given seed and preset reproduce the same word or boards. Hit the bounded
+  duplicate-draw limit to reject a seed. The existing daily seed walk tries
+  the next candidate and reports `daily_unavailable` on exhaustion.
+- Resize and rotation preserve the active row, board and keyboard. Double
+  Enter spends one row. Missing motion settles to a playable board, failed
+  view loading exposes Retry and Home, and navigation during a flip cleans
+  up the animation.
+
+Evidence comes from the Word Guess focused units, vectors, real D1 suite and
+Chromium run. See [the phase report](PHASE_REPORTS.md).

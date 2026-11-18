@@ -8,6 +8,7 @@ import { manifest as manifest4 } from './puzzles/mahjong-solitaire/manifest.js';
 import { manifest as manifest5 } from './puzzles/memory/manifest.js';
 import { manifest as manifest6 } from './puzzles/nonogram/manifest.js';
 import { manifest as manifest7 } from './puzzles/tangram/manifest.js';
+import { manifest as manifest8 } from './puzzles/word-guess/manifest.js';
 export const catalog: Record<PuzzleId, PuzzleManifest> & {
 	block: typeof manifest0;
 	connect: typeof manifest1;
@@ -17,6 +18,7 @@ export const catalog: Record<PuzzleId, PuzzleManifest> & {
 	memory: typeof manifest5;
 	nonogram: typeof manifest6;
 	tangram: typeof manifest7;
+	'word-guess': typeof manifest8;
 } = {
 	['block']: manifest0,
 	['connect']: manifest1,
@@ -25,6 +27,7 @@ export const catalog: Record<PuzzleId, PuzzleManifest> & {
 	['mahjong-solitaire']: manifest4,
 	['memory']: manifest5,
 	['nonogram']: manifest6,
-	['tangram']: manifest7
+	['tangram']: manifest7,
+	['word-guess']: manifest8
 };
 export { puzzleMessages } from './puzzle-messages.js';

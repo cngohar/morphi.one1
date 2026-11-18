@@ -440,11 +440,12 @@ export async function saveRun(
 			userId,
 			now - 3600000
 		);
-	const dailyDate = dailySession && ranked ? utcDate(issued!.createdAt) : null;
+	const dailyDate =
+		dailySession && ranked && result.won !== false ? utcDate(issued!.createdAt) : null;
 	if (dailyDate) {
 		const results = await binding.batch([
 			commit,
-			...dailyCompletionStatements(binding, userId, run.id, run.family, dailyDate, now)
+			...dailyCompletionStatements(binding, userId, run.id, run.family, dailyDate, now, result)
 		]);
 		if (results[1].meta.changes) await invalidateDailyBoard(cache, run.family, dailyDate);
 	} else await commit.run();

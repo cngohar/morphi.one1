@@ -19,6 +19,7 @@ export interface CompletedRun {
 }
 export interface ReplayedResult {
 	score: number;
+	won?: boolean;
 	group?: string;
 	pairs: number | null;
 	moves: number;

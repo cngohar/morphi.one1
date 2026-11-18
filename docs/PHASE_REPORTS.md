@@ -17,6 +17,80 @@ One report per phase, newest first. Use the template below (the same one in `AGE
 
 ## Reports
 
+## v1.4.6 Word Guess — local closeout (2026-11-18)
+
+- **Built.** Classic and ten Batch A presets, all enabled, in `word-guess-1`.
+  One daily board per UTC date and zero variant groups. The shared RoundStage
+  hosts a keyboard and DOM boards with five-key seeded rules, count-aware
+  feedback, and family-local anime.js 4.5.0 presentation. See
+  [the family README](../src/lib/puzzles/word-guess/README.md) and
+  [the checkpoint](work/V1.4.6_WORD_GUESS_WORK.md).
+- **Shared changes.** The vector harness selects Word Guess. The replay
+  contract adds optional `won`. The daily save and Word Guess retry paths
+  use the replayed outcome, with one additive SQL migration and matching
+  daily board reads and rendering for the hint indicator. The Word Guess
+  edge cases are appended to the catalog. See the checkpoint for file paths
+  and compatibility checks.
+- **Decisions.** Reuse the pinned `brief-v1` score definition, UTC rollover,
+  local checkpoint storage, shared card beats and existing sound cues.
+  The configured defaults and the owner review items are recorded in
+  [DECISIONS.md](DECISIONS.md) and section 10 of the Revision 5 brief.
+- **Skipped.** Full verify, other-family suites, physical devices, production
+  CPU and release checks, later batches, and source handoff. Focus was this
+  family and its shared paths.
+- **Known issues.** At 390×844 the shared Played badge clips the upper-left
+  edge of Enter. The eight-board layout has 8–11 px tile rows in the measured
+  viewports, and the narrowest short-landscape key height is 24 px. Check
+  readability and touch on owner devices. The cold solver measurement is a
+  local wall-clock value. Production Worker CPU is unmeasured. The brief's
+  10th-family wording differs from the nine registered families at this HEAD.
+- **Waivers.** None recorded. Full verification and physical-device testing
+  remain deferred.
+- **Owner responsibilities.** Review the three layouts, confirm the choices
+  marked specified in the brief, and record functional acceptance separately.
+- **CODEMAP.** Word Guess closeout appended. The existing simple-plan and
+  CODEMAP text was preserved.
+
+| Acceptance item                                                  | Evidence                                                                  | Result                                                                                                                                                                             |
+| ---------------------------------------------------------------- | ------------------------------------------------------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Classic before Batch A                                           | `build/v1.4.6/baseline/`                                                  | 9 units, 4 D1 cases and 4 Chromium cases passed before the expansion                                                                                                               |
+| Rules, feedback, scoring, curation, bounded rejection and solver | `build/v1.4.6/resume/unit-final.log` and `solver-words.json` one level up | 26 passed. All 1,881 answers solved within five guesses in the information-gain proof                                                                                              |
+| Frozen seeds and replay                                          | `build/v1.4.6/resume/vectors-final.log`                                   | 33 generated, solved and lost, and 66 illegal or incomplete replays rejected in each of six runtimes                                                                               |
+| Real storage, retry, timing, admin and retention                 | `build/v1.4.6/resume/d1-final.log`                                        | 13 passed, including 2,499/2,500 ms, timeout, loss, zero-point win, both hint board reads, and R2 archival followed by D1 deletion                                                 |
+| Gameplay, keyboard, layout and recovery                          | `build/v1.4.6/resume/browser-final.log` and `build/v1.4.6/browser/`       | 48 Chromium cases passed at one worker. All 11 presets solved at all three sizes. Recovery restored `IM`, guesses, hints, and the elapsed clock                                    |
+| Countdown, motion and font                                       | Same browser log and captures                                             | Expiry at 00:00 spent zero rows and exposed no result score. Normal tile flips and key pops, Nunito, reduced motion, missing motion and view recovery passed                       |
+| Owner fixture                                                    | `build/v1.4.6/resume/demo/` and `demo-final.log` beside it                | Opened in Chromium. Three viewports and reduced-motion duplicate feedback, 90-point solve, Reset and expiry passed. The normal-motion demo probe did not complete the second guess |
+| Types, focused formatting and lint, engine boundaries            | `build/v1.4.6/resume/{check,prettier,eslint,boundaries}-final.log`        | Pass, including zero errors and warnings from Svelte check                                                                                                                         |
+| Registry, build and lazy isolation                               | `build/v1.4.6/resume/{registry,build,lazy}-final.log`                     | Pass. Five projections matched byte for byte. All five pre-existing Stage registrations match HEAD                                                                                 |
+| Workspace lint                                                   | `build/v1.4.6/resume/global-lint.log`                                     | Stops on pre-existing Prettier drift in 22 files including the supplied Word Guess brief. Scoped source checks pass                                                                |
+
+Local desktop Chromium used emulated 390×844, 844×390 and 1280×800 viewports.
+On the app's Classic keyboard, Q measured 30.2×44, 69.4×28 and 48.6×44 CSS px.
+It stayed in the initial viewport at all three sizes. The demo measured
+30.8×58, 43.8×58 and 43.8×58 and needed vertical scrolling to expose the full
+keyboard. Both had zero horizontal overflow. The three screenshots are
+layout checks, with one measurement per viewport and no network throttling.
+
+Solver and issuance samples were taken locally on an AMD PRO A8-8650B Linux
+desktop. The Node 24.14.1 Vitest proof records one ordered pass per length
+with memoized candidate partitions. These values describe that pass, where
+only the first answer per length starts with an empty decision cache.
+
+| Length | Answers | Median per word | p95 per word | First cold proof | Cold feedback evaluations |
+| ------ | ------: | --------------: | -----------: | ---------------: | ------------------------: |
+| 4      |     556 |        0.462 ms |    10.006 ms |       743.026 ms |                   642,518 |
+| 5      |     440 |        0.336 ms |    13.075 ms |       715.489 ms |                   812,456 |
+| 6      |     441 |        0.347 ms |    21.030 ms |     1,085.452 ms |                 1,313,855 |
+| 7      |     444 |        0.355 ms |    18.186 ms |     1,327.779 ms |                 1,610,710 |
+
+The saved 33-seed issuance sample mixes cold and reused decisions. Median
+was 12.54 ms, p95 was 595.68 ms, and the longest was 802.38 ms for seed 1
+in the seven-letter preset. All 66 board draws passed, with zero rejected
+answers, solver failures, curation exclusions or duplicates in that sample.
+A separate forced-exhaustion unit hit 100 duplicate rejections on the
+second board and the bounded gate rejected the seed. These local CPU timings
+describe observed performance. The acceptance gate is a correct, bounded solve.
+
 ## v1.4.2 Mahjong Solitaire — source commit and push authorized (2026-11-13)
 
 The owner said “comit and push to github”, authorizing the completed Mahjong

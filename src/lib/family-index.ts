@@ -8,5 +8,6 @@ export const familyIndex: readonly PuzzleFamilyEntry[] = [
 	{ id: 'mahjong-solitaire', weight: 1, enabled: true, orientation: 'any', selectionOrder: 4 },
 	{ id: 'tangram', weight: 1, enabled: true, orientation: 'any', selectionOrder: 5 },
 	{ id: 'klondike-solitaire', weight: 1, enabled: true, orientation: 'any', selectionOrder: 6 },
-	{ id: 'light-bend', weight: 1, enabled: true, orientation: 'any', selectionOrder: 7 }
+	{ id: 'light-bend', weight: 1, enabled: true, orientation: 'any', selectionOrder: 7 },
+	{ id: 'word-guess', weight: 1, enabled: true, orientation: 'any', selectionOrder: 8 }
 ];

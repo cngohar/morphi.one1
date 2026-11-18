@@ -1574,3 +1574,33 @@ Slice 6 additions:
 - `components/SupportDesk.svelte`, `routes/account/support/`, `routes/account/+page.svelte`, `routes/admin/[view]/`: member support and staff inbox/taxonomy in existing shells; paginated plain text, unread replies and memory-only drafts/ambiguous retry ids.
 - `content/privacy.ts`, `i18n/messages.ts`, `docs/privacy/{PRIVACY_RETENTION,PRIVACY_REQUESTS}.md`: approved local conversation retention/deletion policy; no publication.
 - `tests/integration/support.test.ts`, `tests/e2e/support.spec.ts`, `tests/e2e/privacy.spec.ts`: focused service/access/race/deletion and UI/privacy coverage. Targeted results and the explicit full-verification deferral are recorded in `docs/work/V1.3.3_WORK.md`, `docs/evidence/v1.3.3/verification.json` and the latest phase report.
+
+## v1.4.6 Word Guess — saved draft, paused by owner (2026-11-17)
+
+The owner requested continuing Word Guess implementation, authorized direct
+parent takeover for all work, then said “save the work so i can resume later”.
+The Classic plus ten Batch A draft is saved locally: 11 enabled presets, zero
+variant groups, one `(word-guess, UTC date)` board. Latest changes guard UI
+callbacks, resume the practice clock and preserve motion pauses during loading;
+the recovery browser test now waits for a real hide checkpoint. Fresh 26 units,
+scoped ESLint and workspace types (0 errors / 0 warnings) pass. Scoped formatting
+still needs `daily.ts` cleanup; final browser/D1/vectors/build/boundaries/lazy
+checks and owner functional acceptance remain pending. Full verify is deferred.
+No commit, push, deployment or Batch B. Resume from
+`docs/work/V1.4.6_WORD_GUESS_WORK.md` and the Revision 5 brief; preserve existing
+unrelated changes and editor exclusions.
+
+## v1.4.6 Word Guess — local closeout (2026-11-18)
+
+The saved draft was resumed and focused local verification is complete.
+Classic and ten Batch A presets are enabled in `word-guess-1`, with zero
+variant groups and one daily board per UTC date. The new Word Guess board
+hint label survives retry and retention. All 26 unit, 13 real-D1 and 48
+single-worker Chromium cases passed. Six runtimes agreed on 33 seeded
+rounds with completed win and loss witnesses. Scoped format/lint, types,
+boundaries, registry, build and Word Guess lazy isolation passed.
+
+See `docs/work/V1.4.6_WORD_GUESS_WORK.md` and `docs/PHASE_REPORTS.md` for the
+source backup, measurements and the remaining visual review. Owner
+acceptance, physical devices and full verify remain outstanding. Source
+handoff, release and later batches remain outside this continuation.

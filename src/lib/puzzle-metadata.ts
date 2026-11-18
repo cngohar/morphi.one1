@@ -4217,6 +4217,329 @@ const metadata = {
 				fill: 'solid'
 			}
 		}
+	},
+	['word-guess']: {
+		engineVersion: 'word-guess-1',
+		titleAfterEntrance: true,
+		scoring: {
+			version: 'brief-v1',
+			fields: [
+				'first',
+				'second',
+				'third',
+				'fourth',
+				'fifth',
+				'sixth',
+				'seventh',
+				'eighth',
+				'ninth',
+				'tenth',
+				'eleventh',
+				'twelfth',
+				'thirteenth',
+				'hint',
+				'countdown',
+				'hintSolvedRanks'
+			],
+			defaults: {
+				first: 100,
+				second: 90,
+				third: 75,
+				fourth: 60,
+				fifth: 45,
+				sixth: 30,
+				seventh: 25,
+				eighth: 20,
+				ninth: 15,
+				tenth: 10,
+				eleventh: 5,
+				twelfth: 5,
+				thirteenth: 5,
+				hint: 100,
+				countdown: 10,
+				hintSolvedRanks: 1
+			}
+		},
+		variants: [
+			{
+				id: 'word-guess:classic',
+				name: 'variant.word-guess:classic',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.step2', 'word-guess.step3'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:hard-mode',
+				name: 'variant.word-guess:hard-mode',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.hard-mode'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:ultra-hard',
+				name: 'variant.word-guess:ultra-hard',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.ultra-hard'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:length-4',
+				name: 'variant.word-guess:length-4',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.length-4'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:length-6',
+				name: 'variant.word-guess:length-6',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.length-6'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:length-7',
+				name: 'variant.word-guess:length-7',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.length-7'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:boards-2',
+				name: 'variant.word-guess:boards-2',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.boards-2'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:boards-4',
+				name: 'variant.word-guess:boards-4',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.boards-4'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:boards-8',
+				name: 'variant.word-guess:boards-8',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.boards-8'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			},
+			{
+				id: 'word-guess:countdown-120',
+				name: 'variant.word-guess:countdown-120',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.countdown-120'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				},
+				maxSeconds: 120,
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.word-guess.headline', cap: 'ending.word-guess.timeUp' },
+					subline: { key: 'ending.word-guess.subline', values: ['tries'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition:
+						'Solve before 120 seconds; timeout retains the failed board and saves no score.'
+				}
+			},
+			{
+				id: 'word-guess:hint-budget-3',
+				name: 'variant.word-guess:hint-budget-3',
+				enabled: true,
+				weight: 1,
+				maxMoves: 10000,
+				help: {
+					steps: ['word-guess.step1', 'word-guess.rule.hint-budget-3'],
+					rows: [
+						{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+						{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+						{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+						{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+						{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+						{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' },
+						{ label: 'scoring.word-guess.hint', field: 'hint', sign: '−' }
+					],
+					note: 'word-guess.note',
+					tips: 'word-guess.tips'
+				}
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.word-guess.headline' },
+			subline: { key: 'ending.word-guess.subline', values: ['tries'] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition:
+				'Every word is solved within the shared guess budget; exhausted guesses complete a loss with zero points.'
+		},
+		presentation: {
+			name: 'v1.game.word-guess',
+			scoringLabels: {
+				first: 'scoring.word-guess.first',
+				second: 'scoring.word-guess.second',
+				third: 'scoring.word-guess.third',
+				fourth: 'scoring.word-guess.fourth',
+				fifth: 'scoring.word-guess.fifth',
+				sixth: 'scoring.word-guess.sixth',
+				seventh: 'scoring.word-guess.seventh',
+				eighth: 'scoring.word-guess.eighth',
+				ninth: 'scoring.word-guess.ninth',
+				tenth: 'scoring.word-guess.tenth',
+				eleventh: 'scoring.word-guess.eleventh',
+				twelfth: 'scoring.word-guess.twelfth',
+				thirteenth: 'scoring.word-guess.thirteenth',
+				hint: 'scoring.word-guess.hint',
+				countdown: 'scoring.word-guess.countdown',
+				hintSolvedRanks: 'scoring.word-guess.hintSolvedRanks'
+			},
+			help: {
+				steps: ['word-guess.step1', 'word-guess.step2', 'word-guess.step3'],
+				rows: [
+					{ label: 'scoring.word-guess.first', field: 'first', sign: '+' },
+					{ label: 'scoring.word-guess.second', field: 'second', sign: '+' },
+					{ label: 'scoring.word-guess.third', field: 'third', sign: '+' },
+					{ label: 'scoring.word-guess.fourth', field: 'fourth', sign: '+' },
+					{ label: 'scoring.word-guess.fifth', field: 'fifth', sign: '+' },
+					{ label: 'scoring.word-guess.sixth', field: 'sixth', sign: '+' }
+				],
+				note: 'word-guess.note',
+				tips: 'word-guess.tips'
+			},
+			backdrop: {
+				items: [{ id: 'letter-tile', path: 'M12 8h40v48H12ZM22 42l10-20 10 20M26 34h12' }],
+				fill: 'outline'
+			}
+		}
 	}
 } as const;
 export const puzzleMetadata: Record<PuzzleId, ClientPuzzleMetadata> & typeof metadata = metadata;

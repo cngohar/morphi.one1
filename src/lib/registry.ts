@@ -12,7 +12,8 @@ export const puzzleViews: Record<PuzzleId, () => Promise<{ default: Component<Pu
 		'mahjong-solitaire': () => import('./puzzles/mahjong-solitaire/View.svelte'),
 		memory: () => import('./puzzles/memory/View.svelte'),
 		nonogram: () => import('./puzzles/nonogram/View.svelte'),
-		tangram: () => import('./puzzles/tangram/View.svelte')
+		tangram: () => import('./puzzles/tangram/View.svelte'),
+		'word-guess': () => import('./puzzles/word-guess/View.svelte')
 	};
 export type PuzzleStage = Component<
 	ComponentProps<typeof RoundStage> & { footerContent?: Snippet },
@@ -34,5 +35,6 @@ export const puzzlePools: Record<PuzzleId, () => Promise<{ manifest: PuzzleManif
 	'mahjong-solitaire': () => import('./puzzles/mahjong-solitaire/manifest.js'),
 	memory: () => import('./puzzles/memory/manifest.js'),
 	nonogram: () => import('./puzzles/nonogram/manifest.js'),
-	tangram: () => import('./puzzles/tangram/manifest.js')
+	tangram: () => import('./puzzles/tangram/manifest.js'),
+	'word-guess': () => import('./puzzles/word-guess/manifest.js')
 };

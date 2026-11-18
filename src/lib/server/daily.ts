@@ -1,9 +1,14 @@
 import { catalog } from '#lib/catalog.js';
-import type { PuzzleId, PuzzleManifest, PuzzlePresentation } from '#lib/engine/contract.js';
+import type {
+	PuzzleId,
+	PuzzleManifest,
+	PuzzlePresentation,
+	ReplayedResult
+} from '#lib/engine/contract.js';
 import type { ResolvedTheme } from '#lib/engine/theme/generator.js';
 import { defaultScoreConfig, scoreScope, type ScoreConfig } from '#lib/scoring.js';
 import { enabledVariants, gameAvailable } from './games.js';
-import { readLiveScoreConfig } from './scoring.js';
+import { readLiveScoreConfig, readScoreConfig } from './scoring.js';
 import { RunError, digest } from './runs.js';
 import { cachedConfigRow, dailyBoardKey, invalidateDailyBoard } from './config-cache.js';
 import { memorySqlPaths } from './memory-policy.js';
@@ -236,7 +241,7 @@ export async function dailyBest(
 ) {
 	const candidates = await binding
 		.prepare(
-			`SELECT r.family,r.score,r.seconds,r.moves,r.created_at AS submittedAt,p.variant,p.date
+			`SELECT r.family,r.seconds,r.seed,r.move_log AS moveLog,r.score_config_version AS scoreVersion,p.variant,p.date
 		FROM completed_run r LEFT JOIN play_session s ON s.id=r.id AND s.user_id=r.user_id
 		JOIN daily_puzzle p ON p.family=r.family AND p.seed=r.seed AND p.engine_version=r.engine_version
 		AND p.score_config_version=r.score_config_version
@@ -250,10 +255,10 @@ export async function dailyBest(
 			family: string;
 			date: string;
 			variant: string;
-			score: number;
+			seed: string;
+			moveLog: string;
+			scoreVersion: string;
 			seconds: number;
-			moves: number;
-			submittedAt: number;
 		}>();
 	let run;
 	for (const candidate of candidates.results) {
@@ -266,8 +271,36 @@ export async function dailyBest(
 		}
 	}
 	if (!run) return null;
+	let outcome: Pick<ReplayedResult, 'won' | 'hintUsed'> = {};
+	if (run.family === 'word-guess') {
+		try {
+			const moves = JSON.parse(run.moveLog);
+			if (!Array.isArray(moves)) throw new RangeError('move_log');
+			const config = await readScoreConfig(
+				binding,
+				run.family,
+				run.scoreVersion,
+				cache,
+				run.variant
+			);
+			outcome = catalog[run.family].replay(
+				run.seed,
+				moves,
+				run.seconds,
+				config.values,
+				run.variant
+			);
+			if (outcome.won === undefined) throw new RangeError('missing_outcome');
+		} catch {
+			console.warn(
+				JSON.stringify({ event: 'daily_retry_outcome_unavailable', family: run.family })
+			);
+			return null;
+		}
+	}
+	if (outcome.won === false) return null;
 	const results = await binding.batch(
-		dailyCompletionStatements(binding, userId, runId, run.family, run.date, now)
+		dailyCompletionStatements(binding, userId, runId, run.family, run.date, now, outcome)
 	);
 	if (results[0].meta.changes) await invalidateDailyBoard(cache, run.family, run.date);
 	return { family: run.family, date: run.date };
@@ -280,24 +313,37 @@ export function dailyCompletionStatements(
 	runId: string,
 	family: string,
 	date: string,
-	now: number
+	now: number,
+	outcome: Pick<ReplayedResult, 'won' | 'hintUsed'> = {}
 ) {
 	validateDailyDate(date);
 	return [
 		binding
 			.prepare(
-				`INSERT INTO daily_best(family,date,user_id,score,seconds,moves,created_at,updated_at)
-			SELECT r.family,?,r.user_id,r.score,r.seconds,r.moves,r.created_at,? FROM completed_run r
+				`INSERT INTO daily_best(family,date,user_id,score,seconds,moves,created_at,updated_at,hint_used)
+			SELECT r.family,?,r.user_id,r.score,r.seconds,r.moves,r.created_at,?,? FROM completed_run r
 			JOIN daily_puzzle p ON p.family=r.family AND p.date=? AND p.seed=r.seed
 			AND p.engine_version=r.engine_version AND p.score_config_version=r.score_config_version
-			WHERE r.id=? AND r.user_id=? AND r.family=? AND r.ranked=1 AND r.hidden=0 AND ?<?
+			WHERE r.id=? AND r.user_id=? AND r.family=? AND r.ranked=1 AND r.hidden=0 AND ?<? AND ?=1
 			AND EXISTS(SELECT 1 FROM player WHERE user_id=r.user_id)
 			AND NOT EXISTS(SELECT 1 FROM user_lifecycle WHERE user_id=r.user_id)
 			AND NOT EXISTS(SELECT 1 FROM player_ban WHERE user_id=r.user_id AND (expires_at IS NULL OR expires_at>?))
 			ON CONFLICT(family,date,user_id) DO UPDATE SET score=excluded.score,seconds=excluded.seconds,
-			moves=excluded.moves,created_at=excluded.created_at,updated_at=excluded.updated_at WHERE excluded.score>daily_best.score`
+			moves=excluded.moves,created_at=excluded.created_at,updated_at=excluded.updated_at,hint_used=excluded.hint_used WHERE excluded.score>daily_best.score`
 			)
-			.bind(date, now, date, runId, userId, family, now, dailyFreezeAt(date), now),
+			.bind(
+				date,
+				now,
+				Number(family === 'word-guess' && Boolean(outcome.hintUsed)),
+				date,
+				runId,
+				userId,
+				family,
+				now,
+				dailyFreezeAt(date),
+				Number(outcome.won !== false),
+				now
+			),
 		binding
 			.prepare('DELETE FROM daily_board_snapshot WHERE family=? AND date=? AND changes()>0')
 			.bind(family, date),
@@ -320,6 +366,7 @@ interface SnapshotRow {
 	name: string;
 	score: number;
 	position: number;
+	hintUsed?: number;
 }
 interface Snapshot {
 	rows: SnapshotRow[];
@@ -345,7 +392,8 @@ function parseSnapshot(value: unknown): Snapshot | null {
 				typeof entry.userId !== 'string' ||
 				typeof entry.name !== 'string' ||
 				!Number.isSafeInteger(entry.score) ||
-				!Number.isSafeInteger(entry.position)
+				!Number.isSafeInteger(entry.position) ||
+				(entry.hintUsed !== undefined && entry.hintUsed !== 0 && entry.hintUsed !== 1)
 		)
 	)
 		return null;
@@ -363,7 +411,7 @@ async function computeSnapshot(
 	const results = await binding.batch([
 		binding
 			.prepare(
-				`SELECT b.user_id AS userId,COALESCE(p.name,'Anonymous') AS name,b.score FROM daily_best b
+				`SELECT b.user_id AS userId,COALESCE(p.name,'Anonymous') AS name,b.score,b.hint_used AS hintUsed FROM daily_best b
 			LEFT JOIN player p ON p.user_id=b.user_id WHERE b.family=? AND b.date=?
 			ORDER BY b.score DESC,b.created_at,b.user_id LIMIT 25`
 			)
@@ -453,7 +501,7 @@ export async function dailyBoard(
 	if (limit === 100) {
 		const result = await binding
 			.prepare(
-				`SELECT b.user_id AS userId,COALESCE(p.name,'Anonymous') AS name,b.score
+				`SELECT b.user_id AS userId,COALESCE(p.name,'Anonymous') AS name,b.score,b.hint_used AS hintUsed
 			FROM daily_best b LEFT JOIN player p ON p.user_id=b.user_id WHERE b.family=? AND b.date=?
 			ORDER BY b.score DESC,b.created_at,b.user_id LIMIT 100`
 			)
@@ -477,12 +525,13 @@ export async function dailyBoard(
 	const ownRow = viewer
 		? await binding
 				.prepare(
-					`SELECT b.score,b.created_at AS createdAt FROM daily_best b WHERE b.family=? AND b.date=? AND b.user_id=?`
+					`SELECT b.score,b.created_at AS createdAt,b.hint_used AS hintUsed FROM daily_best b WHERE b.family=? AND b.date=? AND b.user_id=?`
 				)
 				.bind(family, date, viewer)
-				.first<{ score: number; createdAt: number }>()
+				.first<{ score: number; createdAt: number; hintUsed: number }>()
 		: null;
-	let own: { score: number; position: number; percentile?: number } | null = null;
+	let own: { score: number; position: number; percentile?: number; hintUsed?: boolean } | null =
+		null;
 	if (ownRow) {
 		const count = await binding
 			.prepare(
@@ -502,7 +551,12 @@ export async function dailyBoard(
 			.first<{ higher: number }>();
 		const position = count!.higher + 1;
 		const percentile = rankPercentile(position, snapshot.cutoffs);
-		own = { score: ownRow.score, position, ...(percentile === undefined ? {} : { percentile }) };
+		own = {
+			score: ownRow.score,
+			position,
+			...(percentile === undefined ? {} : { percentile }),
+			...(ownRow.hintUsed ? { hintUsed: true } : {})
+		};
 	}
 	return {
 		family,
@@ -510,6 +564,7 @@ export async function dailyBoard(
 		rows: rows.map((row) => ({
 			name: names.find((entry) => entry.userId === row.userId)?.name ?? 'Anonymous',
 			score: row.score,
+			...(row.hintUsed ? { hintUsed: true } : {}),
 			position: row.position,
 			own: row.userId === viewer
 		})),
@@ -579,9 +634,18 @@ export async function refreshDailyBoards(
 				if (isDailyFrozen(row.date, now)) await computeSnapshot(binding, row.family, row.date, now);
 			} catch (error) {
 				const code =
-					error instanceof RunError ? error.code : error instanceof Error ? error.message : 'failed';
+					error instanceof RunError
+						? error.code
+						: error instanceof Error
+							? error.message
+							: 'failed';
 				console.error(
-					JSON.stringify({ event: 'daily_refresh_failed', family: row.family, date: row.date, code })
+					JSON.stringify({
+						event: 'daily_refresh_failed',
+						family: row.family,
+						date: row.date,
+						code
+					})
 				);
 				continue;
 			}

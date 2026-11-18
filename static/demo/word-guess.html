@@ -1,0 +1,791 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>Word Guess Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdn.jsdelivr.net/npm/animejs@3.2.1/lib/anime.min.js"></script>
+    <style>
+      :root{
+        --bg:#eef2f7; --surface:#ffffff; --surface2:#f7f9fc; --ink:#1b2433; --ink-soft:#48536a;
+        --line:#d3dbe7; --tile-empty:#ffffff; --tile-border:#b9c4d6; --tile-filled:#8794ab;
+        --teal:#009a86; --orange:#e5532d; --grey:#787c82; --grey-key:#d3d6da; --key-bg:#dfe5ee;
+        --blue:#2f6fed; --violet:#7d61ae; --focus:#2f6fed;
+        --pastel-a:#ffd9a8; --pastel-b:#bfe3dd; --pastel-c:#d9d2f0; --pastel-d:#f6c9d4;
+        --shadow:0 10px 30px rgba(27,36,51,.10);
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#141a26; --surface:#1e2739; --surface2:#232f47; --ink:#eef2f7; --ink-soft:#b7c1d4;
+          --line:#35425c; --tile-empty:#1e2739; --tile-border:#46587a; --tile-filled:#7d8fb3;
+          --grey:#5c6470; --grey-key:#3a4358; --key-bg:#2b3852;
+          --pastel-a:#6b4d22; --pastel-b:#14524a; --pastel-c:#43357a; --pastel-d:#6e3547;
+          --shadow:0 10px 30px rgba(0,0,0,.35);
+        }
+      }
+      *{box-sizing:border-box}
+      html,body{margin:0;padding:0}
+      body{
+        font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+        background:var(--bg); color:var(--ink);
+        min-height:100dvh; display:flex; flex-direction:column; align-items:center;
+      }
+      button{font-family:inherit; cursor:pointer}
+      button:focus-visible, [tabindex]:focus-visible{outline:3px solid var(--focus); outline-offset:2px}
+      .stage{width:100%; max-width:520px; padding:14px 14px 28px; display:flex; flex-direction:column; align-items:center; gap:12px}
+
+      /* Header */
+      header{text-align:center; position:relative; width:100%}
+      .shapes{display:flex; justify-content:center; gap:8px; margin-bottom:6px}
+      .shapes span{display:block}
+      .shapes .sq{width:16px;height:16px;border-radius:4px;background:var(--pastel-a)}
+      .shapes .ci{width:16px;height:16px;border-radius:50%;background:var(--pastel-b)}
+      .shapes .tr{width:0;height:0;border-left:9px solid transparent;border-right:9px solid transparent;border-bottom:16px solid var(--pastel-c)}
+      .shapes .rc{width:22px;height:16px;border-radius:8px;background:var(--pastel-d)}
+      .wordmark{font-size:.8rem; font-weight:900; letter-spacing:.14em; text-transform:uppercase; color:var(--ink-soft)}
+      h1{margin:2px 0 0; font-size:2rem; font-weight:900; line-height:1.1}
+      .rule-line{margin:4px 0 0; font-size:1rem; font-weight:700; color:var(--ink-soft)}
+      .rule-line strong{color:var(--ink)}
+
+      /* Control bar */
+      .controls{width:100%; display:flex; flex-wrap:wrap; gap:8px; justify-content:center; align-items:stretch}
+      .seg{display:flex; background:var(--surface); border:1.5px solid var(--line); border-radius:12px; overflow:hidden}
+      .seg button{border:0; background:transparent; color:var(--ink-soft); font-weight:800; font-size:.85rem; padding:8px 12px; min-height:44px}
+      .seg button[aria-pressed="true"]{background:var(--blue); color:#fff}
+      .seg button:disabled{opacity:.45; cursor:default}
+      .ctl-btn{
+        border:1.5px solid var(--line); background:var(--surface); color:var(--ink);
+        border-radius:12px; font-weight:800; font-size:.85rem; padding:8px 14px; min-height:44px;
+        display:inline-flex; align-items:center; gap:6px;
+      }
+      .ctl-btn:disabled{opacity:.45; cursor:default}
+      .ctl-btn.primary{background:var(--ink); color:var(--bg); border-color:var(--ink)}
+      .hard-toggle{
+        display:inline-flex; align-items:center; gap:8px; background:var(--surface);
+        border:1.5px solid var(--line); border-radius:12px; padding:6px 12px; min-height:44px;
+        font-weight:800; font-size:.85rem; cursor:pointer; user-select:none;
+      }
+      .hard-toggle input{width:20px; height:20px; accent-color:var(--violet); margin:0}
+      .hard-toggle.disabled{opacity:.5}
+
+      .hud{width:100%; display:flex; justify-content:center; gap:10px; flex-wrap:wrap}
+      .hud .chip{
+        background:var(--surface); border:1.5px solid var(--line); border-radius:999px;
+        padding:6px 14px; font-weight:800; font-size:.9rem; min-height:36px; display:inline-flex; align-items:center; gap:6px;
+      }
+      .hud .chip .lbl{color:var(--ink-soft); font-size:.75rem; text-transform:uppercase; letter-spacing:.06em}
+
+      .message{
+        min-height:44px; width:100%; display:flex; align-items:center; justify-content:center; text-align:center;
+        font-weight:800; font-size:.95rem; color:var(--ink);
+      }
+      .message:empty{visibility:hidden}
+      .message .pill{background:var(--ink); color:var(--bg); padding:8px 16px; border-radius:10px; box-shadow:var(--shadow)}
+
+      /* Board */
+      .board{display:grid; grid-template-rows:repeat(6,1fr); gap:6px; width:min(330px,100%)}
+      .row{display:grid; grid-template-columns:repeat(5,1fr); gap:6px}
+      .row.shake{animation:shake .45s ease}
+      @keyframes shake{10%,90%{transform:translateX(-2px)}20%,80%{transform:translateX(3px)}30%,50%,70%{transform:translateX(-5px)}40%,60%{transform:translateX(5px)}}
+      .tile{
+        aspect-ratio:1/1; display:flex; align-items:center; justify-content:center;
+        font-size:clamp(1.4rem,7vw,2rem); font-weight:900; text-transform:uppercase;
+        background:var(--tile-empty); border:2px solid var(--tile-border); border-radius:8px;
+        color:var(--ink); user-select:none; transform-style:preserve-3d;
+      }
+      .tile.filled{border-color:var(--tile-filled)}
+      .tile.hinted{color:var(--teal); border-color:var(--teal); border-style:dashed}
+      .tile.correct{background:var(--teal); border-color:var(--teal); color:#fff}
+      .tile.present{background:var(--orange); border-color:var(--orange); color:#fff}
+      .tile.absent{background:var(--grey); border-color:var(--grey); color:#fff}
+      @media (prefers-reduced-motion: reduce){
+        .row.shake{animation:none}
+      }
+
+      .hint-line{min-height:24px; font-weight:800; font-size:.9rem; color:var(--teal); text-align:center}
+      .hint-line:empty{visibility:hidden}
+
+      /* Keyboard */
+      .keyboard{width:100%; max-width:500px; display:flex; flex-direction:column; gap:6px; touch-action:manipulation}
+      .kb-row{display:flex; gap:6px; justify-content:center}
+      .key{
+        flex:1 1 0; min-width:0; height:58px; border:0; border-radius:8px;
+        background:var(--key-bg); color:var(--ink); font-weight:800; font-size:1rem;
+        display:flex; align-items:center; justify-content:center; text-transform:uppercase;
+        padding:0 2px; user-select:none; -webkit-tap-highlight-color:transparent;
+      }
+      .key.wide{flex:1.6 1 0; font-size:.78rem; letter-spacing:.02em}
+      .key.correct{background:var(--teal); color:#fff}
+      .key.present{background:var(--orange); color:#fff}
+      .key.absent{background:var(--grey); color:#fff}
+      .key:active{filter:brightness(.92)}
+
+      /* Result */
+      .result{
+        width:100%; background:var(--surface); border:1.5px solid var(--line); border-radius:16px;
+        box-shadow:var(--shadow); padding:16px; text-align:center; display:none;
+      }
+      .result.show{display:block}
+      .result h2{margin:0 0 4px; font-size:1.3rem; font-weight:900}
+      .result p{margin:4px 0; color:var(--ink-soft); font-weight:700}
+      .result .score-big{font-size:1.6rem; font-weight:900; color:var(--ink)}
+      .result .grid-share{font-size:1.15rem; line-height:1.5; letter-spacing:2px; margin:8px 0}
+      .result .actions{display:flex; gap:8px; justify-content:center; flex-wrap:wrap; margin-top:10px}
+
+      /* Stats */
+      .stats{width:100%; background:var(--surface); border:1.5px solid var(--line); border-radius:16px; padding:14px 16px}
+      .stats h2{margin:0 0 10px; font-size:.95rem; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft)}
+      .stat-grid{display:grid; grid-template-columns:repeat(4,1fr); gap:8px; text-align:center}
+      .stat-grid .num{font-size:1.5rem; font-weight:900}
+      .stat-grid .cap{font-size:.72rem; font-weight:800; color:var(--ink-soft); text-transform:uppercase; letter-spacing:.04em}
+      .dist{margin-top:12px; display:flex; flex-direction:column; gap:4px}
+      .dist-row{display:flex; align-items:center; gap:8px; font-weight:800; font-size:.85rem}
+      .dist-row .n{width:12px; text-align:right}
+      .dist-bar-wrap{flex:1; background:var(--surface2); border-radius:4px; overflow:hidden; height:20px}
+      .dist-bar{height:100%; background:var(--grey); color:#fff; font-size:.75rem; font-weight:800; display:flex; align-items:center; justify-content:flex-end; padding-right:6px; min-width:26px; width:26px; transition:width .3s ease}
+      .dist-bar.win{background:var(--teal)}
+
+      /* Panels */
+      .panel{width:100%; background:var(--surface); border:1.5px solid var(--line); border-radius:16px; padding:14px 16px}
+      .panel h2{margin:0 0 6px; font-size:.95rem; font-weight:900; text-transform:uppercase; letter-spacing:.06em; color:var(--ink-soft)}
+      .panel p{margin:6px 0; font-size:.9rem; font-weight:600; color:var(--ink-soft); line-height:1.5}
+      .panel p strong{color:var(--ink)}
+      .test-boards{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+      .test-boards button{
+        border:1.5px solid var(--line); background:var(--surface2); color:var(--ink); border-radius:10px;
+        font-weight:800; font-size:.85rem; padding:8px 12px; min-height:44px;
+      }
+      .test-boards button .sub{display:block; font-size:.72rem; color:var(--ink-soft); font-weight:700}
+      .legend{display:flex; flex-wrap:wrap; gap:14px; margin-top:8px; font-size:.85rem; font-weight:700; color:var(--ink-soft)}
+      .legend .sw{display:inline-block; width:14px; height:14px; border-radius:4px; vertical-align:-2px; margin-right:5px}
+      footer{font-size:.78rem; color:var(--ink-soft); font-weight:600; text-align:center; line-height:1.5}
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <header>
+        <div class="shapes" aria-hidden="true"><span class="sq"></span><span class="ci"></span><span class="tr"></span><span class="rc"></span></div>
+        <div class="wordmark">Morphi</div>
+        <h1 id="game-title">Word Guess</h1>
+        <p class="rule-line"><strong>Five-letter word guess</strong> — guess the hidden word in six tries.</p>
+      </header>
+
+      <div class="controls" role="group" aria-label="Game controls">
+        <div class="seg" role="group" aria-label="Timer mode">
+          <button type="button" id="mode-classic" aria-pressed="true">Classic</button>
+          <button type="button" id="mode-countdown" aria-pressed="false">Countdown 120</button>
+        </div>
+        <label class="hard-toggle" id="hard-toggle-wrap">
+          <input type="checkbox" id="hard-toggle" />
+          Hard Mode
+        </label>
+        <button type="button" class="ctl-btn" id="hint-btn">Hint (<span id="hints-left">3</span> left)</button>
+        <button type="button" class="ctl-btn" id="reset-btn">Reset</button>
+        <button type="button" class="ctl-btn primary" id="next-btn">Next</button>
+      </div>
+
+      <div class="hud" aria-label="Round status">
+        <span class="chip"><span class="lbl">Time</span><span id="timer">0:00</span></span>
+        <span class="chip"><span class="lbl">Guess</span><span id="guess-count">– / 6</span></span>
+        <span class="chip"><span class="lbl">Daily word</span><span id="daily-date"></span></span>
+      </div>
+
+      <div class="message" id="message" role="status" aria-live="polite"></div>
+
+      <div class="board" id="board" role="grid" aria-label="Guess board"></div>
+
+      <div class="hint-line" id="hint-line" aria-live="polite"></div>
+
+      <div class="keyboard" id="keyboard" aria-label="On-screen keyboard"></div>
+
+      <section class="result" id="result" aria-live="polite">
+        <h2 id="result-title"></h2>
+        <p id="result-detail"></p>
+        <div class="grid-share" id="result-grid" aria-hidden="true"></div>
+        <p>Score <span class="score-big" id="result-score"></span></p>
+        <div class="actions">
+          <button type="button" class="ctl-btn" id="copy-btn">Copy result grid</button>
+          <button type="button" class="ctl-btn primary" id="again-btn">Next word</button>
+        </div>
+      </section>
+
+      <section class="stats" aria-label="Statistics">
+        <h2>Statistics — this demo session</h2>
+        <div class="stat-grid">
+          <div><div class="num" id="stat-played">0</div><div class="cap">Played</div></div>
+          <div><div class="num" id="stat-winpct">0</div><div class="cap">Win %</div></div>
+          <div><div class="num" id="stat-streak">0</div><div class="cap">Cur. streak</div></div>
+          <div><div class="num" id="stat-maxstreak">0</div><div class="cap">Max streak</div></div>
+        </div>
+        <div class="dist" id="dist" aria-label="Guess distribution"></div>
+      </section>
+
+      <section class="panel" aria-label="How feedback works">
+        <h2>How the colours work</h2>
+        <div class="legend">
+          <span><span class="sw" style="background:var(--teal)"></span>Right letter, right place</span>
+          <span><span class="sw" style="background:var(--orange)"></span>Letter is in the word, wrong place</span>
+          <span><span class="sw" style="background:var(--grey)"></span>Letter is not in the word</span>
+        </div>
+        <p>If a letter appears twice in your guess but only once in the answer, only one tile lights up — the other stays grey, meaning there is no second copy. Correct tiles are locked in first, then “in the word” tiles are given out left to right.</p>
+        <p><strong>Hard Mode</strong> (set it before your first guess): letters shown in the right place must stay there, and letters shown as “in the word” must be used again in every later guess. A guess that ignores a revealed letter or a hint is not accepted.</p>
+        <p><strong>Hint:</strong> up to 3 per round. A hint fixes one correct letter in its place on the board.</p>
+      </section>
+
+      <section class="panel" aria-label="Scoring proposal">
+        <h2>Scoring — proposal, not locked</h2>
+        <p>Classic word-guess games award no points, just the result out of 6. For Morphi, the proposal is: a win scores <strong>100</strong> in 1 guess, <strong>90</strong> in 2, <strong>75</strong> in 3, <strong>60</strong> in 4, <strong>45</strong> in 5, <strong>30</strong> in 6. Each hint costs <strong>100</strong> points (score never drops below 0). Classic mode times you counting up; Countdown gives you 120 seconds. The owner still has to lock this formula.</p>
+      </section>
+
+      <section class="panel" aria-label="Demo test boards">
+        <h2>Try a test board</h2>
+        <p>Seeded boards for checking the demo — including the tricky repeated-letter cases:</p>
+        <div class="test-boards">
+          <button type="button" data-answer="APPLE">Board 1 · APPLE<span class="sub">Repeated letter — double P</span></button>
+          <button type="button" data-answer="CRANE">Board 2 · CRANE<span class="sub">No repeated letters</span></button>
+          <button type="button" data-answer="BERRY">Board 3 · BERRY<span class="sub">Repeated letter — double R</span></button>
+          <button type="button" id="daily-btn">Today’s daily word<span class="sub">Same word for everyone today</span></button>
+        </div>
+      </section>
+
+      <footer>
+        Demo only — statistics live in this tab and are not saved. Type with the on-screen keys or your own keyboard: letters type, Enter submits, Backspace deletes.
+      </footer>
+    </main>
+
+    <script>
+      "use strict";
+      /* The working title lives in ONE place — rename the game by changing
+         this string (and the <h1> text, which is set from it on load). */
+      var GAME_TITLE = "Word Guess";
+
+      /* ---------- Word lists (the demo's own — built for this demo) ----------
+         Answers: ~30 familiar words. No simple plurals ending in S/ES,
+         no -ED past tenses, no proper nouns, no obscure words.
+         Every answer is also a legal guess (solvable by construction). */
+      var ANSWERS = [
+        "APPLE","BREAD","CRANE","LIGHT","WATER","PLANT","CHAIR","TABLE","MUSIC","HAPPY",
+        "BERRY","LEMON","OCEAN","RIVER","STONE","CLOUD","HEART","SMILE","DREAM","PIANO",
+        "TIGER","ROBOT","MAGIC","LUCKY","HONEY","MAPLE","CORAL","VIVID","SUGAR","SPICE",
+        "WHEAT","GRAPE"
+      ];
+      /* Extra allowed guesses (real 5-letter words that are never answers here). */
+      var EXTRA_GUESSES = [
+        "ABOUT","ABOVE","ACTOR","ACUTE","ADMIT","ADOPT","ADORE","ADULT","AFTER","AGAIN",
+        "AGENT","AHEAD","ALARM","ALBUM","ALERT","ALIEN","ALIGN","ALIKE","ALIVE","ALLOW",
+        "ALOUD","ALPHA","ALTAR","ALTER","AMBER","AMPLE","AMUSE","ANGEL","ANGLE","ANGRY",
+        "ANKLE","APART","APRON","ARBOR","ARENA","ARGUE","ARISE","ARMOR","AROMA","ARROW",
+        "ASHEN","ASIDE","ASSET","ATLAS","AUDIO","AUDIT","AVOID","AWAIT","AWAKE","AWARD",
+        "AWARE","AWFUL","AZURE","BAKER","BALMY","BANJO","BARGE","BASIC","BASIL","BASIN",
+        "BASIS","BATCH","BATHE","BATON","BAYOU","BEACH","BEARD","BEAST","BEECH","BEEFY",
+        "BEGIN","BEIGE","BEING","BELLE","BELLY","BELOW","BENCH","BERET","BEVEL","BEZEL",
+        "BIBLE","BICEP","BIGOT","BILGE","BINGE","BINGO","BIOME","BIRCH","BIRTH","BISON",
+        "BLACK","BLADE","BLAME","BLAND","BLANK","BLARE","BLAST","BLAZE","BLEAK","BLEAT",
+        "BLEED","BLEEP","BLEND","BLESS","BLIMP","BLIND","BLINK","BLISS","BLITZ","BLOAT",
+        "BLOCK","BLOND","BLOOD","BLOOM","BLUES","BLUFF","BLUNT","BLURT","BLUSH","BOARD",
+        "BOAST","BOGUS","BONGO","BONUS","BOOST","BOOTH","BOOTY","BOOZE","BORNE","BOSOM",
+        "BOSSY","BOTCH","BOUGH","BOUND","BOWEL","BOWER","BOXER","BRACE","BRAID","BRAIN",
+        "BRAKE","BRAND","BRASH","BRASS","BRAVE","BRAWL","BREAK","BREED","BRIAR","BRIBE",
+        "BRICK","BRIDE","BRIEF","BRIMS","BRINE","BRING","BRINK","BRISK","BROAD","BROIL",
+        "BROKE","BROOD","BROOK","BROOM","BROTH","BROWN","BRUNT","BRUSH","BRUTE","BUDDY",
+        "BUDGE","BUGLE","BUILD","BUILT","BULGE","BULLY","BUMPY","BUNCH","BURLY","BURNT",
+        "BURST","BUXOM","BUYER","BUZZY","BYLAW","EERIE","ELATE","ERASE","PAPER","PEARL","PUPPY","SLATE","SPEED","STARE","SHARE",
+        "SPARE","SCARE","SNARE","CRATE","TRACE","ADIEU","PLAID","PLAIN","PLANE","PLAZA",
+        "PLEAD","PLEAT","QUILT","QUIRK","QUOTA","RADIO","RAINY","RAISE","RALLY","RAMEN",
+        "RANCH","RANGE","RAPID","RATIO","RAVEN","RAYON","RAZOR","REACH","REACT","READY",
+        "REALM","REBEL","REBUT","RECAP","RECUR","REEDY","REFER","REGAL","REHAB","REIGN",
+        "REINS","RELAX","RELAY","RELIC","RENEW","RENTS","REPAY","REPEL","REPLY","RERAN",
+        "RERUN","RESET","RESIN","RETRO","RETRY","REUSE","REVEL","REVUE","RHINO","RHYME",
+        "RIDGE","RIFLE","RIGHT","RIGID","RIGOR","RINSE","RIOTS","RIPEN","RISEN","RISKS",
+        "RISKY","RITZY","RIVAL","RIVET","ROACH","ROADS","ROAMS","ROARS","ROAST","ROBES",
+        "ROBIN","ROCKY","RODEO","ROGUE","ROOFS","ROOKS","ROOMS","ROOMY","ROOST","ROOTS",
+        "ROPED","ROPER","ROPES","ROUGE","ROUGH","ROUND","ROUSE","ROUTE","ROVER","ROWAN",
+        "ROWED","ROWEL","ROWER","ROYAL","RUDDY","RUGBY","RUINS","RULED","RULER","RULES",
+        "RUMBA","RUMOR","RUNGS","RUNIC","RUNNY","RUNTS","RUPEE","RURAL","RUSHY","RUSTS",
+        "RUSTY","RUTIN"];
+      var ALLOWED = {};
+      ANSWERS.concat(EXTRA_GUESSES).forEach(function (w) { ALLOWED[w] = true; });
+
+      /* ---------- Seeded RNG ---------- */
+      function hashSeed(str) {
+        var h = 2166136261;
+        for (var i = 0; i < str.length; i++) { h ^= str.charCodeAt(i); h = Math.imul(h, 16777619); }
+        return h >>> 0;
+      }
+      function pickAnswer(seedStr) {
+        return ANSWERS[hashSeed(seedStr) % ANSWERS.length];
+      }
+      function todayKey() {
+        var d = new Date();
+        function p(n) { return (n < 10 ? "0" : "") + n; }
+        return d.getFullYear() + "-" + p(d.getMonth() + 1) + "-" + p(d.getDate());
+      }
+
+      /* ---------- Feedback: green-first, then yellow left-to-right ---------- */
+      function scoreGuess(guess, answer) {
+        var result = ["absent", "absent", "absent", "absent", "absent"];
+        var remaining = {};
+        var i, ch;
+        for (i = 0; i < 5; i++) { ch = answer[i]; remaining[ch] = (remaining[ch] || 0) + 1; }
+        for (i = 0; i < 5; i++) {
+          if (guess[i] === answer[i]) { result[i] = "correct"; remaining[guess[i]]--; }
+        }
+        for (i = 0; i < 5; i++) {
+          if (result[i] === "correct") continue;
+          ch = guess[i];
+          if (remaining[ch] > 0) { result[i] = "present"; remaining[ch]--; }
+        }
+        return result;
+      }
+
+      /* ---------- State ---------- */
+      var WIN_BASE = [100, 90, 75, 60, 45, 30];
+      var HINT_COST = 100, MAX_HINTS = 3, COUNTDOWN_SECONDS = 120;
+      var reducedMotion = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      var state = null;
+      var seedCounter = 0;
+      var stats = { played: 0, wins: 0, streak: 0, maxStreak: 0, dist: [0, 0, 0, 0, 0, 0], lastWinGuess: 0 };
+
+      function newRound(answer, label) {
+        state = {
+          answer: answer,
+          label: label,
+          guesses: [],        /* committed guesses: {word, result} */
+          current: "",
+          over: false,
+          won: false,
+          hard: document.getElementById("hard-toggle").checked,
+          mode: currentMode,
+          hintsUsed: 0,
+          hinted: {},         /* position -> letter revealed by hint */
+          greens: {},         /* position -> letter (from feedback or hint) */
+          presentMin: {},     /* letter -> minimum copies that must be reused (hard mode) */
+          startedAt: Date.now(),
+          elapsedAtEnd: null,
+          animating: false
+        };
+        renderAll();
+        setMessage("");
+        startTimer();
+      }
+
+      /* ---------- DOM ---------- */
+      var boardEl = document.getElementById("board");
+      var kbEl = document.getElementById("keyboard");
+      var msgEl = document.getElementById("message");
+      var hintLineEl = document.getElementById("hint-line");
+      var timerEl = document.getElementById("timer");
+      var guessCountEl = document.getElementById("guess-count");
+      var resultEl = document.getElementById("result");
+      var currentMode = "classic";
+      var timerId = null;
+
+      document.getElementById("game-title").textContent = GAME_TITLE;
+      document.title = GAME_TITLE + " Demo";
+      document.getElementById("daily-date").textContent = todayKey();
+
+      function buildBoard() {
+        boardEl.innerHTML = "";
+        for (var r = 0; r < 6; r++) {
+          var row = document.createElement("div");
+          row.className = "row"; row.setAttribute("role", "row"); row.id = "row-" + r;
+          for (var c = 0; c < 5; c++) {
+            var t = document.createElement("div");
+            t.className = "tile"; t.id = "tile-" + r + "-" + c;
+            t.setAttribute("role", "gridcell");
+            row.appendChild(t);
+          }
+          boardEl.appendChild(row);
+        }
+      }
+
+      var KB_ROWS = ["QWERTYUIOP", "ASDFGHJKL", "ZXCVBNM"];
+      var keyState = {}; /* letter -> correct|present|absent (strongest wins) */
+      function buildKeyboard() {
+        kbEl.innerHTML = "";
+        KB_ROWS.forEach(function (rowStr, ri) {
+          var row = document.createElement("div"); row.className = "kb-row";
+          if (ri === 2) row.appendChild(makeKey("ENTER", "Enter", true));
+          rowStr.split("").forEach(function (ch) { row.appendChild(makeKey(ch, ch, false)); });
+          if (ri === 2) row.appendChild(makeKey("⌫", "Backspace", true));
+          kbEl.appendChild(row);
+        });
+      }
+      function makeKey(label, action, wide) {
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "key" + (wide ? " wide" : "");
+        b.textContent = label; b.dataset.action = action;
+        b.setAttribute("aria-label", action === "Backspace" ? "Delete letter" : action);
+        b.addEventListener("click", function () { handleKey(action); });
+        return b;
+      }
+      function refreshKeyboard() {
+        var keys = kbEl.querySelectorAll(".key");
+        keys.forEach(function (k) {
+          var a = k.dataset.action;
+          k.classList.remove("correct", "present", "absent");
+          if (a.length === 1 && keyState[a]) k.classList.add(keyState[a]);
+        });
+      }
+
+      function renderAll() {
+        /* Board */
+        for (var r = 0; r < 6; r++) {
+          for (var c = 0; c < 5; c++) {
+            var tile = document.getElementById("tile-" + r + "-" + c);
+            tile.className = "tile"; tile.textContent = "";
+            tile.removeAttribute("aria-label");
+          }
+        }
+        state.guesses.forEach(function (g, r) {
+          for (var c = 0; c < 5; c++) {
+            var t = document.getElementById("tile-" + r + "-" + c);
+            t.textContent = g.word[c];
+            t.classList.add(g.result[c]);
+            t.setAttribute("aria-label", g.word[c] + ", " + g.result[c]);
+          }
+        });
+        renderCurrentRow();
+        /* Keyboard */
+        keyState = {};
+        state.guesses.forEach(function (g) {
+          for (var i = 0; i < 5; i++) {
+            var ch = g.word[i], s = g.result[i], prev = keyState[ch];
+            if (s === "correct" || (s === "present" && prev !== "correct") || !prev) keyState[ch] = s;
+          }
+        });
+        refreshKeyboard();
+        /* HUD */
+        document.getElementById("hints-left").textContent = String(MAX_HINTS - state.hintsUsed);
+        document.getElementById("hint-btn").disabled = state.over || state.hintsUsed >= MAX_HINTS;
+        guessCountEl.textContent = (state.guesses.length ? state.guesses.length : "–") + " / 6";
+        var ht = document.getElementById("hard-toggle");
+        ht.disabled = state.guesses.length > 0;
+        document.getElementById("hard-toggle-wrap").classList.toggle("disabled", ht.disabled);
+        document.getElementById("mode-classic").disabled = state.guesses.length > 0;
+        document.getElementById("mode-countdown").disabled = state.guesses.length > 0;
+        resultEl.classList.remove("show");
+        renderHintLine();
+        renderStats();
+      }
+
+      function renderCurrentRow() {
+        var r = state.guesses.length;
+        if (r >= 6) return;
+        for (var c = 0; c < 5; c++) {
+          var t = document.getElementById("tile-" + r + "-" + c);
+          var ch = state.current[c] || "";
+          t.textContent = ch;
+          t.classList.toggle("filled", !!ch);
+          t.classList.toggle("hinted", !ch && !!state.hinted[c]);
+          if (!ch && state.hinted[c]) { t.textContent = state.hinted[c]; }
+        }
+      }
+
+      function renderHintLine() {
+        var parts = [];
+        Object.keys(state.hinted).forEach(function (pos) {
+          parts.push("Position " + (Number(pos) + 1) + " is " + state.hinted[pos]);
+        });
+        hintLineEl.textContent = parts.length ? "Hint: " + parts.join(" · ") : "";
+      }
+
+      function renderStats() {
+        document.getElementById("stat-played").textContent = stats.played;
+        document.getElementById("stat-winpct").textContent = stats.played ? Math.round(100 * stats.wins / stats.played) : 0;
+        document.getElementById("stat-streak").textContent = stats.streak;
+        document.getElementById("stat-maxstreak").textContent = stats.maxStreak;
+        var distEl = document.getElementById("dist");
+        distEl.innerHTML = "";
+        var max = Math.max(1, Math.max.apply(null, stats.dist));
+        for (var i = 0; i < 6; i++) {
+          var row = document.createElement("div"); row.className = "dist-row";
+          var barWrap = document.createElement("div"); barWrap.className = "dist-bar-wrap";
+          var bar = document.createElement("div");
+          bar.className = "dist-bar" + (stats.lastWinGuess === i + 1 ? " win" : "");
+          bar.style.width = Math.max(12, (stats.dist[i] / max) * 100) + "%";
+          bar.textContent = stats.dist[i];
+          barWrap.appendChild(bar);
+          var n = document.createElement("span"); n.className = "n"; n.textContent = i + 1;
+          row.appendChild(n); row.appendChild(barWrap);
+          distEl.appendChild(row);
+        }
+      }
+
+      var msgTimer = null;
+      function setMessage(text, sticky) {
+        if (msgTimer) { clearTimeout(msgTimer); msgTimer = null; }
+        msgEl.innerHTML = text ? "" : "";
+        if (text) {
+          var pill = document.createElement("span"); pill.className = "pill"; pill.textContent = text;
+          msgEl.appendChild(pill);
+          if (!sticky) msgTimer = setTimeout(function () { msgEl.innerHTML = ""; }, 2200);
+        }
+      }
+
+      /* ---------- Timer ---------- */
+      function fmt(sec) {
+        sec = Math.max(0, Math.floor(sec));
+        return Math.floor(sec / 60) + ":" + ("0" + (sec % 60)).slice(-2);
+      }
+      function elapsedSec() {
+        var end = state.elapsedAtEnd != null ? state.elapsedAtEnd : (Date.now() - state.startedAt) / 1000;
+        return end;
+      }
+      function tick() {
+        if (!state) return;
+        if (state.mode === "countdown") {
+          var left = COUNTDOWN_SECONDS - elapsedSec();
+          timerEl.textContent = fmt(left) + " left";
+          if (left <= 0 && !state.over) endRound(false, "Time's up! The word was " + state.answer + ".");
+        } else {
+          timerEl.textContent = fmt(elapsedSec());
+        }
+      }
+      function startTimer() {
+        if (timerId) clearInterval(timerId);
+        tick();
+        timerId = setInterval(tick, 250);
+      }
+
+      /* ---------- Input ---------- */
+      function handleKey(action) {
+        if (!state || state.over || state.animating) return;
+        if (action === "Enter") { submitGuess(); return; }
+        if (action === "Backspace") {
+          state.current = state.current.slice(0, -1);
+          renderCurrentRow(); return;
+        }
+        if (/^[A-Z]$/.test(action) && state.current.length < 5) {
+          state.current += action;
+          renderCurrentRow();
+        }
+      }
+      document.addEventListener("keydown", function (e) {
+        if (e.ctrlKey || e.metaKey || e.altKey) return;
+        if (e.key === "Enter") { handleKey("Enter"); e.preventDefault(); }
+        else if (e.key === "Backspace") { handleKey("Backspace"); e.preventDefault(); }
+        else if (/^[a-zA-Z]$/.test(e.key)) handleKey(e.key.toUpperCase());
+      });
+
+      function shakeRow(r) {
+        var row = document.getElementById("row-" + r);
+        row.classList.remove("shake");
+        void row.offsetWidth;
+        row.classList.add("shake");
+      }
+
+      function hardModeError(word) {
+        var pos;
+        for (pos in state.greens) {
+          if (word[Number(pos)] !== state.greens[pos]) {
+            return "Hard Mode: position " + (Number(pos) + 1) + " must stay " + state.greens[pos] + ".";
+          }
+        }
+        for (var ch in state.presentMin) {
+          var need = state.presentMin[ch], have = 0;
+          for (var i = 0; i < 5; i++) if (word[i] === ch) have++;
+          if (have < need) return "Hard Mode: your guess must use the letter " + ch + ".";
+        }
+        return null;
+      }
+      function hintError(word) {
+        for (var pos in state.hinted) {
+          if (word[Number(pos)] !== state.hinted[pos]) {
+            return "That guess ignores your hint — position " + (Number(pos) + 1) + " is " + state.hinted[pos] + ".";
+          }
+        }
+        return null;
+      }
+
+      function submitGuess() {
+        var word = state.current;
+        var rowIdx = state.guesses.length;
+        if (word.length < 5) { setMessage("Not enough letters"); shakeRow(rowIdx); return; }
+        if (!ALLOWED[word]) { setMessage("Not in the demo word list"); shakeRow(rowIdx); return; }
+        var herr = hintError(word);
+        if (herr) { setMessage(herr); shakeRow(rowIdx); return; }
+        if (state.hard) {
+          var gerr = hardModeError(word);
+          if (gerr) { setMessage(gerr); shakeRow(rowIdx); return; }
+        }
+        /* Commit first — presentation only shows the committed guess. */
+        var result = scoreGuess(word, state.answer);
+        state.guesses.push({ word: word, result: result });
+        state.current = "";
+        for (var i = 0; i < 5; i++) {
+          if (result[i] === "correct") state.greens[i] = word[i];
+        }
+        var counts = {};
+        for (i = 0; i < 5; i++) {
+          if (result[i] === "correct" || result[i] === "present") counts[word[i]] = (counts[word[i]] || 0) + 1;
+        }
+        for (var ch in counts) {
+          if (counts[ch] > (state.presentMin[ch] || 0)) state.presentMin[ch] = counts[ch];
+        }
+        var won = result.every(function (s) { return s === "correct"; });
+        revealRow(rowIdx, word, result, function () {
+          guessCountEl.textContent = state.guesses.length + " / 6";
+          document.getElementById("hint-btn").disabled = state.over || state.hintsUsed >= MAX_HINTS;
+          var ht = document.getElementById("hard-toggle");
+          ht.disabled = true; document.getElementById("hard-toggle-wrap").classList.add("disabled");
+          document.getElementById("mode-classic").disabled = true;
+          document.getElementById("mode-countdown").disabled = true;
+          if (won) endRound(true);
+          else if (state.guesses.length >= 6) endRound(false);
+          else renderCurrentRow();
+        });
+      }
+
+      function revealRow(r, word, result, done) {
+        renderAll();
+        /* renderAll repaints committed rows instantly; for animation we flip tiles one by one. */
+        var tiles = [];
+        for (var c = 0; c < 5; c++) tiles.push(document.getElementById("tile-" + r + "-" + c));
+        tiles.forEach(function (t) {
+          t.textContent = word[Array.prototype.indexOf.call(tiles, t)];
+        });
+        if (reducedMotion || typeof window.anime !== "function") { done(); return; }
+        state.animating = true;
+        tiles.forEach(function (t) { t.classList.remove("correct", "present", "absent"); });
+        var finished = 0;
+        tiles.forEach(function (t, i) {
+          window.anime({
+            targets: t,
+            rotateX: [0, 90],
+            duration: 150,
+            delay: i * 90,
+            easing: "easeInQuad",
+            complete: function () {
+              t.classList.add(result[i]);
+              window.anime({
+                targets: t, rotateX: [90, 0], duration: 150, easing: "easeOutQuad",
+                complete: function () {
+                  t.style.transform = "";
+                  finished++;
+                  if (finished === 5) { state.animating = false; done(); }
+                }
+              });
+            }
+          });
+        });
+      }
+
+      /* ---------- Round end ---------- */
+      function endRound(won, loseReason) {
+        if (state.over) return;
+        state.over = true; state.won = won;
+        state.elapsedAtEnd = (Date.now() - state.startedAt) / 1000;
+        if (timerId) clearInterval(timerId);
+        tick();
+        stats.played++;
+        if (won) {
+          stats.wins++; stats.streak++;
+          stats.maxStreak = Math.max(stats.maxStreak, stats.streak);
+          stats.dist[state.guesses.length - 1]++;
+          stats.lastWinGuess = state.guesses.length;
+        } else {
+          stats.streak = 0; stats.lastWinGuess = 0;
+        }
+        var score = won ? Math.max(0, WIN_BASE[state.guesses.length - 1] - state.hintsUsed * HINT_COST) : 0;
+        document.getElementById("result-title").textContent =
+          won ? (["Brilliant — first try!", "Superb!", "Great solve!", "Well played!", "Got there!", "Phew — in six!"][state.guesses.length - 1])
+              : "Out of guesses";
+        document.getElementById("result-detail").textContent =
+          won ? ("You found " + state.answer + " in " + state.guesses.length + "/6 · " + fmt(state.elapsedAtEnd) +
+                 (state.hintsUsed ? " · " + state.hintsUsed + " hint" + (state.hintsUsed > 1 ? "s" : "") + " used (−" + (state.hintsUsed * HINT_COST) + ")" : ""))
+              : (loseReason || ("The word was " + state.answer + ". That one counts as X/6."));
+        document.getElementById("result-score").textContent = score + " pts (proposal)";
+        var grid = state.guesses.map(function (g) {
+          return g.result.map(function (s) { return s === "correct" ? "🟩" : s === "present" ? "🟧" : "⬛"; }).join("");
+        }).join("<br>");
+        document.getElementById("result-grid").innerHTML = grid;
+        resultEl.classList.add("show");
+        document.getElementById("hint-btn").disabled = true;
+        renderStats();
+        setMessage(won ? "Solved in " + state.guesses.length + "/6" : "The word was " + state.answer, true);
+      }
+
+      /* ---------- Controls ---------- */
+      document.getElementById("hint-btn").addEventListener("click", function () {
+        if (!state || state.over || state.hintsUsed >= MAX_HINTS) return;
+        var candidates = [];
+        for (var i = 0; i < 5; i++) {
+          if (!state.hinted[i] && state.greens[i] !== state.answer[i]) candidates.push(i);
+        }
+        if (!candidates.length) candidates = [0, 1, 2, 3, 4].filter(function (i) { return !state.hinted[i]; });
+        if (!candidates.length) { setMessage("Every letter is already revealed"); return; }
+        var pos = candidates[0];
+        state.hinted[pos] = state.answer[pos];
+        state.greens[pos] = state.answer[pos];
+        state.hintsUsed++;
+        document.getElementById("hints-left").textContent = String(MAX_HINTS - state.hintsUsed);
+        document.getElementById("hint-btn").disabled = state.hintsUsed >= MAX_HINTS;
+        renderHintLine(); renderCurrentRow();
+        setMessage("Hint used (−" + HINT_COST + " pts): position " + (pos + 1) + " is " + state.answer[pos]);
+      });
+
+      document.getElementById("reset-btn").addEventListener("click", function () {
+        seedCounter++;
+        newRound(pickAnswer("reset-" + Date.now() + "-" + seedCounter), "Reset word");
+        setMessage("Fresh word — good luck!");
+      });
+      function nextWord() {
+        seedCounter++;
+        var w = pickAnswer("next-" + Date.now() + "-" + seedCounter);
+        if (state && w === state.answer) w = ANSWERS[(ANSWERS.indexOf(w) + 1) % ANSWERS.length];
+        newRound(w, "Next word");
+        setMessage("New word — good luck!");
+      }
+      document.getElementById("next-btn").addEventListener("click", nextWord);
+      document.getElementById("again-btn").addEventListener("click", nextWord);
+      document.getElementById("daily-btn").addEventListener("click", function () {
+        newRound(pickAnswer("daily-" + todayKey()), "Daily word");
+        setMessage("Today's daily word — same for everyone today.");
+      });
+      document.querySelectorAll("[data-answer]").forEach(function (b) {
+        b.addEventListener("click", function () {
+          newRound(b.dataset.answer, "Test board");
+          setMessage("Test board loaded — the answer is " + b.dataset.answer + " if you are checking feedback.");
+        });
+      });
+      document.getElementById("copy-btn").addEventListener("click", function () {
+        var lines = state.guesses.map(function (g) {
+          return g.result.map(function (s) { return s === "correct" ? "🟩" : s === "present" ? "🟧" : "⬛"; }).join("");
+        });
+        var text = GAME_TITLE + " " + (state.won ? state.guesses.length : "X") + "/6\n" + lines.join("\n");
+        function done() { setMessage("Result grid copied"); }
+        if (navigator.clipboard && navigator.clipboard.writeText) {
+          navigator.clipboard.writeText(text).then(done, function () { setMessage("Copy not available here"); });
+        } else setMessage("Copy not available here");
+      });
+
+      var modeClassic = document.getElementById("mode-classic");
+      var modeCountdown = document.getElementById("mode-countdown");
+      function setMode(m) {
+        currentMode = m;
+        modeClassic.setAttribute("aria-pressed", m === "classic" ? "true" : "false");
+        modeCountdown.setAttribute("aria-pressed", m === "countdown" ? "true" : "false");
+        if (state && !state.guesses.length && !state.over) { state.mode = m; state.startedAt = Date.now(); startTimer(); }
+      }
+      modeClassic.addEventListener("click", function () { setMode("classic"); });
+      modeCountdown.addEventListener("click", function () { setMode("countdown"); });
+
+      document.getElementById("hard-toggle").addEventListener("change", function (e) {
+        if (state && !state.guesses.length) state.hard = e.target.checked;
+        setMessage(e.target.checked ? "Hard Mode on — revealed letters must be reused." : "Hard Mode off.");
+      });
+
+      /* ---------- Boot: today's date-seeded daily word ---------- */
+      buildBoard();
+      buildKeyboard();
+      newRound(pickAnswer("daily-" + todayKey()), "Daily word");
+    </script>
+  </body>
+</html>

@@ -1,0 +1,2253 @@
+{
+	"engineVersion": "word-guess-1",
+	"wordsFingerprint": "d2821badae3662b2a8a4f826e6c3462f228d51b4cf346bee459fe8b1f889f160",
+	"generation": [
+		{
+			"seed": "1",
+			"variant": "word-guess:classic",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["IMPLY"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 3877170
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:classic",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["POWER"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 7115697
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:classic",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["LUCKY"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 5379892
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:hard-mode",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 1,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["IMPLY"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 3877170
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:hard-mode",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 1,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["POWER"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 7115697
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:hard-mode",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 1,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["LUCKY"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 5379892
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "77",
+			"variant": "word-guess:ultra-hard",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 2,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["ROUND"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 8028517
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 716901
+				},
+				{
+					"action": 0,
+					"code": 2544805
+				},
+				{
+					"action": 0,
+					"code": 3458757
+				},
+				{
+					"action": 0,
+					"code": 5743637
+				},
+				{
+					"action": 0,
+					"code": 7114565
+				},
+				{
+					"action": 0,
+					"code": 8485493
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "602",
+			"variant": "word-guess:ultra-hard",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 2,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["ROUND"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 8028517
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 716901
+				},
+				{
+					"action": 0,
+					"code": 2544805
+				},
+				{
+					"action": 0,
+					"code": 3458757
+				},
+				{
+					"action": 0,
+					"code": 5743637
+				},
+				{
+					"action": 0,
+					"code": 7114565
+				},
+				{
+					"action": 0,
+					"code": 8485493
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "652",
+			"variant": "word-guess:ultra-hard",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 2,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["ROUND"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 8028517
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 716901
+				},
+				{
+					"action": 0,
+					"code": 2544805
+				},
+				{
+					"action": 0,
+					"code": 3458757
+				},
+				{
+					"action": 0,
+					"code": 5743637
+				},
+				{
+					"action": 0,
+					"code": 7114565
+				},
+				{
+					"action": 0,
+					"code": 8485493
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:length-4",
+			"rules": {
+				"length": 4,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["HILL"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 128737
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:length-4",
+			"rules": {
+				"length": 4,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["BAKE"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 17840
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:length-4",
+			"rules": {
+				"length": 4,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["HERE"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 126182
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				},
+				{
+					"action": 0,
+					"code": 799
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:length-6",
+			"rules": {
+				"length": 6,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["EXPECT"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 58302367
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:length-6",
+			"rules": {
+				"length": 6,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["ACTING"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 1253648
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:length-6",
+			"rules": {
+				"length": 6,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["EFFECT"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 49901039
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				},
+				{
+					"action": 0,
+					"code": 458866
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:length-7",
+			"rules": {
+				"length": 7,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["DIGITAL"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 1024693655
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:length-7",
+			"rules": {
+				"length": 7,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["STUDENT"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 5795425421
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:length-7",
+			"rules": {
+				"length": 7,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["SUSPEND"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 5806603741
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				},
+				{
+					"action": 0,
+					"code": 12112269
+				}
+			],
+			"result": {
+				"score": 100,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:boards-2",
+			"rules": {
+				"length": 5,
+				"boards": 2,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 7,
+			"answers": ["IMPLY", "NICER"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 3877170
+				},
+				{
+					"action": 0,
+					"code": 6082769
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 190,
+				"pairs": 2,
+				"moves": 2,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 7,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:boards-2",
+			"rules": {
+				"length": 5,
+				"boards": 2,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 7,
+			"answers": ["POWER", "ARISE"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 7115697
+				},
+				{
+					"action": 0,
+					"code": 304672
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 190,
+				"pairs": 2,
+				"moves": 2,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 7,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:boards-2",
+			"rules": {
+				"length": 5,
+				"boards": 2,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 7,
+			"answers": ["LUCKY", "TABLE"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 5379892
+				},
+				{
+					"action": 0,
+					"code": 8683510
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 190,
+				"pairs": 2,
+				"moves": 2,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 7,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:boards-4",
+			"rules": {
+				"length": 5,
+				"boards": 4,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 9,
+			"answers": ["IMPLY", "NICER", "EARLY", "SHELL"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 3877170
+				},
+				{
+					"action": 0,
+					"code": 6082769
+				},
+				{
+					"action": 0,
+					"code": 1839706
+				},
+				{
+					"action": 0,
+					"code": 8351601
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 325,
+				"pairs": 4,
+				"moves": 4,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 9,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:boards-4",
+			"rules": {
+				"length": 5,
+				"boards": 4,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 9,
+			"answers": ["POWER", "ARISE", "STOCK", "LABEL"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 7115697
+				},
+				{
+					"action": 0,
+					"code": 304672
+				},
+				{
+					"action": 0,
+					"code": 8569038
+				},
+				{
+					"action": 0,
+					"code": 5027527
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 325,
+				"pairs": 4,
+				"moves": 4,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 9,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:boards-4",
+			"rules": {
+				"length": 5,
+				"boards": 4,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 9,
+			"answers": ["LUCKY", "TABLE", "THESE", "FAIRY"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 5379892
+				},
+				{
+					"action": 0,
+					"code": 8683510
+				},
+				{
+					"action": 0,
+					"code": 8808752
+				},
+				{
+					"action": 0,
+					"code": 2290754
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 325,
+				"pairs": 4,
+				"moves": 4,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 9,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:boards-8",
+			"rules": {
+				"length": 5,
+				"boards": 8,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 13,
+			"answers": ["IMPLY", "NICER", "EARLY", "SHELL", "GREAT", "VALID", "GROUP", "SPARE"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 3877170
+				},
+				{
+					"action": 0,
+					"code": 6082769
+				},
+				{
+					"action": 0,
+					"code": 1839706
+				},
+				{
+					"action": 0,
+					"code": 8351601
+				},
+				{
+					"action": 0,
+					"code": 3043371
+				},
+				{
+					"action": 0,
+					"code": 9604143
+				},
+				{
+					"action": 0,
+					"code": 3050647
+				},
+				{
+					"action": 0,
+					"code": 8489654
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 445,
+				"pairs": 8,
+				"moves": 8,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 13,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:boards-8",
+			"rules": {
+				"length": 5,
+				"boards": 8,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 13,
+			"answers": ["POWER", "ARISE", "STOCK", "LABEL", "SORRY", "CARRY", "CEASE", "TRUNK"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 7115697
+				},
+				{
+					"action": 0,
+					"code": 304672
+				},
+				{
+					"action": 0,
+					"code": 8569038
+				},
+				{
+					"action": 0,
+					"code": 5027527
+				},
+				{
+					"action": 0,
+					"code": 8483590
+				},
+				{
+					"action": 0,
+					"code": 925910
+				},
+				{
+					"action": 0,
+					"code": 984728
+				},
+				{
+					"action": 0,
+					"code": 8995204
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 445,
+				"pairs": 8,
+				"moves": 8,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 13,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:boards-8",
+			"rules": {
+				"length": 5,
+				"boards": 8,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 0
+			},
+			"budget": 13,
+			"answers": ["LUCKY", "TABLE", "THESE", "FAIRY", "RANGE", "ROBOT", "MONTH", "JELLY"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 5379892
+				},
+				{
+					"action": 0,
+					"code": 8683510
+				},
+				{
+					"action": 0,
+					"code": 8808752
+				},
+				{
+					"action": 0,
+					"code": 2290754
+				},
+				{
+					"action": 0,
+					"code": 7777540
+				},
+				{
+					"action": 0,
+					"code": 8015715
+				},
+				{
+					"action": 0,
+					"code": 5739065
+				},
+				{
+					"action": 0,
+					"code": 4190834
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 445,
+				"pairs": 8,
+				"moves": 8,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 13,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:countdown-120",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 1,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["IMPLY"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 3877170
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 1200,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:countdown-120",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 1,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["POWER"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 7115697
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 1200,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:countdown-120",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 1,
+				"hint": 0
+			},
+			"budget": 6,
+			"answers": ["LUCKY"],
+			"moves": [
+				{
+					"action": 0,
+					"code": 5379892
+				}
+			],
+			"loss": [
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 1200,
+				"pairs": 1,
+				"moves": 1,
+				"hintUsed": false,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 6,
+				"hintUsed": false,
+				"won": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "word-guess:hint-budget-3",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 1
+			},
+			"budget": 6,
+			"answers": ["IMPLY"],
+			"moves": [
+				{
+					"action": 1,
+					"code": 0
+				},
+				{
+					"action": 0,
+					"code": 3877170
+				}
+			],
+			"loss": [
+				{
+					"action": 1,
+					"code": 0
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 0,
+				"pairs": 1,
+				"moves": 2,
+				"hintUsed": true,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 7,
+				"hintUsed": true,
+				"won": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "word-guess:hint-budget-3",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 1
+			},
+			"budget": 6,
+			"answers": ["POWER"],
+			"moves": [
+				{
+					"action": 1,
+					"code": 0
+				},
+				{
+					"action": 0,
+					"code": 7115697
+				}
+			],
+			"loss": [
+				{
+					"action": 1,
+					"code": 0
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 0,
+				"pairs": 1,
+				"moves": 2,
+				"hintUsed": true,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 7,
+				"hintUsed": true,
+				"won": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "word-guess:hint-budget-3",
+			"rules": {
+				"length": 5,
+				"boards": 1,
+				"constraint": 0,
+				"timing": 0,
+				"hint": 1
+			},
+			"budget": 6,
+			"answers": ["LUCKY"],
+			"moves": [
+				{
+					"action": 1,
+					"code": 0
+				},
+				{
+					"action": 0,
+					"code": 5379892
+				}
+			],
+			"loss": [
+				{
+					"action": 1,
+					"code": 0
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				},
+				{
+					"action": 0,
+					"code": 17638
+				}
+			],
+			"result": {
+				"score": 0,
+				"pairs": 1,
+				"moves": 2,
+				"hintUsed": true,
+				"won": true
+			},
+			"lossResult": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 7,
+				"hintUsed": true,
+				"won": false
+			}
+		}
+	],
+	"behavior": {
+		"hard": {
+			"seed": "746",
+			"first": "PAPER",
+			"rejected": "MUSIC"
+		},
+		"ultra": {
+			"seed": "746",
+			"first": "PAPER",
+			"rejected": "PAPER"
+		}
+	}
+}

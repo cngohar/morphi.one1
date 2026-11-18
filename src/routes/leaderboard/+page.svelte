@@ -57,7 +57,10 @@
 					>
 					<tbody
 						>{#each data.rows as row (row.position)}<tr class:own={row.own}
-								><td>{row.position}</td><td>{row.name}</td><td>{formatNumber(row.score)}</td></tr
+								><td>{row.position}</td><td
+									>{row.name}{#if row.hintUsed}
+										<small>{t('word-guess.solvedWithHint')}</small>{/if}</td
+								><td>{formatNumber(row.score)}</td></tr
 							>{/each}</tbody
 					>
 				</table>{/if}
@@ -71,6 +74,7 @@
 				{data.own
 					? t('leaderboard.own', { rank: data.own.position, score: formatNumber(data.own.score) })
 					: t('leaderboard.noPosition')}
+				{#if data.own?.hintUsed}<small>{t('word-guess.solvedWithHint')}</small>{/if}
 				{#if data.own?.percentile}<strong class="percentile"
 						>{t('daily.percentile', { percent: data.own.percentile })}</strong
 					>{/if}

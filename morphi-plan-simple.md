@@ -788,3 +788,33 @@ Not for now. Each of these is designed in the long plan and stays there until pl
 - Server-side scoring and anti-cheat (until leaderboards exist)
 - Durable Objects, D1 sharding, seed banks, analytics pipeline, and audit logs
 - Puzzle types beyond the first two
+
+## v1.4.6 Word Guess — saved draft, paused by owner (2026-11-17)
+
+The owner requested continuing Word Guess implementation, authorized direct
+parent takeover for all work, then said “save the work so i can resume later”.
+The Classic plus ten Batch A draft is saved locally: 11 enabled presets, zero
+variant groups, one `(word-guess, UTC date)` board. Latest changes guard UI
+callbacks, resume the practice clock and preserve motion pauses during loading;
+the recovery browser test now waits for a real hide checkpoint. Fresh 26 units,
+scoped ESLint and workspace types (0 errors / 0 warnings) pass. Scoped formatting
+still needs `daily.ts` cleanup; final browser/D1/vectors/build/boundaries/lazy
+checks and owner functional acceptance remain pending. Full verify is deferred.
+No commit, push, deployment or Batch B. Resume from
+`docs/work/V1.4.6_WORD_GUESS_WORK.md` and the Revision 5 brief; preserve existing
+unrelated changes and editor exclusions.
+
+## v1.4.6 Word Guess — local closeout (2026-11-18)
+
+The saved draft was resumed and focused local verification is complete.
+Classic and ten Batch A presets are enabled in `word-guess-1`, with zero
+variant groups and one daily board per UTC date. The new Word Guess board
+hint label survives retry and retention. All 26 unit, 13 real-D1 and 48
+single-worker Chromium cases passed. Six runtimes agreed on 33 seeded
+rounds with completed win and loss witnesses. Scoped format/lint, types,
+boundaries, registry, build and Word Guess lazy isolation passed.
+
+See `docs/work/V1.4.6_WORD_GUESS_WORK.md` and `docs/PHASE_REPORTS.md` for the
+source backup, measurements and the remaining visual review. Owner
+acceptance, physical devices and full verify remain outstanding. Source
+handoff, release and later batches remain outside this continuation.

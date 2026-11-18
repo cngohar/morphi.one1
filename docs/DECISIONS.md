@@ -1,5 +1,25 @@
 # DECISIONS.md
 
+## v1.4.6 Word Guess — Revision 5 local implementation (2026-11-18)
+
+- Use the Word Guess working title, UTC midnight rollover, one daily family
+  board and zero variant groups. Ship Classic and Batch A enabled. Use
+  `word-guess-1`, one immutable-version `brief-v1` score definition, and
+  the 2,500 ms server gameplay floor.
+- A rank-eligible hinted win receives the “solved with hint” label on the
+  result and board. The Word Guess retry path recomputes the stored outcome.
+  A completed loss scores zero with no row. A replayed zero-point win can
+  insert a row. Persist the hint flag in SQL-managed `daily_best` via
+  `0016_daily_best_hint_used.sql` so the label survives run retention.
+- Reuse the centered RoundStage, card timings, checkpoint storage and sound
+  cues. Use the installed anime.js 4.5.0 for the family-local animation.
+- The brief's specified choices remain review items, including the extended
+  guess scoring, multi-board losses, practice after a daily attempt, the
+  Reset behavior, the curated word-list minimum, the solver heuristic, the
+  numeric move encoding, the replay board count and motion budgets. See
+  [the Revision 5 brief](briefs/v1.4.6-word-guess-codex-brief.md).
+  Implementation and focused local checks do not establish owner acceptance.
+
 ## 2026-11-13 — v1.4.2 source handoff authorized
 
 The owner said “comit and push to github”, authorizing the completed Mahjong
