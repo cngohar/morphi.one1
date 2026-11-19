@@ -305,7 +305,7 @@ it('admin disable is audited and group-less preset activity/history remain bound
 			.first()
 	).toEqual({ total: 2 });
 });
-it('clean and existing-family board rows retain no hint label', async () => {
+it('only the hinted Light Bend row gets a hint label', async () => {
 	const { user, now, issued } = await issue();
 	await saveRun(db(), user, completion(issued), now + 1000 + CARD_RANKED_OPENING_MS + 5000);
 	expect(
@@ -341,7 +341,7 @@ it('clean and existing-family board rows retain no hint label', async () => {
 		now + 30000
 	);
 	expect(board.rows).toHaveLength(1);
-	expect(board.rows[0]).not.toHaveProperty('hintUsed');
+	expect(board.rows[0]).toMatchObject({ hintUsed: true });
 });
 it('the board hint label survives real R2 archival and deletion after ninety days', async () => {
 	const { user, now, issued } = await issue(hintVariant);

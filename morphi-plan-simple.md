@@ -818,3 +818,21 @@ See `docs/work/V1.4.6_WORD_GUESS_WORK.md` and `docs/PHASE_REPORTS.md` for the
 source backup, measurements and the remaining visual review. Owner
 acceptance, physical devices and full verify remain outstanding. Source
 handoff, release and later batches remain outside this continuation.
+
+## v1.4.7 One-line — local closeout (2026-11-19)
+
+Classic and ten Batch A presets are available locally. One-line adds zero
+variant groups and one family board per UTC date. Verdict stays in unlimited
+practice. Hinted daily wins display their label on first save and retry.
+
+Focused verification passed 19 unit tests, 17 real-D1 cases, 24 Chromium
+cases at one worker, and frozen replay vectors across six runtimes. Browser
+checks covered the 34-edge figure at all three specified sizes, keyboard
+and pointer input, Undo and Restart, loss paths and checkpoint recovery.
+Build, types, boundaries and lazy isolation also passed.
+
+See [the code map](docs/CODEMAP.md#v147-one-line--local-closeout-2026-11-19)
+and [the puzzle guide](docs/puzzles/one-line.md).
+Owner functional review, physical-device testing and full verify remain
+open. The owner authorized the One-line source handoff to `origin/main` on
+2026-11-19.

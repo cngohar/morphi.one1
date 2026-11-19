@@ -1,0 +1,3289 @@
+{
+	"generation": [
+		{
+			"seed": "1",
+			"variant": "one-line:classic",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "0686d167e245b503960297d0d9de4fef10b4e31260d7c6c19517817c0ef64302",
+			"result": {
+				"score": 600,
+				"pairs": 6,
+				"moves": 6,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:classic",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				}
+			],
+			"graph": "3dd927f4693580f9a4e75b4f92d597b8f889db017e53b64b7ee446db5d6ff9e3",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 18,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:classic",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				}
+			],
+			"graph": "c4fa880d9203f9d93ae75d8acc126954b8a581eb49c03e036bd49db75340d451",
+			"result": {
+				"score": 2600,
+				"pairs": 26,
+				"moves": 26,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:one-way",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "6a570cfec4ad4be9c05f849287372e782454b700775f26da3fff785ebc23de51",
+			"result": {
+				"score": 600,
+				"pairs": 6,
+				"moves": 6,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:one-way",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				}
+			],
+			"graph": "53fd80bfcc8fefc8638678974a1499c5cec2eb29d5047abfa4aa668a7fb6f1b7",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 18,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:one-way",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				}
+			],
+			"graph": "eb3bedb258650827f172090dcae51143a5ab18ec4ca203588691a2db76ec2c5c",
+			"result": {
+				"score": 2600,
+				"pairs": 26,
+				"moves": 26,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:double-trace",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "41082cb3e5d70df408f1523c983753873c6c4eb09cacbf2f36784f03b6df6134",
+			"result": {
+				"score": 700,
+				"pairs": 7,
+				"moves": 7,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:double-trace",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				}
+			],
+			"graph": "715ed83505dc00f483daddc5c93a89041f640ccdd9b23f0527fe82b2c36a1b16",
+			"result": {
+				"score": 1900,
+				"pairs": 19,
+				"moves": 19,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:double-trace",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				}
+			],
+			"graph": "31b4e0819b36fd310dcaba900035b3437727541725a3791deb6bbf3bbdcc977b",
+			"result": {
+				"score": 2700,
+				"pairs": 27,
+				"moves": 27,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:closed-loop",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "b4c7ddd7e7e633a3c26f0cb725ed4924816296c70c08e0dcd7bf39c8f3a144f0",
+			"result": {
+				"score": 600,
+				"pairs": 6,
+				"moves": 6,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:closed-loop",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				}
+			],
+			"graph": "3def55de7e6600591bec52b0dec1719ca921a55ba6d95bede438bf77c026596e",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 18,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:closed-loop",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				}
+			],
+			"graph": "a43af49b42eee1c31675bac77f6c2d08fe6bf089e8a4cfbce28ad55d0c5fc9bb",
+			"result": {
+				"score": 2600,
+				"pairs": 26,
+				"moves": 26,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:two-stroke",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 6,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "37e67a771449cd794bdb5e4b8412a556a38572b89c5779c92f7b2c8feac89ba0",
+			"result": {
+				"score": 600,
+				"pairs": 6,
+				"moves": 7,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:two-stroke",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 6,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				}
+			],
+			"graph": "b0edcb93a2bcad7444be332da3f0d77dfeb2eb4b6056e77efeab9acbd7466fd0",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 19,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:two-stroke",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 6,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				}
+			],
+			"graph": "b8439e1bef7c887b1ed81d17604a7a2d9c870060e91a7975627cc64602befede",
+			"result": {
+				"score": 2600,
+				"pairs": 26,
+				"moves": 27,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:crossings-are-junctions",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "d257bffb4042df82f3a7ca89bc10aef3df39d8507d0560fa650bc6126f3ed351",
+			"result": {
+				"score": 600,
+				"pairs": 6,
+				"moves": 6,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:crossings-are-junctions",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				}
+			],
+			"graph": "460dc8c271e6c54fb43e9a20965caf5124c808beb34acfbee943b7eface76130",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 18,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:crossings-are-junctions",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				}
+			],
+			"graph": "991f9e661dcd1e6f7a2126bbcf53073646d7a812f7c717cafe617d32763f207b",
+			"result": {
+				"score": 2600,
+				"pairs": 26,
+				"moves": 26,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:countdown",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "a9766425f56ee0ebdc9b2fa163db6668a6f5783c4f2142d0e0a934f17aeb0a99",
+			"result": {
+				"score": 1700,
+				"pairs": 6,
+				"moves": 6,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:countdown",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				}
+			],
+			"graph": "40289f2649e5504406a36a530c3ee4ea5f8dde555215cd503e131ea479e51803",
+			"result": {
+				"score": 2900,
+				"pairs": 18,
+				"moves": 18,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:countdown",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				}
+			],
+			"graph": "8415707af159eff1f8e3757146f38ed1e7b0a43db5b391b30c41a218811bf318",
+			"result": {
+				"score": 3700,
+				"pairs": 26,
+				"moves": 26,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:no-hint",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "176811d2977348f443e195d0832daac20acc1536febc586acbae63a1baa7c033",
+			"result": {
+				"score": 600,
+				"pairs": 6,
+				"moves": 6,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:no-hint",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				}
+			],
+			"graph": "7abc9040374663c9f39efd1df4a6a62b3c8560339e3a2115313d03bbca1a4880",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 18,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:no-hint",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				}
+			],
+			"graph": "75273c242f7d78aa042c62ca8d54a2c4091b9dccafdd47bb9c9f22162c40ed52",
+			"result": {
+				"score": 2600,
+				"pairs": 26,
+				"moves": 26,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:degree-hidden",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "def70a1270fe124b843a8e07119b5bc4d0613e013ca8c21930efbe3035600ce9",
+			"result": {
+				"score": 600,
+				"pairs": 6,
+				"moves": 6,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:degree-hidden",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				}
+			],
+			"graph": "2a81a211881d64633666f5a57370eaa732856c56fcb1fa0762a387ce949381c3",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 18,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:degree-hidden",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				}
+			],
+			"graph": "357c6ec7217fc3b8cb2d505f915510014b95eba158443f0878c8210111c469c0",
+			"result": {
+				"score": 2600,
+				"pairs": 26,
+				"moves": 26,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "one-line:lift-resume",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				}
+			],
+			"graph": "3a11630b2b8ac56e6cb1e2926afc7fc944eb50ca6deb01c66e6fc90dfae75239",
+			"result": {
+				"score": 600,
+				"pairs": 6,
+				"moves": 6,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:lift-resume",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				}
+			],
+			"graph": "02192d17b4c17ac0f9db723a46f31ad9cf25de0d95c7cf3a8fd8efa585d8f3cf",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 18,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "one-line:lift-resume",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				}
+			],
+			"graph": "6614fbecbfa44726713f80cee3561cb9b46d4985f0a835e6487b75bbdbe89877",
+			"result": {
+				"score": 2600,
+				"pairs": 26,
+				"moves": 26,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "39",
+			"variant": "one-line:verdict",
+			"moves": [
+				{
+					"action": 4,
+					"edge": 0,
+					"value": 1
+				}
+			],
+			"graph": "6db73b262edb9db5e5ef41fde70f027b656e5ba7f96b54f39c3a74d71b7c3901",
+			"result": {
+				"score": 500,
+				"pairs": 0,
+				"moves": 1,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:verdict",
+			"moves": [
+				{
+					"action": 4,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				}
+			],
+			"graph": "2261c5a32b83b37afb32521f024ad2e6cbafa40a645f28d1a0c978e704d676e4",
+			"result": {
+				"score": 1800,
+				"pairs": 18,
+				"moves": 19,
+				"won": true,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "3",
+			"variant": "one-line:verdict",
+			"moves": [
+				{
+					"action": 4,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 9,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 27,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 21,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 16,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 20,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 15,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 1,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 22,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 26,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 13,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 14,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 7,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 17,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 11,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 19,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 8,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 10,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 12,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 3,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 25,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 24,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 23,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 6,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 4,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 18,
+					"value": 0
+				}
+			],
+			"graph": "0750db04b7b41b17601c4f88897ca1c380fca461c94a4319421cf22032d3fa96",
+			"result": {
+				"score": 2800,
+				"pairs": 28,
+				"moves": 29,
+				"won": true,
+				"hintUsed": false
+			}
+		}
+	],
+	"losses": [
+		{
+			"seed": "1",
+			"variant": "one-line:classic",
+			"moves": [
+				{
+					"action": 0,
+					"edge": 0,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"edge": 2,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"edge": 5,
+					"value": 0
+				}
+			],
+			"result": {
+				"score": 0,
+				"pairs": 3,
+				"moves": 3,
+				"won": false,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "10",
+			"variant": "one-line:verdict",
+			"moves": [
+				{
+					"action": 4,
+					"edge": 0,
+					"value": 1
+				}
+			],
+			"result": {
+				"score": 0,
+				"pairs": 0,
+				"moves": 1,
+				"won": false,
+				"hintUsed": false
+			}
+		}
+	]
+}

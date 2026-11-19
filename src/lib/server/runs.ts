@@ -351,15 +351,19 @@ export async function saveRun(
 	const replayStarted = performance.now();
 	try {
 		const timing = catalog[run.family].rankedTiming;
-		// Resolve the presentation allowance before elapsed-time validation sees it.
-		result = catalog[run.family].replay(
-			run.seed,
-			run.moves,
-			run.rankedSession && timing ? 0 : seconds,
-			scoring.values,
-			run.variant
-		);
-		const openingMs = timing?.openingMs(result, run.variant) ?? null;
+		// One-line has zero opening time and validates logged timeouts only at measured time.
+		const timeout =
+			run.rankedSession && run.family === 'one-line' && run.moves.at(-1)?.action === 5;
+		const preflight = timeout
+			? null
+			: catalog[run.family].replay(
+					run.seed,
+					run.moves,
+					run.rankedSession && timing ? 0 : seconds,
+					scoring.values,
+					run.variant
+				);
+		const openingMs = preflight ? (timing?.openingMs(preflight, run.variant) ?? null) : 0;
 		const maxSeconds = puzzleVariant(run.family, run.variant)?.maxSeconds;
 		let gameplayMs = rankedWallMs;
 		if (run.rankedSession && maxSeconds !== undefined) {
@@ -371,14 +375,10 @@ export async function saveRun(
 			gameplayMs = Math.max(0, rankedWallMs - openingMs - cardOpeningMs);
 			seconds = Math.floor(gameplayMs / 1000);
 		}
-		if (run.rankedSession && (timing || maxSeconds !== undefined))
-			result = catalog[run.family].replay(
-				run.seed,
-				run.moves,
-				seconds,
-				scoring.values,
-				run.variant
-			);
+		const measured = run.rankedSession && (timing || maxSeconds !== undefined);
+		result =
+			(measured ? null : preflight) ??
+			catalog[run.family].replay(run.seed, run.moves, seconds, scoring.values, run.variant);
 		if (run.rankedSession && timing && (maxSeconds !== undefined || openingMs !== null))
 			ranked = gameplayMs >= timing.minimumSeconds(result, run.variant) * 1000;
 		ranked = ranked && !(result.hintUsed && (scoring.values.hintSolvedRanks ?? 0) === 0);

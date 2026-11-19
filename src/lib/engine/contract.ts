@@ -30,6 +30,7 @@ export interface PuzzleVariant {
 	name: string;
 	weight: number;
 	enabled?: boolean;
+	daily?: boolean;
 	maxMoves: number;
 	maxSeconds?: number;
 	leaderboardGroups?: readonly string[];

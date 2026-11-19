@@ -699,3 +699,15 @@ Evidence: `memory/time-strata.test.ts`, `dimensions.test.ts`, `tests/vectors/mem
 
 Evidence comes from the Word Guess focused units, vectors, real D1 suite and
 Chromium run. See [the phase report](PHASE_REPORTS.md).
+
+## One-line v1.4.7
+
+- Covering the final traversal wins before dead-end evaluation. Earlier arrivals without a legal outgoing traversal lose immediately. Undo works before the loss.
+- Reusing an exhausted edge is rejected. A vertex may be revisited, and a marked double edge has two traversals. Wrong-way arrows are rejected before logging.
+- Hint use survives undo, lift, and restart. Restart keeps the same figure and elapsed time.
+- A second stroke begins on an eligible dot in the remainder. Lifting with an unsolvable remainder completes a loss. A further lift is refused. Junction parity uses the graph after splitting the marked crossing.
+- Declaring an impossible figure drawable starts a drawing that cannot finish. Declaring a drawable figure impossible completes a zero-point loss.
+- A countdown win at 119 seconds is valid. A win at 120 seconds or later is rejected. A timeout before 120 seconds is rejected, including a measured zero. A timeout logged at expiry saves a loss through 122 elapsed gameplay seconds. Later submissions are too slow.
+- Countdown elapsed time subtracts the ranked card's 1,200 ms. Untimed ranked elapsed time also subtracts the shared 1,000 ms wall allowance. A below-floor completion consumes the attempt and leaves the daily board untouched.
+- A verdict-only daily pool and exhausted seed search return `daily_unavailable`. Practice uses the existing fallback. Retry repairs winning board rows using replay, including the hint label, and leaves completed losses off the board.
+- Preserve the figure and committed moves across resize, reload, hidden tabs, and navigation. Ignore duplicate input and settle to a playable board when optional motion fails.

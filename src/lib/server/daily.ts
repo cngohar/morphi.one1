@@ -113,7 +113,10 @@ export async function dailyPuzzle(
 	if (existing) return existing; // Secret rotation and later disablement never change a pinned puzzle.
 	if (!(await gameAvailable(binding, family))) throw new RunError('game_disabled', 409);
 	const enabled = await enabledVariants(binding, family);
-	const choices = (catalog[family].variants ?? []).filter((row) => enabled.includes(row.id));
+	const choices = (catalog[family].variants ?? []).filter(
+		(row) => row.daily !== false && enabled.includes(row.id)
+	);
+	if (!choices.length) throw new RunError('daily_unavailable', 503);
 	const derived = await deriveDailyPuzzle(date, family, secret, choices);
 	let pinnedSeed = derived.seed;
 	if (catalog[family].dailySeedOk) {
@@ -271,32 +274,15 @@ export async function dailyBest(
 		}
 	}
 	if (!run) return null;
-	let outcome: Pick<ReplayedResult, 'won' | 'hintUsed'> = {};
-	if (run.family === 'word-guess') {
-		try {
-			const moves = JSON.parse(run.moveLog);
-			if (!Array.isArray(moves)) throw new RangeError('move_log');
-			const config = await readScoreConfig(
-				binding,
-				run.family,
-				run.scoreVersion,
-				cache,
-				run.variant
-			);
-			outcome = catalog[run.family].replay(
-				run.seed,
-				moves,
-				run.seconds,
-				config.values,
-				run.variant
-			);
-			if (outcome.won === undefined) throw new RangeError('missing_outcome');
-		} catch {
-			console.warn(
-				JSON.stringify({ event: 'daily_retry_outcome_unavailable', family: run.family })
-			);
-			return null;
-		}
+	let outcome: Pick<ReplayedResult, 'won' | 'hintUsed'>;
+	try {
+		const moves = JSON.parse(run.moveLog);
+		if (!Array.isArray(moves)) throw new RangeError('move_log');
+		const config = await readScoreConfig(binding, run.family, run.scoreVersion, cache, run.variant);
+		outcome = catalog[run.family].replay(run.seed, moves, run.seconds, config.values, run.variant);
+	} catch {
+		console.warn(JSON.stringify({ event: 'daily_retry_outcome_unavailable', family: run.family }));
+		return null;
 	}
 	if (outcome.won === false) return null;
 	const results = await binding.batch(
@@ -334,7 +320,7 @@ export function dailyCompletionStatements(
 			.bind(
 				date,
 				now,
-				Number(family === 'word-guess' && Boolean(outcome.hintUsed)),
+				Number(Boolean(outcome.hintUsed)),
 				date,
 				runId,
 				userId,

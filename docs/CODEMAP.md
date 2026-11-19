@@ -1604,3 +1604,41 @@ See `docs/work/V1.4.6_WORD_GUESS_WORK.md` and `docs/PHASE_REPORTS.md` for the
 source backup, measurements and the remaining visual review. Owner
 acceptance, physical devices and full verify remain outstanding. Source
 handoff, release and later batches remain outside this continuation.
+
+## v1.4.7 One-line — local closeout (2026-11-19)
+
+Classic and ten Batch A presets are enabled in `one-line-1`. The family adds no
+preset leaderboard groups and uses one `(one-line, UTC date)` board. Verdict
+stays in unlimited practice. The generated registry loads the One-line view
+lazily and uses the shared RoundStage.
+
+- `src/lib/puzzles/one-line/` owns the graph generator, Hierholzer witness and
+  trap checks, move replay, scoring, manifest, copy, board, view, motion and
+  two unit test files. The family README and
+  [puzzle guide](puzzles/one-line.md) describe the preset rules.
+- `engine/contract.ts` adds optional daily eligibility. `server/daily.ts`
+  excludes Verdict, returns `daily_unavailable` when the eligible pool is
+  empty, replays retries, and persists hint labels across families. The
+  existing practice fallback handles the unavailable daily. `server/runs.ts`
+  skips the zero-time preflight for a logged One-line timeout and validates
+  it using the measured time. The existing hint-ranking condition applies.
+  The authorised Word Guess regression now expects a label for the hinted
+  Light Bend row.
+- Focused coverage is in `tests/integration/one-line.test.ts`,
+  `tests/e2e/one-line.spec.ts`, and `tests/vectors/one-line{.json,-runner.ts}`.
+  `scripts/check-vectors.ts --one-line` runs the frozen vectors. The supplied
+  `static/demo/one-line.html` served as the visual reference.
+- Passed 19 unit tests, 17 real-D1 cases and 24 Chromium cases across two
+  single-worker runs. Browser checks covered all presets, input, recovery,
+  and a 34-edge figure at 390×844, 844×390 and 1280×800. Six runtimes agreed
+  on 33 generation and solve vectors, two losses, and 66 rejected replays.
+  Scoped formatting, ESLint, types, boundaries, build and lazy isolation
+  passed. Workspace lint stopped on existing formatting drift, including
+  the supplied brief.
+- Local evidence is in `build/v1.4.7/`. The 33-vector timing CSV records
+  a 62.012 ms generation maximum and a 2.643 ms completion maximum. A
+  wider 220-round sample had no generation failures and reached 101.519 ms.
+
+The owner authorized the One-line source handoff to `origin/main` on 2026-11-19.
+Owner functional review, physical-device testing and full verify remain open.
+See the [accepted brief](briefs/v1.4.7-one-line-codex-brief.md).

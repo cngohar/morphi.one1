@@ -1,0 +1,808 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <title>One-line Demo</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800;900&display=swap" rel="stylesheet" />
+    <style>
+      button, [role="button"], select, summary, input:not([type="checkbox"], [type="radio"]) { min-height: 2.25rem; }
+      * { box-sizing: border-box; }
+      :root{
+        --bg:#eef2f7; --panel:#ffffff; --panel2:#e3eaf3; --ink:#1b2433; --ink-soft:#48536a;
+        --line:#c9d4e2; --trail:#2f6fed; --odd:#e5532d; --win:#009a86; --violet:#7d61ae;
+        --chip:#ffffff; --shadow:0 12px 32px rgba(27,36,51,.10);
+        --edge:#96a7bc;
+      }
+      @media (prefers-color-scheme: dark){
+        :root{
+          --bg:#12161f; --panel:#1d2534; --panel2:#263144; --ink:#eef2f7; --ink-soft:#a9b6cc;
+          --line:#39465e; --trail:#6ea8ff; --odd:#ff8a66; --win:#2fd4bc; --violet:#bda6e8;
+          --chip:#232f45; --shadow:0 10px 30px rgba(0,0,0,.45);
+          --edge:#5f718c;
+        }
+      }
+      html{ -webkit-text-size-adjust:100%; }
+      body{
+        margin:0; color:var(--ink);
+        background:
+          radial-gradient(360px 360px at -90px -90px, rgba(47,111,237,.13), rgba(47,111,237,0) 70%),
+          radial-gradient(400px 400px at calc(100% + 110px) calc(100% + 110px), rgba(0,154,134,.12), rgba(0,154,134,0) 70%),
+          var(--bg);
+        font-family:"Nunito",system-ui,-apple-system,"Segoe UI",sans-serif;
+        line-height:1.5;
+      }
+      .wrap{ max-width:620px; margin:0 auto; padding:20px 16px 56px; }
+      header.top{ text-align:center; margin:6px 0 14px; }
+      .demo-tag{
+        display:inline-block; font-size:.78rem; font-weight:800; letter-spacing:.06em;
+        text-transform:uppercase; color:var(--violet); border:2px solid var(--violet);
+        padding:2px 10px; border-radius:999px; margin-bottom:8px;
+      }
+      h1{ font-size:2.4rem; font-weight:900; margin:0; line-height:1.1; }
+      .rule-line{ color:var(--ink-soft); font-weight:600; margin:8px auto 0; max-width:46ch; }
+      .rule-line strong{ color:var(--ink); }
+      .accent-bar{ width:46px; height:5px; border-radius:3px; background:var(--odd); margin:12px auto 0; }
+
+      /* ---------- level picker ---------- */
+      .picker{ display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:16px 0 12px; }
+      .chip{
+        border:2px solid var(--line); background:var(--chip); color:var(--ink);
+        border-radius:999px; padding:6px 12px; font:inherit; font-weight:700; font-size:.88rem;
+        cursor:pointer; display:inline-flex; align-items:center; gap:6px;
+      }
+      .chip{ transition:transform .12s ease, background-color .15s ease, border-color .15s ease; }
+      .chip:active{ transform:scale(.95); }
+      .chip[aria-pressed="true"]{ border-color:var(--trail); background:var(--trail); color:#fff; }
+      .chip .done{ color:var(--win); font-weight:900; }
+      .chip[aria-pressed="true"] .done{ color:#bff5ea; }
+      .chip .tag{ font-size:.68rem; font-weight:900; letter-spacing:.04em; text-transform:uppercase;
+        background:var(--violet); color:#fff; border-radius:999px; padding:1px 7px; }
+
+      /* ---------- board ---------- */
+      .board-card{
+        position:relative; background:var(--panel); border-radius:24px; box-shadow:var(--shadow);
+        padding:16px 16px 12px;
+      }
+      .board-head{ display:flex; align-items:baseline; justify-content:space-between; gap:10px; padding:0 4px 8px; flex-wrap:wrap; }
+      .board-name{ font-weight:900; font-size:1.15rem; }
+      .board-band{ color:var(--ink-soft); font-weight:700; font-size:.85rem; }
+      .stats{
+        display:flex; align-items:stretch; justify-content:space-around; gap:4px;
+        background:var(--panel2); border-radius:999px; padding:8px 10px; margin:0 2px 4px;
+      }
+      .stat{ display:flex; align-items:center; gap:8px; }
+      .stat svg{ width:22px; height:22px; flex:none; }
+      .stat .ic-lines{ color:var(--violet); }
+      .stat .ic-time{ color:var(--trail); }
+      .stat .ic-hints{ color:var(--odd); }
+      .stat-txt{ display:flex; flex-direction:column; line-height:1.15; }
+      .stat-label{ font-size:.64rem; font-weight:900; letter-spacing:.09em; text-transform:uppercase; color:var(--ink-soft); }
+      .stats b{ color:var(--ink); font-size:1.02rem; font-weight:900; font-variant-numeric:tabular-nums; }
+      .stat-sep{ width:2px; background:var(--line); border-radius:2px; margin:2px 0; }
+      .board-note{ color:var(--ink-soft); font-size:.9rem; font-weight:600; padding:6px 4px 8px; }
+      svg#board{ display:block; width:100%; height:auto; touch-action:none; user-select:none; -webkit-user-select:none; }
+      .edge{ stroke:var(--edge); stroke-width:6; fill:none; stroke-linecap:round; }
+      .edge.done{ stroke:var(--trail); stroke-width:8; }
+      .edge.flash{ stroke:var(--win); stroke-width:9; }
+      .arrow{ fill:var(--edge); pointer-events:none; }
+      .edge.done + .arrow, .arrow.done{ fill:var(--trail); }
+      .node{ cursor:pointer; outline:none; }
+      .node .hit{ fill:transparent; }
+      .node .core{ fill:var(--panel); stroke:var(--ink); stroke-width:4.5; }
+      .node .odd-solid{ fill:none; stroke:var(--odd); stroke-width:3.5; }
+      .node .odd-halo{ fill:none; stroke:var(--odd); stroke-width:3; stroke-dasharray:4 5; opacity:.6;
+        transform-box:fill-box; transform-origin:center; animation:ringPulse 2.2s ease-in-out infinite; }
+      @keyframes ringPulse{ 0%,100%{ transform:scale(1); opacity:.5; } 50%{ transform:scale(1.16); opacity:1; } }
+      .node.current .core{ fill:var(--trail); stroke:var(--trail); }
+      .node.flash .core{ fill:var(--win); stroke:var(--win); }
+      .node:focus-visible .core{ stroke:var(--odd); stroke-width:5; }
+      .msg{ min-height:1.6em; text-align:center; font-weight:800; padding:6px 4px 2px; }
+      .msg.warn{ color:var(--odd); }
+      .msg.good{ color:var(--win); }
+      .controls{ display:flex; gap:10px; justify-content:center; flex-wrap:wrap; padding:10px 0 6px; }
+      .btn{
+        font:inherit; font-weight:800; border-radius:999px; border:2px solid transparent;
+        background:var(--panel2); color:var(--ink); padding:9px 20px; cursor:pointer; min-width:44px;
+        display:inline-flex; align-items:center; justify-content:center; gap:8px;
+        box-shadow:0 4px 14px rgba(27,36,51,.10);
+        transition:transform .12s ease, box-shadow .15s ease;
+      }
+      .btn svg{ width:19px; height:19px; flex:none; }
+      .btn:active{ transform:scale(.94); box-shadow:0 2px 6px rgba(27,36,51,.12); }
+      .btn.primary{ background:var(--trail); border-color:var(--trail); color:#fff;
+        box-shadow:0 6px 18px rgba(47,111,237,.32); }
+      .btn.primary:active{ box-shadow:0 2px 8px rgba(47,111,237,.28); }
+      .btn.verdict{ background:var(--odd); border-color:var(--odd); color:#fff; }
+      .btn[hidden]{ display:none; }
+      .legend{ display:flex; flex-wrap:wrap; gap:6px 18px; justify-content:center; color:var(--ink-soft);
+        font-size:.85rem; font-weight:700; padding:8px 4px 6px; }
+      .legend .sw{ display:inline-block; vertical-align:middle; margin-right:6px; }
+      .sw-line{ width:26px; height:6px; border-radius:3px; background:var(--trail); }
+      .sw-odd{ width:13px; height:13px; border-radius:50%; border:3px solid var(--odd);
+        outline:2px dashed var(--odd); outline-offset:2px; }
+      .sw-arrow{ color:var(--ink-soft); font-weight:900; }
+
+      /* ---------- win overlay ---------- */
+      .win{
+        position:absolute; inset:0; border-radius:24px; display:none;
+        align-items:center; justify-content:center; text-align:center; padding:20px;
+        background:color-mix(in srgb, var(--panel) 88%, transparent);
+      }
+      .win.show{ display:flex; }
+      .win.show .win-inner{ animation:winPop .38s cubic-bezier(.2,1.4,.4,1) both; }
+      @keyframes winPop{ from{ transform:scale(.9); opacity:0; } to{ transform:scale(1); opacity:1; } }
+      .win h2{ margin:0 0 2px; font-size:1.6rem; font-weight:900; }
+      .win .stars{ font-size:2rem; color:var(--win); letter-spacing:.15em; line-height:1.2; }
+      .win .stars .star{ display:inline-block; animation:starPop .5s cubic-bezier(.2,1.6,.4,1) both; }
+      @keyframes starPop{ 0%{ transform:scale(0) rotate(-40deg); opacity:0; } 100%{ transform:scale(1) rotate(0deg); opacity:1; } }
+      .win .stars .off{ color:var(--line); }
+      .win p{ margin:4px 0 12px; color:var(--ink-soft); font-weight:700; }
+      .win .row{ display:flex; gap:8px; justify-content:center; flex-wrap:wrap; }
+
+      /* ---------- how to play ---------- */
+      .howto{ background:var(--panel); border-radius:20px; box-shadow:var(--shadow); padding:16px 18px; margin-top:16px; }
+      .howto h2{ font-size:1.1rem; font-weight:900; margin:0 0 10px; }
+      .howto ol{ list-style:none; margin:0; padding:0; display:grid; gap:12px; }
+      .howto li{ display:flex; gap:12px; align-items:flex-start; }
+      .step-num{ flex:none; width:28px; height:28px; border-radius:50%; color:#fff; font-weight:900;
+        display:flex; align-items:center; justify-content:center; font-size:.95rem; margin-top:1px; }
+      .step-num.n1{ background:var(--violet); }
+      .step-num.n2{ background:var(--trail); }
+      .step-num.n3{ background:var(--win); }
+      .howto p{ margin:0; color:var(--ink-soft); font-weight:600; font-size:.95rem; }
+      .howto p b{ color:var(--ink); }
+      @media (min-width:560px){
+        .howto ol{ grid-template-columns:repeat(3,1fr); }
+        .howto li{ flex-direction:column; gap:8px; }
+      }
+
+      @media (prefers-reduced-motion: reduce){
+        *, *::before, *::after{
+          animation-duration:.01ms !important; animation-iteration-count:1 !important;
+          transition-duration:.01ms !important;
+        }
+      }
+
+      /* ---------- notes sections ---------- */
+      section.notes{ margin-top:34px; }
+      section.notes h2{ font-size:1.35rem; font-weight:900; margin:0 0 6px; }
+      section.notes h3{ font-size:1.02rem; font-weight:900; margin:0 0 4px; }
+      section.notes p, section.notes li{ color:var(--ink-soft); font-weight:600; }
+      section.notes p b, section.notes li b{ color:var(--ink); }
+      .cards{ display:grid; grid-template-columns:1fr; gap:12px; margin-top:12px; }
+      @media (min-width:560px){ .cards{ grid-template-columns:1fr 1fr; } }
+      .card{ background:var(--panel); border-radius:16px; box-shadow:var(--shadow); padding:16px 18px; }
+      .card p{ margin:0; font-size:.94rem; }
+      .card .src{ display:block; margin-top:8px; font-size:.8rem; font-weight:800; }
+      a{ color:var(--trail); }
+      ul.tight{ margin:6px 0 0; padding-left:20px; }
+      ul.tight li{ margin:5px 0; font-size:.95rem; }
+      .verdict-banner{
+        background:var(--panel); border-radius:16px; box-shadow:var(--shadow); padding:16px 18px; margin-top:12px;
+      }
+      .verdict-banner p{ margin:0; }
+      .sources{ font-size:.88rem; }
+      .sources li{ margin:4px 0; }
+      footer{ margin-top:36px; text-align:center; color:var(--ink-soft); font-size:.85rem; font-weight:600; }
+    </style>
+  </head>
+  <body>
+    <div class="wrap">
+      <header class="top">
+        <span class="demo-tag">Playable demo · Centered stage test</span>
+        <h1>One-line</h1>
+        <p class="rule-line">Draw <strong>every line exactly once</strong> in one continuous stroke.
+          You can pass through a dot again, but never draw the same line twice.</p>
+        <div class="accent-bar" aria-hidden="true"></div>
+      </header>
+
+      <nav class="picker" id="picker" aria-label="Choose a figure"></nav>
+
+      <div class="board-card">
+        <div class="board-head">
+          <span class="board-name" id="boardName"></span>
+          <span class="board-band" id="boardBand"></span>
+        </div>
+        <div class="stats">
+          <div class="stat">
+            <svg class="ic-lines" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" aria-hidden="true"><path d="M4 6.5h16M4 12h16M4 17.5h10"/></svg>
+            <span class="stat-txt"><span class="stat-label">Lines</span><b id="statLines">0 / 0</b></span>
+          </div>
+          <div class="stat-sep" aria-hidden="true"></div>
+          <div class="stat">
+            <svg class="ic-time" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="13" r="8"/><path d="M12 9.5V13l2.5 1.5M9 2.5h6"/></svg>
+            <span class="stat-txt"><span class="stat-label">Time</span><b id="statTime">0:00</b></span>
+          </div>
+          <div class="stat-sep" aria-hidden="true"></div>
+          <div class="stat">
+            <svg class="ic-hints" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.3 2.2h4.6c.2-.9.6-1.6 1.3-2.2A6 6 0 0 0 12 3Z"/></svg>
+            <span class="stat-txt"><span class="stat-label">Hints</span><b id="statHints">0</b></span>
+          </div>
+        </div>
+        <p class="board-note" id="boardNote"></p>
+        <svg id="board" viewBox="0 0 400 400" role="application"
+             aria-label="One-line drawing board. Drag or tap from dot to dot to draw every line once."></svg>
+        <p class="msg" id="msg" aria-live="polite"></p>
+        <div class="controls">
+          <button class="btn" id="btnUndo" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9 14 4 9l5-5"/><path d="M4 9h10.5a5.5 5.5 0 0 1 0 11H11"/></svg>Undo</button>
+          <button class="btn primary" id="btnRestart" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M3 12a9 9 0 1 0 2.6-6.3L3 8"/><path d="M3 3v5h5"/></svg>Restart</button>
+          <button class="btn" id="btnHint" type="button"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M9.5 18h5M10.5 21h3M12 3a6 6 0 0 0-3.6 10.8c.7.6 1.1 1.3 1.3 2.2h4.6c.2-.9.6-1.6 1.3-2.2A6 6 0 0 0 12 3Z"/></svg>Hint</button>
+          <button class="btn verdict" id="btnVerdict" type="button" hidden>Declare it impossible</button>
+        </div>
+        <div class="legend">
+          <span><span class="sw sw-line"></span>line drawn</span>
+          <span><span class="sw sw-odd"></span>odd dot — a stroke must start &amp; end on the two ringed dots</span>
+          <span><span class="sw sw-arrow">➤</span>one-way line (variant figure)</span>
+        </div>
+        <div class="win" id="win">
+          <div class="win-inner">
+            <h2 id="winTitle">Figure complete</h2>
+            <div class="stars" id="winStars" aria-label="Stars earned"></div>
+            <p id="winStats"></p>
+            <div class="row">
+              <button class="btn" id="btnReplay" type="button">Play again</button>
+              <button class="btn primary" id="btnNext" type="button">Next figure</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <section class="howto" aria-label="How to play">
+        <h2>How to play</h2>
+        <ol>
+          <li><span class="step-num n1">1</span><p><b>Start on a ringed dot.</b> If two dots wear orange rings, the stroke has to start on one of them. No rings — start anywhere.</p></li>
+          <li><span class="step-num n2">2</span><p><b>Draw every line exactly once</b> in one continuous stroke, dot to dot. Drag back along a line, or tap Undo, to take a line back.</p></li>
+          <li><span class="step-num n3">3</span><p><b>End on the other ringed dot</b> — or back where you started, when no dots are ringed.</p></li>
+        </ol>
+      </section>
+
+      <section class="notes">
+        <h2>What this demo is testing</h2>
+        <div class="verdict-banner">
+          <p><b>Centered, not full-screen.</b> The 12 Nov 2026 global research found no sourced
+          One-line game that needs pan or zoom — every sourced game fits the whole figure to the
+          phone screen, so the report's verdict is that this puzzle <b>fits Morphi's centered stage</b>,
+          not the full stage. This demo tests exactly that: the whole board stays visible in a
+          centered column, largest figure 17 lines, and even on a 360px-wide phone the grid dots
+          sit about 70px apart — above the 44–48pt tap-target guidance the research cites.
+          Full stage would only become a sourced need at Expert scale (35–60 lines, Lakolam),
+          which no sourced game pairs with pan/zoom.</p>
+        </div>
+        <div class="cards">
+          <div class="card">
+            <h3>The rule underneath</h3>
+            <p>A connected figure can be drawn in one stroke exactly when it has <b>0 or 2 odd dots</b>
+            (dots with an odd number of lines). 0 odd = start anywhere, finish where you began;
+            2 odd = you must start on one ringed dot and end on the other; more than 2 = impossible.
+            Euler proved the Königsberg case in <b>1736</b>: 7 bridges, 4 land masses with degrees
+            3, 3, 3, 5 — four odd, so no route exists. Try it in the last figure.</p>
+            <a class="src" href="https://math.libretexts.org/Courses/Orange_Coast_College/math_in_plain_sight__mathematics_for_the_liberal_arts/08%3A_Graph_Theory/8.02%3A_Euler_Paths_and_Euler_Circuits">Source: Mathematics LibreTexts — Euler Paths and Euler Circuits</a>
+          </div>
+          <div class="card">
+            <h3>Scoring would be a Morphi invention</h3>
+            <p>Classic play is <b>untimed — no timer, no lives, no game over</b>. The market scores by
+            stars and hints: One Line Galaxy gives three stars for finishing without hints.
+            The closest sourced daily, Constellation Weaver, scores <b>100 points per thread</b>,
+            minus a quarter per stroke above goal, plus a time bonus <b>capped at 500</b>, resetting
+            at midnight UTC. This demo's stars (3 = no hints, 2 = one hint, 1 = more) follow the
+            market pattern, not an established One-line formula — <b>no published par times were found</b>.</p>
+            <a class="src" href="https://onlinegamesgalaxy.com/one-line-draw-puzzle.html">Source: One Line Galaxy</a>
+            <a class="src" href="https://saruplay.com/games/constellation-weaver">Source: Constellation Weaver</a>
+          </div>
+          <div class="card">
+            <h3>Seeded daily fits; variants unproven</h3>
+            <p>Solvability is checkable before a daily ships: parity (0/2 odd) plus connectivity,
+            with a Hierholzer trail as a linear-time witness. Lakolam's generator is
+            <b>deterministic per seed</b>, stores its trail, and re-walks it to verify. VEXO already runs
+            a daily that is “the same for every player worldwide”, one attempt, with a timer and a
+            daily leaderboard; its fastest reported daily solves were <b>5.8s, 9.5s and 13.4s</b>.
+            But genuine variants are the gap: the research lists <b>24 candidates</b> (one-way lines,
+            double lines, must-return-home, two-stroke, spot-the-impossible, repair-one-edge…) and
+            <b>no source enumerates 100+</b> — that count is <b>not proven</b>.</p>
+            <a class="src" href="https://www.lakolam.com/generators/onestroke/">Source: Lakolam — One Stroke Generator</a>
+            <a class="src" href="https://www.appbrain.com/app/vexo-one-line-puzzle-duels/world.vexo.app">Source: AppBrain — VEXO: One Line Puzzle Duels</a>
+          </div>
+          <div class="card">
+            <h3>Demand is real — read the numbers carefully</h3>
+            <p><b>Line Drawing: No Lift Puzzle</b> — the figure-tracing form this demo matches — is at
+            <b>46 million installs</b> on AppBrain (data updated 11 Nov 2026; AppBrain's own estimates,
+            not Google's official counts), 4.8 stars from 70,624 ratings. The bigger 89M figure for
+            1LINE is a <b>different sub-genre</b> (connect-the-dots in one touch), so it evidences demand
+            for one-touch play generally, not for figure tracing specifically.</p>
+            <a class="src" href="https://www.appbrain.com/app/line-drawing-no-lift-puzzle/com.bbg.one.line.puzzle.games">Source: AppBrain — Line Drawing: No Lift Puzzle</a>
+          </div>
+        </div>
+      </section>
+
+      <section class="notes">
+        <h2>Open questions the research leaves</h2>
+        <ul class="tight">
+          <li><b>Lift rule:</b> sources split — Trace Once resets the board when the finger lifts;
+          Block Link and MangoFun's One Line let you lift and resume. <b>This demo uses lift-and-resume</b>
+          (drag back along a line, or Undo, to take a line back) — a choice, not a settled standard.</li>
+          <li><b>Dead ends:</b> classic play has no lose state — getting stuck means a route stranded
+          part of the figure, and the remedy is undo or restart. Whether Morphi should call that a
+          formal “lose” is undecided. This demo only flags it and lets you recover.</li>
+          <li><b>100+ variants:</b> not proven by any source. Reaching 100+ would rest on combining the
+          24 candidate rule changes, which no source enumerates — the variant matrix still has to be built and tested.</li>
+          <li><b>Daily format:</b> no source settles the daily size band (Lakolam: Kids 6–10, Easy 11–16,
+          Medium 17–24, Hard 25–34, Expert 35–60 lines), whether hints/undo are allowed in a ranked daily,
+          or how ties break when many valid trails solve in similar seconds — the trail is “one of many”;
+          only the solvable/impossible verdict is unique.</li>
+          <li><b>Name:</b> generic wording (“one-line”, “one-stroke”) looks safe and the mechanic is public
+          domain (Euler, 1736), but <b>no formal USPTO/EUIPO trademark clearance was done</b> — that is a
+          research finding, not legal clearance.</li>
+        </ul>
+      </section>
+
+      <section class="notes">
+        <h2>Key sources</h2>
+        <ul class="tight sources">
+          <li><a href="https://one-stroke.doodleburrow.com/how-to-play.html">How to Play One Stroke — DoodleBurrow</a> (core loop, start/end rule, 200 hand-built levels)</li>
+          <li><a href="https://bossgames.io/game/trace-once/">Trace Once — Boss Games</a> (one-way and double lines, lift-and-reset, tiered hints, 300 puzzles)</li>
+          <li><a href="https://www.pagewipe.com/games/one-stroke">One Stroke — PageWipe</a> (level bands: one-way lines from level 41, must-return-home from 61, 3 lives)</li>
+          <li><a href="https://www.lakolam.com/generators/onestroke/">One Stroke Generator — Lakolam</a> (seeded generation, parity repair, ~1 in 5–6 figures deliberately impossible)</li>
+          <li><a href="https://www.mathematische-basteleien.de/house.html">House of Santa Claus — Mathematische Basteleien</a> (the folk house figure: 8 lines, 44 solutions)</li>
+          <li><a href="https://en.wikipedia.org/wiki/Eulerian_path">Eulerian path — Wikipedia</a> (0/2 odd-vertex condition, connectivity)</li>
+        </ul>
+        <p style="margin-top:10px;font-size:.9rem;">Full findings: global research paper, 12 Nov 2026 — 7 topics, every claim sourced; hedges above are carried from it unchanged.</p>
+      </section>
+
+      <footer>One-line demo — a playable test of the centered stage. Demo only: nothing here is a brief, a variant matrix, or a launch decision.</footer>
+    </div>
+
+    <script>
+    "use strict";
+    /* ================= puzzle data =================
+       Every figure below was parity-checked at build time:
+       drawable figures have exactly 0 or 2 odd-degree dots and are connected.
+       Königsberg is the deliberate exception (4 odd dots). */
+    var PUZZLES = [
+      { id:"bowtie", name:"Bowtie", band:"Warm-up · 6 lines",
+        note:"No ringed dots: every dot is even, so you can start anywhere — and you must finish where you began.",
+        nodes:{ c:[200,200], a:[70,105], b:[70,295], d:[330,105], e:[330,295] },
+        edges:[["c","a"],["a","b"],["b","c"],["c","d"],["d","e"],["e","c"]] },
+      { id:"envelope", name:"Envelope", band:"Warm-up · 6 lines",
+        note:"Two ringed dots: start on one, end on the other.",
+        nodes:{ A:[70,110], B:[330,110], C:[330,310], D:[70,310], P:[200,205] },
+        edges:[["A","B"],["B","C"],["C","D"],["D","A"],["A","P"],["P","B"]] },
+      { id:"house", name:"House of St Nicholas", band:"Classic · 8 lines",
+        note:"The old folk figure — “Das Haus vom Nikolaus”. It has 44 different solutions; find any one of them.",
+        nodes:{ A:[80,320], B:[320,320], C:[320,140], D:[80,140], E:[200,40] },
+        edges:[["A","B"],["B","C"],["C","E"],["E","D"],["D","A"],["A","C"],["C","D"],["D","B"]] },
+      { id:"wheel", name:"Wheel", band:"Classic · 8 lines",
+        note:"A ring and a single spoke-line through the middle. The two ringed dots are where the spoke meets the ring.",
+        nodes:{ H0:[345,200], H1:[272,326], H2:[128,326], H3:[55,200], H4:[128,74], H5:[272,74], O:[200,200] },
+        edges:[["H0","H1"],["H1","H2"],["H2","H3"],["H3","H4"],["H4","H5"],["H5","H0"],["O","H0"],["O","H3"]] },
+      { id:"pentagram", name:"Pentagram", band:"Classic · 5 lines",
+        note:"The lines cross — but a crossing is not a dot. You can only turn where there is a dot; the star is one unbroken loop of 5 long lines.",
+        nodes:{ V0:[200,50], V1:[338,150], V2:[285,312], V3:[115,312], V4:[62,150] },
+        edges:[["V0","V2"],["V2","V4"],["V4","V1"],["V1","V3"],["V3","V0"]] },
+      { id:"web", name:"Web", band:"Medium · 10 lines",
+        note:"Plan your exits: crossing the middle too early can strand a corner.",
+        nodes:{ T:[200,40], UR:[320,140], R:[340,260], BR:[260,350], BL:[140,350], L:[60,260], UL:[80,140], C:[200,200] },
+        edges:[["T","UR"],["UR","R"],["R","C"],["C","BL"],["BL","L"],["L","UL"],["UL","T"],["T","C"],["C","BR"],["BR","R"]] },
+      { id:"oneway", name:"One-way Web", band:"Variant test · 10 lines", variant:true,
+        note:"Variant test — one-way lines: three lines carry an arrow and may only be drawn in that direction. One-way lines appear in Trace Once, and from level 41 in PageWipe's One Stroke.",
+        nodes:{ T:[200,40], UR:[320,140], R:[340,260], BR:[260,350], BL:[140,350], L:[60,260], UL:[80,140], C:[200,200] },
+        edges:[["T","UR"],["UR","R"],["R","C","R>C"],["C","BL"],["BL","L"],["L","UL"],["UL","T"],["T","C","T>C"],["C","BR","C>BR"],["BR","R"]] },
+      { id:"lattice", name:"Lattice", band:"Hard · 17 lines",
+        note:"Lakolam's Medium band is 17–24 lines. The whole figure still fits the phone screen — no zoom needed.",
+        nodes:{ a:[80,80], b:[160,80], c:[240,80], d:[320,80], e:[80,160], f:[160,160], g:[240,160], h:[320,160],
+                i:[80,240], j:[160,240], k:[240,240], l:[320,240], m:[80,320], n:[160,320], o:[240,320], p:[320,320] },
+        edges:[["e","a"],["a","b"],["b","c"],["c","d"],["d","h"],["h","l"],["l","p"],["p","o"],["o","n"],["n","j"],["j","f"],["f","g"],["g","k"],["k","j"],["j","i"],["i","m"],["m","n"]] },
+      { id:"konigsberg", name:"Königsberg, 1736", band:"Verdict · 7 lines", verdict:true,
+        note:"Euler's original problem: cross every bridge exactly once. Try to draw it — or, if you can prove it can't be done, declare it impossible. Count the ringed dots first.",
+        nodes:{ I:[200,200], N:[200,55], S:[200,345], E:[335,200] },
+        edges:[["I","N",null,-30],["I","N",null,30],["I","S",null,-30],["I","S",null,30],["I","E"],["N","E"],["S","E"]] }
+    ];
+
+    /* ================= helpers ================= */
+    function $(id){ return document.getElementById(id); }
+    function degrees(p){
+      var d = {};
+      Object.keys(p.nodes).forEach(function(k){ d[k]=0; });
+      p.edges.forEach(function(e){ d[e[0]]++; d[e[1]]++; });
+      return d;
+    }
+    function edgeDir(e){ return e[2] || null; }           // "A>B" for one-way
+    function bend(e){ return e[3] || 0; }
+    function canTraverse(p, e, from){
+      var dir = edgeDir(e);
+      if (!dir) return true;
+      return dir.split(">")[0] === from;
+    }
+    function otherEnd(e, n){ return e[0] === n ? e[1] : e[0]; }
+
+    /* Completion solver: DFS with Fleury-style bridge avoidance + failed-state memo.
+       Returns an array of edge indices completing the figure from `from`, or null. */
+    function findCompletion(p, from, usedMask, budget){
+      var E = p.edges.length;
+      var full = (1n << BigInt(E)) - 1n;
+      var failed = {};
+      var steps = 0;
+      function isBridge(remMask, ei, node){
+        // would removing ei disconnect the remaining graph from the far end?
+        var target = otherEnd(p.edges[ei], node);
+        var seen = {}, stack = [target];
+        seen[target] = true;
+        while (stack.length){
+          var n = stack.pop();
+          for (var j = 0; j < E; j++){
+            if (j === ei) continue;
+            if (remMask & (1n << BigInt(j))){
+              var e = p.edges[j];
+              var m = (e[0] === n) ? e[1] : (e[1] === n) ? e[0] : null;
+              if (m && !seen[m]){ seen[m] = true; stack.push(m); }
+            }
+          }
+        }
+        // any remaining edge (other than ei) must touch the seen component
+        for (var j = 0; j < E; j++){
+          if (j === ei) continue;
+          if (remMask & (1n << BigInt(j))){
+            var e2 = p.edges[j];
+            if (!seen[e2[0]] && !seen[e2[1]]) return true;
+          }
+        }
+        return false;
+      }
+      function dfs(node, mask){
+        if (mask === full) return [];
+        if (++steps > budget) return "unknown";
+        var key = node + "|" + mask.toString();
+        if (failed[key]) return null;
+        var cands = [], bridges = [];
+        for (var i = 0; i < E; i++){
+          var bit = 1n << BigInt(i);
+          if (mask & bit) continue;
+          var e = p.edges[i];
+          if (e[0] !== node && e[1] !== node) continue;
+          if (!canTraverse(p, e, node)) continue;
+          var rem = full ^ mask ^ bit; // remaining after taking i... careful: remaining = full & ~mask & ~bit
+          rem = full & ~mask & ~bit;
+          (isBridge(full & ~mask, i, node) ? bridges : cands).push(i);
+        }
+        var order = cands.concat(bridges);
+        for (var k = 0; k < order.length; k++){
+          var ei = order[k], e3 = p.edges[ei];
+          var rest = dfs(otherEnd(e3, node), mask | (1n << BigInt(ei)));
+          if (rest === "unknown") return "unknown";
+          if (rest) return [ei].concat(rest);
+        }
+        failed[key] = true;
+        return null;
+      }
+      return dfs(from, usedMask);
+    }
+
+    /* ================= state ================= */
+    var cur = 0;               // puzzle index
+    var results = {};          // puzzleId -> {stars, verdict}
+    var S = null;              // per-puzzle play state
+    function newState(){
+      return { current:null, stack:[], used:{}, usedCount:0, hints:0,
+               startedAt:null, elapsed:0, timer:null, finished:false, dragging:false };
+    }
+
+    var svg = $("board");
+    var NS = "http://www.w3.org/2000/svg";
+    function el(tag, attrs){
+      var n = document.createElementNS(NS, tag);
+      for (var k in attrs) n.setAttribute(k, attrs[k]);
+      return n;
+    }
+    function edgePath(p, e){
+      var a = p.nodes[e[0]], b = p.nodes[e[1]], bd = bend(e);
+      if (!bd) return "M" + a[0] + " " + a[1] + " L" + b[0] + " " + b[1];
+      var mx = (a[0]+b[0])/2, my = (a[1]+b[1])/2;
+      var dx = b[0]-a[0], dy = b[1]-a[1], len = Math.hypot(dx,dy) || 1;
+      var cx = mx + (-dy/len)*bd, cy = my + (dx/len)*bd;
+      return "M" + a[0] + " " + a[1] + " Q" + cx + " " + cy + " " + b[0] + " " + b[1];
+    }
+    function arrowFor(p, e){
+      var dir = edgeDir(e); if (!dir) return null;
+      var from = p.nodes[dir.split(">")[0]], to = p.nodes[dir.split(">")[1]];
+      var t = 0.62, x = from[0] + (to[0]-from[0])*t, y = from[1] + (to[1]-from[1])*t;
+      var ang = Math.atan2(to[1]-from[1], to[0]-from[0]) * 180/Math.PI;
+      var g = el("g", { "class":"arrow", transform:"translate(" + x + " " + y + ") rotate(" + ang + ")" });
+      g.appendChild(el("path", { d:"M8 0 L-6 -6 L-6 6 Z" }));
+      return g;
+    }
+
+    var edgeEls = [], nodeEls = {};
+
+    function buildPicker(){
+      var pk = $("picker"); pk.innerHTML = "";
+      PUZZLES.forEach(function(p, i){
+        var b = document.createElement("button");
+        b.type = "button"; b.className = "chip";
+        b.setAttribute("aria-pressed", i === cur ? "true" : "false");
+        var label = p.name + " · " + p.edges.length;
+        b.innerHTML = "";
+        b.appendChild(document.createTextNode(label));
+        if (p.variant){ var t = document.createElement("span"); t.className = "tag"; t.textContent = "Variant"; b.appendChild(t); }
+        if (p.verdict){ var t2 = document.createElement("span"); t2.className = "tag"; t2.textContent = "Verdict"; b.appendChild(t2); }
+        if (results[p.id]){ var d = document.createElement("span"); d.className = "done"; d.textContent = results[p.id].verdict ? "✓ impossible" : "★".repeat(results[p.id].stars); b.appendChild(d); }
+        b.addEventListener("click", function(){ load(i); });
+        pk.appendChild(b);
+      });
+    }
+
+    function load(i){
+      cur = i;
+      if (S && S.timer) clearInterval(S.timer);
+      S = newState();
+      pathNodes = [];
+      var p = PUZZLES[cur];
+      $("boardName").textContent = p.name;
+      $("boardBand").textContent = p.band;
+      $("boardNote").textContent = p.note;
+      $("btnVerdict").hidden = !p.verdict;
+      $("win").classList.remove("show");
+      setMsg("", "");
+      svg.innerHTML = ""; edgeEls = []; nodeEls = {};
+      var deg = degrees(p);
+      p.edges.forEach(function(e, ei){
+        var path = el("path", { "class":"edge", d: edgePath(p, e) });
+        svg.appendChild(path); edgeEls.push(path);
+        var ar = arrowFor(p, e); if (ar) svg.appendChild(ar);
+      });
+      Object.keys(p.nodes).forEach(function(id){
+        var xy = p.nodes[id];
+        var g = el("g", { "class":"node", tabindex:"0", role:"button",
+          "aria-label":"Dot" + (deg[id] % 2 ? " (odd dot)" : "") });
+        g.appendChild(el("circle", { "class":"hit", cx:xy[0], cy:xy[1], r:26 }));
+        if (deg[id] % 2){
+          g.appendChild(el("circle", { "class":"odd-halo", cx:xy[0], cy:xy[1], r:20 }));
+          g.appendChild(el("circle", { "class":"odd-solid", cx:xy[0], cy:xy[1], r:14.5 }));
+        }
+        g.appendChild(el("circle", { "class":"core", cx:xy[0], cy:xy[1], r:11 }));
+        g.addEventListener("pointerdown", function(ev){ ev.preventDefault(); nodeTap(id); });
+        g.addEventListener("keydown", function(ev){
+          if (ev.key === "Enter" || ev.key === " "){ ev.preventDefault(); nodeTap(id); }
+        });
+        svg.appendChild(g); nodeEls[id] = g;
+      });
+      updateStats();
+      buildPicker();
+    }
+
+    function setMsg(text, cls){
+      var m = $("msg"); m.textContent = text; m.className = "msg" + (cls ? " " + cls : "");
+    }
+    function fmtTime(ms){
+      var s = Math.floor(ms/1000);
+      return Math.floor(s/60) + ":" + ("0" + (s % 60)).slice(-2);
+    }
+    function updateStats(){
+      var p = PUZZLES[cur];
+      $("statLines").textContent = S.usedCount + " / " + p.edges.length;
+      $("statHints").textContent = S.hints;
+      $("statTime").textContent = fmtTime(S.elapsed);
+    }
+    function startTimer(){
+      if (S.timer || S.startedAt !== null) return;
+      S.startedAt = Date.now();
+      S.timer = setInterval(function(){
+        if (!S.finished){ S.elapsed = Date.now() - S.startedAt; $("statTime").textContent = fmtTime(S.elapsed); }
+      }, 250);
+    }
+    function usedMask(){
+      var m = 0n;
+      for (var k in S.used) m |= 1n << BigInt(+k);
+      return m;
+    }
+
+    function nodeTap(id){
+      if (S.finished) return;
+      var p = PUZZLES[cur];
+      if (S.current === null){
+        S.current = id; pathNodes = [id]; markCurrent();
+        setMsg("Started. Drag or tap the next dot along a line.", "");
+        return;
+      }
+      if (id === S.current) return;
+      // drag back onto the previous dot = undo last line
+      if (S.stack.length){
+        var last = p.edges[S.stack[S.stack.length - 1]];
+        if (otherEnd(last, S.current) === id){ doUndo(); return; }
+      }
+      for (var i = 0; i < p.edges.length; i++){
+        if (S.used[i]) continue;
+        var e = p.edges[i];
+        if ((e[0] === S.current && e[1] === id) || (e[1] === S.current && e[0] === id)){
+          if (!canTraverse(p, e, S.current)){
+            setMsg("That line is one-way — it can only be drawn the other way.", "warn");
+            return;
+          }
+          traverse(i, id);
+          return;
+        }
+      }
+      setMsg("No unused line joins those two dots.", "warn");
+    }
+
+    function traverse(ei, to){
+      var p = PUZZLES[cur];
+      S.used[ei] = true; S.stack.push(ei); S.usedCount++;
+      S.current = to; pathNodes.push(to);
+      edgeEls[ei].classList.add("done");
+      animateDraw(edgeEls[ei]);
+      startTimer();
+      markCurrent();
+      updateStats();
+      if (S.usedCount === p.edges.length){ win(); return; }
+      // moves left from here?
+      var hasMove = p.edges.some(function(e, i){
+        return !S.used[i] && (e[0] === S.current || e[1] === S.current) && canTraverse(p, e, S.current);
+      });
+      if (!hasMove){
+        setMsg("Stuck — no unused line leaves this dot, but lines remain. Undo or restart; in classic play this is a blocked route, not a game over.", "warn");
+        return;
+      }
+      var res = findCompletion(p, S.current, usedMask(), 30000);
+      if (res === null){
+        setMsg("That route strands part of the figure — it can't be finished from here. Undo a line or two.", "warn");
+      } else {
+        setMsg("", "");
+      }
+    }
+
+    function markCurrent(){
+      Object.keys(nodeEls).forEach(function(k){ nodeEls[k].classList.toggle("current", k === S.current); });
+    }
+
+    var pathNodes = [];
+    function doUndo(){
+      if (S.finished || !S.stack.length) return;
+      var ei = S.stack.pop();
+      delete S.used[ei]; S.usedCount--;
+      edgeEls[ei].classList.remove("done");
+      pathNodes.pop();
+      S.current = pathNodes.length ? pathNodes[pathNodes.length - 1] : null;
+      markCurrent(); updateStats(); setMsg("", "");
+    }
+
+    function win(){
+      S.finished = true;
+      if (S.timer) clearInterval(S.timer);
+      S.elapsed = S.startedAt !== null ? Date.now() - S.startedAt : 0;
+      var p = PUZZLES[cur];
+      var stars = S.hints === 0 ? 3 : (S.hints === 1 ? 2 : 1);
+      results[p.id] = { stars: stars };
+      $("winTitle").textContent = "Figure complete";
+      var sh = "";
+      for (var si = 0; si < 3; si++){
+        sh += '<span class="star' + (si < stars ? "" : " off") + '" style="animation-delay:' + (0.15 + si * 0.14) + 's">★</span>';
+      }
+      $("winStars").innerHTML = sh;
+      if (!reducedMotion){
+        edgeEls.forEach(function(pe, idx){
+          setTimeout(function(){
+            pe.classList.add("flash");
+            setTimeout(function(){ pe.classList.remove("flash"); }, 450);
+          }, idx * 45);
+        });
+      }
+      $("winStats").textContent = "All " + p.edges.length + " lines in one stroke · " + fmtTime(S.elapsed) +
+        " · " + (S.hints === 0 ? "no hints — three stars, the One Line Galaxy standard" : S.hints + (S.hints === 1 ? " hint" : " hints"));
+      $("btnNext").textContent = cur < PUZZLES.length - 1 ? "Next figure" : "Back to first figure";
+      $("win").classList.add("show");
+      setMsg("", "");
+      buildPicker();
+    }
+
+    /* ================= controls ================= */
+    $("btnUndo").addEventListener("click", function(){
+      if (S.finished) return;
+      if (!S.stack.length){ setMsg("Nothing to undo yet.", ""); return; }
+      doUndo();
+    });
+    $("btnRestart").addEventListener("click", function(){
+      load(cur);
+      setMsg("Figure reset. Pick a starting dot.", "");
+    });
+    $("btnHint").addEventListener("click", function(){
+      if (S.finished) return;
+      var p = PUZZLES[cur];
+      S.hints++; updateStats();
+      if (S.current === null){
+        var deg = degrees(p), odds = Object.keys(deg).filter(function(k){ return deg[k] % 2; });
+        var target = odds.length ? odds[0] : Object.keys(p.nodes)[0];
+        flashNode(target);
+        setMsg(odds.length ? "Hint: start on a ringed (odd) dot." : "Hint: every dot is even — start anywhere, finish where you began.", "");
+        return;
+      }
+      var res = findCompletion(p, S.current, usedMask(), 60000);
+      if (res === null){
+        setMsg("Hint: this route can't be finished — undo until the warning clears, then choose differently.", "warn");
+        return;
+      }
+      if (res === "unknown" || !res.length){
+        setMsg("Hint unavailable for this position — try undoing one line.", "warn");
+        return;
+      }
+      flashEdge(res[0]);
+      setMsg("Hint: the glowing line is a safe next line.", "");
+    });
+    $("btnVerdict").addEventListener("click", function(){
+      if (S.finished) return;
+      var p = PUZZLES[cur];
+      S.finished = true;
+      if (S.timer) clearInterval(S.timer);
+      results[p.id] = { verdict: true };
+      $("winTitle").textContent = "Correct — it can't be drawn";
+      $("winStars").innerHTML = "";
+      $("winStats").textContent = "All four land masses are odd dots (degrees 3, 5, 3, 3). A one-stroke figure needs 0 or 2 odd dots, so no route can cross all 7 bridges exactly once — Euler's proof of 1736. In Lakolam's generator about 1 figure in 5 or 6 is deliberately impossible like this.";
+      $("btnNext").textContent = cur < PUZZLES.length - 1 ? "Next figure" : "Back to first figure";
+      $("win").classList.add("show");
+      buildPicker();
+    });
+    $("btnReplay").addEventListener("click", function(){ load(cur); });
+    $("btnNext").addEventListener("click", function(){
+      load(cur < PUZZLES.length - 1 ? cur + 1 : 0);
+    });
+
+    var reducedMotion = !!(window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches);
+    function animateDraw(path){
+      if (reducedMotion) return;
+      try {
+        var len = path.getTotalLength();
+        path.style.strokeDasharray = len + " " + len;
+        path.style.strokeDashoffset = String(len);
+        void path.getBoundingClientRect();
+        path.style.transition = "stroke-dashoffset .3s ease-out";
+        path.style.strokeDashoffset = "0";
+        setTimeout(function(){
+          path.style.transition = "";
+          path.style.strokeDasharray = "";
+          path.style.strokeDashoffset = "";
+        }, 340);
+      } catch (e) {}
+    }
+
+    function flashEdge(ei){
+      edgeEls[ei].classList.add("flash");
+      setTimeout(function(){ edgeEls[ei].classList.remove("flash"); }, 1600);
+    }
+    function flashNode(id){
+      nodeEls[id].classList.add("flash");
+      setTimeout(function(){ nodeEls[id].classList.remove("flash"); }, 1600);
+    }
+
+    /* drag support: pointer moving over the board while held down */
+    function svgPoint(ev){
+      var r = svg.getBoundingClientRect();
+      return [ (ev.clientX - r.left) / r.width * 400, (ev.clientY - r.top) / r.height * 400 ];
+    }
+    function nodeNear(x, y, radius){
+      var p = PUZZLES[cur], best = null, bd = radius;
+      Object.keys(p.nodes).forEach(function(id){
+        var xy = p.nodes[id], d = Math.hypot(xy[0]-x, xy[1]-y);
+        if (d < bd){ bd = d; best = id; }
+      });
+      return best;
+    }
+    svg.addEventListener("pointerdown", function(ev){
+      S.dragging = true;
+      try { svg.setPointerCapture(ev.pointerId); } catch (e) {}
+    });
+    svg.addEventListener("pointermove", function(ev){
+      if (!S.dragging || S.current === null || S.finished) return;
+      var pt = svgPoint(ev), id = nodeNear(pt[0], pt[1], 27);
+      if (id && id !== S.current) nodeTap(id);
+    });
+    ["pointerup","pointercancel"].forEach(function(t){
+      svg.addEventListener(t, function(){ S.dragging = false; });
+    });
+
+    load(0);
+    </script>
+  </body>
+</html>

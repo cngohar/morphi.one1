@@ -3904,6 +3904,258 @@ const metadata = {
 			}
 		}
 	},
+	['one-line']: {
+		engineVersion: 'one-line-1',
+		scoring: {
+			version: 'brief-v1',
+			fields: ['edge', 'hint', 'restart', 'countdown', 'verdict', 'hintSolvedRanks'],
+			defaults: {
+				edge: 100,
+				hint: 100,
+				restart: 50,
+				countdown: 10,
+				verdict: 500,
+				hintSolvedRanks: 1
+			}
+		},
+		variants: [
+			{
+				id: 'one-line:classic',
+				name: 'variant.one-line:classic',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.step1', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:one-way',
+				name: 'variant.one-line:one-way',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.one-way', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:double-trace',
+				name: 'variant.one-line:double-trace',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.double-trace', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:closed-loop',
+				name: 'variant.one-line:closed-loop',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.closed-loop', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:two-stroke',
+				name: 'variant.one-line:two-stroke',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.two-stroke', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:crossings-are-junctions',
+				name: 'variant.one-line:crossings-are-junctions',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.crossings-are-junctions', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:countdown',
+				name: 'variant.one-line:countdown',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.countdown', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				},
+				maxSeconds: 120,
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.one-line.headline', cap: 'ending.one-line.timeUp' },
+					subline: { key: 'ending.one-line.subline', values: ['lines'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition: 'Complete the drawing before 120 seconds. A timeout saves as a loss.'
+				}
+			},
+			{
+				id: 'one-line:no-hint',
+				name: 'variant.one-line:no-hint',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.no-hint', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:degree-hidden',
+				name: 'variant.one-line:degree-hidden',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.degree-hidden', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:lift-resume',
+				name: 'variant.one-line:lift-resume',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.lift-resume', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				}
+			},
+			{
+				id: 'one-line:verdict',
+				name: 'variant.one-line:verdict',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['one-line.rule.verdict', 'one-line.step2', 'one-line.step3'],
+					rows: [
+						{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+						{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+					],
+					note: 'one-line.note',
+					tips: 'one-line.tips'
+				},
+				daily: false
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.one-line.headline' },
+			subline: { key: 'ending.one-line.subline', values: ['lines'] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition: 'Cover every required traversal or give the correct impossible verdict.'
+		},
+		presentation: {
+			name: 'v1.game.one-line',
+			scoringLabels: {
+				edge: 'scoring.one-line.edge',
+				hint: 'scoring.one-line.hint',
+				restart: 'scoring.one-line.restart',
+				countdown: 'scoring.one-line.countdown',
+				verdict: 'scoring.one-line.verdict',
+				hintSolvedRanks: 'scoring.one-line.hintSolvedRanks'
+			},
+			help: {
+				steps: ['one-line.step1', 'one-line.step2', 'one-line.step3'],
+				rows: [
+					{ label: 'scoring.one-line.edge', field: 'edge', sign: '+' },
+					{ label: 'scoring.one-line.hint', field: 'hint', sign: '−' },
+					{ label: 'scoring.one-line.restart', field: 'restart', sign: '−' }
+				],
+				note: 'one-line.note',
+				tips: 'one-line.tips'
+			},
+			backdrop: {
+				items: [
+					{
+						id: 'linked-dots',
+						path: 'M12 14L51 21L23 50L12 14M8 14a4 4 0 1 1 8 0a4 4 0 1 1 -8 0M47 21a4 4 0 1 1 8 0a4 4 0 1 1 -8 0M19 50a4 4 0 1 1 8 0a4 4 0 1 1 -8 0'
+					}
+				],
+				fill: 'outline'
+			}
+		}
+	},
 	['tangram']: {
 		engineVersion: 'tangram-1',
 		titleAfterEntrance: true,
