@@ -13,6 +13,7 @@ export const puzzleViews: Record<PuzzleId, () => Promise<{ default: Component<Pu
 		memory: () => import('./puzzles/memory/View.svelte'),
 		nonogram: () => import('./puzzles/nonogram/View.svelte'),
 		'one-line': () => import('./puzzles/one-line/View.svelte'),
+		sudoku: () => import('./puzzles/sudoku/View.svelte'),
 		tangram: () => import('./puzzles/tangram/View.svelte'),
 		'word-guess': () => import('./puzzles/word-guess/View.svelte')
 	};
@@ -37,6 +38,7 @@ export const puzzlePools: Record<PuzzleId, () => Promise<{ manifest: PuzzleManif
 	memory: () => import('./puzzles/memory/manifest.js'),
 	nonogram: () => import('./puzzles/nonogram/manifest.js'),
 	'one-line': () => import('./puzzles/one-line/manifest.js'),
+	sudoku: () => import('./puzzles/sudoku/manifest.js'),
 	tangram: () => import('./puzzles/tangram/manifest.js'),
 	'word-guess': () => import('./puzzles/word-guess/manifest.js')
 };

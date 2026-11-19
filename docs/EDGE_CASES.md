@@ -711,3 +711,42 @@ Chromium run. See [the phase report](PHASE_REPORTS.md).
 - Countdown elapsed time subtracts the ranked card's 1,200 ms. Untimed ranked elapsed time also subtracts the shared 1,000 ms wall allowance. A below-floor completion consumes the attempt and leaves the daily board untouched.
 - A verdict-only daily pool and exhausted seed search return `daily_unavailable`. Practice uses the existing fallback. Retry repairs winning board rows using replay, including the hint label, and leaves completed losses off the board.
 - Preserve the figure and committed moves across resize, reload, hidden tabs, and navigation. Ignore duplicate input and settle to a playable board when optional motion fails.
+
+## Sudoku v1.4.8
+
+- Refuse a unit conflict before checking the solution. Keep the previous value
+  when a replacement conflicts. Re-entering the same digit leaves the log
+  unchanged. A correct replacement can win. A legal wrong replacement can
+  trigger the mistake-limit loss.
+- A hint fills an incorrect cell. At the cap the control is disabled. Undo
+  restores the pre-hint board and notes while retaining the hint deduction.
+  Undo also retains mistake deductions and restores notes after autofill.
+- Placing the ninth copy of a digit removes that candidate across the board
+  and dims its pad button. Rapid duplicate input logs one placement.
+- Restart restores the givens of the original seed. Ranked time continues
+  across restart and while hidden. A restart at 590 seconds leaves 10 seconds
+  on the Countdown clock.
+- Countdown wins require fewer than 600 measured gameplay seconds. A timeout
+  before 600 seconds, including measured second zero, is rejected. A timeout
+  at ranked elapsed 607,200–609,200 ms saves a completed loss. The upper window
+  covers submission latency. An entry pending at expiry is not logged.
+- An unfinished round at 9,999 moves has one terminal slot. The placement
+  scan considers every editable cell, including filled cells. If no legal win,
+  mistake-limit loss or timeout remains, Try another abandons the session and
+  spends its ranked daily attempt.
+- A 10,001-move submission returns `moves` before replay. The session remains
+  active and the rejected run stays on the device. Abandon + New on the next
+  resume screen releases the session and spends its ranked daily attempt.
+- The shared loader discards a stored checkpoint with more than 10,000 moves
+  and logs `checkpoint_discarded`. An active ranked session can resume from
+  zero moves with its original identity. Valid daily checkpoints replay on the
+  server with the pinned configuration. Direct oversized resume logs return
+  `moves`.
+- If generation exhausts its bounded attempts, the daily seed walk can reject
+  the candidate and try another. Exhausting the walk reports
+  `daily_unavailable` for that family.
+- Admin changes apply to the next unpinned daily. A pinned daily retains its
+  scoring version for later sessions.
+- Resize and rotation preserve the grid. Hidden-tab recovery retains moves.
+  Missing motion settles the board and clears the input lock. Navigation
+  cancels local motion and timers.

@@ -4,6 +4,7 @@ import { defaultScoreConfig, puzzleVariant } from '#lib/scoring.js';
 import { and, asc, desc, eq, gt, isNull, sql } from 'drizzle-orm';
 import { catalog } from '#lib/catalog.js';
 import { normalizeSeed } from '#lib/engine/rng.js';
+import { SUDOKU_ENTRANCE_MS } from '#lib/round-timing.js';
 import type { CompletedRun } from '#lib/engine/contract.js';
 import { createDatabase } from './db/index.js';
 import { completedRun, playSession } from './db/schema.js';
@@ -351,9 +352,11 @@ export async function saveRun(
 	const replayStarted = performance.now();
 	try {
 		const timing = catalog[run.family].rankedTiming;
-		// One-line has zero opening time and validates logged timeouts only at measured time.
+		// Logged timeouts are valid only at the server-measured deadline.
 		const timeout =
-			run.rankedSession && run.family === 'one-line' && run.moves.at(-1)?.action === 5;
+			run.rankedSession &&
+			(run.family === 'one-line' || run.family === 'sudoku') &&
+			run.moves.at(-1)?.action === 5;
 		const preflight = timeout
 			? null
 			: catalog[run.family].replay(
@@ -363,7 +366,12 @@ export async function saveRun(
 					scoring.values,
 					run.variant
 				);
-		const openingMs = preflight ? (timing?.openingMs(preflight, run.variant) ?? null) : 0;
+		// A Sudoku timeout still receives the same fixed opening deduction as a win.
+		const openingMs = preflight
+			? (timing?.openingMs(preflight, run.variant) ?? null)
+			: run.family === 'sudoku'
+				? SUDOKU_ENTRANCE_MS
+				: 0;
 		const maxSeconds = puzzleVariant(run.family, run.variant)?.maxSeconds;
 		let gameplayMs = rankedWallMs;
 		if (run.rankedSession && maxSeconds !== undefined) {

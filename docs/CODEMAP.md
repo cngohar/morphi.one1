@@ -1642,3 +1642,18 @@ lazily and uses the shared RoundStage.
 The owner authorized the One-line source handoff to `origin/main` on 2026-11-19.
 Owner functional review, physical-device testing and full verify remain open.
 See the [accepted brief](briefs/v1.4.7-one-line-codex-brief.md).
+
+## v1.4.8 Sudoku
+
+Sudoku uses the shared RoundStage and the existing daily key `(sudoku, UTC
+date)`. Its family package in `src/lib/puzzles/sudoku/` owns deterministic
+generation, unique-solution and logic-only gates, replay, scoring, and the
+board UI. Classic and ten Batch A presets are enabled with zero variant
+leaderboard groups. Easy grading filters daily seeds.
+
+`runs.ts` applies the same opening deduction to ranked Countdown wins and
+timeouts. Rev 6 keeps the shared checkpoint discard for stored logs longer
+than 10,000 moves. For rules and operator settings, see
+[Sudoku](puzzles/sudoku.md). Focused proof is in the Sudoku unit, D1, Chromium,
+and vector tests.
+The owner authorized the Sudoku source handoff to `origin/main`.

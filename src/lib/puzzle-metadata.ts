@@ -4156,6 +4156,307 @@ const metadata = {
 			}
 		}
 	},
+	['sudoku']: {
+		engineVersion: 'sudoku-1',
+		scoring: {
+			version: 'brief-v1',
+			fields: [
+				'completion',
+				'second',
+				'floor',
+				'hint',
+				'mistake',
+				'restart',
+				'countdown',
+				'hintSolvedRanks',
+				'mistakeLimit',
+				'hintCap'
+			],
+			defaults: {
+				completion: 1000,
+				second: 1,
+				floor: 200,
+				hint: 100,
+				mistake: 50,
+				restart: 50,
+				countdown: 1,
+				hintSolvedRanks: 1,
+				mistakeLimit: 3,
+				hintCap: 0
+			}
+		},
+		variants: [
+			{
+				id: 'sudoku:classic',
+				name: 'variant.sudoku:classic',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:diagonal',
+				name: 'variant.sudoku:diagonal',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.diagonal', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:irregular',
+				name: 'variant.sudoku:irregular',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.outline', 'sudoku.rule.irregular', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:killer',
+				name: 'variant.sudoku:killer',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.killer', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:thermo',
+				name: 'variant.sudoku:thermo',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.thermo', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:anti-knight',
+				name: 'variant.sudoku:anti-knight',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.anti-knight', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:kropki',
+				name: 'variant.sudoku:kropki',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.kropki', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:countdown-600',
+				name: 'variant.sudoku:countdown-600',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.countdown-600', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				},
+				maxSeconds: 600,
+				ending: {
+					kind: 'run_over',
+					headlines: { default: 'ending.sudoku.headline', cap: 'ending.sudoku.timeUp' },
+					subline: { key: 'ending.sudoku.subline', values: ['time'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition: 'Fill the grid before 600 seconds. A timeout saves a completed loss.'
+				}
+			},
+			{
+				id: 'sudoku:no-hint',
+				name: 'variant.sudoku:no-hint',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.no-hint', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:odd-even',
+				name: 'variant.sudoku:odd-even',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.odd-even', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			},
+			{
+				id: 'sudoku:xv',
+				name: 'variant.sudoku:xv',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: ['sudoku.rule.xv', 'sudoku.rule.classic', 'sudoku.step.play'],
+					rows: [
+						{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+						{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+						{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+						{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+						{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+						{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+					],
+					note: 'sudoku.help.note',
+					tips: 'sudoku.help.tips'
+				}
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.sudoku.headline' },
+			subline: { key: 'ending.sudoku.subline', values: ['time'] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition: 'Fill all 81 cells with their correct digits.'
+		},
+		presentation: {
+			name: 'v1.game.sudoku',
+			scoringLabels: {
+				completion: 'scoring.sudoku.completion',
+				second: 'scoring.sudoku.second',
+				floor: 'scoring.sudoku.floor',
+				hint: 'scoring.sudoku.hint',
+				mistake: 'scoring.sudoku.mistake',
+				restart: 'scoring.sudoku.restart',
+				countdown: 'scoring.sudoku.countdown',
+				hintSolvedRanks: 'scoring.sudoku.hintSolvedRanks',
+				mistakeLimit: 'scoring.sudoku.mistakeLimit',
+				hintCap: 'scoring.sudoku.hintCap'
+			},
+			help: {
+				steps: ['sudoku.rule.classic', 'sudoku.step.play'],
+				rows: [
+					{ label: 'scoring.sudoku.completion', field: 'completion', sign: '+' },
+					{ label: 'scoring.sudoku.second', field: 'second', sign: '−' },
+					{ label: 'scoring.sudoku.hint', field: 'hint', sign: '−' },
+					{ label: 'scoring.sudoku.mistake', field: 'mistake', sign: '−' },
+					{ label: 'scoring.sudoku.restart', field: 'restart', sign: '−' },
+					{ label: 'scoring.sudoku.countdown', field: 'countdown', sign: '+' }
+				],
+				note: 'sudoku.help.note',
+				tips: 'sudoku.help.tips'
+			},
+			backdrop: {
+				items: [{ id: 'digit-grid', path: 'M8 8h48v48H8ZM8 24h48M8 40h48M24 8v48M40 8v48' }],
+				fill: 'outline'
+			}
+		}
+	},
 	['tangram']: {
 		engineVersion: 'tangram-1',
 		titleAfterEntrance: true,

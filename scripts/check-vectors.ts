@@ -17,6 +17,7 @@ const klondikeOnly = process.argv.includes('--klondike-solitaire');
 const lightBendOnly = process.argv.includes('--light-bend');
 const wordGuessOnly = process.argv.includes('--word-guess');
 const oneLineOnly = process.argv.includes('--one-line');
+const sudokuOnly = process.argv.includes('--sudoku');
 if (
 	[
 		memoryOnly,
@@ -27,7 +28,8 @@ if (
 		klondikeOnly,
 		lightBendOnly,
 		wordGuessOnly,
-		oneLineOnly
+		oneLineOnly,
+		sudokuOnly
 	].filter(Boolean).length > 1
 )
 	throw new Error('Choose one family vector filter.');
@@ -56,7 +58,8 @@ try {
 			klondikeOnly ||
 			lightBendOnly ||
 			wordGuessOnly ||
-			oneLineOnly
+			oneLineOnly ||
+			sudokuOnly
 		) {
 			source = join(directory, `${entry}.ts`);
 			const harness =
@@ -65,19 +68,21 @@ try {
 					: entry === 'browser'
 						? 'globalThis.verifyMorphiVectors = verifyVectors;'
 						: 'export default { async fetch() { return Response.json(await verifyVectors()); } };';
-			const runnerFile = oneLineOnly
-				? 'one-line'
-				: wordGuessOnly
-					? 'word-guess'
-					: lightBendOnly
-						? 'light-bend'
-						: klondikeOnly
-							? 'klondike-solitaire'
-							: tangramOnly
-								? 'tangram'
-								: mahjongOnly
-									? 'mahjong-solitaire'
-									: 'nonogram';
+			const runnerFile = sudokuOnly
+				? 'sudoku'
+				: oneLineOnly
+					? 'one-line'
+					: wordGuessOnly
+						? 'word-guess'
+						: lightBendOnly
+							? 'light-bend'
+							: klondikeOnly
+								? 'klondike-solitaire'
+								: tangramOnly
+									? 'tangram'
+									: mahjongOnly
+										? 'mahjong-solitaire'
+										: 'nonogram';
 			await writeFile(
 				source,
 				`import { verifyVectors } from ${JSON.stringify(resolve(`tests/vectors/${runnerFile}-runner.ts`))};\n${harness}\n`

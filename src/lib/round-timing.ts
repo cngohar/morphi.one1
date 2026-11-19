@@ -4,6 +4,7 @@ export const MEMORY_HIDE_MS = 250;
 export const BLOCK_ENTRANCE_MS = 3000;
 export const CONNECT_ENTRANCE_MS = 2500;
 export const NONOGRAM_ENTRANCE_MS = 2500;
+export const SUDOKU_ENTRANCE_MS = 6000;
 export const MAHJONG_ENTRANCE_MS = 2000;
 export const TANGRAM_ENTRANCE_MS = 1500;
 export const KLONDIKE_ENTRANCE_MS = 3000;

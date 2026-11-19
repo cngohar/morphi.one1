@@ -1,0 +1,8246 @@
+{
+	"generation": [
+		{
+			"seed": "1",
+			"variant": "sudoku:classic",
+			"board": "d5edb8d4a377c541b5ffa773ee36038f142e925a8ec533223b694ea058460ed6",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 9
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:classic",
+			"board": "663d22fc610dffdb1e29e9ac016444a06169804725b1ecedfbe0ad26e41517dd",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 1
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:classic",
+			"board": "9a57ff5d5c3867b6b3e547292fad5f70c4133f9fb49b7564a5ddd2f17eaccb79",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 2
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:diagonal",
+			"board": "1e5f457fc73101c7aef0149da1118edf0da523aed9deb1387a3a1d2294ff3102",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 8
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 8
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 8
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 8
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:diagonal",
+			"board": "3bb76173e558da49d5984aae952ecdd3b3a2fbd593d90fb1c1cb2bd379cc72c5",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 7
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 4
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:diagonal",
+			"board": "830be239ddd384a23297ca5af75bee7aaae4884008b23b1f2b5dae10402dd3eb",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 2
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 3
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 3
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 3
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:irregular",
+			"board": "a67fbd4b3ef950286cf82e442605a714c7c96ce3318c94fc5a0db3d6bf213a95",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 3
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:irregular",
+			"board": "3d69eac1bf1b65935cf5ea59ad6335e4625c7a2cd3178d1bd7a999157538263c",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 9
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 2
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 2
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 2
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:irregular",
+			"board": "384bbecf996a1c6fddbba4acd8e3c4165bea3252cd709dcd28a8935cd1eabcc8",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 1
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 9
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 9
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 9
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:killer",
+			"board": "f9a0db6c51449caacf1a900fa337bba8748f0e18abbbc62364e80561ca4f2a67",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 9
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 47,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 1
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:killer",
+			"board": "baa21e070f3f4413af09f658be0838553181b56d08cd3a33873e34e07e9088f4",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 1
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 47,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 4
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:killer",
+			"board": "04833e47767d944a17acd6c2405edd2fc265350591069162fb68af5f2a520351",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 7
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 47,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 3
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 3
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 3
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:thermo",
+			"board": "d68790fa4ff7b31e6035be3fe4f14d47b9a1e3adc33362af4cfd174c58e6b7f1",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 6
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:thermo",
+			"board": "74d7113dccd79bd444afa597e45fc09f1dcd4fc5f61f93deb5c654ce7fbc0031",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 9
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 1
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:thermo",
+			"board": "59c9f20f618b5ef0c9e2441024ba9da2d636d2e072470c00abc32377cba6e402",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 3
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 3
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 3
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 3
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:anti-knight",
+			"board": "5a2b03d3c7b1af10651148269c9b9af9ed250da891b6b03119e4afb75146b6b9",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 7
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:anti-knight",
+			"board": "db49202d7aac07aa4f7c1d9496adf6e2c1a77bedbaf016b32f930c0922fa56b0",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 5
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 8
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 8
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 8
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:anti-knight",
+			"board": "845201ff09c9967de80c68625c48111fc76c6212e449689aff23c3dcea2c7010",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 7
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 6
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:kropki",
+			"board": "78a0b8a67ffd4de804ab04bd25adef5a85ce5f1a2ee95e656cdac9d60d4fd0f6",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 6
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:kropki",
+			"board": "c43ea659844894274c8f42be348a475c38a53e8f9447318d934859e2938294d5",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 4
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 2
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 2
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 2
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:kropki",
+			"board": "4364f319cdae2e324d63facaf06445ec6a7f0c2ad90b88d76fddea1c119329d6",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 2
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 2
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 2
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 2
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:countdown-600",
+			"board": "29237045e001cc5bf92ade58e9bfe823b0ce0ade1ba54f9d5e4bdde4bf930375",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 9
+				}
+			],
+			"result": {
+				"score": 1300,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:countdown-600",
+			"board": "5cdaddfbb67c5d2f1dcac00e06d096b0b4038db98f3ec171b32eae02f071b4ce",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 1
+				}
+			],
+			"result": {
+				"score": 1300,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:countdown-600",
+			"board": "4d15e1a7d23d5f9ee0c08cd9c48f84c8a52ef3ac133c696bdf1efec90afe7d97",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 2
+				}
+			],
+			"result": {
+				"score": 1300,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:no-hint",
+			"board": "15d53cbdf56bfc2d1322b93107b02fc0c9c33ce7ed9bb68d0b06ef4ca0537a85",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 9
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:no-hint",
+			"board": "65e87f1020fc23993fcc6962d0f8480d9309464e2a69a462f63a9f12794bd5a0",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 28,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 1
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 7
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:no-hint",
+			"board": "83d18b402f7c62c16b87ba7e2af4e9bbd250bead825fbe7ef85e85d2c28e645d",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 52,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 2
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 4
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:odd-even",
+			"board": "28d321201f684740e9e5ad3ef09b99c1676fb786a2d4adfcda58acbbc06298ac",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 9
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 9
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 9
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 9
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:odd-even",
+			"board": "1d8cab7d9bdd3de59cfa01867cda1e6d51845f4ebf792c95a3840aaee5b909ec",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 17,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 5
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 6
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 6
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:odd-even",
+			"board": "33f5bb19d0c5383141cf99832bd4f143f53b908491ed0da4c0d1851c13458a51",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 9,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 10,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 13,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 15,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 44,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 57,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 59,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 3
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 8
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 8
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 1,
+					"value": 8
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "sudoku:xv",
+			"board": "e36a81bc6d25f8d0a3cf846149c5cddabe28de3561030821a51e79fd64ed8d05",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 0,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 7,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 33,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 42,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 51,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 64,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 67,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 69,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 73,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 80,
+					"value": 5
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 1
+				}
+			]
+		},
+		{
+			"seed": "2",
+			"variant": "sudoku:xv",
+			"board": "3c760778eee7a5d38590d5a05b29347b1d4bfb67432c7881d159b58dfe40f629",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 4,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 6,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 8,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 19,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 22,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 25,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 31,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 39,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 45,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 46,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 48,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 56,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 61,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 63,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 68,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 70,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 72,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 74,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 78,
+					"value": 7
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 3
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 3
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 3
+				}
+			]
+		},
+		{
+			"seed": "3",
+			"variant": "sudoku:xv",
+			"board": "38dc5608fbc72f64036f472ee2a74fbf3600a97f5ceba7bee0d4a3ff6d5a9f1f",
+			"moves": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 3,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 5,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 11,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 12,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 14,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 16,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 18,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 20,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 21,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 23,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 24,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 26,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 27,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 29,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 30,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 32,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 34,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 35,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 36,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 37,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 38,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 40,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 41,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 43,
+					"value": 7
+				},
+				{
+					"action": 0,
+					"cell": 47,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 49,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 50,
+					"value": 4
+				},
+				{
+					"action": 0,
+					"cell": 53,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 54,
+					"value": 5
+				},
+				{
+					"action": 0,
+					"cell": 55,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 58,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 60,
+					"value": 2
+				},
+				{
+					"action": 0,
+					"cell": 62,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 65,
+					"value": 1
+				},
+				{
+					"action": 0,
+					"cell": 66,
+					"value": 3
+				},
+				{
+					"action": 0,
+					"cell": 71,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 75,
+					"value": 9
+				},
+				{
+					"action": 0,
+					"cell": 76,
+					"value": 8
+				},
+				{
+					"action": 0,
+					"cell": 77,
+					"value": 6
+				},
+				{
+					"action": 0,
+					"cell": 79,
+					"value": 5
+				}
+			],
+			"result": {
+				"score": 700,
+				"pairs": null,
+				"moves": 41,
+				"won": true,
+				"hintUsed": false,
+				"mistakes": 0
+			},
+			"loss": [
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 8
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 8
+				},
+				{
+					"action": 3,
+					"cell": 0,
+					"value": 0
+				},
+				{
+					"action": 0,
+					"cell": 2,
+					"value": 8
+				}
+			]
+		}
+	],
+	"timeouts": ["1", "2", "3"]
+}

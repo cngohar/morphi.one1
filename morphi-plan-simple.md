@@ -836,3 +836,11 @@ and [the puzzle guide](docs/puzzles/one-line.md).
 Owner functional review, physical-device testing and full verify remain
 open. The owner authorized the One-line source handoff to `origin/main` on
 2026-11-19.
+
+## v1.4.8 Sudoku
+
+Classic and ten Batch A presets use a single Sudoku daily board per UTC date.
+The preset rules, score settings, and Easy daily eligibility are documented
+in [Sudoku](docs/puzzles/sudoku.md). Rev 6 accepts the existing checkpoint
+discard behavior for oversized stored logs. The owner authorized the source
+handoff to `origin/main`.

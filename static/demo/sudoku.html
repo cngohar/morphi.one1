@@ -1,0 +1,765 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+<meta name="color-scheme" content="light dark" />
+<link rel="icon" href="data:," />
+<title>Sudoku Demo — Classic + Batch A</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Nunito:wght@600;700;800;900&display=swap" rel="stylesheet">
+<style>
+:root{
+  --bg:#eef2f7; --surface:#ffffff; --surface2:#f7f9fc; --ink:#1b2433; --muted:#5b6b82; --line:#d7dee9;
+  --navy:#1b2433; --orange:#e5532d; --blue:#2f6fed; --teal:#009a86; --violet:#7d61ae;
+  --cell:#ffffff; --cell-given:#f1f4f9; --cell-sel:#ffe3d6; --cell-peer:#eef3ff; --cell-same:#dbe7ff;
+  --grid-strong:#1b2433; --grid-thin:#c9d2e0; --error:#d92d20; --good:#009a86;
+  --chip:#e6ebf3;
+}
+@media (prefers-color-scheme: dark){
+  :root{
+    --bg:#0f1522; --surface:#1b2433; --surface2:#232f45; --ink:#eef2f7; --muted:#a7b3c6; --line:#33415c;
+    --cell:#1b2433; --cell-given:#232f45; --cell-sel:#4a2c1e; --cell-peer:#24314f; --cell-same:#2f4470;
+    --grid-strong:#e8edf5; --grid-thin:#3a4763; --chip:#2a364e;
+  }
+}
+*{box-sizing:border-box}
+body{margin:0;font-family:"Nunito",system-ui,sans-serif;background:var(--bg);color:var(--ink);}
+button,select{min-height:40px;font-family:inherit;cursor:pointer}
+.wrap{max-width:560px;margin:0 auto;padding:16px 14px 40px}
+h1{font-size:30px;line-height:1;margin:4px 0 4px;font-weight:900;letter-spacing:-.02em}
+.sub{color:var(--muted);font-weight:700;font-size:14.5px;line-height:1.45;margin:0 0 14px}
+.sub strong{color:var(--ink)}
+/* variant picker */
+.picker{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:12px}
+.picker button{border:2px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:7px 12px;font-weight:800;font-size:13.5px;min-height:38px}
+.picker button[aria-pressed="true"]{background:var(--navy);color:#fff;border-color:var(--navy)}
+@media (prefers-color-scheme: dark){.picker button[aria-pressed="true"]{background:var(--orange);border-color:var(--orange)}}
+.rule{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:11px 13px;font-size:14px;line-height:1.5;font-weight:700;margin-bottom:12px}
+.rule b{color:var(--orange)}
+.rule .src{color:var(--muted);font-weight:600;font-size:12.5px;display:block;margin-top:4px}
+/* stats */
+.stats{display:flex;gap:7px;flex-wrap:wrap;margin-bottom:12px}
+.stat{flex:1;min-width:78px;background:var(--surface);border:1px solid var(--line);border-radius:999px;padding:7px 10px;text-align:center}
+.stat small{display:block;font-size:10.5px;letter-spacing:.07em;text-transform:uppercase;color:var(--muted);font-weight:900}
+.stat span{font-size:16px;font-weight:900}
+.stat.danger span{color:var(--error)}
+/* board */
+.board-outer{position:relative;width:100%;max-width:460px;margin:0 auto;aspect-ratio:1}
+.board{display:grid;grid-template-columns:repeat(9,1fr);grid-template-rows:repeat(9,1fr);width:100%;height:100%;background:var(--cell);border:2.5px solid var(--grid-strong);border-radius:10px;overflow:hidden;position:relative;z-index:2}
+.cell{position:relative;display:flex;align-items:center;justify-content:center;border-right:1px solid var(--grid-thin);border-bottom:1px solid var(--grid-thin);font-size:clamp(18px,5.4vw,26px);font-weight:800;cursor:pointer;user-select:none;-webkit-tap-highlight-color:transparent;min-height:0;background:var(--cell)}
+.cell:nth-child(9n){border-right:none}
+.cell.given{background:var(--cell-given);font-weight:900;color:var(--ink)}
+.cell.player{color:var(--blue)}
+.cell.peer{background:var(--cell-peer)}
+.cell.same{background:var(--cell-same)}
+.cell.sel{background:var(--cell-sel);box-shadow:inset 0 0 0 2.5px var(--orange)}
+.cell.error{color:var(--error)!important;background:#fdeceb}
+@media (prefers-color-scheme: dark){.cell.error{background:#3d1f1c}}
+.cell.diag{background-image:linear-gradient(135deg,transparent 0%,rgba(125,97,174,.14) 0%)}
+.cell.parity-odd::before,.cell.parity-even::before{content:"";position:absolute;inset:14%;border-radius:50%;z-index:0}
+.cell.parity-odd::before{background:rgba(47,111,237,.16);border:1.5px solid rgba(47,111,237,.35)}
+.cell.parity-even::before{background:rgba(0,154,134,.14);border:1.5px solid rgba(0,154,134,.4);border-radius:6px}
+.cell .val{position:relative;z-index:2}
+.cell .notes{position:relative;z-index:2;display:grid;grid-template-columns:repeat(3,1fr);width:92%;height:92%;font-size:9.5px;line-height:1;color:var(--muted);font-weight:800}
+.cell .notes i{font-style:normal;display:flex;align-items:center;justify-content:center}
+.cell .cage-sum{position:absolute;top:1px;left:3px;font-size:9.5px;font-weight:900;color:var(--ink);z-index:3;line-height:1}
+.cell .parity-tag{position:absolute;bottom:1px;right:3px;font-size:8.5px;font-weight:900;color:var(--muted);z-index:3}
+svg.thermo{position:absolute;inset:0;width:100%;height:100%;z-index:3;pointer-events:none}
+.marks{position:absolute;inset:0;z-index:4;pointer-events:none}
+.mark-dot{position:absolute;width:13px;height:13px;border-radius:50%;transform:translate(-50%,-50%);border:2px solid var(--grid-strong)}
+.mark-dot.white{background:#fff}.mark-dot.black{background:var(--grid-strong)}
+.mark-xv{position:absolute;transform:translate(-50%,-50%);background:var(--surface);border:1.5px solid var(--grid-strong);border-radius:50%;width:17px;height:17px;font-size:10px;font-weight:900;display:flex;align-items:center;justify-content:center;color:var(--ink)}
+/* generating veil — shown the instant a variant tab is tapped, while the board is built */
+.genveil{position:absolute;inset:0;z-index:6;display:flex;align-items:center;justify-content:center;background:color-mix(in srgb,var(--bg) 45%,transparent);border-radius:10px}
+.genveil[hidden]{display:none}
+.genveil-card{display:flex;align-items:center;gap:10px;background:var(--surface);border:1.5px solid var(--line);border-radius:999px;padding:10px 18px;font-weight:900;font-size:14px;box-shadow:0 6px 22px rgba(15,25,45,.18)}
+.gen-spin{width:18px;height:18px;border-radius:50%;border:3px solid var(--line);border-top-color:var(--orange);flex:none}
+/* toast */
+.toast{min-height:22px;text-align:center;font-weight:800;font-size:13.5px;color:var(--error);margin:9px 0 2px}
+.toast.ok{color:var(--good)}
+/* controls */
+.actions{display:flex;gap:7px;justify-content:center;flex-wrap:wrap;margin:8px 0 12px}
+.actions button{border:1.5px solid var(--line);background:var(--surface);color:var(--ink);border-radius:999px;padding:8px 14px;font-weight:900;font-size:13.5px}
+.actions button.on{background:var(--blue);color:#fff;border-color:var(--blue)}
+.actions button:disabled{opacity:.38;cursor:not-allowed}
+.actions button:active{transform:scale(.97)}
+.pad{display:grid;grid-template-columns:repeat(9,1fr);gap:6px;max-width:460px;margin:0 auto}
+.pad button{border:1.5px solid var(--line);background:var(--surface);border-radius:12px;font-size:21px;font-weight:900;color:var(--blue);min-height:52px;position:relative;padding:2px}
+.pad button small{display:block;font-size:9.5px;color:var(--muted);font-weight:800}
+.pad button.done{opacity:.3}
+.pad button:active{transform:scale(.95)}
+.newrow{display:flex;gap:8px;justify-content:center;margin-top:14px;flex-wrap:wrap}
+.newrow button{border-radius:999px;padding:9px 18px;font-weight:900;border:none;font-size:14px}
+.btn-primary{background:var(--orange);color:#fff}
+.btn-ghost{background:var(--surface);color:var(--ink);border:1.5px solid var(--line)!important}
+/* end panel */
+.end{display:none;background:var(--surface);border:2px solid var(--teal);border-radius:16px;padding:18px;margin-top:16px;text-align:center}
+.end.show{display:block}
+.end.lost{border-color:var(--error)}
+.end h2{margin:0 0 6px;font-size:24px}
+.end p{margin:4px 0;color:var(--muted);font-weight:700;line-height:1.5;font-size:14.5px}
+.end .score{font-size:38px;font-weight:900;color:var(--ink)}
+.end table{margin:10px auto;text-align:left;font-size:14px;font-weight:700;border-collapse:collapse}
+.end td{padding:2px 10px}.end td:last-child{text-align:right;font-weight:900}
+.how{background:var(--surface);border:1px solid var(--line);border-radius:14px;padding:13px 15px;margin-top:18px;font-size:14px;line-height:1.6}
+.how h3{margin:0 0 6px;font-size:15px}
+.how ol{margin:0;padding-left:20px;font-weight:600;color:var(--muted)}
+.how ol b{color:var(--ink)}
+.foot{color:var(--muted);font-size:12.5px;font-weight:600;line-height:1.55;margin-top:14px}
+.stat.time-danger{border-color:var(--error)}
+.stat.time-danger span{color:var(--error)}
+/* ---------- animation (all motion off under prefers-reduced-motion) ---------- */
+.picker button{transition:background .18s,border-color .18s,color .18s,transform .12s}
+.picker button:active{transform:scale(.94)}
+.actions button{transition:background .15s,color .15s,border-color .15s,transform .1s}
+.pad button{transition:transform .08s,opacity .25s,background .25s}
+@media (prefers-reduced-motion: no-preference){
+  .cell{transition:background .12s}
+  .board{transition:filter .45s ease}
+  @keyframes popIn{0%{transform:scale(.3);opacity:0}55%{transform:scale(1.22);opacity:1}100%{transform:scale(1);opacity:1}}
+  @keyframes shakeX{0%,100%{transform:translateX(0)}18%{transform:translateX(-4px)}38%{transform:translateX(4px)}58%{transform:translateX(-3px)}78%{transform:translateX(2px)}}
+  @keyframes enterIn{from{opacity:0;transform:translateY(5px) scale(.94)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes numIn{0%{opacity:0;transform:scale(.4)}70%{opacity:1;transform:scale(1.18)}100%{opacity:1;transform:scale(1)}}
+  @keyframes boardIn{from{opacity:0;transform:scale(.982)}to{opacity:1;transform:scale(1)}}
+  @keyframes spinIt{to{transform:rotate(360deg)}}
+  @keyframes completeFlash{0%{background-color:rgba(0,154,134,.42)}100%{background-color:rgba(0,154,134,0)}}
+  @keyframes hintGlow{0%{box-shadow:inset 0 0 0 3px var(--teal),0 0 0 0 rgba(0,154,134,.45);background-color:rgba(0,154,134,.28)}100%{box-shadow:inset 0 0 0 2.5px var(--orange),0 0 0 16px rgba(0,154,134,0);background-color:rgba(0,154,134,0)}}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  @keyframes riseIn{from{opacity:0;transform:translateY(16px) scale(.98)}to{opacity:1;transform:translateY(0) scale(1)}}
+  @keyframes fadeSlideIn{from{opacity:0;transform:translateY(6px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes toastIn{from{opacity:0;transform:translateY(-3px)}to{opacity:1;transform:translateY(0)}}
+  @keyframes selIn{from{box-shadow:inset 0 0 0 0 rgba(229,83,45,0)}to{box-shadow:inset 0 0 0 2.5px var(--orange)}}
+  @keyframes waveCell{0%{background-color:rgba(0,154,134,0)}30%{background-color:rgba(0,154,134,.38)}100%{background-color:rgba(0,154,134,0)}}
+  @keyframes statBump{0%{transform:scale(1)}35%{transform:scale(1.14)}100%{transform:scale(1)}}
+  @keyframes dangerPulse{0%,100%{transform:scale(1)}50%{transform:scale(1.09)}}
+  @keyframes padDone{0%{transform:scale(1)}40%{transform:scale(1.16) rotate(-3deg)}100%{transform:scale(1)}}
+  .cell.sel{animation:selIn .16s ease both}
+  .cell.enter{animation:enterIn .15s ease both}
+  /* entrance phase 2: each given digit pops in strictly on its own — its
+     duration equals its slot, so one number finishes before the next starts */
+  .cell .val.enter-num{animation-name:numIn;animation-timing-function:ease-out;animation-fill-mode:both;display:inline-block}
+  .board.entering{animation:boardIn .5s ease both}
+  .gen-spin{animation:spinIt .8s linear infinite}
+  .cell.anim-complete{animation:completeFlash .7s ease}
+  .cell.anim-hint{animation:hintGlow .9s ease-out both}
+  .cell.anim-shake{animation:shakeX .38s ease}
+  .cell .val.pop{animation:popIn .28s cubic-bezier(.2,1.4,.4,1) both;display:inline-block}
+  .cell .notes.pop-note{animation:popIn .2s ease both}
+  .board.won .cell{animation:waveCell .85s ease both}
+  .board.won .cell .val{animation:popIn .5s ease both;display:inline-block}
+  .board.lost{filter:saturate(.5)}
+  .end.show{animation:riseIn .45s cubic-bezier(.2,1.15,.3,1) both}
+  .end.show table tr{animation:fadeSlideIn .4s ease both}
+  .end.show table tr:nth-child(2){animation-delay:.06s}
+  .end.show table tr:nth-child(3){animation-delay:.12s}
+  .end.show table tr:nth-child(4){animation-delay:.18s}
+  .end.show table tr:nth-child(5){animation-delay:.24s}
+  .toast.show{animation:toastIn .25s ease both}
+  .stat.bump{animation:statBump .35s ease}
+  .stat.time-danger span{display:inline-block;animation:dangerPulse 1s ease-in-out infinite}
+  .pad button.just-done{animation:padDone .5s ease;background:rgba(0,154,134,.16)}
+  .thermo.fade-in,.marks.fade-in{animation:fadeIn .9s ease 3s both}
+  .rule.swap{animation:fadeSlideIn .3s ease both}
+}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Sudoku</h1>
+  <p class="sub">Playtest demo — <strong>Classic + all 10 Batch A variants</strong>. Every board is generated fresh from a seed, checked for exactly one solution, and graded Easy. Nothing here is saved or ranked — this is for trying the rules on your phone.</p>
+
+  <div class="picker" id="picker" role="group" aria-label="Choose variant"></div>
+
+  <div class="rule" id="ruleBox"></div>
+
+  <div class="stats">
+    <div class="stat" id="timeStat"><small id="timeLabel">Time</small><span id="timeVal">0:00</span></div>
+    <div class="stat" id="mistakeStat"><small>Mistakes</small><span id="mistakeVal">0 / 3</span></div>
+    <div class="stat"><small>Hints</small><span id="hintVal">0</span></div>
+    <div class="stat"><small>Givens</small><span id="givenVal">–</span></div>
+  </div>
+
+  <div class="board-outer">
+    <svg class="thermo" id="thermoSvg" viewBox="0 0 900 900" aria-hidden="true"></svg>
+    <div class="board" id="board" role="grid" aria-label="Sudoku board"></div>
+    <div class="marks" id="marks"></div>
+    <div class="genveil" id="genVeil" hidden><div class="genveil-card"><span class="gen-spin" aria-hidden="true"></span>Building your puzzle…</div></div>
+  </div>
+  <div class="toast" id="toast" role="status"></div>
+
+  <div class="actions">
+    <button id="undoBtn" type="button">↩ Undo</button>
+    <button id="eraseBtn" type="button">Erase</button>
+    <button id="notesBtn" type="button" aria-pressed="false">✎ Notes</button>
+    <button id="hintBtn" type="button">Hint</button>
+    <button id="restartBtn" type="button">Restart</button>
+  </div>
+
+  <div class="pad" id="pad" aria-label="Digit pad"></div>
+
+  <div class="newrow">
+    <button class="btn-primary" id="newBtn" type="button">New puzzle</button>
+  </div>
+
+  <div class="end" id="endPanel"></div>
+
+  <section class="how">
+    <h3>How to play</h3>
+    <ol>
+      <li><b>Tap a cell, then tap a digit.</b> Fill the grid so every row, column and box holds 1–9 exactly once — plus the extra rule for the variant you picked above.</li>
+      <li><b>Notes</b> toggles pencil marks. Placing a digit clears that note from its row, column and box automatically.</li>
+      <li><b>A duplicate is refused</b> — if a digit already sits in the row, column or box, it won't go in and it doesn't count as a mistake.</li>
+      <li><b>A wrong digit counts.</b> A digit that fits the row, column and box but isn't the solution is placed, marked red, and counts as a mistake. <b>Three mistakes end the run.</b></li>
+      <li><b>Hint</b> fills one correct cell. <b>Undo</b> is free and unlimited.</li>
+      <li><b>Watch the board.</b> A placed digit pops in, a wrong one shakes, a refused duplicate shakes the cell, and a hint glows teal. When a row, column or box completes, it sweeps teal — and a finished grid ripples while your score counts up. All motion switches off if your device is set to reduce motion.</li>
+    </ol>
+  </section>
+
+  <p class="foot">Scoring in this demo follows the variant matrix proposal (not yet locked): win 1,000 points, −1 per second floored at 200, −100 per hint, −50 per mistake, −50 per restart. Countdown scores 1,000 + 1 per second left instead of the per-second deduction. A hint-solved win is labelled “solved with hint”. Difficulty is graded by the hardest technique a board needs, not by clue count — Easy means singles and locked candidates only, about 5–10 minutes. Killer Easy grading and the 600-second clock are the two riskiest Batch A items in the matrix, so try those two hardest.</p>
+</div>
+
+<script>
+"use strict";
+/* ---------- seeded PRNG ---------- */
+function mulberry32(a){return function(){a|=0;a=a+0x6D2B79F5|0;var t=Math.imul(a^a>>>15,1|a);t=t+Math.imul(t^t>>>7,61|t)^t;return((t^t>>>14)>>>0)/4294967296}}
+function shuffled(arr,rng){var a=arr.slice();for(var i=a.length-1;i>0;i--){var j=Math.floor(rng()*(i+1));var t=a[i];a[i]=a[j];a[j]=t}return a}
+function rc(r,c){return r*9+c}
+function rowOf(i){return Math.floor(i/9)} function colOf(i){return i%9}
+
+/* ---------- variant definitions ---------- */
+var VARIANTS=[
+ {id:"classic",name:"Classic",rule:"Every row, column and 3×3 box holds 1–9 exactly once.",extra:"The baseline everything else is measured against."},
+ {id:"diagonal",name:"Diagonal",rule:"Classic rules, <b>plus both main diagonals</b> must also hold 1–9 exactly once.",extra:"The two shaded diagonals are extra units — a duplicate on a diagonal is refused, just like a row."},
+ {id:"irregular",name:"Irregular",rule:"Classic rules, but the nine 3×3 boxes are replaced by <b>nine irregular regions</b> of nine cells each. Each region must hold 1–9 once.",extra:"Thick borders show the regions. Watch the “law of leftovers” — where a region spills into a row or column."},
+ {id:"killer",name:"Killer",rule:"Classic rules, <b>plus cages</b>: digits inside a dashed cage must add up to the small number in its corner, and can't repeat inside the cage.",extra:"The hardest Batch A grading problem in the matrix — tell us if this Easy board actually feels like 5–10 minutes."},
+ {id:"thermo",name:"Thermo",rule:"Classic rules, <b>plus thermometers</b>: digits must strictly increase along each thermometer, from the round bulb to the tip.",extra:"A bulb can only hold a small digit, and the tip of a long thermometer only a large one."},
+ {id:"anti-knight",name:"Anti-Knight",rule:"Classic rules, <b>plus a chess rule</b>: no two cells a knight's move apart (two along, one across) may hold the same digit.",extra:"A digit that repeats a knight's move away is refused, like a duplicate in a row."},
+ {id:"kropki",name:"Kropki",rule:"Classic rules, <b>plus dots between cells</b>: a white dot means the two digits are consecutive; a black dot means one is double the other.",extra:"No dot carries no information in Kropki — unlike Consecutive Sudoku, an unmarked pair can still be consecutive."},
+ {id:"countdown",name:"Countdown · 600s",rule:"Classic rules against the clock: <b>solve within 600 seconds</b> or the run ends with no score.",extra:"Scoring flips here — 1,000 plus 1 point per second left, instead of losing a point per second."},
+ {id:"no-hint",name:"No Hint",rule:"Classic rules, but <b>the Hint button is gone</b>. Undo and notes still work.",extra:"Tests whether Easy boards really are solvable by logic alone, with no rescue."},
+ {id:"odd-even",name:"Odd / Even",rule:"Classic rules, <b>plus parity cells</b>: a cell with a blue circle may only hold an odd digit; a cell with a teal square may only hold an even digit.",extra:"A digit of the wrong parity is refused at entry, like a duplicate."},
+ {id:"xv",name:"XV",rule:"Classic rules, <b>plus marks between cells</b>: an X means the two digits sum to 10; a V means they sum to 5.",extra:"Every X and V pair in the solution is marked — use them to pin down pairs like 1+9, 2+8, 1+4 and 2+3."}
+];
+
+/* ---------- constraint helpers ---------- */
+function boxRegions(){var r=[];for(var i=0;i<81;i++){r.push(Math.floor(rowOf(i)/3)*3+Math.floor(colOf(i)/3))}return r}
+function makeIrregularRegions(rng){
+  for(var attempt=0;attempt<60;attempt++){
+    var reg=new Array(81).fill(-1), sizes=new Array(9).fill(0);
+    var seeds=[[1,1],[1,4],[1,7],[4,1],[4,4],[4,7],[7,1],[7,4],[7,7]];
+    seeds=shuffled(seeds,rng);
+    for(var s=0;s<9;s++){var i=rc(seeds[s][0],seeds[s][1]);reg[i]=s;sizes[s]=1}
+    var left=81-9, guard=0;
+    while(left>0&&guard++<20000){
+      var idx=Math.floor(rng()*81); if(reg[idx]===-1)continue;
+      var g=reg[idx]; if(sizes[g]>=9)continue;
+      var r=rowOf(idx),c=colOf(idx),dirs=shuffled([[1,0],[-1,0],[0,1],[0,-1]],rng),moved=false;
+      for(var d=0;d<4;d++){var nr=r+dirs[d][0],nc=c+dirs[d][1];if(nr<0||nr>8||nc<0||nc>8)continue;var ni=rc(nr,nc);if(reg[ni]===-1){reg[ni]=g;sizes[g]++;left--;moved=true;break}}
+    }
+    if(left===0&&sizes.every(function(x){return x===9}))return reg;
+  }
+  return boxRegions();
+}
+function peersFor(i,regions,diagonal,antiKnight){
+  var set={},r=rowOf(i),c=colOf(i);
+  for(var k=0;k<9;k++){set[rc(r,k)]=1;set[rc(k,c)]=1}
+  for(var j=0;j<81;j++)if(regions[j]===regions[i])set[j]=1;
+  if(diagonal){if(r===c)for(var d=0;d<9;d++)set[rc(d,d)]=1;if(r+c===8)for(var d2=0;d2<9;d2++)set[rc(d2,8-d2)]=1}
+  if(antiKnight){var km=[[1,2],[2,1],[-1,2],[-2,1],[1,-2],[2,-1],[-1,-2],[-2,-1]];for(var m=0;m<8;m++){var nr=r+km[m][0],nc=c+km[m][1];if(nr>=0&&nr<9&&nc>=0&&nc<9)set[rc(nr,nc)]=1}}
+  delete set[i];
+  return Object.keys(set).map(Number);
+}
+var PEERS=null; /* per-game peer cache: rebuilt once per puzzle, not on every solver check */
+function canPlace(grid,i,v,regions,diagonal,antiKnight){
+  var peers=PEERS?PEERS[i]:peersFor(i,regions,diagonal,antiKnight);
+  for(var p=0;p<peers.length;p++)if(grid[peers[p]]===v)return false;
+  return true;
+}
+function fillGrid(grid,rng,regions,diagonal,antiKnight){
+  var idx=-1;
+  for(var i=0;i<81;i++)if(grid[i]===0){idx=i;break}
+  if(idx===-1)return true;
+  var digs=shuffled([1,2,3,4,5,6,7,8,9],rng);
+  for(var d=0;d<9;d++){if(canPlace(grid,idx,digs[d],regions,diagonal,antiKnight)){grid[idx]=digs[d];if(fillGrid(grid,rng,regions,diagonal,antiKnight))return true;grid[idx]=0}}
+  return false;
+}
+function countSolutions(grid,regions,diagonal,antiKnight,limit){
+  var best=-1,bestOpts=null;
+  for(var i=0;i<81;i++){
+    if(grid[i]===0){
+      var opts=[];
+      for(var v=1;v<=9;v++)if(canPlace(grid,i,v,regions,diagonal,antiKnight))opts.push(v);
+      if(opts.length===0)return 0;
+      if(bestOpts===null||opts.length<bestOpts.length){best=i;bestOpts=opts;if(opts.length===1)break}
+    }
+  }
+  if(best===-1)return 1;
+  var total=0;
+  for(var o=0;o<bestOpts.length;o++){
+    grid[best]=bestOpts[o];
+    total+=countSolutions(grid,regions,diagonal,antiKnight,limit-total);
+    grid[best]=0;
+    if(total>=limit)return total;
+  }
+  return total;
+}
+
+/* ---------- extra-rule artefacts derived from a solution ---------- */
+function makeCages(solution,rng){
+  var cageOf=new Array(81).fill(-1),cages=[];
+  for(var i=0;i<81;i++){
+    if(cageOf[i]!==-1)continue;
+    var target=2+Math.floor(rng()*3); /* 2..4 */
+    var cells=[i];cageOf[i]=cages.length;
+    while(cells.length<target){
+      var frontier=[];
+      cells.forEach(function(ci){var r=rowOf(ci),c=colOf(ci);[[1,0],[-1,0],[0,1],[0,-1]].forEach(function(d){var nr=r+d[0],nc=c+d[1];if(nr>=0&&nr<9&&nc>=0&&nc<9&&cageOf[rc(nr,nc)]===-1)frontier.push(rc(nr,nc))})});
+      if(!frontier.length)break;
+      var pick=frontier[Math.floor(rng()*frontier.length)];
+      /* avoid repeat digit inside cage */
+      var vals=cells.map(function(x){return solution[x]});
+      if(vals.indexOf(solution[pick])!==-1&&cells.length>=2)break;
+      cageOf[pick]=cages.length;cells.push(pick);
+    }
+    var sum=cells.reduce(function(a,x){return a+solution[x]},0);
+    cages.push({cells:cells,sum:sum});
+  }
+  return {cageOf:cageOf,cages:cages};
+}
+function makeThermos(solution,rng){
+  var used={},thermos=[],tries=0;
+  while(thermos.length<5&&tries++<300){
+    var start=Math.floor(rng()*81);
+    if(used[start]||solution[start]>5)continue;
+    var path=[start],cur=start;
+    var want=3+Math.floor(rng()*3);
+    while(path.length<want){
+      var r=rowOf(cur),c=colOf(cur),opts=[];
+      [[1,0],[-1,0],[0,1],[0,-1]].forEach(function(d){var nr=r+d[0],nc=c+d[1];if(nr<0||nr>8||nc<0||nc>8)return;var ni=rc(nr,nc);if(!used[ni]&&path.indexOf(ni)===-1&&solution[ni]>solution[cur])opts.push(ni)});
+      if(!opts.length)break;
+      cur=opts[Math.floor(rng()*opts.length)];path.push(cur);
+    }
+    if(path.length>=3){path.forEach(function(x){used[x]=1});thermos.push(path)}
+  }
+  return thermos;
+}
+function adjacentPairs(){var pairs=[];for(var i=0;i<81;i++){var r=rowOf(i),c=colOf(i);if(c<8)pairs.push([i,i+1,"h"]);if(r<8)pairs.push([i,i+9,"v"])}return pairs}
+
+/* ---------- game state ---------- */
+var S=null;
+var TIMER=null;
+var els={};
+["picker","ruleBox","board","marks","thermoSvg","genVeil","toast","pad","timeVal","timeLabel","timeStat","mistakeVal","mistakeStat","hintVal","givenVal","endPanel","undoBtn","eraseBtn","notesBtn","hintBtn","restartBtn","newBtn"].forEach(function(id){els[id]=document.getElementById(id)});
+
+function buildPicker(){
+  els.picker.innerHTML="";
+  VARIANTS.forEach(function(v){
+    var b=document.createElement("button");b.type="button";b.textContent=v.name;
+    b.setAttribute("aria-pressed",S&&S.variant===v.id?"true":"false");
+    b.addEventListener("click",function(){requestGame(v.id,1)});
+    els.picker.appendChild(b);
+  });
+}
+function toast(msg,ok){els.toast.textContent=msg||"";els.toast.className="toast"+(ok?" ok":"");if(msg){void els.toast.offsetWidth;els.toast.classList.add("show")}}
+/* Switch games off the tap's critical path: the pressed tab, rule card and a
+   "building" veil paint immediately, then generation runs in a deferred tick
+   so the tap never freezes the page. A token drops stale requests when the
+   player taps several tabs quickly — only the last one builds. */
+var GEN_TOKEN=0;
+function requestGame(variantId,puzzleNo,after){
+  var token=++GEN_TOKEN;
+  var v=VARIANTS.filter(function(x){return x.id===variantId})[0];
+  var btns=els.picker.children;
+  for(var b=0;b<btns.length&&b<VARIANTS.length;b++)btns[b].setAttribute("aria-pressed",VARIANTS[b].id===variantId?"true":"false");
+  els.ruleBox.innerHTML="<b>"+v.name+".</b> "+v.rule+"<span class='src'>"+v.extra+"</span>";
+  els.ruleBox.classList.remove("swap");void els.ruleBox.offsetWidth;els.ruleBox.classList.add("swap");
+  els.genVeil.hidden=false;
+  setTimeout(function(){
+    if(token!==GEN_TOKEN)return;
+    newGame(variantId,puzzleNo);
+    if(after)after();
+  },40);
+}
+function shakeCell(i){var el=els.board.children[i];if(!el)return;el.classList.remove("anim-shake");void el.offsetWidth;el.classList.add("anim-shake")}
+function completedCells(i){
+  /* every unit (row / column / region / diagonal) that this placement finished correctly */
+  var r=rowOf(i),c=colOf(i),row=[],col=[],reg=[],units=[],out=[];
+  for(var k=0;k<9;k++){row.push(rc(r,k));col.push(rc(k,c))}
+  for(var j=0;j<81;j++)if(S.regions[j]===S.regions[i])reg.push(j);
+  units.push(row);units.push(col);units.push(reg);
+  if(S.diagonal){
+    if(r===c){var d1=[];for(var d=0;d<9;d++)d1.push(rc(d,d));units.push(d1)}
+    if(r+c===8){var d2=[];for(var d3=0;d3<9;d3++)d2.push(rc(d3,8-d3));units.push(d2)}
+  }
+  units.forEach(function(u){if(u.every(function(x){return S.board[x]===S.solution[x]}))u.forEach(function(x){if(out.indexOf(x)===-1)out.push(x)})});
+  return out.length?out:null;
+}
+function countUpScore(total){
+  var el=document.getElementById("scoreVal");if(!el)return;
+  if(window.matchMedia("(prefers-reduced-motion: reduce)").matches||total<=0){el.textContent=total+" pts";return}
+  var t0=null,dur=950;
+  function step(ts){if(!t0)t0=ts;var p=Math.min(1,(ts-t0)/dur),e=1-Math.pow(1-p,3);el.textContent=Math.round(total*e)+" pts";if(p<1)requestAnimationFrame(step)}
+  requestAnimationFrame(step);
+}
+
+function newGame(variantId,puzzleNo){
+  var v=VARIANTS.filter(function(x){return x.id===variantId})[0];
+  var seedBase=variantId.split("").reduce(function(a,ch){return a*31+ch.charCodeAt(0)|0},12345);
+  var rng=mulberry32((seedBase^(puzzleNo*7919))>>>0);
+  var diagonal=variantId==="diagonal", antiKnight=variantId==="anti-knight";
+  var regions=variantId==="irregular"?makeIrregularRegions(rng):boxRegions();
+  PEERS=[];for(var pi=0;pi<81;pi++)PEERS.push(peersFor(pi,regions,diagonal,antiKnight));
+  var solution=new Array(81).fill(0);
+  fillGrid(solution,rng,regions,diagonal,antiKnight);
+  /* carve puzzle, keep unique solution */
+  var puzzle=solution.slice();
+  var targetGivens=variantId==="killer"?34:40;
+  var order=shuffled(Array.from({length:81},function(_,i){return i}),rng);
+  var givens=81;
+  for(var o=0;o<81&&givens>targetGivens;o++){
+    var idx=order[o],bak=puzzle[idx];puzzle[idx]=0;
+    var copy=puzzle.slice();
+    if(countSolutions(copy,regions,diagonal,antiKnight,2)!==1){puzzle[idx]=bak}else givens--;
+  }
+  var extra={};
+  if(variantId==="killer")extra=makeCages(solution,rng);
+  if(variantId==="thermo")extra.thermos=makeThermos(solution,rng);
+  if(variantId==="odd-even"){
+    extra.parity={};
+    var cells=shuffled(Array.from({length:81},function(_,i){return i}),rng).slice(0,26);
+    cells.forEach(function(i){extra.parity[i]=solution[i]%2===1?"odd":"even"});
+  }
+  if(variantId==="kropki"||variantId==="xv"){
+    extra.pairs=adjacentPairs().filter(function(p){
+      var a=solution[p[0]],b=solution[p[1]];
+      if(variantId==="kropki")return Math.abs(a-b)===1||a===b*2||b===a*2;
+      return a+b===10||a+b===5;
+    });
+  }
+  S={variant:variantId,puzzleNo:puzzleNo,solution:solution,regions:regions,diagonal:diagonal,antiKnight:antiKnight,
+     given:puzzle.map(function(x){return x!==0}),board:puzzle.slice(),
+     notes:{},selected:-1,notesMode:false,mistakes:0,hints:0,restarts:0,undoStack:[],
+     startedAt:Date.now(),elapsed:0,finished:false,won:false,hintUsed:false,extra:extra,givens:givens,
+     pendingAnim:null,entranceAnim:true};
+  for(var n=0;n<81;n++)S.notes[n]=[];
+  els.board.classList.remove("won");els.board.classList.remove("lost");
+  els.endPanel.className="end";els.endPanel.innerHTML="";
+  els.ruleBox.innerHTML="<b>"+v.name+".</b> "+v.rule+"<span class='src'>"+v.extra+"</span>";
+  els.ruleBox.classList.remove("swap");void els.ruleBox.offsetWidth;els.ruleBox.classList.add("swap");
+  els.timeLabel.textContent=variantId==="countdown"?"Time left":"Time";
+  els.hintBtn.style.display=variantId==="no-hint"?"none":"";
+  buildPicker();render();toast("");
+  clearInterval(TIMER);
+  TIMER=setInterval(tick,500);tick();
+  els.genVeil.hidden=true;
+}
+function tick(){
+  if(!S||S.finished)return;
+  S.elapsed=Math.floor((Date.now()-S.startedAt)/1000);
+  if(S.variant==="countdown"){
+    var left=Math.max(0,600-S.elapsed);
+    els.timeVal.textContent=fmt(left);
+    els.timeStat.classList.toggle("time-danger",left<=60&&left>0);
+    if(left<=0){finish(false,"Time's up — the 600 seconds ran out before the grid was finished. No score is saved for a timeout.");}
+  }else{els.timeVal.textContent=fmt(S.elapsed);els.timeStat.classList.remove("time-danger")}
+}
+function fmt(s){return Math.floor(s/60)+":"+String(s%60).padStart(2,"0")}
+
+function remainingCounts(){
+  var counts={};for(var d=1;d<=9;d++)counts[d]=9;
+  S.board.forEach(function(x){if(x)counts[x]--});
+  return counts;
+}
+function cellBorders(i){
+  /* thick box/region borders + killer cage dashes handled inline */
+  var r=rowOf(i),c=colOf(i),st={};
+  if(S.variant==="irregular"){
+    if(c<8&&S.regions[i]!==S.regions[i+1])st.borderRight="2.5px solid var(--grid-strong)";
+    if(r<8&&S.regions[i]!==S.regions[i+9])st.borderBottom="2.5px solid var(--grid-strong)";
+  }else{
+    if(c===2||c===5)st.borderRight="2.5px solid var(--grid-strong)";
+    if(r===2||r===5)st.borderBottom="2.5px solid var(--grid-strong)";
+  }
+  if(S.variant==="killer"&&S.extra.cageOf){
+    var cg=S.extra.cageOf[i],dash="1.5px dashed var(--muted)";
+    if(r===0||S.extra.cageOf[i-9]!==cg)st.borderTop=dash;
+    if(r===8||S.extra.cageOf[i+9]!==cg)st.borderBottom=dash;
+    if(c===0||S.extra.cageOf[i-1]!==cg)st.borderLeft=dash;
+    if(c===8||S.extra.cageOf[i+1]!==cg)st.borderRight=dash;
+  }
+  return st;
+}
+function render(){
+  var counts=remainingCounts();
+  var anim=S.pendingAnim, entering=!!S.entranceAnim;
+  els.thermoSvg.classList.toggle("fade-in",entering);
+  els.marks.classList.toggle("fade-in",entering);
+  els.mistakeVal.textContent=S.mistakes+" / 3";
+  els.mistakeStat.className="stat"+(S.mistakes>=2?" danger":"");
+  els.hintVal.textContent=S.variant==="no-hint"?"—":String(S.hints);
+  els.givenVal.textContent=String(S.givens);
+  els.notesBtn.classList.toggle("on",S.notesMode);
+  els.notesBtn.setAttribute("aria-pressed",S.notesMode?"true":"false");
+  els.hintBtn.disabled=S.variant==="no-hint"||S.finished;
+  /* board */
+  var selVal=S.selected>=0?S.board[S.selected]:0;
+  var peers=S.selected>=0?peersFor(S.selected,S.regions,S.diagonal,S.antiKnight):[];
+  /* entrance runs in two 3-second phases: phase 1 reveals the 81 cells one by
+     one (35ms apart, digits still hidden); phase 2 reveals each given digit
+     strictly one at a time — every digit gets an equal slot across 3s and its
+     animation lasts exactly that slot, so digits never overlap or sweep by row */
+  var givenRank={},givenCount=0,numStep=0;
+  if(entering){for(var gi=0;gi<81;gi++)if(S.given[gi])givenRank[gi]=givenCount++;if(givenCount)numStep=Math.floor(3000/givenCount)}
+  els.board.innerHTML="";
+  els.board.classList.toggle("entering",entering);
+  for(var i=0;i<81;i++){
+    (function(i){
+      var cell=document.createElement("div");
+      cell.className="cell"+(S.given[i]?" given":" player");
+      if(S.diagonal&&(rowOf(i)===colOf(i)||rowOf(i)+colOf(i)===8))cell.className+=" diag";
+      if(S.variant==="odd-even"&&S.extra.parity&&S.extra.parity[i])cell.className+=" parity-"+S.extra.parity[i];
+      if(peers.indexOf(i)!==-1)cell.className+=" peer";
+      if(selVal&&S.board[i]===selVal&&i!==S.selected)cell.className+=" same";
+      if(i===S.selected)cell.className+=" sel";
+      if(S.board[i]&&S.board[i]!==S.solution[i])cell.className+=" error";
+      if(entering){cell.className+=" enter";cell.style.animationDelay=(i*35)+"ms"}
+      if(anim&&anim.completed&&anim.completed.indexOf(i)!==-1){cell.className+=" anim-complete";cell.style.animationDelay=(anim.completed.indexOf(i)*45)+"ms"}
+      if(anim&&anim.cell===i){
+        if(anim.kind==="bad")cell.className+=" anim-shake";
+        if(anim.kind==="hint")cell.className+=" anim-hint";
+      }
+      var st=cellBorders(i);Object.keys(st).forEach(function(k){cell.style[k]=st[k]});
+      var html="";
+      if(S.variant==="killer"&&S.extra.cages){
+        var cage=S.extra.cages[S.extra.cageOf[i]];
+        var origin=cage.cells.reduce(function(a,x){return (rowOf(x)<rowOf(a)||(rowOf(x)===rowOf(a)&&colOf(x)<colOf(a)))?x:a},cage.cells[0]);
+        if(origin===i)html+="<span class='cage-sum'>"+cage.sum+"</span>";
+      }
+      if(S.board[i]){
+        var vcls="val"+(anim&&anim.cell===i&&(anim.kind==="good"||anim.kind==="bad"||anim.kind==="hint")?" pop":"");
+        var vstyle="";
+        if(entering&&S.given[i]){vcls+=" enter-num";vstyle=" style='animation-delay:"+(3000+givenRank[i]*numStep)+"ms;animation-duration:"+numStep+"ms'"}
+        html+="<span class='"+vcls+"'"+vstyle+">"+S.board[i]+"</span>";
+      }
+      else if(S.notes[i].length){
+        html+="<span class='notes"+(anim&&anim.cell===i&&anim.kind==="note"?" pop-note":"")+"'>";
+        for(var d=1;d<=9;d++)html+="<i>"+(S.notes[i].indexOf(d)!==-1?d:"")+"</i>";
+        html+="</span>";
+      }
+      if(S.variant==="odd-even"&&S.extra.parity&&S.extra.parity[i])html+="<span class='parity-tag'>"+(S.extra.parity[i]==="odd"?"odd":"even")+"</span>";
+      cell.innerHTML=html;
+      cell.setAttribute("role","gridcell");
+      cell.setAttribute("aria-label","Row "+(rowOf(i)+1)+" column "+(colOf(i)+1)+(S.board[i]?": "+S.board[i]:""));
+      cell.addEventListener("click",function(){if(!S.finished){S.selected=i;render()}});
+      els.board.appendChild(cell);
+    })(i);
+  }
+  /* thermo svg */
+  var svg="";
+  if(S.variant==="thermo"&&S.extra.thermos){
+    S.extra.thermos.forEach(function(path){
+      var pts=path.map(function(ci){return (colOf(ci)*100+50)+","+(rowOf(ci)*100+50)}).join(" ");
+      svg+="<polyline points='"+pts+"' fill='none' stroke='rgba(125,97,174,.45)' stroke-width='34' stroke-linecap='round' stroke-linejoin='round'/>";
+      svg+="<circle cx='"+(colOf(path[0])*100+50)+"' cy='"+(rowOf(path[0])*100+50)+"' r='34' fill='rgba(125,97,174,.45)'/>";
+    });
+  }
+  els.thermoSvg.innerHTML=svg;
+  /* kropki / xv marks */
+  var mk="";
+  if(S.extra.pairs){
+    S.extra.pairs.forEach(function(p){
+      var a=p[0],b=p[1],x,y;
+      if(p[2]==="h"){x=(colOf(a)+1)*100/9;y=(rowOf(a)+.5)*100/9}else{x=(colOf(a)+.5)*100/9;y=(rowOf(a)+1)*100/9}
+      if(S.variant==="kropki"){
+        var va=S.solution[a],vb=S.solution[b],black=va===vb*2||vb===va*2;
+        mk+="<span class='mark-dot "+(black?"black":"white")+"' style='left:"+x+"%;top:"+y+"%'></span>";
+      }else{
+        mk+="<span class='mark-xv' style='left:"+x+"%;top:"+y+"%'>"+(S.solution[a]+S.solution[b]===10?"X":"V")+"</span>";
+      }
+    });
+  }
+  els.marks.innerHTML=mk;
+  /* pad */
+  els.pad.innerHTML="";
+  for(var d=1;d<=9;d++){
+    (function(d){
+      var b=document.createElement("button");b.type="button";
+      b.innerHTML=d+"<small>"+counts[d]+" left</small>";
+      if(counts[d]<=0)b.className="done";
+      if(anim&&anim.digitDone===d)b.className=(b.className?b.className+" ":"")+"just-done";
+      b.setAttribute("aria-label","Enter "+d);
+      b.addEventListener("click",function(){enterDigit(d)});
+      els.pad.appendChild(b);
+    })(d);
+  }
+  S.pendingAnim=null;S.entranceAnim=false;
+}
+function snapshot(){S.undoStack.push({board:S.board.slice(),notes:JSON.parse(JSON.stringify(S.notes)),mistakes:S.mistakes});if(S.undoStack.length>200)S.undoStack.shift()}
+function autoClean(cellIdx,digit){
+  var peers=peersFor(cellIdx,boxRegions(),false,false);
+  /* classic row/col/box cleanup regardless of variant regions */
+  var set={};peers.forEach(function(p){set[p]=1});
+  if(S.variant==="irregular")peersFor(cellIdx,S.regions,false,false).forEach(function(p){set[p]=1});
+  Object.keys(set).forEach(function(p){var arr=S.notes[p];var k=arr.indexOf(digit);if(k!==-1)arr.splice(k,1)});
+  S.notes[cellIdx]=[];
+}
+function conflictReason(i,digit){
+  var r=rowOf(i),c=colOf(i);
+  for(var k=0;k<9;k++){
+    if(rc(r,k)!==i&&S.board[rc(r,k)]===digit)return "That "+digit+" is already in this row.";
+    if(rc(k,c)!==i&&S.board[rc(k,c)]===digit)return "That "+digit+" is already in this column.";
+  }
+  for(var j=0;j<81;j++)if(j!==i&&S.regions[j]===S.regions[i]&&S.board[j]===digit)return S.variant==="irregular"?"That "+digit+" is already in this region.":"That "+digit+" is already in this box.";
+  if(S.diagonal&&(r===c||r+c===8)){
+    for(var d=0;d<9;d++){if(rc(d,d)!==i&&S.board[rc(d,d)]===digit&&(r===c))return "That "+digit+" is already on this diagonal.";if(rc(d,8-d)!==i&&S.board[rc(d,8-d)]===digit&&(r+c===8))return "That "+digit+" is already on this diagonal."}
+  }
+  if(S.antiKnight){
+    var peers=peersFor(i,S.regions,false,true);
+    for(var p=0;p<peers.length;p++){
+      var pi=peers[p];
+      /* only knight peers beyond row/col/region: check all knight positions */
+      var dr=Math.abs(rowOf(pi)-r),dc=Math.abs(colOf(pi)-c);
+      if(((dr===1&&dc===2)||(dr===2&&dc===1))&&S.board[pi]===digit)return "A knight's move away already holds a "+digit+".";
+    }
+  }
+  if(S.variant==="odd-even"&&S.extra.parity&&S.extra.parity[i]){
+    var need=S.extra.parity[i]==="odd"?1:0;
+    if(digit%2!==need)return "This cell only takes "+S.extra.parity[i]+" digits.";
+  }
+  return null;
+}
+function enterDigit(digit){
+  if(!S||S.finished||S.selected<0){if(S&&S.selected<0)toast("Tap a cell first, then a digit.");return}
+  var i=S.selected;
+  if(S.given[i]){shakeCell(i);toast("That cell is a given — it can't be changed.");return}
+  if(S.notesMode){
+    if(S.board[i])return;
+    snapshot();
+    var arr=S.notes[i],k=arr.indexOf(digit);
+    if(k===-1)arr.push(digit);else arr.splice(k,1);
+    arr.sort();S.pendingAnim={cell:i,kind:"note"};toast("");render();return;
+  }
+  if(S.board[i]===digit)return;
+  var reason=conflictReason(i,digit);
+  if(reason){shakeCell(i);toast(reason+" It wasn't placed, and it doesn't count as a mistake.");return}
+  snapshot();
+  S.board[i]=digit;autoClean(i,digit);
+  var isRight=digit===S.solution[i];
+  S.pendingAnim={cell:i,kind:isRight?"good":"bad",
+    completed:isRight?completedCells(i):null,
+    digitDone:(isRight&&remainingCounts()[digit]===0)?digit:null};
+  if(!isRight){
+    S.mistakes++;
+    els.mistakeStat.classList.remove("bump");void els.mistakeStat.offsetWidth;els.mistakeStat.classList.add("bump");
+    toast("That fits the row, column and box — but it isn't the solution. Mistake "+S.mistakes+" of 3.");
+    if(S.mistakes>=3){render();finish(false,"Three mistakes — the run is over. In the matrix baseline the third solution-error ends the run and no score is saved.");return}
+  }else toast("");
+  render();checkWin();
+}
+function checkWin(){
+  for(var i=0;i<81;i++)if(S.board[i]!==S.solution[i])return;
+  finish(true);
+}
+function scoreBreakdown(){
+  var secs=S.elapsed;
+  var base,timePart;
+  if(S.variant==="countdown"){var left=Math.max(0,600-secs);base=1000;timePart=left}
+  else{base=1000;timePart=-(secs);var raw=base-secs;if(raw<200)timePart=-(base-200)}
+  var hintCost=S.hints*100,mistakeCost=S.mistakes*50,restartCost=S.restarts*50;
+  var total=Math.max(0,base+timePart-hintCost-mistakeCost-restartCost);
+  return {base:base,timePart:timePart,hintCost:hintCost,mistakeCost:mistakeCost,restartCost:restartCost,total:total,secs:secs};
+}
+function finish(won,msg){
+  if(S.finished)return;
+  S.finished=true;S.won=won;clearInterval(TIMER);
+  S.elapsed=Math.floor((Date.now()-S.startedAt)/1000);
+  var p=els.endPanel;
+  if(won){
+    var sc=scoreBreakdown();
+    p.className="end show";
+    p.innerHTML="<h2>Solved"+(S.hintUsed?" — solved with hint":"")+" 🎉</h2>"+
+      "<div class='score' id='scoreVal'>0 pts</div>"+
+      "<table>"+
+      "<tr><td>Win</td><td>1,000</td></tr>"+
+      (S.variant==="countdown"
+        ?"<tr><td>Time left ("+fmt(Math.max(0,600-sc.secs))+") × 1</td><td>+"+sc.timePart+"</td></tr>"
+        :"<tr><td>Time ("+fmt(sc.secs)+") at −1/sec, floored at 200</td><td>"+sc.timePart+"</td></tr>")+
+      "<tr><td>Hints × "+S.hints+"</td><td>−"+sc.hintCost+"</td></tr>"+
+      "<tr><td>Mistakes × "+S.mistakes+"</td><td>−"+sc.mistakeCost+"</td></tr>"+
+      "<tr><td>Restarts × "+S.restarts+"</td><td>−"+sc.restartCost+"</td></tr>"+
+      "</table>"+
+      "<p>That's the matrix's proposed scoring, not a locked Morphi rule. Tap New puzzle for another board, or pick another variant above.</p>";
+    toast("Solved in "+fmt(sc.secs)+".",true);
+  }else{
+    p.className="end show lost";
+    p.innerHTML="<h2>Run over</h2><p>"+(msg||"")+"</p><p>Tap New puzzle to try another board, or Restart to try this one again.</p>";
+    toast("");
+  }
+  render();
+  if(won){
+    els.board.classList.add("won");
+    var kids=els.board.children;
+    for(var bi=0;bi<kids.length;bi++){
+      var dl=((rowOf(bi)+colOf(bi))*45)+"ms";
+      kids[bi].style.animationDelay=dl;
+      var vv=kids[bi].querySelector(".val");if(vv)vv.style.animationDelay=dl;
+    }
+    countUpScore(sc.total);
+  }else{
+    els.board.classList.add("lost");
+  }
+}
+els.undoBtn.addEventListener("click",function(){
+  if(!S||S.finished||!S.undoStack.length)return;
+  var s=S.undoStack.pop();S.board=s.board;S.notes=s.notes;S.mistakes=s.mistakes;toast("Undone — free, and it doesn't refund hints.");render();
+});
+els.eraseBtn.addEventListener("click",function(){
+  if(!S||S.finished||S.selected<0||S.given[S.selected])return;
+  snapshot();S.board[S.selected]=0;S.notes[S.selected]=[];render();
+});
+els.notesBtn.addEventListener("click",function(){if(!S)return;S.notesMode=!S.notesMode;render()});
+els.hintBtn.addEventListener("click",function(){
+  if(!S||S.finished||S.variant==="no-hint")return;
+  var wrong=[];
+  for(var i=0;i<81;i++)if(S.board[i]!==S.solution[i]&&!S.given[i])wrong.push(i);
+  if(!wrong.length)return;
+  snapshot();
+  var pick=wrong[Math.floor(Math.random()*wrong.length)];
+  S.board[pick]=S.solution[pick];S.hints++;S.hintUsed=true;S.selected=pick;
+  autoClean(pick,S.solution[pick]);
+  S.pendingAnim={cell:pick,kind:"hint",completed:completedCells(pick),
+    digitDone:remainingCounts()[S.solution[pick]]===0?S.solution[pick]:null};
+  toast("Hint used (−100): one cell filled for you.",true);render();checkWin();
+});
+els.restartBtn.addEventListener("click",function(){
+  if(!S)return;
+  var v=S.variant,no=S.puzzleNo;
+  var restarts=S.restarts+1,hints=S.hints;
+  requestGame(v,no,function(){
+    S.restarts=restarts;S.hints=hints;S.hintUsed=hints>0;
+    for(var i=0;i<81;i++)if(S.given[i])S.board[i]=S.solution[i];
+    /* newGame rebuilt givens from its own puzzle; restore board to givens only */
+    S.board=S.board.map(function(x,idx){return S.given[idx]?x:0});
+    toast("Restarted (−50). Same board, fresh start.");render();
+  });
+});
+els.newBtn.addEventListener("click",function(){if(!S)return;requestGame(S.variant,S.puzzleNo+1)});
+document.addEventListener("keydown",function(e){
+  if(!S||S.finished)return;
+  if(e.key>="1"&&e.key<="9"){enterDigit(Number(e.key));return}
+  if(e.key==="Backspace"||e.key==="Delete"||e.key==="0"){els.eraseBtn.click();return}
+  if(e.key==="n"||e.key==="N"){S.notesMode=!S.notesMode;render();return}
+  if(e.key==="u"||e.key==="U"){els.undoBtn.click();return}
+  if(S.selected>=0&&e.key.indexOf("Arrow")===0){
+    e.preventDefault();
+    var r=rowOf(S.selected),c=colOf(S.selected);
+    if(e.key==="ArrowUp")r=Math.max(0,r-1);if(e.key==="ArrowDown")r=Math.min(8,r+1);
+    if(e.key==="ArrowLeft")c=Math.max(0,c-1);if(e.key==="ArrowRight")c=Math.min(8,c+1);
+    S.selected=rc(r,c);render();
+  }
+});
+newGame("classic",1);
+</script>
+</body>
+</html>

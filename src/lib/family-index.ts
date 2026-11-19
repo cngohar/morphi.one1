@@ -10,5 +10,6 @@ export const familyIndex: readonly PuzzleFamilyEntry[] = [
 	{ id: 'klondike-solitaire', weight: 1, enabled: true, orientation: 'any', selectionOrder: 6 },
 	{ id: 'light-bend', weight: 1, enabled: true, orientation: 'any', selectionOrder: 7 },
 	{ id: 'word-guess', weight: 1, enabled: true, orientation: 'any', selectionOrder: 8 },
-	{ id: 'one-line', weight: 1, enabled: true, orientation: 'any', selectionOrder: 9 }
+	{ id: 'one-line', weight: 1, enabled: true, orientation: 'any', selectionOrder: 9 },
+	{ id: 'sudoku', weight: 1, enabled: true, orientation: 'any', selectionOrder: 10 }
 ];
