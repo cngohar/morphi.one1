@@ -1,0 +1,3053 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+    <meta name="color-scheme" content="light dark" />
+    <link rel="icon" href="data:," />
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;700;800;900&display=swap" rel="stylesheet" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/animejs/3.2.1/anime.min.js"></script>
+    <title>Shape Division Demo</title>
+    <style>
+      :root {
+        color-scheme: light dark;
+        --bg: #eef2f7;
+        --panel: #ffffff;
+        --ink: #1b2433;
+        --muted: #54657c;
+        --line: #c3d0df;
+        --shape-fill: #ffffff;
+        --danger: #c62f1d;
+        --teal: #009a86;
+        --orange: #e5532d;
+        --blue: #2f6fed;
+        --violet: #7d61ae;
+      }
+      @media (prefers-color-scheme: dark) {
+        :root {
+          --bg: #12161f;
+          --panel: #1d2635;
+          --ink: #eef2f7;
+          --muted: #9db0c6;
+          --line: #35455c;
+          --shape-fill: #26334a;
+          --danger: #ff7a66;
+          --teal: #2fd3bd;
+        }
+      }
+      * { box-sizing: border-box; }
+      body {
+        margin: 0;
+        background: var(--bg);
+        color: var(--ink);
+        font-family: "Nunito", system-ui, -apple-system, "Segoe UI", sans-serif;
+      }
+      .stage { width: 100%; max-width: none; margin: 0; padding: 14px 18px 18px; display: flex; flex-direction: column; height: 100vh; height: 100dvh; }
+      h1 { font-size: 30px; font-weight: 900; margin: 2px 0 4px; letter-spacing: 0.2px; }
+      .intro { margin: 0 0 14px; color: var(--muted); font-weight: 700; font-size: 15px; line-height: 1.45; max-width: 62ch; }
+
+      .picker-label { font-size: 12.5px; font-weight: 800; color: var(--muted); margin: 0 0 6px; }
+      .picker { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 18px; }
+      .pick-btn {
+        min-height: 44px; padding: 8px 12px; border-radius: 10px;
+        border: 2px solid var(--line); background: var(--panel); color: var(--ink);
+        font: inherit; font-weight: 800; font-size: 13px; cursor: pointer; line-height: 1.2;
+      }
+      .pick-btn.active { background: var(--ink); border-color: var(--ink); color: var(--bg); }
+
+      .layout { display: grid; grid-template-columns: minmax(0, 1fr) 360px; gap: 20px; align-items: stretch; flex: 1 1 auto; min-height: 0; }
+      @media (max-width: 820px) {
+        .stage { height: auto; display: block; padding: 18px 16px 44px; }
+        .layout { grid-template-columns: minmax(0, 1fr); }
+        .panel { max-height: none !important; overflow: visible !important; }
+        #boardWrap { display: block !important; }
+        #boardWrap svg { height: auto !important; }
+      }
+
+      .canvas-card {
+        background: var(--panel); border: 2px solid var(--line); border-radius: 16px;
+        padding: 14px; display: flex; flex-direction: column; min-height: 0;
+      }
+      #boardWrap { touch-action: none; flex: 1 1 auto; min-height: 0; display: flex; }
+      #boardWrap svg { display: block; width: 100%; height: 100%; min-height: 0; touch-action: none; -webkit-tap-highlight-color: transparent; }
+      .piece-group.is-detached { transform: scale(0.93); transform-box: fill-box; transform-origin: center; }
+      .grid-guides { opacity: 0; transition: opacity 0.15s ease; pointer-events: none; }
+      svg.dragging .grid-guides, svg.has-pending .grid-guides { opacity: 0.16; }
+      .tap-dot { fill: var(--ink); opacity: 0.3; pointer-events: none; }
+      svg.has-pending .tap-dot { opacity: 0.55; }
+      .pending-dot { fill: var(--teal); stroke: var(--panel); stroke-width: 2.5; pointer-events: none; }
+      .tap-status { margin: 10px 2px 0; font-weight: 800; font-size: 14px; color: var(--teal); min-height: 20px; line-height: 1.4; }
+      .cell-shape { stroke-width: 0.6; }
+      .outline-path, .piece-outline, .entrance-path { fill: none; stroke: var(--ink); stroke-width: 3.2; stroke-linecap: round; stroke-linejoin: round; pointer-events: none; }
+      .ghost-outline { fill: none; stroke: var(--ink); stroke-width: 2.4; stroke-linecap: round; stroke-linejoin: round; opacity: 0.22; pointer-events: none; }
+      .entrance-path { opacity: 1; }
+      .cut-line { stroke: var(--ink); stroke-width: 3; stroke-linecap: round; pointer-events: none; }
+      .preview-line { fill: none; stroke: var(--teal); stroke-width: 3.4; stroke-linecap: round; stroke-linejoin: round; stroke-dasharray: 7 5; pointer-events: none; }
+      .raw-line { fill: none; stroke: var(--teal); stroke-width: 2; stroke-linecap: round; stroke-linejoin: round; opacity: 0.4; pointer-events: none; }
+      .mark-text { font-size: 15px; font-weight: 900; text-anchor: middle; dominant-baseline: central; pointer-events: none; }
+      .share-text { font-size: 14px; font-weight: 900; text-anchor: middle; dominant-baseline: central; pointer-events: none; fill: var(--ink); }
+      .canvas-hint { margin: 10px 2px 0; color: var(--muted); font-weight: 700; font-size: 13.5px; line-height: 1.45; }
+      .verify { color: var(--muted); font-size: 12.5px; font-weight: 600; margin: 6px 2px 0; line-height: 1.45; }
+
+      .panel {
+        background: var(--panel); border: 2px solid var(--line); border-radius: 16px; padding: 16px;
+        min-height: 0; max-height: 100%; overflow-y: auto;
+      }
+      .objective-label { font-size: 12.5px; font-weight: 800; color: var(--muted); margin: 0 0 4px; }
+      .objective { margin: 0 0 14px; font-size: 16.5px; font-weight: 800; line-height: 1.45; }
+
+      .ghost-box { display: flex; align-items: center; gap: 14px; margin-bottom: 14px; border: 2px dashed var(--line); border-radius: 12px; padding: 10px 14px; }
+      .ghost-box[hidden] { display: none; }
+      .ghost-label { font-weight: 800; font-size: 13.5px; color: var(--muted); }
+
+      .stats { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; margin-bottom: 12px; }
+      .stat { border: 2px solid var(--line); border-radius: 12px; padding: 8px 12px; display: flex; flex-direction: column; }
+      .stat-label { font-size: 12px; font-weight: 700; color: var(--muted); }
+      .stat-val { font-size: 20px; font-weight: 900; font-variant-numeric: tabular-nums; }
+      .stat-val.low { color: var(--danger); }
+      .progress-track { height: 10px; border-radius: 999px; background: var(--bg); border: 2px solid var(--line); overflow: hidden; margin: 2px 0 14px; }
+      .progress-fill { height: 100%; width: 0%; background: var(--teal); transition: width 0.35s ease; }
+
+      .controls { display: flex; flex-wrap: wrap; gap: 8px; }
+      .btn {
+        min-height: 44px; padding: 10px 16px; border-radius: 10px;
+        border: 2px solid var(--line); background: var(--panel); color: var(--ink);
+        font: inherit; font-weight: 800; font-size: 15px; cursor: pointer;
+      }
+      .btn.primary { background: var(--ink); border-color: var(--ink); color: var(--bg); flex: 1 1 100%; }
+      .btn.danger { border-color: var(--danger); color: var(--danger); }
+      .btn[disabled] { opacity: 0.45; cursor: default; }
+
+      .confirm {
+        display: flex; align-items: center; flex-wrap: wrap; gap: 8px; margin-top: 10px;
+        border: 2px solid var(--danger); border-radius: 12px; padding: 10px 12px;
+        font-weight: 700; font-size: 14px;
+      }
+      .confirm[hidden] { display: none; }
+
+      .msg { margin-top: 12px; font-weight: 700; color: var(--danger); font-size: 14.5px; line-height: 1.4; }
+      .msg:empty { margin-top: 0; }
+      .msg ul { margin: 4px 0; padding-left: 20px; }
+      .msg li { margin: 2px 0; }
+      .msg.ok { color: var(--teal); }
+      .preview { color: var(--muted); font-weight: 700; font-size: 13.5px; margin: 10px 0 0; line-height: 1.45; }
+
+      .result { margin-top: 16px; border: 2px solid var(--line); border-radius: 14px; padding: 14px; }
+      .result[hidden] { display: none; }
+      .result h2 { margin: 0 0 4px; font-size: 22px; font-weight: 900; }
+      .result .score-big { font-size: 32px; font-weight: 900; margin: 4px 0 2px; }
+      .result p { margin: 6px 0; font-size: 14.5px; line-height: 1.45; }
+      .result .breakdown { color: var(--muted); font-weight: 700; font-size: 13.5px; }
+      .hint-label {
+        display: inline-block; background: var(--teal); color: #fff; font-weight: 800; font-size: 12.5px;
+        border-radius: 999px; padding: 3px 10px; margin-left: 8px; vertical-align: middle;
+      }
+      .result .rbtns { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 12px; }
+
+      .about { margin-top: 26px; background: var(--panel); border: 2px solid var(--line); border-radius: 12px; padding: 4px 16px 10px; }
+      .about summary { min-height: 44px; display: flex; align-items: center; font-weight: 800; cursor: pointer; font-size: 15px; }
+      .about p, .about li { font-size: 14px; line-height: 1.5; }
+      .about ul { padding-left: 20px; margin: 6px 0; }
+
+      @media (prefers-reduced-motion: reduce) {
+        * { transition: none !important; animation: none !important; }
+        .entrance-path { stroke-dasharray: none !important; stroke-dashoffset: 0 !important; }
+      }
+    </style>
+  </head>
+  <body>
+    <main class="stage">
+      <header>
+        <h1>Shape Division</h1>
+        <p class="intro">One empty shape. Cut it into identical pieces — same size <em>and</em> same shape. Tap two points and the cut runs along the grid between them. Any division that makes identical pieces wins. (Equal area is the exception: there, pieces only need the same size.)</p>
+      </header>
+
+      <p class="picker-label">Dev presets (picker is demo-only — the player surface never shows variant names)</p>
+      <div id="picker" class="picker" role="group" aria-label="Preset picker (dev only)"></div>
+
+      <div class="layout">
+        <section class="canvas-card" aria-label="Shape canvas">
+          <div id="boardWrap"></div>
+          <p id="tapStatus" class="tap-status" role="status" aria-live="polite"></p>
+          <p class="canvas-hint">Tap a point to start a cut, then tap a second point — the cut appears along the grid between them, exactly where you tapped. The faint dots are the grid points you can tap. A straight cut is one pair of taps; if a cut turns, tap the corner where it turns, then tap on. To remove a cut, tap its two end points again. A swipe from one point to another works as the same two taps. On the square grid there is no diagonal grid line — the dots on a diagonal are joined only by horizontal and vertical lines — so tapping opposite corners makes a stepped cut along the grid lines instead, and the dashed preview shows exactly where it will run before you tap. A corner point itself sits on the outline: the route follows the outline to the nearest grid line, and only the grid-line part becomes the cut. You can keep cutting pieces that have already come free. Any piece you cut free lifts in place at once, in its own colour, identical or not — Check is what judges it: pieces must be the same size and the same shape (except on Equal area, where only the size must match). One square is the smallest piece there is.</p>
+          <p id="verifyLine" class="verify"></p>
+        </section>
+
+        <aside class="panel" aria-label="Objective, stats and controls">
+          <p class="objective-label">Objective</p>
+          <p id="ruleLine" class="objective"></p>
+
+          <div id="ghostBox" class="ghost-box" hidden>
+            <span class="ghost-label">Cut pieces shaped like this:</span>
+            <span id="ghostSil" aria-hidden="true"></span>
+          </div>
+
+          <div class="stats">
+            <div class="stat"><span class="stat-label" id="clockLabel">Time</span><span id="clock" class="stat-val">0:00</span></div>
+            <div class="stat"><span class="stat-label">Progress</span><span id="statProgress" class="stat-val">0%</span></div>
+            <div class="stat"><span class="stat-label">Mistakes</span><span id="statMistakes" class="stat-val">0/3</span></div>
+            <div class="stat"><span class="stat-label">Hints used</span><span id="statHints" class="stat-val">0</span></div>
+          </div>
+          <div class="progress-track" aria-hidden="true"><div id="progressFill" class="progress-fill"></div></div>
+
+          <div class="controls">
+            <button id="btnCheck" class="btn primary" type="button">Check</button>
+            <button id="btnUndo" class="btn" type="button">Undo</button>
+            <button id="btnHint" class="btn" type="button">Hint (−100)</button>
+            <button id="btnRestart" class="btn" type="button">Restart</button>
+          </div>
+
+          <div id="confirmBar" class="confirm" hidden>
+            <span>Restart this round? It costs −50 points.</span>
+            <button id="btnConfirmRestart" class="btn danger" type="button">Restart</button>
+            <button id="btnCancelRestart" class="btn" type="button">Cancel</button>
+          </div>
+
+          <div id="msg" class="msg" role="status" aria-live="polite"></div>
+          <p id="preview" class="preview"></p>
+
+          <section id="result" class="result" hidden></section>
+        </aside>
+      </div>
+
+      <details class="about">
+        <summary>About this demo (owner review)</summary>
+        <p><strong>How v10 works:</strong> the board is one empty outline — no cells are shown, but a faint dot marks every grid point. You cut by tapping two points: tap where a cut starts, tap where it ends, and the cut runs along the grid edges between them (the straightest route — a cut that turns is built by tapping the corner where it turns). Tapping the same two points again removes the cut, and a swipe counts as its two end points tapped in order. Cutting is free-form: any region your cuts separate from the rest of the shape detaches at once — whole piece, outline and fill together — whether it is identical or not. The checker is property-based, not answer-matching, and judges only at Check: any division into the required number of identical (same size and same shape), connected pieces that covers the shape wins, and a non-identical division fails Check and counts a mistake. Equal area is the exception: there only the sizes must match. Undo puts the last detached piece back.</p>
+        <p><strong>What v5 fixes:</strong> detached pieces no longer slide outward — they lift in place with a small inset gap, so the board stays one aligned shape instead of an exploded pile of overlapping boxes, and a cut that separates two pieces is drawn once (as the pieces' own outlines), not twice. Dragging now also samples the grid line nearest the finger, so a fast stroke — or a stroke across a piece that already came free — actually cuts; and a tap anywhere on a piece toggles its nearest cut (a single square's centre used to fall in a dead zone). The two-column layout now fills the whole screen: the board stretches to the available height and the side panel scrolls internally if it needs to.</p>
+        <p><strong>What v6 fixes:</strong> cutting a piece that had already come free stopped working once the board stretched to fill its column. The stretched svg letterboxes the drawing (centred, with empty bands), but the pointer was still mapped linearly across the whole element, so a drag across a visible piece landed whole cells away from the finger and no cut registered. The pointer is now mapped through the letterbox, so drags and taps land where the finger actually is — on the main shape and on detached pieces alike, and any piece can be cut into smaller pieces.</p>
+        <p><strong>What v7 fixes:</strong> dragging a straight cut, a small sideways slip of the mouse used to drop in a short vertical cut that was never planned (the owner's screenshot showed exactly that spur on a horizontal stroke). The old code snapped on every pointer movement and also added any nearby grid line that touched the stroke, so passing a junction with a slight slip added the vertical line. The stroke now locks to one direction per segment — a segment is only drawn when the pointer moves clearly along that line and travels most of the way across it — slips are ignored, the dashed line is only a preview, and the cut is committed on release. Turning at a corner and backtracking along your own line still work. No drawing library was needed: the lock is small geometry against the grid edges the board already has, and a freehand library would still need that same grid lock on top.</p>
+        <p><strong>What v8 fixes:</strong> on Shape given the Classic drag fix was not enough — whole pieces could not be cut at all and a line drawn above the 58% label never appeared. Three causes, all in the v7 vertex-walk: (1) the walk could only travel along connected cut edges, so a stroke across the top of the ∩-shaped piece stalled at the notch — the segment over the notch borders an empty cell and is not a cut edge, so the far side was never reached; (2) a stroke had to start within 0.62 cells of a grid vertex, but the centre of a cell — where a piece's % label sits, and where a player naturally starts — is 0.707 cells from every vertex, so strokes starting on the 25% bar or an 8% single cell never anchored; (3) the walk rejected travel more than ~0.38 cells from a grid line, and drawing across a one-cell-wide bar runs down its centreline, a full 0.5 cells away. The walk is replaced by stroke matching: the finished stroke is compared with the board's edges directly — an edge is cut if the stroke runs along it (most of its span, within half a cell, travelling along it rather than forth-and-back, which is what still rejects a sideways slip) or slashes straight across it (through its middle and past the far side, which is how a one-cell-wide bar is chopped by a stroke down its middle). A stroke running between two parallel lines cuts only the nearer one. Matching runs live for the dashed preview — the player's own stroke also shows faintly, so a stroke is never invisible — and the cut is committed on release, as before.</p>
+        <p><strong>What v9 fixes:</strong> on Equality score, pressing Check before the division was complete counted as a mistake (−50 each, and three such Checks ended the run) and gave no equality reading at all — the owner's screenshot showed that dead end at 50% progress, asking why they could not check themself. The variant is no pass/fail by its own rule, so Check is now a self-check at any point: it reports the equality % of the pieces formed so far, lists each piece's share, and says how many more pieces to cut (or that there are too many) — it costs nothing and the run continues. Only a complete 4-piece division ends the run, scored by its equality % as before.</p>
+        <p><strong>What v10 changes:</strong> the freehand drag is gone, replaced by tap-two-points cutting (owner's pick after the drag kept failing in playtests). Every drag version had to guess which grid line a wobbly finger path meant — v7's vertex-walk stalled at notches and had a centre dead zone, v8's stroke matching fixed those and still depended on interpreting a path. Tapping never guesses: the player names the exact two grid points, the cut follows the grid edges between them (Dijkstra over the edge graph with a turn penalty, so straight stays straight), re-tapping a pair removes the cut, and each pair is a single Undo step. On the square grid, corner-to-corner is not a grid line, so that tap pair resolves to one clean turn. Faint dots now mark every tappable grid point, and a status line under the board confirms the first point and explains any pair that cannot connect.</p>
+        <p><strong>What v11 fixes:</strong> two owner calls from playtest. (1) The congruent rule was not stated on the info panel: Classic said “4 equal pieces” and “every equal division wins”, so a division into two 25% bars and two 25% squares looked like a win but failed Check — the checker has always required congruent pieces (same size <em>and</em> same shape), and the panel never said so. The intro, the Classic objective, every “identical pieces” objective, the canvas hint and the win/fail messages now state “same size and same shape” explicitly, and Classic adds “Same size alone is not enough”. Equal area remains the stated exception (same size only). (2) Diagonal is dropped from Batch A: its board’s triangles overlap, so it cannot be cut into 4 pieces of 4 triangle-units — the preset is removed from the picker and is no longer part of Batch A (Classic + 9 remain).</p>
+        <p><strong>What v12 fixes:</strong> the owner tapped the square’s top-left corner, then its bottom-right corner, got “No grid line connects those two points” — yet the dashed preview ran straight through the intermediate grid dots (1,1), (2,2), (3,3), so the points looked connected. Two faults: (1) a convex corner touches no cuttable grid line at all — the only lines there are the shape’s outline — so the v10 router, which walked only cuttable edges, could never start or end a cut at any corner; (2) when no route existed the preview still drew a straight dashed line directly between the two taps, visually inventing the diagonal connection the message denied. The router now also walks the outline, at 2.5× cost so a real grid route always wins where one exists, and commits only the grid-line part of the route: opposite corners now produce a stepped cut along the grid lines, and the preview shows it exactly before the tap lands. The preview draws only the actual routed cut, segment by segment — no route, no line. The dots on a diagonal are not connected to each other diagonally; they are joined only by horizontal and vertical lines, and the hint under the board now says so.</p>
+        <p>The scoring (1,000 for a win, −1 per second floored at 200, −100 per hint, −50 per mistake, −50 per restart, countdown scored on seconds left), the 3-mistake lose rule and the hint behaviour are <strong>proposals</strong> from the variant matrix, not locks — the owner locks them at the brief.</p>
+        <p>Owner-locked percentage split, as built:</p>
+        <ul>
+          <li><strong>Progress %</strong> — always on in the stats panel (share of the shape separated into detached pieces). Not a variant.</li>
+          <li><strong>Piece-share labels</strong> — every detached piece shows its actual share of the shape (“25%” on each piece of an equal 4-way split), so pieces of different shapes but equal area read as equal.</li>
+          <li><strong>Equality score</strong> — rule variant: the Equality score preset ends any complete division with an equality % and scales the points by it, instead of pass/fail. Check also works mid-division as a self-check: it reports the current equality % without ending the run or counting a mistake.</li>
+        </ul>
+        <p>Boards (all except Classic reuse the Python-verified shapes from boards.json):</p>
+        <ul>
+          <li>Classic is the owner’s example — an empty square cut into 4 identical pieces (same size and same shape). A square has many valid identical divisions and every one wins; the hint suggests one (four small squares).</li>
+          <li>Pieces 2, Pieces 5, Piece size 4, Symbols, One tree, Shape given, Countdown and No hint: the stored division is unique (exact-cover count 1) — but in v4 the checker still accepts any division that satisfies the stated rule, stored answer or not.</li>
+          <li>Equal area: 6 valid partitions were counted — any equal-area partition wins. This is the one preset where pieces only need the same size, not the same shape.</li>
+        </ul>
+        <p>The seed L-tromino puzzle itself has 2 valid divisions, so it is not used as a stored-answer board.</p>
+        <p>Equal-area Easy grading is still an open problem: this demo accepts any valid equal-area partition and does not pretend to grade Easy vs trivial.</p>
+        <p>The preset picker is dev-only. The player surface will never show variant names. There are no levels, no progression and no unlocking.</p>
+      </details>
+    </main>
+
+    <script>
+      "use strict";
+var BOARDS = {
+ "classic": {
+  "cells": [
+   [
+    0,
+    0
+   ],
+   [
+    1,
+    0
+   ],
+   [
+    2,
+    0
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    3,
+    0
+   ],
+   [
+    3,
+    1
+   ],
+   [
+    3,
+    2
+   ],
+   [
+    4,
+    2
+   ],
+   [
+    5,
+    2
+   ],
+   [
+    6,
+    2
+   ]
+  ],
+  "n": 4,
+  "size": 3,
+  "solution": [
+   [
+    [
+     3,
+     0
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     3,
+     2
+    ]
+   ],
+   [
+    [
+     4,
+     2
+    ],
+    [
+     5,
+     2
+    ],
+    [
+     6,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     2
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     4
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "forced": true
+ },
+ "pieces-2": {
+  "cells": [
+   [
+    0,
+    0
+   ],
+   [
+    1,
+    0
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    1,
+    3
+   ],
+   [
+    2,
+    0
+   ]
+  ],
+  "n": 2,
+  "size": 3,
+  "solution": [
+   [
+    [
+     1,
+     1
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "forced": true
+ },
+ "pieces-5": {
+  "cells": [
+   [
+    0,
+    0
+   ],
+   [
+    0,
+    1
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    1,
+    4
+   ],
+   [
+    1,
+    5
+   ],
+   [
+    1,
+    6
+   ],
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    2,
+    6
+   ],
+   [
+    2,
+    7
+   ],
+   [
+    3,
+    2
+   ],
+   [
+    3,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    3
+   ]
+  ],
+  "n": 5,
+  "size": 3,
+  "solution": [
+   [
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     3
+    ]
+   ],
+   [
+    [
+     1,
+     4
+    ],
+    [
+     1,
+     5
+    ],
+    [
+     2,
+     4
+    ]
+   ],
+   [
+    [
+     1,
+     6
+    ],
+    [
+     2,
+     6
+    ],
+    [
+     2,
+     7
+    ]
+   ],
+   [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     3,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "forced": true
+ },
+ "piece-size-4": {
+  "cells": [
+   [
+    0,
+    1
+   ],
+   [
+    0,
+    3
+   ],
+   [
+    0,
+    4
+   ],
+   [
+    0,
+    5
+   ],
+   [
+    1,
+    0
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    1,
+    3
+   ],
+   [
+    1,
+    5
+   ],
+   [
+    1,
+    6
+   ],
+   [
+    2,
+    0
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    3,
+    3
+   ],
+   [
+    3,
+    4
+   ]
+  ],
+  "n": 4,
+  "size": 4,
+  "solution": [
+   [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     3
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ],
+    [
+     2,
+     2
+    ]
+   ],
+   [
+    [
+     0,
+     4
+    ],
+    [
+     0,
+     5
+    ],
+    [
+     1,
+     5
+    ],
+    [
+     1,
+     6
+    ]
+   ],
+   [
+    [
+     2,
+     4
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     4
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "forced": true
+ },
+ "countdown-300": {
+  "cells": [
+   [
+    0,
+    0
+   ],
+   [
+    1,
+    0
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    1,
+    4
+   ],
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    3,
+    2
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    3
+   ],
+   [
+    4,
+    4
+   ]
+  ],
+  "n": 4,
+  "size": 3,
+  "solution": [
+   [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     3,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     4
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     4
+    ]
+   ],
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     1
+    ]
+   ],
+   [
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     3
+    ],
+    [
+     4,
+     4
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "forced": true
+ },
+ "no-hint": {
+  "cells": [
+   [
+    0,
+    4
+   ],
+   [
+    1,
+    4
+   ],
+   [
+    2,
+    0
+   ],
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    3,
+    0
+   ],
+   [
+    3,
+    2
+   ],
+   [
+    4,
+    0
+   ],
+   [
+    4,
+    2
+   ],
+   [
+    5,
+    2
+   ]
+  ],
+  "n": 4,
+  "size": 3,
+  "solution": [
+   [
+    [
+     3,
+     2
+    ],
+    [
+     4,
+     2
+    ],
+    [
+     5,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   [
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ]
+   ],
+   [
+    [
+     0,
+     4
+    ],
+    [
+     1,
+     4
+    ],
+    [
+     2,
+     4
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "forced": true
+ },
+ "equal-area": {
+  "cells": [
+   [
+    0,
+    1
+   ],
+   [
+    0,
+    2
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    1,
+    3
+   ],
+   [
+    1,
+    4
+   ],
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    0
+   ],
+   [
+    3,
+    1
+   ],
+   [
+    3,
+    2
+   ]
+  ],
+  "n": 4,
+  "size": 3,
+  "solution": [
+   [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     2
+    ]
+   ],
+   [
+    [
+     3,
+     0
+    ],
+    [
+     3,
+     1
+    ],
+    [
+     3,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     3
+    ],
+    [
+     1,
+     4
+    ],
+    [
+     2,
+     3
+    ]
+   ]
+  ],
+  "equal_area_partition_count_capped_100": 6,
+  "unique_count": null
+ },
+ "symbols-1": {
+  "cells": [
+   [
+    0,
+    2
+   ],
+   [
+    1,
+    1
+   ],
+   [
+    1,
+    2
+   ],
+   [
+    1,
+    3
+   ],
+   [
+    1,
+    4
+   ],
+   [
+    2,
+    0
+   ],
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    2,
+    5
+   ],
+   [
+    3,
+    5
+   ],
+   [
+    4,
+    4
+   ],
+   [
+    4,
+    5
+   ]
+  ],
+  "n": 4,
+  "size": 3,
+  "solution": [
+   [
+    [
+     0,
+     2
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     1,
+     3
+    ]
+   ],
+   [
+    [
+     1,
+     4
+    ],
+    [
+     2,
+     4
+    ],
+    [
+     2,
+     5
+    ]
+   ],
+   [
+    [
+     3,
+     5
+    ],
+    [
+     4,
+     4
+    ],
+    [
+     4,
+     5
+    ]
+   ],
+   [
+    [
+     1,
+     1
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     2,
+     1
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "unique_count_with_symbol_rule": 1,
+  "symbols": [
+   [
+    0,
+    2
+   ],
+   [
+    1,
+    4
+   ],
+   [
+    3,
+    5
+   ],
+   [
+    1,
+    1
+   ]
+  ]
+ },
+ "one-tree": {
+  "cells": [
+   [
+    0,
+    0
+   ],
+   [
+    1,
+    0
+   ],
+   [
+    2,
+    0
+   ],
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    2,
+    4
+   ],
+   [
+    3,
+    0
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    4,
+    0
+   ],
+   [
+    4,
+    4
+   ],
+   [
+    5,
+    0
+   ]
+  ],
+  "n": 4,
+  "size": 3,
+  "solution": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ]
+   ],
+   [
+    [
+     3,
+     0
+    ],
+    [
+     4,
+     0
+    ],
+    [
+     5,
+     0
+    ]
+   ],
+   [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   [
+    [
+     2,
+     4
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     4
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "unique_count_with_tree_rule": 1,
+  "trees": [
+   [
+    2,
+    0
+   ],
+   [
+    5,
+    0
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    4,
+    4
+   ]
+  ]
+ },
+ "shape-given": {
+  "cells": [
+   [
+    0,
+    0
+   ],
+   [
+    0,
+    1
+   ],
+   [
+    0,
+    2
+   ],
+   [
+    1,
+    0
+   ],
+   [
+    2,
+    0
+   ],
+   [
+    2,
+    1
+   ],
+   [
+    2,
+    2
+   ],
+   [
+    2,
+    3
+   ],
+   [
+    3,
+    0
+   ],
+   [
+    3,
+    3
+   ],
+   [
+    3,
+    4
+   ],
+   [
+    3,
+    5
+   ]
+  ],
+  "n": 4,
+  "size": 3,
+  "solution": [
+   [
+    [
+     0,
+     0
+    ],
+    [
+     0,
+     1
+    ],
+    [
+     0,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     0
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     2
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   [
+    [
+     3,
+     3
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     3,
+     5
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "piece": [
+   [
+    0,
+    0
+   ],
+   [
+    0,
+    1
+   ],
+   [
+    0,
+    2
+   ]
+  ]
+ },
+ "diagonal": {
+  "model": "triangles",
+  "n": 4,
+  "size": 4,
+  "triangles": [
+   [
+    [
+     0,
+     1
+    ],
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     1
+    ]
+   ],
+   [
+    [
+     1,
+     0
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     3,
+     0
+    ]
+   ],
+   [
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     3
+    ]
+   ],
+   [
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     1
+    ],
+    [
+     3,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     2
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     2
+    ]
+   ],
+   [
+    [
+     1,
+     4
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     5
+    ]
+   ],
+   [
+    [
+     1,
+     4
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     4
+    ]
+   ],
+   [
+    [
+     2,
+     1
+    ],
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     2
+    ]
+   ],
+   [
+    [
+     2,
+     1
+    ],
+    [
+     3,
+     2
+    ],
+    [
+     4,
+     1
+    ]
+   ],
+   [
+    [
+     2,
+     3
+    ],
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     4
+    ]
+   ],
+   [
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     2
+    ],
+    [
+     3,
+     4
+    ]
+   ],
+   [
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     2
+    ],
+    [
+     4,
+     3
+    ]
+   ],
+   [
+    [
+     2,
+     3
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     3
+    ]
+   ],
+   [
+    [
+     2,
+     5
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     5
+    ]
+   ],
+   [
+    [
+     3,
+     2
+    ],
+    [
+     3,
+     4
+    ],
+    [
+     4,
+     3
+    ]
+   ]
+  ],
+  "solution": [
+   [
+    [
+     [
+      1,
+      2
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      2,
+      3
+     ]
+    ],
+    [
+     [
+      2,
+      1
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      2
+     ]
+    ],
+    [
+     [
+      2,
+      1
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      4,
+      1
+     ]
+    ],
+    [
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      4,
+      3
+     ]
+    ]
+   ],
+   [
+    [
+     [
+      0,
+      1
+     ],
+     [
+      1,
+      0
+     ],
+     [
+      1,
+      2
+     ]
+    ],
+    [
+     [
+      1,
+      0
+     ],
+     [
+      1,
+      2
+     ],
+     [
+      2,
+      1
+     ]
+    ],
+    [
+     [
+      1,
+      0
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      3,
+      0
+     ]
+    ],
+    [
+     [
+      1,
+      2
+     ],
+     [
+      2,
+      1
+     ],
+     [
+      3,
+      2
+     ]
+    ]
+   ],
+   [
+    [
+     [
+      1,
+      2
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      2
+     ]
+    ],
+    [
+     [
+      1,
+      4
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      4
+     ]
+    ],
+    [
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      2
+     ],
+     [
+      3,
+      4
+     ]
+    ],
+    [
+     [
+      3,
+      2
+     ],
+     [
+      3,
+      4
+     ],
+     [
+      4,
+      3
+     ]
+    ]
+   ],
+   [
+    [
+     [
+      1,
+      4
+     ],
+     [
+      2,
+      3
+     ],
+     [
+      2,
+      5
+     ]
+    ],
+    [
+     [
+      2,
+      3
+     ],
+     [
+      2,
+      5
+     ],
+     [
+      3,
+      4
+     ]
+    ],
+    [
+     [
+      2,
+      3
+     ],
+     [
+      3,
+      4
+     ],
+     [
+      4,
+      3
+     ]
+    ],
+    [
+     [
+      2,
+      5
+     ],
+     [
+      3,
+      4
+     ],
+     [
+      4,
+      5
+     ]
+    ]
+   ]
+  ],
+  "unique_count": 1,
+  "placements": 14,
+  "doubled_bbox": [
+   5,
+   6
+  ]
+ }
+};
+
+      var PART_COLORS = ["#e5532d", "#2f6fed", "#009a86", "#7d61ae", "#dd9413"];
+      var REDUCED = window.matchMedia && window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+      /* Classic (v2): the owner's example — an empty 4x4 square, cut into
+         4 equal pieces of 4 cells. The stored solution (four 2x2 squares)
+         is only a hint source; the checker accepts ANY valid division. */
+      var SQUARE_BOARD = (function () {
+        var cells = [];
+        for (var y = 0; y < 4; y++) for (var x = 0; x < 4; x++) cells.push([x, y]);
+        function block(x0, y0) { return [[x0, y0], [x0 + 1, y0], [x0, y0 + 1], [x0 + 1, y0 + 1]]; }
+        return { cells: cells, n: 4, size: 4, solution: [block(0, 0), block(2, 0), block(0, 2), block(2, 2)] };
+      })();
+
+      var PRESETS = [
+        { id: "classic",       name: "Classic",        board: "square", share: true,  rule: "Cut the empty square into 4 identical pieces — same size and same shape. Any way you like — every identical division wins. Same size alone is not enough: four pieces at 25% each still fail if their shapes differ.", verify: "Property-checked: any division into 4 congruent (same size and same shape) connected pieces wins. No stored answer." },
+        { id: "pieces-2",      name: "Pieces · 2",     board: "boards", rule: "Cut the shape into 2 identical pieces — same size and same shape.", verify: "Shape verified: stored division is unique (exact-cover count 1); any rule-satisfying division wins." },
+        { id: "pieces-5",      name: "Pieces · 5",     board: "boards", rule: "Cut the shape into 5 identical pieces — same size and same shape.", verify: "Shape verified: stored division is unique (exact-cover count 1); any rule-satisfying division wins." },
+        { id: "piece-size-4",  name: "Piece size · 4", board: "boards", rule: "Cut the shape into 4 identical pieces of 4 squares each — same size and same shape.", verify: "Shape verified: stored division is unique (exact-cover count 1); any rule-satisfying division wins." },
+        { id: "equal-area",    name: "Equal area",     board: "boards", rule: "Cut the shape into 4 pieces of equal area — the pieces may be any shape.", verify: "Shape verified: 6 valid equal-area partitions counted — any one wins." },
+        { id: "symbols-1",     name: "Symbols · ★",    board: "boards", rule: "Cut the shape into 4 identical pieces (same size and same shape) — each piece must hold exactly one ★.", verify: "Shape verified: stored division is unique with the one-★-per-piece rule; any rule-satisfying division wins." },
+        { id: "one-tree",      name: "One tree · 🌳",  board: "boards", rule: "Cut the shape into 4 identical pieces (same size and same shape) — each piece must hold exactly one 🌳.", verify: "Shape verified: stored division is unique with the one-🌳-per-piece rule; any rule-satisfying division wins." },
+        { id: "shape-given",   name: "Shape given",    board: "boards", rule: "Cut the shape into pieces shaped exactly like the ghost piece shown.", verify: "Shape verified: stored division is unique (exact-cover count 1); any rule-satisfying division wins." },
+        { id: "countdown-300", name: "Countdown 5:00", board: "boards", rule: "Cut the shape into 4 identical pieces (same size and same shape) before the 5:00 clock runs out.", verify: "Shape verified: stored division is unique (exact-cover count 1); any rule-satisfying division wins." },
+        { id: "no-hint",       name: "No hint",        board: "boards", rule: "Cut the shape into 4 identical pieces (same size and same shape). No hints in this round.", verify: "Shape verified: stored division is unique (exact-cover count 1); any rule-satisfying division wins." },
+        { id: "equality",      name: "Equality score", board: "square", equality: true, rule: "Cut the empty square into 4 pieces. Check scores how equal they are — 100% is perfectly equal, and your points scale with the score. You can press Check at any time to see how equal your pieces are so far.", verify: "Rule variant: no pass/fail — Check shows your current equality % at any point (no mistake, the run continues); a complete 4-piece division ends the run and is scored by its equality %." }
+      ];
+
+      var S = null;
+
+      function $(id) { return document.getElementById(id); }
+      function key2(x, y) { return x + "," + y; }
+      function vKey(v) { return v[0] + "," + v[1]; }
+      function eKey(a, b) { var ka = vKey(a), kb = vKey(b); return ka < kb ? ka + "|" + kb : kb + "|" + ka; }
+      function triKey(t) { return t.map(function (p) { return p[0] + "," + p[1]; }).sort().join("|"); }
+      function fmt(sec) {
+        sec = Math.max(0, Math.floor(sec));
+        var m = Math.floor(sec / 60), s = sec % 60;
+        return m + ":" + (s < 10 ? "0" : "") + s;
+      }
+      function svgEl(tag, attrs) {
+        var el = document.createElementNS("http://www.w3.org/2000/svg", tag);
+        for (var k in attrs) el.setAttribute(k, attrs[k]);
+        return el;
+      }
+      function entranceMsFor(P) { return Math.max(700, Math.min(2600, 80 * P)); }
+      function unitSides(i) {
+        if (S.diag) { var u = S.units[i]; return [[u[0], u[1]], [u[1], u[2]], [u[2], u[0]]]; }
+        var x = S.units[i][0], y = S.units[i][1];
+        return [[[x, y], [x + 1, y]], [[x + 1, y], [x + 1, y + 1]], [[x + 1, y + 1], [x, y + 1]], [[x, y + 1], [x, y]]];
+      }
+      function componentSegs(members) {
+        var set = new Set(members);
+        var seen = new Set();
+        var segs = [];
+        members.forEach(function (i) {
+          unitSides(i).forEach(function (side) {
+            var k = eKey(side[0], side[1]);
+            if (seen.has(k)) return;
+            seen.add(k);
+            var e = S.edges.get(k);
+            if (e) {
+              var in0 = set.has(e.units[0]), in1 = set.has(e.units[1]);
+              if (in0 !== in1) segs.push(side);
+            } else {
+              segs.push(side);
+            }
+          });
+        });
+        return segs;
+      }
+      function segsToPathD(segs) {
+        if (!segs || !segs.length) return "";
+        var edgeSet = new Set(segs.map(function (s) { return eKey(s[0], s[1]); }));
+        var unused = segs.slice();
+        var d = "";
+        var valid = true;
+        while (unused.length) {
+          var start = unused[0][0];
+          var stack = [start];
+          var circuit = [];
+          while (stack.length) {
+            var cur = stack[stack.length - 1];
+            var idx = -1;
+            for (var i = 0; i < unused.length; i++) {
+              if (vKey(unused[i][0]) === vKey(cur) || vKey(unused[i][1]) === vKey(cur)) { idx = i; break; }
+            }
+            if (idx >= 0) {
+              var seg = unused.splice(idx, 1)[0];
+              var nxt = vKey(seg[0]) === vKey(cur) ? seg[1] : seg[0];
+              stack.push(nxt);
+            } else {
+              circuit.push(stack.pop());
+            }
+          }
+          circuit.reverse();
+          if (circuit.length < 2) { valid = false; break; }
+          if (vKey(circuit[0]) !== vKey(circuit[circuit.length - 1])) valid = false;
+          for (var ci = 0; ci + 1 < circuit.length; ci++) {
+            if (!edgeSet.has(eKey(circuit[ci], circuit[ci + 1]))) valid = false;
+          }
+          if (!valid) break;
+          var pts = circuit.map(function (v) { var p = toPx(v); return p[0].toFixed(2) + " " + p[1].toFixed(2); });
+          d += "M" + pts.join("L") + "Z";
+        }
+        if (valid && d) return d;
+        return segs.map(function (seg) {
+          var p1 = toPx(seg[0]), p2 = toPx(seg[1]);
+          return "M" + p1[0].toFixed(2) + " " + p1[1].toFixed(2) + "L" + p2[0].toFixed(2) + " " + p2[1].toFixed(2);
+        }).join("");
+      }
+
+      /* ---------- preset loading / geometry ---------- */
+
+      function loadPreset(idx) {
+        var p = PRESETS[idx];
+        var b = p.board === "square" ? SQUARE_BOARD : BOARDS[p.id];
+        if (S && S.timer) clearInterval(S.timer);
+        S = {
+          preset: p, presetIdx: idx,
+          n: b.n, size: b.size,
+          countdown: p.id === "countdown-300",
+          noHint: p.id === "no-hint",
+          diag: b.model === "triangles",
+          units: [], index: new Map(),
+          solPart: [], marks: new Map(), markKind: null, pieceGiven: b.piece || null,
+          edges: new Map(), adjEdges: new Map(), solCuts: new Set(),
+          cuts: new Set(), history: [], detached: new Map(), detachSeq: 0,
+          hints: 0, mistakes: 0, restarts: 0,
+          started: false, startTs: 0, elapsedMs: 0, timer: null,
+          over: false, won: false, ready: false, entering: false, entranceId: 0, perimeter: 0, entranceMs: 700, pending: null, downPt: null, downSnap: null, downTs: 0,
+          scale: 40, minX: 0, minY: 0, wUnits: 0, hUnits: 0, pad: 18,
+          svg: null, layers: null, boundarySegs: []
+        };
+        var total = S.diag ? b.triangles.length : b.cells.length;
+        S.solPart = new Array(total).fill(-1);
+
+        if (S.diag) {
+          S.units = b.triangles;
+          var byKey = new Map();
+          b.triangles.forEach(function (t, i) { byKey.set(triKey(t), i); });
+          b.solution.forEach(function (part, pi) {
+            part.forEach(function (t) { S.solPart[byKey.get(triKey(t))] = pi; });
+          });
+          var xs = [], ys = [];
+          b.triangles.forEach(function (t) { t.forEach(function (pt) { xs.push(pt[0]); ys.push(pt[1]); }); });
+          S.minX = Math.min.apply(null, xs); S.minY = Math.min.apply(null, ys);
+          S.wUnits = Math.max.apply(null, xs) - S.minX;
+          S.hUnits = Math.max.apply(null, ys) - S.minY;
+          S.scale = Math.min(352 / S.wUnits, 430 / S.hUnits);
+        } else {
+          S.units = b.cells;
+          b.cells.forEach(function (c, i) { S.index.set(key2(c[0], c[1]), i); });
+          var cx = b.cells.map(function (c) { return c[0]; }), cy = b.cells.map(function (c) { return c[1]; });
+          S.minX = Math.min.apply(null, cx); S.minY = Math.min.apply(null, cy);
+          S.wUnits = Math.max.apply(null, cx) - S.minX + 1;
+          S.hUnits = Math.max.apply(null, cy) - S.minY + 1;
+          S.scale = Math.min(352 / S.wUnits, 430 / S.hUnits);
+          b.solution.forEach(function (part, pi) {
+            part.forEach(function (c) { S.solPart[S.index.get(key2(c[0], c[1]))] = pi; });
+          });
+          if (b.symbols) {
+            S.markKind = "star";
+            b.symbols.forEach(function (c) { S.marks.set(S.index.get(key2(c[0], c[1])), "star"); });
+          }
+          if (b.trees) {
+            S.markKind = "tree";
+            b.trees.forEach(function (c) { S.marks.set(S.index.get(key2(c[0], c[1])), "tree"); });
+          }
+        }
+
+        buildEdges();
+        S.perimeter = S.boundarySegs.length;
+        S.entranceMs = entranceMsFor(S.perimeter);
+
+        $("ruleLine").textContent = p.rule;
+        $("verifyLine").textContent = p.verify;
+        $("clockLabel").textContent = S.countdown ? "Time left" : "Time";
+        $("btnHint").style.display = S.noHint ? "none" : "";
+        document.querySelectorAll(".pick-btn").forEach(function (btn, i) {
+          btn.classList.toggle("active", i === idx);
+        });
+
+        renderGhost(b);
+        resetRound(true);
+        S.entering = !REDUCED;
+        S.ready = REDUCED;
+        renderBoard();
+        playEntrance();
+      }
+
+      /* Build every unit side; sides shared by two units are cuttable
+         internal edges, sides belonging to one unit form the outline. */
+      function buildEdges() {
+        var sideOwners = new Map();
+        function addSide(a, b, unit) {
+          var k = eKey(a, b);
+          if (!sideOwners.has(k)) sideOwners.set(k, { a: a, b: b, units: [] });
+          sideOwners.get(k).units.push(unit);
+        }
+        S.units.forEach(function (u, i) {
+          if (S.diag) {
+            addSide(u[0], u[1], i); addSide(u[1], u[2], i); addSide(u[2], u[0], i);
+          } else {
+            var x = u[0], y = u[1];
+            addSide([x, y], [x + 1, y], i);
+            addSide([x + 1, y], [x + 1, y + 1], i);
+            addSide([x + 1, y + 1], [x, y + 1], i);
+            addSide([x, y + 1], [x, y], i);
+          }
+        });
+        sideOwners.forEach(function (side, k) {
+          if (side.units.length === 2) {
+            S.edges.set(k, { a: side.a, b: side.b, units: side.units });
+            var u0 = side.units[0], u1 = side.units[1];
+            S.adjEdges.set(u0 + "|" + u1, k);
+            S.adjEdges.set(u1 + "|" + u0, k);
+            if (S.solPart[u0] !== S.solPart[u1]) S.solCuts.add(k);
+          } else {
+            S.boundarySegs.push([side.a, side.b]);
+          }
+        });
+      }
+
+      function toPx(v) {
+        return [S.pad + (v[0] - S.minX) * S.scale, S.pad + (v[1] - S.minY) * S.scale];
+      }
+      function unitPoints(i) {
+        if (S.diag) return S.units[i].map(function (v) { return toPx(v); });
+        var x = S.units[i][0], y = S.units[i][1];
+        return [[x, y], [x + 1, y], [x + 1, y + 1], [x, y + 1]].map(function (v) { return toPx(v); });
+      }
+      function unitCentroidPx(i) {
+        var pts = unitPoints(i), sx = 0, sy = 0;
+        pts.forEach(function (p) { sx += p[0]; sy += p[1]; });
+        return [sx / pts.length, sy / pts.length];
+      }
+
+      function renderGhost(b) {
+        var box = $("ghostBox");
+        if (!b.piece) { box.hidden = true; return; }
+        box.hidden = false;
+        var host = $("ghostSil");
+        host.innerHTML = "";
+        var cols = Math.max.apply(null, b.piece.map(function (c) { return c[0]; })) + 1;
+        var rows = Math.max.apply(null, b.piece.map(function (c) { return c[1]; })) + 1;
+        var u = 20;
+        var svg = svgEl("svg", { width: cols * u, height: rows * u, viewBox: "0 0 " + cols * u + " " + rows * u, "aria-hidden": "true" });
+        b.piece.forEach(function (c) {
+          svg.appendChild(svgEl("rect", { x: c[0] * u + 1, y: c[1] * u + 1, width: u - 2, height: u - 2, rx: 4, fill: "var(--ink)", opacity: "0.35" }));
+        });
+        host.appendChild(svg);
+      }
+
+      /* ---------- components (pieces) from the current cut set ---------- */
+
+      function computeComponents() {
+        var n = S.units.length;
+        var compOf = new Array(n).fill(-1);
+        var comps = [];
+        for (var s = 0; s < n; s++) {
+          if (compOf[s] >= 0) continue;
+          var id = comps.length, members = [], stack = [s];
+          compOf[s] = id;
+          while (stack.length) {
+            var cur = stack.pop();
+            members.push(cur);
+            for (var o = 0; o < n; o++) {
+              if (compOf[o] >= 0 || o === cur) continue;
+              var ek = S.adjEdges.get(cur + "|" + o);
+              if (ek && !S.cuts.has(ek)) { compOf[o] = id; stack.push(o); }
+            }
+          }
+          comps.push(members);
+        }
+        return comps;
+      }
+      function compSig(members) {
+        return members.slice().sort(function (a, b) { return a - b; }).join(",");
+      }
+
+      /* FREE-FORM CUTTING (v4, owner-locked): any region the cuts separate
+         from the rest of the shape detaches immediately — outline + fill
+         together — whether it is equal or not. Equality is judged only at
+         Check. The largest remaining region stays in place as the main
+         shape while the division is incomplete; once the piece count
+         reaches the target, every piece is detached and coloured, so no
+         region the player sees is left white. */
+      function refreshDetached(comps) {
+        var alive = new Set();
+        var newly = [];
+        if (comps.length > 1) {
+          var detachAll = comps.length >= S.n;
+          var largestIdx = 0;
+          comps.forEach(function (m, i) { if (m.length > comps[largestIdx].length) largestIdx = i; });
+          comps.forEach(function (members, ci) {
+            if (!detachAll && ci === largestIdx) return;
+            var sig = compSig(members);
+            alive.add(sig);
+            if (!S.detached.has(sig)) {
+              /* v5: pieces detach IN PLACE — no outward slide. Sliding
+                 pieces overlapped their neighbours and the cut lines,
+                 which is what made the board look messed up. The piece
+                 group is inset slightly (CSS scale about its own centre)
+                 so a clean gap opens around it while it stays exactly
+                 where it was cut, aligned with the ghost outline. */
+              S.detached.set(sig, { color: S.detachSeq % PART_COLORS.length });
+              S.detachSeq++;
+              newly.push(sig);
+            }
+          });
+        }
+        S.detached.forEach(function (v, sig) { if (!alive.has(sig)) S.detached.delete(sig); });
+        return newly;
+      }
+
+      function progressPct(comps) {
+        var done = 0;
+        comps.forEach(function (m) { if (S.detached.has(compSig(m))) done += m.length; });
+        if (comps.length === 1 && S.n === 1) done = S.units.length;
+        return Math.round(100 * done / S.units.length);
+      }
+
+      /* ---------- board rendering ---------- */
+
+      function renderBoard(newSigs) {
+        var wrap = $("boardWrap");
+        wrap.innerHTML = "";
+        var W = S.pad * 2 + S.wUnits * S.scale, H = S.pad * 2 + S.hUnits * S.scale;
+        var svg = svgEl("svg", {
+          viewBox: "0 0 " + W + " " + H, role: "img",
+          preserveAspectRatio: "xMidYMid meet",
+          "aria-label": "Empty shape. Tap two points to cut along the grid between them.",
+          "data-perimeter": String(S.perimeter || (S.boundarySegs ? S.boundarySegs.length : 0)),
+          "data-entrance-ms": String(S.entranceMs || 700),
+          "data-entering": S.entering ? "true" : "false",
+          "data-ready": S.ready ? "true" : "false",
+          "data-detached": String(S.detached.size)
+        });
+        S.svg = svg;
+
+        /* faint grid guides — visible while a cut's first point is set */
+        var guides = svgEl("g", { "class": "grid-guides" });
+        S.edges.forEach(function (e) {
+          var p1 = toPx(e.a), p2 = toPx(e.b);
+          guides.appendChild(svgEl("line", { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], stroke: "var(--ink)", "stroke-width": 1 }));
+        });
+        svg.appendChild(guides);
+
+        var comps = computeComponents();
+
+        /* faint ghost of the original outline, left behind once pieces
+           detach so the divided shape still reads as one shape */
+        if (S.detached.size > 0) {
+          var ghostD = segsToPathD(S.boundarySegs);
+          if (ghostD) svg.appendChild(svgEl("path", { d: ghostD, "class": "ghost-outline", "data-ghost": "true" }));
+        }
+
+        var piecesLayer = svgEl("g", { id: "piecesLayer" });
+        if (S.entering) piecesLayer.setAttribute("opacity", "0");
+        comps.forEach(function (members) {
+          var sig = compSig(members);
+          var det = S.detached.get(sig);
+          var g = svgEl("g", { "class": det ? "piece-group is-detached" : "piece-group" });
+          if (det) { g.dataset.sig = sig; g.dataset.detached = "true"; }
+          members.forEach(function (i) {
+            var pts = unitPoints(i).map(function (p) { return p[0] + "," + p[1]; }).join(" ");
+            var fill = det ? PART_COLORS[det.color] : "var(--shape-fill)";
+            g.appendChild(svgEl("polygon", {
+              points: pts, "class": "cell-shape",
+              fill: fill, stroke: fill, opacity: det ? 0.88 : 1
+            }));
+            var mark = S.marks.get(i);
+            if (mark) {
+              var c = unitCentroidPx(i);
+              var t = svgEl("text", { x: c[0], y: c[1] + 1, "class": "mark-text", fill: mark === "star" ? "#dd9413" : "var(--teal)" });
+              t.textContent = mark === "star" ? "★" : "🌳";
+              g.appendChild(t);
+            }
+          });
+          if (det) {
+            /* share label on EVERY detached piece: its actual share of
+               the whole shape, so equal-area pieces of different shapes
+               visibly carry the same share (e.g. all "25%") */
+            var mx = 0, my = 0;
+            members.forEach(function (i) { var c = unitCentroidPx(i); mx += c[0]; my += c[1]; });
+            var lt = svgEl("text", { x: mx / members.length, y: my / members.length, "class": "share-text", "data-share": "true" });
+            lt.textContent = Math.round(100 * members.length / S.units.length) + "%";
+            g.appendChild(lt);
+          }
+          var compD = segsToPathD(componentSegs(members));
+          if (compD) g.appendChild(svgEl("path", { d: compD, "class": "piece-outline" }));
+          piecesLayer.appendChild(g);
+        });
+        svg.appendChild(piecesLayer);
+
+        /* entrance: one continuous ordered perimeter stroke (single subpath) */
+        if (S.entering) {
+          var entranceD = segsToPathD(S.boundarySegs);
+          var entrancePath = svgEl("path", { d: entranceD, "class": "entrance-path", "data-duration-ms": String(S.entranceMs || 700), "data-perimeter": String(S.perimeter || S.boundarySegs.length) });
+          entrancePath.id = "entrancePath";
+          svg.appendChild(entrancePath);
+        }
+
+        /* committed cuts — only partial cuts inside a piece are drawn
+           here. A cut that already separates two pieces is drawn once,
+           as the pieces' own outlines; drawing it again on top made
+           every border a doubled line. */
+        var compOf = {};
+        comps.forEach(function (m, ci) { m.forEach(function (i) { compOf[i] = ci; }); });
+        var cutsLayer = svgEl("g", {});
+        S.cuts.forEach(function (k) {
+          var e = S.edges.get(k);
+          if (!e) return;
+          if (compOf[e.units[0]] !== compOf[e.units[1]]) return;
+          var p1 = toPx(e.a), p2 = toPx(e.b);
+          cutsLayer.appendChild(svgEl("line", { x1: p1[0], y1: p1[1], x2: p2[0], y2: p2[1], "class": "cut-line" }));
+        });
+        svg.appendChild(cutsLayer);
+
+        /* tap points: a faint dot on every grid vertex, so the player
+           can see exactly where a tap will land */
+        var dots = svgEl("g", {});
+        collectVertices().forEach(function (v) {
+          var p = toPx(v);
+          dots.appendChild(svgEl("circle", { cx: p[0], cy: p[1], r: Math.max(3.2, S.scale * 0.055), "class": "tap-dot" }));
+        });
+        svg.appendChild(dots);
+        if (S.pending) svg.classList.add("has-pending");
+
+        /* tap overlay: pending-point marker + preview line */
+        var tapLayer = svgEl("g", {});
+        tapLayer.id = "tapLayer";
+        svg.appendChild(tapLayer);
+
+        wrap.appendChild(svg);
+        attachPointer(svg);
+
+        /* detach pop for pieces completed by the latest stroke: the
+           piece settles from full size into its inset, in place */
+        if (newSigs && newSigs.length && !REDUCED) {
+          newSigs.forEach(function (sig) {
+            var g = svg.querySelector('g[data-sig="' + sig + '"]');
+            if (!g || !g.animate) return;
+            try {
+              g.animate(
+                [{ transform: "scale(1)" }, { transform: "scale(0.93)" }],
+                { duration: 320, easing: "ease-out" }
+              );
+            } catch (err) {}
+          });
+        }
+        return comps;
+      }
+
+      function playEntrance() {
+        if (REDUCED) { S.entering = false; S.ready = true; return; }
+        S.entering = true;
+        S.ready = false;
+        S.entranceId = (S.entranceId || 0) + 1;
+        var token = S.entranceId;
+        var path = document.getElementById("entrancePath");
+        if (!path) { setTimeout(function () { finishEntrance(token); }, S.entranceMs); return; }
+        var len = 0;
+        try { len = path.getTotalLength(); } catch (e) { len = 0; }
+        if (!len || !isFinite(len)) len = 1000;
+        path.dataset.pathLengthPx = String(Math.round(len));
+        path.style.strokeDasharray = String(len);
+        path.style.strokeDashoffset = String(len);
+        path.style.opacity = "1";
+        if (window.anime) {
+          if (window.anime.remove) window.anime.remove(path);
+          window.anime({
+            targets: path, strokeDashoffset: [len, 0],
+            duration: S.entranceMs, easing: "linear",
+            complete: function () { finishEntrance(token); }
+          });
+        } else {
+          path.style.transition = "stroke-dashoffset " + S.entranceMs + "ms linear";
+          if (window.requestAnimationFrame) requestAnimationFrame(function () { path.style.strokeDashoffset = "0"; });
+          else path.style.strokeDashoffset = "0";
+          setTimeout(function () { finishEntrance(token); }, S.entranceMs + 40);
+        }
+        setTimeout(function () { finishEntrance(token); }, S.entranceMs + 700);
+      }
+      function finishEntrance(token) {
+        if (!S || token !== S.entranceId || !S.entering) return;
+        S.entering = false;
+        S.ready = true;
+        renderBoard();
+        if (!REDUCED && window.anime) {
+          var fills = Array.prototype.slice.call(document.querySelectorAll("#boardWrap .cell-shape"));
+          if (fills.length) {
+            fills.forEach(function (el) { el.style.opacity = "0"; });
+            window.anime({
+              targets: fills, opacity: [0, 1], duration: 300, easing: "easeOutQuad",
+              complete: function () { fills.forEach(function (el) { el.style.opacity = ""; }); }
+            });
+          }
+        }
+      }
+      function startEntranceCycle() {
+        S.entering = !REDUCED;
+        S.ready = REDUCED ? true : false;
+        renderBoard();
+        playEntrance();
+      }
+
+      /* ---------- round state / stats / scoring ---------- */
+
+      function resetRound(fresh) {
+        if (S.timer) { clearInterval(S.timer); S.timer = null; }
+        S.cuts = new Set();
+        S.history = [];
+        S.detached = new Map(); S.detachSeq = 0;
+        S.hints = 0; S.mistakes = 0;
+        if (fresh) S.restarts = 0;
+        S.started = false; S.elapsedMs = 0; S.over = false; S.won = false; S.pending = null; S.downPt = null; S.downSnap = null;
+        setTapStatus("");
+        $("confirmBar").hidden = true;
+        $("result").hidden = true;
+        setControlsEnabled(true);
+        updateStats(); updateClock(); updatePreview();
+        setMsg("", false);
+      }
+
+      function setControlsEnabled(on) {
+        $("btnCheck").disabled = !on;
+        $("btnHint").disabled = !on;
+        $("btnUndo").disabled = !on;
+      }
+      function setMsg(html, ok) {
+        var m = $("msg");
+        m.className = "msg" + (ok ? " ok" : "");
+        m.innerHTML = html;
+      }
+      function currentProgress() { return progressPct(computeComponents()); }
+      function updateStats() {
+        $("statMistakes").textContent = S.mistakes + "/3";
+        $("statHints").textContent = S.hints;
+        var pct = S.over && S.won ? 100 : currentProgress();
+        $("statProgress").textContent = pct + "%";
+        $("progressFill").style.width = pct + "%";
+      }
+      function updateClock() {
+        var el = $("clock");
+        if (S.countdown) {
+          var rem = Math.max(0, 300 - Math.floor(S.elapsedMs / 1000));
+          el.textContent = fmt(rem);
+          el.classList.toggle("low", S.started && !S.over && rem <= 30);
+        } else {
+          el.textContent = fmt(S.elapsedMs / 1000);
+          el.classList.remove("low");
+        }
+      }
+      function scoreNow() {
+        var sec = Math.floor(S.elapsedMs / 1000);
+        var base, timeLabel;
+        if (S.countdown) {
+          var rem = Math.max(0, 300 - sec);
+          base = 1000 + rem;
+          timeLabel = "time left +" + rem;
+        } else {
+          base = Math.max(200, 1000 - sec);
+          timeLabel = "time −" + (1000 - base);
+        }
+        var total = Math.max(0, base - 100 * S.hints - 50 * S.mistakes - 50 * S.restarts);
+        return { total: total, base: base, timeLabel: timeLabel, sec: sec };
+      }
+      function updatePreview() {
+        if (S.over) { $("preview").textContent = ""; return; }
+        var sc = scoreNow();
+        var when = S.countdown
+          ? "Time left " + fmt(Math.max(0, 300 - Math.floor(S.elapsedMs / 1000)))
+          : "Elapsed " + fmt(S.elapsedMs / 1000);
+        $("preview").textContent =
+          when + " · Progress " + currentProgress() + "% · Hints " + S.hints +
+          " · Mistakes " + S.mistakes + " · Restarts " + S.restarts +
+          " · Score if solved now: " + sc.total + " points (proposed scoring)";
+      }
+      function refreshAfterCuts() {
+        S.pending = null;
+        var comps = computeComponents();
+        var newly = refreshDetached(comps);
+        S.entering = false;
+        renderBoard(newly);
+        updateStats(); updatePreview();
+      }
+
+      /* ---------- timer ---------- */
+
+      function startClock() {
+        if (S.started || S.over) return;
+        S.started = true;
+        S.startTs = Date.now();
+        S.timer = setInterval(tick, 200);
+        tick();
+      }
+      function tick() {
+        if (!S.started || S.over) return;
+        S.elapsedMs = Date.now() - S.startTs;
+        updateClock(); updatePreview();
+        if (S.countdown && S.elapsedMs >= 300000) {
+          S.elapsedMs = 300000;
+          endRun(false, "timeout");
+        }
+      }
+      function stopClock() {
+        if (S.timer) { clearInterval(S.timer); S.timer = null; }
+        if (S.started) S.elapsedMs = Date.now() - S.startTs;
+      }
+
+      /* ---------- input: tap two points (v10) ----------
+         The freehand drag (v5-v9) is gone. It had to guess which grid
+         line a wobbly finger path meant, and every playtest found
+         another way the guess failed - the sideways slip, the notch
+         stall, the centre dead zone, the centreline rejection.
+         Tap-two-points never guesses: the player taps the exact grid
+         points a cut runs between, and the cut follows grid edges from
+         the first point to the second (the straightest route; a
+         turning cut is built by tapping the corner where it turns).
+         Tapping the same pair again removes the cut. A swipe still
+         works: its start and end points act as the two taps. */
+
+      function svgPoint(svg, evt) {
+        var r = svg.getBoundingClientRect();
+        var vb = svg.viewBox.baseVal;
+        /* The board svg fills its column (width AND height 100%), so the
+           element's box usually has a different aspect ratio than the
+           viewBox and the drawing is letterboxed inside it
+           (preserveAspectRatio "xMidYMid meet": scaled by the smaller
+           ratio, centred, empty bands on the other axis). The pointer
+           must be mapped through that letterbox, not linearly across
+           the whole element box - the linear mapping put every tap
+           whole cells away from the finger once the layout stretched. */
+        var s = Math.min(r.width / vb.width, r.height / vb.height);
+        if (!isFinite(s) || s <= 0) s = 1;
+        var ox = (r.width - vb.width * s) / 2;
+        var oy = (r.height - vb.height * s) / 2;
+        return [
+          (evt.clientX - r.left - ox) / s,
+          (evt.clientY - r.top - oy) / s
+        ];
+      }
+      function collectVertices() {
+        var map = new Map();
+        function add(v) { var k = vKey(v); if (!map.has(k)) map.set(k, v); }
+        S.edges.forEach(function (e) { add(e.a); add(e.b); });
+        S.boundarySegs.forEach(function (s) { add(s[0]); add(s[1]); });
+        return Array.from(map.values());
+      }
+      function snapVertex(pt) {
+        var best = null, bd = Infinity;
+        collectVertices().forEach(function (v) {
+          var p = toPx(v);
+          var d = (pt[0] - p[0]) * (pt[0] - p[0]) + (pt[1] - p[1]) * (pt[1] - p[1]);
+          if (d < bd) { bd = d; best = v; }
+        });
+        var maxD = S.scale * 0.85;
+        return bd <= maxD * maxD ? best : null;
+      }
+      function setTapStatus(t) { var el = $("tapStatus"); if (el) el.textContent = t || ""; }
+      function gcd2(a, b) { a = Math.abs(a); b = Math.abs(b); while (b) { var t = a % b; a = b; b = t; } return a || 1; }
+
+      /* The route between two tapped points. Dijkstra over (vertex,
+         incoming direction) with a turn penalty, so a straight line
+         stays straight rather than zigzagging.
+         v12: the graph now includes the shape's OUTLINE as well as the
+         cuttable (internal) edges. A convex corner vertex touches no
+         internal edge at all — the only lines there are the outline —
+         so in v10/v11 any tap pair involving a corner returned null
+         ("No grid line connects those two points") even though the
+         corner is a shown, tappable dot. Outline travel now costs 2.5x
+         per unit, so a genuine grid route always wins where one
+         exists, and only the internal edges of the winning route are
+         committed as the cut: tapping opposite corners of the square
+         now produces a stepped cut along the grid lines instead of
+         failing outright. Returns { edges, route, usedOutline }, or
+         null when no route exists or the best route uses no cuttable
+         edge at all (e.g. two points joined only by the outline). */
+      function findCutPath(a, b) {
+        var adj = new Map();
+        function link(from, to, k, outline) {
+          var kk = vKey(from);
+          if (!adj.has(kk)) adj.set(kk, []);
+          adj.get(kk).push({ to: to, k: k, outline: outline, dx: to[0] - from[0], dy: to[1] - from[1] });
+        }
+        S.edges.forEach(function (e, k) { link(e.a, e.b, k, false); link(e.b, e.a, k, false); });
+        S.boundarySegs.forEach(function (s) {
+          var k = eKey(s[0], s[1]);
+          link(s[0], s[1], k, true); link(s[1], s[0], k, true);
+        });
+        var startK = vKey(a), goalK = vKey(b);
+        if (!adj.has(startK) || !adj.has(goalK)) return null;
+        function dirKey(dx, dy) { var g = gcd2(dx, dy); return (dx / g) + "," + (dy / g); }
+        var dist = new Map(), prev = new Map(), pq = [];
+        var startState = startK + "|";
+        dist.set(startState, 0);
+        pq.push([0, startState]);
+        var goalState = null;
+        while (pq.length) {
+          var mi = 0;
+          for (var i = 1; i < pq.length; i++) if (pq[i][0] < pq[mi][0]) mi = i;
+          var top = pq.splice(mi, 1)[0];
+          var cost = top[0], state = top[1];
+          if (cost > (dist.get(state) || Infinity)) continue;
+          var parts = state.split("|");
+          var vk = parts[0], inDir = parts[1] || "";
+          if (vk === goalK) { goalState = state; break; }
+          (adj.get(vk) || []).forEach(function (e2) {
+            var len = Math.sqrt(e2.dx * e2.dx + e2.dy * e2.dy);
+            var dk = dirKey(e2.dx, e2.dy);
+            var turn = inDir && inDir !== dk ? 1.4 : 0;
+            var ns = vKey(e2.to) + "|" + dk;
+            var nc = cost + len * (e2.outline ? 2.5 : 1) + turn + 0.01;
+            if (nc < (dist.get(ns) || Infinity)) {
+              dist.set(ns, nc);
+              prev.set(ns, { from: state, k: e2.k, outline: e2.outline, to: e2.to });
+              pq.push([nc, ns]);
+            }
+          });
+        }
+        if (!goalState) return null;
+        var steps = [], cur = goalState;
+        while (cur !== startState) {
+          var p = prev.get(cur);
+          if (!p) return null;
+          steps.push(p);
+          cur = p.from;
+        }
+        steps.reverse();
+        var route = [a], edges = [], usedOutline = false;
+        steps.forEach(function (st) {
+          route.push(st.to);
+          if (st.outline) usedOutline = true;
+          else edges.push(st.k);
+        });
+        if (!edges.length) return null;
+        return { edges: edges, route: route, usedOutline: usedOutline };
+      }
+
+      function drawTapOverlay(hover, from) {
+        var host = document.getElementById("tapLayer");
+        if (!host) return;
+        host.innerHTML = "";
+        var anchor = from || S.pending;
+        if (!anchor) return;
+        var p1 = toPx(anchor);
+        if (hover && vKey(hover) !== vKey(anchor)) {
+          /* Preview the actual cut the second tap would make: the
+             routed internal edges only, drawn segment by segment, so a
+             cut that turns shows its turn before the tap lands. v12:
+             when no cut connects the points, NOTHING is drawn — the
+             old fallback drew a straight dashed line between the taps,
+             which on a corner-to-corner pair ran exactly through the
+             intermediate grid dots and made it look as if a diagonal
+             grid line connected them. It does not. */
+          var res = findCutPath(anchor, hover);
+          if (res && res.edges.length) {
+            for (var ri = 0; ri + 1 < res.route.length; ri++) {
+              if (!S.edges.has(eKey(res.route[ri], res.route[ri + 1]))) continue;
+              var q1 = toPx(res.route[ri]), q2 = toPx(res.route[ri + 1]);
+              host.appendChild(svgEl("line", { x1: q1[0], y1: q1[1], x2: q2[0], y2: q2[1], "class": "preview-line" }));
+            }
+          }
+        }
+        host.appendChild(svgEl("circle", { cx: p1[0], cy: p1[1], r: Math.max(7, S.scale * 0.11), "class": "pending-dot" }));
+      }
+
+      function handleTapVertex(v) {
+        if (!S.pending) {
+          S.pending = v;
+          if (S.svg) S.svg.classList.add("has-pending");
+          drawTapOverlay(null);
+          setTapStatus("First point set - tap the second point to make the cut.");
+          return;
+        }
+        if (vKey(v) === vKey(S.pending)) {
+          S.pending = null;
+          if (S.svg) S.svg.classList.remove("has-pending");
+          drawTapOverlay(null);
+          setTapStatus("Cut cancelled - tap a point to start again.");
+          return;
+        }
+        var res = findCutPath(S.pending, v);
+        if (!res || !res.edges.length) {
+          setTapStatus("No cut connects those two points — they are joined only by the shape's outline, and the outline is not a cut. Tap a different second point. (First point still set; tap it again to cancel.)");
+          return;
+        }
+        var path = res.edges;
+        startClock();
+        S.history.push(Array.from(S.cuts));
+        var allCut = path.every(function (k) { return S.cuts.has(k); });
+        path.forEach(function (k) { if (allCut) S.cuts.delete(k); else S.cuts.add(k); });
+        S.pending = null;
+        refreshAfterCuts();
+        setTapStatus(allCut ? "Cut removed." : (res.usedOutline ? "Cut made along the grid lines between those points — a corner sits on the outline, so the cut starts where the first grid line meets it. There is no diagonal grid line." : ""));
+      }
+
+      function attachPointer(svg) {
+        svg.addEventListener("pointerdown", function (e) {
+          if (S.over || !S.ready) return;
+          e.preventDefault();
+          try { svg.setPointerCapture(e.pointerId); } catch (err) {}
+          S.downPt = svgPoint(svg, e);
+          S.downSnap = snapVertex(S.downPt);
+          S.downTs = Date.now();
+        });
+        svg.addEventListener("pointermove", function (e) {
+          if (S.over || !S.ready) return;
+          var pt = svgPoint(svg, e);
+          if (S.downPt) {
+            if (S.downSnap) drawTapOverlay(snapVertex(pt), S.downSnap);
+            return;
+          }
+          if (S.pending) drawTapOverlay(snapVertex(pt), S.pending);
+        });
+        function finish(e) {
+          if (!S.downPt) return;
+          var downPt = S.downPt, downSnap = S.downSnap;
+          S.downPt = null; S.downSnap = null;
+          if (S.over || !S.ready) return;
+          var upPt = svgPoint(svg, e);
+          var upSnap = snapVertex(upPt);
+          var moved = Math.abs(upPt[0] - downPt[0]) + Math.abs(upPt[1] - downPt[1]) > 12;
+          if (moved) {
+            /* a swipe acts as its two end points tapped in order */
+            if (downSnap && upSnap && vKey(downSnap) !== vKey(upSnap)) {
+              S.pending = null;
+              if (S.svg) S.svg.classList.remove("has-pending");
+              S.pending = downSnap;
+              handleTapVertex(upSnap);
+            } else {
+              setTapStatus("That swipe did not start and end on grid points - tap the two points instead.");
+              drawTapOverlay(null);
+            }
+            return;
+          }
+          if (!upSnap) {
+            setTapStatus("That tap did not land on a grid point - tap one of the dots.");
+            return;
+          }
+          handleTapVertex(upSnap);
+        }
+        svg.addEventListener("pointerup", finish);
+        svg.addEventListener("pointercancel", function () {
+          S.downPt = null; S.downSnap = null;
+          drawTapOverlay(null);
+        });
+      }
+
+      /* ---------- undo / hint / restart ---------- */
+
+      function doUndo() {
+        if (S.over) return;
+        var prev = S.history.pop();
+        if (!prev) return;
+        S.cuts = new Set(prev);
+        refreshAfterCuts();
+      }
+      $("btnUndo").addEventListener("click", doUndo);
+      document.addEventListener("keydown", function (e) {
+        if (!S || S.over) return;
+        if ((e.ctrlKey || e.metaKey) && (e.key === "z" || e.key === "Z")) { e.preventDefault(); doUndo(); return; }
+        if (e.key === "u" || e.key === "U") doUndo();
+      });
+
+      $("btnHint").addEventListener("click", function () {
+        if (S.over || S.noHint) return;
+        var it = S.solCuts.values(), step;
+        var found = null;
+        while (!(step = it.next()).done) {
+          if (!S.cuts.has(step.value)) { found = step.value; break; }
+        }
+        if (found === null) {
+          /* player's cuts may differ from the stored solution and still win */
+          setMsg("No stored-solution cut is missing — your own division may still be valid. Press Check when the pieces look equal.", true);
+          return;
+        }
+        startClock();
+        S.history.push(Array.from(S.cuts));
+        S.cuts.add(found);
+        S.hints++;
+        refreshAfterCuts();
+        setMsg("", false);
+      });
+
+      $("btnRestart").addEventListener("click", function () {
+        if (S.over) { loadPreset(S.presetIdx); return; }
+        var untouched = !S.started && S.cuts.size === 0;
+        if (untouched) { resetRound(false); startEntranceCycle(); return; }
+        $("confirmBar").hidden = false;
+      });
+      $("btnCancelRestart").addEventListener("click", function () { $("confirmBar").hidden = true; });
+      $("btnConfirmRestart").addEventListener("click", function () {
+        S.restarts++;
+        var keep = S.restarts;
+        resetRound(false);
+        S.restarts = keep;
+        startEntranceCycle();
+        updateStats(); updatePreview();
+      });
+
+      /* ---------- validation (property-based: no stored answer) ---------- */
+
+      var D4 = [
+        [1, 0, 0, 1], [1, 0, 0, -1], [-1, 0, 0, 1], [-1, 0, 0, -1],
+        [0, 1, 1, 0], [0, 1, -1, 0], [0, -1, 1, 0], [0, -1, -1, 0]
+      ];
+      function canonOf(members) {
+        var best = null;
+        D4.forEach(function (m) {
+          var a = m[0], b = m[1], c = m[2], d = m[3], s;
+          if (S.diag) {
+            var tris = members.map(function (i) {
+              return S.units[i].map(function (p) { return [a * p[0] + b * p[1], c * p[0] + d * p[1]]; });
+            });
+            var mx = Infinity, my = Infinity;
+            tris.forEach(function (t) { t.forEach(function (p) { if (p[0] < mx) mx = p[0]; if (p[1] < my) my = p[1]; }); });
+            s = tris.map(function (t) {
+              return t.map(function (p) { return (p[0] - mx) + "," + (p[1] - my); }).sort().join(";");
+            }).sort().join("|");
+          } else {
+            var pts = members.map(function (i) {
+              var cell = S.units[i];
+              return [a * cell[0] + b * cell[1], c * cell[0] + d * cell[1]];
+            });
+            var nx = Math.min.apply(null, pts.map(function (p) { return p[0]; }));
+            var ny = Math.min.apply(null, pts.map(function (p) { return p[1]; }));
+            s = pts.map(function (p) { return (p[0] - nx) + "," + (p[1] - ny); }).sort().join(";");
+          }
+          if (best === null || s < best) best = s;
+        });
+        return best;
+      }
+      function pieceGivenCanon() {
+        if (!S.pieceGiven) return null;
+        var fake = S.units;
+        var saved = S.diag;
+        var pts = S.pieceGiven;
+        var best = null;
+        D4.forEach(function (m) {
+          var a = m[0], b = m[1], c = m[2], d = m[3];
+          var tr = pts.map(function (p) { return [a * p[0] + b * p[1], c * p[0] + d * p[1]]; });
+          var nx = Math.min.apply(null, tr.map(function (p) { return p[0]; }));
+          var ny = Math.min.apply(null, tr.map(function (p) { return p[1]; }));
+          var s = tr.map(function (p) { return (p[0] - nx) + "," + (p[1] - ny); }).sort().join(";");
+          if (best === null || s < best) best = s;
+        });
+        return best;
+      }
+
+      function validate() {
+        var comps = computeComponents();
+        var errs = [];
+        var word = S.diag ? "triangles" : "squares";
+        if (comps.length !== S.n) {
+          errs.push("You have " + comps.length + " piece" + (comps.length === 1 ? "" : "s") + " — the shape must be cut into exactly " + S.n);
+        }
+        var sizes = comps.map(function (m) { return m.length; });
+        var unequal = sizes.some(function (s) { return s !== sizes[0]; });
+        if (comps.length === S.n && unequal) {
+          errs.push("Pieces are not equal in size: " + sizes.join(", ") + " " + word);
+        }
+        if (comps.length === S.n && !unequal && S.preset.id !== "equal-area") {
+          var c0 = canonOf(comps[0]);
+          for (var r = 1; r < comps.length; r++) {
+            if (canonOf(comps[r]) !== c0) { errs.push("Pieces are the same size but not the same shape"); break; }
+          }
+          if (S.pieceGiven && pieceGivenCanon() !== c0) {
+            errs.push("Pieces do not match the ghost piece shape");
+          }
+        }
+        if (S.markKind) {
+          var glyph = S.markKind === "star" ? "★" : "🌳";
+          comps.forEach(function (members, pi) {
+            var c = 0;
+            members.forEach(function (i) { if (S.marks.get(i) === S.markKind) c++; });
+            if (c === 0) errs.push("Piece " + (pi + 1) + " has no " + glyph);
+            else if (c > 1) errs.push("Piece " + (pi + 1) + " has " + c + " " + glyph + "s");
+          });
+        }
+        return { errs: errs, comps: comps };
+      }
+
+      function equalityPct(comps) {
+        if (comps.length === 0) return 0;
+        var sizes = comps.map(function (m) { return m.length; });
+        var sizeRatio = Math.min.apply(null, sizes) / Math.max.apply(null, sizes);
+        var counts = {};
+        comps.forEach(function (m) { var c = canonOf(m); counts[c] = (counts[c] || 0) + 1; });
+        var best = 0;
+        for (var k in counts) if (counts[k] > best) best = counts[k];
+        var shapeFrac = best / comps.length;
+        return Math.round(100 * (0.5 * sizeRatio + 0.5 * shapeFrac));
+      }
+
+      /* ---------- check / end of run ---------- */
+
+      $("btnCheck").addEventListener("click", function () {
+        if (S.over) return;
+        startClock();
+        if (S.preset.equality) {
+          var comps = computeComponents();
+          if (comps.length !== S.n) {
+            /* SELF-CHECK (v9): this variant is no pass/fail, so an
+               incomplete Check must not cost a mistake or end the run.
+               Up to v8 it called registerMistake — three incomplete
+               Checks ended the run, and the player never got an
+               equality reading at all (the owner's screenshot: stuck
+               at 50% progress asking why they cannot check themself).
+               Instead, report the equality of the pieces formed so
+               far and what is still to do, and let the run continue.
+               Only a complete division ends the run, scored below. */
+            var pct = equalityPct(comps);
+            var shares = comps.map(function (m) { return Math.round(100 * m.length / S.units.length) + "%"; });
+            var note;
+            if (comps.length < S.n) {
+              var need = S.n - comps.length;
+              note = "You have " + comps.length + " piece" + (comps.length === 1 ? "" : "s") +
+                " (" + shares.join(" · ") + ") — cut " + need + " more piece" + (need === 1 ? "" : "s") +
+                " to reach " + S.n + ", then Check again to score the run.";
+            } else {
+              note = "You have " + comps.length + " pieces (" + shares.join(" · ") +
+                ") — more than the " + S.n + " needed. Undo a cut, or tap its two end points again to remove it, then Check again to score the run.";
+            }
+            setMsg("<strong>Self-check: your pieces so far are " + pct + "% equal.</strong> " + note, true);
+            return;
+          }
+          endRun(true, "equality", equalityPct(comps));
+          return;
+        }
+        var v = validate();
+        if (v.errs.length === 0) { endRun(true, "solved"); return; }
+        registerMistake(v.errs);
+      });
+
+      function registerMistake(errs) {
+        S.mistakes++;
+        updateStats(); updatePreview();
+        if (S.mistakes >= 3) { endRun(false, "mistakes"); return; }
+        setMsg("<strong>Not identical yet — mistake " + S.mistakes + " of 3 (−50):</strong><ul>" +
+          errs.map(function (e) { return "<li>" + e + "</li>"; }).join("") + "</ul>", false);
+      }
+
+      function endRun(won, reason, eqPct) {
+        stopClock();
+        S.over = true; S.won = won;
+        setControlsEnabled(false);
+        updateClock(); updatePreview(); updateStats();
+        var box = $("result");
+        box.innerHTML = "";
+        var h = document.createElement("h2");
+        var body = document.createElement("div");
+        if (won) {
+          setMsg("", false);
+          var sc = scoreNow();
+          var tooFast = S.elapsedMs < 2500;
+          var finalScore = sc.total;
+          h.textContent = reason === "equality" ? "Scored!" : "Solved — all pieces identical!";
+          if (S.hints > 0) {
+            var tag = document.createElement("span");
+            tag.className = "hint-label";
+            tag.textContent = "solved with hint";
+            h.appendChild(tag);
+          }
+          if (reason === "equality") {
+            var eq = document.createElement("p");
+            eq.innerHTML = "<strong>Equality score: " + eqPct + "%</strong> — points scale with how equal the pieces are.";
+            body.appendChild(eq);
+            finalScore = Math.max(0, Math.round(sc.total * eqPct / 100));
+          }
+          var big = document.createElement("div");
+          big.className = "score-big";
+          big.textContent = finalScore + " points";
+          var parts = ["Base 1,000", sc.timeLabel];
+          if (S.hints > 0) parts.push("hints −" + (100 * S.hints));
+          if (S.mistakes > 0) parts.push("mistakes −" + (50 * S.mistakes));
+          if (S.restarts > 0) parts.push("restarts −" + (50 * S.restarts));
+          if (reason === "equality") parts.push("× equality " + eqPct + "%");
+          var bd = document.createElement("p");
+          bd.className = "breakdown";
+          bd.textContent = parts.join(" · ") + " = " + finalScore;
+          var st = document.createElement("p");
+          st.textContent = "Time " + fmt(S.elapsedMs / 1000) + " · Mistakes " + S.mistakes +
+            " · Hints " + S.hints + " · Restarts " + S.restarts;
+          body.appendChild(big); body.appendChild(bd); body.appendChild(st);
+          if (tooFast) {
+            var tf = document.createElement("p");
+            tf.innerHTML = "<strong>Too fast — unranked (timing floor 2,500 ms).</strong> This score is practice only.";
+            body.appendChild(tf);
+          }
+        } else {
+          h.textContent = reason === "timeout" ? "Time up" : "Run over";
+          var lp = document.createElement("p");
+          lp.textContent = reason === "timeout"
+            ? "The 5:00 clock ran out before the shape was divided. No score saved."
+            : "Three wrong Checks end the run. No score saved.";
+          var st2 = document.createElement("p");
+          st2.textContent = "Time " + fmt(S.elapsedMs / 1000) + " · Mistakes " + S.mistakes +
+            " · Hints " + S.hints + " · Restarts " + S.restarts;
+          body.appendChild(lp); body.appendChild(st2);
+          setMsg("", false);
+        }
+        box.appendChild(h);
+        box.appendChild(body);
+        var btns = document.createElement("div");
+        btns.className = "rbtns";
+        var again = document.createElement("button");
+        again.type = "button"; again.className = "btn primary";
+        again.textContent = won ? "Play again" : "Restart";
+        again.addEventListener("click", function () { loadPreset(S.presetIdx); });
+        var next = document.createElement("button");
+        next.type = "button"; next.className = "btn";
+        next.textContent = "Next preset";
+        next.addEventListener("click", function () { loadPreset((S.presetIdx + 1) % PRESETS.length); });
+        btns.appendChild(again); btns.appendChild(next);
+        box.appendChild(btns);
+        box.hidden = false;
+      }
+
+      /* ---------- picker + boot ---------- */
+
+      (function buildPicker() {
+        var box = $("picker");
+        PRESETS.forEach(function (p, i) {
+          var btn = document.createElement("button");
+          btn.type = "button";
+          btn.className = "pick-btn";
+          btn.textContent = p.name;
+          btn.addEventListener("click", function () { loadPreset(i); });
+          box.appendChild(btn);
+        });
+      })();
+
+      loadPreset(0);
+    </script>
+  </body>
+</html>

@@ -844,3 +844,14 @@ The preset rules, score settings, and Easy daily eligibility are documented
 in [Sudoku](docs/puzzles/sudoku.md). Rev 6 accepts the existing checkpoint
 discard behavior for oversized stored logs. The owner authorized the source
 handoff to `origin/main`.
+
+## v1.4.9 Shape Division
+
+Revision 6 selects Classic, eight Batch A rule changes and Equality score.
+The family uses the centered RoundStage, an exact-cover fairness gate and
+one Classic-only board per UTC day. The owner authorized implementation
+and one scoped shared motion entry. See the [family design](docs/puzzles/shape-division.md)
+and the [Revision 6 brief](docs/briefs/v1.4.9-shape-division-codex-brief.md).
+
+Focused local verification passed for all ten presets. The implementation
+record and remaining verification limits are in `docs/CODEMAP.md`.

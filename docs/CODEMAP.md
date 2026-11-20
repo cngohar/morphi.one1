@@ -1657,3 +1657,43 @@ than 10,000 moves. For rules and operator settings, see
 [Sudoku](puzzles/sudoku.md). Focused proof is in the Sudoku unit, D1, Chromium,
 and vector tests.
 The owner authorized the Sudoku source handoff to `origin/main`.
+
+## v1.4.9 Shape Division
+
+The engine, manifest, scoring, messages, Game, View and motion adapter are in
+`src/lib/puzzles/shape-division/`. The baseline, eight Batch A rule changes
+and Equality-score preset use `shape-division-1`. The family has ten enabled
+presets, zero variant board groups and a Classic-only daily. The generated
+registry loads its View lazily and uses the shared centered RoundStage.
+The owner approved a scoped Shape Division entry in `src/lib/ui/motion.ts`.
+
+See `docs/puzzles/shape-division.md` and the Revision 6 brief. Focused tests
+live beside the engine and in `tests/integration/shape-division.test.ts`,
+`tests/e2e/shape-division.spec.ts` and the `--shape-division` vector runner.
+
+Focused verification on an isolated copy of `14ed815` plus the Shape Division
+changes passed 19 unit cases, 19 real-D1 cases and 13 single-worker Chromium
+cases. The browser suite used port 5177. It covered the production win at
+390×844, 844×390 and 1280×800, the square fixture's wrong Check, countdown loss,
+keyboard completion, motion, and the final move slot. The live detach capture
+showed a gap between the two lifted pieces.
+
+The six-runtime vector result contains 13 terminal rounds, 7 rejected logs,
+5 square routes and one blocked square partition. Fingerprint
+`05bc8a26e955855fc880ae6ebf46832db55ce74b65ef60cf16bd3ef6d8290f18`.
+Scoped formatting and ESLint, types (0 errors and warnings), architecture
+boundaries, production build and lazy isolation passed. Global lint stopped
+at formatting drift in existing files and isolated browser assets.
+
+Across 90 synthetic UTC dates, the local daily seed walk averaged 6.29
+attempts, with p95 16 and max 27. On a synthetic 48-cell board, exact-cover
+p95 was 5.86 ms for three-cell pieces and 22.36 ms for four-cell pieces, with
+30 runs each. These are local measurements. Practice can fall back to the
+validated seed-24 generation stream if it exhausts the initial 24 candidates.
+Daily issuance keeps walking seeds.
+
+Live-session checkpoint replay passed in D1. The existing PlaySession
+visibility handler can abandon ranked rounds when the page hides, so the
+evidence does not establish ranked browser reload recovery. Full verify and
+physical-device checks remain deferred. Local implementation awaits owner
+review.

@@ -173,6 +173,7 @@ export async function startRanked(
 	} catch {
 		throw new RunError('variant');
 	}
+	if (family === 'shape-division' && selected?.daily === false) throw new RunError('variant');
 	variant = selected?.id;
 	const policyPaths =
 		family === 'memory'

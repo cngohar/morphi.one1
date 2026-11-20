@@ -110,6 +110,7 @@ export interface PuzzleManifest {
 	rankedTiming: {
 		/** Null preserves the family's legacy timing for this variant. */
 		openingMs(result: ReplayedResult, variant?: string): number | null;
+		openingMsForSeed?(seed: string, variant?: string): number | null;
 		minimumSeconds(result: ReplayedResult, variant?: string): number;
 	} | null;
 	scoring: import('./scoring.js').ScoreDefinition;

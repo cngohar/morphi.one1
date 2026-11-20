@@ -11,5 +11,6 @@ export const familyIndex: readonly PuzzleFamilyEntry[] = [
 	{ id: 'light-bend', weight: 1, enabled: true, orientation: 'any', selectionOrder: 7 },
 	{ id: 'word-guess', weight: 1, enabled: true, orientation: 'any', selectionOrder: 8 },
 	{ id: 'one-line', weight: 1, enabled: true, orientation: 'any', selectionOrder: 9 },
-	{ id: 'sudoku', weight: 1, enabled: true, orientation: 'any', selectionOrder: 10 }
+	{ id: 'sudoku', weight: 1, enabled: true, orientation: 'any', selectionOrder: 10 },
+	{ id: 'shape-division', weight: 1, enabled: true, orientation: 'any', selectionOrder: 11 }
 ];

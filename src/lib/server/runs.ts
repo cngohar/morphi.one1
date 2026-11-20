@@ -355,7 +355,7 @@ export async function saveRun(
 		// Logged timeouts are valid only at the server-measured deadline.
 		const timeout =
 			run.rankedSession &&
-			(run.family === 'one-line' || run.family === 'sudoku') &&
+			(run.family === 'one-line' || run.family === 'sudoku' || run.family === 'shape-division') &&
 			run.moves.at(-1)?.action === 5;
 		const preflight = timeout
 			? null
@@ -366,12 +366,14 @@ export async function saveRun(
 					scoring.values,
 					run.variant
 				);
-		// A Sudoku timeout still receives the same fixed opening deduction as a win.
-		const openingMs = preflight
-			? (timing?.openingMs(preflight, run.variant) ?? null)
-			: run.family === 'sudoku'
-				? SUDOKU_ENTRANCE_MS
-				: 0;
+		// Seed-based entrances are the same for a completed board and a logged timeout.
+		const openingMs =
+			(run.rankedSession ? timing?.openingMsForSeed?.(run.seed, run.variant) : undefined) ??
+			(preflight
+				? (timing?.openingMs(preflight, run.variant) ?? null)
+				: run.family === 'sudoku'
+					? SUDOKU_ENTRANCE_MS
+					: 0);
 		const maxSeconds = puzzleVariant(run.family, run.variant)?.maxSeconds;
 		let gameplayMs = rankedWallMs;
 		if (run.rankedSession && maxSeconds !== undefined) {

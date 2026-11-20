@@ -4156,6 +4156,387 @@ const metadata = {
 			}
 		}
 	},
+	['shape-division']: {
+		engineVersion: 'shape-division-1',
+		scoring: {
+			version: 'brief-v1',
+			fields: [
+				'completionPoints',
+				'pointsPerSecond',
+				'timeFloorPoints',
+				'hintCost',
+				'hintSolvedRanks',
+				'hintCap',
+				'mistakeCost',
+				'mistakeLimit',
+				'restartCost',
+				'countdownBonusPerSecond'
+			],
+			defaults: {
+				completionPoints: 1000,
+				pointsPerSecond: 1,
+				timeFloorPoints: 200,
+				hintCost: 100,
+				hintSolvedRanks: 1,
+				hintCap: 3,
+				mistakeCost: 50,
+				mistakeLimit: 3,
+				restartCost: 50,
+				countdownBonusPerSecond: 1
+			}
+		},
+		variants: [
+			{
+				id: 'shape-division:classic',
+				name: 'variant.shape-division:classic',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				help: {
+					steps: [
+						'shape-division.rule.classic',
+						'shape-division.teach',
+						'shape-division.rule.congruence'
+					],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				}
+			},
+			{
+				id: 'shape-division:pieces-2',
+				name: 'variant.shape-division:pieces-2',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.pieces-2', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				}
+			},
+			{
+				id: 'shape-division:pieces-5',
+				name: 'variant.shape-division:pieces-5',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.pieces-5', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				}
+			},
+			{
+				id: 'shape-division:piece-size-4',
+				name: 'variant.shape-division:piece-size-4',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.piece-size-4', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				}
+			},
+			{
+				id: 'shape-division:equal-area',
+				name: 'variant.shape-division:equal-area',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.equal-area', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'ending.shape-division.equalArea' },
+					subline: { key: 'ending.shape-division.subline', values: ['pieces'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition: 'The player submits four pieces of equal area via Check.'
+				}
+			},
+			{
+				id: 'shape-division:one-tree',
+				name: 'variant.shape-division:one-tree',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.one-tree', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				}
+			},
+			{
+				id: 'shape-division:shape-given',
+				name: 'variant.shape-division:shape-given',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.shape-given', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				}
+			},
+			{
+				id: 'shape-division:countdown-300',
+				name: 'variant.shape-division:countdown-300',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.countdown-300', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				},
+				maxSeconds: 300
+			},
+			{
+				id: 'shape-division:no-hint',
+				name: 'variant.shape-division:no-hint',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.no-hint', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				}
+			},
+			{
+				id: 'shape-division:equality-score',
+				name: 'variant.shape-division:equality-score',
+				weight: 1,
+				enabled: true,
+				maxMoves: 10000,
+				daily: false,
+				help: {
+					steps: ['shape-division.rule.equality-score', 'shape-division.teach'],
+					rows: [
+						{
+							label: 'scoring.shape-division.completionPoints',
+							field: 'completionPoints',
+							sign: '+'
+						},
+						{
+							label: 'scoring.shape-division.pointsPerSecond',
+							field: 'pointsPerSecond',
+							sign: '−'
+						},
+						{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+						{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+						{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+					],
+					note: 'shape-division.help.note',
+					tips: 'shape-division.help.tips'
+				},
+				ending: {
+					kind: 'completion',
+					headlines: { default: 'ending.shape-division.equality' },
+					subline: { key: 'ending.shape-division.subline', values: ['pieces'] },
+					animation: 'fade-rise',
+					continue: 'auto_500ms',
+					condition: 'The player submits any complete 4-piece division via Check.'
+				}
+			}
+		],
+		ending: {
+			kind: 'completion',
+			headlines: { default: 'ending.shape-division.headline' },
+			subline: { key: 'ending.shape-division.subline', values: ['pieces'] },
+			animation: 'fade-rise',
+			continue: 'auto_500ms',
+			condition: 'The player submits a complete division of identical pieces via Check.'
+		},
+		presentation: {
+			name: 'v1.game.shape-division',
+			scoringLabels: {
+				completionPoints: 'scoring.shape-division.completionPoints',
+				pointsPerSecond: 'scoring.shape-division.pointsPerSecond',
+				timeFloorPoints: 'scoring.shape-division.timeFloorPoints',
+				hintCost: 'scoring.shape-division.hintCost',
+				hintSolvedRanks: 'scoring.shape-division.hintSolvedRanks',
+				hintCap: 'scoring.shape-division.hintCap',
+				mistakeCost: 'scoring.shape-division.mistakeCost',
+				mistakeLimit: 'scoring.shape-division.mistakeLimit',
+				restartCost: 'scoring.shape-division.restartCost',
+				countdownBonusPerSecond: 'scoring.shape-division.countdownBonusPerSecond'
+			},
+			help: {
+				steps: [
+					'shape-division.rule.classic',
+					'shape-division.teach',
+					'shape-division.rule.congruence'
+				],
+				rows: [
+					{
+						label: 'scoring.shape-division.completionPoints',
+						field: 'completionPoints',
+						sign: '+'
+					},
+					{ label: 'scoring.shape-division.pointsPerSecond', field: 'pointsPerSecond', sign: '−' },
+					{ label: 'scoring.shape-division.hintCost', field: 'hintCost', sign: '−' },
+					{ label: 'scoring.shape-division.mistakeCost', field: 'mistakeCost', sign: '−' },
+					{ label: 'scoring.shape-division.restartCost', field: 'restartCost', sign: '−' }
+				],
+				note: 'shape-division.help.note',
+				tips: 'shape-division.help.tips'
+			},
+			backdrop: {
+				items: [
+					{ id: 'cut-outline', path: 'M6 10H33V26H57V42H36V56H20V35H6ZM20 10V35M33 26H20M36 42V26' }
+				],
+				fill: 'outline'
+			}
+		}
+	},
 	['sudoku']: {
 		engineVersion: 'sudoku-1',
 		scoring: {

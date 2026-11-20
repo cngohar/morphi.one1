@@ -1,0 +1,635 @@
+{
+	"rounds": [
+		{
+			"seed": "24",
+			"variant": "shape-division:classic",
+			"board": "f3d20392a97e4a9f72d202acebbf3ef79f45750d04a110c441cf3b1fed142489",
+			"moves": [
+				{
+					"action": 3,
+					"first": 0,
+					"second": 0
+				},
+				{
+					"action": 0,
+					"first": 17,
+					"second": 25
+				},
+				{
+					"action": 0,
+					"first": 18,
+					"second": 26
+				},
+				{
+					"action": 0,
+					"first": 20,
+					"second": 21
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 890,
+				"won": true,
+				"pairs": null,
+				"moves": 5,
+				"hintUsed": true
+			}
+		},
+		{
+			"seed": "0",
+			"variant": "shape-division:pieces-2",
+			"board": "b66bf3202a0c46ebc0365bee04bc31e08268c2978bd58150e1f2169ff579af9d",
+			"moves": [
+				{
+					"action": 0,
+					"first": 7,
+					"second": 12
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 990,
+				"won": true,
+				"pairs": null,
+				"moves": 2,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "5",
+			"variant": "shape-division:pieces-5",
+			"board": "491caacee2e454bdb34de73fb0b841b4b01ffda46c7e0ebe22e0fe84bca8ca36",
+			"moves": [
+				{
+					"action": 0,
+					"first": 5,
+					"second": 14
+				},
+				{
+					"action": 0,
+					"first": 11,
+					"second": 12
+				},
+				{
+					"action": 0,
+					"first": 20,
+					"second": 21
+				},
+				{
+					"action": 0,
+					"first": 23,
+					"second": 32
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 990,
+				"won": true,
+				"pairs": null,
+				"moves": 5,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "2",
+			"variant": "shape-division:piece-size-4",
+			"board": "e676b9d42cdf510d0cbeb6dc7515a18024267ddcbb36e30595e5d6aa46ee1127",
+			"moves": [
+				{
+					"action": 0,
+					"first": 11,
+					"second": 19
+				},
+				{
+					"action": 0,
+					"first": 18,
+					"second": 19
+				},
+				{
+					"action": 0,
+					"first": 19,
+					"second": 20
+				},
+				{
+					"action": 0,
+					"first": 21,
+					"second": 22
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 990,
+				"won": true,
+				"pairs": null,
+				"moves": 5,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "4",
+			"variant": "shape-division:equal-area",
+			"board": "7a48d816355073338b09449344b77c0ebc48e6c6be06687497babfb83f0e2a8a",
+			"moves": [
+				{
+					"action": 0,
+					"first": 9,
+					"second": 10
+				},
+				{
+					"action": 0,
+					"first": 10,
+					"second": 11
+				},
+				{
+					"action": 0,
+					"first": 12,
+					"second": 20
+				},
+				{
+					"action": 0,
+					"first": 22,
+					"second": 30
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 990,
+				"won": true,
+				"pairs": null,
+				"moves": 5,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "12",
+			"variant": "shape-division:one-tree",
+			"board": "7d47921094356a0b2a73a896def7c5adb3453669e51ba432a9326d0ccf82be82",
+			"moves": [
+				{
+					"action": 0,
+					"first": 10,
+					"second": 11
+				},
+				{
+					"action": 0,
+					"first": 10,
+					"second": 16
+				},
+				{
+					"action": 0,
+					"first": 15,
+					"second": 16
+				},
+				{
+					"action": 0,
+					"first": 20,
+					"second": 26
+				},
+				{
+					"action": 0,
+					"first": 21,
+					"second": 22
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 990,
+				"won": true,
+				"pairs": null,
+				"moves": 6,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "shape-division:shape-given",
+			"board": "8bd912589e6b8db597241facb06540769238e6a6374597c22706cf03cebabb77",
+			"moves": [
+				{
+					"action": 0,
+					"first": 9,
+					"second": 16
+				},
+				{
+					"action": 0,
+					"first": 11,
+					"second": 18
+				},
+				{
+					"action": 0,
+					"first": 17,
+					"second": 18
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 990,
+				"won": true,
+				"pairs": null,
+				"moves": 4,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:countdown-300",
+			"board": "f3d20392a97e4a9f72d202acebbf3ef79f45750d04a110c441cf3b1fed142489",
+			"moves": [
+				{
+					"action": 0,
+					"first": 17,
+					"second": 25
+				},
+				{
+					"action": 0,
+					"first": 18,
+					"second": 26
+				},
+				{
+					"action": 0,
+					"first": 20,
+					"second": 21
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 1280,
+				"won": true,
+				"pairs": null,
+				"moves": 4,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:no-hint",
+			"board": "f3d20392a97e4a9f72d202acebbf3ef79f45750d04a110c441cf3b1fed142489",
+			"moves": [
+				{
+					"action": 0,
+					"first": 17,
+					"second": 25
+				},
+				{
+					"action": 0,
+					"first": 18,
+					"second": 26
+				},
+				{
+					"action": 0,
+					"first": 20,
+					"second": 21
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 990,
+				"won": true,
+				"pairs": null,
+				"moves": 4,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "shape-division:equality-score",
+			"board": "724b9bd72697075e3224170d04559722e55ed38d3edeb2cc1b981585eabe2da3",
+			"moves": [
+				{
+					"action": 0,
+					"first": 9,
+					"second": 16
+				},
+				{
+					"action": 0,
+					"first": 11,
+					"second": 18
+				},
+				{
+					"action": 0,
+					"first": 17,
+					"second": 18
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 990,
+				"won": true,
+				"pairs": null,
+				"moves": 4,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:classic",
+			"board": "f3d20392a97e4a9f72d202acebbf3ef79f45750d04a110c441cf3b1fed142489",
+			"moves": [
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 0,
+				"won": false,
+				"pairs": null,
+				"moves": 3,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:countdown-300",
+			"board": "f3d20392a97e4a9f72d202acebbf3ef79f45750d04a110c441cf3b1fed142489",
+			"moves": [
+				{
+					"action": 5,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 300,
+			"result": {
+				"score": 0,
+				"won": false,
+				"pairs": null,
+				"moves": 1,
+				"hintUsed": false
+			}
+		},
+		{
+			"seed": "1",
+			"variant": "shape-division:equality-score",
+			"board": "724b9bd72697075e3224170d04559722e55ed38d3edeb2cc1b981585eabe2da3",
+			"moves": [
+				{
+					"action": 0,
+					"first": 10,
+					"second": 17
+				},
+				{
+					"action": 0,
+					"first": 12,
+					"second": 19
+				},
+				{
+					"action": 0,
+					"first": 24,
+					"second": 25
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			],
+			"seconds": 10,
+			"result": {
+				"score": 495,
+				"won": true,
+				"pairs": null,
+				"moves": 4,
+				"hintUsed": false
+			}
+		}
+	],
+	"rejected": [
+		{
+			"seed": "24",
+			"variant": "shape-division:classic",
+			"seconds": 10,
+			"moves": [
+				{
+					"action": 0,
+					"first": 0,
+					"second": 999
+				}
+			]
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:classic",
+			"seconds": 10,
+			"moves": [
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0,
+					"extra": 1
+				}
+			]
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:no-hint",
+			"seconds": 10,
+			"moves": [
+				{
+					"action": 3,
+					"first": 0,
+					"second": 0
+				}
+			]
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:countdown-300",
+			"seconds": 299,
+			"moves": [
+				{
+					"action": 5,
+					"first": 0,
+					"second": 0
+				}
+			]
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:countdown-300",
+			"seconds": 303,
+			"moves": [
+				{
+					"action": 5,
+					"first": 0,
+					"second": 0
+				}
+			]
+		},
+		{
+			"seed": "24",
+			"variant": "shape-division:countdown-300",
+			"seconds": 300,
+			"moves": [
+				{
+					"action": 0,
+					"first": 17,
+					"second": 25
+				},
+				{
+					"action": 0,
+					"first": 18,
+					"second": 26
+				},
+				{
+					"action": 0,
+					"first": 20,
+					"second": 21
+				},
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			]
+		},
+		{
+			"seed": "1",
+			"variant": "shape-division:equality-score",
+			"seconds": 10,
+			"moves": [
+				{
+					"action": 2,
+					"first": 0,
+					"second": 0
+				}
+			]
+		}
+	],
+	"square": {
+		"blocked": [
+			{
+				"action": 0,
+				"first": 5,
+				"second": 9
+			},
+			{
+				"action": 0,
+				"first": 10,
+				"second": 14
+			},
+			{
+				"action": 0,
+				"first": 12,
+				"second": 22
+			},
+			{
+				"action": 2,
+				"first": 0,
+				"second": 0
+			}
+		],
+		"routes": [
+			{
+				"first": 0,
+				"second": 24,
+				"edges": [
+					[1, 6],
+					[6, 11],
+					[11, 16],
+					[16, 17],
+					[17, 18],
+					[18, 19]
+				]
+			},
+			{
+				"first": 24,
+				"second": 0,
+				"edges": [
+					[1, 6],
+					[6, 11],
+					[11, 16],
+					[16, 17],
+					[17, 18],
+					[18, 19]
+				]
+			},
+			{
+				"first": 0,
+				"second": 4,
+				"edges": null
+			},
+			{
+				"first": 2,
+				"second": 22,
+				"edges": [
+					[2, 7],
+					[7, 12],
+					[12, 17],
+					[17, 22]
+				]
+			},
+			{
+				"first": 0,
+				"second": 12,
+				"edges": [
+					[1, 6],
+					[6, 11],
+					[11, 12]
+				]
+			}
+		]
+	}
+}

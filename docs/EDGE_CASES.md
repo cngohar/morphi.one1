@@ -750,3 +750,30 @@ Chromium run. See [the phase report](PHASE_REPORTS.md).
 - Resize and rotation preserve the grid. Hidden-tab recovery retains moves.
   Missing motion settles the board and clears the input lock. Navigation
   cancels local motion and timers.
+
+## Shape Division (v1.4.9)
+
+- An unroutable pair and an unsubmitted endpoint leave the log and mistake count
+  alone. Straight, stepped and partial routes only draw interior edges. A swipe
+  logs one endpoint pair. Repeating the pair removes its cut. Rapid taps may
+  select points but cannot log the same cut twice.
+- An incomplete Check spends a mistake in pass/fail presets. Loss preserves
+  the cuts. Equality-score incomplete Check is free, including at the last
+  move slot. A zero mistake limit never ends the round. Undo is logged and
+  retains penalties. Restart logs the same board, keeps the timer and hints,
+  and clears mistakes and their deductions. An inconsistent or exhausted hint
+  charges nothing.
+- Countdown uses the original deadline across restarts. A pending endpoint is
+  discarded on timeout. Practice Check can win at whole second 299 and timeout
+  starts at second 300. The ranked harness uses exact elapsed milliseconds
+  including the card and seed-derived entrance. An early timeout is rejected.
+- Move 10,000 is reserved for a terminal Check or timeout. If neither can end
+  the round, Try another puzzle exits the attempt. Too many submitted moves
+  fail before abandonment. The checkpoint loader discards an over-cap log.
+  Test local recovery, server replay and resizing or hiding the active round.
+- A loss, an abandoned daily or a below-floor save spends the attempt. A
+  pre-midnight session can credit yesterday while live, until the 02:00 UTC
+  board freeze. Admin changes leave issued scores and pinned boards intact.
+- An Easy seed-walk exhaustion reports `daily_unavailable`. Only Classic can
+  issue a ranked session. Cover the alternate-shape rejection on the 4×4
+  square fixture and production wins on the generated 12-cell outline.

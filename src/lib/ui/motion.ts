@@ -259,6 +259,50 @@ export function cardProofMotion(
 }
 
 export const motion = {
+	shapeDivision(
+		node: SVGElement,
+		kind: 'entrance' | 'detach',
+		duration: number,
+		ready?: () => void,
+		lift?: SVGElement
+	) {
+		const preference = matchMedia('(prefers-reduced-motion: reduce)');
+		let animation: ReturnType<typeof animate> | ReturnType<typeof createTimeline> | undefined;
+		let done = false;
+		let timer: ReturnType<typeof setTimeout> | undefined;
+		const finish = () => {
+			if (done) return;
+			done = true;
+			clearTimeout(timer);
+			preference.removeEventListener('change', changed);
+			animation?.revert();
+			node.style.removeProperty('stroke-dasharray');
+			node.style.removeProperty('stroke-dashoffset');
+			ready?.();
+		};
+		const changed = () => {
+			if (preference.matches) finish();
+		};
+		try {
+			if (preference.matches) finish();
+			else {
+				preference.addEventListener('change', changed);
+				timer = setTimeout(finish, duration);
+				if (kind === 'entrance') {
+					const length = (node as SVGPathElement).getTotalLength();
+					node.style.strokeDasharray = String(length);
+					animation = animate(node, { strokeDashoffset: [length, 0], duration, ease: 'linear' });
+				} else if (lift) {
+					animation = createTimeline()
+						.add(node, { strokeWidth: [0, 12], duration, ease: 'outCubic' }, 0)
+						.add(lift, { translateY: [0, -2], duration, ease: 'outCubic' }, 0);
+				}
+			}
+		} catch {
+			finish();
+		}
+		return finish;
+	},
 	/** Connect's 2.5 s centre ripple and pair-by-pair dot arrival. Logical readiness is external. */
 	connectEnter(board: HTMLElement) {
 		let timeline: ReturnType<typeof createTimeline> | null = null;
